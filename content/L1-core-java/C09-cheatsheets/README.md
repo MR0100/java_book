@@ -1,0 +1,21 @@
+---
+title: "Core Java & OOP — Cheatsheets & Reference"
+slug: l1-cheatsheets
+level: L1
+module: "Core Java & OOP"
+section: "Cheatsheets & Reference"
+type: index
+difficulty: beginner
+order: 9
+tags: [section-index]
+prerequisites: []
+status: planned
+estimated_minutes: 3
+last_updated: 2026-05-29
+---
+
+# Core Java & OOP — Cheatsheets & Reference
+
+Cheatsheets and quick-reference material.
+
+[Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
