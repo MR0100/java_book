@@ -237,7 +237,7 @@ Beyond branch/merge/rebase, a handful of commands handle everyday situations:
 | `git bisect` | **binary-search** for the commit that introduced a bug (mark good/bad; Git checks out the midpoint; test; repeat — O(log n) tests) |
 | `git reflog` | a log of where `HEAD` has been — **recover "lost" commits** after a bad rebase/reset |
 | `git blame <file>` | annotate each line with the commit that last changed it (who/when/why) |
-| `git revert <commit>` | create a **new** commit that undoes a previous one — **safe for shared history** (vs `reset`, which rewrites) |
+| `git revert <commit>` | create a **new** commit that undoes a previous one — **safe for shared history** (vs `reset`, which rewrites). Reverting a **merge commit** needs `-m <parent#>` to pick the mainline parent — and note that re-merging that branch later won't restore the reverted changes (a classic footgun). |
 
 ```mermaid
 flowchart TB

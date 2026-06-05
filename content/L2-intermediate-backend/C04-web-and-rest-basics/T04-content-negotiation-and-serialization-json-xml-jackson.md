@@ -44,7 +44,7 @@ JSON (RFC 8259 / ECMA-404) has exactly six value types: **object**, **array**, *
 - **No date/time type** — dates are strings; standardize on **ISO 8601** (`2024-06-20T14:30:00Z`).
 - **No comments, no trailing commas** — strict JSON forbids both (JSON5/JSONC relax this for config files, not APIs).
 - **No `NaN`/`Infinity`** — not representable; Jackson can be configured to emit them but it's non-standard.
-- **Encoding is UTF-8**; **duplicate object keys** have undefined behaviour (last-wins in most parsers — a parser-differential security risk).
+- **Encoding is UTF-8**; **duplicate object keys** have undefined behaviour (last-wins in most parsers — a parser-differential security risk). **Jackson** accepts duplicates silently (last-wins) unless you enable `JsonReadFeature.STRICT_DUPLICATE_DETECTION` (or the parser feature `STRICT_DUPLICATE_DETECTION`) to reject them.
 
 ## Serialization Formats
 

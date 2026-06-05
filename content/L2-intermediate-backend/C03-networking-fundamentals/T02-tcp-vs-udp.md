@@ -92,7 +92,7 @@ flowchart LR
 
 ### Congestion Control
 
-Distinct from flow control: don't overrun **the network** (not just the receiver). TCP keeps a **congestion window** (`cwnd`) that starts small and grows — **slow start** (exponential growth) then **congestion avoidance** (**AIMD**: additive increase, and *multiplicative decrease* — halve the window — when loss signals congestion). This collective back-off is what keeps the internet from collapsing under load.
+Distinct from flow control: don't overrun **the network** (not just the receiver). TCP keeps a **congestion window** (`cwnd`) that starts small and grows — **slow start** (exponential growth) then **congestion avoidance** (**AIMD**: additive increase, and *multiplicative decrease* when loss signals congestion). This collective back-off is what keeps the internet from collapsing under load. (The classic *halve-the-window* on loss is **TCP Reno**; modern Linux defaults to **CUBIC** — a cubic growth curve with a gentler ~0.7× cut — and **BBR** is increasingly used, modeling bandwidth/RTT instead of treating loss as the only congestion signal.)
 
 ### Teardown and Head-of-Line Blocking
 

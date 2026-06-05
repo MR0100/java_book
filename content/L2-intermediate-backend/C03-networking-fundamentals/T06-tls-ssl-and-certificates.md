@@ -49,7 +49,7 @@ sequenceDiagram
   S->>C: Application data (encrypted)
 ```
 
-TLS 1.3 completes in **1 RTT** (1.2 needed 2); **session resumption** and **0-RTT** let repeat visits skip most of it. The crucial idea is **hybrid crypto**:
+TLS 1.3 completes in **1 RTT** (1.2 needed 2); **session resumption** and **0-RTT** let repeat visits skip most of it. A subtle 1.3 improvement: once the key-share is exchanged, the rest of the server's flight — `EncryptedExtensions`, the **Certificate**, and `CertificateVerify` — is **encrypted** (in TLS 1.2 the certificate was sent in the clear). So a passive eavesdropper no longer sees *which* certificate/host you're talking to from the cert itself; only the **SNI** in the ClientHello still leaks the hostname (which **Encrypted Client Hello** aims to close — see [T04](./T04-dns-resolution-records.md)). The crucial idea is **hybrid crypto**:
 
 ```mermaid
 flowchart LR

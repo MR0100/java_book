@@ -68,7 +68,7 @@ The reason only one can win: the **classpath holds exactly one version of a clas
 Maven and Gradle choose **differently**, which is a real source of "works in Maven, breaks in Gradle" surprises.
 
 - **Maven — nearest wins.** The version at the **shortest path** from the root POM. On a depth tie, the **first declared** wins.
-- **Gradle — highest wins.** The **highest version number** requested anywhere in the graph, regardless of depth.
+- **Gradle — highest wins.** The **highest version number** requested anywhere in the graph, regardless of depth. (Gradle can also be told to *fail* instead of silently picking — `configurations.all { resolutionStrategy { failOnVersionConflict() } }` — a common CI hardening that surfaces conflicts at build time rather than as a runtime surprise.)
 
 Consider this graph — your app declares **D:1.0 directly** (depth 1) *and* transitively pulls **D:2.0 via A** (depth 2):
 

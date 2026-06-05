@@ -9,9 +9,9 @@ difficulty: advanced
 order: 1
 tags: [section-index]
 prerequisites: []
-status: planned
+status: in-progress
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-05
 ---
 
 # Advanced Java & the JVM — Concurrency & Multithreading
@@ -20,8 +20,8 @@ This section covers the topics below. Each `.md` file is created as the topic is
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
-| 01 | Threads & Runnable | `T01-threads-and-runnable.md` | planned |
-| 02 | Thread lifecycle & states | `T02-thread-lifecycle-and-states.md` | planned |
+| 01 | Threads & Runnable | [`T01-threads-and-runnable.md`](./T01-threads-and-runnable.md) | **complete** |
+| 02 | Thread lifecycle & states | [`T02-thread-lifecycle-and-states.md`](./T02-thread-lifecycle-and-states.md) | **complete** |
 | 03 | synchronized, monitors & intrinsic locks | `T03-synchronized-monitors-and-intrinsic-locks.md` | planned |
 | 04 | wait / notify / notifyAll | `T04-wait-notify-notifyall.md` | planned |
 | 05 | Executors & thread pools | `T05-executors-and-thread-pools.md` | planned |

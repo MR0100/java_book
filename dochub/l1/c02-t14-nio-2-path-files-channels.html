@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NIO.2 (Path, Files, channels) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">7</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link active" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">54</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">60</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">12</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">18</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">11</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">7</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧬</span><span>Ch. 3 · L1 — Core Java &amp; OOP</span></div><div class="chapter-path">content/L1-core-java/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l1/overview.html" data-q="l1 — core java &amp; oop content/l1-core-java/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · oop content/l1-core-java/c01-oop/readme.md content/l1-core-java/c01-oop/t01-classes-and-objects.md content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md content/l1-core-java/c01-oop/t04-inheritance-and-super.md content/l1-core-java/c01-oop/t05-method-overriding.md content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md content/l1-core-java/c01-oop/t14-record-types.md content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md content/l1-core-java/c01-oop/t16-packages-and-imports.md content/l1-core-java/c01-oop/t17-java-module-system-jpms.md content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><summary><span class="caret">▶</span><span>C01 · OOP</span></summary><ul class="pages"><li data-q="core java &amp; oop — object-oriented programming content/l1-core-java/c01-oop/readme.md"><a class="" href="../l1/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="classes &amp; objects content/l1-core-java/c01-oop/t01-classes-and-objects.md"><a class="" href="../l1/c01-t01-classes-and-objects.html"><span>Classes &amp; Objects</span><span class="kind-pill "></span></a></li><li data-q="fields, methods, constructors, this content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md"><a class="" href="../l1/c01-t02-fields-methods-constructors-this.html"><span>Fields, methods, constructors, this</span><span class="kind-pill "></span></a></li><li data-q="encapsulation &amp; access modifiers content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md"><a class="" href="../l1/c01-t03-encapsulation-and-access-modifiers.html"><span>Encapsulation &amp; access modifiers</span><span class="kind-pill "></span></a></li><li data-q="inheritance &amp; super content/l1-core-java/c01-oop/t04-inheritance-and-super.md"><a class="" href="../l1/c01-t04-inheritance-and-super.html"><span>Inheritance &amp; super</span><span class="kind-pill "></span></a></li><li data-q="method overriding content/l1-core-java/c01-oop/t05-method-overriding.md"><a class="" href="../l1/c01-t05-method-overriding.html"><span>Method overriding</span><span class="kind-pill "></span></a></li><li data-q="polymorphism (compile-time vs runtime) content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md"><a class="" href="../l1/c01-t06-polymorphism-compile-time-vs-runtime.html"><span>Polymorphism (compile-time vs runtime)</span><span class="kind-pill "></span></a></li><li data-q="abstraction &amp; abstract classes content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md"><a class="" href="../l1/c01-t07-abstraction-and-abstract-classes.html"><span>Abstraction &amp; abstract classes</span><span class="kind-pill "></span></a></li><li data-q="interfaces (default, static, private methods) content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md"><a class="" href="../l1/c01-t08-interfaces-default-static-private-methods.html"><span>Interfaces (default, static, private methods)</span><span class="kind-pill "></span></a></li><li data-q="object class &amp; its methods content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md"><a class="" href="../l1/c01-t09-object-class-and-its-methods.html"><span>Object class &amp; its methods</span><span class="kind-pill "></span></a></li><li data-q="equals, hashcode, tostring contracts content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md"><a class="" href="../l1/c01-t10-equals-hashcode-tostring-contracts.html"><span>equals, hashCode, toString contracts</span><span class="kind-pill "></span></a></li><li data-q="static members, blocks &amp; nested classes content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md"><a class="" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><span>static members, blocks &amp; nested classes</span><span class="kind-pill "></span></a></li><li data-q="inner, local &amp; anonymous classes content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md"><a class="" href="../l1/c01-t12-inner-local-and-anonymous-classes.html"><span>Inner, local &amp; anonymous classes</span><span class="kind-pill "></span></a></li><li data-q="enum types (with fields/methods) content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md"><a class="" href="../l1/c01-t13-enum-types-with-fields-methods.html"><span>enum types (with fields/methods)</span><span class="kind-pill "></span></a></li><li data-q="record types content/l1-core-java/c01-oop/t14-record-types.md"><a class="" href="../l1/c01-t14-record-types.html"><span>record types</span><span class="kind-pill "></span></a></li><li data-q="sealed classes &amp; interfaces content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md"><a class="" href="../l1/c01-t15-sealed-classes-and-interfaces.html"><span>Sealed classes &amp; interfaces</span><span class="kind-pill "></span></a></li><li data-q="packages &amp; imports content/l1-core-java/c01-oop/t16-packages-and-imports.md"><a class="" href="../l1/c01-t16-packages-and-imports.html"><span>Packages &amp; imports</span><span class="kind-pill "></span></a></li><li data-q="java module system (jpms) content/l1-core-java/c01-oop/t17-java-module-system-jpms.md"><a class="" href="../l1/c01-t17-java-module-system-jpms.html"><span>Java Module System (JPMS)</span><span class="kind-pill "></span></a></li><li data-q="object cloning &amp; cloneable content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md"><a class="" href="../l1/c01-t18-object-cloning-and-cloneable.html"><span>Object cloning &amp; Cloneable</span><span class="kind-pill "></span></a></li><li data-q="immutability &amp; immutable class design content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><a class="" href="../l1/c01-t19-immutability-and-immutable-class-design.html"><span>Immutability &amp; immutable class design</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · collections and core apis content/l1-core-java/c02-collections-and-core-apis/readme.md content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md content/l1-core-java/c02-collections-and-core-apis/t19-optional.md content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><summary><span class="caret">▶</span><span>C02 · Collections And Core APIs</span></summary><ul class="pages"><li data-q="core java &amp; oop — collections &amp; core apis content/l1-core-java/c02-collections-and-core-apis/readme.md"><a class="" href="../l1/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="collections framework overview content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md"><a class="" href="../l1/c02-t01-collections-framework-overview.html"><span>Collections framework overview</span><span class="kind-pill "></span></a></li><li data-q="list (arraylist, linkedlist) content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md"><a class="" href="../l1/c02-t02-list-arraylist-linkedlist.html"><span>List (ArrayList, LinkedList)</span><span class="kind-pill "></span></a></li><li data-q="set (hashset, linkedhashset, treeset) content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md"><a class="" href="../l1/c02-t03-set-hashset-linkedhashset-treeset.html"><span>Set (HashSet, LinkedHashSet, TreeSet)</span><span class="kind-pill "></span></a></li><li data-q="map (hashmap, linkedhashmap, treemap) content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md"><a class="" href="../l1/c02-t04-map-hashmap-linkedhashmap-treemap.html"><span>Map (HashMap, LinkedHashMap, TreeMap)</span><span class="kind-pill "></span></a></li><li data-q="queue, deque, priorityqueue, stack content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md"><a class="" href="../l1/c02-t05-queue-deque-priorityqueue-stack.html"><span>Queue, Deque, PriorityQueue, Stack</span><span class="kind-pill "></span></a></li><li data-q="iterators &amp; iterable content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md"><a class="" href="../l1/c02-t06-iterators-and-iterable.html"><span>Iterators &amp; Iterable</span><span class="kind-pill "></span></a></li><li data-q="comparable vs comparator content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md"><a class="" href="../l1/c02-t07-comparable-vs-comparator.html"><span>Comparable vs Comparator</span><span class="kind-pill "></span></a></li><li data-q="collection performance characteristics (big-o) content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md"><a class="" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><span>Collection Performance Characteristics (Big-O)</span><span class="kind-pill "></span></a></li><li data-q="exceptions: try/catch/finally, checked vs unchecked content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md"><a class="" href="../l1/c02-t09-exceptions-try-catch-finally-checked-vs-unchecked.html"><span>Exceptions: try/catch/finally, checked vs unchecked</span><span class="kind-pill "></span></a></li><li data-q="custom exceptions &amp; try-with-resources content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md"><a class="" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><span>Custom exceptions &amp; try-with-resources</span><span class="kind-pill "></span></a></li><li data-q="generics — basics content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md"><a class="" href="../l1/c02-t11-generics-basics.html"><span>Generics — basics</span><span class="kind-pill "></span></a></li><li data-q="generics — bounded types, wildcards, type erasure content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md"><a class="" href="../l1/c02-t12-generics-bounded-types-wildcards-type-erasure.html"><span>Generics — bounded types, wildcards, type erasure</span><span class="kind-pill "></span></a></li><li data-q="i/o streams (byte &amp; character) content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md"><a class="" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><span>I/O streams (byte &amp; character)</span><span class="kind-pill "></span></a></li><li data-q="nio.2 (path, files, channels) content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md"><a class="active" href="../l1/c02-t14-nio-2-path-files-channels.html"><span>NIO.2 (Path, Files, channels)</span><span class="kind-pill "></span></a></li><li data-q="date/time api (java.time) content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md"><a class="" href="../l1/c02-t15-date-time-api-java-time.html"><span>Date/Time API (java.time)</span><span class="kind-pill "></span></a></li><li data-q="regular expressions content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md"><a class="" href="../l1/c02-t16-regular-expressions.html"><span>Regular expressions</span><span class="kind-pill "></span></a></li><li data-q="reflection content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md"><a class="" href="../l1/c02-t17-reflection.html"><span>Reflection</span><span class="kind-pill "></span></a></li><li data-q="annotations (using &amp; writing meta-annotations) content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md"><a class="" href="../l1/c02-t18-annotations-using-and-writing-meta-annotations.html"><span>Annotations (using &amp; writing meta-annotations)</span><span class="kind-pill "></span></a></li><li data-q="optional content/l1-core-java/c02-collections-and-core-apis/t19-optional.md"><a class="" href="../l1/c02-t19-optional.html"><span>Optional</span><span class="kind-pill "></span></a></li><li data-q="math, bigdecimal / biginteger, random content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md"><a class="" href="../l1/c02-t20-math-bigdecimal-biginteger-random.html"><span>Math, BigDecimal / BigInteger, Random</span><span class="kind-pill "></span></a></li><li data-q="serialization &amp; deserialization content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md"><a class="" href="../l1/c02-t21-serialization-and-deserialization.html"><span>Serialization &amp; deserialization</span><span class="kind-pill "></span></a></li><li data-q="networking (socket, httpclient) content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md"><a class="" href="../l1/c02-t22-networking-socket-httpclient.html"><span>Networking (Socket, HttpClient)</span><span class="kind-pill "></span></a></li><li data-q="internationalization (i18n) &amp; formatting content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><a class="" href="../l1/c02-t23-internationalization-i18n-and-formatting.html"><span>Internationalization (i18n) &amp; formatting</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><summary><span class="caret">▶</span><span>C03 · Testing Fundamentals</span></summary><ul class="pages"><li data-q="core java &amp; oop — testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md"><a class="" href="../l1/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="unit testing with junit 5 content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><a class="" href="../l1/c03-t01-unit-testing-with-junit-5.html"><span>Unit testing with JUnit 5</span><span class="kind-pill "></span></a></li></ul></details><a class="mod-flat" href="../l1/c04-readme.html" data-q="core java &amp; oop — tools &amp; environment content/l1-core-java/c04-tools-and-environment/readme.md c04 · tools and environment"><span>C04 · Tools And Environment</span></a><a class="mod-flat" href="../l1/c05-readme.html" data-q="core java &amp; oop — hands-on content/l1-core-java/c05-hands-on/readme.md c05 · hands on"><span>C05 · Hands On</span></a><a class="mod-flat" href="../l1/c06-readme.html" data-q="core java &amp; oop — best practices &amp; pitfalls content/l1-core-java/c06-best-practices/readme.md c06 · best practices"><span>C06 · Best Practices</span></a><a class="mod-flat" href="../l1/c07-readme.html" data-q="core java &amp; oop — interview prep content/l1-core-java/c07-interview-prep/readme.md c07 · interview prep"><span>C07 · Interview Prep</span></a><a class="mod-flat" href="../l1/c08-readme.html" data-q="core java &amp; oop — q&amp;a / faq content/l1-core-java/c08-qa-faq/readme.md c08 · qa faq"><span>C08 · QA FAQ</span></a><a class="mod-flat" href="../l1/c09-readme.html" data-q="core java &amp; oop — cheatsheets &amp; reference content/l1-core-java/c09-cheatsheets/readme.md c09 · cheatsheets"><span>C09 · Cheatsheets</span></a><a class="mod-flat" href="../l1/c10-readme.html" data-q="core java &amp; oop — resources content/l1-core-java/c10-resources/readme.md c10 · resources"><span>C10 · Resources</span></a></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l1/index.html">L1 — Core Java &amp; OOP</a><span class="sep">/</span><span>NIO.2 (Path, Files, channels)</span></div>
+        <h1>NIO.2 (Path, Files, channels)</h1>
+        <div><span class="source-path">content/L1-core-java/C02-collections-and-core-apis/T14-nio-2-path-files-channels.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~60 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "NIO.2 (Path, Files, channels)"
+slug: nio-2-path-files-channels
+level: L1
+module: "Core Java &amp; OOP"
+section: "Collections &amp; Core APIs"
+type: concept
+difficulty: intermediate
+order: 14
+tags: [nio2, path, files, filechannel, bytebuffer, direct-buffer, memory-mapped-file, zero-copy, dma, walkfiletree, watchservice]
+prerequisites: [i-o-streams-byte-and-character, custom-exceptions-and-try-with-resources, collection-performance-characteristics-big-o, generics-bounded-types-wildcards-type-erasure, iterators-and-iterable]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="nio2-path-files-channels">NIO.2 (Path, Files, channels)</h1>
+<p><a href="c02-t13-i-o-streams-byte-and-character.html">T13</a> covered moving bytes and characters; this topic covers <strong>naming and managing the files themselves</strong>. The two together are Java's complete file story: streams for the <em>data</em>, NIO.2 for the <em>filesystem</em>. NIO.2 (Java 7, JSR 203) replaced the original <code>java.io.File</code> — a class so flawed that <code>file.delete()</code> returning <code>false</code> told you <em>nothing</em> about why it failed — with three things: <strong><code>Path</code></strong>, an immutable, manipulable representation of a file location; <strong><code>Files</code></strong>, a utility class of static methods that wrap T13's stream-and-charset boilerplate into one-line conveniences (<code>Files.readString</code>, <code>Files.lines</code>, <code>Files.copy</code>, <code>Files.walk</code>) <em>and</em> default to UTF-8, fixing the <code>FileReader</code> trap; and the lower-level <strong>channels and buffers</strong> (<code>FileChannel</code>, <code>ByteBuffer</code>) behind high-performance and memory-mapped I/O. For everyday file work, <code>Path</code> + <code>Files</code> is all you need; the channel layer is for when throughput matters.</p>
+<p>The depth bar is <strong>why direct and memory-mapped buffers exist — the copy that a heap buffer forces and a direct buffer avoids</strong>. When you read a file into a heap <code>ByteBuffer</code> (backed by a <code>byte[]</code> on the GC heap), the OS <em>cannot</em> transfer data straight into it, because a moving garbage collector can relocate that array mid-transfer — so the JVM reads into an off-heap staging buffer and then <strong>copies</strong> it onto the heap. A <strong>direct</strong> <code>ByteBuffer</code> lives off-heap and pinned, so the OS can <strong>DMA</strong> straight into it with no intermediate copy — which is why high-throughput libraries use them. A <strong>memory-mapped</strong> file goes further: <code>FileChannel.map</code> puts the file's pages directly into your process's virtual address space, so reading the buffer is just a memory access and the OS faults pages in lazily through its page cache — no <code>read()</code> syscalls at all. And <code>transferTo</code> can invoke the kernel's <strong>zero-copy</strong> <code>sendfile</code> to move a file to a socket without ever entering user space. By the end you will manipulate paths, use the <code>Files</code> conveniences, walk and watch directory trees, drive the <code>ByteBuffer</code> flip/clear cycle, and explain in terms of DMA and page faults why the buffer you choose changes how many times your data gets copied.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t13-i-o-streams-byte-and-character.html">I/O streams</a> (<code>L1/C02/T13</code>) — NIO.2 sits above these streams and <code>Files</code> wraps them; <a href="c02-t10-custom-exceptions-and-try-with-resources.html">try-with-resources</a> (<code>L1/C02/T10</code>) — the <code>Stream</code>-returning <code>Files</code> methods hold an open handle and must be closed; <a href="c02-t08-collection-performance-characteristics-big-o.html">Big-O / memory hierarchy</a> (<code>L1/C02/T08</code>) — direct buffers and <code>mmap</code> are about avoiding copies, the constant-factor lesson again; <a href="c02-t06-iterators-and-iterable.html">Iterators</a> (<code>L1/C02/T06</code>) — <code>Path</code> is <code>Iterable</code>, and <code>Files.walk</code> returns a lazy <code>Stream</code>. Forward: <a href="c02-t15-date-time-api-java-time.html">T15</a> (java.time), L3 (non-blocking socket channels &amp; selectors).</p></div></div>
+<h2 id="why-nio2-javaiofile-was-not-enough">Why NIO.2 — <code>java.io.File</code> Was Not Enough<a class="anchor" href="#why-nio2-javaiofile-was-not-enough" aria-hidden="true">#</a></h2>
+<p>The original <code>java.io.File</code> (1996) aged badly, and NIO.2 was the fix:</p>
+<div class="mermaid">flowchart TB
+  F["java.io.File — the problems"]
+  F --> P1["delete()/mkdir() return boolean → WHY it failed is lost"]
+  F --> P2["no symbolic-link support, thin metadata (no owner/permissions)"]
+  F --> P3["listFiles() loads the whole directory into an array — no lazy/recursive walk"]
+  F --> P4["no file-change notification, no atomic move, no pluggable filesystems"]
+  F -->|"NIO.2 (Java 7, JSR 203) fixes all of these"| N["Path + Files + channels"]
+</div>
+<p><code>Files</code> methods <strong>throw <code>IOException</code> with details</strong> instead of returning a bare <code>false</code>; <code>Path</code> understands symbolic links and rich attributes; <code>Files.walk</code> traverses lazily; <code>WatchService</code> notifies on changes; <code>Files.move</code> can be atomic; and <code>FileSystems</code> lets the same API drive a ZIP archive or an in-memory filesystem. Old <code>File</code> lingers only for interop (<code>file.toPath()</code> / <code>path.toFile()</code>).</p>
+<h2 id="path-an-abstract-immutable-location"><code>Path</code> — An Abstract, Immutable Location<a class="anchor" href="#path-an-abstract-immutable-location" aria-hidden="true">#</a></h2>
+<p>A <strong><code>Path</code></strong> represents a file location — <em>not necessarily an existing file</em>. It is immutable, so it's safe to share and use as a map key, and it does <strong>not touch the disk</strong> until you pass it to a <code>Files</code> method:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Path p = Path.of(&quot;/home&quot;, &quot;kgk&quot;, &quot;notes.txt&quot;);   // or Paths.get(...)
+p.getFileName();      // notes.txt
+p.getParent();        // /home/kgk
+p.resolve(&quot;draft&quot;);   // /home/kgk/notes.txt/draft  (join)
+Path base = Path.of(&quot;/home/kgk&quot;);
+base.relativize(Path.of(&quot;/home/kgk/docs/a.txt&quot;));  // docs/a.txt  (the inverse of resolve)
+Path.of(&quot;/a/./b/../c&quot;).normalize();                // /a/c        (remove . and ..)
+</code></pre></div>
+<p>The core operations are <strong><code>resolve</code></strong> (join a child onto a base — the inverse of which is <strong><code>relativize</code></strong>, the relative path from one to another) and <strong><code>normalize</code></strong> (collapse <code>.</code>/<code>..</code>). <code>resolveSibling</code> replaces the last element; <code>toAbsolutePath</code>/<code>toRealPath</code> make it absolute (the latter resolves symlinks and requires the file to exist). <code>Path</code> implements <code>Iterable&lt;Path&gt;</code> (iterate its name elements — <a href="c02-t06-iterators-and-iterable.html">T06</a>) and <code>Comparable&lt;Path&gt;</code>.</p>
+<div class="mermaid">flowchart LR
+  Base["/home/kgk"]
+  Base -->|"resolve('docs/a.txt')"| Joined["/home/kgk/docs/a.txt"]
+  Joined -->|"relativize from /home/kgk"| Rel["docs/a.txt (the inverse)"]
+  Dirty["/a/./b/../c"] -->|"normalize()"| Clean["/a/c"]
+</div>
+<h2 id="files-the-utility-class"><code>Files</code> — The Utility Class<a class="anchor" href="#files-the-utility-class" aria-hidden="true">#</a></h2>
+<p><code>Files</code> is a class of <strong>static methods</strong> operating on <code>Path</code>s, and it is where NIO.2 earns its keep. The conveniences collapse T13's three-layer decorator stacks into one call:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">String text   = Files.readString(path);                 // whole file → String (UTF-8 by default!)
+List&lt;String&gt; ls = Files.readAllLines(path);             // all lines
+byte[] bytes  = Files.readAllBytes(path);               // whole file → byte[]
+Files.writeString(path, &quot;hello&quot;);                       // String → file
+try (Stream&lt;String&gt; lines = Files.lines(path)) { ... }  // LAZY line stream — must close
+BufferedReader br = Files.newBufferedReader(path);      // T13's buffered+decoded reader, in one call
+</code></pre></div>
+<p>Beyond read/write it offers file operations that report failures as exceptions: <code>copy</code>/<code>move</code>/<code>delete</code> (with options like <code>REPLACE_EXISTING</code>, <code>ATOMIC_MOVE</code>, <code>COPY_ATTRIBUTES</code>), <code>createFile</code>/<code>createDirectories</code>/<code>createTempFile</code>, and queries <code>exists</code>/<code>isDirectory</code>/<code>size</code>/<code>getLastModifiedTime</code>/<code>probeContentType</code>. Crucially, <strong><code>Files.readString</code> and <code>newBufferedReader</code> default to UTF-8</strong> — the explicit fix for the <code>FileReader</code> default-charset trap from <a href="c02-t13-i-o-streams-byte-and-character.html">T13</a>.</p>
+<div class="mermaid">flowchart TB
+  Files["Files (static methods over Path)"]
+  Files --> RW["read/write: readString, lines, readAllBytes, writeString (UTF-8 default — fixes T13 trap)"]
+  Files --> Ops["copy / move / delete (+ REPLACE_EXISTING, ATOMIC_MOVE) — throw IOException with detail"]
+  Files --> Make["createDirectories, createTempFile"]
+  Files --> Meta["exists, size, isDirectory, readAttributes, probeContentType"]
+</div>
+<h2 id="directory-traversal">Directory Traversal<a class="anchor" href="#directory-traversal" aria-hidden="true">#</a></h2>
+<p>Reading a single file is easy; walking a tree is where <code>File</code> was worst and NIO.2 shines. Three lazy, <code>Stream</code>-based options plus a visitor:</p>
+<ul>
+<li><strong><code>Files.list(dir)</code></strong> → <code>Stream&lt;Path&gt;</code> of the immediate children (one level).</li>
+<li><strong><code>Files.walk(dir)</code></strong> → <code>Stream&lt;Path&gt;</code> of the whole subtree, depth-first (optional max depth).</li>
+<li><strong><code>Files.find(dir, depth, matcher)</code></strong> → <code>walk</code> + a predicate.</li>
+<li><strong><code>Files.walkFileTree(dir, visitor)</code></strong> → the <strong>visitor</strong> form: a <code>FileVisitor</code> with <code>preVisitDirectory</code>/<code>visitFile</code>/<code>visitFileFailed</code>/<code>postVisitDirectory</code>, each returning a <code>FileVisitResult</code> (<code>CONTINUE</code>/<code>SKIP_SUBTREE</code>/<code>TERMINATE</code>). Subclass <code>SimpleFileVisitor</code> and override what you need — this is how you recursively delete or copy a tree (delete files in <code>visitFile</code>, the now-empty dir in <code>postVisitDirectory</code>).</li>
+</ul>
+<div class="mermaid">flowchart TB
+  List["Files.list(dir): one level → Stream&lt;Path&gt;"]
+  Walk["Files.walk(dir): recursive, depth-first → Stream&lt;Path&gt;"]
+  Visit["Files.walkFileTree(dir, visitor): preVisit/visitFile/postVisit → recursive delete/copy"]
+  Note["all Stream-based ones hold an open handle → MUST try-with-resources"]
+  List --- Note
+  Walk --- Note
+</div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Close the <code>Stream</code> from <code>Files.lines</code>/<code>list</code>/<code>walk</code>/<code>find</code>.</strong> Unlike a <code>Stream</code> over a collection, these hold an <strong>open file/directory handle</strong>, and leaving them unclosed leaks file descriptors (the OS caps them). Always use <code>try</code>-with-resources (<a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>): <code>try (Stream&lt;Path&gt; s = Files.walk(dir)) { ... }</code>.</p></div></div>
+<p>The <strong><code>WatchService</code></strong> rounds out the API: register a directory for <code>ENTRY_CREATE</code>/<code>ENTRY_MODIFY</code>/<code>ENTRY_DELETE</code> events and <code>take()</code> the keys as changes happen (backed by OS facilities like <code>inotify</code>) — the basis of config hot-reload. And <strong><code>FileSystems.newFileSystem(zipPath)</code></strong> opens a ZIP/JAR <em>as a filesystem</em>, so the same <code>Path</code>/<code>Files</code> API reads entries inside it.</p>
+<h2 id="channels-and-bytebuffer-the-lower-level">Channels and <code>ByteBuffer</code> — The Lower Level<a class="anchor" href="#channels-and-bytebuffer-the-lower-level" aria-hidden="true">#</a></h2>
+<p>Beneath the conveniences, NIO works in terms of <strong>channels</strong> (connections to a file or socket) and <strong><code>ByteBuffer</code>s</strong> (fixed-capacity buffers you read into and write out of). A <code>ByteBuffer</code> has four markers — <code>capacity</code> (size), <code>position</code> (next index), <code>limit</code> (first index off-limits), and <code>mark</code> — and the famous <strong>flip/clear</strong> cycle switches it between filling and draining:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ByteBuffer buf = ByteBuffer.allocate(1024);
+channel.read(buf);     // FILL: position advances as bytes arrive
+buf.flip();            // SWITCH TO READ: limit = position, position = 0
+while (buf.hasRemaining()) process(buf.get());   // DRAIN: position advances to limit
+buf.clear();           // RESET TO FILL: position = 0, limit = capacity
+</code></pre></div>
+<p>The mental model is <strong>fill → flip → drain → clear</strong>. <code>flip()</code> prepares a just-filled buffer for reading; <code>clear()</code> prepares a drained buffer for the next fill; <code>compact()</code> keeps unread bytes; <code>rewind()</code> re-reads. A <code>ByteBuffer</code> also carries a <strong>byte order</strong> (<code>ByteOrder.BIG_ENDIAN</code>/<code>LITTLE_ENDIAN</code> — the endianness from L0), so <code>getInt()</code> decodes multi-byte values correctly.</p>
+<div class="mermaid">flowchart LR
+  Fill["FILL: channel.read(buf) → position moves up"]
+  Fill -->|"flip(): limit=position, position=0"| Drain["DRAIN: buf.get() → position moves to limit"]
+  Drain -->|"clear(): position=0, limit=capacity"| Fill
+  Note["fill → flip → drain → clear"]
+</div>
+<h2 id="memory-path-objects-heap-vs-direct-buffers-mapped-files">Memory — Path Objects, Heap vs Direct Buffers, Mapped Files<a class="anchor" href="#memory-path-objects-heap-vs-direct-buffers-mapped-files" aria-hidden="true">#</a></h2>
+<p>A <code>Path</code> is a small immutable object: the Unix implementation (<code>sun.nio.fs.UnixPath</code>) holds a <code>byte[]</code> of the path's bytes plus offsets to each name element; the Windows one holds a <code>String</code>. It carries no file content and touches no disk. <code>BasicFileAttributes</code> is a small snapshot (creation/modified/access times, size, flags) materialized by one <code>stat</code> call.</p>
+<p>The interesting memory is the <code>ByteBuffer</code>, which comes in two kinds:</p>
+<ul>
+<li><strong>Heap buffer</strong> (<code>ByteBuffer.allocate(n)</code>) — a Java object wrapping a <code>byte[]</code> <strong>on the GC heap</strong>, plus the position/limit/capacity/mark ints. Allocates fast, is scanned and movable by the GC.</li>
+<li><strong>Direct buffer</strong> (<code>ByteBuffer.allocateDirect(n)</code>) — a <code>DirectByteBuffer</code> holding a <strong>native memory address</strong> to an <strong>off-heap</strong> allocation (outside the GC heap). It is not moved or scanned by the GC and is freed <em>non-deterministically</em> by a <code>Cleaner</code> when the buffer is collected — so allocating many is a native-memory leak risk; pool them.</li>
+</ul>
+<p>A <strong><code>MappedByteBuffer</code></strong> (from <code>FileChannel.map</code>) is a direct buffer whose memory <strong>is the file's pages</strong> mapped into the process address space — there is no separate buffer to copy into; touching the buffer touches the file's page cache.</p>
+<div class="mermaid">flowchart TB
+  Heap["HEAP buffer: byte[] on the GC heap — fast alloc, GC-movable/scanned"]
+  Direct["DIRECT buffer: off-heap native memory + an address — GC can't move it; freed by a Cleaner (leak risk)"]
+  Mapped["MAPPED buffer: the FILE'S pages in your address space — no separate buffer at all"]
+</div>
+<h2 id="architecture-the-copy-a-direct-buffer-avoids">Architecture — The Copy a Direct Buffer Avoids<a class="anchor" href="#architecture-the-copy-a-direct-buffer-avoids" aria-hidden="true">#</a></h2>
+<p>Here is the payoff. When you read a file into a <strong>heap</strong> <code>ByteBuffer</code>, the OS cannot transfer data straight into it: a <strong>moving garbage collector</strong> may relocate the backing <code>byte[]</code> mid-transfer, which would corrupt the read. So the JVM reads into a temporary <strong>off-heap</strong> buffer and then <strong>copies</strong> those bytes onto the heap — an extra copy on every operation. A <strong>direct</strong> buffer is already off-heap and pinned, so the OS can <strong>DMA</strong> (direct memory access — the device writes to memory without the CPU) straight into it: <strong>no intermediate copy</strong>. That single avoided copy is why throughput-critical libraries (Netty, NIO servers) use direct buffers, accepting their slower allocation and <code>Cleaner</code>-based freeing.</p>
+<div class="mermaid">flowchart TB
+  HeapR["read into a HEAP buffer: OS → off-heap staging buffer → COPY → your byte[] (GC can't be DMA'd into)"]
+  DirectR["read into a DIRECT buffer: OS DMAs straight into off-heap memory → NO extra copy"]
+  HeapR -.->|"direct buffers exist to remove this copy"| DirectR
+</div>
+<p>Two further optimizations build on this. <strong>Zero-copy <code>transferTo</code></strong>: <code>FileChannel.transferTo(pos, count, socketChannel)</code> asks the kernel to copy file pages <strong>directly to the socket</strong> via <code>sendfile(2)</code> — the data never enters user space, eliminating two copies and two context switches (this is the "zero-copy" mentioned in <a href="c02-t13-i-o-streams-byte-and-character.html">T13</a>, and how web servers ship static files fast).</p>
+<div class="mermaid">flowchart TB
+  Norm["NORMAL copy: disk → kernel buffer → COPY to user buffer → COPY to socket buffer → NIC (2 copies, 2 context switches)"]
+  Zero["transferTo / sendfile: disk → kernel → NIC, staying in the kernel (0 user-space copies)"]
+  Norm -.->|"transferTo eliminates the user-space round trip"| Zero
+</div>
+<p><strong>Memory-mapped files</strong>: <code>FileChannel.map</code> maps the file's pages into virtual memory, so after the (cheap) mapping there are <strong>no <code>read</code>/<code>write</code> syscalls</strong> — accessing the <code>MappedByteBuffer</code> is plain memory access, and the OS <strong>lazily page-faults</strong> file pages in and writes dirty pages back through its page cache. This makes random access cheap, lets multiple processes share one copy, and handles files larger than RAM (only touched pages load) — at the cost of page-fault latency on first touch and <code>force()</code> to control when writes hit disk. It is how databases and search engines (Lucene) get their file performance.</p>
+<div class="mermaid">flowchart LR
+  MM["FileChannel.map(file)"]
+  MM --> VM["file pages mapped into VIRTUAL memory — no read()/write() syscalls"]
+  VM --> Fault["touch a page → OS PAGE-FAULTS it in from the page cache (lazy)"]
+  Fault --> Use["random access = memory access; files &gt; RAM work; shared across processes"]
+</div>
+<h2 id="cross-language-perspective">Cross-Language Perspective<a class="anchor" href="#cross-language-perspective" aria-hidden="true">#</a></h2>
+<p>Every modern language has made the same two moves NIO.2 made — from string paths to a <code>Path</code> <em>object</em>, and from C-ish file functions to a rich library — and they all expose memory-mapping:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Path object</th>
+<th>File ops</th>
+<th>Memory-map</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td><code>Path</code> (<code>resolve</code>, <code>relativize</code>)</td>
+<td><code>Files</code> (static)</td>
+<td><code>FileChannel.map</code> → <code>MappedByteBuffer</code></td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td><code>pathlib.Path</code> (<code>/</code> operator)</td>
+<td><code>os</code> / <code>shutil</code> / <code>Path.read_text</code></td>
+<td><code>mmap</code> module</td>
+</tr>
+<tr>
+<td><strong>C#</strong></td>
+<td><code>Path</code>/<code>FileInfo</code>/<code>DirectoryInfo</code></td>
+<td><code>File</code> / <code>Directory</code> (static)</td>
+<td><code>MemoryMappedFile</code></td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td><code>Path</code> / <code>PathBuf</code></td>
+<td><code>std::fs</code></td>
+<td><code>memmap2</code> crate</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td><code>path/filepath</code></td>
+<td><code>os</code></td>
+<td><code>syscall.Mmap</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The standout parallel is <strong>Python's <code>pathlib</code></strong>, the direct twin of NIO.2's <code>Path</code>: object-oriented paths with the <code>/</code> operator overloaded for <code>resolve</code> (<code>Path("home") / "kgk" / "notes.txt"</code>), <code>.name</code>/<code>.parent</code>/<code>.suffix</code> like <code>getFileName</code>/<code>getParent</code>, <code>.read_text()</code>/<code>.write_text()</code> mirroring <code>Files.readString</code>/<code>writeString</code>, and <code>.glob()</code>/<code>.rglob()</code> mirroring <code>Files.find</code>/<code>walk</code>. Python's journey from <code>os.path</code> (string functions) to <code>pathlib</code> (objects) is <strong>exactly</strong> Java's <code>File</code> → <code>Path</code> evolution, a decade apart. C# has the same split (<code>Path</code> string ops + <code>File</code>/<code>Directory</code> operations + <code>FileInfo</code> objects), Rust mirrors <code>&amp;str</code>/<code>String</code> with <code>&amp;Path</code>/<code>PathBuf</code>, and <code>mmap</code> is a universal OS primitive every language surfaces. The consensus is settled: <strong>an immutable <code>Path</code> object plus a convenience library plus memory-mapping</strong> — and NIO.2 (2011) was Java catching up to it.</p>
+<div class="mermaid">flowchart LR
+  Old["string paths + C-ish file functions (Java File, Python os.path)"]
+  Old -->|"universal evolution"| New["immutable Path OBJECT + convenience library + mmap"]
+  New --> Ex["Java Path/Files · Python pathlib · C# FileInfo · Rust PathBuf · Go filepath"]
+</div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Still using <code>java.io.File</code>.</strong> New code should use <code>Path</code>/<code>Files</code> — better error reporting (exceptions, not <code>false</code>), symlinks, rich attributes, lazy traversal, atomic ops. Convert legacy <code>File</code> with <code>file.toPath()</code>.</p><p>[!WARNING]
+<strong>Not closing a <code>Files.lines</code>/<code>walk</code>/<code>list</code> stream.</strong> These hold an open file/directory handle; leaking them exhausts the OS's file-descriptor limit. Always <code>try</code>-with-resources them (<a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>).</p>
+<p>[!WARNING]
+<strong><code>readAllBytes</code>/<code>readString</code> on a huge file.</strong> They load the entire file into memory — an <code>OutOfMemoryError</code> waiting to happen. Stream it with <code>Files.lines</code> or a <code>BufferedReader</code> instead.</p>
+<p>[!WARNING]
+<strong>Confusing <code>resolve</code> with <code>resolveSibling</code>, or misusing <code>relativize</code>.</strong> <code>resolve</code> appends a child; <code>resolveSibling</code> replaces the last element. <code>relativize</code> requires both paths to be the same type (both absolute or both relative) or it throws.</p>
+<p>[!WARNING]
+<strong>Leaking direct buffers.</strong> Direct/off-heap buffers are freed non-deterministically by a <code>Cleaner</code>, so allocating many small ones leaks native memory and can crash the process. Allocate few, large, and pooled.</p>
+<p>[!WARNING]
+<strong>Assuming a mapped write is on disk.</strong> A <code>MappedByteBuffer</code> write goes to the page cache; the OS flushes lazily. Call <code>force()</code> when you need durability, and remember <code>Path</code> operations never touch the disk at all — only <code>Files</code> calls do.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>Common interview questions for this topic:
+1. <strong>Why NIO.2 over <code>java.io.File</code>?</strong> Exceptions with detail (not booleans), symlinks, rich attributes, lazy/recursive traversal, atomic operations, a watch service, and pluggable filesystems.
+2. <strong>What is a <code>Path</code>?</strong> An immutable, abstract file location (not necessarily existing); manipulated with <code>resolve</code>/<code>relativize</code>/<code>normalize</code>; it touches the disk only via <code>Files</code>.
+3. <strong><code>resolve</code> vs <code>relativize</code>?</strong> <code>resolve</code> joins a child onto a base; <code>relativize</code> is the inverse — the relative path from one to another.
+4. <strong>What does <code>Files</code> add over streams?</strong> One-call read/write (<code>readString</code>, <code>lines</code>, <code>readAllBytes</code>), <code>copy</code>/<code>move</code>/<code>delete</code> with options, traversal, attributes — and UTF-8 by default, fixing the <code>FileReader</code> trap.
+5. <strong>How do you walk a directory tree?</strong> <code>Files.walk</code> (lazy recursive <code>Stream</code>) or <code>Files.walkFileTree</code> (a <code>FileVisitor</code>); close the <code>Stream</code>-based ones.
+6. <strong>Why must you close <code>Files.lines</code>/<code>walk</code>?</strong> They hold an open handle; not closing leaks file descriptors. Use <code>try</code>-with-resources.
+7. <strong>Heap vs direct <code>ByteBuffer</code>?</strong> Heap is a <code>byte[]</code> on the GC heap; direct is off-heap native memory the OS can DMA into without an intermediate copy.
+8. <strong>Why does a direct buffer avoid a copy?</strong> A moving GC could relocate a heap <code>byte[]</code> mid-transfer, so the OS can't DMA into the heap — it stages off-heap and copies. A direct buffer is already off-heap, so no copy.
+9. <strong>What is a memory-mapped file?</strong> <code>FileChannel.map</code> puts file pages into virtual memory; access is plain memory access and the OS page-faults pages in lazily — great for large, random, or shared access.
+10. <strong>What is zero-copy / <code>transferTo</code>?</strong> <code>FileChannel.transferTo</code> uses the kernel's <code>sendfile</code> to move file→socket without user-space buffers, removing copies and context switches.
+11. <strong>Explain the <code>ByteBuffer</code> flip/clear cycle.</strong> Fill (position advances), <code>flip()</code> to read (limit=position, position=0), drain, <code>clear()</code> to fill again.
+12. <strong>What is <code>WatchService</code>?</strong> OS-backed directory-change notification (create/modify/delete events).
+13. <strong>How do Python/C# compare?</strong> Python <code>pathlib.Path</code> (<code>/</code> operator, <code>read_text</code>) + <code>mmap</code>; C# <code>Path</code>/<code>File</code>/<code>FileInfo</code> + <code>MemoryMappedFile</code> — the same Path-object + convenience-library + memory-map consensus.</p></div></div>
+<ol>
+<li>
+<p><strong><code>Path</code> manipulation.</strong> Build paths with <code>Path.of</code>; exercise <code>resolve</code>, <code>relativize</code>, <code>normalize</code>, <code>getParent</code>, <code>getFileName</code>; confirm they work on nonexistent paths (no disk access).</p>
+</li>
+<li>
+<p><strong><code>readString</code>/<code>writeString</code>.</strong> Round-trip a non-ASCII string through <code>Files.writeString</code>/<code>readString</code>; confirm it survives — because <code>Files</code> defaults to UTF-8 (contrast the <a href="c02-t13-i-o-streams-byte-and-character.html">T13</a> <code>FileReader</code> trap).</p>
+</li>
+<li>
+<p><strong><code>Files.lines</code> stream.</strong> Read a file as a <code>Stream&lt;String&gt;</code> inside <code>try</code>-with-resources; filter and count lines; explain why the close matters.</p>
+</li>
+<li>
+<p><strong><code>Files.walk</code>.</strong> Walk a directory tree and collect every <code>*.java</code> file into a list; bound the depth.</p>
+</li>
+<li>
+<p><strong><code>copy</code>/<code>move</code>.</strong> Copy a file with <code>REPLACE_EXISTING</code>, then <code>move</code> it with <code>ATOMIC_MOVE</code>; observe the exception when the target exists without the option.</p>
+</li>
+<li>
+<p><strong>Attributes.</strong> Read a file's size and timestamps in one call via <code>Files.readAttributes(path, BasicFileAttributes.class)</code>.</p>
+</li>
+<li>
+<p><strong>Recursive delete.</strong> Implement a <code>SimpleFileVisitor</code> and <code>Files.walkFileTree</code> to delete a directory tree (files in <code>visitFile</code>, dirs in <code>postVisitDirectory</code>).</p>
+</li>
+<li>
+<p><strong><code>WatchService</code>.</strong> Register a directory and print <code>ENTRY_CREATE</code>/<code>MODIFY</code>/<code>DELETE</code> events as you touch files in it.</p>
+</li>
+<li>
+<p><strong>Heap vs direct buffer.</strong> Allocate a <code>ByteBuffer.allocate(n)</code> and a <code>ByteBuffer.allocateDirect(n)</code>; check <code>isDirect()</code>; discuss when each is appropriate.</p>
+</li>
+<li>
+<p><strong>flip/clear cycle.</strong> Write three <code>int</code>s into a <code>ByteBuffer</code>, <code>flip()</code>, read them back; then <code>clear()</code> and reuse. Print <code>position</code>/<code>limit</code> at each step.</p>
+</li>
+<li>
+<p><strong>Memory-mapped file.</strong> <code>FileChannel.map</code> a file as a <code>MappedByteBuffer</code>; read a byte, modify a byte, <code>force()</code> it; confirm the change on disk.</p>
+</li>
+<li>
+<p><strong><code>transferTo</code>.</strong> Copy a file using <code>FileChannel.transferTo</code> (or <code>Files.copy</code>); note that file→socket transfers can use OS zero-copy.</p>
+</li>
+<li>
+<p><strong>ZIP filesystem.</strong> Open a JAR with <code>FileSystems.newFileSystem</code> and list/read entries inside it using the same <code>Path</code>/<code>Files</code> API.</p>
+</li>
+<li>
+<p><strong>Old vs new.</strong> Take a <code>java.io.File</code>-based snippet (e.g. <code>file.delete()</code> with a boolean check) and rewrite it with <code>Files.delete</code>; compare the error reporting.</p>
+</li>
+<li>
+<p><strong>End-to-end explain-it-back.</strong> Reading a file into a heap <code>ByteBuffer</code> vs a direct one vs memory-mapping: (a) why the heap read forces an extra copy; (b) what DMA into a direct buffer avoids; (c) what <code>FileChannel.map</code> does differently and how page faults serve the data; (d) what <code>transferTo</code>/<code>sendfile</code> eliminates for file→socket; (e) the connection to the constant-factor/copy-avoidance lesson from <a href="c02-t08-collection-performance-characteristics-big-o.html">T08</a>/<a href="c02-t13-i-o-streams-byte-and-character.html">T13</a>. Twelve sentences max.</p>
+</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<p><strong>Language layer.</strong></p>
+<ul>
+<li>Explain why NIO.2 replaced <code>java.io.File</code>, and manipulate <code>Path</code>s with <code>resolve</code>/<code>relativize</code>/<code>normalize</code> (knowing they never touch the disk).</li>
+<li>Use <code>Files</code> conveniences (<code>readString</code>, <code>lines</code>, <code>writeString</code>, <code>copy</code>/<code>move</code>, <code>createDirectories</code>) — with UTF-8 by default — and traverse trees with <code>walk</code>/<code>walkFileTree</code>, closing the <code>Stream</code>-based ones.</li>
+<li>Drive a <code>ByteBuffer</code> through the fill→flip→drain→clear cycle and register a <code>WatchService</code>.</li>
+</ul>
+<p><strong>Memory layer.</strong></p>
+<ul>
+<li>Describe a <code>Path</code> as a small immutable object (no content, no disk), and distinguish a heap <code>ByteBuffer</code> (<code>byte[]</code> on the GC heap) from a direct one (off-heap, <code>Cleaner</code>-freed) and a mapped one (the file's pages).</li>
+</ul>
+<p><strong>Architecture layer.</strong></p>
+<ul>
+<li>Explain why a heap-buffer read forces an extra copy (a moving GC can't be DMA'd into) and a direct buffer avoids it, and what <code>transferTo</code>/<code>sendfile</code> zero-copy eliminates.</li>
+<li>Describe memory-mapped files (pages in virtual memory, lazy page faults via the page cache) and when they win, and connect all of it to the copy-avoidance/constant-factor lesson from <a href="c02-t08-collection-performance-characteristics-big-o.html">T08</a>/<a href="c02-t13-i-o-streams-byte-and-character.html">T13</a>.</li>
+<li>Recognize the OO-<code>Path</code> + convenience-library + memory-map design as the cross-language consensus (Python <code>pathlib</code>, C#, Rust, Go).</li>
+</ul>
+<p>This <strong>completes Java's file story</strong> — <a href="c02-t13-i-o-streams-byte-and-character.html">T13</a> streams for the bytes, T14 NIO.2 for the filesystem. The chapter now turns from <em>where data lives</em> to <em>what data is</em>, starting with the type every program gets wrong until it uses the right library: dates and times.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t15-date-time-api-java-time.html">Date/Time API (java.time)</a> — the modern temporal library, and one of the best-designed parts of the JDK. After files, the next perennially-hard data type is <strong>time</strong> — time zones, daylight saving, leap years, instants vs human calendars. Java's first two attempts (<code>java.util.Date</code> and <code>Calendar</code>) were notoriously broken — mutable, zero-based months, no time-zone clarity — and Java 8 replaced them with <strong><code>java.time</code></strong> (JSR 310, inspired by Joda-Time): an immutable, well-typed family — <code>Instant</code> (a machine timestamp), <code>LocalDate</code>/<code>LocalTime</code>/<code>LocalDateTime</code> (human date/time without a zone), <code>ZonedDateTime</code> (with a zone), <code>Duration</code>/<code>Period</code> (amounts of time), and <code>DateTimeFormatter</code>. T15 covers the model, the immutability-and-thread-safety payoff (the <a href="c01-t19-immutability-and-immutable-class-design.html">T19</a> lesson applied), and the byte-level representation of an instant.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;NIO.2 (Path, Files, channels)&quot;
+slug: nio-2-path-files-channels
+level: L1
+module: &quot;Core Java &amp; OOP&quot;
+section: &quot;Collections &amp; Core APIs&quot;
+type: concept
+difficulty: intermediate
+order: 14
+tags: [nio2, path, files, filechannel, bytebuffer, direct-buffer, memory-mapped-file, zero-copy, dma, walkfiletree, watchservice]
+prerequisites: [i-o-streams-byte-and-character, custom-exceptions-and-try-with-resources, collection-performance-characteristics-big-o, generics-bounded-types-wildcards-type-erasure, iterators-and-iterable]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04
+---
+
+# NIO.2 (Path, Files, channels)
+
+[T13](./T13-i-o-streams-byte-and-character.md) covered moving bytes and characters; this topic covers **naming and managing the files themselves**. The two together are Java&#x27;s complete file story: streams for the *data*, NIO.2 for the *filesystem*. NIO.2 (Java 7, JSR 203) replaced the original `java.io.File` — a class so flawed that `file.delete()` returning `false` told you *nothing* about why it failed — with three things: **`Path`**, an immutable, manipulable representation of a file location; **`Files`**, a utility class of static methods that wrap T13&#x27;s stream-and-charset boilerplate into one-line conveniences (`Files.readString`, `Files.lines`, `Files.copy`, `Files.walk`) *and* default to UTF-8, fixing the `FileReader` trap; and the lower-level **channels and buffers** (`FileChannel`, `ByteBuffer`) behind high-performance and memory-mapped I/O. For everyday file work, `Path` + `Files` is all you need; the channel layer is for when throughput matters.
+
+The depth bar is **why direct and memory-mapped buffers exist — the copy that a heap buffer forces and a direct buffer avoids**. When you read a file into a heap `ByteBuffer` (backed by a `byte[]` on the GC heap), the OS *cannot* transfer data straight into it, because a moving garbage collector can relocate that array mid-transfer — so the JVM reads into an off-heap staging buffer and then **copies** it onto the heap. A **direct** `ByteBuffer` lives off-heap and pinned, so the OS can **DMA** straight into it with no intermediate copy — which is why high-throughput libraries use them. A **memory-mapped** file goes further: `FileChannel.map` puts the file&#x27;s pages directly into your process&#x27;s virtual address space, so reading the buffer is just a memory access and the OS faults pages in lazily through its page cache — no `read()` syscalls at all. And `transferTo` can invoke the kernel&#x27;s **zero-copy** `sendfile` to move a file to a socket without ever entering user space. By the end you will manipulate paths, use the `Files` conveniences, walk and watch directory trees, drive the `ByteBuffer` flip/clear cycle, and explain in terms of DMA and page faults why the buffer you choose changes how many times your data gets copied.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [I/O streams](./T13-i-o-streams-byte-and-character.md) (`L1/C02/T13`) — NIO.2 sits above these streams and `Files` wraps them; [try-with-resources](./T10-custom-exceptions-and-try-with-resources.md) (`L1/C02/T10`) — the `Stream`-returning `Files` methods hold an open handle and must be closed; [Big-O / memory hierarchy](./T08-collection-performance-characteristics-big-o.md) (`L1/C02/T08`) — direct buffers and `mmap` are about avoiding copies, the constant-factor lesson again; [Iterators](./T06-iterators-and-iterable.md) (`L1/C02/T06`) — `Path` is `Iterable`, and `Files.walk` returns a lazy `Stream`. Forward: [T15](./T15-date-time-api-java-time.md) (java.time), L3 (non-blocking socket channels &amp; selectors).
+
+## Why NIO.2 — `java.io.File` Was Not Enough
+
+The original `java.io.File` (1996) aged badly, and NIO.2 was the fix:
+
+```mermaid
+flowchart TB
+  F[&quot;java.io.File — the problems&quot;]
+  F --&gt; P1[&quot;delete()/mkdir() return boolean → WHY it failed is lost&quot;]
+  F --&gt; P2[&quot;no symbolic-link support, thin metadata (no owner/permissions)&quot;]
+  F --&gt; P3[&quot;listFiles() loads the whole directory into an array — no lazy/recursive walk&quot;]
+  F --&gt; P4[&quot;no file-change notification, no atomic move, no pluggable filesystems&quot;]
+  F --&gt;|&quot;NIO.2 (Java 7, JSR 203) fixes all of these&quot;| N[&quot;Path + Files + channels&quot;]
+```
+
+`Files` methods **throw `IOException` with details** instead of returning a bare `false`; `Path` understands symbolic links and rich attributes; `Files.walk` traverses lazily; `WatchService` notifies on changes; `Files.move` can be atomic; and `FileSystems` lets the same API drive a ZIP archive or an in-memory filesystem. Old `File` lingers only for interop (`file.toPath()` / `path.toFile()`).
+
+## `Path` — An Abstract, Immutable Location
+
+A **`Path`** represents a file location — *not necessarily an existing file*. It is immutable, so it&#x27;s safe to share and use as a map key, and it does **not touch the disk** until you pass it to a `Files` method:
+
+```java
+Path p = Path.of(&quot;/home&quot;, &quot;kgk&quot;, &quot;notes.txt&quot;);   // or Paths.get(...)
+p.getFileName();      // notes.txt
+p.getParent();        // /home/kgk
+p.resolve(&quot;draft&quot;);   // /home/kgk/notes.txt/draft  (join)
+Path base = Path.of(&quot;/home/kgk&quot;);
+base.relativize(Path.of(&quot;/home/kgk/docs/a.txt&quot;));  // docs/a.txt  (the inverse of resolve)
+Path.of(&quot;/a/./b/../c&quot;).normalize();                // /a/c        (remove . and ..)
+```
+
+The core operations are **`resolve`** (join a child onto a base — the inverse of which is **`relativize`**, the relative path from one to another) and **`normalize`** (collapse `.`/`..`). `resolveSibling` replaces the last element; `toAbsolutePath`/`toRealPath` make it absolute (the latter resolves symlinks and requires the file to exist). `Path` implements `Iterable&lt;Path&gt;` (iterate its name elements — [T06](./T06-iterators-and-iterable.md)) and `Comparable&lt;Path&gt;`.
+
+```mermaid
+flowchart LR
+  Base[&quot;/home/kgk&quot;]
+  Base --&gt;|&quot;resolve(&#x27;docs/a.txt&#x27;)&quot;| Joined[&quot;/home/kgk/docs/a.txt&quot;]
+  Joined --&gt;|&quot;relativize from /home/kgk&quot;| Rel[&quot;docs/a.txt (the inverse)&quot;]
+  Dirty[&quot;/a/./b/../c&quot;] --&gt;|&quot;normalize()&quot;| Clean[&quot;/a/c&quot;]
+```
+
+## `Files` — The Utility Class
+
+`Files` is a class of **static methods** operating on `Path`s, and it is where NIO.2 earns its keep. The conveniences collapse T13&#x27;s three-layer decorator stacks into one call:
+
+```java
+String text   = Files.readString(path);                 // whole file → String (UTF-8 by default!)
+List&lt;String&gt; ls = Files.readAllLines(path);             // all lines
+byte[] bytes  = Files.readAllBytes(path);               // whole file → byte[]
+Files.writeString(path, &quot;hello&quot;);                       // String → file
+try (Stream&lt;String&gt; lines = Files.lines(path)) { ... }  // LAZY line stream — must close
+BufferedReader br = Files.newBufferedReader(path);      // T13&#x27;s buffered+decoded reader, in one call
+```
+
+Beyond read/write it offers file operations that report failures as exceptions: `copy`/`move`/`delete` (with options like `REPLACE_EXISTING`, `ATOMIC_MOVE`, `COPY_ATTRIBUTES`), `createFile`/`createDirectories`/`createTempFile`, and queries `exists`/`isDirectory`/`size`/`getLastModifiedTime`/`probeContentType`. Crucially, **`Files.readString` and `newBufferedReader` default to UTF-8** — the explicit fix for the `FileReader` default-charset trap from [T13](./T13-i-o-streams-byte-and-character.md).
+
+```mermaid
+flowchart TB
+  Files[&quot;Files (static methods over Path)&quot;]
+  Files --&gt; RW[&quot;read/write: readString, lines, readAllBytes, writeString (UTF-8 default — fixes T13 trap)&quot;]
+  Files --&gt; Ops[&quot;copy / move / delete (+ REPLACE_EXISTING, ATOMIC_MOVE) — throw IOException with detail&quot;]
+  Files --&gt; Make[&quot;createDirectories, createTempFile&quot;]
+  Files --&gt; Meta[&quot;exists, size, isDirectory, readAttributes, probeContentType&quot;]
+```
+
+## Directory Traversal
+
+Reading a single file is easy; walking a tree is where `File` was worst and NIO.2 shines. Three lazy, `Stream`-based options plus a visitor:
+
+- **`Files.list(dir)`** → `Stream&lt;Path&gt;` of the immediate children (one level).
+- **`Files.walk(dir)`** → `Stream&lt;Path&gt;` of the whole subtree, depth-first (optional max depth).
+- **`Files.find(dir, depth, matcher)`** → `walk` + a predicate.
+- **`Files.walkFileTree(dir, visitor)`** → the **visitor** form: a `FileVisitor` with `preVisitDirectory`/`visitFile`/`visitFileFailed`/`postVisitDirectory`, each returning a `FileVisitResult` (`CONTINUE`/`SKIP_SUBTREE`/`TERMINATE`). Subclass `SimpleFileVisitor` and override what you need — this is how you recursively delete or copy a tree (delete files in `visitFile`, the now-empty dir in `postVisitDirectory`).
+
+```mermaid
+flowchart TB
+  List[&quot;Files.list(dir): one level → Stream&amp;lt;Path&amp;gt;&quot;]
+  Walk[&quot;Files.walk(dir): recursive, depth-first → Stream&amp;lt;Path&amp;gt;&quot;]
+  Visit[&quot;Files.walkFileTree(dir, visitor): preVisit/visitFile/postVisit → recursive delete/copy&quot;]
+  Note[&quot;all Stream-based ones hold an open handle → MUST try-with-resources&quot;]
+  List --- Note
+  Walk --- Note
+```
+
+&gt; [!WARNING]
+&gt; **Close the `Stream` from `Files.lines`/`list`/`walk`/`find`.** Unlike a `Stream` over a collection, these hold an **open file/directory handle**, and leaving them unclosed leaks file descriptors (the OS caps them). Always use `try`-with-resources ([T10](./T10-custom-exceptions-and-try-with-resources.md)): `try (Stream&lt;Path&gt; s = Files.walk(dir)) { ... }`.
+
+The **`WatchService`** rounds out the API: register a directory for `ENTRY_CREATE`/`ENTRY_MODIFY`/`ENTRY_DELETE` events and `take()` the keys as changes happen (backed by OS facilities like `inotify`) — the basis of config hot-reload. And **`FileSystems.newFileSystem(zipPath)`** opens a ZIP/JAR *as a filesystem*, so the same `Path`/`Files` API reads entries inside it.
+
+## Channels and `ByteBuffer` — The Lower Level
+
+Beneath the conveniences, NIO works in terms of **channels** (connections to a file or socket) and **`ByteBuffer`s** (fixed-capacity buffers you read into and write out of). A `ByteBuffer` has four markers — `capacity` (size), `position` (next index), `limit` (first index off-limits), and `mark` — and the famous **flip/clear** cycle switches it between filling and draining:
+
+```java
+ByteBuffer buf = ByteBuffer.allocate(1024);
+channel.read(buf);     // FILL: position advances as bytes arrive
+buf.flip();            // SWITCH TO READ: limit = position, position = 0
+while (buf.hasRemaining()) process(buf.get());   // DRAIN: position advances to limit
+buf.clear();           // RESET TO FILL: position = 0, limit = capacity
+```
+
+The mental model is **fill → flip → drain → clear**. `flip()` prepares a just-filled buffer for reading; `clear()` prepares a drained buffer for the next fill; `compact()` keeps unread bytes; `rewind()` re-reads. A `ByteBuffer` also carries a **byte order** (`ByteOrder.BIG_ENDIAN`/`LITTLE_ENDIAN` — the endianness from L0), so `getInt()` decodes multi-byte values correctly.
+
+```mermaid
+flowchart LR
+  Fill[&quot;FILL: channel.read(buf) → position moves up&quot;]
+  Fill --&gt;|&quot;flip(): limit=position, position=0&quot;| Drain[&quot;DRAIN: buf.get() → position moves to limit&quot;]
+  Drain --&gt;|&quot;clear(): position=0, limit=capacity&quot;| Fill
+  Note[&quot;fill → flip → drain → clear&quot;]
+```
+
+## Memory — Path Objects, Heap vs Direct Buffers, Mapped Files
+
+A `Path` is a small immutable object: the Unix implementation (`sun.nio.fs.UnixPath`) holds a `byte[]` of the path&#x27;s bytes plus offsets to each name element; the Windows one holds a `String`. It carries no file content and touches no disk. `BasicFileAttributes` is a small snapshot (creation/modified/access times, size, flags) materialized by one `stat` call.
+
+The interesting memory is the `ByteBuffer`, which comes in two kinds:
+
+- **Heap buffer** (`ByteBuffer.allocate(n)`) — a Java object wrapping a `byte[]` **on the GC heap**, plus the position/limit/capacity/mark ints. Allocates fast, is scanned and movable by the GC.
+- **Direct buffer** (`ByteBuffer.allocateDirect(n)`) — a `DirectByteBuffer` holding a **native memory address** to an **off-heap** allocation (outside the GC heap). It is not moved or scanned by the GC and is freed *non-deterministically* by a `Cleaner` when the buffer is collected — so allocating many is a native-memory leak risk; pool them.
+
+A **`MappedByteBuffer`** (from `FileChannel.map`) is a direct buffer whose memory **is the file&#x27;s pages** mapped into the process address space — there is no separate buffer to copy into; touching the buffer touches the file&#x27;s page cache.
+
+```mermaid
+flowchart TB
+  Heap[&quot;HEAP buffer: byte[] on the GC heap — fast alloc, GC-movable/scanned&quot;]
+  Direct[&quot;DIRECT buffer: off-heap native memory + an address — GC can&#x27;t move it; freed by a Cleaner (leak risk)&quot;]
+  Mapped[&quot;MAPPED buffer: the FILE&#x27;S pages in your address space — no separate buffer at all&quot;]
+```
+
+## Architecture — The Copy a Direct Buffer Avoids
+
+Here is the payoff. When you read a file into a **heap** `ByteBuffer`, the OS cannot transfer data straight into it: a **moving garbage collector** may relocate the backing `byte[]` mid-transfer, which would corrupt the read. So the JVM reads into a temporary **off-heap** buffer and then **copies** those bytes onto the heap — an extra copy on every operation. A **direct** buffer is already off-heap and pinned, so the OS can **DMA** (direct memory access — the device writes to memory without the CPU) straight into it: **no intermediate copy**. That single avoided copy is why throughput-critical libraries (Netty, NIO servers) use direct buffers, accepting their slower allocation and `Cleaner`-based freeing.
+
+```mermaid
+flowchart TB
+  HeapR[&quot;read into a HEAP buffer: OS → off-heap staging buffer → COPY → your byte[] (GC can&#x27;t be DMA&#x27;d into)&quot;]
+  DirectR[&quot;read into a DIRECT buffer: OS DMAs straight into off-heap memory → NO extra copy&quot;]
+  HeapR -.-&gt;|&quot;direct buffers exist to remove this copy&quot;| DirectR
+```
+
+Two further optimizations build on this. **Zero-copy `transferTo`**: `FileChannel.transferTo(pos, count, socketChannel)` asks the kernel to copy file pages **directly to the socket** via `sendfile(2)` — the data never enters user space, eliminating two copies and two context switches (this is the &quot;zero-copy&quot; mentioned in [T13](./T13-i-o-streams-byte-and-character.md), and how web servers ship static files fast).
+
+```mermaid
+flowchart TB
+  Norm[&quot;NORMAL copy: disk → kernel buffer → COPY to user buffer → COPY to socket buffer → NIC (2 copies, 2 context switches)&quot;]
+  Zero[&quot;transferTo / sendfile: disk → kernel → NIC, staying in the kernel (0 user-space copies)&quot;]
+  Norm -.-&gt;|&quot;transferTo eliminates the user-space round trip&quot;| Zero
+```
+
+**Memory-mapped files**: `FileChannel.map` maps the file&#x27;s pages into virtual memory, so after the (cheap) mapping there are **no `read`/`write` syscalls** — accessing the `MappedByteBuffer` is plain memory access, and the OS **lazily page-faults** file pages in and writes dirty pages back through its page cache. This makes random access cheap, lets multiple processes share one copy, and handles files larger than RAM (only touched pages load) — at the cost of page-fault latency on first touch and `force()` to control when writes hit disk. It is how databases and search engines (Lucene) get their file performance.
+
+```mermaid
+flowchart LR
+  MM[&quot;FileChannel.map(file)&quot;]
+  MM --&gt; VM[&quot;file pages mapped into VIRTUAL memory — no read()/write() syscalls&quot;]
+  VM --&gt; Fault[&quot;touch a page → OS PAGE-FAULTS it in from the page cache (lazy)&quot;]
+  Fault --&gt; Use[&quot;random access = memory access; files &amp;gt; RAM work; shared across processes&quot;]
+```
+
+## Cross-Language Perspective
+
+Every modern language has made the same two moves NIO.2 made — from string paths to a `Path` *object*, and from C-ish file functions to a rich library — and they all expose memory-mapping:
+
+| Language | Path object | File ops | Memory-map |
+|---|---|---|---|
+| **Java** | `Path` (`resolve`, `relativize`) | `Files` (static) | `FileChannel.map` → `MappedByteBuffer` |
+| **Python** | `pathlib.Path` (`/` operator) | `os` / `shutil` / `Path.read_text` | `mmap` module |
+| **C#** | `Path`/`FileInfo`/`DirectoryInfo` | `File` / `Directory` (static) | `MemoryMappedFile` |
+| **Rust** | `Path` / `PathBuf` | `std::fs` | `memmap2` crate |
+| **Go** | `path/filepath` | `os` | `syscall.Mmap` |
+
+The standout parallel is **Python&#x27;s `pathlib`**, the direct twin of NIO.2&#x27;s `Path`: object-oriented paths with the `/` operator overloaded for `resolve` (`Path(&quot;home&quot;) / &quot;kgk&quot; / &quot;notes.txt&quot;`), `.name`/`.parent`/`.suffix` like `getFileName`/`getParent`, `.read_text()`/`.write_text()` mirroring `Files.readString`/`writeString`, and `.glob()`/`.rglob()` mirroring `Files.find`/`walk`. Python&#x27;s journey from `os.path` (string functions) to `pathlib` (objects) is **exactly** Java&#x27;s `File` → `Path` evolution, a decade apart. C# has the same split (`Path` string ops + `File`/`Directory` operations + `FileInfo` objects), Rust mirrors `&amp;str`/`String` with `&amp;Path`/`PathBuf`, and `mmap` is a universal OS primitive every language surfaces. The consensus is settled: **an immutable `Path` object plus a convenience library plus memory-mapping** — and NIO.2 (2011) was Java catching up to it.
+
+```mermaid
+flowchart LR
+  Old[&quot;string paths + C-ish file functions (Java File, Python os.path)&quot;]
+  Old --&gt;|&quot;universal evolution&quot;| New[&quot;immutable Path OBJECT + convenience library + mmap&quot;]
+  New --&gt; Ex[&quot;Java Path/Files · Python pathlib · C# FileInfo · Rust PathBuf · Go filepath&quot;]
+```
+
+## Common Mistakes
+
+&gt; [!WARNING]
+&gt; **Still using `java.io.File`.** New code should use `Path`/`Files` — better error reporting (exceptions, not `false`), symlinks, rich attributes, lazy traversal, atomic ops. Convert legacy `File` with `file.toPath()`.
+
+&gt; [!WARNING]
+&gt; **Not closing a `Files.lines`/`walk`/`list` stream.** These hold an open file/directory handle; leaking them exhausts the OS&#x27;s file-descriptor limit. Always `try`-with-resources them ([T10](./T10-custom-exceptions-and-try-with-resources.md)).
+
+&gt; [!WARNING]
+&gt; **`readAllBytes`/`readString` on a huge file.** They load the entire file into memory — an `OutOfMemoryError` waiting to happen. Stream it with `Files.lines` or a `BufferedReader` instead.
+
+&gt; [!WARNING]
+&gt; **Confusing `resolve` with `resolveSibling`, or misusing `relativize`.** `resolve` appends a child; `resolveSibling` replaces the last element. `relativize` requires both paths to be the same type (both absolute or both relative) or it throws.
+
+&gt; [!WARNING]
+&gt; **Leaking direct buffers.** Direct/off-heap buffers are freed non-deterministically by a `Cleaner`, so allocating many small ones leaks native memory and can crash the process. Allocate few, large, and pooled.
+
+&gt; [!WARNING]
+&gt; **Assuming a mapped write is on disk.** A `MappedByteBuffer` write goes to the page cache; the OS flushes lazily. Call `force()` when you need durability, and remember `Path` operations never touch the disk at all — only `Files` calls do.
+
+## Practice
+
+&gt; [!INTERVIEW]
+&gt; Common interview questions for this topic:
+&gt; 1. **Why NIO.2 over `java.io.File`?** Exceptions with detail (not booleans), symlinks, rich attributes, lazy/recursive traversal, atomic operations, a watch service, and pluggable filesystems.
+&gt; 2. **What is a `Path`?** An immutable, abstract file location (not necessarily existing); manipulated with `resolve`/`relativize`/`normalize`; it touches the disk only via `Files`.
+&gt; 3. **`resolve` vs `relativize`?** `resolve` joins a child onto a base; `relativize` is the inverse — the relative path from one to another.
+&gt; 4. **What does `Files` add over streams?** One-call read/write (`readString`, `lines`, `readAllBytes`), `copy`/`move`/`delete` with options, traversal, attributes — and UTF-8 by default, fixing the `FileReader` trap.
+&gt; 5. **How do you walk a directory tree?** `Files.walk` (lazy recursive `Stream`) or `Files.walkFileTree` (a `FileVisitor`); close the `Stream`-based ones.
+&gt; 6. **Why must you close `Files.lines`/`walk`?** They hold an open handle; not closing leaks file descriptors. Use `try`-with-resources.
+&gt; 7. **Heap vs direct `ByteBuffer`?** Heap is a `byte[]` on the GC heap; direct is off-heap native memory the OS can DMA into without an intermediate copy.
+&gt; 8. **Why does a direct buffer avoid a copy?** A moving GC could relocate a heap `byte[]` mid-transfer, so the OS can&#x27;t DMA into the heap — it stages off-heap and copies. A direct buffer is already off-heap, so no copy.
+&gt; 9. **What is a memory-mapped file?** `FileChannel.map` puts file pages into virtual memory; access is plain memory access and the OS page-faults pages in lazily — great for large, random, or shared access.
+&gt; 10. **What is zero-copy / `transferTo`?** `FileChannel.transferTo` uses the kernel&#x27;s `sendfile` to move file→socket without user-space buffers, removing copies and context switches.
+&gt; 11. **Explain the `ByteBuffer` flip/clear cycle.** Fill (position advances), `flip()` to read (limit=position, position=0), drain, `clear()` to fill again.
+&gt; 12. **What is `WatchService`?** OS-backed directory-change notification (create/modify/delete events).
+&gt; 13. **How do Python/C# compare?** Python `pathlib.Path` (`/` operator, `read_text`) + `mmap`; C# `Path`/`File`/`FileInfo` + `MemoryMappedFile` — the same Path-object + convenience-library + memory-map consensus.
+
+1. **`Path` manipulation.** Build paths with `Path.of`; exercise `resolve`, `relativize`, `normalize`, `getParent`, `getFileName`; confirm they work on nonexistent paths (no disk access).
+
+2. **`readString`/`writeString`.** Round-trip a non-ASCII string through `Files.writeString`/`readString`; confirm it survives — because `Files` defaults to UTF-8 (contrast the [T13](./T13-i-o-streams-byte-and-character.md) `FileReader` trap).
+
+3. **`Files.lines` stream.** Read a file as a `Stream&lt;String&gt;` inside `try`-with-resources; filter and count lines; explain why the close matters.
+
+4. **`Files.walk`.** Walk a directory tree and collect every `*.java` file into a list; bound the depth.
+
+5. **`copy`/`move`.** Copy a file with `REPLACE_EXISTING`, then `move` it with `ATOMIC_MOVE`; observe the exception when the target exists without the option.
+
+6. **Attributes.** Read a file&#x27;s size and timestamps in one call via `Files.readAttributes(path, BasicFileAttributes.class)`.
+
+7. **Recursive delete.** Implement a `SimpleFileVisitor` and `Files.walkFileTree` to delete a directory tree (files in `visitFile`, dirs in `postVisitDirectory`).
+
+8. **`WatchService`.** Register a directory and print `ENTRY_CREATE`/`MODIFY`/`DELETE` events as you touch files in it.
+
+9. **Heap vs direct buffer.** Allocate a `ByteBuffer.allocate(n)` and a `ByteBuffer.allocateDirect(n)`; check `isDirect()`; discuss when each is appropriate.
+
+10. **flip/clear cycle.** Write three `int`s into a `ByteBuffer`, `flip()`, read them back; then `clear()` and reuse. Print `position`/`limit` at each step.
+
+11. **Memory-mapped file.** `FileChannel.map` a file as a `MappedByteBuffer`; read a byte, modify a byte, `force()` it; confirm the change on disk.
+
+12. **`transferTo`.** Copy a file using `FileChannel.transferTo` (or `Files.copy`); note that file→socket transfers can use OS zero-copy.
+
+13. **ZIP filesystem.** Open a JAR with `FileSystems.newFileSystem` and list/read entries inside it using the same `Path`/`Files` API.
+
+14. **Old vs new.** Take a `java.io.File`-based snippet (e.g. `file.delete()` with a boolean check) and rewrite it with `Files.delete`; compare the error reporting.
+
+15. **End-to-end explain-it-back.** Reading a file into a heap `ByteBuffer` vs a direct one vs memory-mapping: (a) why the heap read forces an extra copy; (b) what DMA into a direct buffer avoids; (c) what `FileChannel.map` does differently and how page faults serve the data; (d) what `transferTo`/`sendfile` eliminates for file→socket; (e) the connection to the constant-factor/copy-avoidance lesson from [T08](./T08-collection-performance-characteristics-big-o.md)/[T13](./T13-i-o-streams-byte-and-character.md). Twelve sentences max.
+
+## Recap
+
+You should now be able to:
+
+**Language layer.**
+
+- Explain why NIO.2 replaced `java.io.File`, and manipulate `Path`s with `resolve`/`relativize`/`normalize` (knowing they never touch the disk).
+- Use `Files` conveniences (`readString`, `lines`, `writeString`, `copy`/`move`, `createDirectories`) — with UTF-8 by default — and traverse trees with `walk`/`walkFileTree`, closing the `Stream`-based ones.
+- Drive a `ByteBuffer` through the fill→flip→drain→clear cycle and register a `WatchService`.
+
+**Memory layer.**
+
+- Describe a `Path` as a small immutable object (no content, no disk), and distinguish a heap `ByteBuffer` (`byte[]` on the GC heap) from a direct one (off-heap, `Cleaner`-freed) and a mapped one (the file&#x27;s pages).
+
+**Architecture layer.**
+
+- Explain why a heap-buffer read forces an extra copy (a moving GC can&#x27;t be DMA&#x27;d into) and a direct buffer avoids it, and what `transferTo`/`sendfile` zero-copy eliminates.
+- Describe memory-mapped files (pages in virtual memory, lazy page faults via the page cache) and when they win, and connect all of it to the copy-avoidance/constant-factor lesson from [T08](./T08-collection-performance-characteristics-big-o.md)/[T13](./T13-i-o-streams-byte-and-character.md).
+- Recognize the OO-`Path` + convenience-library + memory-map design as the cross-language consensus (Python `pathlib`, C#, Rust, Go).
+
+This **completes Java&#x27;s file story** — [T13](./T13-i-o-streams-byte-and-character.md) streams for the bytes, T14 NIO.2 for the filesystem. The chapter now turns from *where data lives* to *what data is*, starting with the type every program gets wrong until it uses the right library: dates and times.
+
+## Next
+
+Continue to [Date/Time API (java.time)](./T15-date-time-api-java-time.md) — the modern temporal library, and one of the best-designed parts of the JDK. After files, the next perennially-hard data type is **time** — time zones, daylight saving, leap years, instants vs human calendars. Java&#x27;s first two attempts (`java.util.Date` and `Calendar`) were notoriously broken — mutable, zero-based months, no time-zone clarity — and Java 8 replaced them with **`java.time`** (JSR 310, inspired by Joda-Time): an immutable, well-typed family — `Instant` (a machine timestamp), `LocalDate`/`LocalTime`/`LocalDateTime` (human date/time without a zone), `ZonedDateTime` (with a zone), `Duration`/`Period` (amounts of time), and `DateTimeFormatter`. T15 covers the model, the immutability-and-thread-safety payoff (the [T19](../C01-oop/T19-immutability-and-immutable-class-design.md) lesson applied), and the byte-level representation of an instant.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><div class="lbl">← Previous</div><div class="ttl">T13-i-o-streams-byte-and-character</div><div class="sub">I/O streams (byte &amp; character)</div></a><a class="next" href="../l1/c02-t15-date-time-api-java-time.html"><div class="lbl">Next →</div><div class="ttl">T15-date-time-api-java-time</div><div class="sub">Date/Time API (java.time)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-nio2-javaiofile-was-not-enough" data-toc-link>Why NIO.2 — java.io.File Was Not Enough</a></li><li class="lvl-2"><a href="#path-an-abstract-immutable-location" data-toc-link>Path — An Abstract, Immutable Location</a></li><li class="lvl-2"><a href="#files-the-utility-class" data-toc-link>Files — The Utility Class</a></li><li class="lvl-2"><a href="#directory-traversal" data-toc-link>Directory Traversal</a></li><li class="lvl-2"><a href="#channels-and-bytebuffer-the-lower-level" data-toc-link>Channels and ByteBuffer — The Lower Level</a></li><li class="lvl-2"><a href="#memory-path-objects-heap-vs-direct-buffers-mapped-files" data-toc-link>Memory — Path Objects, Heap vs Direct Buffers, Mapped Files</a></li><li class="lvl-2"><a href="#architecture-the-copy-a-direct-buffer-avoids" data-toc-link>Architecture — The Copy a Direct Buffer Avoids</a></li><li class="lvl-2"><a href="#cross-language-perspective" data-toc-link>Cross-Language Perspective</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -48,8 +48,8 @@ sequenceDiagram
   Rec->>TLD: www.example.com?
   TLD-->>Rec: ask example.com's authoritative (NS)
   Rec->>Auth: www.example.com?
-  Auth-->>Rec: A 93.184.216.34
-  Rec-->>Stub: A 93.184.216.34 (and caches it)
+  Auth-->>Rec: A 203.0.113.34
+  Rec-->>Stub: A 203.0.113.34 (and caches it)
 ```
 
 The recursive resolver answers you **recursively** (it returns the final answer); each step it makes to root/TLD/authoritative is **iterative** (each returns a **referral** — "I don't know, ask them" — not the answer). And the name is read **right to left**: `www.example.com.` (the trailing dot is the root) is a path *down* the tree **root → com → example → www**.
@@ -94,7 +94,7 @@ flowchart TB
   Root --> Org[".org"]
   Root --> Io[".io"]
   Com --> Ex["example.com  (authoritative — holds the actual records)"]
-  Ex --> WWW["www.example.com  → A 93.184.216.34"]
+  Ex --> WWW["www.example.com  → A 203.0.113.34"]
   Ex --> Mail["mail.example.com"]
 ```
 

@@ -379,7 +379,7 @@ This is why coordinates are globally unique — they *are* the address.
 ### SNAPSHOT vs Release Versions
 
 - A **release** version (`1.0.0`) is **immutable** — once published, it never changes. Maven caches it permanently.
-- A **SNAPSHOT** version (`1.0.0-SNAPSHOT`) is a **mutable** development version — Maven re-checks the remote for a newer build periodically. Used during development before a release.
+- A **SNAPSHOT** version (`1.0.0-SNAPSHOT`) is a **mutable** development version — Maven re-checks the remote for a newer build periodically. Used during development before a release. Force an immediate re-fetch of the latest snapshots with **`mvn -U`** (`--update-snapshots`) — useful when a colleague just published a new build and you're still getting the cached one.
 
 ```mermaid
 flowchart TB

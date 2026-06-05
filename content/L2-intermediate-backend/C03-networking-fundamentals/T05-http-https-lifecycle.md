@@ -72,7 +72,7 @@ Content-Length: 1256
 | **4xx** | client error | **400** Bad Request, **401** Unauthorized, **403** Forbidden, **404** Not Found, 409 Conflict, **429** Too Many Requests |
 | **5xx** | server error | **500** Internal Server Error, **502** Bad Gateway, **503** Service Unavailable, 504 Gateway Timeout |
 
-Returning the *right* code matters — monitoring, retries, caches, and clients all branch on it (a 500 is retriable; a 400 is not).
+Returning the *right* code matters — monitoring, retries, caches, and clients all branch on it (a 500 *may* be retried for an **idempotent** method like GET/PUT/DELETE, but never blindly for a non-idempotent POST; a 400 should not be retried at all — fix the request first). Idempotency, not the status code alone, decides whether a retry is safe ([T02 REST principles in C04](../C04-web-and-rest-basics/T02-rest-principles-and-best-practices.md)).
 
 ## Framing — How HTTP Knows Where a Message Ends
 
@@ -98,7 +98,7 @@ sequenceDiagram
   participant D as DNS (T04)
   participant S as Server :443
   B->>D: resolve example.com
-  D-->>B: 93.184.216.34
+  D-->>B: 203.0.113.34
   B->>S: TCP 3-way handshake (T02/T03) — 1 RTT
   B->>S: TLS handshake (T06) — 1–2 RTT
   B->>S: GET /page HTTP/1.1
@@ -114,14 +114,14 @@ The lesson: a "simple" page load is a *stack of round-trips* — **DNS + TCP + T
 
 | Version | Connections | Concurrency | Head-of-line blocking |
 |---------|-------------|-------------|------------------------|
-| **HTTP/1.0** | one TCP **per request** | none | handshake every request |
+| **HTTP/1.0** | one TCP **per request** | none | n/a — one request per connection (+ a new handshake each time) |
 | **HTTP/1.1** | **persistent** (keep-alive) | one request at a time/conn | **app-level** (ordered responses) |
 | **HTTP/2** | **one** TCP, **multiplexed** streams | many concurrent streams | **TCP-level** (one loss stalls all streams) |
 | **HTTP/3** | **QUIC over UDP** | independent streams | **solved** (per-stream) + faster handshake |
 
 - **HTTP/1.0** opened a fresh TCP connection (and handshake — [T02](./T02-tcp-vs-udp.md)) for *every* request — brutal for a page with dozens of resources.
 - **HTTP/1.1** made connections **persistent (keep-alive)** by default — reuse one TCP connection for many requests, amortizing the handshake and avoiding ephemeral-port churn ([T03](./T03-ip-ports-and-sockets.md)). But it still serves **one request at a time per connection** (responses must come back in order), so browsers open ~6 parallel connections per host as a workaround.
-- **HTTP/2** went **binary** and **multiplexed**: many concurrent **streams** over a **single** TCP connection (killing the 6-connection hack), plus **header compression (HPACK)** and server push. But all streams share one TCP connection, so a single lost TCP segment stalls **every** stream — **TCP-level head-of-line blocking** ([T02](./T02-tcp-vs-udp.md)) remains.
+- **HTTP/2** went **binary** and **multiplexed**: many concurrent **streams** over a **single** TCP connection (killing the 6-connection hack), plus **header compression (HPACK)**. (Server push also shipped but is effectively dead — Chrome removed it in 2022; **`103 Early Hints`** is the modern replacement.) But all streams share one TCP connection, so a single lost TCP segment stalls **every** stream — **TCP-level head-of-line blocking** ([T02](./T02-tcp-vs-udp.md)) remains.
 - **HTTP/3** runs over **QUIC over UDP** ([T02](./T02-tcp-vs-udp.md)): streams are independent at the transport layer, so a lost packet stalls only **its own** stream — **HOL blocking solved** — and QUIC merges the transport + TLS handshake (even 0-RTT).
 
 ```mermaid

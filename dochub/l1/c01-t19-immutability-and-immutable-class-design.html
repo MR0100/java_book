@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Immutability &amp; immutable class design — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">7</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link active" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">54</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">60</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">12</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">18</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">11</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">7</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧬</span><span>Ch. 3 · L1 — Core Java &amp; OOP</span></div><div class="chapter-path">content/L1-core-java/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l1/overview.html" data-q="l1 — core java &amp; oop content/l1-core-java/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · oop content/l1-core-java/c01-oop/readme.md content/l1-core-java/c01-oop/t01-classes-and-objects.md content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md content/l1-core-java/c01-oop/t04-inheritance-and-super.md content/l1-core-java/c01-oop/t05-method-overriding.md content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md content/l1-core-java/c01-oop/t14-record-types.md content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md content/l1-core-java/c01-oop/t16-packages-and-imports.md content/l1-core-java/c01-oop/t17-java-module-system-jpms.md content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><summary><span class="caret">▶</span><span>C01 · OOP</span></summary><ul class="pages"><li data-q="core java &amp; oop — object-oriented programming content/l1-core-java/c01-oop/readme.md"><a class="" href="../l1/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="classes &amp; objects content/l1-core-java/c01-oop/t01-classes-and-objects.md"><a class="" href="../l1/c01-t01-classes-and-objects.html"><span>Classes &amp; Objects</span><span class="kind-pill "></span></a></li><li data-q="fields, methods, constructors, this content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md"><a class="" href="../l1/c01-t02-fields-methods-constructors-this.html"><span>Fields, methods, constructors, this</span><span class="kind-pill "></span></a></li><li data-q="encapsulation &amp; access modifiers content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md"><a class="" href="../l1/c01-t03-encapsulation-and-access-modifiers.html"><span>Encapsulation &amp; access modifiers</span><span class="kind-pill "></span></a></li><li data-q="inheritance &amp; super content/l1-core-java/c01-oop/t04-inheritance-and-super.md"><a class="" href="../l1/c01-t04-inheritance-and-super.html"><span>Inheritance &amp; super</span><span class="kind-pill "></span></a></li><li data-q="method overriding content/l1-core-java/c01-oop/t05-method-overriding.md"><a class="" href="../l1/c01-t05-method-overriding.html"><span>Method overriding</span><span class="kind-pill "></span></a></li><li data-q="polymorphism (compile-time vs runtime) content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md"><a class="" href="../l1/c01-t06-polymorphism-compile-time-vs-runtime.html"><span>Polymorphism (compile-time vs runtime)</span><span class="kind-pill "></span></a></li><li data-q="abstraction &amp; abstract classes content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md"><a class="" href="../l1/c01-t07-abstraction-and-abstract-classes.html"><span>Abstraction &amp; abstract classes</span><span class="kind-pill "></span></a></li><li data-q="interfaces (default, static, private methods) content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md"><a class="" href="../l1/c01-t08-interfaces-default-static-private-methods.html"><span>Interfaces (default, static, private methods)</span><span class="kind-pill "></span></a></li><li data-q="object class &amp; its methods content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md"><a class="" href="../l1/c01-t09-object-class-and-its-methods.html"><span>Object class &amp; its methods</span><span class="kind-pill "></span></a></li><li data-q="equals, hashcode, tostring contracts content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md"><a class="" href="../l1/c01-t10-equals-hashcode-tostring-contracts.html"><span>equals, hashCode, toString contracts</span><span class="kind-pill "></span></a></li><li data-q="static members, blocks &amp; nested classes content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md"><a class="" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><span>static members, blocks &amp; nested classes</span><span class="kind-pill "></span></a></li><li data-q="inner, local &amp; anonymous classes content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md"><a class="" href="../l1/c01-t12-inner-local-and-anonymous-classes.html"><span>Inner, local &amp; anonymous classes</span><span class="kind-pill "></span></a></li><li data-q="enum types (with fields/methods) content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md"><a class="" href="../l1/c01-t13-enum-types-with-fields-methods.html"><span>enum types (with fields/methods)</span><span class="kind-pill "></span></a></li><li data-q="record types content/l1-core-java/c01-oop/t14-record-types.md"><a class="" href="../l1/c01-t14-record-types.html"><span>record types</span><span class="kind-pill "></span></a></li><li data-q="sealed classes &amp; interfaces content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md"><a class="" href="../l1/c01-t15-sealed-classes-and-interfaces.html"><span>Sealed classes &amp; interfaces</span><span class="kind-pill "></span></a></li><li data-q="packages &amp; imports content/l1-core-java/c01-oop/t16-packages-and-imports.md"><a class="" href="../l1/c01-t16-packages-and-imports.html"><span>Packages &amp; imports</span><span class="kind-pill "></span></a></li><li data-q="java module system (jpms) content/l1-core-java/c01-oop/t17-java-module-system-jpms.md"><a class="" href="../l1/c01-t17-java-module-system-jpms.html"><span>Java Module System (JPMS)</span><span class="kind-pill "></span></a></li><li data-q="object cloning &amp; cloneable content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md"><a class="" href="../l1/c01-t18-object-cloning-and-cloneable.html"><span>Object cloning &amp; Cloneable</span><span class="kind-pill "></span></a></li><li data-q="immutability &amp; immutable class design content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><a class="active" href="../l1/c01-t19-immutability-and-immutable-class-design.html"><span>Immutability &amp; immutable class design</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · collections and core apis content/l1-core-java/c02-collections-and-core-apis/readme.md content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md content/l1-core-java/c02-collections-and-core-apis/t19-optional.md content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><summary><span class="caret">▶</span><span>C02 · Collections And Core APIs</span></summary><ul class="pages"><li data-q="core java &amp; oop — collections &amp; core apis content/l1-core-java/c02-collections-and-core-apis/readme.md"><a class="" href="../l1/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="collections framework overview content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md"><a class="" href="../l1/c02-t01-collections-framework-overview.html"><span>Collections framework overview</span><span class="kind-pill "></span></a></li><li data-q="list (arraylist, linkedlist) content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md"><a class="" href="../l1/c02-t02-list-arraylist-linkedlist.html"><span>List (ArrayList, LinkedList)</span><span class="kind-pill "></span></a></li><li data-q="set (hashset, linkedhashset, treeset) content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md"><a class="" href="../l1/c02-t03-set-hashset-linkedhashset-treeset.html"><span>Set (HashSet, LinkedHashSet, TreeSet)</span><span class="kind-pill "></span></a></li><li data-q="map (hashmap, linkedhashmap, treemap) content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md"><a class="" href="../l1/c02-t04-map-hashmap-linkedhashmap-treemap.html"><span>Map (HashMap, LinkedHashMap, TreeMap)</span><span class="kind-pill "></span></a></li><li data-q="queue, deque, priorityqueue, stack content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md"><a class="" href="../l1/c02-t05-queue-deque-priorityqueue-stack.html"><span>Queue, Deque, PriorityQueue, Stack</span><span class="kind-pill "></span></a></li><li data-q="iterators &amp; iterable content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md"><a class="" href="../l1/c02-t06-iterators-and-iterable.html"><span>Iterators &amp; Iterable</span><span class="kind-pill "></span></a></li><li data-q="comparable vs comparator content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md"><a class="" href="../l1/c02-t07-comparable-vs-comparator.html"><span>Comparable vs Comparator</span><span class="kind-pill "></span></a></li><li data-q="collection performance characteristics (big-o) content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md"><a class="" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><span>Collection Performance Characteristics (Big-O)</span><span class="kind-pill "></span></a></li><li data-q="exceptions: try/catch/finally, checked vs unchecked content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md"><a class="" href="../l1/c02-t09-exceptions-try-catch-finally-checked-vs-unchecked.html"><span>Exceptions: try/catch/finally, checked vs unchecked</span><span class="kind-pill "></span></a></li><li data-q="custom exceptions &amp; try-with-resources content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md"><a class="" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><span>Custom exceptions &amp; try-with-resources</span><span class="kind-pill "></span></a></li><li data-q="generics — basics content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md"><a class="" href="../l1/c02-t11-generics-basics.html"><span>Generics — basics</span><span class="kind-pill "></span></a></li><li data-q="generics — bounded types, wildcards, type erasure content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md"><a class="" href="../l1/c02-t12-generics-bounded-types-wildcards-type-erasure.html"><span>Generics — bounded types, wildcards, type erasure</span><span class="kind-pill "></span></a></li><li data-q="i/o streams (byte &amp; character) content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md"><a class="" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><span>I/O streams (byte &amp; character)</span><span class="kind-pill "></span></a></li><li data-q="nio.2 (path, files, channels) content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md"><a class="" href="../l1/c02-t14-nio-2-path-files-channels.html"><span>NIO.2 (Path, Files, channels)</span><span class="kind-pill "></span></a></li><li data-q="date/time api (java.time) content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md"><a class="" href="../l1/c02-t15-date-time-api-java-time.html"><span>Date/Time API (java.time)</span><span class="kind-pill "></span></a></li><li data-q="regular expressions content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md"><a class="" href="../l1/c02-t16-regular-expressions.html"><span>Regular expressions</span><span class="kind-pill "></span></a></li><li data-q="reflection content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md"><a class="" href="../l1/c02-t17-reflection.html"><span>Reflection</span><span class="kind-pill "></span></a></li><li data-q="annotations (using &amp; writing meta-annotations) content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md"><a class="" href="../l1/c02-t18-annotations-using-and-writing-meta-annotations.html"><span>Annotations (using &amp; writing meta-annotations)</span><span class="kind-pill "></span></a></li><li data-q="optional content/l1-core-java/c02-collections-and-core-apis/t19-optional.md"><a class="" href="../l1/c02-t19-optional.html"><span>Optional</span><span class="kind-pill "></span></a></li><li data-q="math, bigdecimal / biginteger, random content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md"><a class="" href="../l1/c02-t20-math-bigdecimal-biginteger-random.html"><span>Math, BigDecimal / BigInteger, Random</span><span class="kind-pill "></span></a></li><li data-q="serialization &amp; deserialization content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md"><a class="" href="../l1/c02-t21-serialization-and-deserialization.html"><span>Serialization &amp; deserialization</span><span class="kind-pill "></span></a></li><li data-q="networking (socket, httpclient) content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md"><a class="" href="../l1/c02-t22-networking-socket-httpclient.html"><span>Networking (Socket, HttpClient)</span><span class="kind-pill "></span></a></li><li data-q="internationalization (i18n) &amp; formatting content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><a class="" href="../l1/c02-t23-internationalization-i18n-and-formatting.html"><span>Internationalization (i18n) &amp; formatting</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><summary><span class="caret">▶</span><span>C03 · Testing Fundamentals</span></summary><ul class="pages"><li data-q="core java &amp; oop — testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md"><a class="" href="../l1/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="unit testing with junit 5 content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><a class="" href="../l1/c03-t01-unit-testing-with-junit-5.html"><span>Unit testing with JUnit 5</span><span class="kind-pill "></span></a></li></ul></details><a class="mod-flat" href="../l1/c04-readme.html" data-q="core java &amp; oop — tools &amp; environment content/l1-core-java/c04-tools-and-environment/readme.md c04 · tools and environment"><span>C04 · Tools And Environment</span></a><a class="mod-flat" href="../l1/c05-readme.html" data-q="core java &amp; oop — hands-on content/l1-core-java/c05-hands-on/readme.md c05 · hands on"><span>C05 · Hands On</span></a><a class="mod-flat" href="../l1/c06-readme.html" data-q="core java &amp; oop — best practices &amp; pitfalls content/l1-core-java/c06-best-practices/readme.md c06 · best practices"><span>C06 · Best Practices</span></a><a class="mod-flat" href="../l1/c07-readme.html" data-q="core java &amp; oop — interview prep content/l1-core-java/c07-interview-prep/readme.md c07 · interview prep"><span>C07 · Interview Prep</span></a><a class="mod-flat" href="../l1/c08-readme.html" data-q="core java &amp; oop — q&amp;a / faq content/l1-core-java/c08-qa-faq/readme.md c08 · qa faq"><span>C08 · QA FAQ</span></a><a class="mod-flat" href="../l1/c09-readme.html" data-q="core java &amp; oop — cheatsheets &amp; reference content/l1-core-java/c09-cheatsheets/readme.md c09 · cheatsheets"><span>C09 · Cheatsheets</span></a><a class="mod-flat" href="../l1/c10-readme.html" data-q="core java &amp; oop — resources content/l1-core-java/c10-resources/readme.md c10 · resources"><span>C10 · Resources</span></a></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l1/index.html">L1 — Core Java &amp; OOP</a><span class="sep">/</span><span>Immutability &amp; immutable class design</span></div>
+        <h1>Immutability &amp; immutable class design</h1>
+        <div><span class="source-path">content/L1-core-java/C01-oop/T19-immutability-and-immutable-class-design.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~60 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Immutability &amp; immutable class design"
+slug: immutability-and-immutable-class-design
+level: L1
+module: "Core Java &amp; OOP"
+section: "Object-Oriented Programming"
+type: concept
+difficulty: intermediate
+order: 19
+tags: [immutability, immutable-class, final, defensive-copy, jmm-final-freeze, safe-publication, thread-safety, functional-update, wither, structural-sharing, persistent-data-structure, effective-java-item-17, records, string-immutability, interning, copy-on-write, value-object]
+prerequisites: [fields-methods-constructors-this, equals-hashcode-tostring-contracts, inner-local-and-anonymous-classes, record-types, object-cloning-and-cloneable]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="immutability-immutable-class-design">Immutability &amp; immutable class design</h1>
+<p>An <strong>immutable</strong> object is one whose state <strong>cannot change after construction</strong> — once built, it stays exactly as it was, forever. <code>String</code>, <code>Integer</code>, <code>BigDecimal</code>, <code>LocalDate</code>, and every record are immutable: there is no method that mutates them, and every "change" produces a <em>new</em> object instead. This is the <strong>capstone of the OOP chapter</strong> because immutability resolves, in one stroke, the problems that recurred through every topic before it: the aliasing bug where a "copy" silently shares mutable state (<a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a>), the defensive-copy dance to protect internal state (<a href="c01-t03-encapsulation-and-access-modifiers.html">T03</a>/<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>), the requirement that hash keys never change (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>), the thread-safety hazards of shared mutable state (<a href="c01-t11-static-members-blocks-and-nested-classes.html">T11</a>), and the broken <code>clone()</code> mechanism (<a href="c01-t18-object-cloning-and-cloneable.html">T18</a> — you don't copy what can't change, you share it). <em>Effective Java</em> Item 17 is "Minimize mutability," and it is among the most consequential pieces of advice in all of Java.</p>
+<p>The depth bar here is <strong>why immutability buys thread-safety for free, and what it costs</strong>. The deep answer to "why are immutable objects inherently thread-safe?" is the <strong>Java Memory Model's <code>final</code>-field safe-publication guarantee</strong> (<a href="c01-t02-fields-methods-constructors-this.html">T02</a>): when a constructor with <code>final</code> fields completes, the JVM inserts a <strong>freeze</strong> (a memory barrier — a <code>StoreStore</code> on weakly-ordered ARM, often a no-op on x86) that guarantees <em>any</em> thread reading a reference to the object after construction sees the fully-initialized <code>final</code> fields — <strong>without any synchronization, lock, or <code>volatile</code></strong>. That single guarantee is why <code>String</code> and every immutable object can be shared across threads via plain non-volatile references and never expose a half-built or stale state. The cost is <strong>a new object per "change"</strong> (more allocation, more GC pressure), but it's mitigated by <strong>escape analysis</strong> eliminating short-lived immutables (<a href="c01-t01-classes-and-objects.html">T01</a>), by <strong>sharing</strong> immutable objects freely instead of copying them, and by <strong>structural sharing</strong> — persistent data structures where a "modified copy" of a million-element collection copies only the ~log₃₂(N) ≈ 4 nodes on the changed path and <em>shares</em> the rest. At the architecture level, read-only shared data is also <strong>cache-friendly</strong>: an immutable object's cache line stays in the MESI "Shared" state across all cores simultaneously, with zero invalidation traffic — the opposite of mutable shared state's cache-line ping-pong. By the end you'll design a contract-correct immutable class, explain the JMM freeze that makes it thread-safe, defensively copy mutable components, reach for structural sharing when copies would be expensive, and place Java's immutability retrofit in the industry-wide trend toward immutable-by-default.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t02-fields-methods-constructors-this.html">Fields, methods, constructors, this</a> (<code>L1/C01/T02</code>) — <code>final</code> fields, the JMM freeze, leaking <code>this</code>; <a href="c01-t10-equals-hashcode-tostring-contracts.html">equals/hashCode</a> (<code>L1/C01/T10</code>) — why immutable objects are safe hash keys; <a href="c01-t12-inner-local-and-anonymous-classes.html">Inner/anonymous classes</a> (<code>L1/C01/T12</code>) — aliasing (shared mutable state); <a href="c01-t14-record-types.html">record types</a> (<code>L1/C01/T14</code>) — immutable carriers; <a href="c01-t18-object-cloning-and-cloneable.html">Object cloning</a> (<code>L1/C01/T18</code>) — defensive copies, why you share immutables instead of cloning.</p></div></div>
+<h2 id="the-recurring-problem-mutation-and-aliasing">The Recurring Problem — Mutation and Aliasing<a class="anchor" href="#the-recurring-problem-mutation-and-aliasing" aria-hidden="true">#</a></h2>
+<p>Almost every hazard in this chapter traces back to one root cause: <strong>shared mutable state</strong>. When two references point at the same mutable object (<a href="c01-t01-classes-and-objects.html">T01</a>/<a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a>), a change through one is silently visible through the other:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;String&gt; names = new ArrayList&lt;&gt;(List.of(&quot;Alice&quot;));
+Customer c = new Customer(names);
+names.add(&quot;Bob&quot;);                    // mutates the list the Customer also holds
+c.getNames();                        // [Alice, Bob] — the Customer's state changed behind its back
+</code></pre></div>
+<p>This is the <strong>aliasing bug</strong> (<a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a>), and the chapter's recurring defenses against it — defensive copies (<a href="c01-t03-encapsulation-and-access-modifiers.html">T03</a>/<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>), <code>clone()</code> (<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>), careful encapsulation — are all <em>patches</em> for a problem that <strong>immutability eliminates at the source</strong>. If the object can't change, sharing it is harmless: there's no mutation to leak, no defensive copy to make, no race to lose. Immutability isn't one more technique; it's the design that makes most of the others unnecessary.</p>
+<div class="mermaid">flowchart TB
+  Root["shared MUTABLE state"]
+  Root --> A["aliasing bugs (T12)"]
+  Root --> D["defensive-copy overhead (T03/T18)"]
+  Root --> H["unstable hash keys (T10)"]
+  Root --> T["thread-safety hazards (T11)"]
+  Imm["IMMUTABILITY"]
+  Imm -.->|"eliminates the root cause"| Root
+</div>
+<h2 id="what-immutability-means">What Immutability Means<a class="anchor" href="#what-immutability-means" aria-hidden="true">#</a></h2>
+<p>An object is <strong>immutable</strong> if its observable state cannot change after the constructor returns. Concretely: no method changes any field, no field is reassigned, and any object the immutable one references is <em>also</em> effectively beyond the reach of mutation (or is itself immutable). Every operation that would "change" an immutable object instead returns a <strong>new</strong> object with the change applied, leaving the original untouched:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">String s = &quot;hello&quot;;
+String t = s.toUpperCase();          // returns a NEW String &quot;HELLO&quot;; s is still &quot;hello&quot;
+BigInteger a = BigInteger.valueOf(5);
+BigInteger b = a.add(BigInteger.ONE);// returns a NEW BigInteger 6; a is still 5
+LocalDate d = LocalDate.of(2026, 1, 1);
+LocalDate e = d.plusDays(30);        // returns a NEW LocalDate; d is unchanged
+</code></pre></div>
+<p>The JDK is full of immutable types: <code>String</code>, all the wrappers (<code>Integer</code>, <code>Long</code>, …), <code>BigInteger</code>, <code>BigDecimal</code>, the entire <code>java.time</code> API (<code>LocalDate</code>, <code>Instant</code>, <code>Duration</code>, …), and every record. They share the property that you can pass them anywhere, store them in any collection, share them across any number of threads — and never worry that someone, somewhere, changed them.</p>
+<h2 id="the-five-rules-of-an-immutable-class">The Five Rules of an Immutable Class<a class="anchor" href="#the-five-rules-of-an-immutable-class" aria-hidden="true">#</a></h2>
+<p><em>Effective Java</em> Item 17 gives five rules for designing an immutable class:</p>
+<div class="mermaid">flowchart TB
+  R["immutable class rules (EJ Item 17)"]
+  R --> R1["1. no mutators (no setters / state-changing methods)"]
+  R --> R2["2. class can't be extended (final, or private ctor + factories)"]
+  R --> R3["3. all fields final"]
+  R --> R4["4. all fields private"]
+  R --> R5["5. exclusive access to mutable components (defensive copies in + out)"]
+</div>
+<ol>
+<li><strong>Don't provide mutators.</strong> No setters, no methods that change state. Operations return new objects.</li>
+<li><strong>Ensure the class can't be extended.</strong> Make it <code>final</code> (<a href="c01-t04-inheritance-and-super.html">T04</a>), or make the constructor <code>private</code>/package-private and hand out instances via static factories (<a href="c01-t11-static-members-blocks-and-nested-classes.html">T11</a>). Otherwise a malicious or careless subclass could <em>add</em> mutable state or override methods to pretend the object changed — breaking the immutability guarantee for code that holds the object as the supertype.</li>
+<li><strong>Make all fields <code>final</code>.</strong> This expresses intent, and — crucially — gives the JMM safe-publication guarantee (<a href="#the-jmm-final-field-safe-publication-guarantee">§ The JMM Freeze</a>).</li>
+<li><strong>Make all fields <code>private</code>.</strong> So clients can't read-and-then-mutate a field's referenced object directly (<a href="c01-t03-encapsulation-and-access-modifiers.html">T03</a>).</li>
+<li><strong>Ensure exclusive access to any mutable components.</strong> If a field references a mutable object (an array, a <code>List</code>, a <code>Date</code>), the class must <strong>defensively copy</strong> it on the way in (constructor) and on the way out (accessor) so no client can obtain a reference to the internal object and mutate it.</li>
+</ol>
+<p>A complete example:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class Period {                        // rule 2: final
+    private final Date start;                       // rules 3 + 4: private final
+    private final Date end;
+
+    public Period(Date start, Date end) {
+        this.start = new Date(start.getTime());     // rule 5: defensive copy IN
+        this.end   = new Date(end.getTime());
+        if (this.start.after(this.end))             // validate AFTER copying (avoid TOCTOU)
+            throw new IllegalArgumentException(&quot;start after end&quot;);
+    }
+
+    public Date start() { return new Date(start.getTime()); }   // rule 5: defensive copy OUT
+    public Date end()   { return new Date(end.getTime()); }
+    // rule 1: no setters
+}
+</code></pre></div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>Defensive-copy <strong>into the fields first, then validate the copies</strong> — not the parameters. <code>Date</code> is mutable, so validating the parameter and <em>then</em> copying leaves a window where another thread mutates the parameter between the check and the copy (a TOCTOU — time-of-check-to-time-of-use — race). Copy first, validate the copy. (This whole headache is why <code>java.time</code> replaced <code>Date</code> with immutable types — <code>Period</code> of two <code>Instant</code>s needs no defensive copies at all.)</p></div></div>
+<h2 id="defensive-copies-the-mutable-component-rule">Defensive Copies — The Mutable-Component Rule<a class="anchor" href="#defensive-copies-the-mutable-component-rule" aria-hidden="true">#</a></h2>
+<p>Rule 5 is the one that bites, and it's the direct continuation of <a href="c01-t18-object-cloning-and-cloneable.html">T18</a>'s copying and <a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>'s array-component caveat. <code>final</code> only freezes the <strong>reference</strong>, not the object it points at (<a href="c01-t02-fields-methods-constructors-this.html">T02</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class Config {
+    private final List&lt;String&gt; servers;
+    public Config(List&lt;String&gt; servers) {
+        this.servers = servers;              // BUG: stores the caller's mutable list
+    }
+    public List&lt;String&gt; servers() {
+        return servers;                       // BUG: hands out the internal list
+    }
+}
+
+List&lt;String&gt; input = new ArrayList&lt;&gt;(List.of(&quot;a&quot;));
+Config c = new Config(input);
+input.add(&quot;evil&quot;);                            // mutates Config's &quot;immutable&quot; state
+c.servers().add(&quot;also evil&quot;);                 // mutates it again, through the accessor
+</code></pre></div>
+<p>The fixes (<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>): copy in and out, or — better — use <strong>immutable component types</strong> so the copies aren't needed:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public Config(List&lt;String&gt; servers) {
+    this.servers = List.copyOf(servers);      // immutable snapshot IN (Java 10+)
+}
+public List&lt;String&gt; servers() {
+    return servers;                            // safe to share — it's already immutable
+}
+</code></pre></div>
+<p><code>List.copyOf</code>/<code>Set.copyOf</code>/<code>Map.copyOf</code> return <strong>immutable</strong> collections, so one copy at construction suffices and the accessor can return the field directly. This is the modern, allocation-light way: snapshot once into an immutable type, share freely thereafter. The lesson generalizes — <strong>prefer immutable component types</strong> (<code>List</code> over <code>[]</code>, <code>Instant</code> over <code>Date</code>, records over mutable beans) so immutability composes without a thicket of defensive copies.</p>
+<h2 id="the-benefits-of-immutability">The Benefits of Immutability<a class="anchor" href="#the-benefits-of-immutability" aria-hidden="true">#</a></h2>
+<p>Why go to this trouble? Immutability pays off on five fronts (<a href="#the-five-rules-of-an-immutable-class">EJ Item 17</a>):</p>
+<div class="mermaid">flowchart TB
+  Imm["immutable object"]
+  Imm --> Simple["simple: exactly ONE state, for its whole life"]
+  Imm --> Thread["inherently THREAD-SAFE: no writes → no races → share with NO sync"]
+  Imm --> Keys["safe hash keys / set elements (stable hashCode — T10)"]
+  Imm --> Share["share/cache/alias FREELY (no defensive copy for sharing — kills T12)"]
+  Imm --> Atomic["failure-atomic: a failed operation leaves the object unchanged"]
+</div>
+<ol>
+<li><strong>Simplicity.</strong> An immutable object has exactly one state — the one it was created with. There's no lifecycle, no "is it initialized?", no temporal coupling. You reason about it as a <em>value</em>, like the number 5.</li>
+<li><strong>Thread-safety for free.</strong> No writes means no data races; immutable objects need <strong>no synchronization</strong> and can be shared across any number of threads safely (<a href="#the-jmm-final-field-safe-publication-guarantee">§ The JMM Freeze</a>).</li>
+<li><strong>Safe hash keys and set elements.</strong> A key whose state never changes has a stable <code>hashCode</code> (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>) — it can never "get lost" in a <code>HashMap</code> by mutating after insertion. Immutable types are the <em>ideal</em> map keys.</li>
+<li><strong>Free sharing and caching.</strong> Because they can't change, immutable objects can be shared, cached, interned, and aliased without defensive copies — the <a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a> aliasing problem simply doesn't exist for them. <code>BigInteger.ZERO</code> is a single shared instance; the <code>String</code> pool and <code>Integer</code> cache exploit this.</li>
+<li><strong>Failure atomicity.</strong> If a method throws partway through, the object is left exactly as it was — because an immutable object never changes state, a failed operation can't leave it half-modified. You get failure atomicity for free.</li>
+</ol>
+<p>The price (one disadvantage): <strong>a separate object for every distinct value</strong>, addressed in <a href="#the-cost-and-its-mitigations">§ The Cost</a>.</p>
+<h2 id="the-jmm-final-field-safe-publication-guarantee">The JMM Final-Field Safe-Publication Guarantee<a class="anchor" href="#the-jmm-final-field-safe-publication-guarantee" aria-hidden="true">#</a></h2>
+<p>Here is the <strong>deep reason</strong> immutable objects are thread-safe — and it's not obvious. Sharing <em>any</em> object across threads normally requires synchronization, because without it, one thread might see another's writes out of order or not at all (the visibility problem — full treatment in L3/C01). So how can an immutable object be shared via a plain, non-volatile, unsynchronized reference and still be seen correctly?</p>
+<p>The answer is the <strong>Java Memory Model's <code>final</code>-field guarantee</strong> (JLS §17.5), the <strong>freeze</strong> we met in <a href="c01-t02-fields-methods-constructors-this.html">T02</a>. When a constructor that sets <code>final</code> fields completes, the JVM inserts a <strong>freeze action</strong> — a memory barrier — at the end of the constructor. The guarantee: <strong>any thread that reads a reference to the object, where that reference was written after the constructor returned, is guaranteed to see the correctly-initialized values of the object's <code>final</code> fields</strong> — with <strong>no synchronization required</strong>.</p>
+<div class="mermaid">flowchart TB
+  Ctor["constructor sets final fields"]
+  Ctor --> Freeze["JMM FREEZE at constructor exit (memory barrier)"]
+  Freeze --> Pub["reference published to another thread"]
+  Pub --> Read["other thread reads the object"]
+  Read --> Guarantee["GUARANTEED to see initialized final fields — NO sync needed"]
+</div>
+<p>This is <strong>safe publication for immutable objects</strong>. It's why <code>String s = computeString(); sharedField = s;</code> in one thread, read by another thread as <code>sharedField</code>, never exposes a half-built <code>String</code> — the <code>final byte[] value</code> is frozen and visible. Without <code>final</code> fields, there's no such guarantee: another thread could see the default (zero/null) value of a non-<code>final</code> field even after construction, because the constructor's writes could be reordered after the reference write.</p>
+<p>Two caveats (<a href="c01-t02-fields-methods-constructors-this.html">T02</a>):</p>
+<ul>
+<li><strong><code>this</code> must not escape during construction.</strong> If the constructor publishes <code>this</code> before finishing (the leaking-<code>this</code> bug), the freeze hasn't happened yet and the guarantee is void.</li>
+<li><strong>It applies only to <code>final</code> fields.</strong> This is <em>why</em> rule 3 (all fields <code>final</code>) matters beyond intent — it's load-bearing for thread-safety.</li>
+</ul>
+<p>At the architecture level, the freeze is a <strong><code>StoreStore</code> barrier</strong> on weakly-ordered CPUs (ARM emits <code>dmb ishst</code>; Power emits <code>lwsync</code> — <a href="c01-t02-fields-methods-constructors-this.html#deeper-jvm-internals--putfield-field-offsets-and-final-freeze-barriers">T02 deeper section</a>) ensuring the field writes retire before the publishing write; on strongly-ordered x86 (TSO) it's typically a no-op because the hardware already preserves store order. Either way, the cost is ~zero on x86 and a few cycles on ARM, paid once at construction — a tiny price for lock-free sharing.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Why are immutable objects thread-safe?" Two layers: (1) no mutation means no concurrent writes, so no data races; (2) the JMM <code>final</code>-field freeze guarantees that an object's <code>final</code> fields are fully visible to any thread that reads the object after construction, <em>without synchronization</em> — safe publication for free. Together these let you share an immutable object across threads via a plain reference with no locks. This is the deepest practical benefit of immutability and the reason <code>String</code>, records, and <code>java.time</code> types are safely shareable.</p></div></div>
+<h2 id="functional-updates-and-withers">Functional Updates and "Withers"<a class="anchor" href="#functional-updates-and-withers" aria-hidden="true">#</a></h2>
+<p>Since you can't mutate, you <strong>return a new object</strong> for every change — the <em>functional update</em>. The JDK's immutable types all do this (<code>String.toUpperCase</code>, <code>BigInteger.add</code>, <code>LocalDate.plusDays</code>). For your own immutable classes and records, the idiom is a <strong>"wither"</strong> (<a href="c01-t14-record-types.html">T14</a>/<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public record Point(int x, int y) {
+    public Point withX(int newX) { return new Point(newX, y); }   // a modified COPY
+    public Point withY(int newY) { return new Point(x, newY); }
+}
+
+Point p = new Point(3, 4);
+Point q = p.withX(10);            // Point[x=10, y=4]; p is unchanged
+</code></pre></div>
+<p>Each wither builds a new object sharing the unchanged components. Chained, they read like a fluent transformation (<code>p.withX(10).withY(20)</code>), each step producing a fresh immutable value. (Records don't auto-generate withers — <a href="c01-t14-record-types.html">T14</a> — though a <code>with</code>-expression language feature is planned. Kotlin data classes auto-generate <code>copy(x = ...)</code> to the same end.)</p>
+<div class="mermaid">flowchart LR
+  P["p = Point(3,4)"]
+  P -- "withX(10) → NEW object" --> Q["q = Point(10,4)"]
+  P -. "p UNCHANGED" .-> P2["still Point(3,4)"]
+  Q -- "withY(20) → NEW object" --> R["Point(10,20)"]
+</div>
+<h2 id="records-as-immutability-by-default">Records as Immutability-by-Default<a class="anchor" href="#records-as-immutability-by-default" aria-hidden="true">#</a></h2>
+<p>Records (<a href="c01-t14-record-types.html">T14</a>) are the language's <strong>immutability-by-default</strong> construct: <code>final</code> class, <code>private final</code> fields, no setters, generated value-based <code>equals</code>/<code>hashCode</code> — four of the five rules satisfied automatically. For a transparent immutable value, <code>record Point(int x, int y) {}</code> <em>is</em> a correct immutable class in one line.</p>
+<p>The one rule records <em>don't</em> automatically satisfy is <strong>rule 5</strong> (mutable components): a record with a mutable component is only <em>shallowly</em> immutable — the component can be mutated through its shared reference (<a href="c01-t14-record-types.html">T14</a>/<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">record Data(int[] values) {}              // shallowly immutable — the array is mutable!
+record Data2(List&lt;Integer&gt; values) {      // deeply immutable IF you copy
+    Data2 { values = List.copyOf(values); }   // compact constructor: immutable snapshot
+}
+</code></pre></div>
+<p>So: <strong>for immutable value types, default to records</strong>; add defensive copies in the compact constructor (or use immutable component types) when a component is mutable. Records make rules 1–4 free and turn rule 5 into a one-line compact-constructor copy.</p>
+<h2 id="effectively-immutable-and-the-mutability-spectrum">Effectively Immutable and the Mutability Spectrum<a class="anchor" href="#effectively-immutable-and-the-mutability-spectrum" aria-hidden="true">#</a></h2>
+<p>Immutability isn't binary; there's a useful spectrum:</p>
+<div class="mermaid">flowchart LR
+  I["immutable: final fields → free thread-safety (JMM freeze)"]
+  EI["effectively immutable: never mutated but non-final → safe ONLY if published with sync/volatile"]
+  DC["defensively copied: mutable, copies at every boundary"]
+  M["mutable: needs synchronization to share"]
+  I --> EI --> DC --> M
+</div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Definition</th>
+<th>Thread-safe?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Immutable</strong></td>
+<td><code>final</code> fields, no mutation, deeply protected components</td>
+<td>yes, with JMM freeze (no sync)</td>
+</tr>
+<tr>
+<td><strong>Effectively immutable</strong></td>
+<td>never mutated after construction, but fields not <code>final</code></td>
+<td>yes, <em>only if safely published</em> (needs <code>volatile</code>/sync)</td>
+</tr>
+<tr>
+<td><strong>Defensively copied</strong></td>
+<td>mutable, but copies cross every boundary</td>
+<td>depends</td>
+</tr>
+<tr>
+<td><strong>Mutable</strong></td>
+<td>freely changes</td>
+<td>no (needs synchronization)</td>
+</tr>
+</tbody>
+</table></div>
+<p>An <strong>effectively immutable</strong> object is technically mutable (non-<code>final</code> fields, maybe setters) but is <em>never mutated</em> after construction in practice. It gets immutability's <em>simplicity</em> benefits, but it <strong>lacks the JMM freeze</strong> (which requires <code>final</code> fields), so safe publication across threads requires <code>volatile</code> or synchronization. Prefer genuine immutability (<code>final</code> fields) when you can — the freeze is free thread-safety that effectively-immutable objects don't get.</p>
+<h2 id="the-cost-and-its-mitigations">The Cost and Its Mitigations<a class="anchor" href="#the-cost-and-its-mitigations" aria-hidden="true">#</a></h2>
+<p>The one real downside: <strong>a new object for every distinct value</strong>, which means more allocation and GC pressure when values are large or change often. A loop that "updates" an immutable object N times creates N objects. Four mitigations:</p>
+<div class="mermaid">flowchart TB
+  Cost["cost: a new object per change (allocation + GC)"]
+  Cost --> M1["escape analysis: short-lived immutables eliminated (T01)"]
+  Cost --> M2["share, don't copy: immutables alias freely"]
+  Cost --> M3["structural sharing: copy only the changed path (O(log n))"]
+  Cost --> M4["mutable companion for hot building (StringBuilder for String)"]
+</div>
+<ol>
+<li><strong>Escape analysis</strong> (<a href="c01-t01-classes-and-objects.html">T01</a>) — a short-lived immutable that doesn't escape its method is scalar-replaced and never allocated. The functional-update object that you immediately consume costs nothing in hot code.</li>
+<li><strong>Share, don't copy.</strong> Because immutables can't change, you <em>share</em> them instead of copying — the opposite of the mutable world's defensive copying. <code>BigInteger.ZERO</code>, <code>""</code>, <code>Optional.empty()</code>, <code>List.of()</code> are shared singletons.</li>
+<li><strong>Structural sharing</strong> (<a href="#memory-layer--structural-sharing">§ Structural Sharing</a>) — for collections, a "modified copy" shares the unchanged structure, copying only the changed path (O(log n) nodes, not O(n)).</li>
+<li><strong>A mutable companion for performance-critical building.</strong> <code>String</code> is immutable, but <code>StringBuilder</code> is its mutable companion for building strings in a loop (<a href="../l0/c02-t07-stringbuilder-stringbuffer.html">L0/C02/T07</a>) — build mutably, freeze to immutable at the end (<code>sb.toString()</code>). The pattern: mutate locally where it's confined and safe, expose immutability at the boundary.</li>
+</ol>
+<h2 id="memory-layer-immutable-object-layout">Memory Layer — Immutable Object Layout<a class="anchor" href="#memory-layer-immutable-object-layout" aria-hidden="true">#</a></h2>
+<p>An immutable object has <strong>no special memory layout</strong> — it's an ordinary object: header + fields (<a href="c01-t01-classes-and-objects.html">T01</a>), with the fields marked <code>final</code> (the <code>ACC_FINAL</code> flag — <a href="c01-t03-encapsulation-and-access-modifiers.html">T03</a>). <code>record Point(int x, int y)</code> is 24 bytes (12 header + 4 + 4 + 4 pad), identical to a mutable <code>Point</code> (<a href="c01-t14-record-types.html">T14</a>). Immutability is a property of the <em>type's contract and the <code>final</code> flags</em>, not of the instance bytes — there's no per-object "immutable" tag.</p>
+<p>The <code>final</code> flag does two things in memory: it makes the field read-only after construction (the verifier and compiler reject reassignment — <a href="c01-t02-fields-methods-constructors-this.html">T02</a>), and it triggers the JMM freeze barrier at constructor exit. The JIT can also exploit <code>final</code>: it may <strong>constant-fold</strong> a <code>final</code> field's value if it's provably constant, and it can <strong>cache</strong> a <code>final</code> field's value across reads without re-loading (a non-<code>final</code> field must be re-read in case another thread changed it — a real optimization difference).</p>
+<h3 id="strings-immutability-mechanics">String's Immutability Mechanics<a class="anchor" href="#strings-immutability-mechanics" aria-hidden="true">#</a></h3>
+<p><code>String</code> is the archetypal immutable, and its internals show the pattern (<a href="../l0/c02-t06-strings-and-text-blocks.html">L0/C02/T06</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class String {            // final class
+    private final byte[] value;         // final — the characters, never mutated or exposed
+    private final byte coder;           // final
+    private int hash;                   // NON-final — but a benign data race (see below)
+}
+</code></pre></div>
+<p>The <code>value</code> array is <code>final</code>, <code>private</code>, never handed out, and never mutated after construction — so the <code>String</code> is deeply immutable even though it holds an array (the array is <em>exclusively owned</em>, rule 5). This is what makes <code>String</code> safely shareable, internable (the string pool), and a perfect hash key. The one non-<code>final</code> field, <code>hash</code>, is a <strong>deliberate benign data race</strong>: it caches the hashCode, and if two threads compute it simultaneously they compute the <em>same</em> value, so the race is harmless (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>) — a rare, expert-level exception that proves the rule.</p>
+<h2 id="memory-layer-structural-sharing">Memory Layer — Structural Sharing<a class="anchor" href="#memory-layer-structural-sharing" aria-hidden="true">#</a></h2>
+<p>The technique that makes immutable <em>collections</em> practical is <strong>structural sharing</strong>, the heart of <strong>persistent data structures</strong> (Clojure's vectors/maps, Scala's immutable collections, Java's planned persistent collections). The idea: an "update" creates a new version that <strong>shares the unchanged structure</strong> with the old version, copying only the path from the root to the changed node.</p>
+<p>Consider an immutable tree-backed list of a million elements. A naive immutable update would copy all million elements — O(n), prohibitive. A persistent vector (a wide tree, branching factor 32) instead copies only the nodes on the <strong>path from root to the changed leaf</strong> — about log₃₂(1,000,000) ≈ <strong>4 nodes</strong> — and <em>shares</em> every other subtree with the original:</p>
+<div class="mermaid">flowchart TB
+  Old["original (root v1)"]
+  New["updated copy (root v2)"]
+  Old --> A1["subtree A (SHARED)"]
+  New --> A1
+  Old --> B1["subtree B v1 (changed path — copied)"]
+  New --> B2["subtree B v2 (copied, points to changed leaf)"]
+  B1 --> Shared["most leaves SHARED between v1 and v2"]
+  B2 --> Shared
+</div>
+<p>So a "modified copy" of a million-element persistent collection copies ~4 nodes and shares the rest — O(log n), not O(n). Both versions remain valid and immutable; the old one is unaffected. This is why functional languages can treat collections as immutable values without crippling performance: structural sharing turns "copy the whole thing" into "copy the spine." It also dovetails with garbage collection — when the old version becomes unreachable, only its ~4 unique nodes are garbage; the shared structure stays alive under the new version.</p>
+<h2 id="memory-layer-interning-and-caching">Memory Layer — Interning and Caching<a class="anchor" href="#memory-layer-interning-and-caching" aria-hidden="true">#</a></h2>
+<p>Because immutable objects can't change, <strong>identical values can be deduplicated into a single shared instance</strong> — interning. The JVM does this for two important cases (<a href="../l0/c02-t05-type-conversion-and-casting.html">L0/C02/T05</a>/<a href="../l0/c02-t06-strings-and-text-blocks.html">T06</a>):</p>
+<ul>
+<li><strong>The String pool</strong> — <code>String</code> literals are interned: every <code>"hello"</code> in your program refers to the <em>same</em> <code>String</code> object (<a href="../l0/c02-t06-strings-and-text-blocks.html">L0/C02/T06</a>). <code>String.intern()</code> deduplicates dynamically-created strings. Safe <em>because</em> <code>String</code> is immutable — sharing one instance among many call sites can't cause a surprise, since no one can change it.</li>
+<li><strong>The Integer cache</strong> — <code>Integer.valueOf(i)</code> returns a cached shared instance for −128..127 (<a href="../l0/c02-t05-type-conversion-and-casting.html">L0/C02/T05</a>). Safe for the same reason: an immutable <code>Integer</code> can be shared without risk (and it's the cause of the <code>Integer == Integer</code> cache trap).</li>
+</ul>
+<p>Interning is a <em>direct consequence</em> of immutability: you can only safely share-one-for-many if the shared thing can't be mutated by any of the sharers. Mutable objects can never be interned. Immutability is what unlocks deduplication, caching, and the flyweight pattern.</p>
+<h2 id="architecture-layer-read-only-data-is-cache-friendly">Architecture Layer — Read-Only Data Is Cache-Friendly<a class="anchor" href="#architecture-layer-read-only-data-is-cache-friendly" aria-hidden="true">#</a></h2>
+<p>Immutability has a multicore performance benefit beyond lock-free sharing: <strong>read-only shared data is cache-coherence-friendly</strong>. Under the MESI cache-coherence protocol, when multiple cores read the same cache line, each holds it in the <strong>Shared</strong> state in its own L1 — all cores can read concurrently with <strong>zero coherence traffic</strong> (<a href="c01-t01-classes-and-objects.html">T01</a> caches). No core's read invalidates another's copy.</p>
+<p>Mutable shared data is the opposite. When one core <em>writes</em> a cache line, the protocol must <strong>invalidate</strong> every other core's copy (transition them to Invalid), and the next reader must re-fetch — the cache line <strong>ping-pongs</strong> between cores' caches. For a hot mutable field touched by many threads, this coherence traffic dominates and serializes what looks like parallel code (the true-sharing / false-sharing problem, full treatment in L3/C01).</p>
+<div class="mermaid">flowchart TB
+  Imm["immutable shared object (read-only)"]
+  Imm --> Shared["cache line stays SHARED across all cores' L1 — concurrent reads, ZERO invalidation traffic"]
+  Mut["mutable shared object (writes)"]
+  Mut --> Pong["each write INVALIDATES other cores' copies → cache-line ping-pong → serialization"]
+</div>
+<p>So immutable shared data is not merely <em>safe</em> on multicore — it's <em>fast</em>, because read-only lines never trigger coherence traffic. This is increasingly decisive: as core counts grow, the cost of mutable shared state grows with them, while immutable shared state scales freely. It's a deep reason the industry is trending toward immutability for concurrent and parallel code — the hardware <em>rewards</em> read-only sharing.</p>
+<h2 id="cross-language-perspective-the-immutable-by-default-trend">Cross-Language Perspective — The Immutable-by-Default Trend<a class="anchor" href="#cross-language-perspective-the-immutable-by-default-trend" aria-hidden="true">#</a></h2>
+<p>Java makes mutability the default and immutability a discipline you opt into. Many modern languages do the reverse — and the trend is unmistakably toward immutable-by-default:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Default</th>
+<th>Immutability mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td>mutable</td>
+<td><code>final</code>, records, <code>List.of</code>/<code>copyOf</code> (opt-in)</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td><strong>immutable</strong> (<code>let</code>)</td>
+<td><code>let mut</code> to opt <em>into</em> mutation; borrow checker enforces shared-xor-mutable</td>
+</tr>
+<tr>
+<td><strong>Clojure</strong></td>
+<td><strong>immutable</strong></td>
+<td>persistent data structures with structural sharing as the core model</td>
+</tr>
+<tr>
+<td><strong>Haskell</strong></td>
+<td><strong>immutable</strong> (pure)</td>
+<td>no mutation at all; state via monads</td>
+</tr>
+<tr>
+<td><strong>Scala</strong></td>
+<td>mutable allowed, immutable encouraged</td>
+<td><code>val</code> vs <code>var</code>; immutable collections by default</td>
+</tr>
+<tr>
+<td><strong>Kotlin</strong></td>
+<td>mutable allowed, immutable encouraged</td>
+<td><code>val</code> vs <code>var</code>; <code>data class</code>; read-only collection interfaces</td>
+</tr>
+<tr>
+<td><strong>C#</strong></td>
+<td>mutable</td>
+<td><code>readonly</code>, records (C# 9), <code>ImmutableList</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Two contrasts:</p>
+<p><strong>Rust makes immutability the default <em>and</em> enforces safe sharing.</strong> A <code>let x = 5</code> binding is immutable; you opt into mutation with <code>let mut x = 5</code>. More deeply, Rust's borrow checker enforces the rule that at any moment you may have <strong>either one mutable reference or many immutable references</strong>, never both (<a href="c01-t01-classes-and-objects.html">T01</a>/<a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a>) — which makes shared-immutable data <em>provably</em> safe at compile time and is the language-level resolution of the aliasing problem Java patches with discipline. Rust gets, at compile time, what Java achieves only by convention.</p>
+<p><strong>Clojure and Haskell build everything on immutability.</strong> Clojure's core data structures are <em>persistent and immutable</em> with structural sharing — "modifying" a map returns a new map sharing most of its structure (<a href="#memory-layer--structural-sharing">§ Structural Sharing</a>), and this is the <em>normal</em> way to work, designed for effortless concurrency. Haskell goes further: nothing mutates, ever; the entire language is built on immutable values and pure functions, with controlled effects via monads. These languages chose immutable-by-default <em>specifically because</em> it makes concurrent and parallel programming tractable — no shared mutable state means no data races by construction.</p>
+<p>The industry trend is clear: as multicore became universal, immutable-by-default went from a functional-programming niche to a mainstream concurrency strategy. Java is <strong>retrofitting</strong> — records, the encouragement to "minimize mutability," immutable collection factories (<code>List.of</code>, <code>copyOf</code>), the <code>java.time</code> redesign around immutability, and (forthcoming) value classes and <code>with</code>-expressions. You can't make Java immutable-by-default without breaking decades of code, but every modern Java feature pushes that direction. The takeaway for <em>your</em> code: <strong>make classes immutable unless there's a compelling reason not to</strong> — it's the single most effective way to make Java code simpler, safer, and more concurrency-ready.</p>
+<div class="mermaid">flowchart LR
+  Mut["mutable-by-default: Java, C# (immutability opt-in)"]
+  Imm["immutable-by-default: Rust (let), Clojure, Haskell, (Scala/Kotlin encourage val)"]
+  Mut -.->|"multicore drives the shift"| Imm
+  Imm --> Why["no shared mutable state → no data races by construction → scales with cores"]
+  Mut --> Retro["Java retrofitting: records, final, List.of/copyOf, java.time, value classes (coming)"]
+</div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Missing defensive copy of a mutable component.</strong> A <code>final</code> field referencing a mutable object (array, <code>List</code>, <code>Date</code>) is <em>not</em> immutable — clients can mutate it through a shared reference. Copy in and out, or use immutable component types (<code>List.copyOf</code>, <code>Instant</code>).</p><p>[!WARNING]
+<strong>Non-<code>final</code> class.</strong> If your "immutable" class isn't <code>final</code> (and lacks private-constructor-plus-factory protection), a subclass can add mutable state or override methods to fake mutation, breaking the guarantee for code holding it as the supertype.</p>
+<p>[!WARNING]
+<strong>Confusing <code>final</code> field with deep immutability.</strong> <code>final</code> freezes the <em>reference</em>, not the referenced object's contents (<a href="c01-t02-fields-methods-constructors-this.html">T02</a>/<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>). <code>private final int[] data</code> is a frozen reference to a <em>mutable</em> array.</p>
+<p>[!WARNING]
+<strong>Returning the internal mutable collection from an accessor.</strong> Even with a <code>final</code> private field, an accessor that returns the field hands out a mutable reference — an encapsulation leak (<a href="c01-t03-encapsulation-and-access-modifiers.html">T03</a>). Return an immutable view/copy.</p>
+<p>[!WARNING]
+<strong>Validating before defensively copying.</strong> With a mutable parameter (<code>Date</code>), validate the <em>copy</em>, not the parameter — otherwise a TOCTOU race lets another thread change the value between the check and the copy.</p>
+<p>[!WARNING]
+<strong>Over-copying when sharing or structural sharing would do.</strong> Immutables can be <em>shared</em> freely — don't defensively copy an immutable object (it can't change). For large collections, reach for immutable/persistent collections rather than copying on every change.</p>
+<p>[!WARNING]
+<strong>Relying on effective immutability across threads without safe publication.</strong> A never-mutated-but-non-<code>final</code>-field object lacks the JMM freeze; sharing it across threads still needs <code>volatile</code>/synchronization. Use <code>final</code> fields for free thread-safety.</p>
+<p>[!INTERVIEW]
+Common interview questions for this topic:
+1. <strong>What are the five rules for an immutable class?</strong> No mutators; class final (or private ctor + factories); all fields final; all fields private; defensive copies of mutable components (in and out).
+2. <strong>Why are immutable objects thread-safe?</strong> No writes → no races; plus the JMM <code>final</code>-field freeze guarantees safe publication (other threads see initialized final fields without synchronization). Together: share via a plain reference, no locks.
+3. <strong>What's the JMM final-field guarantee?</strong> When a constructor setting <code>final</code> fields completes, a freeze (memory barrier) ensures any thread reading the object after construction sees the initialized final fields — no synchronization needed (provided <code>this</code> didn't escape).
+4. <strong>Why must immutable fields be <code>final</code> and not just never-mutated?</strong> <code>final</code> triggers the JMM freeze (free safe publication); effectively-immutable objects with non-final fields lack it and need explicit synchronization to publish safely.
+5. <strong>Why does <code>final</code> alone not make an object immutable?</strong> <code>final</code> freezes the reference, not the referenced object's contents — a <code>final</code> array/List/Date field is still mutable.
+6. <strong>What's a defensive copy and when?</strong> Copying a mutable component in the constructor (so the class owns it) and the accessor (so clients can't mutate the internal one). Or use immutable component types.
+7. <strong>What's structural sharing?</strong> A persistent data structure's "modified copy" shares the unchanged structure and copies only the changed path (O(log n) nodes, not O(n)) — what makes immutable collections practical.
+8. <strong>Why are immutable objects good hash keys?</strong> Their state never changes, so their <code>hashCode</code> is stable — they can't get lost in a <code>HashMap</code> by mutating after insertion (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>).
+9. <strong>What's the cost of immutability and how is it mitigated?</strong> A new object per change. Mitigated by escape analysis (eliminate short-lived ones), sharing (don't copy immutables), structural sharing (for collections), and mutable companions (StringBuilder).
+10. <strong>Why is immutable shared data cache-friendly?</strong> Read-only cache lines stay in the MESI Shared state across all cores with no invalidation traffic; mutable shared data ping-pongs between caches on every write.
+11. <strong>How do records relate to immutability?</strong> Records are immutable-by-default (final class, private final fields, no setters) — four of five rules free; only mutable components need defensive copies (rule 5).
+12. <strong>What's a "wither"?</strong> A method returning a modified copy of an immutable object (<code>point.withX(10)</code>), the functional-update idiom since you can't mutate.
+13. <strong>How does Rust's approach differ?</strong> Immutable by default (<code>let</code> vs <code>let mut</code>), and the borrow checker enforces shared-xor-mutable at compile time — making shared-immutable data provably safe, which Java only achieves by convention.
+14. <strong>Why is the industry trending to immutable-by-default?</strong> Multicore: no shared mutable state means no data races by construction, and read-only sharing scales with core count while mutable sharing degrades — immutability is the simplest path to safe, scalable concurrency.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li>
+<p><strong>Five-rule immutable class.</strong> Build an immutable <code>Money(long cents, String currency)</code> following all five rules (final class, private final fields, no setters, validation, immutable components). Add an <code>add(Money)</code> that returns a new <code>Money</code>. Confirm the original is never modified.</p>
+</li>
+<li>
+<p><strong>Defensive copy with a mutable component.</strong> Build the <code>Period(Date start, Date end)</code> example. Demonstrate the bug <em>without</em> defensive copies (mutate the input <code>Date</code> and the accessor's returned <code>Date</code>, observe the <code>Period</code> changes), then fix with copies in and out. Then rewrite with <code>Instant</code> and observe no copies are needed.</p>
+</li>
+<li>
+<p><strong>TOCTOU validation order.</strong> Show that validating the parameter before copying (vs copying then validating) leaves a race window. Reorder to copy-then-validate.</p>
+</li>
+<li>
+<p><strong><code>List.copyOf</code> snapshot.</strong> Rewrite a <code>Config</code> holding a <code>List&lt;String&gt;</code> to snapshot with <code>List.copyOf</code> in the constructor. Confirm mutating the input list afterward doesn't affect the <code>Config</code>, and the accessor can safely return the field directly (it's immutable).</p>
+</li>
+<li>
+<p><strong>Immutable as a stable hash key.</strong> Put an immutable <code>Point</code> in a <code>HashMap</code>. Confirm you can always retrieve it (its hashCode never changes). Contrast with a mutable <code>Point</code> whose field you change after insertion — it gets lost (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>).</p>
+</li>
+<li>
+<p><strong>JMM safe publication.</strong> Build an immutable class with a <code>final</code> field. Publish an instance from one thread via a <em>non-volatile</em> static field; read it from another. Confirm correct visibility (statistically). Then make the field non-<code>final</code> and a never-set-correctly value can appear under contention (hard to reproduce; document the rule).</p>
+</li>
+<li>
+<p><strong><code>final</code> is shallow.</strong> Declare <code>private final int[] data</code>. Confirm you can't reassign <code>data</code> but <em>can</em> do <code>data[0] = 99</code>. Conclude that <code>final</code> ≠ deep immutability.</p>
+</li>
+<li>
+<p><strong>Functional update / wither.</strong> Add <code>withX</code>/<code>withY</code> to a <code>Point</code> record. Chain <code>p.withX(10).withY(20)</code>; confirm the original <code>p</code> and each intermediate are unchanged.</p>
+</li>
+<li>
+<p><strong>Record shallow-immutability fix.</strong> Make <code>record Data(int[] values)</code>. Mutate the array through the component; observe the record "changed." Fix by switching to <code>List&lt;Integer&gt;</code> + <code>List.copyOf</code> in a compact constructor.</p>
+</li>
+<li>
+<p><strong>Structural sharing.</strong> Use a persistent collection (e.g., via a library like Vavr or a hand-built persistent list, or study Clojure semantics). "Update" a large persistent vector and confirm (conceptually or via instrumentation) that most structure is shared, not copied — O(log n) new nodes.</p>
+</li>
+<li>
+<p><strong>String immutability mechanics.</strong> Use reflection to read <code>String</code>'s private <code>final byte[] value</code>. Confirm it's never exposed by any public method. Confirm two <code>"hello"</code> literals are <code>==</code> (interned — shared because immutable).</p>
+</li>
+<li>
+<p><strong>Sharing vs copying immutables.</strong> Show that you can freely share <code>BigInteger.ZERO</code> / <code>""</code> / <code>List.of()</code> across threads and data structures with no defensive copies — because they can't change.</p>
+</li>
+<li>
+<p><strong>EA eliminates a short-lived immutable.</strong> Write a hot method that creates an immutable object, uses it, and discards it. Run with <code>-XX:+PrintEliminateAllocations</code>; confirm the allocation is eliminated by escape analysis (<a href="c01-t01-classes-and-objects.html">T01</a>).</p>
+</li>
+<li>
+<p><strong>Mutable companion.</strong> Build a <code>String</code> in a loop with <code>+=</code> (creating many immutables) vs a <code>StringBuilder</code> (mutable companion). Measure the allocation/time difference; conclude the pattern "build mutably, freeze to immutable."</p>
+</li>
+<li>
+<p><strong>End-to-end explain-it-back (capstone).</strong> Trace why <code>String s = compute(); sharedField = s;</code> is safe to read from another thread with no lock: (a) <code>String</code> is immutable with a <code>final byte[] value</code>; (b) the constructor's freeze inserts a memory barrier (a <code>dmb ishst</code> on ARM, a no-op on x86) at construction exit; (c) the barrier guarantees the <code>value</code> writes retire before the publishing write to <code>sharedField</code>; (d) the reading thread sees the fully-initialized <code>String</code>, never a half-built one; (e) no mutation means no further races; (f) tie this back to the chapter — how immutability dissolves the aliasing (T12), defensive-copy (T18), hash-key (T10), and thread-safety problems at once. Twelve sentences max.</p>
+</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<p><strong>Language layer.</strong></p>
+<ul>
+<li>Define immutability (state can't change after construction) and recognize the JDK's immutable types (<code>String</code>, wrappers, <code>BigInteger</code>, <code>java.time</code>, records).</li>
+<li>Apply the five rules: no mutators; final class (or private ctor + factories); all fields final; all fields private; defensive copies of mutable components.</li>
+<li>Defensively copy mutable components in and out — or, better, use immutable component types (<code>List.copyOf</code>, <code>Instant</code>).</li>
+<li>State immutability's benefits: simplicity, free thread-safety, safe hash keys, free sharing/caching, failure atomicity.</li>
+<li>Write functional updates / withers (return a new object).</li>
+<li>Use records as immutability-by-default and fix the shallow-immutability caveat with compact-constructor copies.</li>
+<li>Distinguish immutable, effectively-immutable, defensively-copied, and mutable, and know the thread-safety implications of each.</li>
+</ul>
+<p><strong>Memory layer.</strong></p>
+<ul>
+<li>Explain that an immutable object has a normal layout (header + <code>final</code> fields, <code>ACC_FINAL</code>); immutability is in the contract and flags, not the bytes.</li>
+<li>Explain <code>String</code>'s immutability mechanics (final private never-exposed <code>value</code> array; the benign <code>hash</code> data race).</li>
+<li>Explain structural sharing: a persistent collection's modified copy shares unchanged structure, copying only the O(log n) changed path.</li>
+<li>Explain how immutability enables interning and caching (String pool, Integer cache) — safe deduplication of shared instances.</li>
+</ul>
+<p><strong>Architecture layer.</strong></p>
+<ul>
+<li>Explain the JMM <code>final</code>-field freeze as the mechanism behind safe publication: a constructor-exit memory barrier (StoreStore on ARM, no-op on x86) that makes <code>final</code> fields visible to other threads without synchronization.</li>
+<li>Explain why immutable shared data is cache-friendly (read-only lines stay MESI-Shared across cores, zero invalidation traffic) and mutable shared data ping-pongs.</li>
+<li>Explain the cost (new object per change) and its mitigations (EA, sharing, structural sharing, mutable companions).</li>
+<li>Place Java's immutability retrofit in the immutable-by-default trend (Rust's <code>let</code>/borrow-checker, Clojure/Haskell persistence/purity) and articulate why multicore drives it.</li>
+</ul>
+<p><strong>Chapter capstone.</strong> Immutability ties together everything in L1/C01: it's <code>final</code> fields (<a href="c01-t02-fields-methods-constructors-this.html">T02</a>) made into a design discipline, the resolution of the aliasing problem (<a href="c01-t12-inner-local-and-anonymous-classes.html">T12</a>), the reason <code>equals</code>/<code>hashCode</code> keys stay stable (<a href="c01-t10-equals-hashcode-tostring-contracts.html">T10</a>), the natural form of records (<a href="c01-t14-record-types.html">T14</a>), and the reason you share instead of clone (<a href="c01-t18-object-cloning-and-cloneable.html">T18</a>). The single most valuable habit from this chapter: <strong>make classes immutable unless you have a compelling reason not to.</strong></p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>This completes <strong>L1/C01 — Object-Oriented Programming</strong>. You can now design Java types from first principles: classes and objects in memory; constructors, encapsulation, inheritance, overriding, and polymorphism; abstract classes and interfaces; the <code>Object</code> contract and <code>equals</code>/<code>hashCode</code>/<code>toString</code>; static members and the four kinds of nested class; enums, records, and sealed types for modern data modeling; packages and modules for organization; and cloning and immutability for copying and protecting state — all with their memory and machine-level mechanics.</p>
+<p>Continue to <strong><a href="../C02-collections-and-core-apis/">L1/C02 — Collections &amp; Core APIs</a></strong>, starting with <a href="c02-t01-collections-framework-overview.html">Collections framework overview</a>. Having built the <em>types</em>, you'll now use the JDK's <em>data structures</em> — <code>List</code>, <code>Set</code>, <code>Map</code>, <code>Queue</code> and their implementations — applying everything from this chapter (<code>equals</code>/<code>hashCode</code> for keys, immutability for safety, generics for type-safety) to store and manipulate data at scale, with the same memory-and-performance depth.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Immutability &amp; immutable class design&quot;
+slug: immutability-and-immutable-class-design
+level: L1
+module: &quot;Core Java &amp; OOP&quot;
+section: &quot;Object-Oriented Programming&quot;
+type: concept
+difficulty: intermediate
+order: 19
+tags: [immutability, immutable-class, final, defensive-copy, jmm-final-freeze, safe-publication, thread-safety, functional-update, wither, structural-sharing, persistent-data-structure, effective-java-item-17, records, string-immutability, interning, copy-on-write, value-object]
+prerequisites: [fields-methods-constructors-this, equals-hashcode-tostring-contracts, inner-local-and-anonymous-classes, record-types, object-cloning-and-cloneable]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04
+---
+
+# Immutability &amp; immutable class design
+
+An **immutable** object is one whose state **cannot change after construction** — once built, it stays exactly as it was, forever. `String`, `Integer`, `BigDecimal`, `LocalDate`, and every record are immutable: there is no method that mutates them, and every &quot;change&quot; produces a *new* object instead. This is the **capstone of the OOP chapter** because immutability resolves, in one stroke, the problems that recurred through every topic before it: the aliasing bug where a &quot;copy&quot; silently shares mutable state ([T12](./T12-inner-local-and-anonymous-classes.md)), the defensive-copy dance to protect internal state ([T03](./T03-encapsulation-and-access-modifiers.md)/[T18](./T18-object-cloning-and-cloneable.md)), the requirement that hash keys never change ([T10](./T10-equals-hashcode-tostring-contracts.md)), the thread-safety hazards of shared mutable state ([T11](./T11-static-members-blocks-and-nested-classes.md)), and the broken `clone()` mechanism ([T18](./T18-object-cloning-and-cloneable.md) — you don&#x27;t copy what can&#x27;t change, you share it). *Effective Java* Item 17 is &quot;Minimize mutability,&quot; and it is among the most consequential pieces of advice in all of Java.
+
+The depth bar here is **why immutability buys thread-safety for free, and what it costs**. The deep answer to &quot;why are immutable objects inherently thread-safe?&quot; is the **Java Memory Model&#x27;s `final`-field safe-publication guarantee** ([T02](./T02-fields-methods-constructors-this.md)): when a constructor with `final` fields completes, the JVM inserts a **freeze** (a memory barrier — a `StoreStore` on weakly-ordered ARM, often a no-op on x86) that guarantees *any* thread reading a reference to the object after construction sees the fully-initialized `final` fields — **without any synchronization, lock, or `volatile`**. That single guarantee is why `String` and every immutable object can be shared across threads via plain non-volatile references and never expose a half-built or stale state. The cost is **a new object per &quot;change&quot;** (more allocation, more GC pressure), but it&#x27;s mitigated by **escape analysis** eliminating short-lived immutables ([T01](./T01-classes-and-objects.md)), by **sharing** immutable objects freely instead of copying them, and by **structural sharing** — persistent data structures where a &quot;modified copy&quot; of a million-element collection copies only the ~log₃₂(N) ≈ 4 nodes on the changed path and *shares* the rest. At the architecture level, read-only shared data is also **cache-friendly**: an immutable object&#x27;s cache line stays in the MESI &quot;Shared&quot; state across all cores simultaneously, with zero invalidation traffic — the opposite of mutable shared state&#x27;s cache-line ping-pong. By the end you&#x27;ll design a contract-correct immutable class, explain the JMM freeze that makes it thread-safe, defensively copy mutable components, reach for structural sharing when copies would be expensive, and place Java&#x27;s immutability retrofit in the industry-wide trend toward immutable-by-default.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Fields, methods, constructors, this](./T02-fields-methods-constructors-this.md) (`L1/C01/T02`) — `final` fields, the JMM freeze, leaking `this`; [equals/hashCode](./T10-equals-hashcode-tostring-contracts.md) (`L1/C01/T10`) — why immutable objects are safe hash keys; [Inner/anonymous classes](./T12-inner-local-and-anonymous-classes.md) (`L1/C01/T12`) — aliasing (shared mutable state); [record types](./T14-record-types.md) (`L1/C01/T14`) — immutable carriers; [Object cloning](./T18-object-cloning-and-cloneable.md) (`L1/C01/T18`) — defensive copies, why you share immutables instead of cloning.
+
+## The Recurring Problem — Mutation and Aliasing
+
+Almost every hazard in this chapter traces back to one root cause: **shared mutable state**. When two references point at the same mutable object ([T01](./T01-classes-and-objects.md)/[T12](./T12-inner-local-and-anonymous-classes.md)), a change through one is silently visible through the other:
+
+```java
+List&lt;String&gt; names = new ArrayList&lt;&gt;(List.of(&quot;Alice&quot;));
+Customer c = new Customer(names);
+names.add(&quot;Bob&quot;);                    // mutates the list the Customer also holds
+c.getNames();                        // [Alice, Bob] — the Customer&#x27;s state changed behind its back
+```
+
+This is the **aliasing bug** ([T12](./T12-inner-local-and-anonymous-classes.md)), and the chapter&#x27;s recurring defenses against it — defensive copies ([T03](./T03-encapsulation-and-access-modifiers.md)/[T18](./T18-object-cloning-and-cloneable.md)), `clone()` ([T18](./T18-object-cloning-and-cloneable.md)), careful encapsulation — are all *patches* for a problem that **immutability eliminates at the source**. If the object can&#x27;t change, sharing it is harmless: there&#x27;s no mutation to leak, no defensive copy to make, no race to lose. Immutability isn&#x27;t one more technique; it&#x27;s the design that makes most of the others unnecessary.
+
+```mermaid
+flowchart TB
+  Root[&quot;shared MUTABLE state&quot;]
+  Root --&gt; A[&quot;aliasing bugs (T12)&quot;]
+  Root --&gt; D[&quot;defensive-copy overhead (T03/T18)&quot;]
+  Root --&gt; H[&quot;unstable hash keys (T10)&quot;]
+  Root --&gt; T[&quot;thread-safety hazards (T11)&quot;]
+  Imm[&quot;IMMUTABILITY&quot;]
+  Imm -.-&gt;|&quot;eliminates the root cause&quot;| Root
+```
+
+## What Immutability Means
+
+An object is **immutable** if its observable state cannot change after the constructor returns. Concretely: no method changes any field, no field is reassigned, and any object the immutable one references is *also* effectively beyond the reach of mutation (or is itself immutable). Every operation that would &quot;change&quot; an immutable object instead returns a **new** object with the change applied, leaving the original untouched:
+
+```java
+String s = &quot;hello&quot;;
+String t = s.toUpperCase();          // returns a NEW String &quot;HELLO&quot;; s is still &quot;hello&quot;
+BigInteger a = BigInteger.valueOf(5);
+BigInteger b = a.add(BigInteger.ONE);// returns a NEW BigInteger 6; a is still 5
+LocalDate d = LocalDate.of(2026, 1, 1);
+LocalDate e = d.plusDays(30);        // returns a NEW LocalDate; d is unchanged
+```
+
+The JDK is full of immutable types: `String`, all the wrappers (`Integer`, `Long`, …), `BigInteger`, `BigDecimal`, the entire `java.time` API (`LocalDate`, `Instant`, `Duration`, …), and every record. They share the property that you can pass them anywhere, store them in any collection, share them across any number of threads — and never worry that someone, somewhere, changed them.
+
+## The Five Rules of an Immutable Class
+
+*Effective Java* Item 17 gives five rules for designing an immutable class:
+
+```mermaid
+flowchart TB
+  R[&quot;immutable class rules (EJ Item 17)&quot;]
+  R --&gt; R1[&quot;1. no mutators (no setters / state-changing methods)&quot;]
+  R --&gt; R2[&quot;2. class can&#x27;t be extended (final, or private ctor + factories)&quot;]
+  R --&gt; R3[&quot;3. all fields final&quot;]
+  R --&gt; R4[&quot;4. all fields private&quot;]
+  R --&gt; R5[&quot;5. exclusive access to mutable components (defensive copies in + out)&quot;]
+```
+
+1. **Don&#x27;t provide mutators.** No setters, no methods that change state. Operations return new objects.
+2. **Ensure the class can&#x27;t be extended.** Make it `final` ([T04](./T04-inheritance-and-super.md)), or make the constructor `private`/package-private and hand out instances via static factories ([T11](./T11-static-members-blocks-and-nested-classes.md)). Otherwise a malicious or careless subclass could *add* mutable state or override methods to pretend the object changed — breaking the immutability guarantee for code that holds the object as the supertype.
+3. **Make all fields `final`.** This expresses intent, and — crucially — gives the JMM safe-publication guarantee ([§ The JMM Freeze](#the-jmm-final-field-safe-publication-guarantee)).
+4. **Make all fields `private`.** So clients can&#x27;t read-and-then-mutate a field&#x27;s referenced object directly ([T03](./T03-encapsulation-and-access-modifiers.md)).
+5. **Ensure exclusive access to any mutable components.** If a field references a mutable object (an array, a `List`, a `Date`), the class must **defensively copy** it on the way in (constructor) and on the way out (accessor) so no client can obtain a reference to the internal object and mutate it.
+
+A complete example:
+
+```java
+public final class Period {                        // rule 2: final
+    private final Date start;                       // rules 3 + 4: private final
+    private final Date end;
+
+    public Period(Date start, Date end) {
+        this.start = new Date(start.getTime());     // rule 5: defensive copy IN
+        this.end   = new Date(end.getTime());
+        if (this.start.after(this.end))             // validate AFTER copying (avoid TOCTOU)
+            throw new IllegalArgumentException(&quot;start after end&quot;);
+    }
+
+    public Date start() { return new Date(start.getTime()); }   // rule 5: defensive copy OUT
+    public Date end()   { return new Date(end.getTime()); }
+    // rule 1: no setters
+}
+```
+
+&gt; [!IMPORTANT]
+&gt; Defensive-copy **into the fields first, then validate the copies** — not the parameters. `Date` is mutable, so validating the parameter and *then* copying leaves a window where another thread mutates the parameter between the check and the copy (a TOCTOU — time-of-check-to-time-of-use — race). Copy first, validate the copy. (This whole headache is why `java.time` replaced `Date` with immutable types — `Period` of two `Instant`s needs no defensive copies at all.)
+
+## Defensive Copies — The Mutable-Component Rule
+
+Rule 5 is the one that bites, and it&#x27;s the direct continuation of [T18](./T18-object-cloning-and-cloneable.md)&#x27;s copying and [T10](./T10-equals-hashcode-tostring-contracts.md)&#x27;s array-component caveat. `final` only freezes the **reference**, not the object it points at ([T02](./T02-fields-methods-constructors-this.md)):
+
+```java
+public final class Config {
+    private final List&lt;String&gt; servers;
+    public Config(List&lt;String&gt; servers) {
+        this.servers = servers;              // BUG: stores the caller&#x27;s mutable list
+    }
+    public List&lt;String&gt; servers() {
+        return servers;                       // BUG: hands out the internal list
+    }
+}
+
+List&lt;String&gt; input = new ArrayList&lt;&gt;(List.of(&quot;a&quot;));
+Config c = new Config(input);
+input.add(&quot;evil&quot;);                            // mutates Config&#x27;s &quot;immutable&quot; state
+c.servers().add(&quot;also evil&quot;);                 // mutates it again, through the accessor
+```
+
+The fixes ([T18](./T18-object-cloning-and-cloneable.md)): copy in and out, or — better — use **immutable component types** so the copies aren&#x27;t needed:
+
+```java
+public Config(List&lt;String&gt; servers) {
+    this.servers = List.copyOf(servers);      // immutable snapshot IN (Java 10+)
+}
+public List&lt;String&gt; servers() {
+    return servers;                            // safe to share — it&#x27;s already immutable
+}
+```
+
+`List.copyOf`/`Set.copyOf`/`Map.copyOf` return **immutable** collections, so one copy at construction suffices and the accessor can return the field directly. This is the modern, allocation-light way: snapshot once into an immutable type, share freely thereafter. The lesson generalizes — **prefer immutable component types** (`List` over `[]`, `Instant` over `Date`, records over mutable beans) so immutability composes without a thicket of defensive copies.
+
+## The Benefits of Immutability
+
+Why go to this trouble? Immutability pays off on five fronts ([EJ Item 17](#the-five-rules-of-an-immutable-class)):
+
+```mermaid
+flowchart TB
+  Imm[&quot;immutable object&quot;]
+  Imm --&gt; Simple[&quot;simple: exactly ONE state, for its whole life&quot;]
+  Imm --&gt; Thread[&quot;inherently THREAD-SAFE: no writes → no races → share with NO sync&quot;]
+  Imm --&gt; Keys[&quot;safe hash keys / set elements (stable hashCode — T10)&quot;]
+  Imm --&gt; Share[&quot;share/cache/alias FREELY (no defensive copy for sharing — kills T12)&quot;]
+  Imm --&gt; Atomic[&quot;failure-atomic: a failed operation leaves the object unchanged&quot;]
+```
+
+1. **Simplicity.** An immutable object has exactly one state — the one it was created with. There&#x27;s no lifecycle, no &quot;is it initialized?&quot;, no temporal coupling. You reason about it as a *value*, like the number 5.
+2. **Thread-safety for free.** No writes means no data races; immutable objects need **no synchronization** and can be shared across any number of threads safely ([§ The JMM Freeze](#the-jmm-final-field-safe-publication-guarantee)).
+3. **Safe hash keys and set elements.** A key whose state never changes has a stable `hashCode` ([T10](./T10-equals-hashcode-tostring-contracts.md)) — it can never &quot;get lost&quot; in a `HashMap` by mutating after insertion. Immutable types are the *ideal* map keys.
+4. **Free sharing and caching.** Because they can&#x27;t change, immutable objects can be shared, cached, interned, and aliased without defensive copies — the [T12](./T12-inner-local-and-anonymous-classes.md) aliasing problem simply doesn&#x27;t exist for them. `BigInteger.ZERO` is a single shared instance; the `String` pool and `Integer` cache exploit this.
+5. **Failure atomicity.** If a method throws partway through, the object is left exactly as it was — because an immutable object never changes state, a failed operation can&#x27;t leave it half-modified. You get failure atomicity for free.
+
+The price (one disadvantage): **a separate object for every distinct value**, addressed in [§ The Cost](#the-cost-and-its-mitigations).
+
+## The JMM Final-Field Safe-Publication Guarantee
+
+Here is the **deep reason** immutable objects are thread-safe — and it&#x27;s not obvious. Sharing *any* object across threads normally requires synchronization, because without it, one thread might see another&#x27;s writes out of order or not at all (the visibility problem — full treatment in L3/C01). So how can an immutable object be shared via a plain, non-volatile, unsynchronized reference and still be seen correctly?
+
+The answer is the **Java Memory Model&#x27;s `final`-field guarantee** (JLS §17.5), the **freeze** we met in [T02](./T02-fields-methods-constructors-this.md). When a constructor that sets `final` fields completes, the JVM inserts a **freeze action** — a memory barrier — at the end of the constructor. The guarantee: **any thread that reads a reference to the object, where that reference was written after the constructor returned, is guaranteed to see the correctly-initialized values of the object&#x27;s `final` fields** — with **no synchronization required**.
+
+```mermaid
+flowchart TB
+  Ctor[&quot;constructor sets final fields&quot;]
+  Ctor --&gt; Freeze[&quot;JMM FREEZE at constructor exit (memory barrier)&quot;]
+  Freeze --&gt; Pub[&quot;reference published to another thread&quot;]
+  Pub --&gt; Read[&quot;other thread reads the object&quot;]
+  Read --&gt; Guarantee[&quot;GUARANTEED to see initialized final fields — NO sync needed&quot;]
+```
+
+This is **safe publication for immutable objects**. It&#x27;s why `String s = computeString(); sharedField = s;` in one thread, read by another thread as `sharedField`, never exposes a half-built `String` — the `final byte[] value` is frozen and visible. Without `final` fields, there&#x27;s no such guarantee: another thread could see the default (zero/null) value of a non-`final` field even after construction, because the constructor&#x27;s writes could be reordered after the reference write.
+
+Two caveats ([T02](./T02-fields-methods-constructors-this.md)):
+
+- **`this` must not escape during construction.** If the constructor publishes `this` before finishing (the leaking-`this` bug), the freeze hasn&#x27;t happened yet and the guarantee is void.
+- **It applies only to `final` fields.** This is *why* rule 3 (all fields `final`) matters beyond intent — it&#x27;s load-bearing for thread-safety.
+
+At the architecture level, the freeze is a **`StoreStore` barrier** on weakly-ordered CPUs (ARM emits `dmb ishst`; Power emits `lwsync` — [T02 deeper section](./T02-fields-methods-constructors-this.md#deeper-jvm-internals--putfield-field-offsets-and-final-freeze-barriers)) ensuring the field writes retire before the publishing write; on strongly-ordered x86 (TSO) it&#x27;s typically a no-op because the hardware already preserves store order. Either way, the cost is ~zero on x86 and a few cycles on ARM, paid once at construction — a tiny price for lock-free sharing.
+
+&gt; [!INTERVIEW]
+&gt; &quot;Why are immutable objects thread-safe?&quot; Two layers: (1) no mutation means no concurrent writes, so no data races; (2) the JMM `final`-field freeze guarantees that an object&#x27;s `final` fields are fully visible to any thread that reads the object after construction, *without synchronization* — safe publication for free. Together these let you share an immutable object across threads via a plain reference with no locks. This is the deepest practical benefit of immutability and the reason `String`, records, and `java.time` types are safely shareable.
+
+## Functional Updates and &quot;Withers&quot;
+
+Since you can&#x27;t mutate, you **return a new object** for every change — the *functional update*. The JDK&#x27;s immutable types all do this (`String.toUpperCase`, `BigInteger.add`, `LocalDate.plusDays`). For your own immutable classes and records, the idiom is a **&quot;wither&quot;** ([T14](./T14-record-types.md)/[T18](./T18-object-cloning-and-cloneable.md)):
+
+```java
+public record Point(int x, int y) {
+    public Point withX(int newX) { return new Point(newX, y); }   // a modified COPY
+    public Point withY(int newY) { return new Point(x, newY); }
+}
+
+Point p = new Point(3, 4);
+Point q = p.withX(10);            // Point[x=10, y=4]; p is unchanged
+```
+
+Each wither builds a new object sharing the unchanged components. Chained, they read like a fluent transformation (`p.withX(10).withY(20)`), each step producing a fresh immutable value. (Records don&#x27;t auto-generate withers — [T14](./T14-record-types.md) — though a `with`-expression language feature is planned. Kotlin data classes auto-generate `copy(x = ...)` to the same end.)
+
+```mermaid
+flowchart LR
+  P[&quot;p = Point(3,4)&quot;]
+  P -- &quot;withX(10) → NEW object&quot; --&gt; Q[&quot;q = Point(10,4)&quot;]
+  P -. &quot;p UNCHANGED&quot; .-&gt; P2[&quot;still Point(3,4)&quot;]
+  Q -- &quot;withY(20) → NEW object&quot; --&gt; R[&quot;Point(10,20)&quot;]
+```
+
+## Records as Immutability-by-Default
+
+Records ([T14](./T14-record-types.md)) are the language&#x27;s **immutability-by-default** construct: `final` class, `private final` fields, no setters, generated value-based `equals`/`hashCode` — four of the five rules satisfied automatically. For a transparent immutable value, `record Point(int x, int y) {}` *is* a correct immutable class in one line.
+
+The one rule records *don&#x27;t* automatically satisfy is **rule 5** (mutable components): a record with a mutable component is only *shallowly* immutable — the component can be mutated through its shared reference ([T14](./T14-record-types.md)/[T18](./T18-object-cloning-and-cloneable.md)):
+
+```java
+record Data(int[] values) {}              // shallowly immutable — the array is mutable!
+record Data2(List&lt;Integer&gt; values) {      // deeply immutable IF you copy
+    Data2 { values = List.copyOf(values); }   // compact constructor: immutable snapshot
+}
+```
+
+So: **for immutable value types, default to records**; add defensive copies in the compact constructor (or use immutable component types) when a component is mutable. Records make rules 1–4 free and turn rule 5 into a one-line compact-constructor copy.
+
+## Effectively Immutable and the Mutability Spectrum
+
+Immutability isn&#x27;t binary; there&#x27;s a useful spectrum:
+
+```mermaid
+flowchart LR
+  I[&quot;immutable: final fields → free thread-safety (JMM freeze)&quot;]
+  EI[&quot;effectively immutable: never mutated but non-final → safe ONLY if published with sync/volatile&quot;]
+  DC[&quot;defensively copied: mutable, copies at every boundary&quot;]
+  M[&quot;mutable: needs synchronization to share&quot;]
+  I --&gt; EI --&gt; DC --&gt; M
+```
+
+| Tier | Definition | Thread-safe? |
+|------|------------|--------------|
+| **Immutable** | `final` fields, no mutation, deeply protected components | yes, with JMM freeze (no sync) |
+| **Effectively immutable** | never mutated after construction, but fields not `final` | yes, *only if safely published* (needs `volatile`/sync) |
+| **Defensively copied** | mutable, but copies cross every boundary | depends |
+| **Mutable** | freely changes | no (needs synchronization) |
+
+An **effectively immutable** object is technically mutable (non-`final` fields, maybe setters) but is *never mutated* after construction in practice. It gets immutability&#x27;s *simplicity* benefits, but it **lacks the JMM freeze** (which requires `final` fields), so safe publication across threads requires `volatile` or synchronization. Prefer genuine immutability (`final` fields) when you can — the freeze is free thread-safety that effectively-immutable objects don&#x27;t get.
+
+## The Cost and Its Mitigations
+
+The one real downside: **a new object for every distinct value**, which means more allocation and GC pressure when values are large or change often. A loop that &quot;updates&quot; an immutable object N times creates N objects. Four mitigations:
+
+```mermaid
+flowchart TB
+  Cost[&quot;cost: a new object per change (allocation + GC)&quot;]
+  Cost --&gt; M1[&quot;escape analysis: short-lived immutables eliminated (T01)&quot;]
+  Cost --&gt; M2[&quot;share, don&#x27;t copy: immutables alias freely&quot;]
+  Cost --&gt; M3[&quot;structural sharing: copy only the changed path (O(log n))&quot;]
+  Cost --&gt; M4[&quot;mutable companion for hot building (StringBuilder for String)&quot;]
+```
+
+1. **Escape analysis** ([T01](./T01-classes-and-objects.md)) — a short-lived immutable that doesn&#x27;t escape its method is scalar-replaced and never allocated. The functional-update object that you immediately consume costs nothing in hot code.
+2. **Share, don&#x27;t copy.** Because immutables can&#x27;t change, you *share* them instead of copying — the opposite of the mutable world&#x27;s defensive copying. `BigInteger.ZERO`, `&quot;&quot;`, `Optional.empty()`, `List.of()` are shared singletons.
+3. **Structural sharing** ([§ Structural Sharing](#memory-layer--structural-sharing)) — for collections, a &quot;modified copy&quot; shares the unchanged structure, copying only the changed path (O(log n) nodes, not O(n)).
+4. **A mutable companion for performance-critical building.** `String` is immutable, but `StringBuilder` is its mutable companion for building strings in a loop ([L0/C02/T07](../../L0-foundations/C02-java-core/T07-stringbuilder-stringbuffer.md)) — build mutably, freeze to immutable at the end (`sb.toString()`). The pattern: mutate locally where it&#x27;s confined and safe, expose immutability at the boundary.
+
+## Memory Layer — Immutable Object Layout
+
+An immutable object has **no special memory layout** — it&#x27;s an ordinary object: header + fields ([T01](./T01-classes-and-objects.md)), with the fields marked `final` (the `ACC_FINAL` flag — [T03](./T03-encapsulation-and-access-modifiers.md)). `record Point(int x, int y)` is 24 bytes (12 header + 4 + 4 + 4 pad), identical to a mutable `Point` ([T14](./T14-record-types.md)). Immutability is a property of the *type&#x27;s contract and the `final` flags*, not of the instance bytes — there&#x27;s no per-object &quot;immutable&quot; tag.
+
+The `final` flag does two things in memory: it makes the field read-only after construction (the verifier and compiler reject reassignment — [T02](./T02-fields-methods-constructors-this.md)), and it triggers the JMM freeze barrier at constructor exit. The JIT can also exploit `final`: it may **constant-fold** a `final` field&#x27;s value if it&#x27;s provably constant, and it can **cache** a `final` field&#x27;s value across reads without re-loading (a non-`final` field must be re-read in case another thread changed it — a real optimization difference).
+
+### String&#x27;s Immutability Mechanics
+
+`String` is the archetypal immutable, and its internals show the pattern ([L0/C02/T06](../../L0-foundations/C02-java-core/T06-strings-and-text-blocks.md)):
+
+```java
+public final class String {            // final class
+    private final byte[] value;         // final — the characters, never mutated or exposed
+    private final byte coder;           // final
+    private int hash;                   // NON-final — but a benign data race (see below)
+}
+```
+
+The `value` array is `final`, `private`, never handed out, and never mutated after construction — so the `String` is deeply immutable even though it holds an array (the array is *exclusively owned*, rule 5). This is what makes `String` safely shareable, internable (the string pool), and a perfect hash key. The one non-`final` field, `hash`, is a **deliberate benign data race**: it caches the hashCode, and if two threads compute it simultaneously they compute the *same* value, so the race is harmless ([T10](./T10-equals-hashcode-tostring-contracts.md)) — a rare, expert-level exception that proves the rule.
+
+## Memory Layer — Structural Sharing
+
+The technique that makes immutable *collections* practical is **structural sharing**, the heart of **persistent data structures** (Clojure&#x27;s vectors/maps, Scala&#x27;s immutable collections, Java&#x27;s planned persistent collections). The idea: an &quot;update&quot; creates a new version that **shares the unchanged structure** with the old version, copying only the path from the root to the changed node.
+
+Consider an immutable tree-backed list of a million elements. A naive immutable update would copy all million elements — O(n), prohibitive. A persistent vector (a wide tree, branching factor 32) instead copies only the nodes on the **path from root to the changed leaf** — about log₃₂(1,000,000) ≈ **4 nodes** — and *shares* every other subtree with the original:
+
+```mermaid
+flowchart TB
+  Old[&quot;original (root v1)&quot;]
+  New[&quot;updated copy (root v2)&quot;]
+  Old --&gt; A1[&quot;subtree A (SHARED)&quot;]
+  New --&gt; A1
+  Old --&gt; B1[&quot;subtree B v1 (changed path — copied)&quot;]
+  New --&gt; B2[&quot;subtree B v2 (copied, points to changed leaf)&quot;]
+  B1 --&gt; Shared[&quot;most leaves SHARED between v1 and v2&quot;]
+  B2 --&gt; Shared
+```
+
+So a &quot;modified copy&quot; of a million-element persistent collection copies ~4 nodes and shares the rest — O(log n), not O(n). Both versions remain valid and immutable; the old one is unaffected. This is why functional languages can treat collections as immutable values without crippling performance: structural sharing turns &quot;copy the whole thing&quot; into &quot;copy the spine.&quot; It also dovetails with garbage collection — when the old version becomes unreachable, only its ~4 unique nodes are garbage; the shared structure stays alive under the new version.
+
+## Memory Layer — Interning and Caching
+
+Because immutable objects can&#x27;t change, **identical values can be deduplicated into a single shared instance** — interning. The JVM does this for two important cases ([L0/C02/T05](../../L0-foundations/C02-java-core/T05-type-conversion-and-casting.md)/[T06](../../L0-foundations/C02-java-core/T06-strings-and-text-blocks.md)):
+
+- **The String pool** — `String` literals are interned: every `&quot;hello&quot;` in your program refers to the *same* `String` object ([L0/C02/T06](../../L0-foundations/C02-java-core/T06-strings-and-text-blocks.md)). `String.intern()` deduplicates dynamically-created strings. Safe *because* `String` is immutable — sharing one instance among many call sites can&#x27;t cause a surprise, since no one can change it.
+- **The Integer cache** — `Integer.valueOf(i)` returns a cached shared instance for −128..127 ([L0/C02/T05](../../L0-foundations/C02-java-core/T05-type-conversion-and-casting.md)). Safe for the same reason: an immutable `Integer` can be shared without risk (and it&#x27;s the cause of the `Integer == Integer` cache trap).
+
+Interning is a *direct consequence* of immutability: you can only safely share-one-for-many if the shared thing can&#x27;t be mutated by any of the sharers. Mutable objects can never be interned. Immutability is what unlocks deduplication, caching, and the flyweight pattern.
+
+## Architecture Layer — Read-Only Data Is Cache-Friendly
+
+Immutability has a multicore performance benefit beyond lock-free sharing: **read-only shared data is cache-coherence-friendly**. Under the MESI cache-coherence protocol, when multiple cores read the same cache line, each holds it in the **Shared** state in its own L1 — all cores can read concurrently with **zero coherence traffic** ([T01](./T01-classes-and-objects.md) caches). No core&#x27;s read invalidates another&#x27;s copy.
+
+Mutable shared data is the opposite. When one core *writes* a cache line, the protocol must **invalidate** every other core&#x27;s copy (transition them to Invalid), and the next reader must re-fetch — the cache line **ping-pongs** between cores&#x27; caches. For a hot mutable field touched by many threads, this coherence traffic dominates and serializes what looks like parallel code (the true-sharing / false-sharing problem, full treatment in L3/C01).
+
+```mermaid
+flowchart TB
+  Imm[&quot;immutable shared object (read-only)&quot;]
+  Imm --&gt; Shared[&quot;cache line stays SHARED across all cores&#x27; L1 — concurrent reads, ZERO invalidation traffic&quot;]
+  Mut[&quot;mutable shared object (writes)&quot;]
+  Mut --&gt; Pong[&quot;each write INVALIDATES other cores&#x27; copies → cache-line ping-pong → serialization&quot;]
+```
+
+So immutable shared data is not merely *safe* on multicore — it&#x27;s *fast*, because read-only lines never trigger coherence traffic. This is increasingly decisive: as core counts grow, the cost of mutable shared state grows with them, while immutable shared state scales freely. It&#x27;s a deep reason the industry is trending toward immutability for concurrent and parallel code — the hardware *rewards* read-only sharing.
+
+## Cross-Language Perspective — The Immutable-by-Default Trend
+
+Java makes mutability the default and immutability a discipline you opt into. Many modern languages do the reverse — and the trend is unmistakably toward immutable-by-default:
+
+| Language | Default | Immutability mechanism |
+|----------|---------|------------------------|
+| **Java** | mutable | `final`, records, `List.of`/`copyOf` (opt-in) |
+| **Rust** | **immutable** (`let`) | `let mut` to opt *into* mutation; borrow checker enforces shared-xor-mutable |
+| **Clojure** | **immutable** | persistent data structures with structural sharing as the core model |
+| **Haskell** | **immutable** (pure) | no mutation at all; state via monads |
+| **Scala** | mutable allowed, immutable encouraged | `val` vs `var`; immutable collections by default |
+| **Kotlin** | mutable allowed, immutable encouraged | `val` vs `var`; `data class`; read-only collection interfaces |
+| **C#** | mutable | `readonly`, records (C# 9), `ImmutableList` |
+
+Two contrasts:
+
+**Rust makes immutability the default *and* enforces safe sharing.** A `let x = 5` binding is immutable; you opt into mutation with `let mut x = 5`. More deeply, Rust&#x27;s borrow checker enforces the rule that at any moment you may have **either one mutable reference or many immutable references**, never both ([T01](./T01-classes-and-objects.md)/[T12](./T12-inner-local-and-anonymous-classes.md)) — which makes shared-immutable data *provably* safe at compile time and is the language-level resolution of the aliasing problem Java patches with discipline. Rust gets, at compile time, what Java achieves only by convention.
+
+**Clojure and Haskell build everything on immutability.** Clojure&#x27;s core data structures are *persistent and immutable* with structural sharing — &quot;modifying&quot; a map returns a new map sharing most of its structure ([§ Structural Sharing](#memory-layer--structural-sharing)), and this is the *normal* way to work, designed for effortless concurrency. Haskell goes further: nothing mutates, ever; the entire language is built on immutable values and pure functions, with controlled effects via monads. These languages chose immutable-by-default *specifically because* it makes concurrent and parallel programming tractable — no shared mutable state means no data races by construction.
+
+The industry trend is clear: as multicore became universal, immutable-by-default went from a functional-programming niche to a mainstream concurrency strategy. Java is **retrofitting** — records, the encouragement to &quot;minimize mutability,&quot; immutable collection factories (`List.of`, `copyOf`), the `java.time` redesign around immutability, and (forthcoming) value classes and `with`-expressions. You can&#x27;t make Java immutable-by-default without breaking decades of code, but every modern Java feature pushes that direction. The takeaway for *your* code: **make classes immutable unless there&#x27;s a compelling reason not to** — it&#x27;s the single most effective way to make Java code simpler, safer, and more concurrency-ready.
+
+```mermaid
+flowchart LR
+  Mut[&quot;mutable-by-default: Java, C# (immutability opt-in)&quot;]
+  Imm[&quot;immutable-by-default: Rust (let), Clojure, Haskell, (Scala/Kotlin encourage val)&quot;]
+  Mut -.-&gt;|&quot;multicore drives the shift&quot;| Imm
+  Imm --&gt; Why[&quot;no shared mutable state → no data races by construction → scales with cores&quot;]
+  Mut --&gt; Retro[&quot;Java retrofitting: records, final, List.of/copyOf, java.time, value classes (coming)&quot;]
+```
+
+## Common Mistakes
+
+&gt; [!WARNING]
+&gt; **Missing defensive copy of a mutable component.** A `final` field referencing a mutable object (array, `List`, `Date`) is *not* immutable — clients can mutate it through a shared reference. Copy in and out, or use immutable component types (`List.copyOf`, `Instant`).
+
+&gt; [!WARNING]
+&gt; **Non-`final` class.** If your &quot;immutable&quot; class isn&#x27;t `final` (and lacks private-constructor-plus-factory protection), a subclass can add mutable state or override methods to fake mutation, breaking the guarantee for code holding it as the supertype.
+
+&gt; [!WARNING]
+&gt; **Confusing `final` field with deep immutability.** `final` freezes the *reference*, not the referenced object&#x27;s contents ([T02](./T02-fields-methods-constructors-this.md)/[T18](./T18-object-cloning-and-cloneable.md)). `private final int[] data` is a frozen reference to a *mutable* array.
+
+&gt; [!WARNING]
+&gt; **Returning the internal mutable collection from an accessor.** Even with a `final` private field, an accessor that returns the field hands out a mutable reference — an encapsulation leak ([T03](./T03-encapsulation-and-access-modifiers.md)). Return an immutable view/copy.
+
+&gt; [!WARNING]
+&gt; **Validating before defensively copying.** With a mutable parameter (`Date`), validate the *copy*, not the parameter — otherwise a TOCTOU race lets another thread change the value between the check and the copy.
+
+&gt; [!WARNING]
+&gt; **Over-copying when sharing or structural sharing would do.** Immutables can be *shared* freely — don&#x27;t defensively copy an immutable object (it can&#x27;t change). For large collections, reach for immutable/persistent collections rather than copying on every change.
+
+&gt; [!WARNING]
+&gt; **Relying on effective immutability across threads without safe publication.** A never-mutated-but-non-`final`-field object lacks the JMM freeze; sharing it across threads still needs `volatile`/synchronization. Use `final` fields for free thread-safety.
+
+&gt; [!INTERVIEW]
+&gt; Common interview questions for this topic:
+&gt; 1. **What are the five rules for an immutable class?** No mutators; class final (or private ctor + factories); all fields final; all fields private; defensive copies of mutable components (in and out).
+&gt; 2. **Why are immutable objects thread-safe?** No writes → no races; plus the JMM `final`-field freeze guarantees safe publication (other threads see initialized final fields without synchronization). Together: share via a plain reference, no locks.
+&gt; 3. **What&#x27;s the JMM final-field guarantee?** When a constructor setting `final` fields completes, a freeze (memory barrier) ensures any thread reading the object after construction sees the initialized final fields — no synchronization needed (provided `this` didn&#x27;t escape).
+&gt; 4. **Why must immutable fields be `final` and not just never-mutated?** `final` triggers the JMM freeze (free safe publication); effectively-immutable objects with non-final fields lack it and need explicit synchronization to publish safely.
+&gt; 5. **Why does `final` alone not make an object immutable?** `final` freezes the reference, not the referenced object&#x27;s contents — a `final` array/List/Date field is still mutable.
+&gt; 6. **What&#x27;s a defensive copy and when?** Copying a mutable component in the constructor (so the class owns it) and the accessor (so clients can&#x27;t mutate the internal one). Or use immutable component types.
+&gt; 7. **What&#x27;s structural sharing?** A persistent data structure&#x27;s &quot;modified copy&quot; shares the unchanged structure and copies only the changed path (O(log n) nodes, not O(n)) — what makes immutable collections practical.
+&gt; 8. **Why are immutable objects good hash keys?** Their state never changes, so their `hashCode` is stable — they can&#x27;t get lost in a `HashMap` by mutating after insertion ([T10](./T10-equals-hashcode-tostring-contracts.md)).
+&gt; 9. **What&#x27;s the cost of immutability and how is it mitigated?** A new object per change. Mitigated by escape analysis (eliminate short-lived ones), sharing (don&#x27;t copy immutables), structural sharing (for collections), and mutable companions (StringBuilder).
+&gt; 10. **Why is immutable shared data cache-friendly?** Read-only cache lines stay in the MESI Shared state across all cores with no invalidation traffic; mutable shared data ping-pongs between caches on every write.
+&gt; 11. **How do records relate to immutability?** Records are immutable-by-default (final class, private final fields, no setters) — four of five rules free; only mutable components need defensive copies (rule 5).
+&gt; 12. **What&#x27;s a &quot;wither&quot;?** A method returning a modified copy of an immutable object (`point.withX(10)`), the functional-update idiom since you can&#x27;t mutate.
+&gt; 13. **How does Rust&#x27;s approach differ?** Immutable by default (`let` vs `let mut`), and the borrow checker enforces shared-xor-mutable at compile time — making shared-immutable data provably safe, which Java only achieves by convention.
+&gt; 14. **Why is the industry trending to immutable-by-default?** Multicore: no shared mutable state means no data races by construction, and read-only sharing scales with core count while mutable sharing degrades — immutability is the simplest path to safe, scalable concurrency.
+
+## Practice
+
+1. **Five-rule immutable class.** Build an immutable `Money(long cents, String currency)` following all five rules (final class, private final fields, no setters, validation, immutable components). Add an `add(Money)` that returns a new `Money`. Confirm the original is never modified.
+
+2. **Defensive copy with a mutable component.** Build the `Period(Date start, Date end)` example. Demonstrate the bug *without* defensive copies (mutate the input `Date` and the accessor&#x27;s returned `Date`, observe the `Period` changes), then fix with copies in and out. Then rewrite with `Instant` and observe no copies are needed.
+
+3. **TOCTOU validation order.** Show that validating the parameter before copying (vs copying then validating) leaves a race window. Reorder to copy-then-validate.
+
+4. **`List.copyOf` snapshot.** Rewrite a `Config` holding a `List&lt;String&gt;` to snapshot with `List.copyOf` in the constructor. Confirm mutating the input list afterward doesn&#x27;t affect the `Config`, and the accessor can safely return the field directly (it&#x27;s immutable).
+
+5. **Immutable as a stable hash key.** Put an immutable `Point` in a `HashMap`. Confirm you can always retrieve it (its hashCode never changes). Contrast with a mutable `Point` whose field you change after insertion — it gets lost ([T10](./T10-equals-hashcode-tostring-contracts.md)).
+
+6. **JMM safe publication.** Build an immutable class with a `final` field. Publish an instance from one thread via a *non-volatile* static field; read it from another. Confirm correct visibility (statistically). Then make the field non-`final` and a never-set-correctly value can appear under contention (hard to reproduce; document the rule).
+
+7. **`final` is shallow.** Declare `private final int[] data`. Confirm you can&#x27;t reassign `data` but *can* do `data[0] = 99`. Conclude that `final` ≠ deep immutability.
+
+8. **Functional update / wither.** Add `withX`/`withY` to a `Point` record. Chain `p.withX(10).withY(20)`; confirm the original `p` and each intermediate are unchanged.
+
+9. **Record shallow-immutability fix.** Make `record Data(int[] values)`. Mutate the array through the component; observe the record &quot;changed.&quot; Fix by switching to `List&lt;Integer&gt;` + `List.copyOf` in a compact constructor.
+
+10. **Structural sharing.** Use a persistent collection (e.g., via a library like Vavr or a hand-built persistent list, or study Clojure semantics). &quot;Update&quot; a large persistent vector and confirm (conceptually or via instrumentation) that most structure is shared, not copied — O(log n) new nodes.
+
+11. **String immutability mechanics.** Use reflection to read `String`&#x27;s private `final byte[] value`. Confirm it&#x27;s never exposed by any public method. Confirm two `&quot;hello&quot;` literals are `==` (interned — shared because immutable).
+
+12. **Sharing vs copying immutables.** Show that you can freely share `BigInteger.ZERO` / `&quot;&quot;` / `List.of()` across threads and data structures with no defensive copies — because they can&#x27;t change.
+
+13. **EA eliminates a short-lived immutable.** Write a hot method that creates an immutable object, uses it, and discards it. Run with `-XX:+PrintEliminateAllocations`; confirm the allocation is eliminated by escape analysis ([T01](./T01-classes-and-objects.md)).
+
+14. **Mutable companion.** Build a `String` in a loop with `+=` (creating many immutables) vs a `StringBuilder` (mutable companion). Measure the allocation/time difference; conclude the pattern &quot;build mutably, freeze to immutable.&quot;
+
+15. **End-to-end explain-it-back (capstone).** Trace why `String s = compute(); sharedField = s;` is safe to read from another thread with no lock: (a) `String` is immutable with a `final byte[] value`; (b) the constructor&#x27;s freeze inserts a memory barrier (a `dmb ishst` on ARM, a no-op on x86) at construction exit; (c) the barrier guarantees the `value` writes retire before the publishing write to `sharedField`; (d) the reading thread sees the fully-initialized `String`, never a half-built one; (e) no mutation means no further races; (f) tie this back to the chapter — how immutability dissolves the aliasing (T12), defensive-copy (T18), hash-key (T10), and thread-safety problems at once. Twelve sentences max.
+
+## Recap
+
+You should now be able to:
+
+**Language layer.**
+
+- Define immutability (state can&#x27;t change after construction) and recognize the JDK&#x27;s immutable types (`String`, wrappers, `BigInteger`, `java.time`, records).
+- Apply the five rules: no mutators; final class (or private ctor + factories); all fields final; all fields private; defensive copies of mutable components.
+- Defensively copy mutable components in and out — or, better, use immutable component types (`List.copyOf`, `Instant`).
+- State immutability&#x27;s benefits: simplicity, free thread-safety, safe hash keys, free sharing/caching, failure atomicity.
+- Write functional updates / withers (return a new object).
+- Use records as immutability-by-default and fix the shallow-immutability caveat with compact-constructor copies.
+- Distinguish immutable, effectively-immutable, defensively-copied, and mutable, and know the thread-safety implications of each.
+
+**Memory layer.**
+
+- Explain that an immutable object has a normal layout (header + `final` fields, `ACC_FINAL`); immutability is in the contract and flags, not the bytes.
+- Explain `String`&#x27;s immutability mechanics (final private never-exposed `value` array; the benign `hash` data race).
+- Explain structural sharing: a persistent collection&#x27;s modified copy shares unchanged structure, copying only the O(log n) changed path.
+- Explain how immutability enables interning and caching (String pool, Integer cache) — safe deduplication of shared instances.
+
+**Architecture layer.**
+
+- Explain the JMM `final`-field freeze as the mechanism behind safe publication: a constructor-exit memory barrier (StoreStore on ARM, no-op on x86) that makes `final` fields visible to other threads without synchronization.
+- Explain why immutable shared data is cache-friendly (read-only lines stay MESI-Shared across cores, zero invalidation traffic) and mutable shared data ping-pongs.
+- Explain the cost (new object per change) and its mitigations (EA, sharing, structural sharing, mutable companions).
+- Place Java&#x27;s immutability retrofit in the immutable-by-default trend (Rust&#x27;s `let`/borrow-checker, Clojure/Haskell persistence/purity) and articulate why multicore drives it.
+
+**Chapter capstone.** Immutability ties together everything in L1/C01: it&#x27;s `final` fields ([T02](./T02-fields-methods-constructors-this.md)) made into a design discipline, the resolution of the aliasing problem ([T12](./T12-inner-local-and-anonymous-classes.md)), the reason `equals`/`hashCode` keys stay stable ([T10](./T10-equals-hashcode-tostring-contracts.md)), the natural form of records ([T14](./T14-record-types.md)), and the reason you share instead of clone ([T18](./T18-object-cloning-and-cloneable.md)). The single most valuable habit from this chapter: **make classes immutable unless you have a compelling reason not to.**
+
+## Next
+
+This completes **L1/C01 — Object-Oriented Programming**. You can now design Java types from first principles: classes and objects in memory; constructors, encapsulation, inheritance, overriding, and polymorphism; abstract classes and interfaces; the `Object` contract and `equals`/`hashCode`/`toString`; static members and the four kinds of nested class; enums, records, and sealed types for modern data modeling; packages and modules for organization; and cloning and immutability for copying and protecting state — all with their memory and machine-level mechanics.
+
+Continue to **[L1/C02 — Collections &amp; Core APIs](../C02-collections-and-core-apis/)**, starting with [Collections framework overview](../C02-collections-and-core-apis/T01-collections-framework-overview.md). Having built the *types*, you&#x27;ll now use the JDK&#x27;s *data structures* — `List`, `Set`, `Map`, `Queue` and their implementations — applying everything from this chapter (`equals`/`hashCode` for keys, immutability for safety, generics for type-safety) to store and manipulate data at scale, with the same memory-and-performance depth.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l1/c01-t18-object-cloning-and-cloneable.html"><div class="lbl">← Previous</div><div class="ttl">T18-object-cloning-and-cloneable</div><div class="sub">Object cloning &amp; Cloneable</div></a><a class="next" href="../l1/c02-readme.html"><div class="lbl">Next →</div><div class="ttl">C02-collections-and-core-apis/README</div><div class="sub">Core Java &amp; OOP — Collections &amp; Core APIs</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-recurring-problem-mutation-and-aliasing" data-toc-link>The Recurring Problem — Mutation and Aliasing</a></li><li class="lvl-2"><a href="#what-immutability-means" data-toc-link>What Immutability Means</a></li><li class="lvl-2"><a href="#the-five-rules-of-an-immutable-class" data-toc-link>The Five Rules of an Immutable Class</a></li><li class="lvl-2"><a href="#defensive-copies-the-mutable-component-rule" data-toc-link>Defensive Copies — The Mutable-Component Rule</a></li><li class="lvl-2"><a href="#the-benefits-of-immutability" data-toc-link>The Benefits of Immutability</a></li><li class="lvl-2"><a href="#the-jmm-final-field-safe-publication-guarantee" data-toc-link>The JMM Final-Field Safe-Publication Guarantee</a></li><li class="lvl-2"><a href="#functional-updates-and-withers" data-toc-link>Functional Updates and &quot;Withers&quot;</a></li><li class="lvl-2"><a href="#records-as-immutability-by-default" data-toc-link>Records as Immutability-by-Default</a></li><li class="lvl-2"><a href="#effectively-immutable-and-the-mutability-spectrum" data-toc-link>Effectively Immutable and the Mutability Spectrum</a></li><li class="lvl-2"><a href="#the-cost-and-its-mitigations" data-toc-link>The Cost and Its Mitigations</a></li><li class="lvl-2"><a href="#memory-layer-immutable-object-layout" data-toc-link>Memory Layer — Immutable Object Layout</a></li><li class="lvl-3"><a href="#strings-immutability-mechanics" data-toc-link>String&#x27;s Immutability Mechanics</a></li><li class="lvl-2"><a href="#memory-layer-structural-sharing" data-toc-link>Memory Layer — Structural Sharing</a></li><li class="lvl-2"><a href="#memory-layer-interning-and-caching" data-toc-link>Memory Layer — Interning and Caching</a></li><li class="lvl-2"><a href="#architecture-layer-read-only-data-is-cache-friendly" data-toc-link>Architecture Layer — Read-Only Data Is Cache-Friendly</a></li><li class="lvl-2"><a href="#cross-language-perspective-the-immutable-by-default-trend" data-toc-link>Cross-Language Perspective — The Immutable-by-Default Trend</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

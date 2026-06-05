@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Parallel streams — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">7</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">54</span></a><a class="nav-link active" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">60</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">12</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">18</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">11</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">7</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🛰</span><span>Ch. 4 · L2 — Intermediate &amp; Backend</span></div><div class="chapter-path">content/L2-intermediate-backend/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l2/overview.html" data-q="l2 — intermediate java &amp; backend foundations content/l2-intermediate-backend/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · functional and modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><summary><span class="caret">▶</span><span>C01 · Functional And Modern Java</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — functional &amp; modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md"><a class="" href="../l2/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="lambda expressions content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md"><a class="" href="../l2/c01-t01-lambda-expressions.html"><span>Lambda expressions</span><span class="kind-pill "></span></a></li><li data-q="functional interfaces (function, predicate, supplier, consumer) content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md"><a class="" href="../l2/c01-t02-functional-interfaces-function-predicate-supplier-consumer.html"><span>Functional interfaces (Function, Predicate, Supplier, Consumer)</span><span class="kind-pill "></span></a></li><li data-q="method &amp; constructor references content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md"><a class="" href="../l2/c01-t03-method-and-constructor-references.html"><span>Method &amp; constructor references</span><span class="kind-pill "></span></a></li><li data-q="streams api (intermediate &amp; terminal operations) content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md"><a class="" href="../l2/c01-t04-streams-api-intermediate-and-terminal-operations.html"><span>Streams API (intermediate &amp; terminal operations)</span><span class="kind-pill "></span></a></li><li data-q="collectors &amp; grouping content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md"><a class="" href="../l2/c01-t05-collectors-and-grouping.html"><span>Collectors &amp; grouping</span><span class="kind-pill "></span></a></li><li data-q="parallel streams content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md"><a class="active" href="../l2/c01-t06-parallel-streams.html"><span>Parallel streams</span><span class="kind-pill "></span></a></li><li data-q="optional in depth content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md"><a class="" href="../l2/c01-t07-optional-in-depth.html"><span>Optional in depth</span><span class="kind-pill "></span></a></li><li data-q="functional programming style &amp; immutability content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md"><a class="" href="../l2/c01-t08-functional-programming-style-and-immutability.html"><span>Functional programming style &amp; immutability</span><span class="kind-pill "></span></a></li><li data-q="new language features by version (java 8 to 21+) content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><a class="" href="../l2/c01-t09-new-language-features-by-version-java-8-to-21-plus.html"><span>New language features by version (Java 8 to 21+)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · build tools and workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><summary><span class="caret">▶</span><span>C02 · Build Tools And Workflow</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — build tools &amp; developer workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md"><a class="" href="../l2/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="maven (lifecycle, pom, dependencies, plugins) content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md"><a class="" href="../l2/c02-t01-maven-lifecycle-pom-dependencies-plugins.html"><span>Maven (lifecycle, POM, dependencies, plugins)</span><span class="kind-pill "></span></a></li><li data-q="gradle (tasks, build scripts, dependencies) content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md"><a class="" href="../l2/c02-t02-gradle-tasks-build-scripts-dependencies.html"><span>Gradle (tasks, build scripts, dependencies)</span><span class="kind-pill "></span></a></li><li data-q="dependency management &amp; version conflicts content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md"><a class="" href="../l2/c02-t03-dependency-management-and-version-conflicts.html"><span>Dependency management &amp; version conflicts</span><span class="kind-pill "></span></a></li><li data-q="multi-module projects content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md"><a class="" href="../l2/c02-t04-multi-module-projects.html"><span>Multi-module projects</span><span class="kind-pill "></span></a></li><li data-q="git workflows (branching, prs, rebasing) content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md"><a class="" href="../l2/c02-t05-git-workflows-branching-prs-rebasing.html"><span>Git workflows (branching, PRs, rebasing)</span><span class="kind-pill "></span></a></li><li data-q="code formatters &amp; linters (checkstyle, spotless) content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md"><a class="" href="../l2/c02-t06-code-formatters-and-linters-checkstyle-spotless.html"><span>Code formatters &amp; linters (Checkstyle, Spotless)</span><span class="kind-pill "></span></a></li><li data-q="static analysis (pmd, spotbugs, sonarqube) content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md"><a class="" href="../l2/c02-t07-static-analysis-pmd-spotbugs-sonarqube.html"><span>Static analysis (PMD, SpotBugs, SonarQube)</span><span class="kind-pill "></span></a></li><li data-q="lombok content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md"><a class="" href="../l2/c02-t08-lombok.html"><span>Lombok</span><span class="kind-pill "></span></a></li><li data-q="mapstruct content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md"><a class="" href="../l2/c02-t09-mapstruct.html"><span>MapStruct</span><span class="kind-pill "></span></a></li><li data-q="annotation processing content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md"><a class="" href="../l2/c02-t10-annotation-processing.html"><span>Annotation processing</span><span class="kind-pill "></span></a></li><li data-q="dependency vulnerability scanning content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><a class="" href="../l2/c02-t11-dependency-vulnerability-scanning.html"><span>Dependency vulnerability scanning</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · networking fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><summary><span class="caret">▶</span><span>C03 · Networking Fundamentals</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — networking &amp; web fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md"><a class="" href="../l2/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="osi &amp; tcp/ip models content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md"><a class="" href="../l2/c03-t01-osi-and-tcp-ip-models.html"><span>OSI &amp; TCP/IP models</span><span class="kind-pill "></span></a></li><li data-q="tcp vs udp content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md"><a class="" href="../l2/c03-t02-tcp-vs-udp.html"><span>TCP vs UDP</span><span class="kind-pill "></span></a></li><li data-q="ip, ports &amp; sockets content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md"><a class="" href="../l2/c03-t03-ip-ports-and-sockets.html"><span>IP, ports &amp; sockets</span><span class="kind-pill "></span></a></li><li data-q="dns (resolution, records) content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md"><a class="" href="../l2/c03-t04-dns-resolution-records.html"><span>DNS (resolution, records)</span><span class="kind-pill "></span></a></li><li data-q="http/https lifecycle content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md"><a class="" href="../l2/c03-t05-http-https-lifecycle.html"><span>HTTP/HTTPS lifecycle</span><span class="kind-pill "></span></a></li><li data-q="tls/ssl &amp; certificates content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md"><a class="" href="../l2/c03-t06-tls-ssl-and-certificates.html"><span>TLS/SSL &amp; certificates</span><span class="kind-pill "></span></a></li><li data-q="cookies, sessions &amp; tokens content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md"><a class="" href="../l2/c03-t07-cookies-sessions-and-tokens.html"><span>Cookies, sessions &amp; tokens</span><span class="kind-pill "></span></a></li><li data-q="proxies &amp; reverse proxies content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md"><a class="" href="../l2/c03-t08-proxies-and-reverse-proxies.html"><span>Proxies &amp; reverse proxies</span><span class="kind-pill "></span></a></li><li data-q="load balancers content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md"><a class="" href="../l2/c03-t09-load-balancers.html"><span>Load balancers</span><span class="kind-pill "></span></a></li><li data-q="cdns content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md"><a class="" href="../l2/c03-t10-cdns.html"><span>CDNs</span><span class="kind-pill "></span></a></li><li data-q="firewalls &amp; nat (basics) content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><a class="" href="../l2/c03-t11-firewalls-and-nat-basics.html"><span>Firewalls &amp; NAT (basics)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · web and rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><summary><span class="caret">▶</span><span>C04 · Web And REST Basics</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — web &amp; rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md"><a class="" href="../l2/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http in depth (methods, status, headers) content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md"><a class="" href="../l2/c04-t01-http-in-depth-methods-status-headers.html"><span>HTTP in depth (methods, status, headers)</span><span class="kind-pill "></span></a></li><li data-q="rest principles &amp; best practices content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md"><a class="" href="../l2/c04-t02-rest-principles-and-best-practices.html"><span>REST principles &amp; best practices</span><span class="kind-pill "></span></a></li><li data-q="api design (resources, versioning, pagination, filtering) content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md"><a class="" href="../l2/c04-t03-api-design-resources-versioning-pagination-filtering.html"><span>API design (resources, versioning, pagination, filtering)</span><span class="kind-pill "></span></a></li><li data-q="content negotiation &amp; serialization (json/xml, jackson) content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><a class="" href="../l2/c04-t04-content-negotiation-and-serialization-json-xml-jackson.html"><span>Content negotiation &amp; serialization (JSON/XML, Jackson)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · databases and sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><summary><span class="caret">▶</span><span>C05 · Databases And SQL</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — databases &amp; sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md"><a class="" href="../l2/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="relational model &amp; terminology content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md"><a class="" href="../l2/c05-t01-relational-model-and-terminology.html"><span>Relational model &amp; terminology</span><span class="kind-pill "></span></a></li><li data-q="sql: select, joins, group by, subqueries content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md"><a class="" href="../l2/c05-t02-sql-select-joins-group-by-subqueries.html"><span>SQL: SELECT, JOINs, GROUP BY, subqueries</span><span class="kind-pill "></span></a></li><li data-q="sql: ddl/dml/dcl content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md"><a class="" href="../l2/c05-t03-sql-ddl-dml-dcl.html"><span>SQL: DDL/DML/DCL</span><span class="kind-pill "></span></a></li><li data-q="normalization &amp; denormalization content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md"><a class="" href="../l2/c05-t04-normalization-and-denormalization.html"><span>Normalization &amp; denormalization</span><span class="kind-pill "></span></a></li><li data-q="keys, constraints &amp; relationships content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md"><a class="" href="../l2/c05-t05-keys-constraints-and-relationships.html"><span>Keys, constraints &amp; relationships</span><span class="kind-pill "></span></a></li><li data-q="transactions &amp; acid content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md"><a class="" href="../l2/c05-t06-transactions-and-acid.html"><span>Transactions &amp; ACID</span><span class="kind-pill "></span></a></li><li data-q="isolation levels &amp; locking content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md"><a class="" href="../l2/c05-t07-isolation-levels-and-locking.html"><span>Isolation levels &amp; locking</span><span class="kind-pill "></span></a></li><li data-q="stored procedures, views, triggers content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md"><a class="" href="../l2/c05-t08-stored-procedures-views-triggers.html"><span>Stored procedures, views, triggers</span><span class="kind-pill "></span></a></li><li data-q="jdbc &amp; connection pooling (hikaricp) content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><a class="" href="../l2/c05-t09-jdbc-and-connection-pooling-hikaricp.html"><span>JDBC &amp; connection pooling (HikariCP)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · tools and environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md"><summary><span class="caret">▶</span><span>C06 · Tools And Environment</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — tools &amp; environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md"><a class="" href="../l2/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="backend toolchain quick reference content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md"><a class="" href="../l2/c06-t01-backend-toolchain-quick-reference.html"><span>Backend Toolchain Quick Reference</span><span class="kind-pill "></span></a></li><li data-q="http &amp; api clients (curl, httpie, postman, devtools) content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md"><a class="" href="../l2/c06-t02-http-and-api-clients.html"><span>HTTP &amp; API Clients (curl, HTTPie, Postman, DevTools)</span><span class="kind-pill "></span></a></li><li data-q="database clients &amp; migration tools (psql, mysql, dbeaver, flyway, liquibase) content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md"><a class="" href="../l2/c06-t03-database-clients-and-migration-tools.html"><span>Database Clients &amp; Migration Tools (psql, mysql, DBeaver, Flyway, Liquibase)</span><span class="kind-pill "></span></a></li></ul></details><a class="mod-flat" href="../l2/c07-readme.html" data-q="intermediate java &amp; backend foundations — hands-on content/l2-intermediate-backend/c07-hands-on/readme.md c07 · hands on"><span>C07 · Hands On</span></a><a class="mod-flat" href="../l2/c08-readme.html" data-q="intermediate java &amp; backend foundations — best practices &amp; pitfalls content/l2-intermediate-backend/c08-best-practices/readme.md c08 · best practices"><span>C08 · Best Practices</span></a><a class="mod-flat" href="../l2/c09-readme.html" data-q="intermediate java &amp; backend foundations — interview prep content/l2-intermediate-backend/c09-interview-prep/readme.md c09 · interview prep"><span>C09 · Interview Prep</span></a><a class="mod-flat" href="../l2/c10-readme.html" data-q="intermediate java &amp; backend foundations — q&amp;a / faq content/l2-intermediate-backend/c10-qa-faq/readme.md c10 · qa faq"><span>C10 · QA FAQ</span></a><a class="mod-flat" href="../l2/c11-readme.html" data-q="intermediate java &amp; backend foundations — cheatsheets &amp; reference content/l2-intermediate-backend/c11-cheatsheets/readme.md c11 · cheatsheets"><span>C11 · Cheatsheets</span></a><a class="mod-flat" href="../l2/c12-readme.html" data-q="intermediate java &amp; backend foundations — resources content/l2-intermediate-backend/c12-resources/readme.md c12 · resources"><span>C12 · Resources</span></a></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l2/index.html">L2 — Intermediate &amp; Backend</a><span class="sep">/</span><span>Parallel streams</span></div>
+        <h1>Parallel streams</h1>
+        <div><span class="source-path">content/L2-intermediate-backend/C01-functional-and-modern-java/T06-parallel-streams.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~110 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Parallel streams"
+slug: parallel-streams
+level: L2
+module: "Intermediate Java &amp; Backend Foundations"
+section: "Functional &amp; Modern Java"
+type: concept
+difficulty: intermediate
+order: 6
+tags: [parallel-stream, parallelstream, parallel, sequential, forkjoinpool, common-pool, work-stealing, trysplit, spliterator, split-tree, associative, identity, stateless, non-interfering, encounter-order, foreachordered, findany, unordered, n-times-q, blocking-task-starvation, custom-forkjoinpool, sized, subsized, concurrent-collector, data-race, jmh]
+prerequisites: [streams-api-intermediate-and-terminal-operations, collectors-and-grouping, threads-and-runnable, arrays-1-d-multi-dimensional, wrapper-classes-and-autoboxing]
+status: complete
+estimated_minutes: 110
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="parallel-streams">Parallel streams</h1>
+<p>A <strong>parallel stream</strong> processes its elements on <strong>multiple threads</strong> — splitting the source into chunks, computing them concurrently, and merging the results. The API surface is almost invisible: <code>list.parallelStream()</code> or <code>stream.parallel()</code> and you're parallel. That tiny surface hides a large amount of machinery — a recursive source split, a shared fork/join thread pool, work-stealing — and a set of <strong>correctness requirements</strong> and <strong>performance traps</strong> that make parallel streams the most-misused feature in the chapter. Used right (large data, expensive per-element work, a splittable source), they give near-linear speedups for free. Used wrong (small data, blocking I/O, non-associative reductions), they're slower, wrong, or freeze the whole JVM.</p>
+<p>The depth-bar requirement isn't just "add <code>.parallel()</code>." At the <strong>language</strong> layer, parallel execution imposes <strong>correctness contracts</strong> that sequential doesn't care about: operations must be <strong>stateless</strong> and <strong>non-interfering</strong>, and reductions must be <strong>associative</strong> with a true <strong>identity</strong> — violate these and parallel silently produces <em>wrong answers</em>. At the <strong>memory</strong> layer, parallelism rests on <strong><code>Spliterator.trySplit()</code></strong> (<a href="c01-t04-streams-api-intermediate-and-terminal-operations.html">T04</a>) — the source recursively splits into a binary tree of chunks, and whether this is <strong>balanced and cheap</strong> (arrays, <code>ArrayList</code>, <code>IntStream.range</code>) or <strong>poor</strong> (<code>LinkedList</code>, <code>Stream.iterate</code>, <code>Files.lines</code>) decides whether parallelism helps at all. At the <strong>architecture</strong> layer, parallel streams run on the <strong>shared <code>ForkJoinPool.commonPool</code></strong> with <strong>work-stealing</strong>, carry real <strong>overhead</strong> (split + schedule + merge), follow the <strong>N×Q rule</strong> (parallelism pays only when <em>elements × cost-per-element</em> is large), and have a dangerous <strong>blocking-task hazard</strong>: blocking I/O on the common pool starves <em>every other</em> parallel stream in the JVM. We'll cover every layer and finish with a decision guide.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t04-streams-api-intermediate-and-terminal-operations.html">Streams API</a> (L2/C01/T04) — the lazy pipeline, the <code>Spliterator</code>, short-circuiting; <a href="c01-t05-collectors-and-grouping.html">Collectors &amp; grouping</a> (L2/C01/T05) — sequential vs parallel <code>collect</code>, per-thread containers + combiner merge, concurrent collectors; <a href="../l3/c01-t01-threads-and-runnable.html">Threads &amp; Runnable</a> (L3/C01/T01) — threads, the cost of context switches, why blocking ties up a thread. The <strong>Fork/Join framework</strong> itself is L3/C01/T13 (not yet authored — forward-referenced here); we cover what a stream user needs.</p></div></div>
+<h2 id="making-a-stream-parallel">Making a Stream Parallel<a class="anchor" href="#making-a-stream-parallel" aria-hidden="true">#</a></h2>
+<p>Two ways in, one way out:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;X&gt; data = ...;
+data.parallelStream().filter(...).map(...).collect(toList());     // parallel from the start
+data.stream().parallel().filter(...).collect(toList());           // convert to parallel
+data.stream().parallel().sequential().collect(toList());          // ...back to sequential
+</code></pre></div>
+<p><code>parallel()</code> and <code>sequential()</code> set a <strong>single flag on the whole pipeline</strong> — there is <strong>no per-stage parallelism</strong>. The <strong>last</strong> call wins:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">stream.parallel().filter(...).sequential().map(...);    // runs SEQUENTIAL (last call)
+</code></pre></div>
+<p>So you can't make <code>filter</code> parallel and <code>map</code> sequential — the entire pipeline is one or the other, decided by the last <code>parallel()</code>/<code>sequential()</code> before the terminal op.</p>
+<div class="mermaid">flowchart TB
+  Seq["sequential stream"]
+  Par["parallel stream"]
+  Seq -->|"parallel()"| Par
+  Par -->|"sequential()"| Seq
+  Note["the WHOLE pipeline is parallel or sequential — last call wins; no per-stage mixing"]
+</div>
+<h2 id="correctness-requirements-where-parallel-bites">Correctness Requirements — Where Parallel Bites<a class="anchor" href="#correctness-requirements-where-parallel-bites" aria-hidden="true">#</a></h2>
+<p>Sequential streams tolerate sloppy lambdas; parallel streams don't. Four contracts:</p>
+<h3 id="1-stateless-operations">1. Stateless Operations<a class="anchor" href="#1-stateless-operations" aria-hidden="true">#</a></h3>
+<p>A <code>map</code>/<code>filter</code>/etc. lambda must compute its output from <strong>only its input element</strong> — not from external mutable state that changes during execution:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int[] counter = {0};
+stream.parallel().map(x -&gt; x + counter[0]++);   // WRONG — shared mutable state, data race
+</code></pre></div>
+<p>Stateful lambdas race across threads and produce non-deterministic, wrong results.</p>
+<h3 id="2-non-interfering-dont-modify-the-source">2. Non-Interfering — Don't Modify the Source<a class="anchor" href="#2-non-interfering-dont-modify-the-source" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">list.parallelStream().forEach(x -&gt; list.add(...));   // WRONG — modifying the source mid-stream
+</code></pre></div>
+<p>Same rule as sequential, but parallel makes the <code>ConcurrentModificationException</code> (or undefined behaviour) far more likely.</p>
+<h3 id="3-associative-accumulator-and-true-identity">3. Associative Accumulator (and True Identity)<a class="anchor" href="#3-associative-accumulator-and-true-identity" aria-hidden="true">#</a></h3>
+<p>For <code>reduce</code>, the accumulator must be <strong>associative</strong> — <code>(a op b) op c == a op (b op c)</code> — because parallel combines partial results in a <strong>non-deterministic order</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Sum is associative → parallel gives the right answer:
+int sum = nums.parallelStream().reduce(0, Integer::sum);          // correct
+
+// Subtraction is NOT associative → parallel gives WRONG answers:
+int diff = nums.parallelStream().reduce(0, (a, b) -&gt; a - b);      // wrong &amp; non-deterministic!
+</code></pre></div>
+<p><code>(10 - 3) - 2 = 5</code> but <code>10 - (3 - 2) = 9</code> — subtraction depends on grouping, which parallel doesn't fix. Addition, multiplication, min, max, <code>String</code> concatenation (with a matching combiner), and <code>Math.max</code> are associative; subtraction, division, and order-sensitive folds are not.</p>
+<p>The <strong>identity</strong> must also be a true identity: <code>combiner(identity, x) == x</code> for all <code>x</code>. In parallel the identity may be combined <strong>multiple times</strong> (once per chunk), so a wrong identity (e.g., <code>1</code> for an addition fold) gives a wrong total.</p>
+<div class="mermaid">flowchart TB
+  Assoc["associative: (a op b) op c == a op (b op c)"]
+  Assoc --> OK["sum, max, min, multiply → parallel-safe"]
+  NonAssoc["non-associative: subtraction, division, order-sensitive"]
+  NonAssoc --> Wrong["parallel gives WRONG, non-deterministic results"]
+</div>
+<h3 id="4-no-side-effects-on-shared-mutable-state">4. No Side Effects on Shared Mutable State<a class="anchor" href="#4-no-side-effects-on-shared-mutable-state" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;X&gt; out = new ArrayList&lt;&gt;();
+list.parallelStream().forEach(out::add);    // DATA RACE — ArrayList isn't thread-safe
+</code></pre></div>
+<p>Use <code>collect</code> (T05) — it gives each thread its <strong>own</strong> container and merges them safely. Ad-hoc <code>forEach(mutableCollection::add)</code> is a data race in parallel (and discouraged even sequentially).</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p>Parallel streams <strong>silently produce wrong results</strong> when these contracts are violated — no exception, just a wrong answer (sometimes; non-deterministically). This is far more dangerous than a crash. Before parallelising, verify: stateless, non-interfering, associative + true identity, no shared mutation.</p></div></div>
+<h2 id="encounter-order-in-parallel">Encounter Order in Parallel<a class="anchor" href="#encounter-order-in-parallel" aria-hidden="true">#</a></h2>
+<p>Parallel streams still <strong>respect encounter order</strong> for ordered sources by default — <code>collect</code>, <code>reduce</code>, <code>findFirst</code> produce order-consistent results. But some ops trade order for speed:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Op</th>
+<th>Parallel behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>forEach</code></td>
+<td><strong>no order guarantee</strong> — fastest</td>
+</tr>
+<tr>
+<td><code>forEachOrdered</code></td>
+<td>encounter order preserved — slower (coordination)</td>
+</tr>
+<tr>
+<td><code>findFirst</code></td>
+<td>respects order (more coordination)</td>
+</tr>
+<tr>
+<td><code>findAny</code></td>
+<td>returns <strong>any</strong> element — parallel-friendly, no order cost</td>
+</tr>
+<tr>
+<td><code>unordered()</code></td>
+<td>explicitly drops the ordering constraint → lets the runtime skip order-preservation (speeds up <code>distinct</code>, <code>limit</code>, etc. in parallel)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">list.parallelStream().forEach(System.out::println);          // order NOT guaranteed
+list.parallelStream().forEachOrdered(System.out::println);   // order preserved (slower)
+list.parallelStream().unordered().distinct()...;              // faster distinct (order relaxed)
+</code></pre></div>
+<p>Prefer <code>findAny</code> over <code>findFirst</code> and <code>forEach</code> over <code>forEachOrdered</code> in parallel when order doesn't matter — the order-preserving variants add real coordination cost.</p>
+<h2 id="memory-layer-spliteratortrysplit-decomposition">Memory Layer — <code>Spliterator.trySplit()</code> Decomposition<a class="anchor" href="#memory-layer-spliteratortrysplit-decomposition" aria-hidden="true">#</a></h2>
+<p>Parallelism rests entirely on the source's ability to <strong>split</strong>. A stream's source is a <code>Spliterator</code> (T04); for parallel execution, the runtime calls <strong><code>trySplit()</code></strong> to break off a portion for another thread.</p>
+<h3 id="the-split-tree">The Split Tree<a class="anchor" href="#the-split-tree" aria-hidden="true">#</a></h3>
+<p><code>trySplit()</code> returns a new <code>Spliterator</code> covering roughly <strong>half</strong> the elements (the original keeps the other half), or <code>null</code> if it can't split. This recurses — each half splits again — building a <strong>binary tree</strong> of chunks, until chunks are small enough (a threshold derived from the estimated size and the pool's parallelism):</p>
+<div class="mermaid">flowchart TB
+  Full["full source (1M elements)"]
+  L["left half (500k)"]
+  R["right half (500k)"]
+  LL["250k"]
+  LR["250k"]
+  RL["250k"]
+  RR["250k"]
+  Full --> L
+  Full --> R
+  L --> LL
+  L --> LR
+  R --> RL
+  R --> RR
+  Note["recursive trySplit → balanced binary tree of chunks → one chunk per task"]
+</div>
+<h3 id="good-splitters-vs-bad-splitters">Good Splitters vs Bad Splitters<a class="anchor" href="#good-splitters-vs-bad-splitters" aria-hidden="true">#</a></h3>
+<p>Whether splitting is <strong>cheap and balanced</strong> decides whether parallelism helps:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Split quality</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ArrayList</code>, arrays (<code>Arrays.stream</code>)</td>
+<td><strong>excellent</strong> — O(1), balanced</td>
+<td>backed by an array; split = compute a midpoint index</td>
+</tr>
+<tr>
+<td><code>IntStream.range(a, b)</code></td>
+<td><strong>excellent</strong> — O(1), balanced</td>
+<td>a numeric range; split the bounds</td>
+</tr>
+<tr>
+<td><code>HashSet</code>, <code>HashMap</code></td>
+<td><strong>good</strong> — reasonably balanced</td>
+<td>split the hash table buckets</td>
+</tr>
+<tr>
+<td><code>LinkedList</code></td>
+<td><strong>poor</strong> — O(n), unbalanced</td>
+<td>must walk to find the midpoint; splits are slow and lopsided</td>
+</tr>
+<tr>
+<td><code>Stream.iterate(seed, next)</code></td>
+<td><strong>terrible</strong> — sequential</td>
+<td>each element depends on the previous; can't split ahead</td>
+</tr>
+<tr>
+<td><code>Files.lines</code>, <code>BufferedReader.lines</code></td>
+<td><strong>terrible</strong> — sequential I/O</td>
+<td>read order is inherent; no split-ahead</td>
+</tr>
+<tr>
+<td><code>Stream.generate(supplier)</code></td>
+<td><strong>terrible</strong> — no size, unordered</td>
+<td>infinite, no structure to split</td>
+</tr>
+</tbody>
+</table></div>
+<div class="mermaid">flowchart TB
+  Good["array-backed: ArrayList, arrays, IntStream.range → O(1) balanced splits → parallel HELPS"]
+  Bad["LinkedList / iterate / Files.lines → poor or no split → parallel DOESN'T HELP"]
+  Good -.->|"vs"| Bad
+</div>
+<p>The <strong><code>SIZED</code></strong> and <strong><code>SUBSIZED</code></strong> spliterator characteristics (T04) matter here: <code>SIZED</code> means the total size is known; <code>SUBSIZED</code> means each split also knows its size — both enable <strong>balanced, predictable</strong> splitting and let the framework size tasks well. Array-backed sources are <code>SIZED</code> + <code>SUBSIZED</code>; <code>iterate</code> and I/O streams are not.</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Parallelise array-backed sources</strong> (<code>ArrayList</code>, arrays, <code>IntStream.range</code>). <strong>Don't bother</strong> with <code>LinkedList</code>, <code>Stream.iterate</code>, or <code>Files.lines</code> — they split poorly (or not at all), so the threads can't get balanced work and parallelism adds overhead with no benefit.</p></div></div>
+<h2 id="architecture-layer-forkjoin-work-stealing-and-overhead">Architecture Layer — Fork/Join, Work-Stealing, and Overhead<a class="anchor" href="#architecture-layer-forkjoin-work-stealing-and-overhead" aria-hidden="true">#</a></h2>
+<h3 id="the-shared-forkjoinpoolcommonpool">The Shared <code>ForkJoinPool.commonPool</code><a class="anchor" href="#the-shared-forkjoinpoolcommonpool" aria-hidden="true">#</a></h3>
+<p>Parallel streams run on the <strong>common <code>ForkJoinPool</code></strong> — a <strong>single, JVM-wide, shared</strong> thread pool:</p>
+<ul>
+<li><strong>Default size</strong> = <code>Runtime.getRuntime().availableProcessors() - 1</code> worker threads. (The submitting thread also participates, so effectively all cores are used.)</li>
+<li><strong>Configurable</strong> via <code>-Djava.util.concurrent.ForkJoinPool.common.parallelism=N</code>.</li>
+<li><strong>Shared across the entire JVM</strong> — every parallel stream, and every <code>CompletableFuture</code> without a custom executor, uses the <em>same</em> pool.</li>
+</ul>
+<div class="mermaid">flowchart TB
+  CommonPool["ForkJoinPool.commonPool (cores − 1 workers, shared JVM-wide)"]
+  PS1["parallel stream A"]
+  PS2["parallel stream B"]
+  CF["CompletableFuture (default executor)"]
+  PS1 --> CommonPool
+  PS2 --> CommonPool
+  CF --> CommonPool
+  Note["ONE pool serves ALL parallel streams + default CompletableFutures"]
+</div>
+<p>That sharing is the root of the blocking hazard (below): a few badly-behaved tasks affect everything.</p>
+<h3 id="forkjoin-work-stealing">Fork/Join + Work-Stealing<a class="anchor" href="#forkjoin-work-stealing" aria-hidden="true">#</a></h3>
+<p>The computation is a <strong>recursive fork/join task</strong> mirroring the split tree (full mechanism in L3/C01/T13):</p>
+<ol>
+<li>If a chunk is small enough → <strong>compute it directly</strong> (a leaf task).</li>
+<li>Else → <strong>split</strong> into two subtasks, <strong>fork</strong> one (queue it for another thread), <strong>compute</strong> the other, then <strong>join</strong> (wait for the forked result) and <strong>merge</strong>.</li>
+</ol>
+<p>Each worker thread has its own <strong>deque</strong> of tasks. When a thread runs out of work, it <strong>steals</strong> a task from the <strong>tail</strong> of a busy thread's deque — <strong>work-stealing</strong>. This keeps all cores busy even when the work is unbalanced; the load self-balances without central coordination.</p>
+<div class="mermaid">flowchart TB
+  Split["split source into tasks (tree)"]
+  T1["worker 1 deque: [t1, t2, t3]"]
+  T2["worker 2 deque: [t4, t5]"]
+  Idle["worker 3 idle → STEALS t3 from worker 1's tail"]
+  Split --> T1
+  Split --> T2
+  T1 -.->|"steal"| Idle
+  Note["work-stealing self-balances; idle threads pull from busy threads' deques"]
+</div>
+<h3 id="the-overhead-why-parallel-can-be-slower">The Overhead — Why Parallel Can Be Slower<a class="anchor" href="#the-overhead-why-parallel-can-be-slower" aria-hidden="true">#</a></h3>
+<p>Parallelism is not free:</p>
+<ul>
+<li><strong>Splitting</strong> the source (<code>trySplit</code> calls down the tree).</li>
+<li><strong>Task creation + scheduling</strong> (<code>ForkJoinTask</code> objects, deque operations).</li>
+<li><strong>Merging</strong> partial results (the combiner — T05; for <code>collect</code>, per-thread containers then merge).</li>
+<li><strong>Common-pool contention</strong> and <strong>cache effects</strong> (threads on different cores sharing data; cache-line bouncing).</li>
+</ul>
+<p>For <strong>small data</strong> or <strong>cheap per-element work</strong>, this overhead <strong>dwarfs</strong> the parallel benefit — parallel is <strong>slower</strong> than sequential. A <code>list.parallelStream().map(x -&gt; x + 1)</code> over 100 elements is pure loss.</p>
+<h3 id="the-nq-rule-of-thumb">The N×Q Rule of Thumb<a class="anchor" href="#the-nq-rule-of-thumb" aria-hidden="true">#</a></h3>
+<p>Parallelism pays off when <strong>N × Q</strong> is large enough to amortise the machinery, where:</p>
+<ul>
+<li><strong>N</strong> = number of elements.</li>
+<li><strong>Q</strong> = cost per element (how expensive the per-element work is).</li>
+</ul>
+<div class="mermaid">flowchart TB
+  NQ["N (elements) × Q (cost per element)"]
+  Small["small N×Q → overhead dominates → sequential wins"]
+  Large["large N×Q → parallel speedup approaches core count"]
+  NQ --> Small
+  NQ --> Large
+  Rule["rule of thumb: ~10,000 cheap ops, OR fewer expensive ones (e.g. 100 × 1ms work)"]
+</div>
+<p>Rough guidance (Goetz/Lea): parallelism is worth considering at <strong>~10,000 elements</strong> of cheap work, or <strong>far fewer</strong> elements of expensive work (e.g., 100 elements each doing a multi-millisecond computation). Below ~1,000 cheap ops, sequential almost always wins. <strong>Always measure</strong> (with JMH or careful warm-up) — don't assume.</p>
+<h3 id="the-blocking-task-hazard">The Blocking-Task Hazard<a class="anchor" href="#the-blocking-task-hazard" aria-hidden="true">#</a></h3>
+<p>The most dangerous parallel-stream mistake. The common pool has only ~(cores − 1) threads. If a parallel stream's per-element work <strong>blocks</strong> — a network call, a database query, <code>Thread.sleep</code>, a contended lock, a blocking queue — it <strong>ties up a common-pool thread doing nothing</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">urls.parallelStream()
+    .map(url -&gt; httpClient.get(url))     // BLOCKS on I/O — ties up a common-pool thread per call
+    .collect(toList());
+</code></pre></div>
+<p>Because the pool is <strong>shared JVM-wide</strong>, a handful of blocking parallel streams can <strong>exhaust all common-pool threads</strong>, <strong>starving every other parallel stream and <code>CompletableFuture</code></strong> in the application — the whole app freezes or deadlocks.</p>
+<div class="mermaid">flowchart TB
+  Blocking["parallel stream doing blocking I/O"]
+  Pool["common pool: only (cores−1) threads"]
+  Blocking --> Tie["each blocking call ties up a thread"]
+  Tie --> Starve["pool exhausted → ALL other parallel streams + CFs starve → app freezes"]
+</div>
+<p>Fixes:</p>
+<ol>
+<li><strong>Don't parallelise blocking work.</strong> CPU-bound work only on parallel streams.</li>
+<li><strong>Use a custom <code>ForkJoinPool</code></strong> to isolate the work (next section).</li>
+<li><strong>Use async/virtual-thread APIs</strong> for I/O (<code>CompletableFuture</code> with a dedicated executor, or virtual threads — L3/C01/T14) instead of parallel streams.</li>
+</ol>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Never do blocking I/O in a parallel stream on the common pool.</strong> It can starve the entire JVM's parallel machinery. Parallel streams are for <strong>CPU-bound</strong> work over large data. For I/O, use async APIs or virtual threads.</p></div></div>
+<h3 id="isolating-work-with-a-custom-forkjoinpool">Isolating Work With a Custom <code>ForkJoinPool</code><a class="anchor" href="#isolating-work-with-a-custom-forkjoinpool" aria-hidden="true">#</a></h3>
+<p>A parallel stream runs on <strong>whatever pool the submitting thread belongs to</strong>. So you can run it on a <em>custom</em> pool by submitting it from that pool:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ForkJoinPool customPool = new ForkJoinPool(4);
+try {
+    List&lt;Integer&gt; result = customPool.submit(() -&gt;
+        list.parallelStream().map(expensiveCpuWork).collect(toList())
+    ).get();
+} finally {
+    customPool.shutdown();
+}
+</code></pre></div>
+<p>The parallel stream executes on <code>customPool</code>, isolated from the common pool. This is the documented (if slightly hacky) way to bound parallel-stream work and protect the common pool. (For blocking work, a dedicated bounded pool is safer than the common pool — but virtual threads are the modern answer.)</p>
+<h3 id="concurrent-collectors-avoid-the-merge-t05-callback">Concurrent Collectors Avoid the Merge (T05 callback)<a class="anchor" href="#concurrent-collectors-avoid-the-merge-t05-callback" aria-hidden="true">#</a></h3>
+<p>For parallel <strong>collection</strong>, <code>groupingByConcurrent</code> / <code>toConcurrentMap</code> (T05) share <strong>one</strong> <code>ConcurrentHashMap</code> across threads instead of per-thread maps + merge — faster for unordered parallel grouping (no merge step), at the price of contention on the shared map.</p>
+<h2 id="when-to-parallelise-decision-guide">When to Parallelise — Decision Guide<a class="anchor" href="#when-to-parallelise-decision-guide" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  Q1{"large N AND/OR expensive Q (N×Q large)?"}
+  Q1 -- no --> Sequential1["sequential"]
+  Q1 -- yes --> Q2{"splittable source (array/ArrayList/range)?"}
+  Q2 -- no --> Sequential2["sequential (LinkedList/iterate/IO won't split)"]
+  Q2 -- yes --> Q3{"stateless, non-interfering, associative + true identity?"}
+  Q3 -- no --> Sequential3["sequential (parallel would be wrong)"]
+  Q3 -- yes --> Q4{"no blocking I/O in the pipeline?"}
+  Q4 -- no --> Sequential4["sequential OR custom pool / async (don't block the common pool)"]
+  Q4 -- yes --> Measure["parallelise — then MEASURE with JMH to confirm it actually helps"]
+</div>
+<p>All of:</p>
+<ul>
+<li><strong>Large N×Q</strong> (≥ ~10k cheap ops, or fewer expensive ones).</li>
+<li><strong>Splittable source</strong> (array-backed; not linked/iterate/IO).</li>
+<li><strong>Associative</strong> reduction + true identity; <strong>stateless</strong>, <strong>non-interfering</strong> ops.</li>
+<li><strong>No blocking</strong> in the pipeline (or use a custom pool / async).</li>
+<li><strong>Measured</strong> to actually help.</li>
+</ul>
+<p>If any fail → <strong>sequential</strong>. The default should be sequential; reach for parallel deliberately, and verify.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="parallelising-small-or-cheap-streams">Parallelising Small or Cheap Streams<a class="anchor" href="#parallelising-small-or-cheap-streams" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">shortList.parallelStream().map(x -&gt; x + 1)...   // slower than sequential — overhead dominates
+</code></pre></div>
+<p>Below the N×Q threshold, the fork/join machinery costs more than it saves.</p>
+<h3 id="stateful-or-side-effecting-lambdas">Stateful or Side-Effecting Lambdas<a class="anchor" href="#stateful-or-side-effecting-lambdas" aria-hidden="true">#</a></h3>
+<p>Shared mutable state read or written in a parallel lambda is a data race and produces wrong, non-deterministic results. Keep lambdas pure.</p>
+<h3 id="foreachsharedcollectionadd"><code>forEach(sharedCollection::add)</code><a class="anchor" href="#foreachsharedcollectionadd" aria-hidden="true">#</a></h3>
+<p>A data race on a non-thread-safe collection. Use <code>collect(toList())</code> — it's parallel-safe (per-thread containers + merge, T05).</p>
+<h3 id="non-associative-reduce">Non-Associative Reduce<a class="anchor" href="#non-associative-reduce" aria-hidden="true">#</a></h3>
+<p><code>reduce(0, (a, b) -&gt; a - b)</code> and other non-associative folds give wrong answers in parallel. Verify associativity before parallelising a reduce.</p>
+<h3 id="blocking-io-on-the-common-pool">Blocking I/O on the Common Pool<a class="anchor" href="#blocking-io-on-the-common-pool" aria-hidden="true">#</a></h3>
+<p>The JVM-wide starvation hazard. Never block in a common-pool parallel stream. Use a custom pool or async I/O.</p>
+<h3 id="assuming-parallel-preserves-foreach-order">Assuming Parallel Preserves <code>forEach</code> Order<a class="anchor" href="#assuming-parallel-preserves-foreach-order" aria-hidden="true">#</a></h3>
+<p><code>forEach</code> is unordered in parallel. Use <code>forEachOrdered</code> if you need order (slower), or restructure to avoid order dependence.</p>
+<h3 id="parallelising-linkedlist-iterate-fileslines">Parallelising <code>LinkedList</code> / <code>iterate</code> / <code>Files.lines</code><a class="anchor" href="#parallelising-linkedlist-iterate-fileslines" aria-hidden="true">#</a></h3>
+<p>These split poorly or not at all — parallelism adds overhead with no balanced work. Copy to an <code>ArrayList</code> first if you must parallelise, or stay sequential.</p>
+<h3 id="measuring-without-warm-up-jmh">Measuring Without Warm-Up / JMH<a class="anchor" href="#measuring-without-warm-up-jmh" aria-hidden="true">#</a></h3>
+<p>Naive <code>System.nanoTime</code> benchmarks measure the cold interpreter, not steady state (T04). Use JMH or careful warm-up; parallel-vs-sequential numbers are meaningless otherwise.</p>
+<h3 id="wrong-identity-in-reduce">Wrong Identity in <code>reduce</code><a class="anchor" href="#wrong-identity-in-reduce" aria-hidden="true">#</a></h3>
+<p>In parallel, the identity is combined once per chunk. <code>reduce(1, Integer::sum)</code> (using 1 as the identity for addition) gives a wrong total — use <code>0</code>.</p>
+<h3 id="nesting-parallel-streams">Nesting Parallel Streams<a class="anchor" href="#nesting-parallel-streams" aria-hidden="true">#</a></h3>
+<p>A parallel stream whose elements each run another parallel stream saturates the common pool with nested tasks. Flatten or keep the inner work sequential.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>Parallel streams are a favourite "do you actually understand this?" interview topic.</p><ol>
+<li><strong>How do you make a stream parallel?</strong> <code>collection.parallelStream()</code> or <code>stream.parallel()</code>. The whole pipeline is parallel; the last <code>parallel()</code>/<code>sequential()</code> wins.</li>
+<li><strong>What pool do parallel streams run on?</strong> The shared <code>ForkJoinPool.commonPool</code> (size = cores − 1, JVM-wide).</li>
+<li><strong>What does a parallel reduce require of the accumulator?</strong> Associativity (and a true identity) — because partial results combine in non-deterministic order. Subtraction is not associative → wrong results.</li>
+<li><strong>Why might a parallel stream be slower than sequential?</strong> Overhead — splitting, task scheduling, merging, contention. For small N or cheap Q, overhead dominates.</li>
+<li><strong>What's the N×Q rule?</strong> Parallelism pays only when elements × cost-per-element is large (≈10k cheap ops or fewer expensive ones).</li>
+<li><strong>What's the blocking-task hazard?</strong> Blocking I/O in a common-pool parallel stream ties up shared threads and can starve the whole JVM's parallel machinery. Use a custom pool or async I/O.</li>
+<li><strong>Which sources parallelise well?</strong> Array-backed (<code>ArrayList</code>, arrays, <code>IntStream.range</code>) — O(1) balanced <code>trySplit</code>. Poorly: <code>LinkedList</code>, <code>Stream.iterate</code>, <code>Files.lines</code>.</li>
+<li><strong>What's <code>trySplit</code>?</strong> The <code>Spliterator</code> method that breaks off ~half the elements for another thread; recursion builds the split tree.</li>
+<li><strong>What's work-stealing?</strong> Idle worker threads steal tasks from busy threads' deques, self-balancing the load.</li>
+<li><strong>Why is <code>collect</code> parallel-safe but <code>forEach(list::add)</code> not?</strong> <code>collect</code> gives each thread its own container and merges; <code>forEach</code> with a shared mutable list is a data race.</li>
+<li><strong><code>findFirst</code> vs <code>findAny</code> in parallel?</strong> <code>findFirst</code> respects encounter order (coordination cost); <code>findAny</code> returns any element (parallel-friendly).</li>
+<li><strong>How do you isolate parallel-stream work from the common pool?</strong> Submit the stream computation to a custom <code>ForkJoinPool</code> via <code>pool.submit(() -&gt; ...parallelStream()...).get()</code>.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Parallel vs sequential — small.</strong> Benchmark (JMH or warm-up) <code>map(x -&gt; x+1)</code> over 100 elements, sequential vs parallel. Confirm parallel is <strong>slower</strong> (overhead).</li>
+<li><strong>Parallel vs sequential — large + expensive.</strong> Benchmark a CPU-heavy op (e.g., <code>isPrime</code>) over 1M ints, sequential vs parallel. Confirm parallel approaches core-count speedup.</li>
+<li><strong>N×Q sweep.</strong> Vary N (100, 10k, 1M) and Q (trivial add, vs a 0.1ms computation). Find where parallel starts winning. Relate to the N×Q rule.</li>
+<li><strong>Non-associative wrongness.</strong> <code>reduce(0, (a,b) -&gt; a-b)</code> sequential vs parallel over a list. Confirm parallel gives a <strong>different, wrong</strong> answer. Repeat with <code>Integer::sum</code> (correct both ways).</li>
+<li><strong>Wrong identity.</strong> <code>reduce(1, Integer::sum)</code> parallel; confirm the total is wrong (identity combined per chunk). Fix with <code>0</code>.</li>
+<li><strong>forEach order.</strong> <code>parallelStream().forEach(println)</code> vs <code>forEachOrdered(println)</code>. Observe the order difference.</li>
+<li><strong>Data race via forEach.</strong> <code>parallelStream().forEach(arrayList::add)</code>; run many times; observe lost/corrupted elements or exceptions. Fix with <code>collect(toList())</code>.</li>
+<li><strong>trySplit observation.</strong> Get an <code>ArrayList</code>'s and a <code>LinkedList</code>'s spliterator; call <code>trySplit()</code> and print the result sizes (<code>estimateSize</code>). Confirm the ArrayList splits cleanly in half; the LinkedList splits poorly or returns null.</li>
+<li><strong>Source matters.</strong> Sum 1M ints from an <code>ArrayList</code> vs a <code>LinkedList</code> in parallel. Confirm the <code>LinkedList</code> gets little/no speedup.</li>
+<li><strong>Common-pool size.</strong> Print <code>ForkJoinPool.commonPool().getParallelism()</code>. Run with <code>-Djava.util.concurrent.ForkJoinPool.common.parallelism=2</code> and confirm it changes.</li>
+<li><strong>Blocking starvation.</strong> Run a parallel stream where each element <code>Thread.sleep(100)</code>s, while another thread tries to run its own parallel stream. Observe the second one starving. Fix by submitting to a custom <code>ForkJoinPool</code>.</li>
+<li><strong>Custom pool isolation.</strong> Run a parallel stream inside <code>new ForkJoinPool(4).submit(() -&gt; ...).get()</code>. Confirm (via <code>Thread.currentThread().getName()</code>) it runs on the custom pool, not the common one.</li>
+<li><strong>groupingBy vs groupingByConcurrent in parallel.</strong> Group 1M elements in parallel both ways; benchmark; confirm the concurrent collector avoids the merge for unordered grouping (T05).</li>
+<li><strong>unordered speedup.</strong> <code>parallelStream().distinct()</code> vs <code>parallelStream().unordered().distinct()</code>; benchmark; observe the unordered version can be faster (no order preservation).</li>
+<li><strong>findAny vs findFirst.</strong> In a parallel stream, time <code>findFirst</code> vs <code>findAny</code>; confirm <code>findAny</code> is cheaper (no order coordination).</li>
+<li><strong>Explain it back.</strong> For <code>list.parallelStream().filter(p).map(f).collect(toList())</code> on a 1M-element <code>ArrayList</code>: describe (a) how <code>trySplit</code> builds the chunk tree, (b) which pool runs it and its size, (c) how work-stealing balances the chunks, (d) why <code>collect</code> is safe (per-thread containers + merge), (e) the N×Q condition under which this beats sequential, (f) what would go wrong if <code>f</code> did blocking I/O.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Make a stream parallel with <code>collection.parallelStream()</code> or <code>stream.parallel()</code>, and recall that the <strong>whole pipeline</strong> is parallel or sequential (no per-stage mixing; last <code>parallel()</code>/<code>sequential()</code> wins).</li>
+<li>Apply the <strong>correctness contracts</strong> parallel imposes: <strong>stateless</strong> ops, <strong>non-interfering</strong> (don't modify the source), <strong>associative</strong> accumulator + <strong>true identity</strong> for reductions (non-associative folds like subtraction give wrong, non-deterministic answers), and <strong>no side effects on shared mutable state</strong> (use <code>collect</code>, not <code>forEach(list::add)</code>).</li>
+<li>Recognise that parallel streams <strong>silently produce wrong results</strong> when these contracts are violated — verify before parallelising.</li>
+<li>Handle <strong>encounter order</strong> in parallel — <code>forEach</code> is unordered (fast), <code>forEachOrdered</code> preserves order (slower); <code>findAny</code> is parallel-friendly, <code>findFirst</code> respects order; <code>unordered()</code> relaxes ordering for speed.</li>
+<li>Explain the <strong><code>Spliterator.trySplit()</code></strong> decomposition — the source recursively splits into a balanced binary tree of chunks; <strong>array-backed sources</strong> (<code>ArrayList</code>, arrays, <code>IntStream.range</code>) split cheaply and balanced (<code>SIZED</code>+<code>SUBSIZED</code>), while <strong><code>LinkedList</code>/<code>Stream.iterate</code>/<code>Files.lines</code></strong> split poorly or not at all (so parallelism doesn't help them).</li>
+<li>Describe the <strong>architecture</strong>: parallel streams run on the shared <strong><code>ForkJoinPool.commonPool</code></strong> (size cores − 1, JVM-wide); the computation is a recursive <strong>fork/join</strong> task tree with <strong>work-stealing</strong> (idle threads steal from busy deques, self-balancing).</li>
+<li>Account for the <strong>overhead</strong> (split + schedule + merge + contention) that makes parallel <strong>slower</strong> for small N or cheap Q, and apply the <strong>N×Q rule</strong> (parallelism pays at ≈10k cheap ops, or fewer expensive ones) — and <strong>always measure</strong>.</li>
+<li>Avoid the <strong>blocking-task hazard</strong>: blocking I/O on the common pool ties up shared threads and can <strong>starve the whole JVM</strong>; for I/O use async APIs / virtual threads, or isolate CPU work on a <strong>custom <code>ForkJoinPool</code></strong> (<code>pool.submit(() -&gt; ...parallelStream()...).get()</code>).</li>
+<li>Use <strong>concurrent collectors</strong> (<code>groupingByConcurrent</code>, <code>toConcurrentMap</code>, T05) to avoid the per-thread-container merge in unordered parallel collection.</li>
+<li>Apply the <strong>decision guide</strong> — parallelise only when N×Q is large, the source is splittable, the ops are stateless/non-interfering/associative, there's no blocking, and you've measured a real benefit; default to sequential otherwise.</li>
+<li>Avoid the <strong>common traps</strong>: parallelising small/cheap streams, stateful/side-effecting lambdas, <code>forEach(sharedCollection::add)</code>, non-associative reduce, blocking I/O on the common pool, assuming <code>forEach</code> order, parallelising <code>LinkedList</code>/<code>iterate</code>/<code>Files.lines</code>, benchmarking without warm-up, wrong identity, nesting parallel streams.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t07-optional-in-depth.html">Optional in depth</a>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Parallel streams&quot;
+slug: parallel-streams
+level: L2
+module: &quot;Intermediate Java &amp; Backend Foundations&quot;
+section: &quot;Functional &amp; Modern Java&quot;
+type: concept
+difficulty: intermediate
+order: 6
+tags: [parallel-stream, parallelstream, parallel, sequential, forkjoinpool, common-pool, work-stealing, trysplit, spliterator, split-tree, associative, identity, stateless, non-interfering, encounter-order, foreachordered, findany, unordered, n-times-q, blocking-task-starvation, custom-forkjoinpool, sized, subsized, concurrent-collector, data-race, jmh]
+prerequisites: [streams-api-intermediate-and-terminal-operations, collectors-and-grouping, threads-and-runnable, arrays-1-d-multi-dimensional, wrapper-classes-and-autoboxing]
+status: complete
+estimated_minutes: 110
+last_updated: 2026-06-04
+---
+
+# Parallel streams
+
+A **parallel stream** processes its elements on **multiple threads** — splitting the source into chunks, computing them concurrently, and merging the results. The API surface is almost invisible: `list.parallelStream()` or `stream.parallel()` and you&#x27;re parallel. That tiny surface hides a large amount of machinery — a recursive source split, a shared fork/join thread pool, work-stealing — and a set of **correctness requirements** and **performance traps** that make parallel streams the most-misused feature in the chapter. Used right (large data, expensive per-element work, a splittable source), they give near-linear speedups for free. Used wrong (small data, blocking I/O, non-associative reductions), they&#x27;re slower, wrong, or freeze the whole JVM.
+
+The depth-bar requirement isn&#x27;t just &quot;add `.parallel()`.&quot; At the **language** layer, parallel execution imposes **correctness contracts** that sequential doesn&#x27;t care about: operations must be **stateless** and **non-interfering**, and reductions must be **associative** with a true **identity** — violate these and parallel silently produces *wrong answers*. At the **memory** layer, parallelism rests on **`Spliterator.trySplit()`** ([T04](./T04-streams-api-intermediate-and-terminal-operations.md)) — the source recursively splits into a binary tree of chunks, and whether this is **balanced and cheap** (arrays, `ArrayList`, `IntStream.range`) or **poor** (`LinkedList`, `Stream.iterate`, `Files.lines`) decides whether parallelism helps at all. At the **architecture** layer, parallel streams run on the **shared `ForkJoinPool.commonPool`** with **work-stealing**, carry real **overhead** (split + schedule + merge), follow the **N×Q rule** (parallelism pays only when *elements × cost-per-element* is large), and have a dangerous **blocking-task hazard**: blocking I/O on the common pool starves *every other* parallel stream in the JVM. We&#x27;ll cover every layer and finish with a decision guide.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Streams API](./T04-streams-api-intermediate-and-terminal-operations.md) (L2/C01/T04) — the lazy pipeline, the `Spliterator`, short-circuiting; [Collectors &amp; grouping](./T05-collectors-and-grouping.md) (L2/C01/T05) — sequential vs parallel `collect`, per-thread containers + combiner merge, concurrent collectors; [Threads &amp; Runnable](../../L3-advanced-jvm/C01-concurrency/T01-threads-and-runnable.md) (L3/C01/T01) — threads, the cost of context switches, why blocking ties up a thread. The **Fork/Join framework** itself is L3/C01/T13 (not yet authored — forward-referenced here); we cover what a stream user needs.
+
+## Making a Stream Parallel
+
+Two ways in, one way out:
+
+```java
+List&lt;X&gt; data = ...;
+data.parallelStream().filter(...).map(...).collect(toList());     // parallel from the start
+data.stream().parallel().filter(...).collect(toList());           // convert to parallel
+data.stream().parallel().sequential().collect(toList());          // ...back to sequential
+```
+
+`parallel()` and `sequential()` set a **single flag on the whole pipeline** — there is **no per-stage parallelism**. The **last** call wins:
+
+```java
+stream.parallel().filter(...).sequential().map(...);    // runs SEQUENTIAL (last call)
+```
+
+So you can&#x27;t make `filter` parallel and `map` sequential — the entire pipeline is one or the other, decided by the last `parallel()`/`sequential()` before the terminal op.
+
+```mermaid
+flowchart TB
+  Seq[&quot;sequential stream&quot;]
+  Par[&quot;parallel stream&quot;]
+  Seq --&gt;|&quot;parallel()&quot;| Par
+  Par --&gt;|&quot;sequential()&quot;| Seq
+  Note[&quot;the WHOLE pipeline is parallel or sequential — last call wins; no per-stage mixing&quot;]
+```
+
+## Correctness Requirements — Where Parallel Bites
+
+Sequential streams tolerate sloppy lambdas; parallel streams don&#x27;t. Four contracts:
+
+### 1. Stateless Operations
+
+A `map`/`filter`/etc. lambda must compute its output from **only its input element** — not from external mutable state that changes during execution:
+
+```java
+int[] counter = {0};
+stream.parallel().map(x -&gt; x + counter[0]++);   // WRONG — shared mutable state, data race
+```
+
+Stateful lambdas race across threads and produce non-deterministic, wrong results.
+
+### 2. Non-Interfering — Don&#x27;t Modify the Source
+
+```java
+list.parallelStream().forEach(x -&gt; list.add(...));   // WRONG — modifying the source mid-stream
+```
+
+Same rule as sequential, but parallel makes the `ConcurrentModificationException` (or undefined behaviour) far more likely.
+
+### 3. Associative Accumulator (and True Identity)
+
+For `reduce`, the accumulator must be **associative** — `(a op b) op c == a op (b op c)` — because parallel combines partial results in a **non-deterministic order**:
+
+```java
+// Sum is associative → parallel gives the right answer:
+int sum = nums.parallelStream().reduce(0, Integer::sum);          // correct
+
+// Subtraction is NOT associative → parallel gives WRONG answers:
+int diff = nums.parallelStream().reduce(0, (a, b) -&gt; a - b);      // wrong &amp; non-deterministic!
+```
+
+`(10 - 3) - 2 = 5` but `10 - (3 - 2) = 9` — subtraction depends on grouping, which parallel doesn&#x27;t fix. Addition, multiplication, min, max, `String` concatenation (with a matching combiner), and `Math.max` are associative; subtraction, division, and order-sensitive folds are not.
+
+The **identity** must also be a true identity: `combiner(identity, x) == x` for all `x`. In parallel the identity may be combined **multiple times** (once per chunk), so a wrong identity (e.g., `1` for an addition fold) gives a wrong total.
+
+```mermaid
+flowchart TB
+  Assoc[&quot;associative: (a op b) op c == a op (b op c)&quot;]
+  Assoc --&gt; OK[&quot;sum, max, min, multiply → parallel-safe&quot;]
+  NonAssoc[&quot;non-associative: subtraction, division, order-sensitive&quot;]
+  NonAssoc --&gt; Wrong[&quot;parallel gives WRONG, non-deterministic results&quot;]
+```
+
+### 4. No Side Effects on Shared Mutable State
+
+```java
+List&lt;X&gt; out = new ArrayList&lt;&gt;();
+list.parallelStream().forEach(out::add);    // DATA RACE — ArrayList isn&#x27;t thread-safe
+```
+
+Use `collect` (T05) — it gives each thread its **own** container and merges them safely. Ad-hoc `forEach(mutableCollection::add)` is a data race in parallel (and discouraged even sequentially).
+
+&gt; [!WARNING]
+&gt; Parallel streams **silently produce wrong results** when these contracts are violated — no exception, just a wrong answer (sometimes; non-deterministically). This is far more dangerous than a crash. Before parallelising, verify: stateless, non-interfering, associative + true identity, no shared mutation.
+
+## Encounter Order in Parallel
+
+Parallel streams still **respect encounter order** for ordered sources by default — `collect`, `reduce`, `findFirst` produce order-consistent results. But some ops trade order for speed:
+
+| Op | Parallel behaviour |
+|----|--------------------|
+| `forEach` | **no order guarantee** — fastest |
+| `forEachOrdered` | encounter order preserved — slower (coordination) |
+| `findFirst` | respects order (more coordination) |
+| `findAny` | returns **any** element — parallel-friendly, no order cost |
+| `unordered()` | explicitly drops the ordering constraint → lets the runtime skip order-preservation (speeds up `distinct`, `limit`, etc. in parallel) |
+
+```java
+list.parallelStream().forEach(System.out::println);          // order NOT guaranteed
+list.parallelStream().forEachOrdered(System.out::println);   // order preserved (slower)
+list.parallelStream().unordered().distinct()...;              // faster distinct (order relaxed)
+```
+
+Prefer `findAny` over `findFirst` and `forEach` over `forEachOrdered` in parallel when order doesn&#x27;t matter — the order-preserving variants add real coordination cost.
+
+## Memory Layer — `Spliterator.trySplit()` Decomposition
+
+Parallelism rests entirely on the source&#x27;s ability to **split**. A stream&#x27;s source is a `Spliterator` (T04); for parallel execution, the runtime calls **`trySplit()`** to break off a portion for another thread.
+
+### The Split Tree
+
+`trySplit()` returns a new `Spliterator` covering roughly **half** the elements (the original keeps the other half), or `null` if it can&#x27;t split. This recurses — each half splits again — building a **binary tree** of chunks, until chunks are small enough (a threshold derived from the estimated size and the pool&#x27;s parallelism):
+
+```mermaid
+flowchart TB
+  Full[&quot;full source (1M elements)&quot;]
+  L[&quot;left half (500k)&quot;]
+  R[&quot;right half (500k)&quot;]
+  LL[&quot;250k&quot;]
+  LR[&quot;250k&quot;]
+  RL[&quot;250k&quot;]
+  RR[&quot;250k&quot;]
+  Full --&gt; L
+  Full --&gt; R
+  L --&gt; LL
+  L --&gt; LR
+  R --&gt; RL
+  R --&gt; RR
+  Note[&quot;recursive trySplit → balanced binary tree of chunks → one chunk per task&quot;]
+```
+
+### Good Splitters vs Bad Splitters
+
+Whether splitting is **cheap and balanced** decides whether parallelism helps:
+
+| Source | Split quality | Why |
+|--------|---------------|-----|
+| `ArrayList`, arrays (`Arrays.stream`) | **excellent** — O(1), balanced | backed by an array; split = compute a midpoint index |
+| `IntStream.range(a, b)` | **excellent** — O(1), balanced | a numeric range; split the bounds |
+| `HashSet`, `HashMap` | **good** — reasonably balanced | split the hash table buckets |
+| `LinkedList` | **poor** — O(n), unbalanced | must walk to find the midpoint; splits are slow and lopsided |
+| `Stream.iterate(seed, next)` | **terrible** — sequential | each element depends on the previous; can&#x27;t split ahead |
+| `Files.lines`, `BufferedReader.lines` | **terrible** — sequential I/O | read order is inherent; no split-ahead |
+| `Stream.generate(supplier)` | **terrible** — no size, unordered | infinite, no structure to split |
+
+```mermaid
+flowchart TB
+  Good[&quot;array-backed: ArrayList, arrays, IntStream.range → O(1) balanced splits → parallel HELPS&quot;]
+  Bad[&quot;LinkedList / iterate / Files.lines → poor or no split → parallel DOESN&#x27;T HELP&quot;]
+  Good -.-&gt;|&quot;vs&quot;| Bad
+```
+
+The **`SIZED`** and **`SUBSIZED`** spliterator characteristics (T04) matter here: `SIZED` means the total size is known; `SUBSIZED` means each split also knows its size — both enable **balanced, predictable** splitting and let the framework size tasks well. Array-backed sources are `SIZED` + `SUBSIZED`; `iterate` and I/O streams are not.
+
+&gt; [!IMPORTANT]
+&gt; **Parallelise array-backed sources** (`ArrayList`, arrays, `IntStream.range`). **Don&#x27;t bother** with `LinkedList`, `Stream.iterate`, or `Files.lines` — they split poorly (or not at all), so the threads can&#x27;t get balanced work and parallelism adds overhead with no benefit.
+
+## Architecture Layer — Fork/Join, Work-Stealing, and Overhead
+
+### The Shared `ForkJoinPool.commonPool`
+
+Parallel streams run on the **common `ForkJoinPool`** — a **single, JVM-wide, shared** thread pool:
+
+- **Default size** = `Runtime.getRuntime().availableProcessors() - 1` worker threads. (The submitting thread also participates, so effectively all cores are used.)
+- **Configurable** via `-Djava.util.concurrent.ForkJoinPool.common.parallelism=N`.
+- **Shared across the entire JVM** — every parallel stream, and every `CompletableFuture` without a custom executor, uses the *same* pool.
+
+```mermaid
+flowchart TB
+  CommonPool[&quot;ForkJoinPool.commonPool (cores − 1 workers, shared JVM-wide)&quot;]
+  PS1[&quot;parallel stream A&quot;]
+  PS2[&quot;parallel stream B&quot;]
+  CF[&quot;CompletableFuture (default executor)&quot;]
+  PS1 --&gt; CommonPool
+  PS2 --&gt; CommonPool
+  CF --&gt; CommonPool
+  Note[&quot;ONE pool serves ALL parallel streams + default CompletableFutures&quot;]
+```
+
+That sharing is the root of the blocking hazard (below): a few badly-behaved tasks affect everything.
+
+### Fork/Join + Work-Stealing
+
+The computation is a **recursive fork/join task** mirroring the split tree (full mechanism in L3/C01/T13):
+
+1. If a chunk is small enough → **compute it directly** (a leaf task).
+2. Else → **split** into two subtasks, **fork** one (queue it for another thread), **compute** the other, then **join** (wait for the forked result) and **merge**.
+
+Each worker thread has its own **deque** of tasks. When a thread runs out of work, it **steals** a task from the **tail** of a busy thread&#x27;s deque — **work-stealing**. This keeps all cores busy even when the work is unbalanced; the load self-balances without central coordination.
+
+```mermaid
+flowchart TB
+  Split[&quot;split source into tasks (tree)&quot;]
+  T1[&quot;worker 1 deque: [t1, t2, t3]&quot;]
+  T2[&quot;worker 2 deque: [t4, t5]&quot;]
+  Idle[&quot;worker 3 idle → STEALS t3 from worker 1&#x27;s tail&quot;]
+  Split --&gt; T1
+  Split --&gt; T2
+  T1 -.-&gt;|&quot;steal&quot;| Idle
+  Note[&quot;work-stealing self-balances; idle threads pull from busy threads&#x27; deques&quot;]
+```
+
+### The Overhead — Why Parallel Can Be Slower
+
+Parallelism is not free:
+
+- **Splitting** the source (`trySplit` calls down the tree).
+- **Task creation + scheduling** (`ForkJoinTask` objects, deque operations).
+- **Merging** partial results (the combiner — T05; for `collect`, per-thread containers then merge).
+- **Common-pool contention** and **cache effects** (threads on different cores sharing data; cache-line bouncing).
+
+For **small data** or **cheap per-element work**, this overhead **dwarfs** the parallel benefit — parallel is **slower** than sequential. A `list.parallelStream().map(x -&gt; x + 1)` over 100 elements is pure loss.
+
+### The N×Q Rule of Thumb
+
+Parallelism pays off when **N × Q** is large enough to amortise the machinery, where:
+
+- **N** = number of elements.
+- **Q** = cost per element (how expensive the per-element work is).
+
+```mermaid
+flowchart TB
+  NQ[&quot;N (elements) × Q (cost per element)&quot;]
+  Small[&quot;small N×Q → overhead dominates → sequential wins&quot;]
+  Large[&quot;large N×Q → parallel speedup approaches core count&quot;]
+  NQ --&gt; Small
+  NQ --&gt; Large
+  Rule[&quot;rule of thumb: ~10,000 cheap ops, OR fewer expensive ones (e.g. 100 × 1ms work)&quot;]
+```
+
+Rough guidance (Goetz/Lea): parallelism is worth considering at **~10,000 elements** of cheap work, or **far fewer** elements of expensive work (e.g., 100 elements each doing a multi-millisecond computation). Below ~1,000 cheap ops, sequential almost always wins. **Always measure** (with JMH or careful warm-up) — don&#x27;t assume.
+
+### The Blocking-Task Hazard
+
+The most dangerous parallel-stream mistake. The common pool has only ~(cores − 1) threads. If a parallel stream&#x27;s per-element work **blocks** — a network call, a database query, `Thread.sleep`, a contended lock, a blocking queue — it **ties up a common-pool thread doing nothing**:
+
+```java
+urls.parallelStream()
+    .map(url -&gt; httpClient.get(url))     // BLOCKS on I/O — ties up a common-pool thread per call
+    .collect(toList());
+```
+
+Because the pool is **shared JVM-wide**, a handful of blocking parallel streams can **exhaust all common-pool threads**, **starving every other parallel stream and `CompletableFuture`** in the application — the whole app freezes or deadlocks.
+
+```mermaid
+flowchart TB
+  Blocking[&quot;parallel stream doing blocking I/O&quot;]
+  Pool[&quot;common pool: only (cores−1) threads&quot;]
+  Blocking --&gt; Tie[&quot;each blocking call ties up a thread&quot;]
+  Tie --&gt; Starve[&quot;pool exhausted → ALL other parallel streams + CFs starve → app freezes&quot;]
+```
+
+Fixes:
+
+1. **Don&#x27;t parallelise blocking work.** CPU-bound work only on parallel streams.
+2. **Use a custom `ForkJoinPool`** to isolate the work (next section).
+3. **Use async/virtual-thread APIs** for I/O (`CompletableFuture` with a dedicated executor, or virtual threads — L3/C01/T14) instead of parallel streams.
+
+&gt; [!WARNING]
+&gt; **Never do blocking I/O in a parallel stream on the common pool.** It can starve the entire JVM&#x27;s parallel machinery. Parallel streams are for **CPU-bound** work over large data. For I/O, use async APIs or virtual threads.
+
+### Isolating Work With a Custom `ForkJoinPool`
+
+A parallel stream runs on **whatever pool the submitting thread belongs to**. So you can run it on a *custom* pool by submitting it from that pool:
+
+```java
+ForkJoinPool customPool = new ForkJoinPool(4);
+try {
+    List&lt;Integer&gt; result = customPool.submit(() -&gt;
+        list.parallelStream().map(expensiveCpuWork).collect(toList())
+    ).get();
+} finally {
+    customPool.shutdown();
+}
+```
+
+The parallel stream executes on `customPool`, isolated from the common pool. This is the documented (if slightly hacky) way to bound parallel-stream work and protect the common pool. (For blocking work, a dedicated bounded pool is safer than the common pool — but virtual threads are the modern answer.)
+
+### Concurrent Collectors Avoid the Merge (T05 callback)
+
+For parallel **collection**, `groupingByConcurrent` / `toConcurrentMap` (T05) share **one** `ConcurrentHashMap` across threads instead of per-thread maps + merge — faster for unordered parallel grouping (no merge step), at the price of contention on the shared map.
+
+## When to Parallelise — Decision Guide
+
+```mermaid
+flowchart TB
+  Q1{&quot;large N AND/OR expensive Q (N×Q large)?&quot;}
+  Q1 -- no --&gt; Sequential1[&quot;sequential&quot;]
+  Q1 -- yes --&gt; Q2{&quot;splittable source (array/ArrayList/range)?&quot;}
+  Q2 -- no --&gt; Sequential2[&quot;sequential (LinkedList/iterate/IO won&#x27;t split)&quot;]
+  Q2 -- yes --&gt; Q3{&quot;stateless, non-interfering, associative + true identity?&quot;}
+  Q3 -- no --&gt; Sequential3[&quot;sequential (parallel would be wrong)&quot;]
+  Q3 -- yes --&gt; Q4{&quot;no blocking I/O in the pipeline?&quot;}
+  Q4 -- no --&gt; Sequential4[&quot;sequential OR custom pool / async (don&#x27;t block the common pool)&quot;]
+  Q4 -- yes --&gt; Measure[&quot;parallelise — then MEASURE with JMH to confirm it actually helps&quot;]
+```
+
+All of:
+
+- **Large N×Q** (≥ ~10k cheap ops, or fewer expensive ones).
+- **Splittable source** (array-backed; not linked/iterate/IO).
+- **Associative** reduction + true identity; **stateless**, **non-interfering** ops.
+- **No blocking** in the pipeline (or use a custom pool / async).
+- **Measured** to actually help.
+
+If any fail → **sequential**. The default should be sequential; reach for parallel deliberately, and verify.
+
+## Common Mistakes
+
+### Parallelising Small or Cheap Streams
+
+```java
+shortList.parallelStream().map(x -&gt; x + 1)...   // slower than sequential — overhead dominates
+```
+
+Below the N×Q threshold, the fork/join machinery costs more than it saves.
+
+### Stateful or Side-Effecting Lambdas
+
+Shared mutable state read or written in a parallel lambda is a data race and produces wrong, non-deterministic results. Keep lambdas pure.
+
+### `forEach(sharedCollection::add)`
+
+A data race on a non-thread-safe collection. Use `collect(toList())` — it&#x27;s parallel-safe (per-thread containers + merge, T05).
+
+### Non-Associative Reduce
+
+`reduce(0, (a, b) -&gt; a - b)` and other non-associative folds give wrong answers in parallel. Verify associativity before parallelising a reduce.
+
+### Blocking I/O on the Common Pool
+
+The JVM-wide starvation hazard. Never block in a common-pool parallel stream. Use a custom pool or async I/O.
+
+### Assuming Parallel Preserves `forEach` Order
+
+`forEach` is unordered in parallel. Use `forEachOrdered` if you need order (slower), or restructure to avoid order dependence.
+
+### Parallelising `LinkedList` / `iterate` / `Files.lines`
+
+These split poorly or not at all — parallelism adds overhead with no balanced work. Copy to an `ArrayList` first if you must parallelise, or stay sequential.
+
+### Measuring Without Warm-Up / JMH
+
+Naive `System.nanoTime` benchmarks measure the cold interpreter, not steady state (T04). Use JMH or careful warm-up; parallel-vs-sequential numbers are meaningless otherwise.
+
+### Wrong Identity in `reduce`
+
+In parallel, the identity is combined once per chunk. `reduce(1, Integer::sum)` (using 1 as the identity for addition) gives a wrong total — use `0`.
+
+### Nesting Parallel Streams
+
+A parallel stream whose elements each run another parallel stream saturates the common pool with nested tasks. Flatten or keep the inner work sequential.
+
+&gt; [!INTERVIEW]
+&gt; Parallel streams are a favourite &quot;do you actually understand this?&quot; interview topic.
+&gt;
+&gt; 1. **How do you make a stream parallel?** `collection.parallelStream()` or `stream.parallel()`. The whole pipeline is parallel; the last `parallel()`/`sequential()` wins.
+&gt; 2. **What pool do parallel streams run on?** The shared `ForkJoinPool.commonPool` (size = cores − 1, JVM-wide).
+&gt; 3. **What does a parallel reduce require of the accumulator?** Associativity (and a true identity) — because partial results combine in non-deterministic order. Subtraction is not associative → wrong results.
+&gt; 4. **Why might a parallel stream be slower than sequential?** Overhead — splitting, task scheduling, merging, contention. For small N or cheap Q, overhead dominates.
+&gt; 5. **What&#x27;s the N×Q rule?** Parallelism pays only when elements × cost-per-element is large (≈10k cheap ops or fewer expensive ones).
+&gt; 6. **What&#x27;s the blocking-task hazard?** Blocking I/O in a common-pool parallel stream ties up shared threads and can starve the whole JVM&#x27;s parallel machinery. Use a custom pool or async I/O.
+&gt; 7. **Which sources parallelise well?** Array-backed (`ArrayList`, arrays, `IntStream.range`) — O(1) balanced `trySplit`. Poorly: `LinkedList`, `Stream.iterate`, `Files.lines`.
+&gt; 8. **What&#x27;s `trySplit`?** The `Spliterator` method that breaks off ~half the elements for another thread; recursion builds the split tree.
+&gt; 9. **What&#x27;s work-stealing?** Idle worker threads steal tasks from busy threads&#x27; deques, self-balancing the load.
+&gt; 10. **Why is `collect` parallel-safe but `forEach(list::add)` not?** `collect` gives each thread its own container and merges; `forEach` with a shared mutable list is a data race.
+&gt; 11. **`findFirst` vs `findAny` in parallel?** `findFirst` respects encounter order (coordination cost); `findAny` returns any element (parallel-friendly).
+&gt; 12. **How do you isolate parallel-stream work from the common pool?** Submit the stream computation to a custom `ForkJoinPool` via `pool.submit(() -&gt; ...parallelStream()...).get()`.
+
+## Practice
+
+1. **Parallel vs sequential — small.** Benchmark (JMH or warm-up) `map(x -&gt; x+1)` over 100 elements, sequential vs parallel. Confirm parallel is **slower** (overhead).
+2. **Parallel vs sequential — large + expensive.** Benchmark a CPU-heavy op (e.g., `isPrime`) over 1M ints, sequential vs parallel. Confirm parallel approaches core-count speedup.
+3. **N×Q sweep.** Vary N (100, 10k, 1M) and Q (trivial add, vs a 0.1ms computation). Find where parallel starts winning. Relate to the N×Q rule.
+4. **Non-associative wrongness.** `reduce(0, (a,b) -&gt; a-b)` sequential vs parallel over a list. Confirm parallel gives a **different, wrong** answer. Repeat with `Integer::sum` (correct both ways).
+5. **Wrong identity.** `reduce(1, Integer::sum)` parallel; confirm the total is wrong (identity combined per chunk). Fix with `0`.
+6. **forEach order.** `parallelStream().forEach(println)` vs `forEachOrdered(println)`. Observe the order difference.
+7. **Data race via forEach.** `parallelStream().forEach(arrayList::add)`; run many times; observe lost/corrupted elements or exceptions. Fix with `collect(toList())`.
+8. **trySplit observation.** Get an `ArrayList`&#x27;s and a `LinkedList`&#x27;s spliterator; call `trySplit()` and print the result sizes (`estimateSize`). Confirm the ArrayList splits cleanly in half; the LinkedList splits poorly or returns null.
+9. **Source matters.** Sum 1M ints from an `ArrayList` vs a `LinkedList` in parallel. Confirm the `LinkedList` gets little/no speedup.
+10. **Common-pool size.** Print `ForkJoinPool.commonPool().getParallelism()`. Run with `-Djava.util.concurrent.ForkJoinPool.common.parallelism=2` and confirm it changes.
+11. **Blocking starvation.** Run a parallel stream where each element `Thread.sleep(100)`s, while another thread tries to run its own parallel stream. Observe the second one starving. Fix by submitting to a custom `ForkJoinPool`.
+12. **Custom pool isolation.** Run a parallel stream inside `new ForkJoinPool(4).submit(() -&gt; ...).get()`. Confirm (via `Thread.currentThread().getName()`) it runs on the custom pool, not the common one.
+13. **groupingBy vs groupingByConcurrent in parallel.** Group 1M elements in parallel both ways; benchmark; confirm the concurrent collector avoids the merge for unordered grouping (T05).
+14. **unordered speedup.** `parallelStream().distinct()` vs `parallelStream().unordered().distinct()`; benchmark; observe the unordered version can be faster (no order preservation).
+15. **findAny vs findFirst.** In a parallel stream, time `findFirst` vs `findAny`; confirm `findAny` is cheaper (no order coordination).
+16. **Explain it back.** For `list.parallelStream().filter(p).map(f).collect(toList())` on a 1M-element `ArrayList`: describe (a) how `trySplit` builds the chunk tree, (b) which pool runs it and its size, (c) how work-stealing balances the chunks, (d) why `collect` is safe (per-thread containers + merge), (e) the N×Q condition under which this beats sequential, (f) what would go wrong if `f` did blocking I/O.
+
+## Recap
+
+You should now be able to:
+
+- Make a stream parallel with `collection.parallelStream()` or `stream.parallel()`, and recall that the **whole pipeline** is parallel or sequential (no per-stage mixing; last `parallel()`/`sequential()` wins).
+- Apply the **correctness contracts** parallel imposes: **stateless** ops, **non-interfering** (don&#x27;t modify the source), **associative** accumulator + **true identity** for reductions (non-associative folds like subtraction give wrong, non-deterministic answers), and **no side effects on shared mutable state** (use `collect`, not `forEach(list::add)`).
+- Recognise that parallel streams **silently produce wrong results** when these contracts are violated — verify before parallelising.
+- Handle **encounter order** in parallel — `forEach` is unordered (fast), `forEachOrdered` preserves order (slower); `findAny` is parallel-friendly, `findFirst` respects order; `unordered()` relaxes ordering for speed.
+- Explain the **`Spliterator.trySplit()`** decomposition — the source recursively splits into a balanced binary tree of chunks; **array-backed sources** (`ArrayList`, arrays, `IntStream.range`) split cheaply and balanced (`SIZED`+`SUBSIZED`), while **`LinkedList`/`Stream.iterate`/`Files.lines`** split poorly or not at all (so parallelism doesn&#x27;t help them).
+- Describe the **architecture**: parallel streams run on the shared **`ForkJoinPool.commonPool`** (size cores − 1, JVM-wide); the computation is a recursive **fork/join** task tree with **work-stealing** (idle threads steal from busy deques, self-balancing).
+- Account for the **overhead** (split + schedule + merge + contention) that makes parallel **slower** for small N or cheap Q, and apply the **N×Q rule** (parallelism pays at ≈10k cheap ops, or fewer expensive ones) — and **always measure**.
+- Avoid the **blocking-task hazard**: blocking I/O on the common pool ties up shared threads and can **starve the whole JVM**; for I/O use async APIs / virtual threads, or isolate CPU work on a **custom `ForkJoinPool`** (`pool.submit(() -&gt; ...parallelStream()...).get()`).
+- Use **concurrent collectors** (`groupingByConcurrent`, `toConcurrentMap`, T05) to avoid the per-thread-container merge in unordered parallel collection.
+- Apply the **decision guide** — parallelise only when N×Q is large, the source is splittable, the ops are stateless/non-interfering/associative, there&#x27;s no blocking, and you&#x27;ve measured a real benefit; default to sequential otherwise.
+- Avoid the **common traps**: parallelising small/cheap streams, stateful/side-effecting lambdas, `forEach(sharedCollection::add)`, non-associative reduce, blocking I/O on the common pool, assuming `forEach` order, parallelising `LinkedList`/`iterate`/`Files.lines`, benchmarking without warm-up, wrong identity, nesting parallel streams.
+
+## Next
+
+Continue to [Optional in depth](./T07-optional-in-depth.md).
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l2/c01-t05-collectors-and-grouping.html"><div class="lbl">← Previous</div><div class="ttl">T05-collectors-and-grouping</div><div class="sub">Collectors &amp; grouping</div></a><a class="next" href="../l2/c01-t07-optional-in-depth.html"><div class="lbl">Next →</div><div class="ttl">T07-optional-in-depth</div><div class="sub">Optional in depth</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#making-a-stream-parallel" data-toc-link>Making a Stream Parallel</a></li><li class="lvl-2"><a href="#correctness-requirements-where-parallel-bites" data-toc-link>Correctness Requirements — Where Parallel Bites</a></li><li class="lvl-3"><a href="#1-stateless-operations" data-toc-link>1. Stateless Operations</a></li><li class="lvl-3"><a href="#2-non-interfering-dont-modify-the-source" data-toc-link>2. Non-Interfering — Don&#x27;t Modify the Source</a></li><li class="lvl-3"><a href="#3-associative-accumulator-and-true-identity" data-toc-link>3. Associative Accumulator (and True Identity)</a></li><li class="lvl-3"><a href="#4-no-side-effects-on-shared-mutable-state" data-toc-link>4. No Side Effects on Shared Mutable State</a></li><li class="lvl-2"><a href="#encounter-order-in-parallel" data-toc-link>Encounter Order in Parallel</a></li><li class="lvl-2"><a href="#memory-layer-spliteratortrysplit-decomposition" data-toc-link>Memory Layer — Spliterator.trySplit() Decomposition</a></li><li class="lvl-3"><a href="#the-split-tree" data-toc-link>The Split Tree</a></li><li class="lvl-3"><a href="#good-splitters-vs-bad-splitters" data-toc-link>Good Splitters vs Bad Splitters</a></li><li class="lvl-2"><a href="#architecture-layer-forkjoin-work-stealing-and-overhead" data-toc-link>Architecture Layer — Fork/Join, Work-Stealing, and Overhead</a></li><li class="lvl-3"><a href="#the-shared-forkjoinpoolcommonpool" data-toc-link>The Shared ForkJoinPool.commonPool</a></li><li class="lvl-3"><a href="#forkjoin-work-stealing" data-toc-link>Fork/Join + Work-Stealing</a></li><li class="lvl-3"><a href="#the-overhead-why-parallel-can-be-slower" data-toc-link>The Overhead — Why Parallel Can Be Slower</a></li><li class="lvl-3"><a href="#the-nq-rule-of-thumb" data-toc-link>The N×Q Rule of Thumb</a></li><li class="lvl-3"><a href="#the-blocking-task-hazard" data-toc-link>The Blocking-Task Hazard</a></li><li class="lvl-3"><a href="#isolating-work-with-a-custom-forkjoinpool" data-toc-link>Isolating Work With a Custom ForkJoinPool</a></li><li class="lvl-3"><a href="#concurrent-collectors-avoid-the-merge-t05-callback" data-toc-link>Concurrent Collectors Avoid the Merge (T05 callback)</a></li><li class="lvl-2"><a href="#when-to-parallelise-decision-guide" data-toc-link>When to Parallelise — Decision Guide</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#parallelising-small-or-cheap-streams" data-toc-link>Parallelising Small or Cheap Streams</a></li><li class="lvl-3"><a href="#stateful-or-side-effecting-lambdas" data-toc-link>Stateful or Side-Effecting Lambdas</a></li><li class="lvl-3"><a href="#foreachsharedcollectionadd" data-toc-link>forEach(sharedCollection::add)</a></li><li class="lvl-3"><a href="#non-associative-reduce" data-toc-link>Non-Associative Reduce</a></li><li class="lvl-3"><a href="#blocking-io-on-the-common-pool" data-toc-link>Blocking I/O on the Common Pool</a></li><li class="lvl-3"><a href="#assuming-parallel-preserves-foreach-order" data-toc-link>Assuming Parallel Preserves forEach Order</a></li><li class="lvl-3"><a href="#parallelising-linkedlist-iterate-fileslines" data-toc-link>Parallelising LinkedList / iterate / Files.lines</a></li><li class="lvl-3"><a href="#measuring-without-warm-up-jmh" data-toc-link>Measuring Without Warm-Up / JMH</a></li><li class="lvl-3"><a href="#wrong-identity-in-reduce" data-toc-link>Wrong Identity in reduce</a></li><li class="lvl-3"><a href="#nesting-parallel-streams" data-toc-link>Nesting Parallel Streams</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

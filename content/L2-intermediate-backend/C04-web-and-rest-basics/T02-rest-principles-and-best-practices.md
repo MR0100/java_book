@@ -70,9 +70,12 @@ HATEOAS is the most-debated, least-implemented constraint — but understanding 
 { "id": 5, "status": "open",
   "_links": {
     "self":   { "href": "/orders/5" },
-    "cancel": { "href": "/orders/5/cancel", "method": "POST" },
+    "cancel": { "href": "/orders/5/cancel" },
     "items":  { "href": "/orders/5/items" } } }
 ```
+
+> [!NOTE]
+> A plain **HAL** link object carries only `href` (+ `templated`, `title`, …) — it has **no `method` member**. The *presence* of a `cancel` link advertises the affordance, but to say *which* HTTP method it uses you need a richer format: **HAL-FORMS** (`_templates`) or **Siren** `actions` (both shown in the table above). Don't put `"method"` inside a HAL `_links` entry — it's non-conformant.
 
 Link relations come from the **IANA link-relations registry** (`self`, `next`, `prev`, `collection`) or custom URIs. The payoff is genuine decoupling; the reason it's rare is client/tooling complexity (few clients are written to *navigate* hypermedia rather than call known URLs).
 

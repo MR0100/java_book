@@ -44,7 +44,7 @@ A **port** is a **16-bit** number (0–65535) identifying a *process/service* on
 
 - **Well-known** (0–1023) — standard services: **80** HTTP, **443** HTTPS, **22** SSH, **53** DNS, **25** SMTP. Binding one typically needs **privilege** (root/capability).
 - **Registered** (1024–49151) — assigned to specific applications.
-- **Ephemeral/dynamic** (49152–65535) — the OS **auto-assigns** a source port for each *outbound* connection.
+- **Ephemeral/dynamic** (49152–65535 per IANA) — the OS **auto-assigns** a source port for each *outbound* connection. (The OS default range is often *wider* and lower: Linux's `ip_local_port_range` defaults to **32768–60999 ≈ 28 000 ports** — which is where the "~28k" figure below comes from.)
 
 A server **listens** on an IP:port; a client **connects** to one.
 

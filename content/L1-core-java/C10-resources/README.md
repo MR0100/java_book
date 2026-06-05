@@ -9,13 +9,19 @@ difficulty: beginner
 order: 10
 tags: [section-index]
 prerequisites: []
-status: planned
+status: complete
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-05
 ---
 
 # Core Java & OOP — Resources
 
-Books, docs, specs, and links for going deeper.
+Books, docs, specs, and links for going deeper on Core Java & OOP.
+
+## Topics
+
+| # | Topic | File | Status |
+|---|-------|------|--------|
+| 01 | L1 Resources (books · docs · JEPs · testing · talks · curated paths) | [`T01-resources.md`](./T01-resources.md) | **complete** |
 
 [Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

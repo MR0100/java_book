@@ -152,7 +152,7 @@ Also: Shenandoah GC (experimental), `String.transform`/`indent`.
 | **Pattern matching for `instanceof`** (JEP 305) | preview | [L0/C02/T08](../../L0-foundations/C02-java-core/T08-control-flow-if-else-switch-switch-expressions.md) |
 | **Helpful NullPointerExceptions** (JEP 358) | standard | L0/C03 |
 
-The **helpful NPE messages** (`Cannot invoke "String.length()" because "name" is null`) are a quiet but huge debugging win — on by default since 17.
+The **helpful NPE messages** (`Cannot invoke "String.length()" because "name" is null`) are a quiet but huge debugging win — shipped in 14 behind a flag, on by default since 15.
 
 ## Java 15 (September 2020) — Text Blocks Standard, Sealed Begins
 
@@ -308,7 +308,7 @@ Java 11 **removed** the Java EE and CORBA modules; Java 16/17 **strongly encapsu
 
 ### Forgetting Helpful NPE Messages Are Version-Dependent
 
-The detailed `Cannot invoke ... because "x" is null` messages arrived in Java 14 (on by default since 17). On older runtimes you get the terse old form.
+The detailed `Cannot invoke ... because "x" is null` messages arrived in Java 14 (on by default since 15). On older runtimes you get the terse old form.
 
 > [!INTERVIEW]
 > "What's new in Java X" is a standard interview opener — know the LTS highlights.

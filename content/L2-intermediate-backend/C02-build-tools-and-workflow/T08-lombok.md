@@ -53,7 +53,7 @@ public class Customer {
 | **`@Value`** | the **immutable** bundle: `final` class, `private final` fields, getters, no setters, all-args ctor, `@ToString`/`@EqualsAndHashCode` |
 | **`@Builder`** | the fluent builder pattern (`@Builder.Default`, `toBuilder`, `@Singular` for collections) |
 | `@Slf4j` / `@Log4j2` / `@Log` | a `private static final Logger log` field |
-| `@NonNull` | a null-check (throws `NullPointerException`) on a parameter/field at entry |
+| `@NonNull` | a null-check (throws `NullPointerException`) on a parameter/field at entry — the thrown type is configurable project-wide via `lombok.config` (`lombok.nonNull.exceptionType=IllegalArgumentException`) |
 | `@SneakyThrows` | throw a checked exception **without declaring** `throws` |
 | `@Cleanup` | auto-close a resource (a `try/finally` around it) |
 | `@With` | a copy-with-one-field-changed method (`withName(x)` returns a new instance) — an immutability helper |
@@ -150,7 +150,7 @@ A new immutable carrier on Java 16+ is a **record** ([L1/C01/T14](../../L1-core-
 
 ### Treating Lombok as Runtime Magic
 
-Lombok is **compile-time**; the methods are baked into your bytecode and there is **no runtime dependency**. Declaring it `implementation`/runtime scope (or expecting reflection-like behaviour) misunderstands it — keep it `compileOnly`/`provided`.
+Lombok is **compile-time**; the methods are baked into your bytecode and there is **no runtime dependency**. Declaring it `implementation`/runtime scope (or expecting reflection-like behaviour) misunderstands it — keep it `compileOnly`/`provided`. A repo-root **`lombok.config`** file tunes behavior project-wide — `lombok.addLombokGeneratedAnnotation = true` makes generated methods `@lombok.Generated` so coverage tools (JaCoCo) skip them, `config.stopBubbling = true` marks the project root, and per-feature flags (like the `@NonNull` exception type above) live here too.
 
 > [!INTERVIEW]
 > Lombok questions almost always pivot to "how does it *work*" — the AST-mutation answer is what separates a user from someone who understands the toolchain.

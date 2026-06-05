@@ -47,18 +47,23 @@ Java backend engineer, plus interview mastery** — a "0 to hero" master book.
 
 ## 3. Progress At A Glance
 
-**67 / 371 concept topics complete (18.1%).** L0 complete; **L2 active this session** — C01 (9/9), C02 (11/11), C03 (11/11), C04 (4/4, deepened) done; **C05 Databases & SQL in progress (1/9)** (last L2 chapter; user had no preference → curriculum order). One L3 topic (C01/T01) stays done; L3 paused. **Applying the new no-shallow deep bar to C05.**
+**125 / 371 concept topics complete (33.7%).**
+- **L0** — FULLY COMPLETE.
+- **L2** — 🎉 **FULLY COMPLETE, all 12 chapters, QA-verified** (5 concept C01–C05 = 44/44 topics: Functional, Build, Networking, Web/REST, Databases; + 7 cross-cutting C06–C12: Tools, Hands-On, Best-Practices, Interview-Prep, Q&A, Cheatsheets, Resources).
+- **L3** — ▶️ **ACTIVE: C01 Concurrency (2/17)** — T01 Threads & Runnable + T02 Thread lifecycle & states done; scope expanded here per the user's "continue with L3/C01".
+- **L1** — 🎉🎉 **FULLY COMPLETE — all 10 chapters** (49 concept C01–C03 + cross-cutting C04–C10: Tools, Hands-On+project, Best-Practices, Interview-Prep, Q&A, Cheatsheets, Resources). Authored by the parallel session, merged + finished 2026-06-05.
+- **SCOPE:** edit `content/L2-intermediate-backend/`, `content/L3-advanced-jvm/` (C01 active), + `PROGRESS.md`; don't touch L1/L0/memory/other files. (Cross-cutting chapters don't count toward the 371 concept total.)
 
 | Module | Title | Concept sections | Topics | Complete | % |
 |--------|-------|:---:|:---:|:---:|:---:|
 | L0 | Foundations | 2 | 30 | **30** | **100% (concept + cross-cutting)** |
-| L1 | Core Java & OOP | 3 | 49 | 0 | 0% (parallel session) |
-| L2 | Intermediate Java & Backend Foundations | 5 | 44 | 36 | 82% **(active — C01-C04 done, C05 in progress)** |
-| L3 | Advanced Java & the JVM | 3 | 41 | 1 | 2% (paused — 1 topic done) |
+| L1 | Core Java & OOP | 3 | 49 | **49** | **100% ✅ (+ cross-cutting C04–C10)** |
+| L2 | Intermediate Java & Backend Foundations | 5 | 44 | 44 | ✅ **100% COMPLETE** |
+| L3 | Advanced Java & the JVM | 3 | 41 | 2 | 5% (**resumed** — C01 Concurrency 2/17) |
 | L4 | Backend Engineering | 10 | 128 | 0 | 0% |
 | L5 | Architecture & Engineering Leadership | 3 | 50 | 0 | 0% |
 | L6 | Interview Mastery | 4 | 29 | 0 | 0% |
-| **Total** | | **30** | **371** | **67** | **18.1%** |
+| **Total** | | **30** | **371** | **125** | **33.7%** |
 
 > [!NOTE]
 > The 371 count is **concept topics** only. Each module also has cross-cutting
@@ -68,13 +73,28 @@ Java backend engineer, plus interview mastery** — a "0 to hero" master book.
 
 ## 4. Current Position — Resume Here
 
-- **Module:** L2 — Intermediate Java & Backend Foundations (active this session per user direction; pivoted from L3). **L1 is being handled by a parallel session — leave L1 alone.** L0 is FULLY COMPLETE. L3 paused with 1 topic done (`L3/C01/T01` Threads & Runnable — stays complete; resume there if/when the user redirects back to L3).
+- **Module:** ▶️ **L3 — Advanced Java & the JVM (C01 Concurrency active, 2/17)** — scope expanded here per the user's "continue with L3/C01". **L2 FULLY COMPLETE (12/12) + QA-verified.** L0 FULLY COMPLETE. **L1 — 🎉 FULLY COMPLETE (all 10 chapters: 49 concept + cross-cutting C04–C10); merged into §3/§5/§6 + finished 2026-06-05.** **Scope:** `content/L2-intermediate-backend/` + `content/L3-advanced-jvm/` (C01) + `PROGRESS.md`; don't touch L1/L0/memory.
 - **L0 chapter status:** all complete (concept + cross-cutting); see §5.
 - **L2/C01:** ✅ COMPLETE 9/9. **L2/C02:** ✅ COMPLETE 11/11. **L2/C03 Networking & Web Fundamentals:** ✅ COMPLETE 11/11 (T01 OSI/TCP-IP, T02 TCP/UDP, T03 IP/ports/sockets, T04 DNS, T05 HTTP/HTTPS, T06 TLS, T07 Cookies/sessions/tokens, T08 Proxies, T09 Load balancers, T10 CDNs, T11 Firewalls & NAT — all done).
 - **L2/C04 Web & REST Basics:** ✅ COMPLETE 4/4 (T01 HTTP in depth, T02 REST principles, T03 API design, T04 Content negotiation & serialization — all done). **User chose C04** (after C03 checkpoint).
 - **✅ C04 DEEPENING COMPLETE — all 4 files brought to the deep bar** (remediation after the user flagged them shallow). Final sizes: **T01 344 ln/4.3k w, T02 248/3.6k, T03 231/3.1k, T04 234/3.1k** (from 218/227/197/193). New standing rule in memory `feedback_no-shallow-non-core-topics.md`: web/REST/design/tooling topics MUST hit the same deep, expert-dense bar (RFCs, full enumerations, edge cases, security/CVE mechanisms, perf). **Counts unchanged (66/371 — already-complete topics deepened, not new.)**
-- **L2/C05 Databases & SQL:** 1/9 (T01 Relational model done; T02 next). User had no preference → **curriculum order, C05** (finishes L2; pays off C04/T03 indexing + C04/T04 ORM forward-links). **Applying the new no-shallow deep bar.** After C05 → L2 COMPLETE (44/44). NOTE: there's no standalone "indexing" topic in C05's 9 — B-tree indexing introduced in T01, weave more into T05 (keys) as natural.
-- **Next topic to write:** `L2/C05/T02` → `content/L2-intermediate-backend/C05-databases-and-sql/T02-sql-select-joins-group-by-subqueries.md`
+- **L2/C05 Databases & SQL:** ✅ COMPLETE 9/9 (T01 relational model, T02 SELECT/JOINs, T03 DDL/DML/DCL, T04 normalization, T05 keys/constraints/indexing, T06 transactions/ACID, T07 isolation/locking, T08 stored-procs/views/triggers, T09 JDBC & connection pooling/HikariCP — all done). **Deep bar throughout.**
+- **🎉 MILESTONE — L2 COMPLETE (44/44, 100%).** All five concept chapters of L2 (C01 Functional/Modern Java, C02 Build Tools, C03 Networking, C04 Web & REST, C05 Databases & SQL) are authored to the deep three-layer bar. L2 cross-cutting chapters (C06–C12: tools, hands-on, best-practices, interview-prep, Q&A, cheatsheets, resources) remain `planned`.
+- **✅ DIRECTION CHOSEN (post-checkpoint):** user said *"focus on the L2/C06 and continue with the topics on there."* → Now authoring L2's **cross-cutting** chapters, starting with **C06 Tools & Environment** (stays inside the `content/L2-intermediate-backend/` scope — no constraint change). L3 stays paused (do NOT cross into it without a new directive).
+- **L2/C06 Tools & Environment:** ✅ **COMPLETE 5/5** — T01 backend toolchain reference, T02 HTTP/API clients, T03 DB clients & migrations, T04 network/TLS diagnostics, T05 Docker & Testcontainers. All `reference`-type cross-cutting topics at the deep no-shallow bar; they do **NOT** change the 75/371 concept count (concept total still 75/371, L2 concept chapters still 44/44).
+- **✅ DIRECTION (post-C06 checkpoint):** user said *"continue on the C07 with deep thinking on each topics inside the C07."* → Authoring **C07 Hands-On** at the deep bar (L0's hands-on files are the book's longest, ~600 ln — match that). In-scope (`content/L2-intermediate-backend/`).
+- **L2/C07 Hands-On:** ✅ **COMPLETE 3/3** — T01 Exercises (19 graded problems C01–C05), T02 Level Project Part 1 (data layer: schema/migrations/JDBC repo/Testcontainers), T03 Level Project Part 2 (REST layer: HttpServer+Jackson, DTOs, error model 404/409/422, validation, pagination links, curl smoke). The **"Tasks API"** is a full worked vertical slice tying C01–C06. Cross-cutting → 75/371 unchanged.
+- **✅ DIRECTION (post-C07 checkpoint):** user said *"continue with the C08."* → Authoring **C08 Best Practices & Pitfalls** (in-scope). Plan mirrors L0's best-practices chapter: **T01 Idioms** + **T02 Pitfalls catalogue**.
+- **🎉 L2 MODULE FULLY COMPLETE — all 12 chapters — ✅ QA-VERIFIED** (full review pass + 22 fixes applied; links/fences clean). Cross-cutting C06–C12 all done this scope of work: **C06** Tools (5/5), **C07** Hands-On (3/3), **C08** Best Practices (2/2), **C09** Interview Prep (1/1), **C10** Q&A/FAQ (1/1), **C11** Cheatsheets (1/1), **C12** Resources (1/1) — on top of the already-complete concept chapters C01–C05 (44/44). L2 README module `status: complete`.
+- **▶️ DIRECTION (post-L2 checkpoint):** user said *"continue with L3/C01."* → **Scope expanded to L3.** Now authoring **L3 — Advanced Java & the JVM, C01 Concurrency** (17 topics) at the deep three-layer bar (T01 set the bar at ~685 ln). **L2 stays complete + QA-verified.** **Scope now: `content/L2-intermediate-backend/` + `content/L3-advanced-jvm/` (C01 active) + PROGRESS.md. Leave L1 (parallel session), L0, and memory files alone.**
+- **L3/C01 Concurrency:** **in-progress 2/17.** T01 Threads & Runnable ✅, **T02 Thread lifecycle & states ✅** (the 6 Thread.State values + transitions, RUNNABLE-vs-OS-state I/O gotcha, BLOCKED/WAITING/TIMED_WAITING, sleep-vs-wait-vs-yield, the interrupt mechanism + restore-the-flag, `threadStatus`/park/futex/`parkBlocker` memory layer, thread-dump reading). Also fixed the C01 README (T01+T02 rows were still `planned`). Concept count **76/371 (20.5%)**.
+- **Next topic to write:** `L3/C01/T03` → `content/L3-advanced-jvm/C01-concurrency/T03-synchronized-monitors-and-intrinsic-locks.md` — how the JVM implements the monitor `BLOCKED` queues on: the object-header **mark word**, biased/thin/fat lock inflation, `monitorenter`/`monitorexit` bytecode, the `ObjectMonitor` + futex, memory-visibility of `synchronized` (happens-before preview → T12). Deep three-layer bar.
+  - `L2/C05/T08` already forward-links to it (its Next). Covers **JDBC & connection pooling (HikariCP)** — how Java talks to a database, and why pooling connections is essential. **THE LAST C05 TOPIC — completes C05 (9/9) + L2 (44/44).** Chapter-final: completion note + Next → next module/chapter (check L2 README order; likely L3 or a wrap). **DEEP bar.** **Language**: **JDBC** = the standard Java DB API (java.sql) — DriverManager/DataSource, **Connection** (= a session/transaction T06), **Statement vs PreparedStatement vs CallableStatement** (PreparedStatement = parameterized → **SQL-injection prevention** T03 + plan caching; CallableStatement = stored procs T08), **ResultSet** (the cursor over a relation T01 — iterate rows, get columns by name/index, the type mapping SQL↔Java), executeQuery/executeUpdate/executeBatch (**batching** = many statements one round-trip, T08 round-trip echo); transactions via setAutoCommit/commit/rollback (T06); try-with-resources to close (Connection/Statement/ResultSet are resources — leak = exhaustion); the driver (the DB-specific implementation behind the standard API). **Connection pooling (HikariCP)**: **why** — opening a DB connection is EXPENSIVE (TCP handshake C03/T02 + TLS C03/T06 + auth + server-side session/process setup — tens of ms) and the DB caps concurrent connections (each = server memory/process, the C10k-for-DB) → opening one per request is catastrophic; **the pool** = a fixed set of pre-opened connections reused across requests (borrow→use→return, not close); **HikariCP** (the fast de-facto Java pool — Spring Boot default); pool config (maximumPoolSize, minimumIdle, connectionTimeout, idleTimeout, maxLifetime, leak detection); the **pool-sizing paradox** (small pool often FASTER — fewer than you think; pool size ≈ cores×2 + disks, not hundreds; a too-big pool thrashes the DB; the connection = a scarce DB resource T08 echo). **Memory/architecture layer**: the connection lifecycle (the expensive setup amortized by pooling); the pool as a **bounded resource pool** (borrow/return, blocking when exhausted → connectionTimeout; queue); **pool exhaustion** (all connections checked out → requests block/timeout → the classic outage; causes = leaked connections [not closed/returned], long transactions [T06 keep-short!], slow queries, pool too small); the **connection = transaction = the unit that holds locks** (T06/T07 — a connection held by a long txn is doubly costly: pool slot + locks + MVCC bloat); **the impedance** (JDBC ResultSet→objects = the T01 mismatch; ORMs/JPA build on JDBC); **prepared-statement plan caching** (the DB caches the plan for a parameterized query → skip re-parse/re-plan T02 — perf + the injection-safety both from parameterization); pool-vs-DB-max-connections coordination (sum of all app pools ≤ DB max_connections — a multi-instance C03/T09 gotcha). **Common mistakes**: opening a connection per request (no pool → catastrophic), not closing/returning connections (leak → pool exhaustion), long transactions holding pool connections (T06), pool too large (thrashes DB) or too small (queueing), string-concatenation SQL (injection — use PreparedStatement T03), ignoring connectionTimeout/leak-detection, sum-of-pools exceeding DB max_connections, not batching (N round-trips T08). INTERVIEW (JDBC pieces, Statement-vs-PreparedStatement + injection + plan-cache, ResultSet, why-pool [expensive-connections + DB-cap], HikariCP, pool-sizing [small!], pool exhaustion + causes, connection=transaction, try-with-resources, batching). Practice (raw JDBC query with try-with-resources, PreparedStatement + injection demo, batch insert vs loop measure, transaction commit/rollback, set up HikariCP + tune pool size, reproduce pool exhaustion via a leak/long-txn, observe connection setup cost, sum-of-pools vs DB max). Deep bar. **THIS COMPLETES L2 (44/44) — milestone; checkpoint with the user on next direction (L3 Advanced JVM, or other) after.**
+  - `L2/C05/T07` already forward-links to it (its Next). Covers **stored procedures, views, triggers** — server-side database programming (logic that runs *in* the DB). **DEEP bar.** **Language**: **Views** (CREATE VIEW = a stored named query/virtual table — T02; simplify complex queries, a stable interface over a changing schema [API-contract echo C04/T03], security [grant on a view not the table, column/row hiding — T03 DCL]; updatable vs read-only views; **materialized views** = T04 stored+refreshed denormalization recap). **Stored procedures & functions** (procedural SQL — PL/pgSQL, T-SQL, PL/SQL; functions return a value/table, procedures do work + can manage txns; encapsulate multi-statement logic server-side; pros [one round-trip vs N from the app, atomicity, reuse, security] vs cons [logic split between app+DB, harder to version/test/debug, DB-vendor-lock-in, scaling — DB CPU is precious]). **Triggers** (BEFORE/AFTER/INSTEAD OF on INSERT/UPDATE/DELETE; auto-run procedural code on a data change; uses — audit logs, maintaining denormalized data [T04 the sync mechanism!], enforcing complex rules, derived columns; the danger — **hidden/implicit logic** [a trigger fires invisibly → surprising side effects, hard to debug, cascading triggers, perf]). **Memory/architecture layer**: views = **query-rewrite/inlining** (a non-materialized view is expanded into the outer query at plan time → no storage, optimizer sees through it; vs materialized = stored T04); the **round-trip economics** (a stored proc does N operations in ONE network round-trip vs N app round-trips — the C03/T05 RTT-cost + N+1 T02 echo; why a proc can crush an app loop for data-heavy logic) **vs** the **DB-as-precious-resource** counter (the DB is the hardest tier to scale horizontally — C03/T09 stateful; pushing CPU-heavy logic into it competes with every query; app tier scales out cheaply → the modern lean-toward-app-logic, thin-DB); triggers run **inside the triggering transaction** (T06 — a slow/failing trigger blocks/aborts the write; cascading triggers + recursion); the **business-logic-in-DB-vs-app** debate (testability/versioning/portability vs performance/atomicity/centralization). **Java**: CallableStatement for procs (T09 fwd); JPA @Subselect/views as read-only entities; the ORM-vs-stored-proc tension (ORMs assume logic in the app); Flyway migrations version views/procs/triggers (T03 echo). **Common mistakes**: business logic hidden in triggers (debugging nightmare), heavy logic in stored procs straining the un-scalable DB tier, vendor-lock-in via proprietary procedural SQL, forgetting a trigger runs in-transaction (slow trigger = slow write), updatable-view surprises, not versioning DB code (T03), using a trigger where an app-level/explicit approach is clearer. INTERVIEW (view vs materialized view, view-as-query-rewrite, stored proc pros/cons + round-trip economics, function vs procedure, trigger types + uses + the hidden-logic danger, trigger-in-transaction, business-logic-in-DB-vs-app + DB-scaling, security via views, CallableStatement). Practice (create a view + see query-rewrite in EXPLAIN, materialized view + refresh T04, write a PL/pgSQL function + procedure, an audit trigger, a denormalization-sync trigger T04, measure stored-proc one-round-trip vs app N-round-trips, a recursive/cascading trigger gotcha, grant on a view not the table). Deep bar. **After T08 → only T09 JDBC/HikariCP → C05 done → L2 COMPLETE (44/44).**
+  - `L2/C05/T06` already forward-links to it (its Next). Covers **isolation levels & locking** — the "I" in ACID (T06) made deep: how concurrent transactions interleave safely and the cost. **DEEP bar.** **Language**: **the read anomalies** (what isolation prevents) — **dirty read** (read another txn's uncommitted change), **non-repeatable read** (re-read a row, value changed by a committed txn), **phantom read** (re-run a range query, new rows appeared), plus **lost update** + **write skew**; **the SQL isolation levels** (ANSI) — **READ UNCOMMITTED** (allows dirty reads — rarely used), **READ COMMITTED** (the common default — sees only committed data, but non-repeatable/phantom possible), **REPEATABLE READ** (a stable snapshot — no non-repeatable; phantoms prevented in MVCC PG/InnoDB), **SERIALIZABLE** (as-if-serial — strongest, slowest) — the table of level × anomaly. **Locking** — **shared (read) vs exclusive (write) locks**; row vs page vs table locks (granularity); **lock escalation**; explicit locks (SELECT ... FOR UPDATE / FOR SHARE — pessimistic); **lock waits + timeouts**. **Deadlocks** — two txns each holding a lock the other needs → the DB detects + aborts a victim (deadlock graph); avoid via consistent lock ordering. **Optimistic vs pessimistic concurrency** — pessimistic (lock up front, FOR UPDATE) vs optimistic (no lock; version-column/check-on-write — the DB-level cousin of HTTP If-Match/ETag C04/T01; retry on conflict). **Memory/architecture layer (deep)**: **MVCC vs locking implementations** (T06 — PG/InnoDB use MVCC snapshots for reads [readers don't block writers] + locks only for writes; how a level = which snapshot/which locks; PG snapshot-isolation, **SERIALIZABLE = SSI serializable-snapshot-isolation** detecting dangerous read-write dependency cycles; vs 2-phase-locking [strict-2PL] in lock-based DBs); **the isolation-vs-throughput trade** (stronger = more locking/abort/retry = less concurrency — the fundamental knob); **lost-update** mechanism + the read-modify-write hazard (why naive `balance = balance - 100` across txns corrupts → atomic `UPDATE ... SET balance = balance - 100` or FOR UPDATE or optimistic version); **write skew** (SERIALIZABLE-only anomaly — two txns read overlapping data, write disjoint, violate an invariant — the classic on-call-doctors example); **MVCC bloat** (T03 — long txns keep old versions for snapshots → VACUUM; T06 keep-txns-short tie). **Java**: connection.setTransactionIsolation(...) / @Transactional(isolation=); JPA optimistic locking (@Version → OptimisticLockException), pessimistic (LockModeType.PESSIMISTIC_WRITE); retry-on-serialization-failure pattern. **Common mistakes**: assuming the default is SERIALIZABLE (it's usually READ COMMITTED → non-repeatable reads), read-modify-write lost-update (use atomic update / FOR UPDATE / @Version), deadlock from inconsistent lock order, holding locks in a long txn (T06), SELECT FOR UPDATE without a transaction, over-using SERIALIZABLE (contention) / under-using it (write skew), not handling serialization-failure retries. INTERVIEW (the 3 read anomalies + lost update + write skew, the 4 isolation levels + level×anomaly table, default level, shared vs exclusive locks, deadlock detection + avoidance, optimistic vs pessimistic, MVCC vs 2PL, SERIALIZABLE/SSI, isolation-vs-throughput, @Version optimistic locking). Practice (reproduce each anomaly at each level with 2 sessions, set isolation levels + observe, lost-update via read-modify-write + fix 3 ways, deadlock 2 sessions + see the victim, SELECT FOR UPDATE pessimistic, @Version optimistic + OptimisticLockException + retry, write skew at REPEATABLE READ then SERIALIZABLE). **DEEP bar — the concurrency-correctness capstone of C05; budget extra. After T07: T08 stored-procs/views/triggers, T09 JDBC/HikariCP → C05 done → L2 COMPLETE.**
+  - `L2/C05/T05` already forward-links to it (its Next). Covers **transactions & ACID** — grouping operations into atomic, durable units (the TCL from T03 made deep; the WAL/MVCC from T03 fully explained). **DEEP bar.** **Language**: a **transaction** = a unit of work (BEGIN…COMMIT/ROLLBACK, T03); **ACID** — **Atomicity** (all-or-nothing, ROLLBACK undoes partial work), **Consistency** (constraints hold before+after — T05; the app+DB keep invariants), **Isolation** (concurrent txns don't corrupt each other — the depth is T07), **Durability** (committed = survives a crash); the classic bank-transfer example (debit+credit must both happen). Autocommit vs explicit; SAVEPOINT (partial rollback / nested); read-only txns. **Architecture/memory layer (the deep part)**: **how Atomicity + Durability are implemented** — the **Write-Ahead Log (WAL)** (T03 — append-only redo log; COMMIT = force the WAL to disk [fsync] then return → durable even on crash; recovery replays committed + undoes uncommitted); **the commit path** (WAL flush is the durability point, not the data-page write — pages flushed lazily, checkpoints); **group commit** (batch fsyncs for throughput); **MVCC** (T03 — each txn sees a consistent snapshot; row versions + visibility by txn id; readers don't block writers → the basis for Isolation T07); the **durability-vs-performance knobs** (synchronous_commit, fsync — the fundamental tradeoff: a relaxed fsync risks losing the last committed txns on crash for speed); **two-phase commit (2PC)** for distributed txns (prepare+commit across nodes — the cost, the blocking problem, why microservices avoid it → sagas/eventual-consistency L4 fwd); the **CAP** preview (consistency vs availability under partition — ties to T04 consistency axis + C03/T09 distributed). **Java angle**: JDBC `connection.setAutoCommit(false)` + commit/rollback (T09 fwd); `@Transactional` (Spring — declarative txn boundaries, propagation, rollback rules — L4 fwd); the connection = the txn (T09 pooling); never leave a txn open (holds locks T07 + a pooled connection). **Common mistakes**: forgetting to commit (autocommit confusion / open txn holding locks), assuming a multi-statement op is atomic without a txn, long-running txns (lock contention T07 + MVCC bloat T03), catching an exception without rollback, relaxing fsync without understanding the durability loss, distributed-txn/2PC where a saga fits. INTERVIEW (what is a transaction, ACID each letter, how atomicity/durability are implemented [WAL], the commit/fsync durability point, MVCC + readers-dont-block-writers, autocommit, SAVEPOINT, 2PC + why microservices avoid it, @Transactional, durability-vs-perf). Practice (bank transfer in a txn + ROLLBACK on failure, observe a partial-failure left consistent, autocommit on/off, SAVEPOINT partial rollback, crash-recovery concept via WAL, a long txn holding a lock [T07 tie], relax synchronous_commit + reason about the risk). Deep bar — sets up T07 isolation.
+  - `L2/C05/T04` already forward-links to it (its Next). Covers **keys, constraints & relationships** — the integrity rules (T01) made concrete in DDL (T03), plus the deep dive on **indexing** (no standalone indexing topic — this is where the B-tree from T01 + sargability from T02 get the full treatment). **DEEP bar.** **Language**: **keys** revisited (primary/candidate/composite/natural-vs-surrogate, T01) + how PK choice drives clustering (T01 InnoDB); **foreign keys & referential actions** (ON DELETE/UPDATE CASCADE/SET NULL/SET DEFAULT/RESTRICT/NO ACTION — the semantics + when each; the cascade-delete-danger); **constraints** in depth (NOT NULL, UNIQUE [+ partial/filtered unique], CHECK, DEFAULT, EXCLUSION; **deferrable** constraints + checking timing IMMEDIATE/DEFERRED; named constraints); **relationships** — 1:1, 1:N, M:N (the **junction/join table** for many-to-many — the canonical pattern), self-referential (hierarchies); **modeling cardinality** in the schema. **INDEXING (the big architecture section, T01/T02 payoff)**: the **B-tree** index recap (O(log n), sorted leaves T01); **clustered vs non-clustered/secondary** (T01 — InnoDB PK-clustered, Postgres heap+secondary); **composite indexes** + the **leftmost-prefix rule** (an index on (a,b,c) serves WHERE a / a,b / a,b,c but NOT b alone — the #1 composite-index gotcha); **covering indexes / index-only scans** (include all queried columns → skip the table fetch); **partial/filtered** indexes (index a subset); **functional/expression** indexes (for non-sargable predicates T02); **unique indexes** (enforce UNIQUE); when an index hurts (write cost, low-selectivity columns — don't index a boolean); the cost model (T02 EXPLAIN — index scan vs seq scan vs bitmap); FK columns need indexes for join+cascade perf (T02/T04). **Architecture/memory**: constraints are enforced by the engine (integrity-by-construction T04) — UNIQUE/PK backed by an index (the lookup mechanism), FK checks = an index probe on the referenced PK (why FKs+their indexes matter), CHECK at write time; the index as a separate B-tree structure in pages (T01 storage), write-amplification (every index updated on write, T03/T04); index selectivity + the optimizer's cardinality estimate (T02 statistics). **Common mistakes**: missing FK index (slow joins/cascades), composite-index leftmost-prefix misuse, indexing low-selectivity/boolean columns, over-indexing (write cost), no constraints (app-enforced integrity drifts), cascade-delete surprises, forgetting UNIQUE is index-backed, NULL-in-UNIQUE behavior (multiple NULLs allowed). INTERVIEW (PK vs unique, FK referential actions, 1:N vs M:N + junction table, clustered vs non-clustered, composite-index leftmost-prefix, covering index/index-only scan, partial/functional index, when NOT to index, how constraints are enforced, deferrable constraints). Practice (model M:N with a junction table, FK with ON DELETE CASCADE + observe, composite index + prove leftmost-prefix with EXPLAIN, covering index → index-only scan, partial/functional index, index a boolean and see it ignored, UNIQUE with NULLs, measure write cost of N indexes). Deep bar — this is the indexing topic.
+  - `L2/C05/T03` already forward-links to it (its Next). Covers **normalization & denormalization** — structuring a schema to eliminate redundancy/anomalies, and the deliberate reversal for performance. **DEEP bar.** **Language**: why normalize — **data anomalies** (insert/update/delete anomalies from redundancy; the single-source-of-truth principle); **functional dependencies** (X→Y; the formal basis); the **normal forms** with concrete before/after examples — **1NF** (atomic values, no repeating groups), **2NF** (no partial dependency on part of a composite key), **3NF** (no transitive dependency — non-key→non-key), **BCNF** (every determinant is a candidate key), brief 4NF/5NF (multivalued/join deps); the practical rule "the key, the whole key, and nothing but the key" (3NF). **Denormalization** — deliberately adding redundancy for read performance (precomputed aggregates, duplicated columns to avoid joins, materialized views T08); the trade-off (faster reads vs write complexity + consistency burden — you must keep copies in sync via triggers/app/batch); when (read-heavy, join-cost-dominated, reporting/OLAP T01). **Architecture/memory layer**: normalization = fewer/smaller rows + less redundancy → smaller storage + tighter cache (T01 buffer pool) but **more joins** (T02 join algorithms — join cost); denormalization = trade storage + write-amplification for fewer joins/seeks; the OLTP-normalized vs OLAP-denormalized/star-schema split (T01 row-vs-column echo; fact/dimension tables, the dimensional model); materialized views (T08) as managed denormalization (stored + refreshed); how normalization interacts with indexes (FK columns need indexes for join perf — T01/T02) and MVCC bloat (T03 — wide denormalized rows churn more); the consistency-vs-performance axis (normalized = consistency-by-construction, denormalized = consistency-by-effort — ties to CAP/eventual-consistency L4 fwd). **Common mistakes**: over-normalization (too many joins for simple reads), under-normalization (update anomalies/redundant data drift), denormalizing without a sync strategy (stale copies), premature denormalization (optimize after measuring), confusing normalization with performance (it's about integrity first), JSON-blob-as-schema (losing relational integrity). INTERVIEW (anomalies, functional dependency, 1NF/2NF/3NF/BCNF with examples, the 3NF mnemonic, when to denormalize + the trade-off, normalized-OLTP vs star-schema-OLAP, materialized views, normalization-vs-indexing). Practice (spot anomalies in an unnormalized table, normalize to 3NF step by step, find a transitive dependency, denormalize a read-heavy report + add a sync trigger, star schema for analytics, measure join cost normalized vs denormalized with EXPLAIN T02). Deep bar.
   - `L2/C05/T01` already forward-links to it (its Next). Covers **SQL: SELECT, JOINs, GROUP BY, subqueries** — the query language over the relational model (T01). **DEEP bar.** **Language layer**: the **logical query-processing order** (the key mental model — `FROM`→`JOIN`→`WHERE`→`GROUP BY`→`HAVING`→`SELECT`→`DISTINCT`→`ORDER BY`→`LIMIT`; why you can't use a `SELECT` alias in `WHERE` but can in `ORDER BY`); **SELECT** (projection π, expressions, `DISTINCT`, column aliases); **WHERE** (selection σ, predicates, `AND/OR/NOT`, `IN`/`BETWEEN`/`LIKE`/`IS NULL`, the 3-valued-logic NULL traps T01); **JOINs** — INNER, LEFT/RIGHT/FULL OUTER, CROSS, SELF, the ON-vs-WHERE distinction (esp. for outer joins — a WHERE on the outer table turns it into an inner join), natural/USING; the relational-algebra join ⋈ (T01); **GROUP BY + aggregates** (COUNT/SUM/AVG/MIN/MAX, the NULL-skipping T01, COUNT(*) vs COUNT(col) vs COUNT(DISTINCT), `HAVING` vs `WHERE` [pre- vs post-aggregation], every non-aggregated SELECT column must be grouped); **subqueries** — scalar, column, row, table; **correlated** vs uncorrelated (the correlated runs per-outer-row → perf); `IN`/`EXISTS`/`NOT EXISTS`/`ANY`/`ALL`; `EXISTS`-vs-`IN` + the NOT IN-with-NULLs trap (T01); derived tables + **CTEs** (`WITH`, readability, recursive CTEs for trees/graphs); **window functions** (`OVER(PARTITION BY … ORDER BY …)`, ROW_NUMBER/RANK/DENSE_RANK/LAG/LEAD/running-SUM — the modern way to rank/paginate without self-joins; ties to keyset pagination T01/C04-T03); set ops (UNION [ALL]/INTERSECT/EXCEPT). **Memory/architecture layer** (DEEP — the executor): **logical plan → physical plan** (the optimizer, T01); **join algorithms** — **nested-loop** (good w/ index on inner, O(n·m) naive), **hash join** (build a hash table on the smaller side, O(n+m), for equijoins/large unindexed), **merge join** (both sorted → linear, great if indexes provide order); how `EXPLAIN`/`EXPLAIN ANALYZE` reveals the chosen plan + estimated-vs-actual rows; **index usage** (a WHERE/JOIN/ORDER BY on an indexed column → index seek O(log n) vs seq scan O(n), T01 B-tree; covering indexes; why a leading-wildcard `LIKE '%x'` or a function on a column kills index use — sargability); aggregation strategies (hash-aggregate vs sorted-group); the **N+1 problem** (app-side per-row queries → one JOIN instead, C04/T04 ORM echo); row-by-row vs set-based thinking (the #1 SQL mindset shift — do it in ONE query, not a loop). **Common mistakes**: the WHERE-on-outer-join inner-join trap, NULL in NOT IN, non-grouped column in GROUP BY, correlated subquery where a JOIN would do, COUNT(col) vs COUNT(*) confusion, cartesian explosion from a missing join condition, non-sargable predicates killing indexes, SELECT * over a join, assuming order without ORDER BY (T01). INTERVIEW (logical query order, INNER vs OUTER + ON-vs-WHERE, GROUP BY/HAVING/WHERE, COUNT variants, correlated subquery, EXISTS vs IN + NULL trap, CTE/recursive, window functions, join algorithms nested-loop/hash/merge, EXPLAIN, sargability, set-based vs row-based). Practice (write the joins, reproduce the WHERE-outer-join trap, GROUP BY + HAVING, correlated vs JOIN perf, EXISTS vs NOT IN with nulls, a recursive CTE for a tree, ROW_NUMBER/RANK + window running total, EXPLAIN ANALYZE a query + read the join algorithm + index seek vs scan, fix a non-sargable predicate, turn an N+1 loop into one JOIN). Must hit the DEEP bar (the logical-query-order + join-algorithms + index-seek-vs-scan + sargability + set-based mechanism is the §4a anchor; this is the LONGEST C05 topic — budget extra). — how the SAME resource (T02) is represented in different formats, and how Java objects ↔ JSON/XML on the wire. **CLOSES C04 (4/4)** → after it only C05 remains in L2. **Language layer**: **content negotiation** — the client says what it wants (`Accept: application/json` — T01 negotiation headers), the server picks a representation and replies with `Content-Type` (T01); `Accept-Language`/`Accept-Encoding` (gzip); server-driven vs agent-driven; quality values (`q=`); 406 Not Acceptable. **Serialization/marshalling** — Java object ↔ wire bytes; **JSON** (the dominant web format — text, simple, JS-native; vs **XML** verbose/schematic/legacy SOAP; brief vs Protobuf/binary — gRPC callback T02). **Jackson** (the de-facto Java JSON library): `ObjectMapper` (readValue/writeValue — serialize/deserialize); annotations (`@JsonProperty`/`@JsonIgnore`/`@JsonInclude`/`@JsonFormat`/`@JsonCreator`/`@JsonValue`/`@JsonTypeInfo` for polymorphism); the data-binding tree (JsonNode) vs streaming (JsonParser/Generator) vs full data-binding (POJO); modules (JavaTimeModule for java.time, Kotlin, records — L1/C01/T14 callback); Gson/JSON-B alternatives. **The tolerant reader** (T03 callback — `@JsonIgnoreProperties(ignoreUnknown=true)` → forward/backward compat; the backward-compat discipline made concrete). **Memory/architecture layer**: the **three Jackson processing models** trade-off — **streaming** (JsonParser/Generator, lowest memory/fastest, token-by-token, no tree — for huge payloads), **tree model** (JsonNode, whole doc in memory, flexible), **data binding** (POJO, convenient, reflection-or-codegen cost) — the memory-vs-convenience axis (ties to L0 streaming idea, T04 cost); **reflection cost** (Jackson uses reflection by default to read/write fields → startup + per-call cost; mitigated by caching `ObjectMapper` [thread-safe, expensive to create — reuse it!] + afterburner/blackbird modules + compile-time codegen); **the serialization boundary as the API contract** (T02/T03 — the JSON shape IS the contract; Jackson annotations control it; field-name mapping decouples Java naming from wire naming — MapStruct/Lombok C02 echo); payload size (JSON text vs binary — C03/T05 cost model; gzip Content-Encoding); **security** (deserialization of untrusted input → the polymorphic-deserialization RCE class [Jackson CVEs, `enableDefaultTyping` danger] — C02/T11 vuln callback; never deserialize untrusted polymorphic JSON). **Java mapping**: Spring Boot auto-configures Jackson (`@RestController` returns a POJO → JSON via HttpMessageConverter); `ObjectMapper` reuse; records as DTOs (L1/C01/T14); custom serializers/deserializers. **Common mistakes**: creating an ObjectMapper per request (expensive — reuse a singleton), not handling unknown fields (brittle — ignoreUnknown for tolerant reader T03), exposing entities directly as JSON (leaks DB shape — use DTOs, T03 leaky-abstraction callback + JPA lazy-loading serialization traps L2/C05 fwd), polymorphic deserialization of untrusted input (RCE), date/time format chaos (use JavaTimeModule + ISO-8601), giant payloads via full data-binding (use streaming), circular references (bidirectional → @JsonManagedReference/@JsonBackReference or infinite loop). INTERVIEW (content negotiation, Accept/Content-Type, JSON vs XML vs binary, Jackson ObjectMapper + the 3 models, streaming vs tree vs binding, tolerant reader/ignoreUnknown, ObjectMapper-reuse, DTO-vs-entity, polymorphic-deserialization security). Practice (serialize/deserialize a POJO with Jackson, content-negotiate JSON vs XML via Accept, ignoreUnknown tolerant reader, streaming a huge JSON array, custom serializer, record DTO, measure ObjectMapper-per-call vs reused, java.time formatting, the unknown-field forward-compat demo). Must hit DEPTH-CHECKLIST §4 (the 3-processing-models + reflection-cost + serialization-as-contract + payload + deserialization-security mechanism is the §4a anchor; closes C04 + ties to C02 codegen, C03 cost, L1 records). **After T04, C04 COMPLETE (4/4); L2 = 35/44; only C05 Databases & SQL [9] left → then L2 COMPLETE. Checkpoint with the user after T04 (start C05, or other).** — the practical craft of designing a good REST API (applies T01 HTTP semantics + T02 REST principles to concrete design decisions). **Language layer**: **resource modeling** (nouns, collections/members/sub-resources — T02 callback; granularity — not too coarse/fine; relationships — embed vs link/reference; composite/singleton resources; avoiding deep nesting `/a/1/b/2/c/3`). **Versioning** (the big one — APIs are contracts that must evolve without breaking clients): strategies — **URI versioning** (`/v1/users` — explicit, cache-friendly, most common), **header versioning** (`Accept: application/vnd.api.v1+json` — cleaner URIs, harder to test), **query param** (`?version=1`); **when to version** (breaking changes only — additive changes shouldn't); **backward compatibility** (add fields don't remove/rename, tolerant reader, deprecation policy/sunset headers). **Pagination** (collections can be huge → never return everything): **offset/limit** (`?offset=20&limit=10` — simple, but slow + inconsistent on deep pages / shifting data), **cursor/keyset** (`?after=<cursor>` — stable + scales, the modern default, ties to T01 ETag/L2-C05-DB-index fwd), page metadata (total/links/next — HATEOAS T02). **Filtering / sorting / field selection** — `?status=active&sort=-created&fields=id,name` (sparse fieldsets — the REST answer to GraphQL over-fetch T02); search. **Other design**: bulk operations, async (202 + status polling — T01), idempotency keys (T01), rate limiting (429 T01), HATEOAS links (T02), consistent errors (problem+json T02), the API as a published **contract** (OpenAPI/Swagger spec). **Memory/architecture layer** (lighter — design topic): **the API is a CONTRACT** (T02 uniform-interface callback — once published, clients depend on it → versioning/backward-compat is about not breaking that contract; the deep reason additive-only changes matter); **pagination performance** (offset = O(n) skip on the DB → deep pages slow; cursor/keyset = O(log n) index seek — L2/C05 DB-index fwd; the why-cursor-scales mechanism); **cache-ability of design choices** (URI versioning + stable resource URLs cache well at the CDN T01/C03-T10; query-param explosion hurts cache keys — C03/T10 Vary/cache-key callback); **field selection reduces payload** (bandwidth, the cost model C03/T05). **Common mistakes**: no versioning strategy (breaking clients), versioning on every change (additive should be compatible), offset pagination on huge/deep datasets (slow + inconsistent), returning unbounded collections (no pagination → OOM/timeout), deep nesting, breaking changes without deprecation, inconsistent filter/sort syntax, exposing DB internals (leaky abstraction — ids/schema), no OpenAPI spec. INTERVIEW (resource modeling, versioning strategies + when to version, backward compatibility, offset vs cursor pagination + why cursor scales, filtering/field selection, the API as a contract, async 202, OpenAPI). Practice (design a paginated/filterable collection API, version an API for a breaking change, offset vs cursor pagination [+ measure deep-page cost], add filtering/sorting/sparse-fieldsets, backward-compatible field addition, problem+json errors, write an OpenAPI snippet, critique an API's design). Must hit DEPTH-CHECKLIST §4 (the API-as-contract + cursor-pagination-performance + cache-ability + field-selection-payload mechanism is the §4a anchor; applies T01/T02 + forward-links L2/C05 DB). — the architectural style for web APIs (builds on C04/T01 HTTP semantics). **Language layer**: what REST is (Representational State Transfer — Fielding's dissertation; an architectural STYLE, not a protocol/standard); the **constraints** — **client-server** (separation), **statelessness** (each request self-contained — C03/T05/T07 callback, the scaling enabler), **cacheability** (C04/T01 caching headers), **uniform interface** (the core — resources + representations + self-descriptive messages + HATEOAS), **layered system** (proxies/LBs/CDNs transparent — C03/T08-T10), **code-on-demand** (optional). **The uniform interface in practice**: **resources** (nouns, not verbs — `/users/5` not `/getUser`), **identified by URIs**, **manipulated via representations** (JSON — T04), **HTTP methods as the verbs** (GET/POST/PUT/PATCH/DELETE map to CRUD — C04/T01 idempotency callback), **status codes** convey outcome (C04/T01). **Resource modeling** — collections (`/users`) + members (`/users/5`) + sub-resources (`/users/5/orders`); nouns + HTTP verbs instead of RPC-style verb-in-URL. **HATEOAS** (Hypermedia As The Engine Of Application State — responses include links to related actions/resources; the most-debated, least-implemented constraint; the **Richardson Maturity Model** L0-L3). **REST vs RPC vs GraphQL** (brief contrast — REST resource-oriented, RPC action-oriented/gRPC, GraphQL query-language single-endpoint). **Best practices**: consistent naming (plural nouns, kebab/snake), proper status codes + methods (C04/T01), statelessness (no server session per client — tokens C03/T07), versioning (preview T03), pagination/filtering (preview T03), HATEOAS where it helps, idempotency (C04/T01), error response shape (problem+json RFC 7807). **Memory/architecture layer** (lighter — an architectural/design topic): **statelessness as the scaling property** (C03/T05/T07/T09 callback — any server handles any request → horizontal scale + cacheability; the deep tie); the **uniform interface as the decoupling contract** (client + server evolve independently because they share HTTP's generic semantics — C04/T01 semantics-as-contract callback; this is WHY REST scales to the whole web); caching leverages the uniform interface (GET cacheable — C03/T10); REST's constraints map directly onto the infra you built in C03 (layered system = proxies/LBs/CDNs work BECAUSE REST is stateless + uniform). **Common mistakes**: verbs in URIs (`/createUser` — RPC not REST), statefulness (server sessions breaking scaling — C03/T07/T09), ignoring HTTP method/status semantics (C04/T01), over/under-using HATEOAS, chatty APIs (n+1 → GraphQL/batch), inconsistent naming, tunneling everything through POST, not being RESTful where it doesn't fit (REST isn't always right — RPC/GraphQL/gRPC have their place). INTERVIEW (what is REST, the 6 constraints, statelessness + why it scales, uniform interface, resources vs RPC verbs, idempotency in REST, HATEOAS + Richardson maturity, REST vs RPC vs GraphQL, status codes in REST). Practice (model a resource API for a domain [users/orders], turn an RPC-style API into REST, design the right method+status for CRUD ops, add HATEOAS links, statelessness with tokens not sessions, problem+json errors, critique a bad API). Must hit DEPTH-CHECKLIST §4 (the statelessness-scaling + uniform-interface-decoupling-contract + constraints-map-to-infra mechanism is the §4a anchor; ties C03 networking/infra to API design).
   - `L2/C03/T10` already forward-links to it (its Next). Covers **firewalls & NAT (basics)** — the network-boundary mechanisms that filter traffic and translate addresses; **CLOSES C03 (11/11)** → checkpoint with the user after. Ties up loose ends from earlier topics (NAT promised in T03 private ranges; firewall/DDoS in T08/T10). **Language layer**: **Firewalls** — filter traffic by rules (allow/deny). Types: **packet-filter / stateless** (per-packet rules on IP/port/protocol — L3/L4, T01/T03), **stateful** (tracks connection state — the 4-tuple/TCB T02/T03 — allows return traffic of established connections), **application/L7 firewall / WAF** (inspects HTTP — T05, blocks SQLi/XSS — the T08/T10 WAF callback); default-deny vs default-allow; ingress vs egress filtering; **security groups / network ACLs** (cloud firewalls); host vs network firewall. **NAT (Network Address Translation)** — translates private IPs (T03 10/8·192.168 ranges) ↔ public IPs; **why NAT exists** (IPv4 exhaustion T03 — many private hosts share one public IP); **how it works** — the NAT table maps (internal IP:port) ↔ (public IP:port) per connection (the 4-tuple/PAT — Port Address Translation/masquerading); **the asymmetry** — outbound connections work transparently, but **inbound is blocked by default** (no NAT-table entry → the firewall-like side effect of NAT) → **port forwarding** to expose a service; the consequences (breaks peer-to-peer → STUN/TURN/hole-punching; why you can't reach a private IP from outside, T03 callback; IPv6 reduces the need). **Memory/architecture layer**: the **NAT table as connection state** (T02/T03 — per-connection 4-tuple mapping in the router's memory; entries time out; table size limits = a scaling constraint); stateful firewall = same connection-tracking idea (conntrack); the **performance cost** (every packet checked/rewritten — fast-path/hardware offload); the **NAT-as-accidental-firewall** insight (inbound-deny-by-default is a side effect, not real security → don't rely on it; defense in depth); CGNAT (carrier-grade); how this ties the addressing story together (T01 layers, T03 IP/ports, T02 connection-as-state). **Java angle**: a server behind NAT/firewall needs **port forwarding** or a public IP/LB (T09) to be reachable; bind to 0.0.0.0 not 127.0.0.1 (T03 callback) AND the firewall must allow the port; outbound usually works (NAT), inbound needs explicit opening; cloud security-group rules; the real client IP behind NAT+proxy (X-Forwarded-For T08). **Common mistakes**: relying on NAT as security (it's not a firewall — inbound-deny is a side effect), default-allow firewall, forgetting egress filtering, port not opened in the firewall (app binds fine but unreachable — T03 bind-vs-firewall confusion), NAT breaking P2P without STUN/TURN, stateful-firewall connection timeouts dropping long-lived idle connections (keep-alive T05/T02), security-group misconfiguration (too open 0.0.0.0/0). INTERVIEW (firewall types stateless/stateful/WAF, default-deny, NAT what/why/how, NAT table, why inbound blocked + port forwarding, NAT vs firewall, security groups, NAT and P2P/STUN, IPv6 and NAT). Practice (write iptables/ufw rules allow/deny a port, stateful vs stateless observe return traffic, set up NAT/port-forward on a router, see the NAT table [conntrack], a cloud security group, WAF rule block SQLi, bind 0.0.0.0 + open the firewall port to reach a Java app, trace why a private IP is unreachable). Must hit DEPTH-CHECKLIST §4 (the stateful-connection-tracking + NAT-table-as-state + inbound-deny-side-effect + L3/L4/L7-filtering mechanism is the §4a anchor). **After T11, C03 COMPLETE (11/11) — ASK THE USER about next direction (C04 Web & REST [4], C05 Databases & SQL [9], or resume L3).** — geographically-distributed caching that serves content from a server near the user (the climax of the edge-infra arc T08→T09→T10; a CDN IS a globally-distributed caching reverse proxy + anycast LB). **Language layer**: why CDN — the **RTT/latency cost is dominated by distance** (T05 cost model — speed of light; a user in Tokyo hitting a US origin pays huge RTT); a CDN puts **edge servers (PoPs — points of presence)** worldwide and serves cached content from the nearest → cut latency + offload the origin + absorb traffic spikes/DDoS. **What a CDN caches/does** — static assets (images/CSS/JS/video — the classic), **edge caching** of cacheable responses (T05 Cache-Control/ETag/max-age callback), **origin offload** (the origin only sees cache misses), TLS termination at the edge (T06), compression, increasingly **dynamic/edge compute** (Cloudflare Workers/Lambda@Edge — running code at the edge, L4/L5 fwd), DDoS protection + WAF. **How requests reach the nearest edge** — **anycast** (T04 — one IP, BGP routes to nearest PoP) and/or **DNS-based steering** (T04 — geo-aware authoritative answers return the nearest edge's IP); the CNAME-to-the-CDN setup. **Cache mechanics** — cache hit/miss/revalidation (T05 304/ETag), TTL, **cache invalidation/purge** (the "two hard things" — purge vs versioned URLs/cache-busting `app.v123.js`), **cache key** (URL + headers), **origin shield** (a mid-tier cache reducing origin load). **Memory/architecture layer**: the **distance-is-latency** physics (T05 RTT — why moving the server closer is the only way to cut propagation delay; ~5ms per 1000km minimum); **consistent hashing** (T09 callback — distributing cache keys across edge nodes within a PoP with minimal reshuffle = cache affinity); the **cache-hit-ratio** economics (higher hit ratio = less origin load + lower latency + lower cost — the core CDN metric); **push vs pull** CDN (pull = lazy-fill on first miss, the common model; push = pre-upload); **edge vs origin** tiering (browser cache → CDN edge → origin shield → origin — the multi-layer cache hierarchy, T05 caching callback); static-vs-dynamic (static trivially cacheable; dynamic needs edge compute or short TTL or bypass); the CDN as the ultimate **anycast + reverse-proxy + LB** synthesis (ties T08+T09+T04). **Java angle**: set proper Cache-Control/ETag headers (T05) so the CDN can cache; cache-bust with versioned asset URLs; the origin behind the CDN sees only misses + the CDN's IPs (X-Forwarded-For T08 for the real client); never cache authenticated/personalized responses at a shared edge (Cache-Control: private — the T07 callback). **Common mistakes**: caching personalized/authenticated content at a shared CDN (data leak — Cache-Control: private/no-store, T07), no cache-busting → stale assets after deploy (versioned URLs), wrong cache headers (origin not cacheable → 0% hit ratio), cache-key explosion (varying on too many headers → low hit ratio), forgetting the origin still needs capacity for misses + uncacheable, purge-as-the-only-strategy (slow/global — prefer versioned URLs), not using the CDN for TLS/DDoS, treating dynamic content as cacheable. INTERVIEW (what/why CDN, edge/PoP, anycast vs DNS steering, cache hit ratio, push vs pull, cache invalidation/busting, what to cache vs not [static vs personalized T07], CDN = reverse-proxy+LB+anycast synthesis, distance-is-latency T05, edge compute). Practice (put a CDN/Cloudflare in front of a site, observe cache HIT/MISS headers, set Cache-Control + watch hit ratio, cache-bust with a versioned URL, measure latency from far away with/without CDN, see the edge IP via anycast/traceroute T04, never-cache a personalized page, edge-compute hello-world). Must hit DEPTH-CHECKLIST §4 (the distance-is-latency + cache-hierarchy + hit-ratio + anycast-steering + consistent-hashing mechanism is the §4a anchor; SYNTHESIZES T04 DNS/anycast + T05 caching + T08 reverse proxy + T09 LB — the arc finale). **After T10, only T11 Firewalls & NAT remains → C03 complete (11/11); checkpoint with the user.** — distributing traffic across many backend instances (the T08 reverse-proxy "load balancing" job, deep-dived; the horizontal-scaling enabler T07-statelessness callback). **Language layer**: why LB (one server can't handle the load / SPOF → run N instances, spread requests → scalability + availability + zero-downtime deploys). **L4 vs L7 load balancing** (the central axis, T08 callback) — **L4** (transport, T01/T02): forwards by IP:port/TCP, fast, protocol-agnostic, no payload inspection (NLB); **L7** (application, T05): reads HTTP → route by path/host/header/cookie, terminate TLS (T06), content-based routing (ALB). **Balancing algorithms** — round-robin, weighted, least-connections, least-response-time, IP/consistent **hash** (sticky by client), random-two-choices; **session affinity / sticky sessions** (T07 callback — route a user to the same backend for in-memory sessions, and why stateless/shared-store removes the need). **Health checks** — the LB probes backends (active: periodic /health; passive: observe failures) and **removes unhealthy** ones from the pool → availability; the failover mechanism. **Where LBs live** — hardware (F5) vs software (HAProxy/Nginx/Envoy) vs cloud (AWS ELB/ALB/NLB, GCP) vs **DNS load balancing** (multiple A records / geo, T04 callback) vs **anycast** (T04 — same IP many sites). **Memory/architecture layer**: the **two-connection model** again (T08 — LB terminates + re-originates; L4 can do **DSR**/direct-server-return where the response bypasses the LB); **connection vs request** balancing (L4 pins a whole TCP connection to one backend; L7 can balance each request — matters for HTTP/2 multiplexing T05 + keep-alive); the **stateless-backend requirement** (T07 — true horizontal scaling needs no sticky sessions → shared session store/tokens; sticky sessions are a crutch); **health-check + removal** as the availability mechanism (vs the LB itself as a SPOF → redundant LBs + DNS/anycast, T08 choke-point callback); **the LB as the new choke point** (must scale itself); consistent hashing (why it minimizes reshuffling when a backend is added/removed — cache-affinity, ties to T10 CDN + distributed systems L4/L5). **Java angle**: app instances behind an LB must be **stateless** (T07) or share state (Redis); read the real client IP via X-Forwarded-For (T08); graceful shutdown + health endpoints (Spring Actuator /health) so the LB drains connections before a deploy. **Common mistakes**: sticky sessions masking non-stateless backends (breaks on failover/scaling — go stateless T07), no/बad health checks (routing to dead backends), the LB as an unmonitored SPOF, L4-when-you-need-L7 (can't route by path) or vice versa, ignoring connection-vs-request balancing with keep-alive/H2, thundering-herd on a cold backend after scale-up, not draining connections on deploy (dropped requests). INTERVIEW (why LB, L4 vs L7, algorithms, sticky sessions + why stateless is better, health checks/failover, DNS/anycast LB, the LB as SPOF, connection vs request balancing, consistent hashing, draining). Practice (HAProxy/Nginx LB across 2-3 Java instances, round-robin vs least-conn, kill a backend + watch health-check failover, sticky sessions demo + the failover problem, L4 vs L7 config, X-Forwarded-For through the LB, /health endpoint + graceful drain). Must hit DEPTH-CHECKLIST §4 (the L4-vs-L7 + algorithms + health-check-failover + stateless-requirement + consistent-hashing mechanism is the §4a anchor; the climax of the T08→T09→T10 edge-infra arc). — intermediaries that sit between client and server (T05 HTTP callback). **Language layer**: a **proxy** is a middleman that forwards requests; the crucial distinction — **forward proxy** (sits in front of CLIENTS, acts on their behalf — corporate egress, content filtering, caching, anonymity/VPN-ish, the client configures it) vs **reverse proxy** (sits in front of SERVERS, acts on their behalf — the client thinks it's talking to the origin; Nginx/HAProxy/Envoy/Apache). **What a reverse proxy does** (the backend workhorse) — **TLS termination** (T06 callback — decrypt at the edge, plain HTTP to backends), **load balancing** (distribute across backends — T09 fwd, the overlap), **caching** (serve cached responses — T05 Cache-Control/ETag, CDN T10 fwd), **compression** (gzip/brotli), **request routing** (path/host-based → different services — the API-gateway role), **rate limiting / WAF / security** (shield + filter), **header manipulation** (X-Forwarded-For/Proto — how the backend learns the real client IP T03 since the proxy is the apparent source), **buffering** (absorb slow clients), **serving static files**. **Forward proxy** uses — egress control/filtering, caching, privacy. **The CONNECT method** (T05 callback — tunneling HTTPS through a forward proxy). **API gateway** (a specialized reverse proxy for microservices — auth/routing/rate-limit/aggregation, L4/L5 fwd). **Memory/architecture layer**: the proxy as an **L7 (application) intermediary** (T01 — it reads/understands HTTP, unlike an L4/TCP load balancer which just forwards bytes — the L4-vs-L7 distinction, T09 overlap); the **two-connection model** (client↔proxy and proxy↔backend are SEPARATE TCP connections T02/T03 — the proxy terminates one and originates another → connection pooling/keep-alive reuse to the backend, the C10k-mitigation; why the backend sees the proxy's IP not the client's → X-Forwarded-For); TLS termination architecture (T06 — where certs live, internal plaintext vs re-encrypt); the **single-choke-point** trade-off (the reverse proxy is a SPOF + bottleneck → needs its own redundancy, but centralizes cross-cutting concerns = the value); **transparent vs explicit** proxies. **Common mistakes**: confusing forward vs reverse proxy, trusting X-Forwarded-For blindly (spoofable unless the proxy is trusted + strips inbound), forgetting the proxy terminates TLS (backend logs show proxy IP, T06), not configuring real-client-IP propagation, the proxy as an unmonitored SPOF, double-caching/stale cache, header size/timeout mismatches between proxy and backend, assuming a reverse proxy load-balances (it CAN but they're distinct roles — T09). INTERVIEW (forward vs reverse proxy, what a reverse proxy does, TLS termination, X-Forwarded-For/real client IP, L4 vs L7 proxy, API gateway, CONNECT tunneling, reverse proxy as SPOF, proxy vs load balancer vs CDN). Practice (set up Nginx as a reverse proxy in front of a Java app, TLS-terminate at Nginx + plain HTTP to backend, observe X-Forwarded-For, path-based routing to 2 services, add caching/gzip, a forward proxy with CONNECT, reason L4-vs-L7). Must hit DEPTH-CHECKLIST §4 (the L7-intermediary + two-connection-model + TLS-termination + X-Forwarded-For + choke-point mechanism is the §4a anchor; bridges to T09 load balancers + T10 CDNs). — how **state** is added on top of **stateless HTTP** (T05 callback — "HTTP is stateless; state is layered via cookies/sessions/tokens"). **Language layer**: the problem — HTTP is stateless (T05), so the server can't tell two requests come from the same user → need a way to carry identity across requests. **Cookies** — the `Set-Cookie` response header + the `Cookie` request header (the browser echoes it back on every request to the domain); cookie **attributes** (Domain, Path, Expires/Max-Age, **Secure** [HTTPS-only, T06], **HttpOnly** [no JS access → XSS defense], **SameSite** [Strict/Lax/None → CSRF defense]); session vs persistent cookies; size limits (~4KB). **Server-side sessions** — the cookie holds an opaque **session ID**; the server stores the actual state (user, cart) in memory/Redis/DB keyed by that ID; the classic web-app model. **Tokens / stateless auth** — instead of server-side session storage, put a **signed token** in the client; the server verifies the signature, no lookup. **JWT** (JSON Web Token — header.payload.signature, base64url; claims sub/exp/iat/iss; signed HMAC or RSA/EC — T06 asymmetric callback); **Bearer tokens** in the `Authorization: Bearer` header. **Sessions vs tokens trade-off** — server-side sessions (stateful, easy revoke, server storage + sticky-session/shared-store needed for scaling T09) vs JWT (stateless, scales horizontally, self-contained, but **hard to revoke** before expiry + size + the "store it where" XSS-vs-CSRF dilemma). **OAuth2/OIDC** (delegated auth — "Login with Google"; access/refresh tokens; the authorization-code flow) at a high level. **Memory/architecture layer**: where state lives (client cookie [≤4KB, sent every request → overhead] vs server session store [Redis/DB → a lookup + a scaling dependency] vs self-contained token [no lookup but no easy revoke]); the **stateless-scaling payoff** (T05/T09 — stateless tokens let any server handle any request without sticky sessions or a shared session store — the horizontal-scaling enabler); the cookie-vs-localStorage storage decision (HttpOnly cookie = XSS-safe but CSRF-prone → SameSite; localStorage = XSS-exposed but CSRF-safe) — the security trade-off; token size on every request (JWT bloat) vs a tiny session ID; signature verification cost (HMAC cheap vs RSA verify). **Security** — **XSS** (steal tokens/cookies → HttpOnly, CSP), **CSRF** (ride the auto-sent cookie → SameSite, CSRF tokens), session fixation, token theft/replay (short expiry + refresh), **always over HTTPS** (T06 — Secure flag). **Java mapping**: servlet `HttpSession` (`request.getSession()`, JSESSIONID cookie — the classic server-side session, forward to L4); Spring Security sessions vs JWT; reading/writing cookies (`Cookie`/`Set-Cookie`); a JWT library (jjwt/nimbus) verify/sign. **Common mistakes**: storing sensitive data in a cookie/JWT payload (it's readable — base64 ≠ encryption!), no HttpOnly/Secure/SameSite, JWT-can't-revoke surprise (use short expiry + refresh + denylist), giant JWTs sent every request, session in memory breaking horizontal scaling (use a shared store / sticky sessions T09), CSRF on cookie auth, trusting an unverified/`alg:none` JWT, long-lived tokens. INTERVIEW (stateless HTTP + how state is added, cookie attributes Secure/HttpOnly/SameSite, server-session vs JWT trade-off, JWT structure + base64≠encryption, XSS vs CSRF + defenses, sessions and horizontal scaling, OAuth2 at a glance, where to store a token). Practice (Set-Cookie/Cookie round trip, inspect cookies + attributes in DevTools, server-side session w/ JSESSIONID, decode a JWT on jwt.io [see it's readable!], verify a JWT signature in Java, SameSite CSRF demo, HttpOnly XSS defense, sticky-session vs shared-store reasoning). Must hit DEPTH-CHECKLIST §4 (the where-state-lives + stateless-scaling + XSS-vs-CSRF-storage-tradeoff + signature mechanism is the §4a anchor; ties to T05 statelessness, T06 signing/HTTPS, T09 scaling). — the encryption/authentication layer that makes HTTP into HTTPS (T05 callback — "HTTPS = HTTP + TLS"). **Language layer**: what TLS provides — **confidentiality** (encryption), **integrity** (tamper detection/MAC), **authentication** (the server is who it claims — and optionally the client, mTLS); TLS vs SSL (SSL is the deprecated predecessor; "SSL" colloquially = TLS); where it sits (between TCP T02/T03 and HTTP T05 — an app-layer security wrapper, T01 "presentation-ish" callback); versions (TLS 1.2 vs **1.3** — 1.3 dropped insecure ciphers + cut the handshake to 1-RTT/0-RTT). **The handshake** (the core mechanism) — ClientHello (cipher suites + supported versions + SNI) → ServerHello (chosen cipher) + **certificate** → key exchange (**ECDHE** ephemeral Diffie-Hellman → forward secrecy) → both derive the **session keys** → Finished; then symmetric encryption for the actual data. The **hybrid crypto** insight: **asymmetric** (slow, public/private key) used ONLY to authenticate + agree on a key; **symmetric** (fast, AES) for the bulk data — best of both. **Certificates & PKI** — an **X.509 certificate** binds a public key to a domain, **signed by a CA** (Certificate Authority); the **chain of trust** (leaf → intermediate → root CA in the OS/browser trust store); how the client verifies (signature chain + domain match + validity dates + not revoked); **self-signed** vs CA-signed; **Let's Encrypt**/ACME (free automated certs); **revocation** (CRL/OCSP/OCSP-stapling); wildcard/SAN certs; **CAA** DNS record (T04 callback — which CA may issue). **Memory/architecture layer**: the asymmetric-vs-symmetric cost model (why hybrid — RSA/ECDHE handshake is expensive, AES bulk is cheap + hardware-accelerated AES-NI); the handshake RTT cost (1-2 RTT — T05 RTT-cost-model callback; why TLS 1.3 1-RTT + session resumption/0-RTT matter; TLS terminates the latency budget); **forward secrecy** (ephemeral keys → past sessions safe even if the private key leaks later); the trust-store as the root of trust (compromised CA = broken trust, real incidents); SNI (one IP, many certs — virtual hosting T05); where TLS runs (often TERMINATED at a load balancer/reverse proxy T08/T09 — the backend sees plain HTTP; the TLS-termination architecture). **Java mapping**: `javax.net.ssl` (`SSLSocket`/`SSLContext`/`SSLEngine` — the NIO async one), `HttpsURLConnection`/`HttpClient` (TLS by default for https URLs, T05); the **JVM trust store** (`cacerts`, `keytool`); `TrustManager`/`KeyManager`; the classic mistakes (disabling cert validation / trust-all-certs = catastrophic, self-signed in dev). **Common mistakes**: trusting-all-certs/disabling validation (MITM), expired certs, hostname-mismatch ignored, mixing SSL/TLS-version confusion, self-signed in prod, not stapling OCSP, forgetting cert renewal (Let's Encrypt 90-day), assuming TLS hides everything (SNI + cert + traffic size leak metadata), private key in the repo. INTERVIEW (what TLS provides, the handshake, asymmetric-vs-symmetric/hybrid, certificates + chain of trust + CA, forward secrecy, TLS 1.3 improvements, TLS termination, mTLS, SNI, the JVM trust store). Practice (openssl s_client to inspect a handshake + cert chain, view a cert's chain/SAN/validity in a browser, generate a self-signed cert with keytool, Let's Encrypt/ACME flow, HttpClient over https, add a cert to the JVM cacerts, observe TLS 1.3 1-RTT in Wireshark, the trust-all-certs anti-pattern + why it's dangerous). Must hit DEPTH-CHECKLIST §4 (the handshake + hybrid-crypto + chain-of-trust + RTT-cost + forward-secrecy mechanism is the rich §4a anchor; ties to T05 HTTPS, T04 CAA, T08/T09 termination). — the application-layer (L7, T01) request/response protocol the web runs on, end to end. **This is a BIG, central topic** — budget the full §4 depth. **Language layer**: HTTP as a **text-based, stateless request/response** protocol over TCP (T02/T03); the **anatomy** — request line (method + path + version), **methods** (GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS + safe/idempotent semantics), **headers** (Host, Content-Type, Content-Length, Accept, User-Agent, Authorization, Cache-Control, Cookie — T07 fwd), the body; the response — **status line + status codes** (1xx/2xx/3xx/4xx/5xx — 200/201/204/301/302/304/400/401/403/404/409/429/500/502/503), headers, body; **content negotiation**, **chunked transfer encoding** (the T02 framing callback — Content-Length vs chunked solves the "TCP is a stream not messages" problem!), MIME types. **The full lifecycle** end-to-end (ties the whole chapter): URL → **DNS** resolve (T04) → **TCP** handshake (T02) → **TLS** handshake if HTTPS (T06 fwd) → send request → server processes → response → render; **connection management** — HTTP/1.0 connection-per-request vs **1.1 keep-alive/persistent connections** (the T02/T03 ephemeral-port + handshake-cost payoff) + pipelining; **HTTP/2** (binary framing, multiplexing many streams over one TCP connection, header compression HPACK, server push) — but still **TCP head-of-line blocking** (T02 callback); **HTTP/3 over QUIC/UDP** (T02 — solves HOL blocking, 0-RTT). **Statelessness** + how state is added back (cookies/sessions/tokens — T07). **HTTPS** = HTTP over **TLS** (T06 fwd — encryption/auth/integrity). **Memory/architecture layer**: HTTP as **text on the wire** (you can literally type it via telnet/nc — T03 callback; the request/response bytes); **chunked encoding framing** (length-prefixed chunks — the explicit solution to TCP's stream-not-messages, T02 IMPORTANT callback); **caching** (Cache-Control/ETag/If-None-Match/304 — the conditional-request mechanism, CDN tie T10); the cost model (RTTs: DNS + TCP + TLS + request = why keep-alive/HTTP-2-multiplexing/HTTP-3 each cut round-trips; head-of-line blocking at HTTP-1 [one req/conn], HTTP-2 [TCP-level], HTTP-3 [solved]); **idempotency/safety** as a correctness contract (retries, T05/L4). **Java mapping**: `java.net.HttpURLConnection` (legacy) vs the modern **`java.net.http.HttpClient`** (Java 11+, HTTP/2, sync + async/CompletableFuture — L2/C01 callback); building requests/reading responses; `HttpServer` (com.sun) / servlet/Spring forward to L4. **Common mistakes**: treating GET as non-idempotent / using GET for mutations, ignoring status-code semantics (200-for-everything), not reusing connections (keep-alive — T02/T03 cost), confusing HTTP/2 multiplexing with HTTP/3 (TCP HOL still bites H2), forgetting HTTPS≠HTTP-secure-magic (it's TLS T06), mishandling chunked/Content-Length framing, caching header confusion (Cache-Control/ETag), assuming stateless means no sessions (cookies T07). INTERVIEW (HTTP methods + idempotency/safety, status code families, the full URL→render lifecycle, keep-alive, HTTP/1.1 vs 2 vs 3 + HOL blocking, chunked vs Content-Length, stateless + cookies, HTTPS=HTTP+TLS, caching/ETag/304, HttpClient). Practice (raw HTTP via telnet/nc/curl -v, each method, read status codes, keep-alive vs close, chunked response, HttpClient sync+async, observe the full lifecycle in browser devtools/Wireshark, caching with ETag/304, compare H1/H2/H3). Must hit DEPTH-CHECKLIST §4 (the text-on-wire + chunked-framing + RTT-cost + HOL-blocking-across-versions mechanism is the rich §4a anchor; ties DNS/TCP/TLS/sockets together). — the distributed name→IP directory that turns `example.com` into an IP (T03) before any connection. **Language layer**: why DNS (humans use names, packets need IPs T03; names are stable while IPs change; one name → many IPs for load balancing T09). **The resolution flow** — stub resolver (the OS) → **recursive resolver** (your ISP's/8.8.8.8/1.1.1.1) → **root** servers (13 logical, return the TLD referral) → **TLD** servers (`.com`, return the authoritative NS) → **authoritative** server (returns the actual record); recursive vs iterative queries; the walk from root down. **Caching + TTL** — every level caches by **TTL** (the record's time-to-live); the resolver cache, OS cache, browser cache; why a DNS change "propagates" slowly (TTL expiry, not real propagation); negative caching. **Record types** — **A** (name→IPv4), **AAAA** (→IPv6), **CNAME** (alias→another name), **MX** (mail servers), **NS** (delegation/authoritative nameservers), **TXT** (SPF/DKIM/verification), **SOA** (zone metadata), **PTR** (reverse IP→name), **SRV** (service location); the zone file. **Mostly UDP port 53** (T02 callback — small query/response, app-level retry; falls back to **TCP** for large responses/zone transfers — the 512-byte UDP limit + EDNS). **Memory/architecture layer**: the **hierarchical distributed database** (the dotted name is a path up a tree — `www.example.com.` read right-to-left: root→com→example→www; the trailing-dot root); the query/response **wire format** (the 12-byte DNS header + question/answer/authority/additional sections, the message ID for matching async UDP responses, name compression with pointers — T01 wire-format/byte-layout angle); why it's UDP (latency T02) + the 512-byte boundary; **anycast** (root/TLD servers are one IP answered by many physically-distributed machines — BGP routes to the nearest, the load/latency mechanism); DNS as a security surface (cache poisoning → **DNSSEC** signatures; DoH/DoT encrypted DNS; DNS used for CDN steering T10 + service discovery). **Java mapping**: `InetAddress.getByName()`/`getAllByName()` (the JVM calls the OS resolver — T03 InetAddress callback); the JVM DNS cache (`networkaddress.cache.ttl` — the infamous default that caches forever / too long, a real production gotcha); resolution happens implicitly when you `new Socket("name", port)`. **Common mistakes**: assuming DNS changes are instant (TTL caching), the JVM DNS-cache-TTL gotcha (stale IPs after failover), CNAME-at-the-apex problem, confusing A vs CNAME, forgetting DNS is a dependency/SPOF + adds latency to the first connection, ignoring negative caching, hardcoding IPs to "skip DNS" (loses failover/LB). INTERVIEW (what is DNS, the resolution chain root→TLD→authoritative, recursive vs iterative, A/AAAA/CNAME/MX/NS/TXT, TTL/caching/propagation, why UDP+53, anycast, DNSSEC, the JVM cache gotcha). Practice (dig +trace to watch the root→TLD→authoritative walk, query each record type with dig/nslookup, observe TTL countdown in cache, see UDP→TCP fallback for big responses, InetAddress.getAllByName in Java, the JVM DNS cache TTL setting, reverse PTR lookup). Must hit DEPTH-CHECKLIST §4 (the hierarchical-distributed-tree + caching/TTL + UDP-wire-format + anycast mechanism is the §4a anchor). — the addressing layer that ties T01/T02 to actual Java networking code. **Language layer**: **IP addresses** — IPv4 (32-bit, dotted-quad, ~4.3B exhausted) vs IPv6 (128-bit, hex, the fix); **subnets/CIDR** (the network/host split, `/24` masks — L0/C01/T02 binary-mask callback), private ranges (10/8, 172.16/12, 192.168/16) + **NAT** (T11 forward), loopback 127.0.0.1/::1, 0.0.0.0 (any), special addresses; **ports** (16-bit, 0-65535; well-known <1024 e.g. 80/443/22/53, registered, ephemeral; the OS assigns an ephemeral source port per outbound connection). **The socket = the (protocol, IP, port) endpoint**; a **connection = the 4-tuple** (src IP, src port, dst IP, dst port) — what uniquely identifies a TCP connection and how one server port handles thousands of clients (each a distinct 4-tuple, T02 TCB callback). **The socket API** — the BSD sockets abstraction (the boundary between app and kernel, T01): server side `socket()→bind()→listen()→accept()` (accept returns a NEW socket per client), client side `socket()→connect()`; then read/write; close. **Java mapping** (the concrete payoff): `InetAddress`/`InetSocketAddress`, `ServerSocket`(bind+listen+accept) + `Socket` (TCP, T02), `DatagramSocket` (UDP), the accept-returns-new-Socket model, `localhost`/binding to 0.0.0.0 vs a specific interface; a tiny TCP echo server/client. **Memory/architecture layer**: a socket is a **file descriptor** (Unix "everything is a file" — the fd indexes a kernel socket structure; T01/T02 kernel-state callback) → fd limits (`ulimit`), the listen **backlog** queue (SYN queue + accept queue), how `accept()` dequeues an established connection; the **ephemeral port range** bounding outbound connections to one destination (~28k, the source-port-exhaustion angle — connection pooling callback T02/T05); IPv4 address as a 32-bit int (the dotted-quad is just 4 bytes — binary/hex, byte-order/network-byte-order BIG-ENDIAN callback to L0 endianness); host-vs-network byte order (htons/ntohs — why ports/addresses are big-endian on the wire). **Common mistakes**: confusing a port with a socket with a connection (4-tuple), binding to 127.0.0.1 then surprised it's unreachable externally (vs 0.0.0.0), fd/port exhaustion, privileged-port (<1024) needs root, forgetting accept() returns a new socket (blocking the listener), NAT/private-IP confusion (T11), assuming IP identifies a host uniquely (NAT/multi-homing). INTERVIEW (IPv4 vs IPv6, what's a socket, the 4-tuple, how one port serves many clients, ephemeral ports, well-known ports, socket=fd, bind 0.0.0.0 vs localhost, CIDR/subnet). Practice (TCP echo server/client, inspect with ss/netstat the 4-tuples, bind to localhost vs 0.0.0.0 and test reachability, ephemeral port observation, fd-as-socket via /proc or lsof, CIDR math, IPv6 socket). Must hit DEPTH-CHECKLIST §4 (socket=fd + 4-tuple + kernel backlog + byte-order is the §4a anchor; ties the whole networking-addressing model to Java code). — the two transport-layer (L4, T01 callback) protocols and when to use each. **Language layer**: both ride on IP (T01 encapsulation — TCP segment / UDP datagram inside an IP packet); the core contrast — **TCP** = connection-oriented, reliable, ordered, flow-controlled, congestion-controlled, byte-STREAM; **UDP** = connectionless, unreliable, unordered, message/DATAGRAM, minimal. **TCP mechanics**: the **3-way handshake** (SYN / SYN-ACK / ACK — connection setup), sequence + ACK numbers (reliability + ordering), retransmission on loss/timeout, the **sliding window** (flow control — don't overrun the receiver), **congestion control** (slow start / AIMD / cwnd — don't overrun the network), the 4-way close (FIN/ACK) + TIME_WAIT; head-of-line blocking. **UDP mechanics**: fire-and-forget datagrams, no handshake/ACK/ordering, 8-byte header (vs TCP 20+), preserves message boundaries (one send = one datagram, unlike TCP's stream), app must handle loss/ordering itself. **When each**: TCP for correctness-critical (HTTP/1-2, DB, file transfer, email); UDP for latency/loss-tolerant or one-to-many (DNS T04, VoIP/video, gaming, DHCP, QUIC/HTTP-3 which rebuilds reliability over UDP in userspace — T05 forward). **Memory/architecture layer**: the header byte-layout (TCP 20-60B with options: ports/seq/ack/flags/window/checksum; UDP 8B: src/dst port/length/checksum — T01 header-overhead callback); the **OS kernel** owns the TCP state machine + send/receive buffers + retransmit timers (T01 — JVM delegates; the socket buffer is kernel memory); **head-of-line blocking** at the byte-stream level; why UDP has lower latency (no handshake RTT, no retransmit waits) + the buffer-bloat/Nagle's-algorithm nuance; the connection as kernel state (a TCP control block per socket — the C10k/resource angle, L3/L4 forward). **Java mapping** (T01/T03 callback): `Socket`/`ServerSocket` = TCP, `DatagramSocket`/`DatagramPacket` = UDP; blocking vs the message-vs-stream API difference. **Common mistakes**: assuming UDP "doesn't work" (it's just unreliable-by-design), expecting TCP to preserve message boundaries (it's a STREAM — must frame yourself, T05/length-prefix), ignoring TIME_WAIT under high connection churn, Nagle vs delayed-ACK latency interaction, UDP without app-level reliability where it's needed, forgetting MTU/fragmentation for big UDP datagrams (T01). INTERVIEW (TCP vs UDP, 3-way handshake, how TCP reliability/ordering/flow/congestion work, stream vs datagram, when UDP, QUIC, head-of-line blocking, what's in the headers). Practice (TCP client/server with Socket, UDP with DatagramSocket, observe handshake in Wireshark, message-boundary loss over TCP stream → framing, packet loss with UDP, compare headers). Must hit DEPTH-CHECKLIST §4 (the handshake + reliability state machine + header layout + kernel-buffer mechanism is the rich §4a anchor — networking topic so byte-layout = the header/wire format).
   - `L2/C02/T10` already forward-links to it (its Next). Covers **dependency vulnerability scanning** — finding KNOWN-vulnerable dependencies (vs T07 static analysis which finds bugs in YOUR code; this scans your DEPENDENCIES against vuln databases). **CLOSES C02 (11/11)** — natural point to check with the user on direction (C03 Networking next, or pivot). NOTE: builds directly on T03 dependency management (the transitive dependency graph) — the vulns are usually in TRANSITIVE deps you didn't choose. **Language layer**: the problem — modern apps are mostly third-party code (the dependency tree, T03/T04); a known CVE in any direct OR transitive dep is YOUR vulnerability (Log4Shell/CVE-2021-44228 as the canonical example — a transitive log4j2 RCE that hit everyone). **Software Composition Analysis (SCA)** = scanning the dependency tree against vulnerability databases. The **databases/identifiers**: **CVE** (Common Vulnerabilities and Exposures — the public ID), **NVD** (NIST National Vulnerability Database), **CVSS** (severity score 0-10, base/temporal/environmental), **GHSA** (GitHub Security Advisories), **OSV** (Google open-source vuln DB), the vendor advisories. **The tools**: **OWASP Dependency-Check** (free, Maven/Gradle plugin; matches deps to CVEs via NVD; the CPE/coordinate-matching + false positives), **OWASP dependency-track** (a platform consuming SBOMs), **Snyk** (commercial, richer DB + fix advice + PR automation), **GitHub Dependabot** (alerts + automated dependency-bump PRs — T05 PR callback), **Gradle/Maven Versions** plugins (find outdated, not vulns), **Sonatype/OSS Index**, **Grype/Trivy** (container + dep scanning). **SBOM** (Software Bill of Materials — CycloneDX / SPDX formats — the inventory of everything in your build; increasingly required, e.g. US EO 14028). **The remediation flow**: scan → triage (real-reachable vs false-positive/unreachable) → upgrade the dep (or override the transitive version, T03 dependencyManagement/resolutionStrategy callback) → if no fix, mitigate/suppress with justification (the suppression-file pattern, T07 callback) → re-scan. **CI gate** (T05/T06/T07 callback) — fail the build on a new HIGH/CRITICAL vuln; the build-break-vs-warn policy; scheduled re-scans (new CVEs appear for OLD code — a dep that was clean yesterday is vulnerable today, the key difference from T07 which only changes when YOUR code does). **Memory/architecture layer** (light §4a — a tooling/process topic, but anchor it): how matching works — coordinate/CPE matching (groupId:artifactId:version → known CVE entries) and its false-positive problem (name collisions); reachability analysis (advanced tools check if the vulnerable CODE PATH is actually called — reduces noise, ties to T07 dataflow/call-graph); scanning happens at build time on the FULL resolved transitive graph (T03 — must resolve first), so it's a build/CI concern + a scheduled concern (the DB changes independently of your code); supply-chain dimension (typosquatting, compromised packages, the build itself as an attack surface — provenance/signing, SLSA). **Common mistakes**: only scanning direct deps (most vulns are transitive — T03), no CI gate (advisory-only = ignored), no scheduled re-scan (new CVEs for unchanged code), alert fatigue / not triaging reachability (drowning), blind auto-upgrade breaking the build, suppressing without justification/expiry, ignoring the SBOM requirement, treating a CVSS score as risk without context (reachability/exposure). INTERVIEW (what is SCA, CVE/CVSS/NVD, Log4Shell, transitive vuln, Dependabot, SBOM, why re-scan unchanged code, scanning vs T07 static analysis, remediation flow). Practice (add OWASP Dependency-Check, introduce a known-vulnerable dep e.g. old log4j and see the CVE, find a TRANSITIVE vuln in the tree, fix by overriding the version T03, suppress a false positive, set a CI gate failing on CRITICAL, generate a CycloneDX SBOM, enable Dependabot). Must hit DEPTH-CHECKLIST §4 (lighter §4a — the coordinate-matching + transitive-graph + DB-changes-independently mechanism anchors it). **After T11, C02 is COMPLETE (11/11) — ASK THE USER about next direction (L2/C03 Networking, or other).**
@@ -115,12 +135,21 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
 | C08-cheatsheets | 1 / 1 | **done** (cross-cutting) |
 | C09-resources | 1 / 1 | **done** (cross-cutting) |
 
-### L1 — Core Java & OOP
+### L1 — Core Java & OOP  🎉🎉 FULLY COMPLETE (49 concept C01–C03 + cross-cutting C04–C10)
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
-| C01-oop | 0 / 19 | **(handled by parallel session — leave alone)** |
-| C02-collections-and-core-apis | 0 / 23 | not-started |
-| C03-testing-fundamentals | 0 / 7 | not-started |
+| C01-oop | 19 / 19 | **complete** ✅ |
+| C02-collections-and-core-apis | 23 / 23 | **complete** ✅ |
+| C03-testing-fundamentals | 7 / 7 | **complete** ✅ |
+| C04-tools-and-environment | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C05-hands-on | 2 / 2 | **complete** ✅ (cross-cutting — exercises + capstone project) |
+| C06-best-practices | 2 / 2 | **complete** ✅ (cross-cutting — idioms + pitfalls) |
+| C07-interview-prep | 1 / 1 | **complete** ✅ (cross-cutting — 45 Q&A) |
+| C08-qa-faq | 1 / 1 | **complete** ✅ (cross-cutting — 53 FAQ) |
+| C09-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting — L1 cheatsheet) |
+| C10-resources | 1 / 1 | **complete** ✅ (cross-cutting — L1 resources) |
+
+**🎉🎉 L1 — CORE JAVA & OOP FULLY COMPLETE — all 10 chapters (49 concept C01–C03 + 9 cross-cutting docs across C04–C10) ✅**
 
 ### L2 — Intermediate Java & Backend Foundations
 | Chapter | Done / Total | Status |
@@ -129,12 +158,19 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
 | C02-build-tools-and-workflow | 11 / 11 | **complete** ✅ |
 | C03-networking-fundamentals | 11 / 11 | **complete** ✅ |
 | C04-web-and-rest-basics | 4 / 4 | **complete** ✅ |
-| C05-databases-and-sql | 1 / 9 | **in-progress** (active) |
+| C05-databases-and-sql | 9 / 9 | **complete** ✅ |
+| C06-tools-and-environment | 5 / 5 | **complete** ✅ (cross-cutting) |
+| C07-hands-on | 3 / 3 | **complete** ✅ (cross-cutting) |
+| C08-best-practices | 2 / 2 | **complete** ✅ (cross-cutting) |
+| C09-interview-prep | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C10-qa-faq | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C11-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C12-resources | 1 / 1 | **complete** ✅ (cross-cutting) |
 
 ### L3 — Advanced Java & the JVM
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
-| C01-concurrency | 1 / 17 | **in-progress** (started this session) |
+| C01-concurrency | 2 / 17 | **in-progress** (resumed — T01, T02 done) |
 | C02-jvm-internals-and-performance | 0 / 14 | not-started |
 | C03-design-patterns-and-principles | 0 / 10 | not-started |
 
@@ -211,6 +247,7 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
 | `L0/C08/T01` · `content/L0-foundations/C08-cheatsheets/T01-l0-cheatsheet.md` | L0 Cheatsheet | 2026-06-04 |
 | `L0/C09/T01` · `content/L0-foundations/C09-resources/T01-resources.md` | L0 Resources | 2026-06-04 |
 | `L3/C01/T01` · `content/L3-advanced-jvm/C01-concurrency/T01-threads-and-runnable.md` | Threads & Runnable | 2026-06-04 |
+| `L3/C01/T02` · `content/L3-advanced-jvm/C01-concurrency/T02-thread-lifecycle-and-states.md` | Thread lifecycle & states | 2026-06-05 |
 | `L2/C01/T01` · `content/L2-intermediate-backend/C01-functional-and-modern-java/T01-lambda-expressions.md` | Lambda expressions | 2026-06-04 |
 | `L2/C01/T02` · `content/L2-intermediate-backend/C01-functional-and-modern-java/T02-functional-interfaces-function-predicate-supplier-consumer.md` | Functional interfaces (Function, Predicate, Supplier, Consumer) | 2026-06-04 |
 | `L2/C01/T03` · `content/L2-intermediate-backend/C01-functional-and-modern-java/T03-method-and-constructor-references.md` | Method & constructor references | 2026-06-04 |
@@ -247,6 +284,63 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
 | `L2/C04/T03` · `content/L2-intermediate-backend/C04-web-and-rest-basics/T03-api-design-resources-versioning-pagination-filtering.md` | API design (resources, versioning, pagination, filtering) | 2026-06-04 |
 | `L2/C04/T04` · `content/L2-intermediate-backend/C04-web-and-rest-basics/T04-content-negotiation-and-serialization-json-xml-jackson.md` | Content negotiation & serialization (JSON/XML, Jackson) | 2026-06-04 |
 | `L2/C05/T01` · `content/L2-intermediate-backend/C05-databases-and-sql/T01-relational-model-and-terminology.md` | Relational model & terminology | 2026-06-04 |
+| `L2/C05/T02` · `content/L2-intermediate-backend/C05-databases-and-sql/T02-sql-select-joins-group-by-subqueries.md` | SQL: SELECT, JOINs, GROUP BY, subqueries | 2026-06-04 |
+| `L2/C05/T03` · `content/L2-intermediate-backend/C05-databases-and-sql/T03-sql-ddl-dml-dcl.md` | SQL: DDL/DML/DCL | 2026-06-04 |
+| `L2/C05/T04` · `content/L2-intermediate-backend/C05-databases-and-sql/T04-normalization-and-denormalization.md` | Normalization & denormalization | 2026-06-04 |
+| `L2/C05/T05` · `content/L2-intermediate-backend/C05-databases-and-sql/T05-keys-constraints-and-relationships.md` | Keys, constraints & relationships (+ indexing) | 2026-06-04 |
+| `L2/C05/T06` · `content/L2-intermediate-backend/C05-databases-and-sql/T06-transactions-and-acid.md` | Transactions & ACID | 2026-06-04 |
+| `L2/C05/T07` · `content/L2-intermediate-backend/C05-databases-and-sql/T07-isolation-levels-and-locking.md` | Isolation levels & locking | 2026-06-04 |
+| `L2/C05/T08` · `content/L2-intermediate-backend/C05-databases-and-sql/T08-stored-procedures-views-triggers.md` | Stored procedures, views, triggers | 2026-06-04 |
+| `L2/C05/T09` · `content/L2-intermediate-backend/C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md` | JDBC & connection pooling (HikariCP) — **L2 finale (44/44)** | 2026-06-04 |
+| `L1/C01/T01` · `content/L1-core-java/C01-oop/T01-classes-and-objects.md` | Classes & Objects | 2026-06-04 |
+| `L1/C01/T02` · `content/L1-core-java/C01-oop/T02-fields-methods-constructors-this.md` | Fields, methods, constructors, this | 2026-06-04 |
+| `L1/C01/T03` · `content/L1-core-java/C01-oop/T03-encapsulation-and-access-modifiers.md` | Encapsulation & access modifiers | 2026-06-04 |
+| `L1/C01/T04` · `content/L1-core-java/C01-oop/T04-inheritance-and-super.md` | Inheritance & super | 2026-06-04 |
+| `L1/C01/T05` · `content/L1-core-java/C01-oop/T05-method-overriding.md` | Method overriding | 2026-06-04 |
+| `L1/C01/T06` · `content/L1-core-java/C01-oop/T06-polymorphism-compile-time-vs-runtime.md` | Polymorphism (compile-time vs runtime) | 2026-06-04 |
+| `L1/C01/T07` · `content/L1-core-java/C01-oop/T07-abstraction-and-abstract-classes.md` | Abstraction & abstract classes | 2026-06-04 |
+| `L1/C01/T08` · `content/L1-core-java/C01-oop/T08-interfaces-default-static-private-methods.md` | Interfaces (default, static, private methods) | 2026-06-04 |
+| `L1/C01/T09` · `content/L1-core-java/C01-oop/T09-object-class-and-its-methods.md` | Object class & its methods | 2026-06-04 |
+| `L1/C01/T10` · `content/L1-core-java/C01-oop/T10-equals-hashcode-tostring-contracts.md` | equals, hashCode, toString contracts | 2026-06-04 |
+| `L1/C01/T11` · `content/L1-core-java/C01-oop/T11-static-members-blocks-and-nested-classes.md` | static members, blocks & nested classes | 2026-06-04 |
+| `L1/C01/T12` · `content/L1-core-java/C01-oop/T12-inner-local-and-anonymous-classes.md` | Inner, local & anonymous classes | 2026-06-04 |
+| `L1/C01/T13` · `content/L1-core-java/C01-oop/T13-enum-types-with-fields-methods.md` | enum types (with fields/methods) | 2026-06-04 |
+| `L1/C01/T14` · `content/L1-core-java/C01-oop/T14-record-types.md` | record types | 2026-06-04 |
+| `L1/C01/T15` · `content/L1-core-java/C01-oop/T15-sealed-classes-and-interfaces.md` | Sealed classes & interfaces | 2026-06-04 |
+| `L1/C01/T16` · `content/L1-core-java/C01-oop/T16-packages-and-imports.md` | Packages & imports | 2026-06-04 |
+| `L1/C01/T17` · `content/L1-core-java/C01-oop/T17-java-module-system-jpms.md` | Java Module System (JPMS) | 2026-06-04 |
+| `L1/C01/T18` · `content/L1-core-java/C01-oop/T18-object-cloning-and-cloneable.md` | Object cloning & Cloneable | 2026-06-04 |
+| `L1/C01/T19` · `content/L1-core-java/C01-oop/T19-immutability-and-immutable-class-design.md` | Immutability & immutable class design | 2026-06-04 |
+| `L1/C02/T01` · `content/L1-core-java/C02-collections-and-core-apis/T01-collections-framework-overview.md` | Collections framework overview | 2026-06-04 |
+| `L1/C02/T02` · `content/L1-core-java/C02-collections-and-core-apis/T02-list-arraylist-linkedlist.md` | List (ArrayList, LinkedList) | 2026-06-04 |
+| `L1/C02/T03` · `content/L1-core-java/C02-collections-and-core-apis/T03-set-hashset-linkedhashset-treeset.md` | Set (HashSet, LinkedHashSet, TreeSet) | 2026-06-04 |
+| `L1/C02/T04` · `content/L1-core-java/C02-collections-and-core-apis/T04-map-hashmap-linkedhashmap-treemap.md` | Map (HashMap, LinkedHashMap, TreeMap) | 2026-06-04 |
+| `L1/C02/T05` · `content/L1-core-java/C02-collections-and-core-apis/T05-queue-deque-priorityqueue-stack.md` | Queue, Deque, PriorityQueue, Stack | 2026-06-04 |
+| `L1/C02/T06` · `content/L1-core-java/C02-collections-and-core-apis/T06-iterators-and-iterable.md` | Iterators & Iterable | 2026-06-04 |
+| `L1/C02/T07` · `content/L1-core-java/C02-collections-and-core-apis/T07-comparable-vs-comparator.md` | Comparable vs Comparator | 2026-06-04 |
+| `L1/C02/T08` · `content/L1-core-java/C02-collections-and-core-apis/T08-collection-performance-characteristics-big-o.md` | Collection performance (Big-O) | 2026-06-04 |
+| `L1/C02/T09` · `content/L1-core-java/C02-collections-and-core-apis/T09-exceptions-try-catch-finally-checked-vs-unchecked.md` | Exceptions: try/catch/finally, checked vs unchecked | 2026-06-04 |
+| `L1/C02/T10` · `content/L1-core-java/C02-collections-and-core-apis/T10-custom-exceptions-and-try-with-resources.md` | Custom exceptions & try-with-resources | 2026-06-04 |
+| `L1/C02/T11` · `content/L1-core-java/C02-collections-and-core-apis/T11-generics-basics.md` | Generics — basics | 2026-06-04 |
+| `L1/C02/T12` · `content/L1-core-java/C02-collections-and-core-apis/T12-generics-bounded-types-wildcards-type-erasure.md` | Generics — bounded types, wildcards, type erasure | 2026-06-04 |
+| `L1/C02/T13` · `content/L1-core-java/C02-collections-and-core-apis/T13-i-o-streams-byte-and-character.md` | I/O streams (byte & character) | 2026-06-04 |
+| `L1/C02/T14` · `content/L1-core-java/C02-collections-and-core-apis/T14-nio-2-path-files-channels.md` | NIO.2 (Path, Files, channels) | 2026-06-04 |
+| `L1/C02/T15` · `content/L1-core-java/C02-collections-and-core-apis/T15-date-time-api-java-time.md` | Date/Time API (java.time) | 2026-06-04 |
+| `L1/C02/T16` · `content/L1-core-java/C02-collections-and-core-apis/T16-regular-expressions.md` | Regular expressions | 2026-06-04 |
+| `L1/C02/T17` · `content/L1-core-java/C02-collections-and-core-apis/T17-reflection.md` | Reflection | 2026-06-04 |
+| `L1/C02/T18` · `content/L1-core-java/C02-collections-and-core-apis/T18-annotations-using-and-writing-meta-annotations.md` | Annotations (using & writing meta-annotations) | 2026-06-04 |
+| `L1/C02/T19` · `content/L1-core-java/C02-collections-and-core-apis/T19-optional.md` | Optional | 2026-06-04 |
+| `L1/C02/T20` · `content/L1-core-java/C02-collections-and-core-apis/T20-math-bigdecimal-biginteger-random.md` | Math, BigDecimal / BigInteger, Random | 2026-06-04 |
+| `L1/C02/T21` · `content/L1-core-java/C02-collections-and-core-apis/T21-serialization-and-deserialization.md` | Serialization & deserialization | 2026-06-04 |
+| `L1/C02/T22` · `content/L1-core-java/C02-collections-and-core-apis/T22-networking-socket-httpclient.md` | Networking (Socket, HttpClient) | 2026-06-04 |
+| `L1/C02/T23` · `content/L1-core-java/C02-collections-and-core-apis/T23-internationalization-i18n-and-formatting.md` | Internationalization (i18n) & formatting | 2026-06-04 |
+| `L1/C03/T01` · `content/L1-core-java/C03-testing-fundamentals/T01-unit-testing-with-junit-5.md` | Unit testing with JUnit 5 | 2026-06-04 |
+| `L1/C03/T02` · `content/L1-core-java/C03-testing-fundamentals/T02-assertions-assertj-hamcrest.md` | Assertions (AssertJ, Hamcrest) | 2026-06-04 |
+| `L1/C03/T03` · `content/L1-core-java/C03-testing-fundamentals/T03-mocking-with-mockito.md` | Mocking with Mockito | 2026-06-04 |
+| `L1/C03/T04` · `content/L1-core-java/C03-testing-fundamentals/T04-test-doubles-stub-mock-spy-fake.md` | Test doubles (stub, mock, spy, fake) | 2026-06-04 |
+| `L1/C03/T05` · `content/L1-core-java/C03-testing-fundamentals/T05-testng-alternative.md` | TestNG (alternative) | 2026-06-04 |
+| `L1/C03/T06` · `content/L1-core-java/C03-testing-fundamentals/T06-test-driven-development-tdd.md` | Test-Driven Development (TDD) | 2026-06-04 |
+| `L1/C03/T07` · `content/L1-core-java/C03-testing-fundamentals/T07-test-coverage-jacoco.md` | Test coverage (JaCoCo) — **L1 concept finale (49/49)** | 2026-06-04 |
 
 ## 7. Open Decisions & TODOs
 
@@ -264,6 +358,900 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
       diagram-per-concept bar (it already meets the spirit; user said it's good).
 
 ## 8. Session Log (append-only, newest first)
+
+### 2026-06-05 (L1/C10 Resources — 🎉🎉 L1 MODULE FULLY COMPLETE 10/10)
+- Authored `L1/C10/T01` **L1 Resources** — `type: resources`, **150 lines, 16
+  sections, 26 links, 18 topic backrefs** (mirrors L0's `C09-resources/`):
+  **Effective Java** as the centerpiece (an EJ-item→L1-topic map), books,
+  testing resources (JUnit/Mockito/AssertJ docs, GOOS, TDD-by-Example,
+  "Mocks Aren't Stubs", "Is TDD Dead?"), build/tooling docs, official docs,
+  online learning (Baeldung), JEPs (records/sealed/pattern-matching/switch),
+  specs, talks, YouTube channels, GitHub repos to study, curated reading paths
+  by goal, what-NOT-to-read-yet (concurrency→L3, Spring→L4, deep JVM→L3), and
+  communities. README + L1 module status flipped to `complete`.
+- **🎉🎉 L1 — CORE JAVA & OOP IS FULLY COMPLETE — all 10 chapters:** concept
+  C01 OOP (19) + C02 Collections & Core APIs (23) + C03 Testing (7) = **49**;
+  cross-cutting C04 Tools, C05 Hands-On (20 exercises + Library-Management
+  capstone), C06 Best-Practices (29 idioms + 42 pitfalls), C07 Interview-Prep
+  (45 Q&A), C08 Q&A/FAQ (53), C09 Cheatsheet, C10 Resources. Disk ↔ all READMEs
+  ↔ this tracker fully consistent. **The L1 authoring track is now closed.**
+- **Next project work:** L3 (main session, active — Concurrency 2/17) + L4/L5/L6
+  (unstarted). Concept total unchanged at **125/371** (L1's 49 already counted).
+
+### 2026-06-05 (L1/C09 Cheatsheets authored + project-wide README staleness fixed)
+- Authored `L1/C09/T01` **L1 Cheatsheet** — `type: cheatsheet`, **352 lines, 26
+  table-driven sections, 163 table rows, 23 topic backrefs** (mirrors L0's
+  `C08-cheatsheets/T01-l0-cheatsheet.md`): access modifiers, type-declaration
+  syntax, OOP keywords, equals/hashCode skeleton, Object methods, choose-the-
+  collection + Big-O, collection ops, Comparator builders, Stream ops,
+  generics/PECS, exception hierarchy + syntax, Optional, BigDecimal+RoundingMode,
+  java.time, regex, JUnit/AssertJ/Mockito, Maven/Gradle + dependency scopes,
+  quality tools. **L1/C09 COMPLETE — only C10 Resources remains in L1.**
+- **README RECONCILIATION (this session):** hand-flipped stale chapter-README
+  status columns to match disk — L0/C01 (11) + L0/C02 (19) concept READMEs;
+  L1/C01–C03 concept READMEs; rebuilt L1/C04–C09 cross-cutting READMEs with real
+  topic tables; updated the L1 module README sections table. Verified
+  project-wide: disk ↔ chapter READMEs ↔ module READMEs ↔ this tracker all agree
+  (L0 39=39, L1 57=57, L2 58=58, L3 2=2; L4–L6 correctly all-planned). **⚠️
+  `generate_skeleton.py` HARDCODES status=`planned` — do NOT run it to
+  "regenerate" statuses or it resets the correct L2/L3 ones; flip by hand.**
+
+### 2026-06-05 (L1 PARALLEL SESSION MERGED into PROGRESS.md; PROGRESS-L1.md deleted)
+- The parallel **L1 — Core Java & OOP** session finished its slice and merged its
+  tracker into this file (per the coordination plan), then deleted the temporary
+  `PROGRESS-L1.md`. **Verified against disk** before merging.
+- **L1 CONCEPT TOPICS COMPLETE (49/49 ✅)** at the full depth bar (language +
+  memory + architecture; ~10 Mermaid diagrams, INTERVIEW callout, 15+ practice,
+  mechanism-aware recap each): **C01 OOP 19/19**, **C02 Collections & Core APIs
+  23/23**, **C03 Testing Fundamentals 7/7**. All 49 appended to §6.
+- **L1 cross-cutting C04–C08 COMPLETE** (mirroring L0's cross-cutting formats):
+  **C04** Tools & Environment (1 ref — Build/Dependencies/Project Tooling, 537
+  ln); **C05** Hands-On (T01 Exercises 20 graded + T02 Library-Management capstone
+  project); **C06** Best Practices (T01 Idioms 29 EJ-aligned + T02 Pitfalls
+  Catalogue 42 traps); **C07** Interview Prep (45 Q&A in the CONVENTIONS §9
+  format); **C08** Q&A/FAQ (53 practical entries). Tracked in §5.
+- **L1 REMAINING: C10 Resources only** (cross-cutting) — C09 Cheatsheets done 2026-06-05.
+  C09 was in progress (L0's `C08-cheatsheets/T01-l0-cheatsheet.md`, 562 ln/30
+  sections, is the format reference) when the session wrapped. These two don't
+  count toward the 371 concept total.
+- **Counts:** glance updated **76 → 125 / 371 (20.5% → 33.7%)** — L1's 49 concept
+  topics added (L0 30 + L1 49 + L2 44 + L3 2 = 125).
+- **README STATUS (fixed 2026-06-05):** the stale L1 chapter-README status
+  columns + the two stale L0 concept-chapter READMEs (C01, C02) were hand-flipped
+  to `complete` to match disk; the L1 cross-cutting READMEs (C04–C08) got proper
+  topic tables. L1/C09–C10 correctly stay `planned` (not yet authored).
+  **⚠️ Do NOT run `scripts/generate_skeleton.py` to "regenerate" statuses — it
+  HARDCODES every README status to `planned` (lines 665/679/715/739) and would
+  reset the correct L2/L3 statuses.** README status is maintained by hand-flipping
+  the table-row Status column (the way L2/L3 were done). No L0/L2/L3 *topic
+  content* was touched.
+
+### 2026-06-05 (latest — L3/C01 T01+T02 DEEPENED to research-grade per user feedback)
+- **User feedback:** the two L3/C01 topics were "too low in quality… improve
+  with more high quality and deep information with better research." → Ran **3
+  parallel web-research agents** against OpenJDK source/JEPs/Shipilëv to gather
+  verified HotSpot internals, then substantially deepened **both** topics.
+- `L3/C01/T01` Threads & Runnable — **685 → 760 ln / 5.8k words, 13 Mermaid**.
+  Added: the full **`start()`→`start0()`→`JVM_StartThread`→`new JavaThread`→
+  `os::create_thread`→`pthread_create`** chain + the `Threads_lock` rendezvous +
+  `JavaThread`/`OSThread`/`OopHandle`/`JavaFrameAnchor` structs; a **stack
+  guard-zones** section (reserved/yellow/red/shadow + stack-banging + JEP 270;
+  SOE recoverable-vs-fatal); `vm.max_map_count` + reserved-vs-committed nuance;
+  a **virtual-thread architectural preview** (Continuation, mount/unmount,
+  freeze/thaw v-stack↔h-stack, FJP-FIFO scheduler, **JEP 491 / synchronized no
+  longer pins in JDK 24**); x86 4 KB vs Apple-silicon 16 KB pages; refined
+  context-switch numbers (~1.2–2.2 µs); 4 new interview Q.
+- `L3/C01/T02` Thread lifecycle & states — **399 → 516 ln / 5.9k words, 7
+  Mermaid**. Added: `threadStatus` now in **`Thread.FieldHolder`** + the exact
+  **`VM.toThreadState` JVMTI bitmask** + priority mapping; the HotSpot
+  **`Parker`** internals (binary `_counter` permit, `_cond[2]`, the `xchg`
+  fast-path, designed-in spurious wakeups) + the **futex `FUTEX_WAIT`
+  compare-value** lost-wakeup defense; **where the interrupt flag lives** (Java
+  `Thread.interrupted` since JDK 11, was `OSThread`) + `JavaThread::interrupt`
+  unparking all three events; **safepoints + thread-local handshakes (JEP
+  312)** + `_thread_in_native`-already-safe + TTSP; a full **virtual-thread
+  state model** (~19 internal states → 6 public, unmount-on-park, JEP 491); 4
+  new interview Q.
+- **Currency corrections baked in** (from research, primary-source-verified):
+  biased locking gone since JDK 18 (don't teach as current — relevant to T03);
+  `synchronized` no longer pins VTs (JDK 24); interrupt flag location; `_cxq`
+  merged into `_entry_list` (JDK 24) — noted for T03. Both files fence-balanced;
+  cross-links resolve (T03/T14 forward-refs intentional). **Next: L3/C01/T03.**
+
+### 2026-06-05 (earlier — ▶️ L3 RESUMED — L3/C01/T02 Thread lifecycle & states)
+- **User directive:** "continue with L3/C01" → **scope expanded to L3** (L2
+  complete). Resumed **L3 — Advanced Java & the JVM, C01 Concurrency** (17
+  topics; T01 Threads & Runnable was already done from an earlier session).
+- `L3/C01/T02` Thread lifecycle & states — **399 ln / 4.3k words, 6 Mermaid
+  (incl. a `stateDiagram-v2`) + 7 callouts + 30 table-rows**, type `concept`,
+  deep three-layer bar (matches T01). **Language**: the 6 `Thread.State`
+  values (NEW/RUNNABLE/BLOCKED/WAITING/TIMED_WAITING/TERMINATED) + the full
+  transition diagram + each trigger; the **RUNNABLE-is-a-coarsening** I/O
+  gotcha (a socket-read thread is RUNNABLE to Java but sleeping to the kernel);
+  BLOCKED = `synchronized`-monitor-only (a ReentrantLock waiter is WAITING);
+  the notified-`wait`er passes through BLOCKED to re-acquire; **sleep-vs-wait-
+  vs-yield** table (sleep keeps locks, wait releases the monitor, yield is an
+  ignorable hint); the **interrupt mechanism** in full — the flag, which
+  methods throw `InterruptedException` + clear it, `isInterrupted()` vs static
+  `interrupted()` (reads-and-clears), the cancellation-loop idiom, and the
+  **restore-the-flag** rule (`Thread.currentThread().interrupt()` when you
+  can't propagate — never swallow). **Memory/arch**: state lives in the
+  `threadStatus` **int** field; Java state ⊃ HotSpot `JavaThreadState`
+  (safepoint-aware) ⊃ OS task state (R/S/D); waiting = **parking** the OS
+  thread on a kernel **futex** via `LockSupport.park/unpark` + a per-thread
+  **permit** (unpark-before-park safe), uncontended path stays in userspace;
+  `parkBlocker` names what a thread is parked on. **Observability**: reading
+  `jstack`/`jcmd Thread.print` dumps (what each state looks like, monitor-
+  deadlock detection, two-dumps-apart diagnosis). INTERVIEW (12 Q) + Practice
+  (12) + Recap. Cross-refs to T01 + L0 resolve; forward-refs to T03+ are the
+  intentional pattern (T01 did the same). **Wired**: L3/C01 README T01+T02 rows
+  → complete (were still `planned`) + chapter status `in-progress`; §3 L3 row
+  1→2 (5%), Total 75→**76 (20.5%)**; §5 C01 1/17→2/17; §6 adds the T02 row.
+- **Note:** T02 is a `concept` topic → it **does** count toward the 371
+  (76/371 now). **Next: L3/C01/T03 synchronized/monitors/intrinsic locks.**
+
+### 2026-06-05 (earlier — L2 FULL QA PASS — verified + 22 fixes applied)
+- **User direction:** "check the entire L2 and verify the quality… keep each
+  topic high quality of code and information… improve and add more where
+  needed." → Ran a full QA sweep over all 58 L2 topic files (in-scope).
+- **Automated audit (clean):** zero broken relative `.md` links, zero
+  unbalanced code fences, zero broken directory links across all of L2; no
+  concept topic thin (178–698 ln). Re-verified clean AFTER the edits below.
+- **Deep review:** 6 parallel subagent reviewers (C01, C02, C03, C04+C05,
+  C06+C07-code, C08–C12) read every file for code correctness + technical
+  accuracy + depth. Verdict: **L2 is high-quality and accurate**; real issues
+  concentrated in the C07 project code. **22 fixes applied:**
+  - **C07 project (load-bearing code) made buildable/consistent:** pom now has
+    Jackson + `maven.compiler.release=21`; project tree shows `api/`+`Main`;
+    the dead `translate()` SQLState→HTTP mapping is now **reachable** (handler
+    catches `DataAccessException` → `ApiException.fromDataAccess` → 409/422);
+    the unused `users` field now drives an explicit unknown-user **422** via
+    `existsById`; redundant PK index → useful composite `(user_id,status,id)`;
+    `SmokeMain` shown + `exec:java` given fully-qualified plugin coords.
+  - **Factual ERRORs:** C01/T09 helpful-NPE default-on "17"→**15** (×2);
+    C04/T02 HAL link had a non-conformant `"method"` member → removed + NOTE
+    (HAL has no method; use HAL-FORMS/Siren).
+  - **Accuracy/stale-fact GAPs:** C03/T05 "500 is retriable" → qualified
+    **idempotent-only**; HTTP/2 **server push** noted deprecated (→103 Early
+    Hints); stale `example.com` IP → RFC-5737 doc IP (T04+T05); C03/T06 TLS 1.3
+    **encrypted cert/EncryptedExtensions** added; C03/T02 Reno-vs-**CUBIC**/BBR;
+    C05/T07 **InnoDB RR next-key-lock** caveat; C05/T05 **SQL Server** single-
+    NULL exception; C04/T04 Jackson **STRICT_DUPLICATE_DETECTION**; C08/T02 P6
+    bad "C01/T17" citation fixed; C09 isolation answer + C11 cheatsheet aligned
+    (Postgres RR = SI/blocks-phantoms-not-write-skew; 204 DELETE/PUT; 307/308
+    preserve-method); C02/T11 dead CVE anchor → NVD URL + **NVD_API_KEY** gotcha.
+  - Left only minor stylistic NITs (already-excellent files); no churn.
+- **Result:** L2 remains **100% complete (all 12 chapters)**, now QA-verified;
+  concept total **75/371 (20.2%)** unchanged. ⏸️ Still paused for user direction
+  on expanding scope to L3 (out of the L2-only scope).
+- **QA round 2 (deferred depth/accuracy items applied, in-scope):** C02/T01
+  `mvn -U` for snapshots; C02/T03 Gradle `failOnVersionConflict()`; C02/T05
+  revert-a-merge `-m` gotcha; C02/T08 `lombok.config` (exception-type +
+  `@lombok.Generated` for coverage + stopBubbling); C02/T09 the actual
+  `lombok-mapstruct-binding` annotationProcessor snippet; C03/T05 HTTP/1.0
+  head-of-line table cell relabeled (was a connection-cost remark); C03/T03
+  ephemeral-port range reconciled (IANA 49152–65535 vs Linux default
+  32768–60999 ≈ 28k). Links + fences re-verified clean. **Total QA fixes this
+  session: 29** (22 round 1 + 7 round 2).
+
+### 2026-06-05 (earlier — L2/C12/T01 Resources — 🎉 ENTIRE L2 MODULE COMPLETE)
+- `L2/C12/T01` L2 Resources — **142 ln / 1.6k words, 9 sections / 10
+  subsections, 26 annotated external resources**, type `resources`, deep bar
+  (L0-resources pattern). Annotated reading/reference list with honest opinions
+  + curated paths + what-not-to-read-yet. **Official docs** (Java SE API/JLS,
+  java.util.stream package doc, RFC 9110 HTTP semantics + 9111/6265, MDN, HPBN;
+  **REST design** subsection — Zalando guidelines, Google AIP, RFC 9457
+  problem+json; PostgreSQL docs, use-the-index-luke; **Security** subsection —
+  OWASP Top 10 + Cheat Sheets; Jackson/HikariCP/Maven/Gradle/curl/Testcontainers).
+  **Books** (must: Effective Java, Modern Java in Action; soon: SQL Performance
+  Explained, **DDIA** as the grow-into book, Database Internals; reference:
+  Java Concurrency in Practice [L3], Release It! [resilience], HTTP Definitive
+  Guide). **Practical tutorials** (Oracle Java Tutorials, Baeldung w/ honest
+  caveat, Jenkov). **Specs table** (RFC 9110/7519/6749/8259, SQL:2016, SemVer,
+  12-factor). **Blogs/talks** (Shipilëv, Vlad Mihalcea, Goetz, Morning Paper).
+  **4 curated paths** (interview / build-a-service / databases / networking) +
+  **what-NOT-to-read-yet** (Spring internals, reactive, k8s, GC tuning, full
+  JLS). All internal cross-refs resolve incl. the L3 path (read-only, in-scope).
+  **Wired**: C12 README T01 → complete + chapter status `complete`; L2 README
+  C12 → complete **+ module frontmatter `status: complete`**; §5 adds
+  `C12-resources | 1/1 | complete`.
+- **🎉🎉🎉 MILESTONE — L2 (Intermediate Java & Backend Foundations) FULLY
+  COMPLETE: ALL 12 CHAPTERS.** 5 concept chapters (C01 Functional 9/9, C02
+  Build 11/11, C03 Networking 11/11, C04 Web&REST 4/4, C05 Databases 9/9 =
+  **44/44 concept topics**) + **7 cross-cutting chapters** authored this scope
+  of work (C06 Tools 5/5, C07 Hands-On 3/3, C08 Best-Practices 2/2, C09
+  Interview-Prep 1/1, C10 Q&A 1/1, C11 Cheatsheets 1/1, C12 Resources 1/1 = 14
+  cross-cutting topics). Every file at the deep no-shallow bar; all READMEs +
+  L2 index synced; cross-links verified. **Concept total: 75/371 (20.2%)** —
+  unchanged (cross-cutting topics aren't in the 371). **The user's L2-only
+  scope directive is now fully satisfied — nothing left to author in
+  `content/L2-intermediate-backend/`.** ⏸️ **Paused for a user checkpoint** on
+  whether to expand scope to **L3 — Advanced JVM** (paused 1/41, OUTSIDE the
+  current scope → needs an explicit directive). Did NOT auto-cross into L3.
+
+### 2026-06-05 (earlier — L2/C11/T01 Cheatsheet — ✅ C11 COMPLETE 1/1)
+- `L2/C11/T01` L2 Cheatsheet — **339 ln / 1.9k words, 22 sections, 102 table-
+  rows + 18 code blocks**, type `cheatsheet`, deep bar (matches L0's ~560-ln
+  tables-no-narrative sheet). Dense pure-recall reference for the whole L2
+  surface, each section + a Topic link: **streams ops** (intermediate/terminal
+  table), **Collectors** snippet, **functional interfaces** table, **Optional**
+  methods, **HTTP methods** (safe/idempotent/body table), **status codes**
+  (200/201/204/3xx/4xx/5xx), **headers**, **REST CRUD map**, **Jackson** (mapper
+  config + annotations), **SQL logical query order**, **JOINs** table (+ ON-vs-
+  WHERE warning), **DDL/constraints**, **normal forms** (1NF–BCNF), **ACID +
+  isolation-levels-vs-anomalies** table, **JDBC skeleton** (PreparedStatement +
+  try-with-resources + tx/batch/RETURNING), **HikariCP knobs**, **keyset
+  pagination**, **CLI quick-ref** (curl/psql/docker/dig/ss/nc/openssl), **build
+  commands** (mvn/gradle + scopes), **idiom one-liners**, **pitfall one-liners**
+  (severity-tagged). All 19 cross-refs resolve into C01–C08 + C12 dir (read-
+  only, in-scope). **Wired**: C11 README T01 → complete + chapter status
+  `complete`; L2 README C11 → complete; §5 adds `C11-cheatsheets | 1/1 |
+  complete`.
+- **✅ MILESTONE — C11 Cheatsheets COMPLETE (1/1).** **Concept count unchanged:
+  75/371 (20.2%); L2 concept 44/44.** **6 of 7** L2 cross-cutting chapters done
+  (C06–C11). **Only C12 Resources remains** → then the ENTIRE L2 module (all 12
+  chapters: 5 concept + 7 cross-cutting) is COMPLETE. ⏸️ **Paused for a user
+  checkpoint.**
+
+### 2026-06-05 (earlier — L2/C10/T01 FAQ — ✅ C10 COMPLETE 1/1)
+- `L2/C10/T01` L2 FAQ — **246 ln / 2.6k words, 33 questions**, type `qa`, deep
+  bar (matches L0's ~445-ln FAQ; single-file pattern). The conversational
+  "wait, why is this happening to me" companion to C09's interview drills —
+  each entry = a plain-English `### Question?` + a colleague-style answer +
+  a `→` link to the deep version. Themes: **functional** (stream-already-
+  operated, streams-vs-loops, can't-mutate-in-lambda, why-Optional, slow-
+  parallelStream, map-vs-forEach); **build** (mvn-vs-mvnw, first-build-
+  downloads-everything, works-in-IDE-not-CLI, Maven-vs-Gradle); **networking/
+  TLS** (HTTP-vs-HTTPS, CORS-in-browser-not-curl, request-hangs, PKIX-from-
+  Java=JVM-truststore, 401-vs-403, localhost-in-Docker=service-name); **REST**
+  (POST-vs-PUT-vs-PATCH, which-status-code, why-paginate, why-DTOs, seq-id-vs-
+  UUID); **SQL** (index-not-used=non-sargable, LEFT-JOIN-dropping-rows=ON-vs-
+  WHERE, WHERE-vs-HAVING, tx-for-single-statement, too-many-connections=leak,
+  ORM-vs-raw-SQL, what-is-a-deadlock); **JDBC/Docker/testing** (why-pool, why-
+  Postgres-in-Docker, why-Testcontainers-not-H2, app-hangs-after-a-while=leak,
+  committed-.env-password=rotate-now). All 28 cross-refs resolve into C01–C09
+  (read-only, in-scope). **Wired**: C10 README T01 → complete + chapter status
+  `complete`; L2 README C10 → complete; §5 adds `C10-qa-faq | 1/1 | complete`.
+- **✅ MILESTONE — C10 Q&A/FAQ COMPLETE (1/1).** **Concept count unchanged:
+  75/371 (20.2%); L2 concept 44/44.** **5 of 7** L2 cross-cutting chapters done
+  (C06–C10). Only **C11 Cheatsheets + C12 Resources** remain → then the ENTIRE
+  L2 module (all 12 chapters) is complete. ⏸️ **Paused for a user checkpoint.**
+
+### 2026-06-05 (earlier — L2/C09/T01 Interview Questions — ✅ C09 COMPLETE 1/1)
+- `L2/C09/T01` Intermediate Backend Interview Questions — **358 ln / 4.3k
+  words, 28 questions**, type `interview-qa`, deep bar (matches L0's ~720-ln
+  interview file; single-file pattern). Full **CONVENTIONS §9 fixed Q&A
+  format** — every Q has `### Q:` + Difficulty + Asked-at + Answer + Follow-ups
+  (verified 28/28 on all four parts). Meta section on L2 answering technique
+  (define→mechanism→trade-off, quantify, volunteer the failure mode, design-
+  question framing). 6 themes: **functional Java** (Collection-vs-Stream,
+  map-vs-flatMap, parallel-stream when, Optional-vs-null, lambda-vs-anon-class,
+  functional-interface, records); **build/deps** (version-conflict resolution,
+  Maven scopes); **networking/HTTP/TLS** (the URL-to-response walk, TLS/PKI,
+  authn-vs-authz+401-vs-403, cookies-vs-session-vs-JWT, load-balancer L4-vs-L7);
+  **REST/API** (what-makes-RESTful, idempotency+retries, versioning+pagination,
+  SQL-injection, CORS); **SQL/DB** (INNER-vs-LEFT+ON-vs-WHERE trap, index/B-tree/
+  sargability, ACID, isolation-levels+anomalies, normalization, N+1); **JDBC**
+  (pooling+sizing, PreparedStatement-vs-Statement, JDBC transactions). Closing
+  "mid-level differentiators" (name the failure mode, quantify, connect layers).
+  All 26 cross-refs resolve into C01–C07 + CONVENTIONS (read-only, in-scope).
+  **Wired**: C09 README T01 → complete + chapter status `complete`; L2 README
+  C09 → complete; §5 adds `C09-interview-prep | 1/1 | complete`.
+- **✅ MILESTONE — C09 Interview Prep COMPLETE (1/1).** **Concept count
+  unchanged: 75/371 (20.2%); L2 concept 44/44.** **4 of 7** L2 cross-cutting
+  chapters complete (C06, C07, C08, C09). ⏸️ **Paused for a user checkpoint**
+  (C10 Q&A/FAQ / another L2 cross-cutting chapter / resume L3) — did NOT auto-
+  continue, per scope.
+
+### 2026-06-05 (earlier — L2/C08/T02 Pitfalls catalogue — ✅ C08 COMPLETE 2/2)
+- `L2/C08/T02` Pitfalls Catalogue — the L2 Traps — **316 ln / 2.2k words,
+  8 code fences, 38 pitfalls**, type `best-practices`, deep bar. The *not-that*
+  shadow of T01's idioms. Each trap = **severity (🔴 security/data-loss · 🟠
+  availability · 🟡 correctness/perf) + symptom → cause → fix** (+ before/after
+  on the code ones). 6 themes: **(1) functional/language** (P1 money-in-double,
+  P2 parallel shared-state, P3 reused-stream, P4 Optional.get/as-field, P5 CME,
+  P6 autobox-NPE, P7 ==-on-strings); **(2) errors/resources** (P8 conn-leak, P9
+  swallowed-exc, P10 lost-cause, P11 return-null, P12 broad-catch); **(3) SQL/
+  JDBC** (P13 injection, P14 N+1, P15 OFFSET-deep, P16 SELECT*, P17 missing-
+  index/non-sargable, P18 long-tx, P19 lost-update, P20 pool-too-large, P21
+  app-only-validation, P22 edit-applied-migration); **(4) REST/web** (P23 200-
+  over-error, P24 GET-mutates, P25 retry-POST, P26 leak-internals, P27 CORS-
+  wildcard+creds, P28 unbounded-list, P29 DTO=entity); **(5) networking/
+  resilience** (P30 no-timeout, P31 retry-storm, P32 disable-TLS, P33 hardcoded-
+  IP); **(6) config/secrets/build** (P34 secrets-in-code, P35 log-PII, P36
+  config-baked-in, P37 unpinned-deps, P38 ignore-CVEs). Ends with a **severity-
+  sorted triage index table** (scan 🔴 first) + a recap on the shared shape
+  (they pass the happy-path test; surface only under load/concurrency/malice/
+  time). All 22 cross-refs resolve into C01–C07 (read-only, in-scope). **Wired**:
+  C08 README T02 → complete + chapter status `complete`; L2 README C08 → complete;
+  §5 C08 1/2→**2/2 complete**.
+- **✅ MILESTONE — C08 Best Practices & Pitfalls COMPLETE (2/2).** L2's third
+  cross-cutting chapter done (idioms + their shadows). **Concept count
+  unchanged: 75/371 (20.2%); L2 concept 44/44.** **3 of 7** L2 cross-cutting
+  chapters now complete (C06 tools, C07 hands-on, C08 best-practices). ⏸️
+  **Paused for a user checkpoint** (C09 Interview Prep / another L2 cross-cutting
+  chapter / resume L3) — did NOT auto-continue, per scope.
+
+### 2026-06-05 (earlier — L2/C08 Best Practices STARTED — C08/T01 Idioms)
+- **User direction after the C07-complete checkpoint:** "continue with the
+  C08." → Started **C08 Best Practices & Pitfalls** (in-scope). Defined the
+  2-topic plan in the README (mirrors L0's best-practices: Idioms + Pitfalls
+  catalogue).
+- `L2/C08/T01` Idioms — the L2 Reflexes — **308 ln / 2.1k words, 2 callouts +
+  28 code fences, 36 idioms across 10 themes**, type `best-practices`, deep
+  bar. The *do-this* half of the module's wisdom; each idiom = one-line rule +
+  why + snippet + pointer to the mechanism topic. Themes: **(1) modern
+  language** (records for carriers, sealed+pattern switch, var judiciously,
+  text blocks/List.of); **(2) functional** (streams transform / side-effect
+  loops stay loops, Optional as return-type-only, method refs, profile-before-
+  parallel); **(3) immutability** (immutable by default, defensive copy /
+  unmodifiable views); **(4) errors** (fail-fast w/ message, wrap+preserve-
+  cause, never-swallow [before/after], translate-at-the-edge); **(5)
+  resources** (try-with-resources always [+ the connection-leak=3am-page
+  WARNING], one small pool once); **(6) data access** (PreparedStatement
+  always [injection before/after], RETURNING, keyset>OFFSET, short tx on one
+  connection, push-set-work-to-SQL/no-N+1, integrity-in-DB+migrations); **(7)
+  REST** (nouns+methods, correct status codes, idempotent/retry-safe, tolerant
+  reader, DTOs at the edge, versioned+paginated); **(8) networking/resilience**
+  (timeout-every-call, backoff-retry-idempotent-only, verify-TLS); **(9)
+  config/ops** (12-factor, secrets-never-in-code, structured-logs-no-PII,
+  health+graceful-stop); **(10) build** (commit-the-wrapper, pin-versions,
+  right-scope, scan-deps). Ends with a scannable **reflex list** + a recap on
+  why they compound. Opening NOTE: idioms are strong defaults not laws — know
+  the why to break them deliberately. All 24 cross-refs resolve into C01–C07
+  (read-only, in-scope); forward-ref to T02 intended. **Wired**: C08 README
+  T01 → complete + plan; §5 adds `C08-best-practices | 1/2 | in-progress`.
+  **Next: T02 Pitfalls catalogue → C08 complete.**
+
+### 2026-06-05 (earlier — L2/C07/T03 REST layer — ✅ C07 COMPLETE 3/3)
+- `L2/C07/T03` Level Project · Part 2 — the REST API — **384 ln / 2.2k words,
+  1 Mermaid + 2 callouts + 18 code fences**, type `project`, deep bar.
+  **Fully-worked REST/HTTP layer** on the T02 data layer using the **JDK
+  `com.sun.net.httpserver.HttpServer` + Jackson** (no web framework — HTTP
+  stays visible; Spring deferred to L4). Sections: **(1) the API contract**
+  table (POST /users + /tasks CRUD with methods/status/errors); **(2) DTOs &
+  JSON** — request/response records SEPARATE from domain (wire-contract
+  decoupling, C04/T04), one ObjectMapper w/ JavaTimeModule + tolerant-reader
+  FAIL_ON_UNKNOWN_PROPERTIES=false; **(3) error model** — single `ApiException`
+  (status+code) + `ErrorResponse` JSON, **SQLState→HTTP map (23505→409,
+  23503→422)**, never-200-over-an-error; **(4) the service** — validation→422
+  (+ DB constraints are the real guard), Optional→404, streams map list→DTOs;
+  **(5) router/handler** — one HttpHandler dispatching by method+path-shape,
+  centralized exception→status catch, 201+`Location`, 204 no-body, `Link:
+  rel="next"` keyset pagination header (C04/T03), never-leak-stack-traces;
+  **(6) main** wiring (migrate on boot, createContext, bounded thread pool);
+  **(7) drive-with-curl** full smoke incl. every error path (201/409/422/404/
+  204) ties C06/T02; **(8) what-a-framework-adds** L4 teaser table (HttpServer→
+  @RestController, manual catch→@ExceptionHandler, manual tx→@Transactional).
+  Code verified correct (HttpServer API, 204=-1 len, header-before-
+  sendResponseHeaders, try/close). All cross-refs into C04/C05/C06 + T02
+  (read-only, in-scope). **Wired**: C07 README T03 → complete + chapter status
+  `complete`; L2 README C07 → complete; §5 C07 2/3→**3/3 complete**.
+- **✅ MILESTONE — C07 Hands-On COMPLETE (3/3).** L2's second cross-cutting
+  chapter done: a graded exercise set + a **full worked vertical slice** (the
+  "Tasks API": Maven→Postgres+Flyway→HikariCP+JDBC repo→service/transactions→
+  HttpServer+Jackson REST→Testcontainers tests→curl), exercising C01–C06
+  together. **Concept count unchanged: 75/371 (20.2%); L2 concept 44/44.**
+  Two L2 cross-cutting chapters now complete (C06, C07). ⏸️ **Paused for a
+  user checkpoint** on next direction (C08 Best Practices / another L2 cross-
+  cutting chapter / resume L3) — did NOT auto-continue, per scope.
+
+### 2026-06-05 (earlier — L2/C07/T02 Level Project Part 1 — data layer)
+- `L2/C07/T02` Level Project · Part 1 — the data layer — **437 ln / 2.1k
+  words, 1 Mermaid + 4 callouts + 28 code fences**, type `project`, deep bar
+  (matches L0's ~670-ln project files). **Fully-worked, runnable plain-JDBC-
+  over-HikariCP data layer** for the "Tasks API" (no ORM/Spring — every line
+  traces to C05/T09; frameworks deferred to L4). Sections: **(1) setup** —
+  Maven layout + pom (postgresql/HikariCP/Flyway + JUnit5/Testcontainers/
+  AssertJ at `test` scope, the C02 scopes note) + docker-compose Postgres w/
+  healthcheck; **(2) domain** — immutable records (User, Task, TaskStatus
+  enum, Page<T>); **(3) schema & Flyway migrations** — V1 users+tasks with FK
+  `ON DELETE CASCADE`, `CHECK` enum, `UNIQUE` email; V2 indexes (sargable,
+  ties C07/T01 E5); integrity-in-the-DB callout; **(4) HikariCP DataSource**
+  (env-driven, small pool, Flyway.migrate on startup); **(5) the repository** —
+  PreparedStatement CRUD (injection-proof + plan-cache), **`RETURNING`** to
+  skip a round trip, **`Optional`** for absent rows, rowcount for exists,
+  try-with-resources everywhere (+ the leak-exhausts-pool warning); **(6)
+  keyset/cursor pagination** (`WHERE id > cursor ORDER BY id LIMIT n` beats
+  OFFSET — ties C04/T03); **(7) transactions** — autoCommit(false)→commit/
+  rollback bounded by ONE Connection (+ the two-connections-two-transactions
+  warning, = Spring @Transactional plumbing); **(8) Testcontainers IT suite** —
+  real Postgres, real migrations, 5 @Tests (create+readback w/ DEFAULT status,
+  empty-Optional, updateStatus rowcount, keyset walks pages, UNIQUE→exception→
+  T03 maps 409); **(9) run-it-locally** (compose up + verify). All cross-refs
+  into C01/C02/C04/C05/C06 (read-only, in-scope); forward-ref to T03 intended.
+  **Wired**: C07 README T02 → complete; §5 C07 1/3→2/3. **Next: T03 REST layer
+  → C07 complete.**
+
+### 2026-06-05 (earlier — L2/C07 Hands-On STARTED — C07/T01 Exercises)
+- **User direction after the C06-complete checkpoint:** "continue on the C07
+  with deep thinking on each topics inside the C07." → Started **C07 Hands-On**
+  (in-scope). C07 was a stub; **defined a 3-topic plan** in the README
+  (exercises + a 2-part level project), with a concept→layer Mermaid map. The
+  level project = a **"Tasks API"** (users own tasks; CRUD + filter +
+  pagination) tying C01–C06: REST (C03/C04) → service (txns C05/T06) → JDBC
+  repo (C05/T09) → Postgres (schema + Flyway C06/T03), tested with
+  Testcontainers (C06/T05), driven by curl (C06/T02).
+- `L2/C07/T01` Exercises — **372 ln / 2.8k words, 3 callouts + 22 table-rows +
+  28 code fences**, type `exercises`, deep hands-on bar (L0's hands-on files
+  are the book's longest ~600 ln — aimed to match the genre). **19 graded
+  problems** (🟢/🟡/🔴) across all five concept chapters, each with task →
+  hint → full worked **solution** → **why** tied to the concept topic:
+  **A (C01 functional)** loop→stream, groupingBy+downstream (money in
+  BigDecimal!), Optional map/orElse no-.get(), the parallel-stream shared-
+  mutable-state bug, flatMap flatten; **B (C02)** dependency:tree conflict
+  (nearest-wins NoSuchMethodError), wrapper reproducibility; **C (C03)**
+  HTTPS-request lifecycle trace, `curl -w` TLS-slow diagnosis, TCP-vs-UDP
+  choice; **D (C04)** REST endpoint+status-code design, idempotency/safe-retry
+  + Idempotency-Key, status-code selection (401-vs-403-vs-409); **E (C05/JDBC)**
+  LEFT JOIN filter-in-ON + GROUP BY, normalize-to-3NF with a join table,
+  batched parameterized PreparedStatement in a txn with try-with-resources
+  (+ injection warning), spot-the-lost-update + fixes, non-sargable predicate
+  (function-on-indexed-column → Seq Scan) rewrite, kill-the-N+1 with a JOIN.
+  Ends with a **self-check rubric** (one box per problem). All 26 cross-refs
+  resolve into C01–C06 (read-only, in-scope); forward-ref to T02 intentional.
+  **Wired**: C07 README T01 → complete + plan; L2 README C07 → in-progress;
+  §5 adds `C07-hands-on | 1/3 | in-progress`. **Next: T02 project data layer.**
+
+### 2026-06-05 (later — L2/C06/T05 Docker & Testcontainers — ✅ C06 COMPLETE 5/5)
+- `L2/C06/T05` Local dev environment: Docker & Testcontainers — **298 ln /
+  2.2k words, 4 Mermaid + 4 callouts + 16 table-rows**, type `reference`,
+  deep bar. The C06 finale. **What a container actually is** (namespaces
+  [pid/net/mnt/uts/ipc/user] + cgroups [cpu/mem caps] + union fs on the
+  SHARED host kernel — NOT a VM; container-vs-VM diagram; millisecond starts =
+  why per-test containers are practical). **Images & Dockerfile** (read-only
+  layers + writable layer; registries; a **multi-stage Java Dockerfile**
+  [temurin-jdk build → temurin-jre runtime, non-root USER]; **layer-cache
+  ordering** copy-pom-resolve-deps-before-src ties C02 dep cache; .dockerignore/
+  distroless/--platform). **docker run** flags + lifecycle (ps/logs/exec/stop/
+  prune/stats). **Volumes** (the ephemeral-writable-layer data-loss warning;
+  named vol vs bind mount vs tmpfs table). **Networking** (`-p host:container`
+  = a **NAT rule** ties C03/T11+T03 — why localhost:5432 works; user-defined
+  bridge → **container-to-container DNS by service name** ties C03/T04).
+  **docker compose** (compose.yaml services/volumes/healthcheck; the
+  **depends_on-only-waits-for-start-not-ready** warning → healthcheck +
+  service_healthy). **Testcontainers** (the payoff): mocks-lie + H2-lies
+  (dialect drift) → boot a **REAL** Dockerized dep from the test; JUnit5
+  `@Testcontainers` + `PostgreSQLContainer` + **`@DynamicPropertySource`**
+  feeding the random port's `getJdbcUrl()` into Spring (ties C05/T09); Ryuk
+  reaper; singleton-container speed; tests real dialect/constraints/migrations
+  that mocks+H2 can't (ties C05/T05,T07); test-pyramid diagram. Troubleshooting
+  (port-in-use/pull-limit/disk/layer-cache/arch-mismatch/no-docker-env/slow-CI).
+  Fixed nothing broken; all cross-refs into C02/C03/C05 + C07-hands-on dir
+  (verified to exist). **Wired**: C06 README T05 → complete + chapter status
+  `complete`; L2 README C06 row → complete; §5 C06 4/5→**5/5 complete**.
+- **✅ MILESTONE — C06 Tools & Environment COMPLETE (5/5).** L2's first
+  cross-cutting chapter is done end-to-end at the deep bar (build→call→inspect-
+  DB→diagnose-network→containerize). The user's "focus on L2/C06" directive is
+  fulfilled. **Concept count unchanged: 75/371 (20.2%); L2 concept 44/44.**
+  ⏸️ **Paused for a user checkpoint** on next direction (C07 Hands-On / another
+  L2 cross-cutting chapter / resume L3) — did NOT auto-continue, per scope.
+
+### 2026-06-05 (later — L2/C06/T04 Network & TLS diagnostics)
+- `L2/C06/T04` Network & TLS diagnostics (dig, ss, lsof, nc, tcpdump,
+  openssl) — **276 ln / 2.4k words, 3 Mermaid + 5 callouts + 20 table-rows**,
+  type `reference`, deep bar. Core thesis: **isolate WHICH layer broke,
+  bottom-up (DNS→TCP→path→TLS→app)** — maps the C03/T01 OSI stack onto its
+  tools. **DNS**: `dig` (+short/+trace/@server/record-types/reverse -x, read
+  ANSWER/TTL/status NXDOMAIN-SERVFAIL) vs **`getent hosts`** — the key gotcha
+  that **dig bypasses /etc/hosts but the app doesn't** (use getent when they
+  disagree); resolv.conf/hosts/nsswitch. **TCP/ports**: `ss -ltnp` (modern
+  netstat, reads /proc/net/tcp), `lsof -i` (which PID owns a port — the
+  address-in-use fix), `nc -vz` (probe, builds the C03/T03 4-tuple); **TCP
+  state reading** — **CLOSE_WAIT pile-up = socket leak in YOUR code**,
+  **TIME_WAIT pile-up = churn (pool instead, C05/T09)**. **Path**: ping/
+  traceroute/mtr + the **ICMP-often-filtered caveat** (ping-fail ≠ down).
+  **The wire**: tcpdump (-i/-n/BPF/-A/-w pcap), reading flags [S]/[S.]/[.]/
+  [F.]/[R] with a **sequenceDiagram of the 3-way handshake on the wire**,
+  what-it-does (promiscuous + in-kernel BPF = C03 encapsulation made literal),
+  Wireshark "Follow TCP Stream". **TLS**: `openssl s_client -servername`
+  (SNI!) real handshake + Verify-return-code table (10 expired/19 self-signed/
+  21 missing-intermediate/62 hostname), `openssl x509 -subject/-issuer/-dates/
+  -ext subjectAltName`; **chain-diagram** (leaf→intermediate→root truststore +
+  SAN-match + expiry); the **JVM-separate-cacerts-truststore** note (PKIX path
+  building failed → keytool import, bridges C05/T09). **Decision-flow table** +
+  a **worked example** ("service can't reach the DB" → 5 commands walking
+  DNS→TCP→tcpdump→TLS→auth). Fixed a `cacexts`→`cacerts` typo. Cross-refs all
+  into C03/C05 (read-only, in-scope). **Wired**: C06 README T04 → complete; §5
+  C06 3/5→4/5. **Next: T05 Docker & Testcontainers — the C06 finale.**
+
+### 2026-06-05 (later — L2/C06/T03 Database clients & migration tools)
+- `L2/C06/T03` Database clients & migration tools (psql, mysql, DBeaver,
+  Flyway, Liquibase) — **346 ln / 2.7k words, 3 Mermaid + 3 callouts + 35
+  table-rows**, type `reference`, deep bar. Two jobs: inspect/query
+  interactively + evolve schema over time. **Connecting** (DSN/URL vs libpq
+  env vars; secrets in ~/.pgpass / ~/.my.cnf [600] not argv; sslmode
+  disable→require→verify-full ties C03/T06). **psql** — meta-commands
+  (\l \dt \d+ \di \dv \du \dp), output modes (\x expanded, -A -t, --csv),
+  **scripting safely (`-v ON_ERROR_STOP=1` — psql plows past errors by
+  default!)**, `\copy` (client) vs `COPY` (server) for bulk load. **mysql** —
+  `SHOW CREATE TABLE\G`, `SHOW FULL PROCESSLIST`, `INNODB STATUS`, mysqldump.
+  **GUI** (DBeaver/DataGrip/pgAdmin/TablePlus — when CLI vs GUI). **Reading
+  EXPLAIN** (the core perf skill): EXPLAIN vs EXPLAIN ANALYZE (+rollback-the-
+  mutation warning), read the tree inside-out, **scan nodes** (Seq/Index/
+  Index-Only/Bitmap) + **join nodes** (Nested Loop/Hash/Merge — ties C05/T02
+  join algos), cost=startup..total + estimate-vs-actual-rows (→ANALYZE for
+  stale stats) + BUFFERS, a **red-flag checklist** (seq-scan-on-big-table →
+  missing index C05/T05, non-sargable predicate). **Migrations** — the core
+  idea (versioned/ordered/immutable scripts + schema-history table = schema
+  is a deterministic function of history); **Flyway** (V__/R__/U__ naming,
+  flyway_schema_history, checksums, migrate/info/validate/baseline/repair,
+  Spring Boot auto-run); **Liquibase** (changelog XML/YAML changesets id+
+  author, declared rollback, DATABASECHANGELOG + LOCK table, DB-agnostic DDL);
+  Flyway-vs-Liquibase table; **discipline** — never-edit-an-applied-migration
+  (checksum), forward-only, **expand/contract zero-downtime pattern** (diagram:
+  add-nullable → dual-write+backfill → drop-old), test on prod-sized data.
+  Troubleshooting matrix (connect/auth/SSL/too-many-connections/slow-query/
+  checksum-mismatch/migration-lock). All cross-refs into L2 C03/C05 (read-only,
+  in-scope). **Wired**: C06 README T03 → complete; §5 C06 2/5→3/5. **Next in
+  C06: T04 network & TLS diagnostics.**
+
+### 2026-06-05 (later — L2/C06/T02 HTTP & API clients)
+- `L2/C06/T02` HTTP & API clients (curl, HTTPie, Postman, DevTools) —
+  **369 ln / 3.0k words, 3 Mermaid + 7 callouts + 23 table-rows**, type
+  `reference`, deep bar. The deep dive expanding T01 §2. **curl** (the bulk):
+  what-curl-actually-does lifecycle diagram (parse→resolve→connect→TLS→
+  request→response→keep-alive, ties C03/T05); **the `-X` trap** (let
+  `-d`/`-F`/`--json` imply the method); headers (incl. removing a default
+  `-H 'Accept:'`, overriding Host); **the 5 body forms** (`-d` form-encoded
+  default gotcha, `--json`, `--data-binary @file` for JSON files, `-F`
+  multipart, `--data-urlencode`); auth shapes (Basic=base64-not-encryption,
+  Bearer, `--netrc`, mTLS, sigv4); **TLS** (`--cacert`/`--cert`, the `-k`
+  =disables-all-trust warning); **HTTP versions** (ALPN/h2 multiplex/h3 QUIC);
+  redirects/retries/timeouts (`-L`, `--retry-connrefused`, idempotent-only
+  retry warning ties C04/T02); **`-w` timing forensics** (localize latency to
+  a layer); output/exit (`-f` so scripts notice HTTP errors — the default-
+  exit-0-on-500 trap); parallel/globbing/curlrc; **security** (secrets in
+  argv visible via /proc/<pid>/cmdline). **HTTPie** (item syntax `=`/`:=`/
+  `==`/`:`/`@`, `--offline`, sessions). **Postman/Insomnia/Bruno** (vars+envs,
+  `pm.*` test scripts, chaining, OAuth helpers, **Newman** CI runner, mocks,
+  codegen; Bruno git-native; the cloud-sync-secret-leak warning). **DevTools
+  Network** (waterfall, **Copy as cURL**, HAR, throttle, preserve-log).
+  **gRPC/WS/SSE** note (grpcurl/websocat/`curl -N`). **6 workflow recipes**
+  (token capture, cursor-pagination walk, conditional GET via ETag/If-None-
+  Match ties C04 caching, multipart, resume) + troubleshooting matrix.
+  Cross-refs all into L2 C03/C04 (read-only, in-scope). **Wired**: C06 README
+  T02 row → complete; §5 C06 1/5→2/5. **Next in C06: T03 DB clients +
+  migrations.**
+
+### 2026-06-05 (L2/C06 Tools & Environment STARTED — C06/T01 backend toolchain reference)
+- **User direction after the L2-complete checkpoint:** "focus on the L2/C06
+  and continue with the topics on there." → Started L2's first cross-cutting
+  chapter, **C06 Tools & Environment** (in-scope: stays inside
+  `content/L2-intermediate-backend/`). C06 was a bare stub (README only, no
+  topic plan), so I **defined a 5-topic plan** in the C06 README mapping each
+  topic to the L2 concept chapters: **T01** backend toolchain quick reference
+  (all of L2), **T02** HTTP/API clients (C03/C04), **T03** DB clients &
+  migrations (C05), **T04** network/TLS diagnostics (C03), **T05** Docker &
+  Testcontainers (all). Added a Mermaid concept→tool map to the README.
+- `L2/C06/T01` Backend Toolchain Quick Reference — **372 ln / 3.5k words,
+  3 Mermaid + 6 callouts + 42 table-rows + ~25 command blocks**, type
+  `reference`, at the deep no-shallow bar (real commands + the mechanism
+  under each + troubleshooting, not an install-X-run-Y sampler). Sections:
+  the **backend inner loop** diagram (edit→build→run→call→slice→inspect, with
+  the "something's wrong" dotted paths); **(1) build/run** — the committed
+  wrapper as a supply-chain boundary, `dependency:tree`; **(2) curl** — `-i`/
+  `-v`/`-w`, the **time_* timing breakdown** mapped 1:1 onto C03's HTTP
+  lifecycle (DNS/TCP/TLS/TTFB → which layer is slow), HTTPie/Postman/DevTools
+  "Copy as cURL"; **(3) jq** — projection/filter/reshape, the `-r` token-
+  extraction idiom; **(4) psql/mysql** meta-commands + **`EXPLAIN ANALYZE`**
+  (with the rollback-the-mutation warning); **(5) network/TLS** — one tool per
+  layer (dig/ss/nc/lsof/tcpdump/openssl s_client) + the under-the-hood
+  (`ss` reads /proc/net/tcp, tcpdump=BPF, container=namespaces+cgroups);
+  **(6) Docker** one-line Postgres + compose + container-is-not-a-VM; **(7)
+  the IDE as a backend cockpit** — IntelliJ `.http` files (chained, version-
+  controlled curl), DB tool window, **remote JDWP debug-attach** (ties L0's
+  JDWP); **(8) 12-factor config** + never-commit-secrets; **(9)** consolidated
+  cheat table; **(10)** symptom→tool troubleshooting matrix. Cross-refs all
+  point into L2 concept chapters (read-only links, in-scope). **Wired**: C06
+  README T01 row → complete + status `in-progress`; §5 adds
+  `C06-tools-and-environment | 1 / 5 | in-progress (cross-cutting)`.
+- **Note:** C06 topics are **cross-cutting** (type `reference`) — they do
+  **not** change the 75/371 concept count (concept total unchanged). Tracked
+  in §5 like L0's cross-cutting rows. Next in C06: **T02 HTTP & API clients**.
+
+### 2026-06-04 (L2/C05/T09 JDBC & connection pooling — 🎉 L2 COMPLETE 44/44)
+- `L2/C05/T09` JDBC & connection pooling (HikariCP) — **190 ln /
+  2.7k words, 1 Mermaid (the connection-establishment cost chain:
+  TCP 3-way → TLS handshake → DB auth → session/backend setup) + 5
+  callouts** at the deep bar (L2-only scope). **The C05 finale and the
+  bridge from SQL to Java.** **Language/JDBC**: `DriverManager`/`DataSource`,
+  `Connection`/`Statement`/`PreparedStatement`/`ResultSet`/`RowSet`; the
+  **`PreparedStatement` two-fold win** — (1) **SQL-injection immunity**
+  (parameters bind as typed values, never re-parsed as SQL — ties to
+  C04/T01 injection + C05/T02 query structure) and (2) **server-side plan
+  cache reuse** (parse/plan once, execute many; the `?` placeholders key
+  the cache); **batching** (`addBatch`/`executeBatch` → one round-trip for
+  N rows — the T08 round-trip-economics recap), `setAutoCommit(false)` +
+  transaction control (T06), **try-with-resources** for deterministic
+  close (L1 AutoCloseable recap; the leaked-Connection = pool-exhaustion
+  bug). **Why pool**: a fresh connection costs TCP + TLS + auth +
+  session/backend allocation (Postgres forks a backend process!) =
+  tens of ms; DBs cap `max_connections` (memory per backend). **HikariCP**:
+  lightweight, fast; key knobs `maximumPoolSize`/`minimumIdle`/
+  `connectionTimeout`/`maxLifetime`/`idleTimeout`/`leakDetectionThreshold`.
+  **Architecture**: pool = **bounded resource** (Little's Law sizing);
+  the **small-pool paradox** (~`cores × 2 + effective_spindles`, NOT
+  hundreds — fewer connections = less context-switch/lock contention =
+  *higher* throughput); **sum-of-all-app-pools ≤ DB `max_connections`**
+  (the multi-instance trap); pool-exhaustion = `connectionTimeout` waits
+  then `SQLTransientConnectionException`. **Common mistakes** (leaked
+  connections, string-concatenated SQL [injection], pool sized too large,
+  per-instance pools ignoring the DB cap, autocommit-per-row in loops).
+  **INTERVIEW** + Practice + Recap. **Next → `../../L3-advanced-jvm/`**
+  (path verified). **Wired**: C05 README T09 row → complete + frontmatter
+  `status: complete`; L2 README C05 row → **complete**.
+- **🎉🎉 MILESTONE — L2 (Intermediate Java & Backend Foundations) COMPLETE: 44/44, 100%.**
+  All five concept chapters authored to the deep three-layer bar this
+  session: **C01** Functional & Modern Java (9), **C02** Build Tools &
+  Workflow (11), **C03** Networking & Web Fundamentals (11), **C04** Web &
+  REST Basics (4, deepened after the shallowness flag), **C05** Databases &
+  SQL (9). **Totals: 75/371 (20.2%).** L2 cross-cutting chapters (C06–C12)
+  remain `planned`. **⏸️ Paused for user checkpoint** — next options:
+  resume L3 (1/41, paused), author L2 C06–C12, or another direction. **Did
+  NOT auto-cross into L3** per the standing scope constraint (this session =
+  `content/L2-intermediate-backend/` + `PROGRESS.md` only).
+
+### 2026-06-04 (later — L2/C05/T08 Stored procs/views/triggers — L2 98%, T09 finishes L2)
+- `L2/C05/T08` Stored procedures, views, triggers — **214 ln / 2.7k
+  words, 1 Mermaid (round-trip economics app-N+1 vs proc-one-trip) +
+  proc-pros/cons table + SQL** at the deep bar (L2-only scope).
+  **Language**: **Views** (stored named query/virtual table, no data;
+  uses = simplify / **stable-interface-over-changing-schema** [C04/T03
+  contract] / **security** [grant-on-view-not-table, column/row hiding,
+  T03 DCL]; updatable-vs-readonly [join/agg = read-only, INSTEAD OF];
+  **materialized** = T04 stored+REFRESH recap). **Stored procs/functions**
+  (procedural SQL PL/pgSQL/T-SQL; function-returns-value-usable-in-query
+  vs procedure-side-effects-CALLed; **pros/cons table** — one-round-trip/
+  atomicity/centralization/security VS split-logic/hard-test-version-debug/
+  vendor-lock-in/DB-scaling). **Triggers** (BEFORE/AFTER/INSTEAD OF;
+  audit-log / **denorm-sync** [T04 the sync mechanism!] / complex-rules;
+  **the hidden-implicit-logic danger** + cascading + perf). **Architecture**:
+  **view = query-rewrite/inlining** (optimizer expands into outer query +
+  predicate-pushdown, no storage, "sees through" — T02; SQL example);
+  **the round-trip economics** (diagram — proc N-ops-one-round-trip vs app
+  **N+1** T2/C03-T5 RTT) **VS the DB-as-precious-unscalable-tier** (DB
+  stateful/single-primary hard-to-scale vs app stateless-scales-out-cheap
+  C03/T09 → **thin-DB/fat-app** modern default; where-does-CPU-go);
+  **triggers run IN the firing transaction** (T06 — slow=slow-write, fail=
+  abort, cascade→longer-txn locks-T07/bloat-T03); **business-logic-DB-vs-
+  app debate** (DB: perf/atomicity/centralization/security; app:
+  testability/versioning/portability/scalability). **Java**: CallableStatement
+  (T09), ORM-tension (views-ok/procs-awkward), **version DB code in Flyway**
+  (T03). IMPORTANT=view-is-a-free-abstraction (query-rewrite); WARNING=
+  triggers-invisible-in-transaction; TIP=thin-DB/fat-app, procs-only-when-
+  round-trip-dominates. 9 mistakes, 13 INTERVIEW, 14 Practice. Cross-links
+  T02/T03/T04/T06 + C03/T05/T09 + C04/T03; fwd T09. Progress 73 → 74/371
+  (19.7% → 19.9%); L2 row 42 → 43/44 (**98%**); C05 7/9 → 8/9. Wired C05
+  README. Resume `L2/C05/T09` JDBC & connection pooling (HikariCP) —
+  **THE LAST C05 TOPIC → C05 done (9/9) → L2 COMPLETE (44/44)**: JDBC
+  (DriverManager/Connection=session-txn/Statement-vs-PreparedStatement[SQL-
+  injection T03 + plan-cache]-vs-CallableStatement/ResultSet/batching/try-
+  with-resources); **connection pooling** (connections EXPENSIVE [TCP-C03T2
+  +TLS-C03T6+auth+session] + DB-caps-them → pool of pre-opened reused
+  conns; **HikariCP** Spring default; the **small-pool-paradox** ≈cores×2;
+  **pool exhaustion** from leaks/long-txns-T06/slow-queries; sum-of-pools≤
+  DB-max-connections C03/T09). Full §4 brief. **T09 COMPLETES L2 (44/44) —
+  milestone; checkpoint with the user after on next direction (L3, or other).**
+
+### 2026-06-04 (later — L2/C05/T07 Isolation levels & locking — concurrency capstone, L2 95%)
+- `L2/C05/T07` Isolation levels & locking — **223 ln / 3.2k words, 2
+  Mermaid (deadlock cycle + lost-update sequence) + anomalies/level×anomaly
+  tables** at the deep bar (concurrency-correctness CAPSTONE; L2-only
+  scope). **Language**: the **anomalies** table (dirty/non-repeatable/
+  phantom read + **lost update** + **write skew** [on-call-doctors]); **the
+  4 ANSI levels × anomaly table** (READ UNCOMMITTED/COMMITTED[**common
+  default!**]/REPEATABLE READ[snapshot iso in MVCC]/SERIALIZABLE);
+  **locking** (shared/exclusive, granularity/escalation, **SELECT FOR
+  UPDATE**/FOR SHARE, waits/timeout); **deadlocks** (diagram — detect-cycle
+  +abort-victim → retry; prevent via consistent lock order + short txns);
+  **optimistic vs pessimistic** (FOR-UPDATE-pessimistic vs **@Version**-
+  optimistic = DB twin of HTTP If-Match/412 C04/T01, retry-on-conflict).
+  **Architecture (deep)**: **MVCC-snapshots vs 2PL** (PG/InnoDB readers-
+  dont-block-writers via snapshots vs lock-based readers-block-writers);
+  **SERIALIZABLE on MVCC = SSI** (snapshot iso + track read-write
+  dependency cycles + abort-one → catches write-skew → **must retry**);
+  **isolation-vs-throughput trade** (stronger = more locking/aborts = less
+  concurrency → READ COMMITTED is the balanced default); **lost-update
+  mechanism** (diagram — both read 500, both write, one lost) + **3 fixes**
+  (atomic UPDATE SET col=col-1 / FOR UPDATE / @Version); **write skew**
+  (SI doesn't prevent — only SERIALIZABLE/SSI); MVCC-bloat from long txns
+  (T03/T06). **Java**: setTransactionIsolation/@Transactional(isolation),
+  **JPA @Version** → OptimisticLockException → retry, PESSIMISTIC_WRITE →
+  FOR UPDATE, retry-on-serialization-failure loop. IMPORTANT=default-is-
+  READ-COMMITTED + read-modify-write-lost-update-fixes; WARNING=snapshot-
+  iso-doesnt-prevent-write-skew (use SERIALIZABLE+retry); TIP=optimistic-
+  if-rare/pessimistic-if-frequent + consistent-lock-order. 8 mistakes, 14
+  INTERVIEW, 15 Practice. Cross-links T03/T05/T06 + C04/T01; fwd T08/T09.
+  Progress 72 → 73/371 (19.4% → 19.7%); L2 row 41 → 42/44 (**95%**); C05
+  6/9 → 7/9. Wired C05 README. Resume `L2/C05/T08` Stored procedures/views/
+  triggers (views=query-rewrite/inlining + materialized T04 + security-DCL;
+  stored procs=server-side procedural SQL, **round-trip economics** [N-ops-
+  one-round-trip vs app-N+1 C03/T05/T02] **vs DB-as-precious-unscalable-
+  tier** C03/T09 → thin-DB modern lean; triggers BEFORE/AFTER/INSTEAD-OF +
+  the **hidden-logic danger** + in-transaction T06; business-logic-in-DB-
+  vs-app debate). Full §4 brief. **After T08 → only T09 JDBC/HikariCP →
+  C05 done → L2 COMPLETE (44/44).**
+
+### 2026-06-04 (later — L2/C05/T06 Transactions & ACID)
+- `L2/C05/T06` Transactions & ACID — **201 ln / 2.8k words, 2 Mermaid
+  (WAL commit-path + 2PC) + ACID table + SQL code** at the deep bar
+  (L2-only scope). **Language**: transaction = atomic unit (BEGIN/COMMIT/
+  ROLLBACK, **bank-transfer** example, autocommit, **SAVEPOINT** partial
+  rollback); **ACID table** — **A**tomicity (all-or-nothing/undo),
+  **C**onsistency (valid→valid via constraints T05 + correct code; ≠ CAP's
+  C), **I**solation (concurrent snapshots → T07), **D**urability (survives
+  crash). **Architecture (the deep part)**: **Durability via the WAL**
+  (diagram — write-ahead rule, **fsync-at-commit = THE durability point**
+  not the data-page write, lazy page flush + checkpoints, **crash recovery
+  = replay WAL** redo-committed/undo-uncommitted, **group commit** batches
+  fsyncs, sequential-vs-random T01); **MVCC** = consistent snapshot →
+  readers-dont-block-writers (basis for Isolation T07); **durability-vs-
+  perf knob** (synchronous_commit=off → faster but loses last-few-committed-
+  txns on crash); **distributed: 2PC** (diagram — prepare+commit, slow+
+  **blocking** if coordinator dies) → **why microservices use sagas**
+  (local-txns + compensating-actions + idempotency C04/T01 + eventual-
+  consistency T04) + **CAP** (partition → C-or-A; single-node sidesteps
+  it); **transaction = a connection** (T09) → long-txn holds locks T07 +
+  pins pooled conn T09 + blocks VACUUM T03 → **keep txns short**. **Java**:
+  setAutoCommit(false)/commit/rollback (T09); **@Transactional**
+  (rollback-on-RuntimeException-not-checked + self-invocation-bypasses-proxy
+  gotchas). IMPORTANT=durability-via-WAL-fsync; WARNING=keep-txns-short;
+  TIP=sagas-not-2PC-across-services. 8 mistakes, 14 INTERVIEW, 14 Practice.
+  Cross-links T01/T03/T04/T05 + C03/T09 + C04/T01; fwd T07/T09. Progress
+  71 → 72/371 (19.1% → 19.4%); L2 row 40 → 41/44 (93%); C05 5/9 → 6/9.
+  Wired C05 README. Resume `L2/C05/T07` Isolation levels & locking —
+  **the concurrency-correctness CAPSTONE** (budget extra): read anomalies
+  (dirty/non-repeatable/phantom + lost-update + **write-skew**), 4 ANSI
+  levels (READ UNCOMMITTED/COMMITTED[default]/REPEATABLE READ/SERIALIZABLE)
+  × anomaly table, locking (shared/exclusive, granularity, FOR UPDATE),
+  **deadlocks** (detect+abort-victim, ordering), **optimistic-vs-pessimistic**
+  (@Version/If-Match C04/T01 vs FOR UPDATE), MVCC-vs-2PL/**SSI**, isolation-
+  vs-throughput. Full §4 brief. **After T07: T08 stored-procs/views/
+  triggers, T09 JDBC/HikariCP → C05 done → L2 COMPLETE (44/44).**
+
+### 2026-06-04 (later — L2/C05/T05 Keys/constraints/relationships [+indexing] — L2 crossed 90%)
+- `L2/C05/T05` Keys, constraints & relationships — **222 ln / 3.1k words,
+  2 Mermaid (relationship cardinalities 1:N/M:N-junction + composite-index
+  leftmost-prefix) + referential-actions table** at the deep bar (L2-only
+  scope). **This is the INDEXING topic** (no standalone one). **Language**:
+  **keys** (PK = unique-index + drives **clustering** T01 → monotonic/ULID
+  vs random-UUID page-splits; composite); **FK referential actions** table
+  (CASCADE/SET NULL/SET DEFAULT/RESTRICT/NO ACTION + **cascade-delete
+  danger** + FK-find-children needs child-FK-index); **constraint family**
+  (NOT NULL; **UNIQUE backed-by-index + the multi-NULL trap** + partial/
+  filtered unique for soft-deletes; CHECK; DEFAULT; EXCLUSION; **deferrable
+  IMMEDIATE/DEFERRED** = check-at-commit); **relationships** diagram (1:1,
+  **1:N FK-on-many-side**, **M:N junction/associative table** composite-PK,
+  self-ref→recursive-CTE T02). **Architecture — INDEXING DEEP-DIVE**:
+  B-tree recap T01; **clustered vs secondary** (InnoDB secondary = key+PK →
+  **double traversal**; Postgres heap+ctid); **composite-index leftmost-
+  prefix rule** (diagram — (a,b,c) serves a/a,b/a,b,c NOT b-alone; range
+  stops prefix; the keyset-pagination index C04/T03); **covering/index-only
+  scan** (+INCLUDE non-key cols, esp. InnoDB skips 2nd lookup); **partial/
+  filtered** + **functional/expression** (LOWER(email) → fixes T02 non-
+  sargability) + **unique** indexes; **when NOT to index** (low-selectivity/
+  boolean → optimizer ignores; write-amplification T03/T04; **selectivity**
+  = distinct/rows); index scan types T02; **constraints enforced BY indexes**
+  (PK/UNIQUE = unique index; FK check = index probe on parent PK; CHECK at
+  write → "integrity-by-construction T04 = indexes + write-time checks").
+  IMPORTANT=keys/constraints/indexes-one-system + index-FKs + leftmost-
+  prefix + write-cost; WARNING=UNIQUE-allows-multiple-NULLs + CASCADE-
+  deletes-wide; TIP=design-indexes-from-query-patterns + covering + skip-
+  low-selectivity. 9 mistakes, 14 INTERVIEW, 15 Practice. Cross-links
+  T01/T02/T03/T04 + C04/T03; fwd T06. Progress 70 → 71/371 (18.9% →
+  19.1%); **L2 row 39 → 40/44 (91% — crossed 90%)**; C05 4/9 → 5/9. Wired
+  C05 README. Resume `L2/C05/T06` Transactions & ACID (BEGIN/COMMIT/
+  ROLLBACK, ACID each letter, **WAL implements Atomicity+Durability** [fsync
+  = the durability point], MVCC snapshot [→ Isolation T07], 2PC + why-
+  microservices-avoid-it/sagas, durability-vs-perf knobs; Java setAutoCommit/
+  @Transactional). Full §4 brief; sets up T07 isolation.
+
+### 2026-06-04 (later — L2/C05/T04 Normalization & denormalization — 70 topics)
+- `L2/C05/T04` Normalization & denormalization — **200 ln / 2.8k words,
+  1 Mermaid (storage-vs-join-cost trade) + anomalies/normal-forms tables**
+  at the deep bar (L2-only scope). **Language**: **the 3 anomalies** table
+  (update/insert/delete from redundancy → single-source-of-truth);
+  **functional dependencies** (X→Y, determinant, partial/transitive);
+  **normal forms** table (1NF atomic / 2NF no-partial-dep / 3NF no-
+  transitive-dep / BCNF every-determinant-a-key) + **worked 1NF→BCNF
+  walkthrough** + **"key, whole key, nothing but the key"**; 4NF/5NF brief;
+  **denormalization** (precomputed aggregates/duplicated cols/flattened;
+  the **sync burden** via triggers-T08/app/materialized-refresh; read-time-
+  joins→write-time-consistency; when = read-heavy/measured/with-sync).
+  **Architecture**: **storage-vs-join-cost trade** (diagram — normalized
+  smaller→buffer-pool-T01 but joins-T02 vs denormalized bigger+write-
+  amplification+MVCC-bloat-T03 but join-free reads); **OLTP-normalized vs
+  OLAP star-schema** (fact+dimension, snowflake; T01 row-vs-column echo);
+  **materialized view = managed denormalization** (stored+refreshed vs
+  plain view = stored query; T08); **normalization↔FK-indexing** (FK cols
+  need indexes or scans, T02); **the consistency axis** = normalized=
+  consistency-by-construction (DB enforces) vs denormalized=consistency-
+  by-effort (you maintain; drift) → cache/replica are denormalized data
+  (CAP/eventual L4 fwd). 8 mistakes, 13 INTERVIEW, 14 Practice. Cross-
+  links T01/T02/T03 + C03/T10; fwd T05/T08. Progress 69 → **70/371**
+  (18.6% → 18.9%); L2 row 38 → 39/44 (89%); C05 3/9 → 4/9. Wired C05
+  README. Resume `L2/C05/T05` Keys, constraints & relationships — **this
+  is the INDEXING topic** (no standalone one): keys/FK-referential-actions/
+  constraints/deferrable, relationships 1:1/1:N/**M:N junction table**,
+  and the big **indexing** section (B-tree T01, clustered-vs-secondary,
+  **composite-index leftmost-prefix rule**, covering/index-only-scan,
+  partial/functional/unique indexes, when-NOT-to-index, FK-indexing,
+  constraints-enforced-by-index). Full §4 brief.
+
+### 2026-06-04 (later — L2/C05/T03 SQL DDL/DML/DCL)
+- `L2/C05/T03` SQL: DDL/DML/DCL — **227 ln / 2.9k words, 1 Mermaid
+  (DML→WAL→page→MVCC→VACUUM flow) + sub-languages table + SQL code** at
+  the deep bar (L2-only scope maintained). **Language**: the SQL **sub-
+  languages** table (DDL/DML/DQL/DCL/TCL); **DDL** — CREATE TABLE w/ full
+  constraint set (PK/FK +ON DELETE actions/UNIQUE/NOT NULL/CHECK/DEFAULT),
+  **types** (**DECIMAL-for-money-not-FLOAT** w/ 0.1+0.2 echo C04/T04,
+  **TIMESTAMPTZ** for instants), ALTER/DROP/**TRUNCATE-vs-DELETE**, indexes
+  (CONCURRENTLY/partial/functional)+views; **DML** — INSERT/INSERT-SELECT/
+  RETURNING, UPDATE/UPDATE-FROM, DELETE, **UPSERT/MERGE** (ON CONFLICT/ON
+  DUPLICATE KEY — idempotent-write, C04/T01 echo), set-based reminder;
+  **DCL** — GRANT/REVOKE/roles/**least-privilege** + RLS; **TCL** preview
+  (COMMIT/ROLLBACK/SAVEPOINT, **transactional-DDL gotcha** PG-yes vs
+  MySQL/Oracle-auto-commit). **Architecture**: **system catalog/data
+  dictionary** (schema is itself relational, meta-circular; planner reads
+  it); **DDL locks + table rewrites** (ACCESS EXCLUSIVE; cheap [nullable
+  col / PG11 const-default] vs expensive [type change/volatile default] →
+  **migrations are an ops concern**: CONCURRENTLY/NOT VALID/online-DDL
+  pt-osc/gh-ost; T07); **DML + WAL** (durability/D-in-ACID, diagram) **+
+  MVCC** (new row version + dead tuple → VACUUM/bloat → why TRUNCATE >>
+  DELETE); **sequences/auto-increment** (non-transactional → gaps normal,
+  contention, UUID/ULID vs index-locality T01 + IDOR C04/T03). **Java**:
+  Flyway/Liquibase **versioned migrations** (never hand-ALTER prod, C02
+  echo), **PreparedStatement/SQL-injection** (T09), least-privilege.
+  IMPORTANT=DDL-metadata-vs-DML-data+WAL (ALTER-rewrite-lock); WARNING=
+  missing-WHERE-disaster + TRUNCATE/DDL-auto-commit-in-MySQL/Oracle;
+  TIP=parameterize/DECIMAL/TIMESTAMPTZ/least-privilege. 9 mistakes, 13
+  INTERVIEW, 14 Practice. Cross-links T01/T02 + C04/T01/T03/T04, C02; fwd
+  T05/T06/T07/T09. Progress 68 → 69/371 (18.3% → 18.6%); L2 row 37 → 38/44
+  (86%); C05 2/9 → 3/9. Wired C05 README. Resume `L2/C05/T04` Normalization
+  & denormalization (anomalies, functional deps, 1NF-BCNF w/ examples,
+  denorm trade-off, OLTP-vs-star-schema, materialized views) — full §4
+  brief.
+
+### 2026-06-04 (later — L2/C05/T02 SQL queries; SCOPE: L2-only per user)
+- **User directive:** work scoped ONLY inside `content/L2-intermediate-
+  backend/` (freely edit anything there incl. READMEs) + PROGRESS.md;
+  do NOT touch L0/L1/L3/memory/other files (parallel session owns them).
+  Acknowledged; following it. Cross-refs to outside files stay read-only
+  links.
+- `L2/C05/T02` SQL: SELECT/JOINs/GROUP BY/subqueries — **280 ln / 3.4k
+  words, 1 Mermaid (logical query order) + 2 tables (join types, join
+  algorithms) + SQL code** at the deep bar (the longest C05 topic).
+  **Language**: **logical query-processing order** (FROM→WHERE→GROUP BY→
+  HAVING→SELECT→DISTINCT→ORDER BY→LIMIT; diagram; explains alias-in-
+  ORDER-BY-not-WHERE + aggregate-in-HAVING-not-WHERE); SELECT/WHERE (π/σ,
+  IN/BETWEEN/LIKE/IS NULL, NULL-3VL T01); **JOINs** (INNER/LEFT/RIGHT/
+  FULL/CROSS/SELF table; **the ON-vs-WHERE outer-join trap** w/ code —
+  outer-table cond in WHERE → silently INNER; **cartesian explosion**;
+  avoid NATURAL); **GROUP BY + aggregates** (COUNT(*)/COUNT(col)/
+  COUNT(DISTINCT), NULL-skip; every-non-agg-col-grouped; **HAVING vs
+  WHERE** w/ code; ROLLUP/CUBE); **subqueries** (scalar/derived,
+  **correlated-vs-uncorrelated** = per-row vs once; EXISTS-vs-IN; **the
+  NOT-IN-with-NULL empty-result trap → NOT EXISTS**); **CTEs** (+**
+  recursive** w/ org-chart code) + **window functions** (ROW_NUMBER/RANK/
+  LAG/running-SUM OVER PARTITION/ORDER — top-N-per-group, no self-joins;
+  keyset-pagination tie); set ops (UNION/UNION ALL/INTERSECT/EXCEPT).
+  **Architecture (executor)**: logical→physical plan from **statistics**/
+  histograms (stale stats = bad plans); **3 join algorithms** table
+  (nested-loop O(n·log m) w/ index, **hash** O(n+m) large unindexed
+  equi-join, **merge** O(n+m) sorted inputs); **EXPLAIN ANALYZE** (scan/
+  join type, est-vs-actual rows); **index seek O(log n) vs seq scan O(n)**
+  + **sargability** (killed by function-on-col / leading-wildcard LIKE
+  '%x' / implicit cast; covering/functional indexes) — T01 B-tree payoff;
+  **the N+1 problem** → one JOIN (C04/T04 ORM echo); **set-based vs row-
+  based** = the #1 SQL mindset. 9 mistakes, 14 INTERVIEW, 16 Practice.
+  Cross-links T01, C04/T03/T04; fwd T03/T05/T06/T09. Progress 67 → 68/371
+  (18.1% → 18.3%); L2 row 36 → 37/44 (84%); C05 1/9 → 2/9. Wired C05
+  README. Resume `L2/C05/T03` SQL DDL/DML/DCL (CREATE/ALTER/DROP +
+  constraints; INSERT/UPDATE/DELETE/MERGE/UPSERT; GRANT/REVOKE/roles;
+  transactional-DDL; architecture = DDL rewrites catalog + table-rewrites/
+  locks, DML + the WAL/MVCC preview T06, auto-increment/sequences). Deep
+  bar.
 
 ### 2026-06-04 (later — L2/C05/T01 Relational model — C05 STARTED, at the new deep bar)
 - **User had no preference at the checkpoint → curriculum order: started

@@ -9,9 +9,9 @@ difficulty: beginner
 order: 0
 tags: [module-index]
 prerequisites: [l0-foundations]
-status: planned
+status: complete
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-05
 ---
 
 # L1 — Core Java & OOP
@@ -33,16 +33,16 @@ Where Java starts to feel like Java. Think in objects and use the core language,
 
 | # | Section | Type | Status |
 |---|---------|------|--------|
-| 01 | [Object-Oriented Programming](C01-oop/) | concept | planned |
-| 02 | [Collections & Core APIs](C02-collections-and-core-apis/) | concept | planned |
-| 03 | [Testing Fundamentals](C03-testing-fundamentals/) | concept | planned |
-| 04 | [Tools & Environment](C04-tools-and-environment/) | tools | planned |
-| 05 | [Hands-On](C05-hands-on/) | hands-on | planned |
-| 06 | [Best Practices & Pitfalls](C06-best-practices/) | best-practices | planned |
-| 07 | [Interview Prep](C07-interview-prep/) | interview-prep | planned |
-| 08 | [Q&A / FAQ](C08-qa-faq/) | qa | planned |
-| 09 | [Cheatsheets & Reference](C09-cheatsheets/) | reference | planned |
-| 10 | [Resources](C10-resources/) | resources | planned |
+| 01 | [Object-Oriented Programming](C01-oop/) | concept | **complete** (19/19) |
+| 02 | [Collections & Core APIs](C02-collections-and-core-apis/) | concept | **complete** (23/23) |
+| 03 | [Testing Fundamentals](C03-testing-fundamentals/) | concept | **complete** (7/7) |
+| 04 | [Tools & Environment](C04-tools-and-environment/) | tools | **complete** |
+| 05 | [Hands-On](C05-hands-on/) | hands-on | **complete** |
+| 06 | [Best Practices & Pitfalls](C06-best-practices/) | best-practices | **complete** |
+| 07 | [Interview Prep](C07-interview-prep/) | interview-prep | **complete** |
+| 08 | [Q&A / FAQ](C08-qa-faq/) | qa | **complete** |
+| 09 | [Cheatsheets & Reference](C09-cheatsheets/) | reference | **complete** |
+| 10 | [Resources](C10-resources/) | resources | **complete** |
 
 ## Level project
 

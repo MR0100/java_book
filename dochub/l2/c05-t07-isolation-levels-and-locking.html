@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Isolation levels &amp; locking — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">7</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">54</span></a><a class="nav-link active" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">60</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">12</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">18</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">11</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">7</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🛰</span><span>Ch. 4 · L2 — Intermediate &amp; Backend</span></div><div class="chapter-path">content/L2-intermediate-backend/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l2/overview.html" data-q="l2 — intermediate java &amp; backend foundations content/l2-intermediate-backend/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · functional and modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><summary><span class="caret">▶</span><span>C01 · Functional And Modern Java</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — functional &amp; modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md"><a class="" href="../l2/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="lambda expressions content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md"><a class="" href="../l2/c01-t01-lambda-expressions.html"><span>Lambda expressions</span><span class="kind-pill "></span></a></li><li data-q="functional interfaces (function, predicate, supplier, consumer) content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md"><a class="" href="../l2/c01-t02-functional-interfaces-function-predicate-supplier-consumer.html"><span>Functional interfaces (Function, Predicate, Supplier, Consumer)</span><span class="kind-pill "></span></a></li><li data-q="method &amp; constructor references content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md"><a class="" href="../l2/c01-t03-method-and-constructor-references.html"><span>Method &amp; constructor references</span><span class="kind-pill "></span></a></li><li data-q="streams api (intermediate &amp; terminal operations) content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md"><a class="" href="../l2/c01-t04-streams-api-intermediate-and-terminal-operations.html"><span>Streams API (intermediate &amp; terminal operations)</span><span class="kind-pill "></span></a></li><li data-q="collectors &amp; grouping content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md"><a class="" href="../l2/c01-t05-collectors-and-grouping.html"><span>Collectors &amp; grouping</span><span class="kind-pill "></span></a></li><li data-q="parallel streams content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md"><a class="" href="../l2/c01-t06-parallel-streams.html"><span>Parallel streams</span><span class="kind-pill "></span></a></li><li data-q="optional in depth content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md"><a class="" href="../l2/c01-t07-optional-in-depth.html"><span>Optional in depth</span><span class="kind-pill "></span></a></li><li data-q="functional programming style &amp; immutability content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md"><a class="" href="../l2/c01-t08-functional-programming-style-and-immutability.html"><span>Functional programming style &amp; immutability</span><span class="kind-pill "></span></a></li><li data-q="new language features by version (java 8 to 21+) content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><a class="" href="../l2/c01-t09-new-language-features-by-version-java-8-to-21-plus.html"><span>New language features by version (Java 8 to 21+)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · build tools and workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><summary><span class="caret">▶</span><span>C02 · Build Tools And Workflow</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — build tools &amp; developer workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md"><a class="" href="../l2/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="maven (lifecycle, pom, dependencies, plugins) content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md"><a class="" href="../l2/c02-t01-maven-lifecycle-pom-dependencies-plugins.html"><span>Maven (lifecycle, POM, dependencies, plugins)</span><span class="kind-pill "></span></a></li><li data-q="gradle (tasks, build scripts, dependencies) content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md"><a class="" href="../l2/c02-t02-gradle-tasks-build-scripts-dependencies.html"><span>Gradle (tasks, build scripts, dependencies)</span><span class="kind-pill "></span></a></li><li data-q="dependency management &amp; version conflicts content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md"><a class="" href="../l2/c02-t03-dependency-management-and-version-conflicts.html"><span>Dependency management &amp; version conflicts</span><span class="kind-pill "></span></a></li><li data-q="multi-module projects content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md"><a class="" href="../l2/c02-t04-multi-module-projects.html"><span>Multi-module projects</span><span class="kind-pill "></span></a></li><li data-q="git workflows (branching, prs, rebasing) content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md"><a class="" href="../l2/c02-t05-git-workflows-branching-prs-rebasing.html"><span>Git workflows (branching, PRs, rebasing)</span><span class="kind-pill "></span></a></li><li data-q="code formatters &amp; linters (checkstyle, spotless) content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md"><a class="" href="../l2/c02-t06-code-formatters-and-linters-checkstyle-spotless.html"><span>Code formatters &amp; linters (Checkstyle, Spotless)</span><span class="kind-pill "></span></a></li><li data-q="static analysis (pmd, spotbugs, sonarqube) content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md"><a class="" href="../l2/c02-t07-static-analysis-pmd-spotbugs-sonarqube.html"><span>Static analysis (PMD, SpotBugs, SonarQube)</span><span class="kind-pill "></span></a></li><li data-q="lombok content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md"><a class="" href="../l2/c02-t08-lombok.html"><span>Lombok</span><span class="kind-pill "></span></a></li><li data-q="mapstruct content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md"><a class="" href="../l2/c02-t09-mapstruct.html"><span>MapStruct</span><span class="kind-pill "></span></a></li><li data-q="annotation processing content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md"><a class="" href="../l2/c02-t10-annotation-processing.html"><span>Annotation processing</span><span class="kind-pill "></span></a></li><li data-q="dependency vulnerability scanning content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><a class="" href="../l2/c02-t11-dependency-vulnerability-scanning.html"><span>Dependency vulnerability scanning</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · networking fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><summary><span class="caret">▶</span><span>C03 · Networking Fundamentals</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — networking &amp; web fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md"><a class="" href="../l2/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="osi &amp; tcp/ip models content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md"><a class="" href="../l2/c03-t01-osi-and-tcp-ip-models.html"><span>OSI &amp; TCP/IP models</span><span class="kind-pill "></span></a></li><li data-q="tcp vs udp content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md"><a class="" href="../l2/c03-t02-tcp-vs-udp.html"><span>TCP vs UDP</span><span class="kind-pill "></span></a></li><li data-q="ip, ports &amp; sockets content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md"><a class="" href="../l2/c03-t03-ip-ports-and-sockets.html"><span>IP, ports &amp; sockets</span><span class="kind-pill "></span></a></li><li data-q="dns (resolution, records) content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md"><a class="" href="../l2/c03-t04-dns-resolution-records.html"><span>DNS (resolution, records)</span><span class="kind-pill "></span></a></li><li data-q="http/https lifecycle content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md"><a class="" href="../l2/c03-t05-http-https-lifecycle.html"><span>HTTP/HTTPS lifecycle</span><span class="kind-pill "></span></a></li><li data-q="tls/ssl &amp; certificates content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md"><a class="" href="../l2/c03-t06-tls-ssl-and-certificates.html"><span>TLS/SSL &amp; certificates</span><span class="kind-pill "></span></a></li><li data-q="cookies, sessions &amp; tokens content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md"><a class="" href="../l2/c03-t07-cookies-sessions-and-tokens.html"><span>Cookies, sessions &amp; tokens</span><span class="kind-pill "></span></a></li><li data-q="proxies &amp; reverse proxies content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md"><a class="" href="../l2/c03-t08-proxies-and-reverse-proxies.html"><span>Proxies &amp; reverse proxies</span><span class="kind-pill "></span></a></li><li data-q="load balancers content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md"><a class="" href="../l2/c03-t09-load-balancers.html"><span>Load balancers</span><span class="kind-pill "></span></a></li><li data-q="cdns content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md"><a class="" href="../l2/c03-t10-cdns.html"><span>CDNs</span><span class="kind-pill "></span></a></li><li data-q="firewalls &amp; nat (basics) content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><a class="" href="../l2/c03-t11-firewalls-and-nat-basics.html"><span>Firewalls &amp; NAT (basics)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · web and rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><summary><span class="caret">▶</span><span>C04 · Web And REST Basics</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — web &amp; rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md"><a class="" href="../l2/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http in depth (methods, status, headers) content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md"><a class="" href="../l2/c04-t01-http-in-depth-methods-status-headers.html"><span>HTTP in depth (methods, status, headers)</span><span class="kind-pill "></span></a></li><li data-q="rest principles &amp; best practices content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md"><a class="" href="../l2/c04-t02-rest-principles-and-best-practices.html"><span>REST principles &amp; best practices</span><span class="kind-pill "></span></a></li><li data-q="api design (resources, versioning, pagination, filtering) content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md"><a class="" href="../l2/c04-t03-api-design-resources-versioning-pagination-filtering.html"><span>API design (resources, versioning, pagination, filtering)</span><span class="kind-pill "></span></a></li><li data-q="content negotiation &amp; serialization (json/xml, jackson) content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><a class="" href="../l2/c04-t04-content-negotiation-and-serialization-json-xml-jackson.html"><span>Content negotiation &amp; serialization (JSON/XML, Jackson)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c05 · databases and sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><summary><span class="caret">▶</span><span>C05 · Databases And SQL</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — databases &amp; sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md"><a class="" href="../l2/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="relational model &amp; terminology content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md"><a class="" href="../l2/c05-t01-relational-model-and-terminology.html"><span>Relational model &amp; terminology</span><span class="kind-pill "></span></a></li><li data-q="sql: select, joins, group by, subqueries content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md"><a class="" href="../l2/c05-t02-sql-select-joins-group-by-subqueries.html"><span>SQL: SELECT, JOINs, GROUP BY, subqueries</span><span class="kind-pill "></span></a></li><li data-q="sql: ddl/dml/dcl content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md"><a class="" href="../l2/c05-t03-sql-ddl-dml-dcl.html"><span>SQL: DDL/DML/DCL</span><span class="kind-pill "></span></a></li><li data-q="normalization &amp; denormalization content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md"><a class="" href="../l2/c05-t04-normalization-and-denormalization.html"><span>Normalization &amp; denormalization</span><span class="kind-pill "></span></a></li><li data-q="keys, constraints &amp; relationships content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md"><a class="" href="../l2/c05-t05-keys-constraints-and-relationships.html"><span>Keys, constraints &amp; relationships</span><span class="kind-pill "></span></a></li><li data-q="transactions &amp; acid content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md"><a class="" href="../l2/c05-t06-transactions-and-acid.html"><span>Transactions &amp; ACID</span><span class="kind-pill "></span></a></li><li data-q="isolation levels &amp; locking content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md"><a class="active" href="../l2/c05-t07-isolation-levels-and-locking.html"><span>Isolation levels &amp; locking</span><span class="kind-pill "></span></a></li><li data-q="stored procedures, views, triggers content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md"><a class="" href="../l2/c05-t08-stored-procedures-views-triggers.html"><span>Stored procedures, views, triggers</span><span class="kind-pill "></span></a></li><li data-q="jdbc &amp; connection pooling (hikaricp) content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><a class="" href="../l2/c05-t09-jdbc-and-connection-pooling-hikaricp.html"><span>JDBC &amp; connection pooling (HikariCP)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · tools and environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md"><summary><span class="caret">▶</span><span>C06 · Tools And Environment</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — tools &amp; environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md"><a class="" href="../l2/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="backend toolchain quick reference content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md"><a class="" href="../l2/c06-t01-backend-toolchain-quick-reference.html"><span>Backend Toolchain Quick Reference</span><span class="kind-pill "></span></a></li><li data-q="http &amp; api clients (curl, httpie, postman, devtools) content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md"><a class="" href="../l2/c06-t02-http-and-api-clients.html"><span>HTTP &amp; API Clients (curl, HTTPie, Postman, DevTools)</span><span class="kind-pill "></span></a></li><li data-q="database clients &amp; migration tools (psql, mysql, dbeaver, flyway, liquibase) content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md"><a class="" href="../l2/c06-t03-database-clients-and-migration-tools.html"><span>Database Clients &amp; Migration Tools (psql, mysql, DBeaver, Flyway, Liquibase)</span><span class="kind-pill "></span></a></li></ul></details><a class="mod-flat" href="../l2/c07-readme.html" data-q="intermediate java &amp; backend foundations — hands-on content/l2-intermediate-backend/c07-hands-on/readme.md c07 · hands on"><span>C07 · Hands On</span></a><a class="mod-flat" href="../l2/c08-readme.html" data-q="intermediate java &amp; backend foundations — best practices &amp; pitfalls content/l2-intermediate-backend/c08-best-practices/readme.md c08 · best practices"><span>C08 · Best Practices</span></a><a class="mod-flat" href="../l2/c09-readme.html" data-q="intermediate java &amp; backend foundations — interview prep content/l2-intermediate-backend/c09-interview-prep/readme.md c09 · interview prep"><span>C09 · Interview Prep</span></a><a class="mod-flat" href="../l2/c10-readme.html" data-q="intermediate java &amp; backend foundations — q&amp;a / faq content/l2-intermediate-backend/c10-qa-faq/readme.md c10 · qa faq"><span>C10 · QA FAQ</span></a><a class="mod-flat" href="../l2/c11-readme.html" data-q="intermediate java &amp; backend foundations — cheatsheets &amp; reference content/l2-intermediate-backend/c11-cheatsheets/readme.md c11 · cheatsheets"><span>C11 · Cheatsheets</span></a><a class="mod-flat" href="../l2/c12-readme.html" data-q="intermediate java &amp; backend foundations — resources content/l2-intermediate-backend/c12-resources/readme.md c12 · resources"><span>C12 · Resources</span></a></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l2/index.html">L2 — Intermediate &amp; Backend</a><span class="sep">/</span><span>Isolation levels &amp; locking</span></div>
+        <h1>Isolation levels &amp; locking</h1>
+        <div><span class="source-path">content/L2-intermediate-backend/C05-databases-and-sql/T07-isolation-levels-and-locking.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~135 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Isolation levels &amp; locking"
+slug: isolation-levels-and-locking
+level: L2
+module: "Intermediate Java &amp; Backend Foundations"
+section: "Databases &amp; SQL"
+type: concept
+difficulty: intermediate
+order: 7
+tags: [isolation-levels, locking, dirty-read, non-repeatable-read, phantom-read, lost-update, write-skew, read-committed, repeatable-read, serializable, shared-lock, exclusive-lock, select-for-update, deadlock, optimistic-concurrency, pessimistic-concurrency, mvcc, two-phase-locking, ssi, snapshot-isolation, version-column, isolation-vs-throughput]
+prerequisites: [transactions-and-acid, keys-constraints-and-relationships]
+status: complete
+estimated_minutes: 135
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="isolation-levels-locking">Isolation levels &amp; locking</h1>
+<p><a href="c05-t06-transactions-and-acid.html">T06</a> introduced the <strong>I</strong> in ACID — <strong>isolation</strong>, the promise that concurrent transactions don't corrupt each other. But perfect isolation (every transaction running as if it were alone) is <em>expensive</em>, so databases offer a spectrum of <strong>isolation levels</strong> that trade correctness for concurrency — each permitting certain <strong>anomalies</strong>. This is one of the most consequential and most <em>misunderstood</em> areas in all of backend engineering, because of one fact that surprises nearly everyone: <strong>the default isolation level in most databases is not the strongest.</strong> Your "obviously correct" transaction, reasoned about as if it ran alone, can be subtly and silently <em>wrong</em> the moment two of them run at once. This topic is the concurrency-correctness capstone of the chapter — the anomalies, the levels that prevent them, the locking that enforces them, deadlocks, and the optimistic-vs-pessimistic design choice that decides your throughput.</p>
+<p>The depth-bar: at the <strong>language</strong> layer, the read <strong>anomalies</strong>, the four <strong>isolation levels</strong> (and what each allows), <strong>locking</strong>, <strong>deadlocks</strong>, and <strong>optimistic vs pessimistic</strong> concurrency. At the <strong>architecture</strong> layer — the heart — how levels are <em>implemented</em> (<strong>MVCC snapshots vs two-phase locking</strong>), how <strong>SERIALIZABLE works on MVCC (SSI)</strong>, the <strong>isolation-vs-throughput</strong> trade, and the mechanics of the <strong>lost update</strong> and <strong>write skew</strong> that catch out even experienced engineers.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c05-t06-transactions-and-acid.html">Transactions &amp; ACID</a> (L2/C05/T06) — <strong>transactions, isolation as the "I", MVCC, keep-transactions-short</strong>; <a href="c05-t05-keys-constraints-and-relationships.html">Keys, constraints &amp; relationships</a> (L2/C05/T05) — <strong>row locks via <code>FOR UPDATE</code>, constraints</strong>.</p></div></div>
+<h2 id="the-anomalies-what-isolation-prevents">The Anomalies — What Isolation Prevents<a class="anchor" href="#the-anomalies-what-isolation-prevents" aria-hidden="true">#</a></h2>
+<p>When transactions interleave, specific bad outcomes become possible. The three classic <strong>read phenomena</strong> (defined by the ANSI standard), plus the two that bite hardest in practice:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Anomaly</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dirty read</strong></td>
+<td>T1 reads a row T2 changed but hasn't committed; if T2 rolls back, T1 saw data that never existed</td>
+</tr>
+<tr>
+<td><strong>Non-repeatable read</strong></td>
+<td>T1 reads a row; T2 commits a change to it; T1 re-reads → a <em>different</em> value, within one transaction</td>
+</tr>
+<tr>
+<td><strong>Phantom read</strong></td>
+<td>T1 runs a range query; T2 commits new rows matching it; T1 re-runs → new "phantom" rows appear</td>
+</tr>
+<tr>
+<td><strong>Lost update</strong></td>
+<td>T1 and T2 both read X, both compute a new value, both write — one write is silently overwritten</td>
+</tr>
+<tr>
+<td><strong>Write skew</strong></td>
+<td>T1 and T2 read an overlapping set, write <em>disjoint</em> rows, and together break an invariant each preserved alone</td>
+</tr>
+</tbody>
+</table></div>
+<p>The last two are the dangerous ones because they cause <em>real data corruption</em>, not just inconsistent reads. The <strong>lost update</strong> is the canonical concurrency bug (two <code>balance = balance - 100</code> from different sessions → one disappears). <strong>Write skew</strong> is subtler — the textbook example: two doctors each run "is <em>anyone else</em> still on call?", each sees "yes," and each goes off-call → now <strong>nobody</strong> is on call, an invariant ("at least one doctor on call") violated even though each transaction alone preserved it.</p>
+<h2 id="the-isolation-levels">The Isolation Levels<a class="anchor" href="#the-isolation-levels" aria-hidden="true">#</a></h2>
+<p>The four ANSI levels form a spectrum — each prevents more anomalies, at more cost:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th style="text-align: center;">Dirty read</th>
+<th style="text-align: center;">Non-repeatable read</th>
+<th style="text-align: center;">Phantom read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>READ UNCOMMITTED</strong></td>
+<td style="text-align: center;">✅ allowed</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td><strong>READ COMMITTED</strong> <em>(common default)</em></td>
+<td style="text-align: center;">❌ prevented</td>
+<td style="text-align: center;">✅ allowed</td>
+<td style="text-align: center;">✅ allowed</td>
+</tr>
+<tr>
+<td><strong>REPEATABLE READ</strong></td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">✅ (ANSI) / ❌ in MVCC</td>
+</tr>
+<tr>
+<td><strong>SERIALIZABLE</strong></td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: center;">❌ (and no write skew)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>READ UNCOMMITTED</strong> — allows even dirty reads. Rarely used; PostgreSQL doesn't implement it as distinct from READ COMMITTED.</li>
+<li><strong>READ COMMITTED</strong> — sees only <strong>committed</strong> data (no dirty reads), but each <em>statement</em> gets a fresh snapshot, so non-repeatable reads and phantoms are possible. <strong>This is the default in PostgreSQL, Oracle, and SQL Server</strong> — the fact that surprises people.</li>
+<li><strong>REPEATABLE READ</strong> — a <strong>stable snapshot for the whole transaction</strong>: re-reading a row always gives the same value (no non-repeatable reads). The ANSI standard still allows phantoms here, but <strong>MVCC implementations (PostgreSQL, MySQL/InnoDB) prevent phantoms too</strong> at this level (it's really <em>snapshot isolation</em>). InnoDB's default.</li>
+<li><strong>SERIALIZABLE</strong> — the result is guaranteed to be <em>as if</em> the transactions ran one after another. Prevents <strong>all</strong> anomalies, including write skew. The strongest and slowest.</li>
+</ul>
+<p>The practical takeaway: <strong>the default (READ COMMITTED) allows non-repeatable reads and phantoms</strong>, so code that reads a value, does some logic, and reads or writes again — assuming a stable view — is buggy under concurrency unless you raise the level or take an explicit lock.</p>
+<h2 id="locking">Locking<a class="anchor" href="#locking" aria-hidden="true">#</a></h2>
+<p>Locks coordinate concurrent access to the same data. The two fundamental modes:</p>
+<ul>
+<li><strong>Shared (S / read) lock</strong> — many transactions can hold it simultaneously; it blocks <em>writers</em>.</li>
+<li><strong>Exclusive (X / write) lock</strong> — only one holder; it blocks <em>everyone</em> (readers and writers).</li>
+</ul>
+<p>Locks have <strong>granularity</strong> — row, page, or table — where finer locks allow more concurrency but cost more bookkeeping, and <strong>lock escalation</strong> (a DB upgrading thousands of row locks to one table lock to save memory) can suddenly kill concurrency. <strong>Explicit locking</strong> lets you reach for a lock yourself: <strong><code>SELECT … FOR UPDATE</code></strong> takes an exclusive row lock now ("I'm about to update these — hold them for me"), and <code>FOR SHARE</code> takes a shared one. A transaction that can't get a lock <strong>waits</strong> (subject to a <code>lock_timeout</code>).</p>
+<h2 id="deadlocks">Deadlocks<a class="anchor" href="#deadlocks" aria-hidden="true">#</a></h2>
+<p>Locking creates the possibility of a <strong>deadlock</strong>: two transactions each hold a lock the other needs, so neither can proceed — a cycle.</p>
+<div class="mermaid">flowchart LR
+  T1["T1: holds lock on row A,<br/>wants row B"] -->|"waits for"| B["row B (held by T2)"]
+  T2["T2: holds lock on row B,<br/>wants row A"] -->|"waits for"| A["row A (held by T1)"]
+  B --- T2
+  A --- T1
+</div>
+<p>Databases <strong>detect</strong> deadlocks (by finding a cycle in the wait-for graph) and break them by <strong>aborting a victim</strong> transaction (rolling it back with a deadlock error) — so the application must be ready to <strong>retry</strong>. The way to <em>prevent</em> deadlocks is to <strong>acquire locks in a consistent order</strong> (e.g. always lock rows by ascending primary key) so a cycle can never form, and to keep transactions short (<a href="c05-t06-transactions-and-acid.html">T06</a>) so locks are held briefly.</p>
+<h2 id="optimistic-vs-pessimistic-concurrency">Optimistic vs Pessimistic Concurrency<a class="anchor" href="#optimistic-vs-pessimistic-concurrency" aria-hidden="true">#</a></h2>
+<p>The central design choice — <em>how</em> you protect a read-modify-write from conflicts:</p>
+<ul>
+<li><strong>Pessimistic</strong> — assume conflicts are likely; <strong>lock up front</strong> (<code>SELECT … FOR UPDATE</code>), forcing other transactions to wait until you commit. Correct and simple, but it serializes access (reduced concurrency) and risks deadlocks. Use it when conflicts are <em>frequent</em> or a lost update is unacceptable (decrementing inventory, booking the last seat).</li>
+<li><strong>Optimistic</strong> — assume conflicts are rare; <strong>don't lock</strong>. Instead, detect a conflict <em>at write time</em>: read a <strong>version</strong> (or timestamp) column, then write with <code>UPDATE … SET …, version = version + 1 WHERE id = ? AND version = :old_version</code>. If <strong>0 rows</strong> were updated, someone else changed it first → conflict → <strong>retry</strong>. This is the database-level twin of HTTP's <strong><code>If-Match</code>/ETag</strong> optimistic concurrency (<a href="c04-t01-http-in-depth-methods-status-headers.html">C04/T01</a> — the <code>412</code>). No locks are held, so throughput is high; the cost is occasional retries. Use it when conflicts are <em>rare</em> (most web CRUD).</li>
+</ul>
+<h2 id="memory-architecture-layer">Memory &amp; Architecture Layer<a class="anchor" href="#memory-architecture-layer" aria-hidden="true">#</a></h2>
+<h3 id="mvcc-snapshots-vs-two-phase-locking">MVCC Snapshots vs Two-Phase Locking<a class="anchor" href="#mvcc-snapshots-vs-two-phase-locking" aria-hidden="true">#</a></h3>
+<p>Isolation levels are <em>concepts</em>; databases implement them two very different ways:</p>
+<ul>
+<li><strong>MVCC databases</strong> (PostgreSQL, InnoDB, Oracle) — reads use <strong>snapshots</strong> (<a href="c05-t06-transactions-and-acid.html">T06</a>): each transaction sees the row versions valid as of a point in time, so <strong>readers never block writers and writers never block readers</strong>. A <em>level</em> is then "which snapshot do you see?" — READ COMMITTED takes a <em>fresh</em> snapshot per statement; REPEATABLE READ takes <em>one</em> snapshot for the whole transaction (this is <strong>snapshot isolation</strong>). Writes still take row locks to prevent two writers clobbering the same row.</li>
+<li><strong>Lock-based databases</strong> (the classic SQL Server default, and the textbook model) — <strong>Two-Phase Locking (2PL)</strong>: a transaction acquires locks in a <em>growing</em> phase and releases them in a <em>shrinking</em> phase; <strong>Strict 2PL</strong> holds all write locks until commit. Here readers <em>do</em> block writers and vice versa, giving straightforward serializability at the cost of concurrency.</li>
+</ul>
+<p>This is why "the same isolation level" can behave differently across engines, and why PostgreSQL's reads are so cheap (no read locks — just a snapshot).</p>
+<h3 id="serializable-on-mvcc-ssi">SERIALIZABLE on MVCC = SSI<a class="anchor" href="#serializable-on-mvcc-ssi" aria-hidden="true">#</a></h3>
+<p>Here's the subtle, important part. <strong>Snapshot isolation alone is NOT serializable</strong> — it prevents the ANSI three but <em>allows write skew</em> (the on-call-doctors bug happens precisely because each transaction reads a consistent snapshot and writes a <em>different</em> row). So how does PostgreSQL offer true SERIALIZABLE without locking everything? <strong>Serializable Snapshot Isolation (SSI)</strong>: it runs transactions under snapshot isolation but <strong>tracks the read-write dependencies</strong> between concurrent transactions, and if it detects a pattern of dependencies that <em>could</em> produce a non-serializable result (a dangerous cycle), it <strong>aborts one of them</strong> with a serialization failure. So <strong>SERIALIZABLE on MVCC = snapshot isolation + conflict detection + abort-and-retry</strong> — which is why correct SERIALIZABLE application code <em>must include a retry loop</em>.</p>
+<h3 id="the-isolation-vs-throughput-trade">The Isolation-vs-Throughput Trade<a class="anchor" href="#the-isolation-vs-throughput-trade" aria-hidden="true">#</a></h3>
+<p>The fundamental knob: <strong>stronger isolation costs concurrency.</strong> More isolation means more locking (in 2PL) or more aborts and retries (in SSI) or longer-held snapshots — all of which reduce throughput. <strong>READ COMMITTED is the common default precisely because it's a good balance</strong> — it eliminates the worst anomaly (dirty reads) cheaply. <strong>SERIALIZABLE</strong> is correct-by-default but you pay in contention and retry overhead. Choosing an isolation level is choosing <em>where on the correctness-vs-throughput curve you want to sit</em> — and the right answer is usually "READ COMMITTED, with explicit locking or optimistic versioning on the few operations that need more."</p>
+<h3 id="the-lost-update-mechanism-and-three-fixes">The Lost-Update Mechanism, and Three Fixes<a class="anchor" href="#the-lost-update-mechanism-and-three-fixes" aria-hidden="true">#</a></h3>
+<p>The canonical concurrency bug, mechanically:</p>
+<div class="mermaid">sequenceDiagram
+  participant T1
+  participant DB
+  participant T2
+  T1->>DB: read balance = 500
+  T2->>DB: read balance = 500
+  T1->>DB: write balance = 500 - 100 = 400
+  T2->>DB: write balance = 500 - 50 = 450   (T1's −100 is LOST)
+</div>
+<p>Both read 500, both compute from the <em>stale</em> value, and the second write overwrites the first — <code>$100</code> vanishes. Three correct fixes: <strong>(1) an atomic <code>UPDATE accounts SET balance = balance - 100 WHERE id = ?</code></strong> (the database does the read-modify-write itself under a row lock — the simplest fix); <strong>(2) <code>SELECT … FOR UPDATE</code></strong> before the read (pessimistic — T2 waits); <strong>(3) a <code>@Version</code> column</strong> (optimistic — T2's write fails the version check and retries). The lesson: <strong>never "read into the app, compute, write back" a value other transactions also modify</strong> without one of these.</p>
+<h3 id="write-skew-and-mvcc-bloat">Write Skew and MVCC Bloat<a class="anchor" href="#write-skew-and-mvcc-bloat" aria-hidden="true">#</a></h3>
+<p>Two final architectural notes. <strong>Write skew</strong> is the anomaly <em>only SERIALIZABLE catches</em> — snapshot isolation (REPEATABLE READ) lets it through because the two transactions touch <em>different</em> rows, so there's no write-write conflict to detect; only SSI's dependency tracking sees the danger. If your correctness depends on an invariant that spans rows which concurrent transactions both read and modify, you need SERIALIZABLE (and a retry loop). And the bloat tie (<a href="c05-t03-sql-ddl-dml-dcl.html">T03</a>/<a href="c05-t06-transactions-and-acid.html">T06</a>): a long-running transaction holds an old snapshot, so the old row versions it might still need <strong>can't be <code>VACUUM</code>ed</strong> — long transactions cause table bloat <em>as well as</em> lock contention. Yet another reason to keep them short.</p>
+<h3 id="java-angle">Java Angle<a class="anchor" href="#java-angle" aria-hidden="true">#</a></h3>
+<p>Set the level with <code>connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ)</code> or Spring's <code>@Transactional(isolation = Isolation.REPEATABLE_READ)</code>. <strong>JPA optimistic locking</strong> is the idiomatic Java pattern: annotate an entity field <code>@Version</code>, and Hibernate appends <code>WHERE version = ?</code> to every update and throws an <strong><code>OptimisticLockException</code></strong> (Spring's <code>ObjectOptimisticLockingFailureException</code>) on conflict — you catch it and retry. <strong>Pessimistic</strong> locking uses <code>LockModeType.PESSIMISTIC_WRITE</code> → <code>SELECT … FOR UPDATE</code>. And under SERIALIZABLE or optimistic locking, a transaction can be aborted to preserve correctness, so a <strong>retry-on-serialization-failure loop</strong> is part of correct code — not an afterthought.</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>The default isolation level in most databases is <strong>READ COMMITTED</strong>, <em>not</em> SERIALIZABLE — so your transaction can see <strong>non-repeatable reads and phantoms</strong>, and a naive <strong>read-modify-write</strong> (<code>x = read(); write(x - 1)</code>) silently <strong>loses updates</strong> under concurrency. Make read-modify-write safe with an <strong>atomic <code>UPDATE … SET col = col - 1</code></strong>, <strong><code>SELECT … FOR UPDATE</code></strong> (pessimistic), or a <strong><code>@Version</code> column</strong> (optimistic — the DB twin of HTTP <code>If-Match</code> — <a href="c04-t01-http-in-depth-methods-status-headers.html">C04/T01</a>). Never assume single-threaded reasoning holds under concurrent transactions.</p><p>[!WARNING]
+<strong>Snapshot isolation (REPEATABLE READ on PostgreSQL/InnoDB) does NOT prevent write skew.</strong> Two transactions can each read an overlapping set, write <strong>disjoint</strong> rows, and jointly violate an invariant each alone preserved (two doctors both go off-call because each saw the other on call). Only <strong>SERIALIZABLE</strong> (via <strong>SSI</strong> on MVCC) catches it — and SERIALIZABLE can <strong>abort</strong> a transaction to do so, so you <strong>must retry</strong> on serialization failures.</p>
+<p>[!TIP]
+Choose concurrency control by <strong>conflict rate</strong>: <strong>optimistic</strong> (a <code>@Version</code> column, retry on conflict) when conflicts are <strong>rare</strong> (most web CRUD) — no locks held, high throughput; <strong>pessimistic</strong> (<code>SELECT … FOR UPDATE</code>) when conflicts are <strong>frequent</strong> or a lost update is unacceptable (inventory, seat booking). Prevent <strong>deadlocks</strong> by acquiring locks in a <strong>consistent order</strong> (e.g. ascending PK) and keeping transactions short (<a href="c05-t06-transactions-and-acid.html">T06</a>).</p></div></div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="assuming-the-default-is-serializable">Assuming the Default Is SERIALIZABLE<a class="anchor" href="#assuming-the-default-is-serializable" aria-hidden="true">#</a></h3>
+<p>It's usually <strong>READ COMMITTED</strong> — non-repeatable reads and phantoms are allowed. Check your engine's default and raise it where correctness needs it.</p>
+<h3 id="read-modify-write-lost-update">Read-Modify-Write Lost Update<a class="anchor" href="#read-modify-write-lost-update" aria-hidden="true">#</a></h3>
+<p><code>x = read(); write(x-1)</code> from two sessions loses an update. Use atomic <code>UPDATE</code>, <code>FOR UPDATE</code>, or <code>@Version</code>.</p>
+<h3 id="deadlock-from-inconsistent-lock-order">Deadlock From Inconsistent Lock Order<a class="anchor" href="#deadlock-from-inconsistent-lock-order" aria-hidden="true">#</a></h3>
+<p>Two transactions locking rows in opposite order deadlock. Lock in a consistent order (ascending PK).</p>
+<h3 id="long-transactions-holding-locks">Long Transactions Holding Locks<a class="anchor" href="#long-transactions-holding-locks" aria-hidden="true">#</a></h3>
+<p>Contention plus <code>VACUUM</code>-blocking bloat (<a href="c05-t03-sql-ddl-dml-dcl.html">T03</a>/<a href="c05-t06-transactions-and-acid.html">T06</a>). Keep transactions short.</p>
+<h3 id="select-for-update-outside-a-transaction"><code>SELECT … FOR UPDATE</code> Outside a Transaction<a class="anchor" href="#select-for-update-outside-a-transaction" aria-hidden="true">#</a></h3>
+<p>In autocommit the lock is released immediately — no protection. Use it inside an explicit transaction.</p>
+<h3 id="over-or-under-using-serializable">Over- or Under-Using SERIALIZABLE<a class="anchor" href="#over-or-under-using-serializable" aria-hidden="true">#</a></h3>
+<p>Over: needless contention and aborts where READ COMMITTED + explicit locking suffices. Under: <strong>write skew</strong> slips through snapshot isolation. Match the level to the invariant.</p>
+<h3 id="not-handling-serializationoptimistic-retries">Not Handling Serialization/Optimistic Retries<a class="anchor" href="#not-handling-serializationoptimistic-retries" aria-hidden="true">#</a></h3>
+<p>SERIALIZABLE and optimistic locking <em>abort</em> on conflict by design — the app <strong>must retry</strong>. A missing retry loop turns a recoverable conflict into a user-facing error.</p>
+<h3 id="confusing-level-with-locking-strategy">Confusing Level With Locking Strategy<a class="anchor" href="#confusing-level-with-locking-strategy" aria-hidden="true">#</a></h3>
+<p>The isolation level sets defaults; explicit locks (<code>FOR UPDATE</code>) and optimistic versioning <em>add</em> to it. They're complementary, not alternatives.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>Isolation/locking is the deepest practical database topic — the standout answers nail the <strong>level × anomaly table</strong>, the <strong>lost-update fixes</strong>, and how <strong>SERIALIZABLE works on MVCC</strong>.</p><ol>
+<li><strong>The read anomalies?</strong> Dirty read, non-repeatable read, phantom read — plus <strong>lost update</strong> and <strong>write skew</strong>.</li>
+<li><strong>The four isolation levels and what each allows?</strong> READ UNCOMMITTED (dirty) → READ COMMITTED (non-repeatable + phantom) → REPEATABLE READ (phantom in ANSI, none in MVCC) → SERIALIZABLE (none).</li>
+<li><strong>What's the common default, and the gotcha?</strong> <strong>READ COMMITTED</strong> — allows non-repeatable reads/phantoms; a "stable view" assumption is unsafe.</li>
+<li><strong>Shared vs exclusive locks?</strong> Many readers (S, blocks writers) vs one writer (X, blocks all).</li>
+<li><strong>What is a deadlock and how is it handled?</strong> Two transactions each holding a lock the other needs → the DB detects the cycle and <strong>aborts a victim</strong>; prevent with consistent lock ordering.</li>
+<li><strong>Optimistic vs pessimistic concurrency?</strong> Pessimistic = lock up front (<code>FOR UPDATE</code>); optimistic = version-check at write (<code>@Version</code>), retry on conflict. Conflict rate decides.</li>
+<li><strong>How do you prevent a lost update?</strong> Atomic <code>UPDATE SET col = col - 1</code>, <code>SELECT … FOR UPDATE</code>, or a <code>@Version</code> column.</li>
+<li><strong>MVCC vs 2PL?</strong> MVCC = snapshots (readers don't block writers); 2PL = locks (readers block writers) — two ways to implement isolation.</li>
+<li><strong>How does SERIALIZABLE work on MVCC?</strong> <strong>SSI</strong> — snapshot isolation + tracking read-write dependency cycles + aborting one → no write skew (so you must retry).</li>
+<li><strong>What is write skew, and which level prevents it?</strong> Disjoint writes jointly breaking an invariant; <strong>only SERIALIZABLE</strong> catches it (snapshot isolation doesn't).</li>
+<li><strong>The isolation-vs-throughput trade?</strong> Stronger isolation = more locking/aborts/retries = less concurrency; pick the level for your correctness need.</li>
+<li><strong><code>@Version</code> optimistic locking in JPA?</strong> A version column; Hibernate adds <code>WHERE version = ?</code> and throws <code>OptimisticLockException</code> on conflict → retry.</li>
+<li><strong><code>SELECT … FOR UPDATE</code> — what and when?</strong> A pessimistic exclusive row lock for a read-modify-write; use inside a transaction.</li>
+<li><strong>Why retry on serialization failure?</strong> SERIALIZABLE/optimistic <em>abort</em> to preserve correctness; the app must retry the whole transaction.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Dirty read.</strong> Where supported (READ UNCOMMITTED), have two sessions show a dirty read.</li>
+<li><strong>Non-repeatable read.</strong> Reproduce it at READ COMMITTED; raise to REPEATABLE READ and watch it disappear.</li>
+<li><strong>Phantom.</strong> Reproduce at READ COMMITTED; observe MVCC REPEATABLE READ preventing it.</li>
+<li><strong>Lost update.</strong> Two sessions read-modify-write a balance; observe the lost update; fix it three ways (atomic <code>UPDATE</code>, <code>FOR UPDATE</code>, <code>@Version</code>).</li>
+<li><strong>Write skew.</strong> At REPEATABLE READ, two sessions each "go off call" and both succeed (invariant broken); switch to SERIALIZABLE and watch one abort.</li>
+<li><strong>Set levels.</strong> <code>SET TRANSACTION ISOLATION LEVEL …</code>; observe the behaviour change.</li>
+<li><strong><code>FOR UPDATE</code>.</strong> One session locks a row; another blocks until commit.</li>
+<li><strong>Deadlock.</strong> Two sessions lock rows in opposite order; observe the DB abort a victim; fix with consistent ordering.</li>
+<li><strong>Optimistic.</strong> Implement a version column; simulate a conflict; observe the failed update (0 rows) and the retry.</li>
+<li><strong>JPA <code>@Version</code>.</strong> Trigger an <code>OptimisticLockException</code>; add a retry.</li>
+<li><strong>JPA pessimistic.</strong> Use <code>PESSIMISTIC_WRITE</code>; observe the <code>FOR UPDATE</code> SQL.</li>
+<li><strong>SSI retry.</strong> At SERIALIZABLE, force a serialization failure; add a retry loop.</li>
+<li><strong>Throughput.</strong> Benchmark a contended workload at READ COMMITTED vs SERIALIZABLE.</li>
+<li><strong>Bloat.</strong> Hold a long REPEATABLE READ transaction; observe <code>VACUUM</code> can't reclaim old versions (<a href="c05-t03-sql-ddl-dml-dcl.html">T03</a>/<a href="c05-t06-transactions-and-acid.html">T06</a>).</li>
+<li><strong>Explain it back.</strong> For a "decrement inventory" operation under concurrency, (a) explain the lost-update hazard, (b) fix it pessimistically (<code>FOR UPDATE</code>) <em>and</em> optimistically (<code>@Version</code>), (c) which isolation level you'd need to also prevent overselling and why, (d) how a deadlock could arise and how to avoid it, and (e) the throughput trade.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Identify the <strong>anomalies</strong> — dirty read, non-repeatable read, phantom, <strong>lost update</strong>, <strong>write skew</strong> — and which are <em>read</em> phenomena vs <em>data-corruption</em> hazards.</li>
+<li>Place a transaction at the right <strong>isolation level</strong> using the <strong>level × anomaly</strong> table, knowing the <strong>default is READ COMMITTED</strong> (which allows non-repeatable reads/phantoms) and that <strong>MVCC REPEATABLE READ is snapshot isolation</strong>.</li>
+<li>Use <strong>locking</strong> — shared vs exclusive, <code>SELECT … FOR UPDATE</code>, granularity — and <strong>prevent/recover from deadlocks</strong> (consistent ordering, abort-a-victim + retry).</li>
+<li>Choose <strong>optimistic</strong> (<code>@Version</code>, retry — <a href="c04-t01-http-in-depth-methods-status-headers.html">C04/T01</a>) vs <strong>pessimistic</strong> (<code>FOR UPDATE</code>) concurrency by conflict rate, and <strong>fix a lost update</strong> three ways.</li>
+<li>Explain the <strong>architecture</strong>: <strong>MVCC snapshots vs 2PL</strong>, <strong>SERIALIZABLE = SSI</strong> (dependency tracking + abort), the <strong>isolation-vs-throughput</strong> trade, the <strong>lost-update</strong> and <strong>write-skew</strong> mechanics, and the MVCC-bloat cost of long transactions (<a href="c05-t06-transactions-and-acid.html">T06</a>) — and the Java side (<code>@Version</code>, <code>setTransactionIsolation</code>, retry loops) — avoiding the traps (assuming SERIALIZABLE default, lost updates, deadlock ordering, long transactions, missing retries, write skew).</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c05-t08-stored-procedures-views-triggers.html">Stored procedures, views, triggers</a>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Isolation levels &amp; locking&quot;
+slug: isolation-levels-and-locking
+level: L2
+module: &quot;Intermediate Java &amp; Backend Foundations&quot;
+section: &quot;Databases &amp; SQL&quot;
+type: concept
+difficulty: intermediate
+order: 7
+tags: [isolation-levels, locking, dirty-read, non-repeatable-read, phantom-read, lost-update, write-skew, read-committed, repeatable-read, serializable, shared-lock, exclusive-lock, select-for-update, deadlock, optimistic-concurrency, pessimistic-concurrency, mvcc, two-phase-locking, ssi, snapshot-isolation, version-column, isolation-vs-throughput]
+prerequisites: [transactions-and-acid, keys-constraints-and-relationships]
+status: complete
+estimated_minutes: 135
+last_updated: 2026-06-04
+---
+
+# Isolation levels &amp; locking
+
+[T06](./T06-transactions-and-acid.md) introduced the **I** in ACID — **isolation**, the promise that concurrent transactions don&#x27;t corrupt each other. But perfect isolation (every transaction running as if it were alone) is *expensive*, so databases offer a spectrum of **isolation levels** that trade correctness for concurrency — each permitting certain **anomalies**. This is one of the most consequential and most *misunderstood* areas in all of backend engineering, because of one fact that surprises nearly everyone: **the default isolation level in most databases is not the strongest.** Your &quot;obviously correct&quot; transaction, reasoned about as if it ran alone, can be subtly and silently *wrong* the moment two of them run at once. This topic is the concurrency-correctness capstone of the chapter — the anomalies, the levels that prevent them, the locking that enforces them, deadlocks, and the optimistic-vs-pessimistic design choice that decides your throughput.
+
+The depth-bar: at the **language** layer, the read **anomalies**, the four **isolation levels** (and what each allows), **locking**, **deadlocks**, and **optimistic vs pessimistic** concurrency. At the **architecture** layer — the heart — how levels are *implemented* (**MVCC snapshots vs two-phase locking**), how **SERIALIZABLE works on MVCC (SSI)**, the **isolation-vs-throughput** trade, and the mechanics of the **lost update** and **write skew** that catch out even experienced engineers.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Transactions &amp; ACID](./T06-transactions-and-acid.md) (L2/C05/T06) — **transactions, isolation as the &quot;I&quot;, MVCC, keep-transactions-short**; [Keys, constraints &amp; relationships](./T05-keys-constraints-and-relationships.md) (L2/C05/T05) — **row locks via `FOR UPDATE`, constraints**.
+
+## The Anomalies — What Isolation Prevents
+
+When transactions interleave, specific bad outcomes become possible. The three classic **read phenomena** (defined by the ANSI standard), plus the two that bite hardest in practice:
+
+| Anomaly | What happens |
+|---------|--------------|
+| **Dirty read** | T1 reads a row T2 changed but hasn&#x27;t committed; if T2 rolls back, T1 saw data that never existed |
+| **Non-repeatable read** | T1 reads a row; T2 commits a change to it; T1 re-reads → a *different* value, within one transaction |
+| **Phantom read** | T1 runs a range query; T2 commits new rows matching it; T1 re-runs → new &quot;phantom&quot; rows appear |
+| **Lost update** | T1 and T2 both read X, both compute a new value, both write — one write is silently overwritten |
+| **Write skew** | T1 and T2 read an overlapping set, write *disjoint* rows, and together break an invariant each preserved alone |
+
+The last two are the dangerous ones because they cause *real data corruption*, not just inconsistent reads. The **lost update** is the canonical concurrency bug (two `balance = balance - 100` from different sessions → one disappears). **Write skew** is subtler — the textbook example: two doctors each run &quot;is *anyone else* still on call?&quot;, each sees &quot;yes,&quot; and each goes off-call → now **nobody** is on call, an invariant (&quot;at least one doctor on call&quot;) violated even though each transaction alone preserved it.
+
+## The Isolation Levels
+
+The four ANSI levels form a spectrum — each prevents more anomalies, at more cost:
+
+| Level | Dirty read | Non-repeatable read | Phantom read |
+|-------|:----------:|:-------------------:|:------------:|
+| **READ UNCOMMITTED** | ✅ allowed | ✅ | ✅ |
+| **READ COMMITTED** *(common default)* | ❌ prevented | ✅ allowed | ✅ allowed |
+| **REPEATABLE READ** | ❌ | ❌ | ✅ (ANSI) / ❌ in MVCC |
+| **SERIALIZABLE** | ❌ | ❌ | ❌ (and no write skew) |
+
+- **READ UNCOMMITTED** — allows even dirty reads. Rarely used; PostgreSQL doesn&#x27;t implement it as distinct from READ COMMITTED.
+- **READ COMMITTED** — sees only **committed** data (no dirty reads), but each *statement* gets a fresh snapshot, so non-repeatable reads and phantoms are possible. **This is the default in PostgreSQL, Oracle, and SQL Server** — the fact that surprises people.
+- **REPEATABLE READ** — a **stable snapshot for the whole transaction**: re-reading a row always gives the same value (no non-repeatable reads). The ANSI standard still allows phantoms here, but **MVCC implementations (PostgreSQL, MySQL/InnoDB) prevent phantoms too** at this level (it&#x27;s really *snapshot isolation*). InnoDB&#x27;s default.
+- **SERIALIZABLE** — the result is guaranteed to be *as if* the transactions ran one after another. Prevents **all** anomalies, including write skew. The strongest and slowest.
+
+The practical takeaway: **the default (READ COMMITTED) allows non-repeatable reads and phantoms**, so code that reads a value, does some logic, and reads or writes again — assuming a stable view — is buggy under concurrency unless you raise the level or take an explicit lock.
+
+## Locking
+
+Locks coordinate concurrent access to the same data. The two fundamental modes:
+
+- **Shared (S / read) lock** — many transactions can hold it simultaneously; it blocks *writers*.
+- **Exclusive (X / write) lock** — only one holder; it blocks *everyone* (readers and writers).
+
+Locks have **granularity** — row, page, or table — where finer locks allow more concurrency but cost more bookkeeping, and **lock escalation** (a DB upgrading thousands of row locks to one table lock to save memory) can suddenly kill concurrency. **Explicit locking** lets you reach for a lock yourself: **`SELECT … FOR UPDATE`** takes an exclusive row lock now (&quot;I&#x27;m about to update these — hold them for me&quot;), and `FOR SHARE` takes a shared one. A transaction that can&#x27;t get a lock **waits** (subject to a `lock_timeout`).
+
+## Deadlocks
+
+Locking creates the possibility of a **deadlock**: two transactions each hold a lock the other needs, so neither can proceed — a cycle.
+
+```mermaid
+flowchart LR
+  T1[&quot;T1: holds lock on row A,&lt;br/&gt;wants row B&quot;] --&gt;|&quot;waits for&quot;| B[&quot;row B (held by T2)&quot;]
+  T2[&quot;T2: holds lock on row B,&lt;br/&gt;wants row A&quot;] --&gt;|&quot;waits for&quot;| A[&quot;row A (held by T1)&quot;]
+  B --- T2
+  A --- T1
+```
+
+Databases **detect** deadlocks (by finding a cycle in the wait-for graph) and break them by **aborting a victim** transaction (rolling it back with a deadlock error) — so the application must be ready to **retry**. The way to *prevent* deadlocks is to **acquire locks in a consistent order** (e.g. always lock rows by ascending primary key) so a cycle can never form, and to keep transactions short ([T06](./T06-transactions-and-acid.md)) so locks are held briefly.
+
+## Optimistic vs Pessimistic Concurrency
+
+The central design choice — *how* you protect a read-modify-write from conflicts:
+
+- **Pessimistic** — assume conflicts are likely; **lock up front** (`SELECT … FOR UPDATE`), forcing other transactions to wait until you commit. Correct and simple, but it serializes access (reduced concurrency) and risks deadlocks. Use it when conflicts are *frequent* or a lost update is unacceptable (decrementing inventory, booking the last seat).
+- **Optimistic** — assume conflicts are rare; **don&#x27;t lock**. Instead, detect a conflict *at write time*: read a **version** (or timestamp) column, then write with `UPDATE … SET …, version = version + 1 WHERE id = ? AND version = :old_version`. If **0 rows** were updated, someone else changed it first → conflict → **retry**. This is the database-level twin of HTTP&#x27;s **`If-Match`/ETag** optimistic concurrency ([C04/T01](../C04-web-and-rest-basics/T01-http-in-depth-methods-status-headers.md) — the `412`). No locks are held, so throughput is high; the cost is occasional retries. Use it when conflicts are *rare* (most web CRUD).
+
+## Memory &amp; Architecture Layer
+
+### MVCC Snapshots vs Two-Phase Locking
+
+Isolation levels are *concepts*; databases implement them two very different ways:
+
+- **MVCC databases** (PostgreSQL, InnoDB, Oracle) — reads use **snapshots** ([T06](./T06-transactions-and-acid.md)): each transaction sees the row versions valid as of a point in time, so **readers never block writers and writers never block readers**. A *level* is then &quot;which snapshot do you see?&quot; — READ COMMITTED takes a *fresh* snapshot per statement; REPEATABLE READ takes *one* snapshot for the whole transaction (this is **snapshot isolation**). Writes still take row locks to prevent two writers clobbering the same row.
+- **Lock-based databases** (the classic SQL Server default, and the textbook model) — **Two-Phase Locking (2PL)**: a transaction acquires locks in a *growing* phase and releases them in a *shrinking* phase; **Strict 2PL** holds all write locks until commit. Here readers *do* block writers and vice versa, giving straightforward serializability at the cost of concurrency.
+
+This is why &quot;the same isolation level&quot; can behave differently across engines, and why PostgreSQL&#x27;s reads are so cheap (no read locks — just a snapshot).
+
+### SERIALIZABLE on MVCC = SSI
+
+Here&#x27;s the subtle, important part. **Snapshot isolation alone is NOT serializable** — it prevents the ANSI three but *allows write skew* (the on-call-doctors bug happens precisely because each transaction reads a consistent snapshot and writes a *different* row). So how does PostgreSQL offer true SERIALIZABLE without locking everything? **Serializable Snapshot Isolation (SSI)**: it runs transactions under snapshot isolation but **tracks the read-write dependencies** between concurrent transactions, and if it detects a pattern of dependencies that *could* produce a non-serializable result (a dangerous cycle), it **aborts one of them** with a serialization failure. So **SERIALIZABLE on MVCC = snapshot isolation + conflict detection + abort-and-retry** — which is why correct SERIALIZABLE application code *must include a retry loop*.
+
+### The Isolation-vs-Throughput Trade
+
+The fundamental knob: **stronger isolation costs concurrency.** More isolation means more locking (in 2PL) or more aborts and retries (in SSI) or longer-held snapshots — all of which reduce throughput. **READ COMMITTED is the common default precisely because it&#x27;s a good balance** — it eliminates the worst anomaly (dirty reads) cheaply. **SERIALIZABLE** is correct-by-default but you pay in contention and retry overhead. Choosing an isolation level is choosing *where on the correctness-vs-throughput curve you want to sit* — and the right answer is usually &quot;READ COMMITTED, with explicit locking or optimistic versioning on the few operations that need more.&quot;
+
+### The Lost-Update Mechanism, and Three Fixes
+
+The canonical concurrency bug, mechanically:
+
+```mermaid
+sequenceDiagram
+  participant T1
+  participant DB
+  participant T2
+  T1-&gt;&gt;DB: read balance = 500
+  T2-&gt;&gt;DB: read balance = 500
+  T1-&gt;&gt;DB: write balance = 500 - 100 = 400
+  T2-&gt;&gt;DB: write balance = 500 - 50 = 450   (T1&#x27;s −100 is LOST)
+```
+
+Both read 500, both compute from the *stale* value, and the second write overwrites the first — `$100` vanishes. Three correct fixes: **(1) an atomic `UPDATE accounts SET balance = balance - 100 WHERE id = ?`** (the database does the read-modify-write itself under a row lock — the simplest fix); **(2) `SELECT … FOR UPDATE`** before the read (pessimistic — T2 waits); **(3) a `@Version` column** (optimistic — T2&#x27;s write fails the version check and retries). The lesson: **never &quot;read into the app, compute, write back&quot; a value other transactions also modify** without one of these.
+
+### Write Skew and MVCC Bloat
+
+Two final architectural notes. **Write skew** is the anomaly *only SERIALIZABLE catches* — snapshot isolation (REPEATABLE READ) lets it through because the two transactions touch *different* rows, so there&#x27;s no write-write conflict to detect; only SSI&#x27;s dependency tracking sees the danger. If your correctness depends on an invariant that spans rows which concurrent transactions both read and modify, you need SERIALIZABLE (and a retry loop). And the bloat tie ([T03](./T03-sql-ddl-dml-dcl.md)/[T06](./T06-transactions-and-acid.md)): a long-running transaction holds an old snapshot, so the old row versions it might still need **can&#x27;t be `VACUUM`ed** — long transactions cause table bloat *as well as* lock contention. Yet another reason to keep them short.
+
+### Java Angle
+
+Set the level with `connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ)` or Spring&#x27;s `@Transactional(isolation = Isolation.REPEATABLE_READ)`. **JPA optimistic locking** is the idiomatic Java pattern: annotate an entity field `@Version`, and Hibernate appends `WHERE version = ?` to every update and throws an **`OptimisticLockException`** (Spring&#x27;s `ObjectOptimisticLockingFailureException`) on conflict — you catch it and retry. **Pessimistic** locking uses `LockModeType.PESSIMISTIC_WRITE` → `SELECT … FOR UPDATE`. And under SERIALIZABLE or optimistic locking, a transaction can be aborted to preserve correctness, so a **retry-on-serialization-failure loop** is part of correct code — not an afterthought.
+
+&gt; [!IMPORTANT]
+&gt; The default isolation level in most databases is **READ COMMITTED**, *not* SERIALIZABLE — so your transaction can see **non-repeatable reads and phantoms**, and a naive **read-modify-write** (`x = read(); write(x - 1)`) silently **loses updates** under concurrency. Make read-modify-write safe with an **atomic `UPDATE … SET col = col - 1`**, **`SELECT … FOR UPDATE`** (pessimistic), or a **`@Version` column** (optimistic — the DB twin of HTTP `If-Match` — [C04/T01](../C04-web-and-rest-basics/T01-http-in-depth-methods-status-headers.md)). Never assume single-threaded reasoning holds under concurrent transactions.
+
+&gt; [!WARNING]
+&gt; **Snapshot isolation (REPEATABLE READ on PostgreSQL/InnoDB) does NOT prevent write skew.** Two transactions can each read an overlapping set, write **disjoint** rows, and jointly violate an invariant each alone preserved (two doctors both go off-call because each saw the other on call). Only **SERIALIZABLE** (via **SSI** on MVCC) catches it — and SERIALIZABLE can **abort** a transaction to do so, so you **must retry** on serialization failures.
+
+&gt; [!TIP]
+&gt; Choose concurrency control by **conflict rate**: **optimistic** (a `@Version` column, retry on conflict) when conflicts are **rare** (most web CRUD) — no locks held, high throughput; **pessimistic** (`SELECT … FOR UPDATE`) when conflicts are **frequent** or a lost update is unacceptable (inventory, seat booking). Prevent **deadlocks** by acquiring locks in a **consistent order** (e.g. ascending PK) and keeping transactions short ([T06](./T06-transactions-and-acid.md)).
+
+## Common Mistakes
+
+### Assuming the Default Is SERIALIZABLE
+
+It&#x27;s usually **READ COMMITTED** — non-repeatable reads and phantoms are allowed. Check your engine&#x27;s default and raise it where correctness needs it.
+
+### Read-Modify-Write Lost Update
+
+`x = read(); write(x-1)` from two sessions loses an update. Use atomic `UPDATE`, `FOR UPDATE`, or `@Version`.
+
+### Deadlock From Inconsistent Lock Order
+
+Two transactions locking rows in opposite order deadlock. Lock in a consistent order (ascending PK).
+
+### Long Transactions Holding Locks
+
+Contention plus `VACUUM`-blocking bloat ([T03](./T03-sql-ddl-dml-dcl.md)/[T06](./T06-transactions-and-acid.md)). Keep transactions short.
+
+### `SELECT … FOR UPDATE` Outside a Transaction
+
+In autocommit the lock is released immediately — no protection. Use it inside an explicit transaction.
+
+### Over- or Under-Using SERIALIZABLE
+
+Over: needless contention and aborts where READ COMMITTED + explicit locking suffices. Under: **write skew** slips through snapshot isolation. Match the level to the invariant.
+
+### Not Handling Serialization/Optimistic Retries
+
+SERIALIZABLE and optimistic locking *abort* on conflict by design — the app **must retry**. A missing retry loop turns a recoverable conflict into a user-facing error.
+
+### Confusing Level With Locking Strategy
+
+The isolation level sets defaults; explicit locks (`FOR UPDATE`) and optimistic versioning *add* to it. They&#x27;re complementary, not alternatives.
+
+&gt; [!INTERVIEW]
+&gt; Isolation/locking is the deepest practical database topic — the standout answers nail the **level × anomaly table**, the **lost-update fixes**, and how **SERIALIZABLE works on MVCC**.
+&gt;
+&gt; 1. **The read anomalies?** Dirty read, non-repeatable read, phantom read — plus **lost update** and **write skew**.
+&gt; 2. **The four isolation levels and what each allows?** READ UNCOMMITTED (dirty) → READ COMMITTED (non-repeatable + phantom) → REPEATABLE READ (phantom in ANSI, none in MVCC) → SERIALIZABLE (none).
+&gt; 3. **What&#x27;s the common default, and the gotcha?** **READ COMMITTED** — allows non-repeatable reads/phantoms; a &quot;stable view&quot; assumption is unsafe.
+&gt; 4. **Shared vs exclusive locks?** Many readers (S, blocks writers) vs one writer (X, blocks all).
+&gt; 5. **What is a deadlock and how is it handled?** Two transactions each holding a lock the other needs → the DB detects the cycle and **aborts a victim**; prevent with consistent lock ordering.
+&gt; 6. **Optimistic vs pessimistic concurrency?** Pessimistic = lock up front (`FOR UPDATE`); optimistic = version-check at write (`@Version`), retry on conflict. Conflict rate decides.
+&gt; 7. **How do you prevent a lost update?** Atomic `UPDATE SET col = col - 1`, `SELECT … FOR UPDATE`, or a `@Version` column.
+&gt; 8. **MVCC vs 2PL?** MVCC = snapshots (readers don&#x27;t block writers); 2PL = locks (readers block writers) — two ways to implement isolation.
+&gt; 9. **How does SERIALIZABLE work on MVCC?** **SSI** — snapshot isolation + tracking read-write dependency cycles + aborting one → no write skew (so you must retry).
+&gt; 10. **What is write skew, and which level prevents it?** Disjoint writes jointly breaking an invariant; **only SERIALIZABLE** catches it (snapshot isolation doesn&#x27;t).
+&gt; 11. **The isolation-vs-throughput trade?** Stronger isolation = more locking/aborts/retries = less concurrency; pick the level for your correctness need.
+&gt; 12. **`@Version` optimistic locking in JPA?** A version column; Hibernate adds `WHERE version = ?` and throws `OptimisticLockException` on conflict → retry.
+&gt; 13. **`SELECT … FOR UPDATE` — what and when?** A pessimistic exclusive row lock for a read-modify-write; use inside a transaction.
+&gt; 14. **Why retry on serialization failure?** SERIALIZABLE/optimistic *abort* to preserve correctness; the app must retry the whole transaction.
+
+## Practice
+
+1. **Dirty read.** Where supported (READ UNCOMMITTED), have two sessions show a dirty read.
+2. **Non-repeatable read.** Reproduce it at READ COMMITTED; raise to REPEATABLE READ and watch it disappear.
+3. **Phantom.** Reproduce at READ COMMITTED; observe MVCC REPEATABLE READ preventing it.
+4. **Lost update.** Two sessions read-modify-write a balance; observe the lost update; fix it three ways (atomic `UPDATE`, `FOR UPDATE`, `@Version`).
+5. **Write skew.** At REPEATABLE READ, two sessions each &quot;go off call&quot; and both succeed (invariant broken); switch to SERIALIZABLE and watch one abort.
+6. **Set levels.** `SET TRANSACTION ISOLATION LEVEL …`; observe the behaviour change.
+7. **`FOR UPDATE`.** One session locks a row; another blocks until commit.
+8. **Deadlock.** Two sessions lock rows in opposite order; observe the DB abort a victim; fix with consistent ordering.
+9. **Optimistic.** Implement a version column; simulate a conflict; observe the failed update (0 rows) and the retry.
+10. **JPA `@Version`.** Trigger an `OptimisticLockException`; add a retry.
+11. **JPA pessimistic.** Use `PESSIMISTIC_WRITE`; observe the `FOR UPDATE` SQL.
+12. **SSI retry.** At SERIALIZABLE, force a serialization failure; add a retry loop.
+13. **Throughput.** Benchmark a contended workload at READ COMMITTED vs SERIALIZABLE.
+14. **Bloat.** Hold a long REPEATABLE READ transaction; observe `VACUUM` can&#x27;t reclaim old versions ([T03](./T03-sql-ddl-dml-dcl.md)/[T06](./T06-transactions-and-acid.md)).
+15. **Explain it back.** For a &quot;decrement inventory&quot; operation under concurrency, (a) explain the lost-update hazard, (b) fix it pessimistically (`FOR UPDATE`) *and* optimistically (`@Version`), (c) which isolation level you&#x27;d need to also prevent overselling and why, (d) how a deadlock could arise and how to avoid it, and (e) the throughput trade.
+
+## Recap
+
+You should now be able to:
+
+- Identify the **anomalies** — dirty read, non-repeatable read, phantom, **lost update**, **write skew** — and which are *read* phenomena vs *data-corruption* hazards.
+- Place a transaction at the right **isolation level** using the **level × anomaly** table, knowing the **default is READ COMMITTED** (which allows non-repeatable reads/phantoms) and that **MVCC REPEATABLE READ is snapshot isolation**.
+- Use **locking** — shared vs exclusive, `SELECT … FOR UPDATE`, granularity — and **prevent/recover from deadlocks** (consistent ordering, abort-a-victim + retry).
+- Choose **optimistic** (`@Version`, retry — [C04/T01](../C04-web-and-rest-basics/T01-http-in-depth-methods-status-headers.md)) vs **pessimistic** (`FOR UPDATE`) concurrency by conflict rate, and **fix a lost update** three ways.
+- Explain the **architecture**: **MVCC snapshots vs 2PL**, **SERIALIZABLE = SSI** (dependency tracking + abort), the **isolation-vs-throughput** trade, the **lost-update** and **write-skew** mechanics, and the MVCC-bloat cost of long transactions ([T06](./T06-transactions-and-acid.md)) — and the Java side (`@Version`, `setTransactionIsolation`, retry loops) — avoiding the traps (assuming SERIALIZABLE default, lost updates, deadlock ordering, long transactions, missing retries, write skew).
+
+## Next
+
+Continue to [Stored procedures, views, triggers](./T08-stored-procedures-views-triggers.md).
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l2/c05-t06-transactions-and-acid.html"><div class="lbl">← Previous</div><div class="ttl">T06-transactions-and-acid</div><div class="sub">Transactions &amp; ACID</div></a><a class="next" href="../l2/c05-t08-stored-procedures-views-triggers.html"><div class="lbl">Next →</div><div class="ttl">T08-stored-procedures-views-triggers</div><div class="sub">Stored procedures, views, triggers</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-anomalies-what-isolation-prevents" data-toc-link>The Anomalies — What Isolation Prevents</a></li><li class="lvl-2"><a href="#the-isolation-levels" data-toc-link>The Isolation Levels</a></li><li class="lvl-2"><a href="#locking" data-toc-link>Locking</a></li><li class="lvl-2"><a href="#deadlocks" data-toc-link>Deadlocks</a></li><li class="lvl-2"><a href="#optimistic-vs-pessimistic-concurrency" data-toc-link>Optimistic vs Pessimistic Concurrency</a></li><li class="lvl-2"><a href="#memory-architecture-layer" data-toc-link>Memory &amp;amp; Architecture Layer</a></li><li class="lvl-3"><a href="#mvcc-snapshots-vs-two-phase-locking" data-toc-link>MVCC Snapshots vs Two-Phase Locking</a></li><li class="lvl-3"><a href="#serializable-on-mvcc-ssi" data-toc-link>SERIALIZABLE on MVCC = SSI</a></li><li class="lvl-3"><a href="#the-isolation-vs-throughput-trade" data-toc-link>The Isolation-vs-Throughput Trade</a></li><li class="lvl-3"><a href="#the-lost-update-mechanism-and-three-fixes" data-toc-link>The Lost-Update Mechanism, and Three Fixes</a></li><li class="lvl-3"><a href="#write-skew-and-mvcc-bloat" data-toc-link>Write Skew and MVCC Bloat</a></li><li class="lvl-3"><a href="#java-angle" data-toc-link>Java Angle</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#assuming-the-default-is-serializable" data-toc-link>Assuming the Default Is SERIALIZABLE</a></li><li class="lvl-3"><a href="#read-modify-write-lost-update" data-toc-link>Read-Modify-Write Lost Update</a></li><li class="lvl-3"><a href="#deadlock-from-inconsistent-lock-order" data-toc-link>Deadlock From Inconsistent Lock Order</a></li><li class="lvl-3"><a href="#long-transactions-holding-locks" data-toc-link>Long Transactions Holding Locks</a></li><li class="lvl-3"><a href="#select-for-update-outside-a-transaction" data-toc-link>SELECT … FOR UPDATE Outside a Transaction</a></li><li class="lvl-3"><a href="#over-or-under-using-serializable" data-toc-link>Over- or Under-Using SERIALIZABLE</a></li><li class="lvl-3"><a href="#not-handling-serializationoptimistic-retries" data-toc-link>Not Handling Serialization/Optimistic Retries</a></li><li class="lvl-3"><a href="#confusing-level-with-locking-strategy" data-toc-link>Confusing Level With Locking Strategy</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

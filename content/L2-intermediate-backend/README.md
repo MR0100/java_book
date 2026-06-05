@@ -9,9 +9,9 @@ difficulty: intermediate
 order: 0
 tags: [module-index]
 prerequisites: [l1-core-java-and-oop]
-status: planned
+status: complete
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-05
 ---
 
 # L2 — Intermediate Java & Backend Foundations
@@ -37,14 +37,14 @@ Modern idiomatic Java plus the backend vocabulary every server-side developer ne
 | 02 | [Build Tools & Developer Workflow](C02-build-tools-and-workflow/) | concept | **complete** |
 | 03 | [Networking & Web Fundamentals](C03-networking-fundamentals/) | concept | **complete** |
 | 04 | [Web & REST Basics](C04-web-and-rest-basics/) | concept | **complete** |
-| 05 | [Databases & SQL](C05-databases-and-sql/) | concept | planned |
-| 06 | [Tools & Environment](C06-tools-and-environment/) | tools | planned |
-| 07 | [Hands-On](C07-hands-on/) | hands-on | planned |
-| 08 | [Best Practices & Pitfalls](C08-best-practices/) | best-practices | planned |
-| 09 | [Interview Prep](C09-interview-prep/) | interview-prep | planned |
-| 10 | [Q&A / FAQ](C10-qa-faq/) | qa | planned |
-| 11 | [Cheatsheets & Reference](C11-cheatsheets/) | reference | planned |
-| 12 | [Resources](C12-resources/) | resources | planned |
+| 05 | [Databases & SQL](C05-databases-and-sql/) | concept | **complete** |
+| 06 | [Tools & Environment](C06-tools-and-environment/) | tools | **complete** |
+| 07 | [Hands-On](C07-hands-on/) | hands-on | **complete** |
+| 08 | [Best Practices & Pitfalls](C08-best-practices/) | best-practices | **complete** |
+| 09 | [Interview Prep](C09-interview-prep/) | interview-prep | **complete** |
+| 10 | [Q&A / FAQ](C10-qa-faq/) | qa | **complete** |
+| 11 | [Cheatsheets & Reference](C11-cheatsheets/) | reference | **complete** |
+| 12 | [Resources](C12-resources/) | resources | **complete** |
 
 ## Level project
 

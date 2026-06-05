@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>equals, hashCode, toString contracts — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">7</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link active" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">54</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">60</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">12</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">18</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">11</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">7</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧬</span><span>Ch. 3 · L1 — Core Java &amp; OOP</span></div><div class="chapter-path">content/L1-core-java/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l1/overview.html" data-q="l1 — core java &amp; oop content/l1-core-java/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · oop content/l1-core-java/c01-oop/readme.md content/l1-core-java/c01-oop/t01-classes-and-objects.md content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md content/l1-core-java/c01-oop/t04-inheritance-and-super.md content/l1-core-java/c01-oop/t05-method-overriding.md content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md content/l1-core-java/c01-oop/t14-record-types.md content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md content/l1-core-java/c01-oop/t16-packages-and-imports.md content/l1-core-java/c01-oop/t17-java-module-system-jpms.md content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><summary><span class="caret">▶</span><span>C01 · OOP</span></summary><ul class="pages"><li data-q="core java &amp; oop — object-oriented programming content/l1-core-java/c01-oop/readme.md"><a class="" href="../l1/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="classes &amp; objects content/l1-core-java/c01-oop/t01-classes-and-objects.md"><a class="" href="../l1/c01-t01-classes-and-objects.html"><span>Classes &amp; Objects</span><span class="kind-pill "></span></a></li><li data-q="fields, methods, constructors, this content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md"><a class="" href="../l1/c01-t02-fields-methods-constructors-this.html"><span>Fields, methods, constructors, this</span><span class="kind-pill "></span></a></li><li data-q="encapsulation &amp; access modifiers content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md"><a class="" href="../l1/c01-t03-encapsulation-and-access-modifiers.html"><span>Encapsulation &amp; access modifiers</span><span class="kind-pill "></span></a></li><li data-q="inheritance &amp; super content/l1-core-java/c01-oop/t04-inheritance-and-super.md"><a class="" href="../l1/c01-t04-inheritance-and-super.html"><span>Inheritance &amp; super</span><span class="kind-pill "></span></a></li><li data-q="method overriding content/l1-core-java/c01-oop/t05-method-overriding.md"><a class="" href="../l1/c01-t05-method-overriding.html"><span>Method overriding</span><span class="kind-pill "></span></a></li><li data-q="polymorphism (compile-time vs runtime) content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md"><a class="" href="../l1/c01-t06-polymorphism-compile-time-vs-runtime.html"><span>Polymorphism (compile-time vs runtime)</span><span class="kind-pill "></span></a></li><li data-q="abstraction &amp; abstract classes content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md"><a class="" href="../l1/c01-t07-abstraction-and-abstract-classes.html"><span>Abstraction &amp; abstract classes</span><span class="kind-pill "></span></a></li><li data-q="interfaces (default, static, private methods) content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md"><a class="" href="../l1/c01-t08-interfaces-default-static-private-methods.html"><span>Interfaces (default, static, private methods)</span><span class="kind-pill "></span></a></li><li data-q="object class &amp; its methods content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md"><a class="" href="../l1/c01-t09-object-class-and-its-methods.html"><span>Object class &amp; its methods</span><span class="kind-pill "></span></a></li><li data-q="equals, hashcode, tostring contracts content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md"><a class="active" href="../l1/c01-t10-equals-hashcode-tostring-contracts.html"><span>equals, hashCode, toString contracts</span><span class="kind-pill "></span></a></li><li data-q="static members, blocks &amp; nested classes content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md"><a class="" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><span>static members, blocks &amp; nested classes</span><span class="kind-pill "></span></a></li><li data-q="inner, local &amp; anonymous classes content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md"><a class="" href="../l1/c01-t12-inner-local-and-anonymous-classes.html"><span>Inner, local &amp; anonymous classes</span><span class="kind-pill "></span></a></li><li data-q="enum types (with fields/methods) content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md"><a class="" href="../l1/c01-t13-enum-types-with-fields-methods.html"><span>enum types (with fields/methods)</span><span class="kind-pill "></span></a></li><li data-q="record types content/l1-core-java/c01-oop/t14-record-types.md"><a class="" href="../l1/c01-t14-record-types.html"><span>record types</span><span class="kind-pill "></span></a></li><li data-q="sealed classes &amp; interfaces content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md"><a class="" href="../l1/c01-t15-sealed-classes-and-interfaces.html"><span>Sealed classes &amp; interfaces</span><span class="kind-pill "></span></a></li><li data-q="packages &amp; imports content/l1-core-java/c01-oop/t16-packages-and-imports.md"><a class="" href="../l1/c01-t16-packages-and-imports.html"><span>Packages &amp; imports</span><span class="kind-pill "></span></a></li><li data-q="java module system (jpms) content/l1-core-java/c01-oop/t17-java-module-system-jpms.md"><a class="" href="../l1/c01-t17-java-module-system-jpms.html"><span>Java Module System (JPMS)</span><span class="kind-pill "></span></a></li><li data-q="object cloning &amp; cloneable content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md"><a class="" href="../l1/c01-t18-object-cloning-and-cloneable.html"><span>Object cloning &amp; Cloneable</span><span class="kind-pill "></span></a></li><li data-q="immutability &amp; immutable class design content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><a class="" href="../l1/c01-t19-immutability-and-immutable-class-design.html"><span>Immutability &amp; immutable class design</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · collections and core apis content/l1-core-java/c02-collections-and-core-apis/readme.md content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md content/l1-core-java/c02-collections-and-core-apis/t19-optional.md content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><summary><span class="caret">▶</span><span>C02 · Collections And Core APIs</span></summary><ul class="pages"><li data-q="core java &amp; oop — collections &amp; core apis content/l1-core-java/c02-collections-and-core-apis/readme.md"><a class="" href="../l1/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="collections framework overview content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md"><a class="" href="../l1/c02-t01-collections-framework-overview.html"><span>Collections framework overview</span><span class="kind-pill "></span></a></li><li data-q="list (arraylist, linkedlist) content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md"><a class="" href="../l1/c02-t02-list-arraylist-linkedlist.html"><span>List (ArrayList, LinkedList)</span><span class="kind-pill "></span></a></li><li data-q="set (hashset, linkedhashset, treeset) content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md"><a class="" href="../l1/c02-t03-set-hashset-linkedhashset-treeset.html"><span>Set (HashSet, LinkedHashSet, TreeSet)</span><span class="kind-pill "></span></a></li><li data-q="map (hashmap, linkedhashmap, treemap) content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md"><a class="" href="../l1/c02-t04-map-hashmap-linkedhashmap-treemap.html"><span>Map (HashMap, LinkedHashMap, TreeMap)</span><span class="kind-pill "></span></a></li><li data-q="queue, deque, priorityqueue, stack content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md"><a class="" href="../l1/c02-t05-queue-deque-priorityqueue-stack.html"><span>Queue, Deque, PriorityQueue, Stack</span><span class="kind-pill "></span></a></li><li data-q="iterators &amp; iterable content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md"><a class="" href="../l1/c02-t06-iterators-and-iterable.html"><span>Iterators &amp; Iterable</span><span class="kind-pill "></span></a></li><li data-q="comparable vs comparator content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md"><a class="" href="../l1/c02-t07-comparable-vs-comparator.html"><span>Comparable vs Comparator</span><span class="kind-pill "></span></a></li><li data-q="collection performance characteristics (big-o) content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md"><a class="" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><span>Collection Performance Characteristics (Big-O)</span><span class="kind-pill "></span></a></li><li data-q="exceptions: try/catch/finally, checked vs unchecked content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md"><a class="" href="../l1/c02-t09-exceptions-try-catch-finally-checked-vs-unchecked.html"><span>Exceptions: try/catch/finally, checked vs unchecked</span><span class="kind-pill "></span></a></li><li data-q="custom exceptions &amp; try-with-resources content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md"><a class="" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><span>Custom exceptions &amp; try-with-resources</span><span class="kind-pill "></span></a></li><li data-q="generics — basics content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md"><a class="" href="../l1/c02-t11-generics-basics.html"><span>Generics — basics</span><span class="kind-pill "></span></a></li><li data-q="generics — bounded types, wildcards, type erasure content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md"><a class="" href="../l1/c02-t12-generics-bounded-types-wildcards-type-erasure.html"><span>Generics — bounded types, wildcards, type erasure</span><span class="kind-pill "></span></a></li><li data-q="i/o streams (byte &amp; character) content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md"><a class="" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><span>I/O streams (byte &amp; character)</span><span class="kind-pill "></span></a></li><li data-q="nio.2 (path, files, channels) content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md"><a class="" href="../l1/c02-t14-nio-2-path-files-channels.html"><span>NIO.2 (Path, Files, channels)</span><span class="kind-pill "></span></a></li><li data-q="date/time api (java.time) content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md"><a class="" href="../l1/c02-t15-date-time-api-java-time.html"><span>Date/Time API (java.time)</span><span class="kind-pill "></span></a></li><li data-q="regular expressions content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md"><a class="" href="../l1/c02-t16-regular-expressions.html"><span>Regular expressions</span><span class="kind-pill "></span></a></li><li data-q="reflection content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md"><a class="" href="../l1/c02-t17-reflection.html"><span>Reflection</span><span class="kind-pill "></span></a></li><li data-q="annotations (using &amp; writing meta-annotations) content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md"><a class="" href="../l1/c02-t18-annotations-using-and-writing-meta-annotations.html"><span>Annotations (using &amp; writing meta-annotations)</span><span class="kind-pill "></span></a></li><li data-q="optional content/l1-core-java/c02-collections-and-core-apis/t19-optional.md"><a class="" href="../l1/c02-t19-optional.html"><span>Optional</span><span class="kind-pill "></span></a></li><li data-q="math, bigdecimal / biginteger, random content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md"><a class="" href="../l1/c02-t20-math-bigdecimal-biginteger-random.html"><span>Math, BigDecimal / BigInteger, Random</span><span class="kind-pill "></span></a></li><li data-q="serialization &amp; deserialization content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md"><a class="" href="../l1/c02-t21-serialization-and-deserialization.html"><span>Serialization &amp; deserialization</span><span class="kind-pill "></span></a></li><li data-q="networking (socket, httpclient) content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md"><a class="" href="../l1/c02-t22-networking-socket-httpclient.html"><span>Networking (Socket, HttpClient)</span><span class="kind-pill "></span></a></li><li data-q="internationalization (i18n) &amp; formatting content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><a class="" href="../l1/c02-t23-internationalization-i18n-and-formatting.html"><span>Internationalization (i18n) &amp; formatting</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><summary><span class="caret">▶</span><span>C03 · Testing Fundamentals</span></summary><ul class="pages"><li data-q="core java &amp; oop — testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md"><a class="" href="../l1/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="unit testing with junit 5 content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><a class="" href="../l1/c03-t01-unit-testing-with-junit-5.html"><span>Unit testing with JUnit 5</span><span class="kind-pill "></span></a></li></ul></details><a class="mod-flat" href="../l1/c04-readme.html" data-q="core java &amp; oop — tools &amp; environment content/l1-core-java/c04-tools-and-environment/readme.md c04 · tools and environment"><span>C04 · Tools And Environment</span></a><a class="mod-flat" href="../l1/c05-readme.html" data-q="core java &amp; oop — hands-on content/l1-core-java/c05-hands-on/readme.md c05 · hands on"><span>C05 · Hands On</span></a><a class="mod-flat" href="../l1/c06-readme.html" data-q="core java &amp; oop — best practices &amp; pitfalls content/l1-core-java/c06-best-practices/readme.md c06 · best practices"><span>C06 · Best Practices</span></a><a class="mod-flat" href="../l1/c07-readme.html" data-q="core java &amp; oop — interview prep content/l1-core-java/c07-interview-prep/readme.md c07 · interview prep"><span>C07 · Interview Prep</span></a><a class="mod-flat" href="../l1/c08-readme.html" data-q="core java &amp; oop — q&amp;a / faq content/l1-core-java/c08-qa-faq/readme.md c08 · qa faq"><span>C08 · QA FAQ</span></a><a class="mod-flat" href="../l1/c09-readme.html" data-q="core java &amp; oop — cheatsheets &amp; reference content/l1-core-java/c09-cheatsheets/readme.md c09 · cheatsheets"><span>C09 · Cheatsheets</span></a><a class="mod-flat" href="../l1/c10-readme.html" data-q="core java &amp; oop — resources content/l1-core-java/c10-resources/readme.md c10 · resources"><span>C10 · Resources</span></a></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l1/index.html">L1 — Core Java &amp; OOP</a><span class="sep">/</span><span>equals, hashCode, toString contracts</span></div>
+        <h1>equals, hashCode, toString contracts</h1>
+        <div><span class="source-path">content/L1-core-java/C01-oop/T10-equals-hashcode-tostring-contracts.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">beginner</span><span class="meta-pill mins">~70 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "equals, hashCode, toString contracts"
+slug: equals-hashcode-tostring-contracts
+level: L1
+module: "Core Java &amp; OOP"
+section: "Object-Oriented Programming"
+type: concept
+difficulty: beginner
+order: 10
+tags: [equals, hashcode, tostring, equals-contract, hashcode-contract, reflexive, symmetric, transitive, consistent, value-equality, identity-equality, objects-equals, objects-hash, getclass-vs-instanceof, hashmap-internals, hash-spreading, treeification, hash-flooding, strength-reduction, why-31, records, lombok, float-compare, arrays-equals]
+prerequisites: [object-class-and-its-methods, classes-and-objects, fields-methods-constructors-this, encapsulation-and-access-modifiers]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="equals-hashcode-tostring-contracts">equals, hashCode, toString contracts</h1>
+<p>Three methods on <code>Object</code> define how your objects <em>compare</em>, <em>hash</em>, and <em>print</em>: <code>equals(Object)</code>, <code>hashCode()</code>, and <code>toString()</code>. <a href="c01-t09-object-class-and-its-methods.html">T09</a> introduced them at the surface — their defaults and when to override. This topic is the deep treatment, because these three methods carry <strong>contracts</strong> the language doesn't enforce but the entire collections framework silently depends on. Override <code>equals</code> without <code>hashCode</code> and your objects vanish from <code>HashSet</code>s. Write an asymmetric <code>equals</code> and <code>list.contains()</code> returns different answers depending on argument order. Mutate a field used in <code>hashCode</code> after putting the object in a <code>HashMap</code> and the entry becomes unreachable — still in the map, occupying memory, but <code>get</code> can never find it. These are not theoretical: they are the single most common category of subtle bug in production Java, and the most-asked-about topic in Java interviews.</p>
+<p>The depth bar here is not just "here's the recipe." It's understanding <strong>why</strong> the contracts have the exact shape they do (they encode the mathematical properties of an equivalence relation, which hash tables require to function); <strong>how</strong> the methods physically interact with memory (the identity hash cached in the mark word, <code>String</code>'s dedicated <code>hash</code> field, the <code>HashMap.Node[]</code> table, the red-black <code>TreeNode</code> treeification at bucket size 8); and <strong>how</strong> they execute on the processor (why the multiplier 31 is chosen for <em>strength reduction</em> into a shift-and-subtract, how collision-chain walks thrash the cache, how a maliciously-crafted set of colliding keys turns an O(1) <code>HashMap</code> into an O(n²) denial-of-service vector). By the end you will write contract-correct implementations by hand, know exactly when to let records or Lombok generate them, and be able to reason about the memory and CPU cost of every hash-based lookup in your program.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t09-object-class-and-its-methods.html">Object class &amp; its methods</a> (<code>L1/C01/T09</code>) — the eleven Object methods, default <code>equals</code>/<code>hashCode</code>/<code>toString</code>, identity hash in the mark word; <a href="c01-t01-classes-and-objects.html">Classes &amp; objects</a> (<code>L1/C01/T01</code>) — object header, mark word, heap layout; <a href="c01-t02-fields-methods-constructors-this.html">Fields, methods, constructors, this</a> (<code>L1/C01/T02</code>) — <code>final</code> fields, immutability; <a href="c01-t03-encapsulation-and-access-modifiers.html">Encapsulation</a> (<code>L1/C01/T03</code>) — why immutable fields make safe hash keys.</p></div></div>
+<h2 id="why-value-equality-exists-the-design-problem">Why Value Equality Exists — The Design Problem<a class="anchor" href="#why-value-equality-exists-the-design-problem" aria-hidden="true">#</a></h2>
+<p>By default, every Java object is equal only to itself. <code>new Point(3,4).equals(new Point(3,4))</code> is <code>false</code> because the inherited <code>Object.equals</code> compares <strong>identity</strong> — are these the same object in memory? — not <strong>state</strong> — do they hold the same values? (<a href="c01-t09-object-class-and-its-methods.html">T09</a>).</p>
+<p>This default is <em>correct</em> for entities with identity: a <code>Thread</code>, a database <code>Connection</code>, a UI <code>Window</code>. Two threads with identical names are still two different threads. But it is <em>wrong</em> for <strong>value types</strong> — <code>Money</code>, <code>Point</code>, <code>LocalDate</code>, <code>Color</code>, <code>String</code>. Two <code>Money(100, "USD")</code> objects represent the <em>same amount</em>; a program that treats them as different is broken. The whole point of a value type is that its identity doesn't matter, only its contents.</p>
+<p>So the language gives you a hook: override <code>equals</code> to define <em>what equal means for your type</em>, and the collections framework, your business logic, and every <code>if (a.equals(b))</code> will use your definition.</p>
+<div class="mermaid">flowchart TB
+  D["default Object.equals"]
+  D --> Id["identity: a == b (same object?)"]
+  O["overridden equals"]
+  O --> Val["value: same field contents?"]
+  Id --> Ent["right for entities: Thread, Connection"]
+  Val --> VT["right for values: Money, Point, String"]
+</div>
+<h3 id="how-other-languages-handle-this-and-what-javas-choice-costs">How Other Languages Handle This — and What Java's Choice Costs<a class="anchor" href="#how-other-languages-handle-this-and-what-javas-choice-costs" aria-hidden="true">#</a></h3>
+<p>The "value equality" problem is universal; every language solves it, and the trade-offs are instructive:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Equality mechanism</th>
+<th>Hashing mechanism</th>
+<th>Contract enforcement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td>override <code>equals(Object)</code></td>
+<td>override <code>hashCode()</code></td>
+<td><strong>none</strong> — silently broken if you forget</td>
+</tr>
+<tr>
+<td><strong>C++</strong></td>
+<td>overload <code>operator==</code> (non-virtual)</td>
+<td>specialize <code>std::hash&lt;T&gt;</code> (separate)</td>
+<td>none; two unrelated mechanisms</td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>define <code>__eq__</code></td>
+<td>define <code>__hash__</code></td>
+<td><strong>partial</strong> — defining <code>__eq__</code> without <code>__hash__</code> makes the object <em>unhashable</em></td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>derive/impl <code>PartialEq</code> + <code>Eq</code></td>
+<td>derive/impl <code>Hash</code></td>
+<td><strong>compile-time</strong> — <code>HashMap</code> keys must be <code>Eq + Hash</code></td>
+</tr>
+<tr>
+<td><strong>C#</strong></td>
+<td>override <code>Equals</code> + <code>==</code> operator</td>
+<td>override <code>GetHashCode</code></td>
+<td>none (like Java); analyzers warn</td>
+</tr>
+<tr>
+<td><strong>Kotlin</strong></td>
+<td><code>data class</code> auto-generates</td>
+<td>auto-generates</td>
+<td>enforced for data classes</td>
+</tr>
+</tbody>
+</table></div>
+<p>Three of these are worth studying because they show what Java <em>didn't</em> do:</p>
+<p><strong>Python disables hashing when you change equality.</strong> If you write <code>__eq__</code> but not <code>__hash__</code>, Python sets <code>__hash__ = None</code>, and any attempt to use the object as a dict key raises <code>TypeError: unhashable type</code>. Python's designers decided: <em>if you redefined equality, you almost certainly broke the default identity hash, so we'll stop you from using a broken hash rather than let you corrupt a dict silently.</em> Java made the opposite choice — it lets you break it and find out at runtime when your <code>HashMap</code> misbehaves.</p>
+<p><strong>Rust encodes the reflexivity property in the type system.</strong> Rust has <em>two</em> equality traits: <code>PartialEq</code> (equality that may not be reflexive) and <code>Eq</code> (a marker trait promising reflexivity — <code>a == a</code> always). Floating-point types implement <code>PartialEq</code> but <strong>not</strong> <code>Eq</code>, because <code>NaN != NaN</code> violates reflexivity. A <code>HashMap</code> key must be <code>Eq + Hash</code> — so the compiler <em>rejects</em> using a bare <code>f64</code> as a hash key, forcing you to handle the NaN problem explicitly. Java has no such distinction; you can use <code>Double</code> as a <code>HashMap</code> key and the NaN trap is yours to discover. This is the single sharpest illustration of why the <code>equals</code> contract's five properties matter — Rust lifted one of them (reflexivity) into a compile-checked trait.</p>
+<p><strong>C++ keeps equality and hashing completely unrelated.</strong> <code>operator==</code> and <code>std::hash</code> are separate; nothing ties them together. The contract "equal objects must hash equal" exists only in documentation and programmer discipline. Java at least co-locates both methods on <code>Object</code> and documents the joint contract — a middle ground between Rust's enforcement and C++'s laissez-faire.</p>
+<p>Java's position: <strong>the contract is real but unenforced.</strong> The language trusts you to honor it; the collections framework assumes you did. The rest of this topic is about honoring it correctly, and understanding exactly what breaks when you don't.</p>
+<h2 id="the-equals-contract-five-properties">The <code>equals</code> Contract — Five Properties<a class="anchor" href="#the-equals-contract-five-properties" aria-hidden="true">#</a></h2>
+<p><code>Object.equals</code>'s Javadoc specifies five properties any override must satisfy. These are not arbitrary style rules — they are the axioms of an <strong>equivalence relation</strong>, the mathematical structure that hash tables and sorted collections require to behave correctly. Violate one and some collection, somewhere, will silently malfunction.</p>
+<div class="mermaid">flowchart TB
+  EC["equals contract"]
+  EC --> R["reflexive: x.equals(x) == true"]
+  EC --> S["symmetric: x.equals(y) iff y.equals(x)"]
+  EC --> T["transitive: x.equals(y) && y.equals(z) ⇒ x.equals(z)"]
+  EC --> C["consistent: repeated calls agree"]
+  EC --> N["non-null: x.equals(null) == false"]
+</div>
+<h3 id="1-reflexive-xequalsx-must-be-true">1. Reflexive — <code>x.equals(x)</code> Must Be True<a class="anchor" href="#1-reflexive-xequalsx-must-be-true" aria-hidden="true">#</a></h3>
+<p>An object must equal itself. This sounds trivial and is almost never violated <em>deliberately</em> — but it can break by accident. Consider an object whose <code>equals</code> compares against the current time, or against a mutable external resource: <code>x.equals(x)</code> could return <code>false</code> if the world changed between the two field reads. The fix is to make equality depend only on the object's own immutable state.</p>
+<p>The collection that depends on reflexivity: <code>List.contains</code>. <code>list.contains(x)</code> is implemented as "does any element <code>e</code> satisfy <code>x.equals(e)</code>?" If you add <code>x</code> to the list and <code>x.equals(x)</code> is false, <code>list.contains(x)</code> returns false for an element that is literally in the list.</p>
+<h3 id="2-symmetric-xequalsy-iff-yequalsx">2. Symmetric — <code>x.equals(y)</code> iff <code>y.equals(x)</code><a class="anchor" href="#2-symmetric-xequalsy-iff-yequalsx" aria-hidden="true">#</a></h3>
+<p>If <code>x</code> equals <code>y</code>, then <code>y</code> must equal <code>x</code>. The classic violation is a class that tries to be equal to a <em>different</em> type:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class CaseInsensitiveString {
+    private final String s;
+    public CaseInsensitiveString(String s) { this.s = s; }
+
+    @Override public boolean equals(Object o) {
+        if (o instanceof CaseInsensitiveString cis)
+            return s.equalsIgnoreCase(cis.s);
+        if (o instanceof String str)                  // BUG: tries to equal a String
+            return s.equalsIgnoreCase(str);
+        return false;
+    }
+}
+
+CaseInsensitiveString cis = new CaseInsensitiveString(&quot;Hello&quot;);
+String str = &quot;hello&quot;;
+cis.equals(str);   // true  — CaseInsensitiveString knows how to compare to String
+str.equals(cis);   // false — String has no idea what CaseInsensitiveString is
+</code></pre></div>
+<p><code>cis.equals(str)</code> is true but <code>str.equals(cis)</code> is false — asymmetry. Now <code>list.contains</code> gives different answers depending on which object is in the list and which is the argument. A <code>HashSet</code> containing <code>cis</code> might or might not "contain" <code>str</code> depending on internal ordering. The fix: <strong>never try to be equal to a foreign type.</strong> Remove the <code>String</code> branch; <code>CaseInsensitiveString</code> equals only other <code>CaseInsensitiveString</code>s.</p>
+<div class="mermaid">flowchart LR
+  CIS["CaseInsensitiveString 'Hello'"] -- "equals" --> Str["String 'hello' → true"]
+  Str2["String 'hello'"] -- "equals" --> CIS2["CaseInsensitiveString → false"]
+  Note["asymmetry: contains() answers depend on argument order"]
+</div>
+<h3 id="3-transitive-equal-chains-must-close">3. Transitive — Equal Chains Must Close<a class="anchor" href="#3-transitive-equal-chains-must-close" aria-hidden="true">#</a></h3>
+<p>If <code>x</code> equals <code>y</code> and <code>y</code> equals <code>z</code>, then <code>x</code> must equal <code>z</code>. This is the property that <strong>inheritance breaks</strong>, and it's the deepest trap in the whole topic.</p>
+<p>Suppose <code>Point</code> has value equality on <code>(x, y)</code>, and <code>ColorPoint extends Point</code> adds a color:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Point {
+    final int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof Point p)) return false;
+        return x == p.x &amp;&amp; y == p.y;
+    }
+}
+
+public class ColorPoint extends Point {
+    final Color color;
+    ColorPoint(int x, int y, Color color) { super(x, y); this.color = color; }
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof ColorPoint cp)) return false;
+        return super.equals(cp) &amp;&amp; color == cp.color;
+    }
+}
+</code></pre></div>
+<p>Now:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Point p          = new Point(1, 2);
+ColorPoint cpRed = new ColorPoint(1, 2, RED);
+
+p.equals(cpRed);   // true  — Point.equals ignores color; sees (1,2) == (1,2)
+cpRed.equals(p);   // false — ColorPoint.equals requires o to be a ColorPoint
+</code></pre></div>
+<p>That's already asymmetric. If you "fix" symmetry by making <code>ColorPoint.equals</code> ignore color when compared to a plain <code>Point</code>, you destroy transitivity:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ColorPoint cpRed   = new ColorPoint(1, 2, RED);
+Point      p       = new Point(1, 2);
+ColorPoint cpBlue  = new ColorPoint(1, 2, BLUE);
+
+cpRed.equals(p);     // true (ignores color, mixed comparison)
+p.equals(cpBlue);    // true (ignores color)
+cpRed.equals(cpBlue);// false (both ColorPoints → color checked → RED != BLUE)
+// red ~ point ~ blue, but red !~ blue. Transitivity broken.
+</code></pre></div>
+<p>This is the famous result from <em>Effective Java</em> Item 10: <strong>there is no way to extend an instantiable class with a new value component while preserving the <code>equals</code> contract.</strong> The mathematics simply doesn't allow it. The escapes:</p>
+<ol>
+<li><strong>Favor composition over inheritance.</strong> Give <code>ColorPoint</code> a <code>private final Point point;</code> field instead of extending <code>Point</code>. Now the two types are unrelated and each has its own clean <code>equals</code>.</li>
+<li><strong>Use <code>getClass()</code> instead of <code>instanceof</code></strong> (next section) — this makes <code>Point</code> and <code>ColorPoint</code> <em>never</em> equal, restoring the contract at the cost of Liskov substitutability.</li>
+<li><strong>Make the class hierarchy a <code>sealed</code> set of records</strong> (<a href="c01-t14-record-types.html">T14</a>, <a href="c01-t15-sealed-classes-and-interfaces.html">T15</a>) — records are <code>final</code>, so the extension problem never arises.</li>
+</ol>
+<p>The collection that depends on transitivity: every hash-based and sorted collection. A <code>TreeSet</code> using a broken equality can place the "same" element in two positions.</p>
+<h3 id="4-consistent-repeated-calls-must-agree">4. Consistent — Repeated Calls Must Agree<a class="anchor" href="#4-consistent-repeated-calls-must-agree" aria-hidden="true">#</a></h3>
+<p><code>x.equals(y)</code> must keep returning the same result as long as neither object's <code>equals</code>-relevant state changes. The textbook violation is <code>java.net.URL.equals</code>, which performs a <strong>DNS lookup</strong> to resolve host names to IP addresses and compares <em>those</em>. Two URLs can be equal or not depending on network conditions and DNS cache state — a method call that does I/O and can change its answer. (The JDK is stuck with this for backward compatibility; use <code>URI</code> instead, which compares textually.)</p>
+<p>The lesson: <code>equals</code> should be a <strong>pure function of immutable, in-memory state.</strong> No I/O, no clocks, no random numbers, no mutable fields that callers can change behind your back.</p>
+<h3 id="5-non-null-xequalsnull-must-return-false">5. Non-Null — <code>x.equals(null)</code> Must Return False<a class="anchor" href="#5-non-null-xequalsnull-must-return-false" aria-hidden="true">#</a></h3>
+<p>For any non-null <code>x</code>, <code>x.equals(null)</code> must return <code>false</code> — never <code>true</code>, never throw <code>NullPointerException</code>. The canonical recipe handles this automatically because <code>instanceof</code> returns <code>false</code> for <code>null</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">if (!(o instanceof Point p)) return false;   // null fails instanceof → returns false. Correct.
+</code></pre></div>
+<p>If you instead write <code>o.getClass() == Point.class</code>, you must guard against <code>o == null</code> first (calling <code>getClass()</code> on null NPEs). The <code>instanceof</code> form is null-safe for free — one of the reasons it's the recommended idiom.</p>
+<h2 id="writing-equals-the-canonical-recipe">Writing <code>equals</code> — The Canonical Recipe<a class="anchor" href="#writing-equals-the-canonical-recipe" aria-hidden="true">#</a></h2>
+<p>The five-step recipe that satisfies all five properties:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Override
+public boolean equals(Object o) {
+    // 1. Identity short-circuit: same object is always equal. Fast path.
+    if (this == o) return true;
+
+    // 2. Type check via pattern-binding instanceof (Java 16+).
+    //    Handles null (instanceof null == false) and wrong types in one line.
+    if (!(o instanceof Money other)) return false;
+
+    // 3. Compare each significant field, cheapest first.
+    return cents == other.cents
+        &amp;&amp; currency.equals(other.currency);   // Objects.equals(currency, other.currency) if nullable
+}
+</code></pre></div>
+<p>Step 1 is a <strong>performance optimization, not a correctness requirement</strong> — but it matters: for objects frequently compared to themselves (common in collections), the <code>this == o</code> reference compare is one CPU instruction (~1 cycle) versus a full field-by-field walk. Order the field comparisons in step 3 from cheapest/most-likely-to-differ to most expensive — a mismatch on the first field short-circuits the <code>&amp;&amp;</code> and skips the rest.</p>
+<h3 id="getclass-vs-instanceof-the-substitutability-trade-off"><code>getClass()</code> vs <code>instanceof</code> — The Substitutability Trade-off<a class="anchor" href="#getclass-vs-instanceof-the-substitutability-trade-off" aria-hidden="true">#</a></h3>
+<p>The type check in step 2 has two forms, and the choice is a genuine design decision:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Form A — instanceof: allows subclass instances to be equal to this class
+if (!(o instanceof Point p)) return false;
+
+// Form B — getClass: requires the EXACT same class
+if (o == null || getClass() != o.getClass()) return false;
+</code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code>instanceof</code> (Form A)</th>
+<th><code>getClass()</code> (Form B)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Subclass can equal parent</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Preserves Liskov substitutability</td>
+<td>yes</td>
+<td><strong>no</strong> (a subclass instance is never <code>equals</code> to a parent instance)</td>
+</tr>
+<tr>
+<td>Survives adding state in a subclass</td>
+<td><strong>no</strong> (breaks symmetry/transitivity)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Null handling</td>
+<td>automatic</td>
+<td>manual guard needed</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Use <code>instanceof</code></strong> when subclasses add no value-significant state (e.g., subclasses that only add behavior). <strong>Use <code>getClass()</code></strong> when you want strict type-identical equality and accept the Liskov violation. In practice: if you favor composition over inheritance (you should), the question rarely arises — each value type is <code>final</code> and stands alone. Records sidestep it entirely (they're <code>final</code>).</p>
+<h3 id="the-float-and-double-trap">The Float and Double Trap<a class="anchor" href="#the-float-and-double-trap" aria-hidden="true">#</a></h3>
+<p>Never compare <code>float</code>/<code>double</code> fields with <code>==</code> in <code>equals</code>. Two reasons, both rooted in IEEE 754:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// WRONG
+return this.value == other.value;   // breaks for NaN and signed zero
+
+// RIGHT
+return Double.compare(this.value, other.value) == 0;
+</code></pre></div>
+<ul>
+<li><strong>NaN.</strong> <code>Double.NaN == Double.NaN</code> is <code>false</code> (IEEE 754 mandates it). But for <code>equals</code> you want <code>NaN.equals(NaN)</code> to be <code>true</code> — otherwise an object with a NaN field isn't reflexive (<code>x.equals(x)</code> fails). <code>Double.compare(NaN, NaN) == 0</code> correctly returns "equal."</li>
+<li><strong>Signed zero.</strong> <code>0.0 == -0.0</code> is <code>true</code>, but <code>Double.compare(0.0, -0.0)</code> is <code>1</code> (they're distinct bit patterns). Boxing agrees: <code>Double.valueOf(0.0).equals(Double.valueOf(-0.0))</code> is <code>false</code>. Using <code>Double.compare</code> keeps your <code>equals</code> consistent with how <code>Double</code> objects and the collections framework treat these values.</li>
+</ul>
+<p>This is exactly the property Rust encodes by making <code>f64</code> <code>PartialEq</code> but not <code>Eq</code> — the reflexivity violation of <code>NaN</code>. Java doesn't warn you; <code>Double.compare</code> is the manual fix.</p>
+<h3 id="the-array-field-trap">The Array Field Trap<a class="anchor" href="#the-array-field-trap" aria-hidden="true">#</a></h3>
+<p>If a field is an array, <code>==</code> and the inherited <code>array.equals</code> both test <strong>reference identity</strong>, not contents:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int[] a = {1, 2, 3}, b = {1, 2, 3};
+a.equals(b);            // false — Object.equals, reference identity
+Arrays.equals(a, b);    // true  — element-by-element
+</code></pre></div>
+<p>Use <code>Arrays.equals(a, b)</code> for one-dimensional arrays and <code>Arrays.deepEquals(a, b)</code> for nested arrays. The same applies to <code>hashCode</code>: use <code>Arrays.hashCode(a)</code> / <code>Arrays.deepHashCode(a)</code>. (This is why records with array components are tricky — the generated <code>equals</code> uses <code>Arrays</code>-unaware <code>Object.equals</code> on the array reference; prefer <code>List&lt;T&gt;</code> over <code>T[]</code> in records.)</p>
+<h2 id="the-hashcode-contract">The <code>hashCode</code> Contract<a class="anchor" href="#the-hashcode-contract" aria-hidden="true">#</a></h2>
+<p><code>hashCode()</code> returns an <code>int</code> used to bucket objects in hash-based collections. Its contract has three clauses:</p>
+<div class="mermaid">flowchart TB
+  HC["hashCode contract"]
+  HC --> C1["consistent with equals: a.equals(b) ⇒ a.hashCode() == b.hashCode()"]
+  HC --> C2["stable: same object, same hashCode across calls (within a run)"]
+  HC --> C3["collisions allowed: a != b MAY share a hashCode"]
+</div>
+<ol>
+<li><strong>Consistency with <code>equals</code> (the critical one).</strong> If <code>a.equals(b)</code>, then <code>a.hashCode() == b.hashCode()</code> <strong>must</strong> hold. This is the clause everyone forgets, and forgetting it is what makes objects vanish from <code>HashSet</code>s.</li>
+<li><strong>Stability.</strong> Repeated <code>hashCode()</code> calls on the same object must return the same value, as long as <code>equals</code>-relevant state doesn't change.</li>
+<li><strong>Collisions are legal.</strong> Unequal objects <em>may</em> return the same hashCode. A hashCode is a <em>bucket hint</em>, not a unique ID. <code>equals</code> is the tiebreaker within a bucket. (The reverse implication — equal hashCodes imply equal objects — is <strong>false</strong> and must never be assumed.)</li>
+</ol>
+<p>Note the asymmetry: equal objects <strong>must</strong> hash equal, but equal hashes <strong>need not</strong> mean equal objects. A perfect hash (no collisions) is ideal but impossible in general — there are 2³² possible <code>int</code> hashes and potentially infinitely many objects.</p>
+<h3 id="why-forgetting-hashcode-breaks-hashmap-the-physical-mechanism">Why Forgetting <code>hashCode</code> Breaks <code>HashMap</code> — The Physical Mechanism<a class="anchor" href="#why-forgetting-hashcode-breaks-hashmap-the-physical-mechanism" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// equals overridden, hashCode NOT overridden (still identity hash from Object)
+Money m1 = new Money(100, &quot;USD&quot;);
+Money m2 = new Money(100, &quot;USD&quot;);
+m1.equals(m2);          // true — we overrode equals
+
+Map&lt;Money, String&gt; map = new HashMap&lt;&gt;();
+map.put(m1, &quot;first&quot;);
+map.get(m2);            // null! — m2 hashes to a DIFFERENT bucket than m1
+</code></pre></div>
+<p><code>m1</code> and <code>m2</code> are <code>equals</code>, but their <em>identity</em> hash codes (from the unoverridden <code>Object.hashCode</code>, derived from each object's mark word — <a href="c01-t09-object-class-and-its-methods.html">T09</a>) are almost certainly different. <code>HashMap</code> uses the hash code to pick a <strong>bucket</strong> (array slot), then searches only that bucket with <code>equals</code>. <code>m2</code> lands in a different bucket than <code>m1</code>, the search never reaches <code>m1</code>, and <code>get</code> returns <code>null</code>. The entry is physically in the map's memory, occupying bytes, permanently unreachable.</p>
+<p>This is why <strong>you must override both or neither.</strong> Overriding <code>equals</code> alone is the single most common Java contract bug.</p>
+<h2 id="writing-hashcode-the-recipe">Writing <code>hashCode</code> — The Recipe<a class="anchor" href="#writing-hashcode-the-recipe" aria-hidden="true">#</a></h2>
+<p>The standard implementation combines the same fields <code>equals</code> uses:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Override
+public int hashCode() {
+    return Objects.hash(cents, currency);   // simplest; boxes args + allocates an array
+}
+</code></pre></div>
+<p>Or, hand-rolled for hot paths (no boxing, no array allocation):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Override
+public int hashCode() {
+    int result = Long.hashCode(cents);      // seed with first field
+    result = 31 * result + currency.hashCode();
+    return result;
+}
+</code></pre></div>
+<p>Both follow the same algorithm: start with one field's hash, then for each subsequent field compute <code>31 * accumulated + fieldHash</code>. The two implementations differ only in cost: <code>Objects.hash(...)</code> takes varargs, which <strong>allocates an <code>Object[]</code></strong> and <strong>boxes</strong> each primitive argument — ~32-80 bytes of garbage per call. Fine for cold paths; wasteful in a method called millions of times per second (a <code>hashCode</code> invoked inside a <code>HashMap</code> resize loop). The hand-rolled form allocates nothing.</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><code>Objects.hash(a, b, c)</code> is convenient but allocates an array and boxes primitives on every call. In hot code (objects used as keys in large, frequently-resized maps), hand-roll the <code>31 * result + field</code> form, or cache the hash for immutable objects (see below).</p></div></div>
+<h3 id="why-the-multiplier-is-31">Why the Multiplier Is 31<a class="anchor" href="#why-the-multiplier-is-31" aria-hidden="true">#</a></h3>
+<p>The magic number <code>31</code> in <code>31 * result + field</code> appears in <code>String.hashCode</code>, <code>Objects.hash</code>, <code>Arrays.hashCode</code>, and every IDE-generated <code>hashCode</code>. Three reasons, in order of importance:</p>
+<p><strong>1. It's odd.</strong> Multiplying by an <em>even</em> number throws away one bit of information per multiply, because the low bit becomes 0 and the high bit shifts off the end of the <code>int</code>. Over several fields, an even multiplier loses entropy and clusters hashes. Any odd multiplier avoids this. (The pathological case: multiplying by 2 is a left shift, so <code>31*</code> becoming <code>2*</code> would make <code>hashCode</code> lose the top bits entirely after 32 fields.)</p>
+<p><strong>2. It's prime.</strong> A prime multiplier distributes hashes more uniformly for certain structured inputs (e.g., short ASCII strings), reducing collisions. The benefit is modest and the reason is partly historical, but it does no harm.</p>
+<p><strong>3. It strength-reduces to a shift and subtract.</strong> This is the deep one. <code>31 * i</code> is algebraically <code>32 * i - i</code>, and <code>32 * i</code> is <code>i &lt;&lt; 5</code>. So:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>31 * i  ≡  (i &lt;&lt; 5) - i
+</code></pre></div>
+<p>The JIT (and historically the C compiler for <code>String.hashCode</code>) emits a <strong>left-shift-by-5 plus a subtract</strong> — two single-cycle ALU operations — instead of a hardware multiply. On the 1990s CPUs Java was designed for, integer multiply took 4-10 cycles while shift and subtract took 1 each; the strength reduction was a real 2-5× speedup for <code>String.hashCode</code>, which the JVM calls constantly. On modern CPUs <code>imul</code> is ~3 cycles (pipelined to ~1 throughput), so the win is smaller, but the JIT still performs the reduction because shift+sub frees the multiplier execution port for other work.</p>
+<div class="mermaid">flowchart LR
+  Mul["31 * i"]
+  Mul --> SR["strength reduction"]
+  SR --> Shift["i << 5  (1 cycle)"]
+  SR --> Sub["result - i  (1 cycle)"]
+  Shift --> Final["(i<<5) - i"]
+  Sub --> Final
+</div>
+<p>You can confirm it: compile a <code>31 * x</code> expression and disassemble with <code>-XX:+PrintAssembly</code>. On x86-64 you'll typically see something like <code>mov eax, edx; shl eax, 5; sub eax, edx</code> — no <code>imul</code>. (Bloch notes in <em>Effective Java</em> that the choice of 31 was partly <em>because</em> of this strength-reduction property; it's a number chosen for the machine, not just the math.)</p>
+<h3 id="caching-the-hash-for-immutable-objects">Caching the Hash for Immutable Objects<a class="anchor" href="#caching-the-hash-for-immutable-objects" aria-hidden="true">#</a></h3>
+<p>If an object is immutable and its <code>hashCode</code> is expensive (many fields, or a large collection), compute it <strong>once and cache</strong> it. This is exactly what <code>String</code> does (see the memory section below). The pattern:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class BigKey {
+    private final List&lt;String&gt; parts;
+    private int hash;            // 0 until computed; cached thereafter
+
+    @Override public int hashCode() {
+        int h = hash;
+        if (h == 0 &amp;&amp; !parts.isEmpty()) {   // 0 is the &quot;not computed yet&quot; sentinel
+            h = parts.hashCode();
+            hash = h;
+        }
+        return h;
+    }
+}
+</code></pre></div>
+<p>The subtlety: <code>0</code> doubles as both "not yet computed" and a legitimate hash value. If the real hash happens to be <code>0</code>, you recompute every time (harmless, just not cached). <code>String</code> solved this more precisely in Java 9 by adding a separate <code>boolean hashIsZero</code> field — covered next.</p>
+<h2 id="memory-layer-where-hash-codes-physically-live">Memory Layer — Where Hash Codes Physically Live<a class="anchor" href="#memory-layer-where-hash-codes-physically-live" aria-hidden="true">#</a></h2>
+<p>Hash codes occupy real bytes, and <em>where</em> they live differs between identity hashing and overridden hashing.</p>
+<h3 id="identity-hash-in-the-mark-word">Identity Hash: In the Mark Word<a class="anchor" href="#identity-hash-in-the-mark-word" aria-hidden="true">#</a></h3>
+<p>The default <code>Object.hashCode</code> (identity hash) is <strong>not stored in a field</strong>. It's computed lazily and cached in the object's <strong>mark word</strong> — the first 8 bytes of every object header (<a href="c01-t01-classes-and-objects.html">T01</a>, <a href="c01-t09-object-class-and-its-methods.html">T09</a>). The mark word layout for an unlocked object with a computed hash (64-bit HotSpot):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>mark word, 8 bytes:
+  bits 63...........38  37.....34  33.....3  2..0
+       | identity hash  | age (4) | unused  | lock (01) |
+         (31 bits)
+</code></pre></div>
+<p>First call to <code>hashCode()</code> runs the thread-local Park-Miller generator (~40 cycles), CAS-installs the 31-bit value into the mark word, and returns it. Subsequent calls read it directly (~5 cycles — <a href="c01-t09-object-class-and-its-methods.html">T09</a>). <strong>Zero extra heap bytes</strong> — it rides in the header that every object already pays for. This is the cost-free case: the universal 12-byte header (<a href="c01-t01-classes-and-objects.html">T01</a>) earns its keep by holding the identity hash.</p>
+<h3 id="overridden-hash-computed-each-call-unless-you-cache-it">Overridden Hash: Computed Each Call, Unless You Cache It<a class="anchor" href="#overridden-hash-computed-each-call-unless-you-cache-it" aria-hidden="true">#</a></h3>
+<p>An overridden <code>hashCode()</code> is <strong>not</strong> stored in the mark word — the JVM has no idea your method exists or what it returns. It runs your method body every call. For a <code>Money { long cents; String currency; }</code>:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>hashCode() execution:
+  Long.hashCode(cents)        ; ~2 cycles (xor of high/low 32 bits)
+  currency.hashCode()         ; ~5 cycles if String hash already cached
+  31 * result + ...           ; ~2 cycles (shift + sub + add)
+  total: ~10 cycles ≈ 3 ns per call, recomputed every time
+</code></pre></div>
+<p>If the object is a frequently-used map key, this recomputation happens on every <code>put</code>, <code>get</code>, <code>containsKey</code>, and during every internal resize. Caching (previous section) trades 4 bytes of object memory for eliminating the recompute.</p>
+<h3 id="strings-dedicated-hash-field-a-case-study">String's Dedicated Hash Field — A Case Study<a class="anchor" href="#strings-dedicated-hash-field-a-case-study" aria-hidden="true">#</a></h3>
+<p><code>String</code> is the most common <code>HashMap</code> key in all of Java, so the JDK caches its hash in a dedicated field. The Java 9+ <code>String</code> instance layout:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class String {
+    private final byte[] value;     // the characters (Latin-1 or UTF-16)
+    private final byte   coder;     // 0 = Latin-1, 1 = UTF-16
+    private int          hash;      // cached hashCode, 0 until computed
+    private boolean      hashIsZero;// true once we've computed it and it WAS 0
+}
+</code></pre></div>
+<p>Physical bytes of a <code>String</code> <em>object</em> (not counting the separate <code>byte[]</code>):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>offset  field         size
++0      object header  12 bytes (mark word 8 + klass ptr 4)
++12     value (ref)    4 bytes  (compressed oop to the byte[])
++16     hash (int)     4 bytes  ← the cached hash
++20     coder (byte)   1 byte
++21     hashIsZero     1 byte
++22     padding        2 bytes
+total: 24 bytes
+</code></pre></div>
+<p>So <strong>4 of every String object's 24 bytes are the cached hash code.</strong> The <code>hashIsZero</code> boolean (1 byte) solves the "is 0 the hash or 'not computed'?" ambiguity precisely: <code>hash == 0 &amp;&amp; !hashIsZero</code> means "not computed yet"; <code>hash == 0 &amp;&amp; hashIsZero</code> means "computed, and it really is 0." <code>String.hashCode</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int hashCode() {
+    int h = hash;
+    if (h == 0 &amp;&amp; !hashIsZero) {       // not computed yet
+        h = isLatin1() ? StringLatin1.hashCode(value)
+                       : StringUTF16.hashCode(value);
+        if (h == 0) hashIsZero = true; // remember that the real hash is 0
+        else        hash = h;          // cache the nonzero hash
+    }
+    return h;
+}
+</code></pre></div>
+<p>The first <code>hashCode()</code> walks the characters (<code>31*h + char</code> per character — O(length), and SIMD-vectorized in modern JVMs via <code>StringLatin1.hashCode</code> intrinsics, ~16 chars/iteration). Every call after is a single 4-byte field read (~1 cycle). This is why using <code>String</code> keys in a <code>HashMap</code> is fast: each key's hash is computed once across its entire lifetime, even if it's looked up a billion times.</p>
+<div class="mermaid">flowchart LR
+  First["first String.hashCode()"]
+  First --> Walk["walk chars: 31*h + c, SIMD ~16/iter"]
+  Walk --> Cache["store in hash field (4 bytes)"]
+  Later["every later call"]
+  Later --> Read["read hash field — 1 cycle"]
+</div>
+<h2 id="memory-layer-how-hashmap-physically-stores-and-looks-up">Memory Layer — How <code>HashMap</code> Physically Stores and Looks Up<a class="anchor" href="#memory-layer-how-hashmap-physically-stores-and-looks-up" aria-hidden="true">#</a></h2>
+<p>To understand why the contracts matter, you have to see what <code>HashMap</code> does with your <code>hashCode</code> and <code>equals</code> in memory.</p>
+<h3 id="the-table-and-the-node">The Table and the Node<a class="anchor" href="#the-table-and-the-node" aria-hidden="true">#</a></h3>
+<p>A <code>HashMap</code> holds a <code>Node&lt;K,V&gt;[] table</code> — an array of bucket heads. Each <code>Node</code> is a small heap object:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static class Node&lt;K,V&gt; {
+    final int hash;     // the SPREAD hash (see below), cached at insertion
+    final K key;        // your key object (a reference)
+    V value;            // your value object (a reference)
+    Node&lt;K,V&gt; next;     // next node in this bucket's collision chain
+}
+</code></pre></div>
+<p>Physical bytes of one <code>Node</code> (compressed oops):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>+0   header     12 bytes
++12  hash (int)  4 bytes
++16  key (ref)   4 bytes
++20  value (ref) 4 bytes
++24  next (ref)  4 bytes
++28  padding     4 bytes
+total: 32 bytes per entry
+</code></pre></div>
+<p>So <strong>every <code>HashMap</code> entry costs 32 bytes of <code>Node</code></strong> on top of the key and value objects themselves, plus its slot in the <code>table</code> array (4 bytes). A <code>HashMap</code> with a million entries holds ~32 MB of <code>Node</code> objects + a 4 MB+ table array — before counting the keys and values. (<code>HashMap</code>'s default <strong>load factor 0.75</strong> means the table is sized to ~1.33× the entry count, so the table for 1M entries is ~2M slots = 8 MB.)</p>
+<div class="mermaid">flowchart TB
+  Table["Node[] table (power-of-2 length)"]
+  Table --> B0["bucket 0 → Node → Node → null"]
+  Table --> B1["bucket 1 → null"]
+  Table --> B2["bucket 2 → Node → null"]
+  Table --> Bn["bucket n-1 → ..."]
+</div>
+<h3 id="bucket-index-why-the-table-length-is-a-power-of-two">Bucket Index — Why the Table Length Is a Power of Two<a class="anchor" href="#bucket-index-why-the-table-length-is-a-power-of-two" aria-hidden="true">#</a></h3>
+<p>To find a key's bucket, <code>HashMap</code> computes <code>(table.length - 1) &amp; hash</code>. Because <code>table.length</code> is <strong>always a power of two</strong>, <code>length - 1</code> is a mask of all-ones in the low bits (e.g., length 16 → mask <code>0b1111</code>), and the <code>&amp;</code> extracts the low bits of the hash. This is a single 1-cycle AND instruction — far cheaper than the <code>hash % length</code> modulo (a 20-40 cycle integer divide) that a non-power-of-two table would require.</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>table.length = 16 = 0b10000
+mask         = 15 = 0b01111
+bucket       = hash &amp; 0b01111   ; low 4 bits of hash, ~1 cycle
+</code></pre></div>
+<h3 id="hash-spreading-why-hashmap-doesnt-trust-your-hashcode-directly">Hash Spreading — Why <code>HashMap</code> Doesn't Trust Your <code>hashCode</code> Directly<a class="anchor" href="#hash-spreading-why-hashmap-doesnt-trust-your-hashcode-directly" aria-hidden="true">#</a></h3>
+<p>Because the bucket index uses only the <strong>low</strong> bits of the hash, two keys whose hashes differ only in the <em>high</em> bits would collide. Many real <code>hashCode</code> implementations produce hashes that vary mostly in high bits (e.g., <code>Float.hashCode</code>, or keys that are powers of two). To defend against this, <code>HashMap</code> <strong>spreads</strong> your hash before masking:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+}
+</code></pre></div>
+<p>It XORs the top 16 bits down into the bottom 16. This mixes high-bit entropy into the low bits that actually choose the bucket, at the cost of one shift and one XOR (~2 cycles). It's a cheap insurance policy that turns a mediocre <code>hashCode</code> into an acceptable bucket distribution.</p>
+<div class="mermaid">flowchart LR
+  H["your hashCode(): 32 bits"]
+  H --> Spread["h ^ (h >>> 16): mix high into low"]
+  Spread --> Mask["& (length-1): pick bucket"]
+  Mask --> Bucket["bucket index"]
+</div>
+<h3 id="collision-chains-and-treeification">Collision Chains and Treeification<a class="anchor" href="#collision-chains-and-treeification" aria-hidden="true">#</a></h3>
+<p>When two keys land in the same bucket (same spread-and-masked index), <code>HashMap</code> stores them in a <strong>linked list</strong> hanging off that bucket's <code>Node.next</code>. A <code>get</code> walks the chain calling <code>equals</code> on each node until it finds a match. With a good <code>hashCode</code>, chains stay length 0-1 and lookup is O(1). With a bad <code>hashCode</code>, chains grow and lookup degrades toward O(n).</p>
+<p>Java 8 added a defense: when a single bucket's chain reaches <strong>8 nodes</strong> (<code>TREEIFY_THRESHOLD</code>) <em>and</em> the table has at least <strong>64 slots</strong> (<code>MIN_TREEIFY_CAPACITY</code>), <code>HashMap</code> converts that bucket's linked list into a <strong>red-black tree</strong> of <code>TreeNode</code>s, making worst-case lookup O(log n) instead of O(n). The <code>TreeNode</code> is much larger than a plain <code>Node</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static final class TreeNode&lt;K,V&gt; extends LinkedHashMap.Entry&lt;K,V&gt; {
+    TreeNode&lt;K,V&gt; parent, left, right, prev;
+    boolean red;
+    // inherits hash, key, value, next (Node) + before, after (Entry)
+}
+</code></pre></div>
+<p>Physical bytes:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Node fields           16 bytes (hash, key, value, next)
+Entry adds            8 bytes  (before, after — from LinkedHashMap.Entry)
+TreeNode adds         17 bytes (parent, left, right, prev, red)
++ header              12 bytes
++ padding             to 8-byte align
+total: ~56 bytes per TreeNode
+</code></pre></div>
+<p>So treeification <strong>nearly doubles per-node memory (32 → 56 bytes)</strong> but converts the collision walk from O(n) to O(log n). It de-treeifies back to a list (<code>UNTREEIFY_THRESHOLD = 6</code>) if the bucket shrinks. The asymmetry (treeify at 8, untreeify at 6) is hysteresis to avoid thrashing around the threshold.</p>
+<div class="mermaid">flowchart TB
+  L["bucket: linked list (≤ 8 nodes, 32 B each)"]
+  L -->|"grows to 8 + table ≥ 64"| T["red-black tree (TreeNode, 56 B each, O(log n))"]
+  T -->|"shrinks to 6"| L
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>Treeification requires the keys to be <code>Comparable</code> to order the red-black tree. If your keys are not <code>Comparable</code>, <code>HashMap</code> falls back to comparing by identity-hash and class name for tree ordering — it still works, but the tree balance is weaker. This is one reason value-type keys often implement <code>Comparable</code> even when not strictly required.</p></div></div>
+<h2 id="architecture-layer-hash-performance-on-the-processor">Architecture Layer — Hash Performance on the Processor<a class="anchor" href="#architecture-layer-hash-performance-on-the-processor" aria-hidden="true">#</a></h2>
+<p>The contracts are about correctness; their <em>performance</em> consequences live in the CPU's cache and branch predictor.</p>
+<h3 id="a-good-hash-is-a-cache-story">A Good Hash Is a Cache Story<a class="anchor" href="#a-good-hash-is-a-cache-story" aria-hidden="true">#</a></h3>
+<p>A <code>HashMap.get</code> with a well-distributed hash:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>1. compute spread hash         ~10 cycles (your hashCode + spread)
+2. mask to bucket index        ~1 cycle (AND)
+3. load table[index]           ~4 cycles (L1 hit if table is hot)
+4. compare hash + equals       ~5 cycles (chain length 1)
+total: ~20 cycles ≈ 6 ns
+</code></pre></div>
+<p>Step 3 is the interesting one: <code>table[index]</code> is a near-random array access (the whole point of hashing is to scatter keys uniformly), so it's <strong>prefetcher-hostile</strong>. The CPU cannot predict which bucket you'll touch next, so each <code>get</code> on a cold map is likely an L2 or L3 miss (~12-60 cycles) for the table slot, then <em>another</em> miss to load the <code>Node</code> object (separate heap allocation), then <em>another</em> to load the key object for <code>equals</code>. A <code>HashMap.get</code> on a large, cold map can be <strong>3 cache misses ≈ 150-300 cycles ≈ 50-90 ns</strong> — versus ~6 ns when everything is L1-hot. This is why hash lookups that look O(1) in Big-O can be 10-15× slower in practice on large maps that don't fit in cache: the constant factor is dominated by memory latency, not computation.</p>
+<h3 id="a-bad-hash-is-a-collision-walk">A Bad Hash Is a Collision Walk<a class="anchor" href="#a-bad-hash-is-a-collision-walk" aria-hidden="true">#</a></h3>
+<p>If many keys collide (poor <code>hashCode</code>), the <code>get</code> walks a long chain:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>chain of N colliding nodes:
+  for each node: load Node (cache miss), compare hash, call equals (cache miss to load key)
+  ~2 cache misses × N nodes
+</code></pre></div>
+<p>For a 100-node chain, that's ~200 cache misses ≈ 20,000 cycles ≈ 6 µs per lookup — a thousand times slower than the O(1) case. Treeification caps this at O(log n) ≈ 7 comparisons for the same 100 nodes, ~14 misses ≈ 1,400 cycles. Still slow, but bounded.</p>
+<h3 id="branch-prediction-in-equals-chains">Branch Prediction in <code>equals</code> Chains<a class="anchor" href="#branch-prediction-in-equals-chains" aria-hidden="true">#</a></h3>
+<p>A field-by-field <code>equals</code> is a chain of <code>&amp;&amp;</code> short-circuits, each compiling to a compare-and-branch. The CPU's branch predictor learns the pattern: if most <code>equals</code> calls fail on the first field (common — most candidate objects differ), the predictor correctly assumes "first field differs, return false" and the misprediction cost is near zero. If <code>equals</code> calls usually <em>succeed</em> (e.g., deduplication where most candidates match), the predictor learns <em>that</em>. The cost shows up only when the success/failure pattern is unpredictable (~50/50), where each mispredict costs ~15-20 cycles. Ordering <code>equals</code> comparisons so the most-discriminating field comes first helps the predictor and short-circuits sooner.</p>
+<h3 id="hash-flooding-when-a-bad-hash-becomes-a-security-vulnerability">Hash Flooding — When a Bad Hash Becomes a Security Vulnerability<a class="anchor" href="#hash-flooding-when-a-bad-hash-becomes-a-security-vulnerability" aria-hidden="true">#</a></h3>
+<p>The collision-walk cost is not just a performance footnote; it's a <strong>denial-of-service attack vector</strong>. If an attacker controls the <em>keys</em> inserted into a <code>HashMap</code> — and they often do, because web frameworks parse HTTP POST parameters, JSON object keys, and HTTP headers into <code>HashMap</code>s — they can craft thousands of distinct keys that all hash to the <strong>same bucket</strong>. Inserting <code>n</code> such keys is O(n²) (each insert walks the growing chain), and a few tens of thousands of crafted keys can pin a CPU core for seconds, hanging the server.</p>
+<p>This was a real, widespread vulnerability disclosed in 2011 (the 28C3 talk "Efficient Denial of Service Attacks on Web Application Platforms," CVE-2011-4858 and relatives) affecting Java, PHP, Python, Ruby, and ASP.NET simultaneously — all used hash tables with predictable string hashing for request parameters. A single ~1 MB POST request with colliding parameter names could consume <em>minutes</em> of CPU.</p>
+<p>Java's mitigations:
+- <strong>Treeification (Java 8+)</strong> caps the worst case at O(n log n) instead of O(n²) — the attack still slows things but no longer hangs the server. This is the <em>primary</em> reason treeification was added; it's a security feature as much as a performance one.
+- <strong>Randomized string hashing</strong> was considered (<code>jdk.map.althashing.threshold</code>) but largely superseded by treeification.</p>
+<div class="mermaid">flowchart TB
+  Atk["attacker sends N keys all hashing to one bucket"]
+  Atk --> Pre8["pre-Java-8: O(n²) chain inserts → server hangs"]
+  Atk --> Post8["Java 8+: treeify at 8 → O(n log n) → degraded but alive"]
+</div>
+<p>The lesson reaches back to the contract: a <code>hashCode</code> that distributes poorly isn't just slow, it's a liability. For keys that come from untrusted input, a well-distributed hash is a security control.</p>
+<h2 id="tostring-the-human-readable-method"><code>toString</code> — The Human-Readable Method<a class="anchor" href="#tostring-the-human-readable-method" aria-hidden="true">#</a></h2>
+<p><code>toString</code> has no five-property contract — it's for humans, not collections — but it has strong conventions. The default is the unhelpful <code>getClass().getName() + "@" + Integer.toHexString(hashCode())</code> (<a href="c01-t09-object-class-and-its-methods.html">T09</a>): <code>com.example.Money@1b6d3586</code>. Override it for any class you'll ever log or debug.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Override
+public String toString() {
+    return &quot;Money[cents=&quot; + cents + &quot;, currency=&quot; + currency + &quot;]&quot;;
+}
+</code></pre></div>
+<p>Conventions worth following:</p>
+<ul>
+<li><strong>Include the class name and the significant fields.</strong> Enough to identify the object in a log line.</li>
+<li><strong>Don't make it parseable as an API.</strong> <code>toString</code> output is for humans and may change; if callers need structured data, expose accessors or a real serialization format. Documenting a <code>toString</code> format locks you into it forever.</li>
+<li><strong>Never put secrets in <code>toString</code>.</strong> Passwords, tokens, full credit-card numbers in a <code>toString</code> end up in log files — a classic data-leak. Mask them: <code>"card=****" + last4</code>.</li>
+<li><strong>Beware cycles and cost.</strong> A <code>toString</code> that walks a large collection or a cyclic object graph can be slow or stack-overflow. The default <code>AbstractCollection.toString</code> walks every element.</li>
+</ul>
+<p><code>toString</code> is called implicitly by string concatenation (<code>"x=" + obj</code>), <code>System.out.println(obj)</code>, logging frameworks, debuggers (the "Variables" pane), and assertion messages. A good <code>toString</code> pays for itself the first time you debug a production incident from logs.</p>
+<h2 id="records-and-the-auto-generated-trio">Records and the Auto-Generated Trio<a class="anchor" href="#records-and-the-auto-generated-trio" aria-hidden="true">#</a></h2>
+<p>Since Java 16, a <strong>record</strong> generates contract-correct <code>equals</code>, <code>hashCode</code>, and <code>toString</code> automatically from its components (<a href="c01-t14-record-types.html">T14</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public record Money(long cents, String currency) { }
+
+Money a = new Money(100, &quot;USD&quot;);
+Money b = new Money(100, &quot;USD&quot;);
+a.equals(b);        // true  — generated equals compares cents and currency
+a.hashCode() == b.hashCode();  // true — generated hashCode is consistent
+a.toString();       // &quot;Money[cents=100, currency=USD]&quot;
+</code></pre></div>
+<p>The generated implementations:
+- <code>equals</code> checks <code>getClass()</code> (exact-class, not <code>instanceof</code>) then compares each component with the right method (<code>==</code> for primitives via <code>Double.compare</code> for floating point, <code>Objects.equals</code> for references).
+- <code>hashCode</code> combines component hashes (using an <code>invokedynamic</code>-bootstrapped method, <code>ObjectMethods.bootstrap</code>, that the JVM generates once).
+- <code>toString</code> produces <code>RecordName[comp1=val1, comp2=val2]</code>.</p>
+<p><strong>For pure value types, records are the correct default</strong> — they eliminate the entire category of hand-written-contract bugs. The generated <code>equals</code> uses <code>getClass()</code>, and records are <code>final</code>, so the inheritance-transitivity trap cannot occur. The one caveat: a record with an <strong>array component</strong> generates an <code>equals</code> that compares the array by reference (because it uses <code>Objects.equals</code>, not <code>Arrays.equals</code>) — so <code>new Data(new int[]{1}).equals(new Data(new int[]{1}))</code> is <code>false</code>. Prefer <code>List&lt;T&gt;</code> over <code>T[]</code> in records, or override <code>equals</code>/<code>hashCode</code> explicitly for array components.</p>
+<h3 id="lombok-and-autovalue-generation-for-non-record-classes">Lombok and AutoValue — Generation for Non-Record Classes<a class="anchor" href="#lombok-and-autovalue-generation-for-non-record-classes" aria-hidden="true">#</a></h3>
+<p>Before records (and for classes that need mutability or inheritance), two libraries generate the trio:</p>
+<ul>
+<li><strong>Lombok</strong> (<code>@EqualsAndHashCode</code>, <code>@ToString</code>, <code>@Data</code>) — annotation-processor that <em>modifies the bytecode</em> at compile time to inject the methods. Zero runtime dependency; the generated code is real bytecode. Caveat: it's "magic" — the source doesn't show the methods, which can confuse debuggers and code review. <code>@EqualsAndHashCode(callSuper = true)</code> is needed for subclasses to include the parent's fields.</li>
+<li><strong>Google AutoValue</strong> (<code>@AutoValue</code>) — generates a <em>concrete subclass</em> with the methods as readable source you can inspect. More verbose, less magic, favored where transparency matters.</li>
+</ul>
+<p>Both predate records and remain useful for classes that can't be records (e.g., need mutable fields, JPA entities, builders). For new immutable value types on Java 16+, <strong>prefer records</strong> — no library, no annotation processor, language-guaranteed correctness.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Overriding <code>equals</code> without <code>hashCode</code> (or vice versa).</strong> The number-one Java contract bug. Equal objects with unequal hashes vanish from <code>HashSet</code>/<code>HashMap</code>. Always override both together; let the IDE generate both at once, or use a record.</p><p>[!WARNING]
+<strong>Using a mutable field in <code>equals</code>/<code>hashCode</code>, then mutating it after insertion into a hash collection.</strong> The object's hash changes, it's now in the "wrong" bucket, and <code>get</code>/<code>contains</code>/<code>remove</code> can never find it — a silent leak. Keys must be effectively immutable. Records with mutable array components are a sneaky version of this.</p>
+<p>[!WARNING]
+<strong>Comparing <code>float</code>/<code>double</code> with <code>==</code> in <code>equals</code>.</strong> Breaks for <code>NaN</code> (loses reflexivity) and signed zero. Use <code>Float.compare</code>/<code>Double.compare</code>.</p>
+<p>[!WARNING]
+<strong>Comparing arrays with <code>==</code> or <code>.equals</code> in <code>equals</code>.</strong> That's reference identity. Use <code>Arrays.equals</code>/<code>Arrays.deepEquals</code> and <code>Arrays.hashCode</code>/<code>Arrays.deepHashCode</code>.</p>
+<p>[!WARNING]
+<strong><code>equals</code> that tries to be equal to a foreign type.</strong> Breaks symmetry (the foreign type doesn't reciprocate). A type should equal only its own type.</p>
+<p>[!WARNING]
+<strong>Extending an instantiable class and adding a value field, then overriding <code>equals</code>.</strong> Breaks symmetry or transitivity — there is no contract-preserving way to do it. Use composition or sealed records instead.</p>
+<p>[!WARNING]
+<strong><code>hashCode</code> that returns a constant</strong> (e.g., <code>return 42;</code>). It's technically <em>legal</em> (equal objects hash equal — trivially), but it puts every entry in one bucket, degrading <code>HashMap</code> to O(n) (or O(log n) after treeification). A correctness-preserving performance disaster, and a self-inflicted hash-flooding vulnerability.</p>
+<p>[!WARNING]
+<strong><code>Objects.hash(...)</code> in hot paths.</strong> It allocates an array and boxes primitives every call. Hand-roll <code>31 * result + field</code> or cache the hash for immutable objects.</p>
+<p>[!WARNING]
+<strong>Secrets in <code>toString</code>.</strong> Passwords/tokens leak into logs. Mask sensitive fields.</p>
+<p>[!WARNING]
+<strong><code>getClass()</code>-based <code>equals</code> without a null guard.</strong> <code>o.getClass()</code> NPEs if <code>o</code> is null. The <code>instanceof</code> form is null-safe; the <code>getClass</code> form needs <code>o == null || ...</code> first.</p>
+<p>[!INTERVIEW]
+Common interview questions for this topic:
+1. <strong>What's the relationship between <code>equals</code> and <code>hashCode</code>?</strong> If <code>a.equals(b)</code> then <code>a.hashCode() == b.hashCode()</code> must hold. The reverse is not required (collisions are legal). Override both or neither.
+2. <strong>What are the five properties of the <code>equals</code> contract?</strong> Reflexive, symmetric, transitive, consistent, non-null.
+3. <strong>Why can't you extend a class and add a value field while preserving <code>equals</code>?</strong> Mixed-type comparisons force you to break either symmetry (subclass requires exact type) or transitivity (subclass ignores its extra field when compared to the parent). <em>Effective Java</em> Item 10.
+4. <strong><code>getClass()</code> vs <code>instanceof</code> in <code>equals</code> — trade-off?</strong> <code>instanceof</code> allows subclass equality but breaks when subclasses add state; <code>getClass()</code> is strict (violates Liskov but preserves the contract). Records use <code>getClass()</code>.
+5. <strong>Why 31 as the hashCode multiplier?</strong> Odd (no bit loss), prime (better distribution), and strength-reduces to <code>(i&lt;&lt;5) - i</code> (shift + subtract, faster than multiply on older CPUs; the JIT still does it).
+6. <strong>Where is the default (identity) hashCode stored?</strong> In the object's mark word (header), lazily computed and cached. Zero extra heap bytes.
+7. <strong>How does <code>HashMap</code> use <code>hashCode</code>?</strong> Spreads it (<code>h ^ (h&gt;&gt;&gt;16)</code>), masks to a bucket (<code>&amp; (length-1)</code>, power-of-2 table), stores in a <code>Node</code>, searches the bucket chain with <code>equals</code>.
+8. <strong>What happens at bucket size 8?</strong> Treeification — the linked list becomes a red-black tree (O(log n) instead of O(n)), if the table is ≥ 64 slots. <code>TreeNode</code> is ~56 bytes vs <code>Node</code>'s 32.
+9. <strong>What's hash flooding?</strong> A DoS where an attacker sends keys that all collide, degrading <code>HashMap</code> to O(n²) inserts. Treeification (Java 8+) mitigates it to O(n log n).
+10. <strong>Why does <code>String</code> have a <code>hash</code> field?</strong> Caches the hashCode (computed once, read forever) — 4 bytes per String — because Strings are the most common map keys.
+11. <strong>Why compare floats with <code>Double.compare</code> in <code>equals</code>?</strong> <code>NaN == NaN</code> is false (breaks reflexivity); <code>0.0 == -0.0</code> is true but they're distinct values. <code>Double.compare</code> fixes both.
+12. <strong>Do records solve this?</strong> Yes — they auto-generate contract-correct <code>equals</code>/<code>hashCode</code>/<code>toString</code>, are <code>final</code> (no inheritance trap), and use <code>getClass()</code>. Caveat: array components compare by reference.
+13. <strong>What does <code>toString</code>'s contract require?</strong> Nothing formally (it's for humans), but conventions: include class + fields, don't leak secrets, don't make it a parseable API.
+14. <strong>Why is <code>HashMap</code>'s table always a power of two?</strong> So bucket index is <code>hash &amp; (length-1)</code> — a 1-cycle AND instead of a 20-40 cycle modulo.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li>
+<p><strong>The vanishing key.</strong> Write a mutable <code>Point</code> with overridden <code>equals</code> and <code>hashCode</code> over <code>(x, y)</code>. Put it in a <code>HashSet</code>. Mutate <code>x</code>. Call <code>set.contains(point)</code> — observe <code>false</code> even though the object is in the set. Print <code>set.size()</code> (still 1). Explain the bucket mismatch.</p>
+</li>
+<li>
+<p><strong>equals without hashCode.</strong> Write <code>Money</code> overriding only <code>equals</code>. Put <code>new Money(100,"USD")</code> in a <code>HashMap</code>, look up with a different equal <code>Money</code>. Observe <code>null</code>. Add the <code>hashCode</code> override; observe it works.</p>
+</li>
+<li>
+<p><strong>Symmetry break.</strong> Implement <code>CaseInsensitiveString</code> that tries to equal <code>String</code>. Demonstrate <code>cis.equals(str)</code> true but <code>str.equals(cis)</code> false. Show how <code>List.contains</code> gives order-dependent answers. Fix it.</p>
+</li>
+<li>
+<p><strong>Transitivity break.</strong> Implement <code>Point</code> and <code>ColorPoint extends Point</code> with the broken mixed-comparison <code>equals</code>. Construct <code>red, point, blue</code> and demonstrate <code>red~point</code>, <code>point~blue</code>, but <code>red≁blue</code>. Refactor <code>ColorPoint</code> to use composition.</p>
+</li>
+<li>
+<p><strong>Float trap.</strong> Write a class with a <code>double</code> field using <code>==</code> in <code>equals</code>. Show <code>x.equals(x)</code> is false when the field is <code>NaN</code>. Switch to <code>Double.compare</code>; observe reflexivity restored.</p>
+</li>
+<li>
+<p><strong>Array trap.</strong> Write a class with an <code>int[]</code> field using <code>==</code> in <code>equals</code>. Show two objects with identical array <em>contents</em> are "unequal." Switch to <code>Arrays.equals</code> + <code>Arrays.hashCode</code>; observe the fix.</p>
+</li>
+<li>
+<p><strong>Why 31 — see the assembly.</strong> Write <code>int h(int x) { return 31 * x; }</code>. Run with <code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly</code> (needs hsdis). Find the compiled code; confirm it's <code>shl ...,5</code> + <code>sub</code> rather than <code>imul</code>.</p>
+</li>
+<li>
+<p><strong>String hash caching.</strong> Use reflection or JOL to read a <code>String</code>'s <code>hash</code> field before and after calling <code>hashCode()</code>. Observe it's 0 before, populated after. Time a million <code>hashCode()</code> calls on the same String — confirm the first is O(length), the rest O(1).</p>
+</li>
+<li>
+<p><strong>HashMap Node memory.</strong> Use JOL (<code>jol-cli internals java.util.HashMap$Node</code>) to confirm the 32-byte Node layout. Then build a <code>HashMap</code> of 1M entries and measure heap before/after; confirm ~32 MB of Nodes plus the table array.</p>
+</li>
+<li>
+<p><strong>Force treeification.</strong> Write a key class whose <code>hashCode</code> always returns the same value (forcing all keys into one bucket). Insert 100 keys into a <code>HashMap</code>. Use a debugger or reflection to confirm the bucket became a <code>TreeNode</code> tree. Make the key <code>Comparable</code> and observe the tree orders properly.</p>
+</li>
+<li>
+<p><strong>Hash flooding microbenchmark.</strong> Insert 50,000 keys with a constant <code>hashCode</code> (all collide) into a <code>HashMap</code>; time it. Compare with 50,000 well-distributed keys. Observe the O(n²) vs O(n) difference (seconds vs milliseconds). Confirm treeification keeps the colliding case from being catastrophic.</p>
+</li>
+<li>
+<p><strong>Bucket distribution.</strong> Write a poor <code>hashCode</code> that varies only in the high 16 bits (e.g., <code>return field &lt;&lt; 16;</code>). Insert keys and measure chain lengths (via reflection on the table). Then observe how <code>HashMap</code>'s spread function (<code>h ^ (h&gt;&gt;&gt;16)</code>) salvages the distribution — compare to a hypothetical no-spread map.</p>
+</li>
+<li>
+<p><strong>Objects.hash allocation cost.</strong> Microbenchmark <code>Objects.hash(a, b, c)</code> vs a hand-rolled <code>31*...</code> hashCode over the same fields, called 10M times. Use <code>-XX:+PrintGC</code> or async-profiler to observe the array allocations from <code>Objects.hash</code>. Quantify the difference.</p>
+</li>
+<li>
+<p><strong>Records.</strong> Convert your hand-written <code>Money</code> into <code>record Money(long cents, String currency)</code>. Verify the generated <code>equals</code>/<code>hashCode</code>/<code>toString</code> behave identically. Then make a record with an <code>int[]</code> component and demonstrate the array-reference-equality surprise; fix by switching to <code>List&lt;Integer&gt;</code>.</p>
+</li>
+<li>
+<p><strong>toString secret leak.</strong> Write a <code>Credentials</code> class with a <code>password</code> field and a naive <code>toString</code> that includes it. Log an instance. Observe the password in the log. Fix by masking. Discuss why this is a common production incident.</p>
+</li>
+<li>
+<p><strong>End-to-end explain-it-back.</strong> Trace <code>map.get(key)</code> for a <code>HashMap&lt;String,V&gt;</code> from source to CPU: (a) <code>key.hashCode()</code> — first call walks chars + caches in the <code>hash</code> field, later calls read 4 bytes; (b) <code>HashMap</code> spreads <code>h ^ (h&gt;&gt;&gt;16)</code>; (c) masks <code>&amp; (table.length-1)</code> — 1-cycle AND on the power-of-2 table; (d) loads <code>table[index]</code> — likely a cache miss on a large map; (e) walks the bucket chain calling <code>equals</code> — more cache misses per node; (f) returns the value or null. Give cycle estimates for the all-L1-hot case (~20 cycles) and the cold-large-map case (~150-300 cycles). Twelve sentences max.</p>
+</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<p><strong>Language layer.</strong></p>
+<ul>
+<li>State the five <code>equals</code> properties (reflexive, symmetric, transitive, consistent, non-null) and give a concrete violation and its consequence for each.</li>
+<li>State the three <code>hashCode</code> clauses (consistent-with-equals, stable, collisions-allowed) and explain why "override both or neither."</li>
+<li>Write a contract-correct <code>equals</code> using the five-step recipe (identity check, <code>instanceof</code> type check, field comparisons cheapest-first).</li>
+<li>Choose between <code>getClass()</code> and <code>instanceof</code> understanding the substitutability vs extensibility trade-off.</li>
+<li>Handle the float/double trap (<code>Double.compare</code>), the array trap (<code>Arrays.equals</code>/<code>hashCode</code>), and the inheritance-transitivity trap (composition or sealed records).</li>
+<li>Write a <code>hashCode</code> with the <code>31 * result + field</code> idiom or <code>Objects.hash</code>, knowing the allocation cost difference.</li>
+<li>Explain why extending an instantiable class and adding a value field cannot preserve the contract.</li>
+<li>Follow <code>toString</code> conventions (class + fields, no secrets, not a parseable API).</li>
+<li>Recognize when to use records (preferred for value types) or Lombok/AutoValue (for non-record classes).</li>
+</ul>
+<p><strong>Memory layer.</strong></p>
+<ul>
+<li>Locate the identity hash in the mark word (zero extra heap bytes) vs an overridden hash (recomputed each call unless cached).</li>
+<li>Describe <code>String</code>'s dedicated <code>hash</code> (4 bytes) + <code>hashIsZero</code> (1 byte) fields and why they exist.</li>
+<li>Describe the <code>HashMap.Node</code> layout (32 bytes: header + hash + key + value + next) and the per-entry memory cost.</li>
+<li>Explain treeification: linked-list <code>Node</code> (32 B) → red-black <code>TreeNode</code> (~56 B) at bucket size 8 with table ≥ 64, for O(log n) worst-case lookup.</li>
+<li>Explain why the table is a power of two (<code>&amp; (length-1)</code> masking vs modulo) and why <code>HashMap</code> spreads the hash (<code>h ^ (h&gt;&gt;&gt;16)</code>).</li>
+</ul>
+<p><strong>Architecture layer.</strong></p>
+<ul>
+<li>Explain why 31 strength-reduces to <code>(i&lt;&lt;5) - i</code> and why that mattered (and still matters) for <code>String.hashCode</code>.</li>
+<li>Explain why a <code>HashMap.get</code> on a large cold map is dominated by cache misses (~150-300 cycles, ~3 misses) despite being "O(1)."</li>
+<li>Explain how a bad <code>hashCode</code> turns lookups into collision walks (O(n)) and how treeification bounds the damage (O(log n)).</li>
+<li>Explain hash flooding as a DoS vector and why treeification (Java 8+) is a security mitigation, not just a performance one.</li>
+<li>Reason about branch prediction in <code>equals</code> chains and why discriminating-field-first ordering helps.</li>
+</ul>
+<p><code>equals</code>/<code>hashCode</code>/<code>toString</code> are where OOP correctness meets the collections framework and the hardware. Get the contracts right — or use records — and every <code>HashMap</code>, <code>HashSet</code>, <code>contains</code>, and <code>distinct()</code> in your program just works. Get them wrong and the failures are silent, intermittent, and maddening. This is the single highest-leverage correctness topic in core Java.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t11-static-members-blocks-and-nested-classes.html">static members, blocks &amp; nested classes</a> — the class-level (not instance-level) members: <code>static</code> fields and methods, <code>static { }</code> initializer blocks and their <code>&lt;clinit&gt;</code> mechanics, <code>static</code> nested classes, and where all of this lives in memory (Metaspace, the <code>Class</code> mirror, the per-class data area). After the instance-focused topics T01–T10, T11 turns to what belongs to the <em>class itself</em> rather than to its objects.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;equals, hashCode, toString contracts&quot;
+slug: equals-hashcode-tostring-contracts
+level: L1
+module: &quot;Core Java &amp; OOP&quot;
+section: &quot;Object-Oriented Programming&quot;
+type: concept
+difficulty: beginner
+order: 10
+tags: [equals, hashcode, tostring, equals-contract, hashcode-contract, reflexive, symmetric, transitive, consistent, value-equality, identity-equality, objects-equals, objects-hash, getclass-vs-instanceof, hashmap-internals, hash-spreading, treeification, hash-flooding, strength-reduction, why-31, records, lombok, float-compare, arrays-equals]
+prerequisites: [object-class-and-its-methods, classes-and-objects, fields-methods-constructors-this, encapsulation-and-access-modifiers]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-04
+---
+
+# equals, hashCode, toString contracts
+
+Three methods on `Object` define how your objects *compare*, *hash*, and *print*: `equals(Object)`, `hashCode()`, and `toString()`. [T09](./T09-object-class-and-its-methods.md) introduced them at the surface — their defaults and when to override. This topic is the deep treatment, because these three methods carry **contracts** the language doesn&#x27;t enforce but the entire collections framework silently depends on. Override `equals` without `hashCode` and your objects vanish from `HashSet`s. Write an asymmetric `equals` and `list.contains()` returns different answers depending on argument order. Mutate a field used in `hashCode` after putting the object in a `HashMap` and the entry becomes unreachable — still in the map, occupying memory, but `get` can never find it. These are not theoretical: they are the single most common category of subtle bug in production Java, and the most-asked-about topic in Java interviews.
+
+The depth bar here is not just &quot;here&#x27;s the recipe.&quot; It&#x27;s understanding **why** the contracts have the exact shape they do (they encode the mathematical properties of an equivalence relation, which hash tables require to function); **how** the methods physically interact with memory (the identity hash cached in the mark word, `String`&#x27;s dedicated `hash` field, the `HashMap.Node[]` table, the red-black `TreeNode` treeification at bucket size 8); and **how** they execute on the processor (why the multiplier 31 is chosen for *strength reduction* into a shift-and-subtract, how collision-chain walks thrash the cache, how a maliciously-crafted set of colliding keys turns an O(1) `HashMap` into an O(n²) denial-of-service vector). By the end you will write contract-correct implementations by hand, know exactly when to let records or Lombok generate them, and be able to reason about the memory and CPU cost of every hash-based lookup in your program.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Object class &amp; its methods](./T09-object-class-and-its-methods.md) (`L1/C01/T09`) — the eleven Object methods, default `equals`/`hashCode`/`toString`, identity hash in the mark word; [Classes &amp; objects](./T01-classes-and-objects.md) (`L1/C01/T01`) — object header, mark word, heap layout; [Fields, methods, constructors, this](./T02-fields-methods-constructors-this.md) (`L1/C01/T02`) — `final` fields, immutability; [Encapsulation](./T03-encapsulation-and-access-modifiers.md) (`L1/C01/T03`) — why immutable fields make safe hash keys.
+
+## Why Value Equality Exists — The Design Problem
+
+By default, every Java object is equal only to itself. `new Point(3,4).equals(new Point(3,4))` is `false` because the inherited `Object.equals` compares **identity** — are these the same object in memory? — not **state** — do they hold the same values? ([T09](./T09-object-class-and-its-methods.md)).
+
+This default is *correct* for entities with identity: a `Thread`, a database `Connection`, a UI `Window`. Two threads with identical names are still two different threads. But it is *wrong* for **value types** — `Money`, `Point`, `LocalDate`, `Color`, `String`. Two `Money(100, &quot;USD&quot;)` objects represent the *same amount*; a program that treats them as different is broken. The whole point of a value type is that its identity doesn&#x27;t matter, only its contents.
+
+So the language gives you a hook: override `equals` to define *what equal means for your type*, and the collections framework, your business logic, and every `if (a.equals(b))` will use your definition.
+
+```mermaid
+flowchart TB
+  D[&quot;default Object.equals&quot;]
+  D --&gt; Id[&quot;identity: a == b (same object?)&quot;]
+  O[&quot;overridden equals&quot;]
+  O --&gt; Val[&quot;value: same field contents?&quot;]
+  Id --&gt; Ent[&quot;right for entities: Thread, Connection&quot;]
+  Val --&gt; VT[&quot;right for values: Money, Point, String&quot;]
+```
+
+### How Other Languages Handle This — and What Java&#x27;s Choice Costs
+
+The &quot;value equality&quot; problem is universal; every language solves it, and the trade-offs are instructive:
+
+| Language | Equality mechanism | Hashing mechanism | Contract enforcement |
+|----------|--------------------|--------------------|----------------------|
+| **Java** | override `equals(Object)` | override `hashCode()` | **none** — silently broken if you forget |
+| **C++** | overload `operator==` (non-virtual) | specialize `std::hash&lt;T&gt;` (separate) | none; two unrelated mechanisms |
+| **Python** | define `__eq__` | define `__hash__` | **partial** — defining `__eq__` without `__hash__` makes the object *unhashable* |
+| **Rust** | derive/impl `PartialEq` + `Eq` | derive/impl `Hash` | **compile-time** — `HashMap` keys must be `Eq + Hash` |
+| **C#** | override `Equals` + `==` operator | override `GetHashCode` | none (like Java); analyzers warn |
+| **Kotlin** | `data class` auto-generates | auto-generates | enforced for data classes |
+
+Three of these are worth studying because they show what Java *didn&#x27;t* do:
+
+**Python disables hashing when you change equality.** If you write `__eq__` but not `__hash__`, Python sets `__hash__ = None`, and any attempt to use the object as a dict key raises `TypeError: unhashable type`. Python&#x27;s designers decided: *if you redefined equality, you almost certainly broke the default identity hash, so we&#x27;ll stop you from using a broken hash rather than let you corrupt a dict silently.* Java made the opposite choice — it lets you break it and find out at runtime when your `HashMap` misbehaves.
+
+**Rust encodes the reflexivity property in the type system.** Rust has *two* equality traits: `PartialEq` (equality that may not be reflexive) and `Eq` (a marker trait promising reflexivity — `a == a` always). Floating-point types implement `PartialEq` but **not** `Eq`, because `NaN != NaN` violates reflexivity. A `HashMap` key must be `Eq + Hash` — so the compiler *rejects* using a bare `f64` as a hash key, forcing you to handle the NaN problem explicitly. Java has no such distinction; you can use `Double` as a `HashMap` key and the NaN trap is yours to discover. This is the single sharpest illustration of why the `equals` contract&#x27;s five properties matter — Rust lifted one of them (reflexivity) into a compile-checked trait.
+
+**C++ keeps equality and hashing completely unrelated.** `operator==` and `std::hash` are separate; nothing ties them together. The contract &quot;equal objects must hash equal&quot; exists only in documentation and programmer discipline. Java at least co-locates both methods on `Object` and documents the joint contract — a middle ground between Rust&#x27;s enforcement and C++&#x27;s laissez-faire.
+
+Java&#x27;s position: **the contract is real but unenforced.** The language trusts you to honor it; the collections framework assumes you did. The rest of this topic is about honoring it correctly, and understanding exactly what breaks when you don&#x27;t.
+
+## The `equals` Contract — Five Properties
+
+`Object.equals`&#x27;s Javadoc specifies five properties any override must satisfy. These are not arbitrary style rules — they are the axioms of an **equivalence relation**, the mathematical structure that hash tables and sorted collections require to behave correctly. Violate one and some collection, somewhere, will silently malfunction.
+
+```mermaid
+flowchart TB
+  EC[&quot;equals contract&quot;]
+  EC --&gt; R[&quot;reflexive: x.equals(x) == true&quot;]
+  EC --&gt; S[&quot;symmetric: x.equals(y) iff y.equals(x)&quot;]
+  EC --&gt; T[&quot;transitive: x.equals(y) &amp;&amp; y.equals(z) ⇒ x.equals(z)&quot;]
+  EC --&gt; C[&quot;consistent: repeated calls agree&quot;]
+  EC --&gt; N[&quot;non-null: x.equals(null) == false&quot;]
+```
+
+### 1. Reflexive — `x.equals(x)` Must Be True
+
+An object must equal itself. This sounds trivial and is almost never violated *deliberately* — but it can break by accident. Consider an object whose `equals` compares against the current time, or against a mutable external resource: `x.equals(x)` could return `false` if the world changed between the two field reads. The fix is to make equality depend only on the object&#x27;s own immutable state.
+
+The collection that depends on reflexivity: `List.contains`. `list.contains(x)` is implemented as &quot;does any element `e` satisfy `x.equals(e)`?&quot; If you add `x` to the list and `x.equals(x)` is false, `list.contains(x)` returns false for an element that is literally in the list.
+
+### 2. Symmetric — `x.equals(y)` iff `y.equals(x)`
+
+If `x` equals `y`, then `y` must equal `x`. The classic violation is a class that tries to be equal to a *different* type:
+
+```java
+public final class CaseInsensitiveString {
+    private final String s;
+    public CaseInsensitiveString(String s) { this.s = s; }
+
+    @Override public boolean equals(Object o) {
+        if (o instanceof CaseInsensitiveString cis)
+            return s.equalsIgnoreCase(cis.s);
+        if (o instanceof String str)                  // BUG: tries to equal a String
+            return s.equalsIgnoreCase(str);
+        return false;
+    }
+}
+
+CaseInsensitiveString cis = new CaseInsensitiveString(&quot;Hello&quot;);
+String str = &quot;hello&quot;;
+cis.equals(str);   // true  — CaseInsensitiveString knows how to compare to String
+str.equals(cis);   // false — String has no idea what CaseInsensitiveString is
+```
+
+`cis.equals(str)` is true but `str.equals(cis)` is false — asymmetry. Now `list.contains` gives different answers depending on which object is in the list and which is the argument. A `HashSet` containing `cis` might or might not &quot;contain&quot; `str` depending on internal ordering. The fix: **never try to be equal to a foreign type.** Remove the `String` branch; `CaseInsensitiveString` equals only other `CaseInsensitiveString`s.
+
+```mermaid
+flowchart LR
+  CIS[&quot;CaseInsensitiveString &#x27;Hello&#x27;&quot;] -- &quot;equals&quot; --&gt; Str[&quot;String &#x27;hello&#x27; → true&quot;]
+  Str2[&quot;String &#x27;hello&#x27;&quot;] -- &quot;equals&quot; --&gt; CIS2[&quot;CaseInsensitiveString → false&quot;]
+  Note[&quot;asymmetry: contains() answers depend on argument order&quot;]
+```
+
+### 3. Transitive — Equal Chains Must Close
+
+If `x` equals `y` and `y` equals `z`, then `x` must equal `z`. This is the property that **inheritance breaks**, and it&#x27;s the deepest trap in the whole topic.
+
+Suppose `Point` has value equality on `(x, y)`, and `ColorPoint extends Point` adds a color:
+
+```java
+public class Point {
+    final int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof Point p)) return false;
+        return x == p.x &amp;&amp; y == p.y;
+    }
+}
+
+public class ColorPoint extends Point {
+    final Color color;
+    ColorPoint(int x, int y, Color color) { super(x, y); this.color = color; }
+    @Override public boolean equals(Object o) {
+        if (!(o instanceof ColorPoint cp)) return false;
+        return super.equals(cp) &amp;&amp; color == cp.color;
+    }
+}
+```
+
+Now:
+
+```java
+Point p          = new Point(1, 2);
+ColorPoint cpRed = new ColorPoint(1, 2, RED);
+
+p.equals(cpRed);   // true  — Point.equals ignores color; sees (1,2) == (1,2)
+cpRed.equals(p);   // false — ColorPoint.equals requires o to be a ColorPoint
+```
+
+That&#x27;s already asymmetric. If you &quot;fix&quot; symmetry by making `ColorPoint.equals` ignore color when compared to a plain `Point`, you destroy transitivity:
+
+```java
+ColorPoint cpRed   = new ColorPoint(1, 2, RED);
+Point      p       = new Point(1, 2);
+ColorPoint cpBlue  = new ColorPoint(1, 2, BLUE);
+
+cpRed.equals(p);     // true (ignores color, mixed comparison)
+p.equals(cpBlue);    // true (ignores color)
+cpRed.equals(cpBlue);// false (both ColorPoints → color checked → RED != BLUE)
+// red ~ point ~ blue, but red !~ blue. Transitivity broken.
+```
+
+This is the famous result from *Effective Java* Item 10: **there is no way to extend an instantiable class with a new value component while preserving the `equals` contract.** The mathematics simply doesn&#x27;t allow it. The escapes:
+
+1. **Favor composition over inheritance.** Give `ColorPoint` a `private final Point point;` field instead of extending `Point`. Now the two types are unrelated and each has its own clean `equals`.
+2. **Use `getClass()` instead of `instanceof`** (next section) — this makes `Point` and `ColorPoint` *never* equal, restoring the contract at the cost of Liskov substitutability.
+3. **Make the class hierarchy a `sealed` set of records** ([T14](./T14-record-types.md), [T15](./T15-sealed-classes-and-interfaces.md)) — records are `final`, so the extension problem never arises.
+
+The collection that depends on transitivity: every hash-based and sorted collection. A `TreeSet` using a broken equality can place the &quot;same&quot; element in two positions.
+
+### 4. Consistent — Repeated Calls Must Agree
+
+`x.equals(y)` must keep returning the same result as long as neither object&#x27;s `equals`-relevant state changes. The textbook violation is `java.net.URL.equals`, which performs a **DNS lookup** to resolve host names to IP addresses and compares *those*. Two URLs can be equal or not depending on network conditions and DNS cache state — a method call that does I/O and can change its answer. (The JDK is stuck with this for backward compatibility; use `URI` instead, which compares textually.)
+
+The lesson: `equals` should be a **pure function of immutable, in-memory state.** No I/O, no clocks, no random numbers, no mutable fields that callers can change behind your back.
+
+### 5. Non-Null — `x.equals(null)` Must Return False
+
+For any non-null `x`, `x.equals(null)` must return `false` — never `true`, never throw `NullPointerException`. The canonical recipe handles this automatically because `instanceof` returns `false` for `null`:
+
+```java
+if (!(o instanceof Point p)) return false;   // null fails instanceof → returns false. Correct.
+```
+
+If you instead write `o.getClass() == Point.class`, you must guard against `o == null` first (calling `getClass()` on null NPEs). The `instanceof` form is null-safe for free — one of the reasons it&#x27;s the recommended idiom.
+
+## Writing `equals` — The Canonical Recipe
+
+The five-step recipe that satisfies all five properties:
+
+```java
+@Override
+public boolean equals(Object o) {
+    // 1. Identity short-circuit: same object is always equal. Fast path.
+    if (this == o) return true;
+
+    // 2. Type check via pattern-binding instanceof (Java 16+).
+    //    Handles null (instanceof null == false) and wrong types in one line.
+    if (!(o instanceof Money other)) return false;
+
+    // 3. Compare each significant field, cheapest first.
+    return cents == other.cents
+        &amp;&amp; currency.equals(other.currency);   // Objects.equals(currency, other.currency) if nullable
+}
+```
+
+Step 1 is a **performance optimization, not a correctness requirement** — but it matters: for objects frequently compared to themselves (common in collections), the `this == o` reference compare is one CPU instruction (~1 cycle) versus a full field-by-field walk. Order the field comparisons in step 3 from cheapest/most-likely-to-differ to most expensive — a mismatch on the first field short-circuits the `&amp;&amp;` and skips the rest.
+
+### `getClass()` vs `instanceof` — The Substitutability Trade-off
+
+The type check in step 2 has two forms, and the choice is a genuine design decision:
+
+```java
+// Form A — instanceof: allows subclass instances to be equal to this class
+if (!(o instanceof Point p)) return false;
+
+// Form B — getClass: requires the EXACT same class
+if (o == null || getClass() != o.getClass()) return false;
+```
+
+| | `instanceof` (Form A) | `getClass()` (Form B) |
+|--|----------------------|----------------------|
+| Subclass can equal parent | yes | no |
+| Preserves Liskov substitutability | yes | **no** (a subclass instance is never `equals` to a parent instance) |
+| Survives adding state in a subclass | **no** (breaks symmetry/transitivity) | yes |
+| Null handling | automatic | manual guard needed |
+
+**Use `instanceof`** when subclasses add no value-significant state (e.g., subclasses that only add behavior). **Use `getClass()`** when you want strict type-identical equality and accept the Liskov violation. In practice: if you favor composition over inheritance (you should), the question rarely arises — each value type is `final` and stands alone. Records sidestep it entirely (they&#x27;re `final`).
+
+### The Float and Double Trap
+
+Never compare `float`/`double` fields with `==` in `equals`. Two reasons, both rooted in IEEE 754:
+
+```java
+// WRONG
+return this.value == other.value;   // breaks for NaN and signed zero
+
+// RIGHT
+return Double.compare(this.value, other.value) == 0;
+```
+
+- **NaN.** `Double.NaN == Double.NaN` is `false` (IEEE 754 mandates it). But for `equals` you want `NaN.equals(NaN)` to be `true` — otherwise an object with a NaN field isn&#x27;t reflexive (`x.equals(x)` fails). `Double.compare(NaN, NaN) == 0` correctly returns &quot;equal.&quot;
+- **Signed zero.** `0.0 == -0.0` is `true`, but `Double.compare(0.0, -0.0)` is `1` (they&#x27;re distinct bit patterns). Boxing agrees: `Double.valueOf(0.0).equals(Double.valueOf(-0.0))` is `false`. Using `Double.compare` keeps your `equals` consistent with how `Double` objects and the collections framework treat these values.
+
+This is exactly the property Rust encodes by making `f64` `PartialEq` but not `Eq` — the reflexivity violation of `NaN`. Java doesn&#x27;t warn you; `Double.compare` is the manual fix.
+
+### The Array Field Trap
+
+If a field is an array, `==` and the inherited `array.equals` both test **reference identity**, not contents:
+
+```java
+int[] a = {1, 2, 3}, b = {1, 2, 3};
+a.equals(b);            // false — Object.equals, reference identity
+Arrays.equals(a, b);    // true  — element-by-element
+```
+
+Use `Arrays.equals(a, b)` for one-dimensional arrays and `Arrays.deepEquals(a, b)` for nested arrays. The same applies to `hashCode`: use `Arrays.hashCode(a)` / `Arrays.deepHashCode(a)`. (This is why records with array components are tricky — the generated `equals` uses `Arrays`-unaware `Object.equals` on the array reference; prefer `List&lt;T&gt;` over `T[]` in records.)
+
+## The `hashCode` Contract
+
+`hashCode()` returns an `int` used to bucket objects in hash-based collections. Its contract has three clauses:
+
+```mermaid
+flowchart TB
+  HC[&quot;hashCode contract&quot;]
+  HC --&gt; C1[&quot;consistent with equals: a.equals(b) ⇒ a.hashCode() == b.hashCode()&quot;]
+  HC --&gt; C2[&quot;stable: same object, same hashCode across calls (within a run)&quot;]
+  HC --&gt; C3[&quot;collisions allowed: a != b MAY share a hashCode&quot;]
+```
+
+1. **Consistency with `equals` (the critical one).** If `a.equals(b)`, then `a.hashCode() == b.hashCode()` **must** hold. This is the clause everyone forgets, and forgetting it is what makes objects vanish from `HashSet`s.
+2. **Stability.** Repeated `hashCode()` calls on the same object must return the same value, as long as `equals`-relevant state doesn&#x27;t change.
+3. **Collisions are legal.** Unequal objects *may* return the same hashCode. A hashCode is a *bucket hint*, not a unique ID. `equals` is the tiebreaker within a bucket. (The reverse implication — equal hashCodes imply equal objects — is **false** and must never be assumed.)
+
+Note the asymmetry: equal objects **must** hash equal, but equal hashes **need not** mean equal objects. A perfect hash (no collisions) is ideal but impossible in general — there are 2³² possible `int` hashes and potentially infinitely many objects.
+
+### Why Forgetting `hashCode` Breaks `HashMap` — The Physical Mechanism
+
+```java
+// equals overridden, hashCode NOT overridden (still identity hash from Object)
+Money m1 = new Money(100, &quot;USD&quot;);
+Money m2 = new Money(100, &quot;USD&quot;);
+m1.equals(m2);          // true — we overrode equals
+
+Map&lt;Money, String&gt; map = new HashMap&lt;&gt;();
+map.put(m1, &quot;first&quot;);
+map.get(m2);            // null! — m2 hashes to a DIFFERENT bucket than m1
+```
+
+`m1` and `m2` are `equals`, but their *identity* hash codes (from the unoverridden `Object.hashCode`, derived from each object&#x27;s mark word — [T09](./T09-object-class-and-its-methods.md)) are almost certainly different. `HashMap` uses the hash code to pick a **bucket** (array slot), then searches only that bucket with `equals`. `m2` lands in a different bucket than `m1`, the search never reaches `m1`, and `get` returns `null`. The entry is physically in the map&#x27;s memory, occupying bytes, permanently unreachable.
+
+This is why **you must override both or neither.** Overriding `equals` alone is the single most common Java contract bug.
+
+## Writing `hashCode` — The Recipe
+
+The standard implementation combines the same fields `equals` uses:
+
+```java
+@Override
+public int hashCode() {
+    return Objects.hash(cents, currency);   // simplest; boxes args + allocates an array
+}
+```
+
+Or, hand-rolled for hot paths (no boxing, no array allocation):
+
+```java
+@Override
+public int hashCode() {
+    int result = Long.hashCode(cents);      // seed with first field
+    result = 31 * result + currency.hashCode();
+    return result;
+}
+```
+
+Both follow the same algorithm: start with one field&#x27;s hash, then for each subsequent field compute `31 * accumulated + fieldHash`. The two implementations differ only in cost: `Objects.hash(...)` takes varargs, which **allocates an `Object[]`** and **boxes** each primitive argument — ~32-80 bytes of garbage per call. Fine for cold paths; wasteful in a method called millions of times per second (a `hashCode` invoked inside a `HashMap` resize loop). The hand-rolled form allocates nothing.
+
+&gt; [!WARNING]
+&gt; `Objects.hash(a, b, c)` is convenient but allocates an array and boxes primitives on every call. In hot code (objects used as keys in large, frequently-resized maps), hand-roll the `31 * result + field` form, or cache the hash for immutable objects (see below).
+
+### Why the Multiplier Is 31
+
+The magic number `31` in `31 * result + field` appears in `String.hashCode`, `Objects.hash`, `Arrays.hashCode`, and every IDE-generated `hashCode`. Three reasons, in order of importance:
+
+**1. It&#x27;s odd.** Multiplying by an *even* number throws away one bit of information per multiply, because the low bit becomes 0 and the high bit shifts off the end of the `int`. Over several fields, an even multiplier loses entropy and clusters hashes. Any odd multiplier avoids this. (The pathological case: multiplying by 2 is a left shift, so `31*` becoming `2*` would make `hashCode` lose the top bits entirely after 32 fields.)
+
+**2. It&#x27;s prime.** A prime multiplier distributes hashes more uniformly for certain structured inputs (e.g., short ASCII strings), reducing collisions. The benefit is modest and the reason is partly historical, but it does no harm.
+
+**3. It strength-reduces to a shift and subtract.** This is the deep one. `31 * i` is algebraically `32 * i - i`, and `32 * i` is `i &lt;&lt; 5`. So:
+
+```
+31 * i  ≡  (i &lt;&lt; 5) - i
+```
+
+The JIT (and historically the C compiler for `String.hashCode`) emits a **left-shift-by-5 plus a subtract** — two single-cycle ALU operations — instead of a hardware multiply. On the 1990s CPUs Java was designed for, integer multiply took 4-10 cycles while shift and subtract took 1 each; the strength reduction was a real 2-5× speedup for `String.hashCode`, which the JVM calls constantly. On modern CPUs `imul` is ~3 cycles (pipelined to ~1 throughput), so the win is smaller, but the JIT still performs the reduction because shift+sub frees the multiplier execution port for other work.
+
+```mermaid
+flowchart LR
+  Mul[&quot;31 * i&quot;]
+  Mul --&gt; SR[&quot;strength reduction&quot;]
+  SR --&gt; Shift[&quot;i &lt;&lt; 5  (1 cycle)&quot;]
+  SR --&gt; Sub[&quot;result - i  (1 cycle)&quot;]
+  Shift --&gt; Final[&quot;(i&lt;&lt;5) - i&quot;]
+  Sub --&gt; Final
+```
+
+You can confirm it: compile a `31 * x` expression and disassemble with `-XX:+PrintAssembly`. On x86-64 you&#x27;ll typically see something like `mov eax, edx; shl eax, 5; sub eax, edx` — no `imul`. (Bloch notes in *Effective Java* that the choice of 31 was partly *because* of this strength-reduction property; it&#x27;s a number chosen for the machine, not just the math.)
+
+### Caching the Hash for Immutable Objects
+
+If an object is immutable and its `hashCode` is expensive (many fields, or a large collection), compute it **once and cache** it. This is exactly what `String` does (see the memory section below). The pattern:
+
+```java
+public final class BigKey {
+    private final List&lt;String&gt; parts;
+    private int hash;            // 0 until computed; cached thereafter
+
+    @Override public int hashCode() {
+        int h = hash;
+        if (h == 0 &amp;&amp; !parts.isEmpty()) {   // 0 is the &quot;not computed yet&quot; sentinel
+            h = parts.hashCode();
+            hash = h;
+        }
+        return h;
+    }
+}
+```
+
+The subtlety: `0` doubles as both &quot;not yet computed&quot; and a legitimate hash value. If the real hash happens to be `0`, you recompute every time (harmless, just not cached). `String` solved this more precisely in Java 9 by adding a separate `boolean hashIsZero` field — covered next.
+
+## Memory Layer — Where Hash Codes Physically Live
+
+Hash codes occupy real bytes, and *where* they live differs between identity hashing and overridden hashing.
+
+### Identity Hash: In the Mark Word
+
+The default `Object.hashCode` (identity hash) is **not stored in a field**. It&#x27;s computed lazily and cached in the object&#x27;s **mark word** — the first 8 bytes of every object header ([T01](./T01-classes-and-objects.md), [T09](./T09-object-class-and-its-methods.md)). The mark word layout for an unlocked object with a computed hash (64-bit HotSpot):
+
+```
+mark word, 8 bytes:
+  bits 63...........38  37.....34  33.....3  2..0
+       | identity hash  | age (4) | unused  | lock (01) |
+         (31 bits)
+```
+
+First call to `hashCode()` runs the thread-local Park-Miller generator (~40 cycles), CAS-installs the 31-bit value into the mark word, and returns it. Subsequent calls read it directly (~5 cycles — [T09](./T09-object-class-and-its-methods.md)). **Zero extra heap bytes** — it rides in the header that every object already pays for. This is the cost-free case: the universal 12-byte header ([T01](./T01-classes-and-objects.md)) earns its keep by holding the identity hash.
+
+### Overridden Hash: Computed Each Call, Unless You Cache It
+
+An overridden `hashCode()` is **not** stored in the mark word — the JVM has no idea your method exists or what it returns. It runs your method body every call. For a `Money { long cents; String currency; }`:
+
+```
+hashCode() execution:
+  Long.hashCode(cents)        ; ~2 cycles (xor of high/low 32 bits)
+  currency.hashCode()         ; ~5 cycles if String hash already cached
+  31 * result + ...           ; ~2 cycles (shift + sub + add)
+  total: ~10 cycles ≈ 3 ns per call, recomputed every time
+```
+
+If the object is a frequently-used map key, this recomputation happens on every `put`, `get`, `containsKey`, and during every internal resize. Caching (previous section) trades 4 bytes of object memory for eliminating the recompute.
+
+### String&#x27;s Dedicated Hash Field — A Case Study
+
+`String` is the most common `HashMap` key in all of Java, so the JDK caches its hash in a dedicated field. The Java 9+ `String` instance layout:
+
+```java
+public final class String {
+    private final byte[] value;     // the characters (Latin-1 or UTF-16)
+    private final byte   coder;     // 0 = Latin-1, 1 = UTF-16
+    private int          hash;      // cached hashCode, 0 until computed
+    private boolean      hashIsZero;// true once we&#x27;ve computed it and it WAS 0
+}
+```
+
+Physical bytes of a `String` *object* (not counting the separate `byte[]`):
+
+```
+offset  field         size
++0      object header  12 bytes (mark word 8 + klass ptr 4)
++12     value (ref)    4 bytes  (compressed oop to the byte[])
++16     hash (int)     4 bytes  ← the cached hash
++20     coder (byte)   1 byte
++21     hashIsZero     1 byte
++22     padding        2 bytes
+total: 24 bytes
+```
+
+So **4 of every String object&#x27;s 24 bytes are the cached hash code.** The `hashIsZero` boolean (1 byte) solves the &quot;is 0 the hash or &#x27;not computed&#x27;?&quot; ambiguity precisely: `hash == 0 &amp;&amp; !hashIsZero` means &quot;not computed yet&quot;; `hash == 0 &amp;&amp; hashIsZero` means &quot;computed, and it really is 0.&quot; `String.hashCode`:
+
+```java
+public int hashCode() {
+    int h = hash;
+    if (h == 0 &amp;&amp; !hashIsZero) {       // not computed yet
+        h = isLatin1() ? StringLatin1.hashCode(value)
+                       : StringUTF16.hashCode(value);
+        if (h == 0) hashIsZero = true; // remember that the real hash is 0
+        else        hash = h;          // cache the nonzero hash
+    }
+    return h;
+}
+```
+
+The first `hashCode()` walks the characters (`31*h + char` per character — O(length), and SIMD-vectorized in modern JVMs via `StringLatin1.hashCode` intrinsics, ~16 chars/iteration). Every call after is a single 4-byte field read (~1 cycle). This is why using `String` keys in a `HashMap` is fast: each key&#x27;s hash is computed once across its entire lifetime, even if it&#x27;s looked up a billion times.
+
+```mermaid
+flowchart LR
+  First[&quot;first String.hashCode()&quot;]
+  First --&gt; Walk[&quot;walk chars: 31*h + c, SIMD ~16/iter&quot;]
+  Walk --&gt; Cache[&quot;store in hash field (4 bytes)&quot;]
+  Later[&quot;every later call&quot;]
+  Later --&gt; Read[&quot;read hash field — 1 cycle&quot;]
+```
+
+## Memory Layer — How `HashMap` Physically Stores and Looks Up
+
+To understand why the contracts matter, you have to see what `HashMap` does with your `hashCode` and `equals` in memory.
+
+### The Table and the Node
+
+A `HashMap` holds a `Node&lt;K,V&gt;[] table` — an array of bucket heads. Each `Node` is a small heap object:
+
+```java
+static class Node&lt;K,V&gt; {
+    final int hash;     // the SPREAD hash (see below), cached at insertion
+    final K key;        // your key object (a reference)
+    V value;            // your value object (a reference)
+    Node&lt;K,V&gt; next;     // next node in this bucket&#x27;s collision chain
+}
+```
+
+Physical bytes of one `Node` (compressed oops):
+
+```
++0   header     12 bytes
++12  hash (int)  4 bytes
++16  key (ref)   4 bytes
++20  value (ref) 4 bytes
++24  next (ref)  4 bytes
++28  padding     4 bytes
+total: 32 bytes per entry
+```
+
+So **every `HashMap` entry costs 32 bytes of `Node`** on top of the key and value objects themselves, plus its slot in the `table` array (4 bytes). A `HashMap` with a million entries holds ~32 MB of `Node` objects + a 4 MB+ table array — before counting the keys and values. (`HashMap`&#x27;s default **load factor 0.75** means the table is sized to ~1.33× the entry count, so the table for 1M entries is ~2M slots = 8 MB.)
+
+```mermaid
+flowchart TB
+  Table[&quot;Node[] table (power-of-2 length)&quot;]
+  Table --&gt; B0[&quot;bucket 0 → Node → Node → null&quot;]
+  Table --&gt; B1[&quot;bucket 1 → null&quot;]
+  Table --&gt; B2[&quot;bucket 2 → Node → null&quot;]
+  Table --&gt; Bn[&quot;bucket n-1 → ...&quot;]
+```
+
+### Bucket Index — Why the Table Length Is a Power of Two
+
+To find a key&#x27;s bucket, `HashMap` computes `(table.length - 1) &amp; hash`. Because `table.length` is **always a power of two**, `length - 1` is a mask of all-ones in the low bits (e.g., length 16 → mask `0b1111`), and the `&amp;` extracts the low bits of the hash. This is a single 1-cycle AND instruction — far cheaper than the `hash % length` modulo (a 20-40 cycle integer divide) that a non-power-of-two table would require.
+
+```
+table.length = 16 = 0b10000
+mask         = 15 = 0b01111
+bucket       = hash &amp; 0b01111   ; low 4 bits of hash, ~1 cycle
+```
+
+### Hash Spreading — Why `HashMap` Doesn&#x27;t Trust Your `hashCode` Directly
+
+Because the bucket index uses only the **low** bits of the hash, two keys whose hashes differ only in the *high* bits would collide. Many real `hashCode` implementations produce hashes that vary mostly in high bits (e.g., `Float.hashCode`, or keys that are powers of two). To defend against this, `HashMap` **spreads** your hash before masking:
+
+```java
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+}
+```
+
+It XORs the top 16 bits down into the bottom 16. This mixes high-bit entropy into the low bits that actually choose the bucket, at the cost of one shift and one XOR (~2 cycles). It&#x27;s a cheap insurance policy that turns a mediocre `hashCode` into an acceptable bucket distribution.
+
+```mermaid
+flowchart LR
+  H[&quot;your hashCode(): 32 bits&quot;]
+  H --&gt; Spread[&quot;h ^ (h &gt;&gt;&gt; 16): mix high into low&quot;]
+  Spread --&gt; Mask[&quot;&amp; (length-1): pick bucket&quot;]
+  Mask --&gt; Bucket[&quot;bucket index&quot;]
+```
+
+### Collision Chains and Treeification
+
+When two keys land in the same bucket (same spread-and-masked index), `HashMap` stores them in a **linked list** hanging off that bucket&#x27;s `Node.next`. A `get` walks the chain calling `equals` on each node until it finds a match. With a good `hashCode`, chains stay length 0-1 and lookup is O(1). With a bad `hashCode`, chains grow and lookup degrades toward O(n).
+
+Java 8 added a defense: when a single bucket&#x27;s chain reaches **8 nodes** (`TREEIFY_THRESHOLD`) *and* the table has at least **64 slots** (`MIN_TREEIFY_CAPACITY`), `HashMap` converts that bucket&#x27;s linked list into a **red-black tree** of `TreeNode`s, making worst-case lookup O(log n) instead of O(n). The `TreeNode` is much larger than a plain `Node`:
+
+```java
+static final class TreeNode&lt;K,V&gt; extends LinkedHashMap.Entry&lt;K,V&gt; {
+    TreeNode&lt;K,V&gt; parent, left, right, prev;
+    boolean red;
+    // inherits hash, key, value, next (Node) + before, after (Entry)
+}
+```
+
+Physical bytes:
+
+```
+Node fields           16 bytes (hash, key, value, next)
+Entry adds            8 bytes  (before, after — from LinkedHashMap.Entry)
+TreeNode adds         17 bytes (parent, left, right, prev, red)
++ header              12 bytes
++ padding             to 8-byte align
+total: ~56 bytes per TreeNode
+```
+
+So treeification **nearly doubles per-node memory (32 → 56 bytes)** but converts the collision walk from O(n) to O(log n). It de-treeifies back to a list (`UNTREEIFY_THRESHOLD = 6`) if the bucket shrinks. The asymmetry (treeify at 8, untreeify at 6) is hysteresis to avoid thrashing around the threshold.
+
+```mermaid
+flowchart TB
+  L[&quot;bucket: linked list (≤ 8 nodes, 32 B each)&quot;]
+  L --&gt;|&quot;grows to 8 + table ≥ 64&quot;| T[&quot;red-black tree (TreeNode, 56 B each, O(log n))&quot;]
+  T --&gt;|&quot;shrinks to 6&quot;| L
+```
+
+&gt; [!IMPORTANT]
+&gt; Treeification requires the keys to be `Comparable` to order the red-black tree. If your keys are not `Comparable`, `HashMap` falls back to comparing by identity-hash and class name for tree ordering — it still works, but the tree balance is weaker. This is one reason value-type keys often implement `Comparable` even when not strictly required.
+
+## Architecture Layer — Hash Performance on the Processor
+
+The contracts are about correctness; their *performance* consequences live in the CPU&#x27;s cache and branch predictor.
+
+### A Good Hash Is a Cache Story
+
+A `HashMap.get` with a well-distributed hash:
+
+```
+1. compute spread hash         ~10 cycles (your hashCode + spread)
+2. mask to bucket index        ~1 cycle (AND)
+3. load table[index]           ~4 cycles (L1 hit if table is hot)
+4. compare hash + equals       ~5 cycles (chain length 1)
+total: ~20 cycles ≈ 6 ns
+```
+
+Step 3 is the interesting one: `table[index]` is a near-random array access (the whole point of hashing is to scatter keys uniformly), so it&#x27;s **prefetcher-hostile**. The CPU cannot predict which bucket you&#x27;ll touch next, so each `get` on a cold map is likely an L2 or L3 miss (~12-60 cycles) for the table slot, then *another* miss to load the `Node` object (separate heap allocation), then *another* to load the key object for `equals`. A `HashMap.get` on a large, cold map can be **3 cache misses ≈ 150-300 cycles ≈ 50-90 ns** — versus ~6 ns when everything is L1-hot. This is why hash lookups that look O(1) in Big-O can be 10-15× slower in practice on large maps that don&#x27;t fit in cache: the constant factor is dominated by memory latency, not computation.
+
+### A Bad Hash Is a Collision Walk
+
+If many keys collide (poor `hashCode`), the `get` walks a long chain:
+
+```
+chain of N colliding nodes:
+  for each node: load Node (cache miss), compare hash, call equals (cache miss to load key)
+  ~2 cache misses × N nodes
+```
+
+For a 100-node chain, that&#x27;s ~200 cache misses ≈ 20,000 cycles ≈ 6 µs per lookup — a thousand times slower than the O(1) case. Treeification caps this at O(log n) ≈ 7 comparisons for the same 100 nodes, ~14 misses ≈ 1,400 cycles. Still slow, but bounded.
+
+### Branch Prediction in `equals` Chains
+
+A field-by-field `equals` is a chain of `&amp;&amp;` short-circuits, each compiling to a compare-and-branch. The CPU&#x27;s branch predictor learns the pattern: if most `equals` calls fail on the first field (common — most candidate objects differ), the predictor correctly assumes &quot;first field differs, return false&quot; and the misprediction cost is near zero. If `equals` calls usually *succeed* (e.g., deduplication where most candidates match), the predictor learns *that*. The cost shows up only when the success/failure pattern is unpredictable (~50/50), where each mispredict costs ~15-20 cycles. Ordering `equals` comparisons so the most-discriminating field comes first helps the predictor and short-circuits sooner.
+
+### Hash Flooding — When a Bad Hash Becomes a Security Vulnerability
+
+The collision-walk cost is not just a performance footnote; it&#x27;s a **denial-of-service attack vector**. If an attacker controls the *keys* inserted into a `HashMap` — and they often do, because web frameworks parse HTTP POST parameters, JSON object keys, and HTTP headers into `HashMap`s — they can craft thousands of distinct keys that all hash to the **same bucket**. Inserting `n` such keys is O(n²) (each insert walks the growing chain), and a few tens of thousands of crafted keys can pin a CPU core for seconds, hanging the server.
+
+This was a real, widespread vulnerability disclosed in 2011 (the 28C3 talk &quot;Efficient Denial of Service Attacks on Web Application Platforms,&quot; CVE-2011-4858 and relatives) affecting Java, PHP, Python, Ruby, and ASP.NET simultaneously — all used hash tables with predictable string hashing for request parameters. A single ~1 MB POST request with colliding parameter names could consume *minutes* of CPU.
+
+Java&#x27;s mitigations:
+- **Treeification (Java 8+)** caps the worst case at O(n log n) instead of O(n²) — the attack still slows things but no longer hangs the server. This is the *primary* reason treeification was added; it&#x27;s a security feature as much as a performance one.
+- **Randomized string hashing** was considered (`jdk.map.althashing.threshold`) but largely superseded by treeification.
+
+```mermaid
+flowchart TB
+  Atk[&quot;attacker sends N keys all hashing to one bucket&quot;]
+  Atk --&gt; Pre8[&quot;pre-Java-8: O(n²) chain inserts → server hangs&quot;]
+  Atk --&gt; Post8[&quot;Java 8+: treeify at 8 → O(n log n) → degraded but alive&quot;]
+```
+
+The lesson reaches back to the contract: a `hashCode` that distributes poorly isn&#x27;t just slow, it&#x27;s a liability. For keys that come from untrusted input, a well-distributed hash is a security control.
+
+## `toString` — The Human-Readable Method
+
+`toString` has no five-property contract — it&#x27;s for humans, not collections — but it has strong conventions. The default is the unhelpful `getClass().getName() + &quot;@&quot; + Integer.toHexString(hashCode())` ([T09](./T09-object-class-and-its-methods.md)): `com.example.Money@1b6d3586`. Override it for any class you&#x27;ll ever log or debug.
+
+```java
+@Override
+public String toString() {
+    return &quot;Money[cents=&quot; + cents + &quot;, currency=&quot; + currency + &quot;]&quot;;
+}
+```
+
+Conventions worth following:
+
+- **Include the class name and the significant fields.** Enough to identify the object in a log line.
+- **Don&#x27;t make it parseable as an API.** `toString` output is for humans and may change; if callers need structured data, expose accessors or a real serialization format. Documenting a `toString` format locks you into it forever.
+- **Never put secrets in `toString`.** Passwords, tokens, full credit-card numbers in a `toString` end up in log files — a classic data-leak. Mask them: `&quot;card=****&quot; + last4`.
+- **Beware cycles and cost.** A `toString` that walks a large collection or a cyclic object graph can be slow or stack-overflow. The default `AbstractCollection.toString` walks every element.
+
+`toString` is called implicitly by string concatenation (`&quot;x=&quot; + obj`), `System.out.println(obj)`, logging frameworks, debuggers (the &quot;Variables&quot; pane), and assertion messages. A good `toString` pays for itself the first time you debug a production incident from logs.
+
+## Records and the Auto-Generated Trio
+
+Since Java 16, a **record** generates contract-correct `equals`, `hashCode`, and `toString` automatically from its components ([T14](./T14-record-types.md)):
+
+```java
+public record Money(long cents, String currency) { }
+
+Money a = new Money(100, &quot;USD&quot;);
+Money b = new Money(100, &quot;USD&quot;);
+a.equals(b);        // true  — generated equals compares cents and currency
+a.hashCode() == b.hashCode();  // true — generated hashCode is consistent
+a.toString();       // &quot;Money[cents=100, currency=USD]&quot;
+```
+
+The generated implementations:
+- `equals` checks `getClass()` (exact-class, not `instanceof`) then compares each component with the right method (`==` for primitives via `Double.compare` for floating point, `Objects.equals` for references).
+- `hashCode` combines component hashes (using an `invokedynamic`-bootstrapped method, `ObjectMethods.bootstrap`, that the JVM generates once).
+- `toString` produces `RecordName[comp1=val1, comp2=val2]`.
+
+**For pure value types, records are the correct default** — they eliminate the entire category of hand-written-contract bugs. The generated `equals` uses `getClass()`, and records are `final`, so the inheritance-transitivity trap cannot occur. The one caveat: a record with an **array component** generates an `equals` that compares the array by reference (because it uses `Objects.equals`, not `Arrays.equals`) — so `new Data(new int[]{1}).equals(new Data(new int[]{1}))` is `false`. Prefer `List&lt;T&gt;` over `T[]` in records, or override `equals`/`hashCode` explicitly for array components.
+
+### Lombok and AutoValue — Generation for Non-Record Classes
+
+Before records (and for classes that need mutability or inheritance), two libraries generate the trio:
+
+- **Lombok** (`@EqualsAndHashCode`, `@ToString`, `@Data`) — annotation-processor that *modifies the bytecode* at compile time to inject the methods. Zero runtime dependency; the generated code is real bytecode. Caveat: it&#x27;s &quot;magic&quot; — the source doesn&#x27;t show the methods, which can confuse debuggers and code review. `@EqualsAndHashCode(callSuper = true)` is needed for subclasses to include the parent&#x27;s fields.
+- **Google AutoValue** (`@AutoValue`) — generates a *concrete subclass* with the methods as readable source you can inspect. More verbose, less magic, favored where transparency matters.
+
+Both predate records and remain useful for classes that can&#x27;t be records (e.g., need mutable fields, JPA entities, builders). For new immutable value types on Java 16+, **prefer records** — no library, no annotation processor, language-guaranteed correctness.
+
+## Common Mistakes
+
+&gt; [!WARNING]
+&gt; **Overriding `equals` without `hashCode` (or vice versa).** The number-one Java contract bug. Equal objects with unequal hashes vanish from `HashSet`/`HashMap`. Always override both together; let the IDE generate both at once, or use a record.
+
+&gt; [!WARNING]
+&gt; **Using a mutable field in `equals`/`hashCode`, then mutating it after insertion into a hash collection.** The object&#x27;s hash changes, it&#x27;s now in the &quot;wrong&quot; bucket, and `get`/`contains`/`remove` can never find it — a silent leak. Keys must be effectively immutable. Records with mutable array components are a sneaky version of this.
+
+&gt; [!WARNING]
+&gt; **Comparing `float`/`double` with `==` in `equals`.** Breaks for `NaN` (loses reflexivity) and signed zero. Use `Float.compare`/`Double.compare`.
+
+&gt; [!WARNING]
+&gt; **Comparing arrays with `==` or `.equals` in `equals`.** That&#x27;s reference identity. Use `Arrays.equals`/`Arrays.deepEquals` and `Arrays.hashCode`/`Arrays.deepHashCode`.
+
+&gt; [!WARNING]
+&gt; **`equals` that tries to be equal to a foreign type.** Breaks symmetry (the foreign type doesn&#x27;t reciprocate). A type should equal only its own type.
+
+&gt; [!WARNING]
+&gt; **Extending an instantiable class and adding a value field, then overriding `equals`.** Breaks symmetry or transitivity — there is no contract-preserving way to do it. Use composition or sealed records instead.
+
+&gt; [!WARNING]
+&gt; **`hashCode` that returns a constant** (e.g., `return 42;`). It&#x27;s technically *legal* (equal objects hash equal — trivially), but it puts every entry in one bucket, degrading `HashMap` to O(n) (or O(log n) after treeification). A correctness-preserving performance disaster, and a self-inflicted hash-flooding vulnerability.
+
+&gt; [!WARNING]
+&gt; **`Objects.hash(...)` in hot paths.** It allocates an array and boxes primitives every call. Hand-roll `31 * result + field` or cache the hash for immutable objects.
+
+&gt; [!WARNING]
+&gt; **Secrets in `toString`.** Passwords/tokens leak into logs. Mask sensitive fields.
+
+&gt; [!WARNING]
+&gt; **`getClass()`-based `equals` without a null guard.** `o.getClass()` NPEs if `o` is null. The `instanceof` form is null-safe; the `getClass` form needs `o == null || ...` first.
+
+&gt; [!INTERVIEW]
+&gt; Common interview questions for this topic:
+&gt; 1. **What&#x27;s the relationship between `equals` and `hashCode`?** If `a.equals(b)` then `a.hashCode() == b.hashCode()` must hold. The reverse is not required (collisions are legal). Override both or neither.
+&gt; 2. **What are the five properties of the `equals` contract?** Reflexive, symmetric, transitive, consistent, non-null.
+&gt; 3. **Why can&#x27;t you extend a class and add a value field while preserving `equals`?** Mixed-type comparisons force you to break either symmetry (subclass requires exact type) or transitivity (subclass ignores its extra field when compared to the parent). *Effective Java* Item 10.
+&gt; 4. **`getClass()` vs `instanceof` in `equals` — trade-off?** `instanceof` allows subclass equality but breaks when subclasses add state; `getClass()` is strict (violates Liskov but preserves the contract). Records use `getClass()`.
+&gt; 5. **Why 31 as the hashCode multiplier?** Odd (no bit loss), prime (better distribution), and strength-reduces to `(i&lt;&lt;5) - i` (shift + subtract, faster than multiply on older CPUs; the JIT still does it).
+&gt; 6. **Where is the default (identity) hashCode stored?** In the object&#x27;s mark word (header), lazily computed and cached. Zero extra heap bytes.
+&gt; 7. **How does `HashMap` use `hashCode`?** Spreads it (`h ^ (h&gt;&gt;&gt;16)`), masks to a bucket (`&amp; (length-1)`, power-of-2 table), stores in a `Node`, searches the bucket chain with `equals`.
+&gt; 8. **What happens at bucket size 8?** Treeification — the linked list becomes a red-black tree (O(log n) instead of O(n)), if the table is ≥ 64 slots. `TreeNode` is ~56 bytes vs `Node`&#x27;s 32.
+&gt; 9. **What&#x27;s hash flooding?** A DoS where an attacker sends keys that all collide, degrading `HashMap` to O(n²) inserts. Treeification (Java 8+) mitigates it to O(n log n).
+&gt; 10. **Why does `String` have a `hash` field?** Caches the hashCode (computed once, read forever) — 4 bytes per String — because Strings are the most common map keys.
+&gt; 11. **Why compare floats with `Double.compare` in `equals`?** `NaN == NaN` is false (breaks reflexivity); `0.0 == -0.0` is true but they&#x27;re distinct values. `Double.compare` fixes both.
+&gt; 12. **Do records solve this?** Yes — they auto-generate contract-correct `equals`/`hashCode`/`toString`, are `final` (no inheritance trap), and use `getClass()`. Caveat: array components compare by reference.
+&gt; 13. **What does `toString`&#x27;s contract require?** Nothing formally (it&#x27;s for humans), but conventions: include class + fields, don&#x27;t leak secrets, don&#x27;t make it a parseable API.
+&gt; 14. **Why is `HashMap`&#x27;s table always a power of two?** So bucket index is `hash &amp; (length-1)` — a 1-cycle AND instead of a 20-40 cycle modulo.
+
+## Practice
+
+1. **The vanishing key.** Write a mutable `Point` with overridden `equals` and `hashCode` over `(x, y)`. Put it in a `HashSet`. Mutate `x`. Call `set.contains(point)` — observe `false` even though the object is in the set. Print `set.size()` (still 1). Explain the bucket mismatch.
+
+2. **equals without hashCode.** Write `Money` overriding only `equals`. Put `new Money(100,&quot;USD&quot;)` in a `HashMap`, look up with a different equal `Money`. Observe `null`. Add the `hashCode` override; observe it works.
+
+3. **Symmetry break.** Implement `CaseInsensitiveString` that tries to equal `String`. Demonstrate `cis.equals(str)` true but `str.equals(cis)` false. Show how `List.contains` gives order-dependent answers. Fix it.
+
+4. **Transitivity break.** Implement `Point` and `ColorPoint extends Point` with the broken mixed-comparison `equals`. Construct `red, point, blue` and demonstrate `red~point`, `point~blue`, but `red≁blue`. Refactor `ColorPoint` to use composition.
+
+5. **Float trap.** Write a class with a `double` field using `==` in `equals`. Show `x.equals(x)` is false when the field is `NaN`. Switch to `Double.compare`; observe reflexivity restored.
+
+6. **Array trap.** Write a class with an `int[]` field using `==` in `equals`. Show two objects with identical array *contents* are &quot;unequal.&quot; Switch to `Arrays.equals` + `Arrays.hashCode`; observe the fix.
+
+7. **Why 31 — see the assembly.** Write `int h(int x) { return 31 * x; }`. Run with `-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly` (needs hsdis). Find the compiled code; confirm it&#x27;s `shl ...,5` + `sub` rather than `imul`.
+
+8. **String hash caching.** Use reflection or JOL to read a `String`&#x27;s `hash` field before and after calling `hashCode()`. Observe it&#x27;s 0 before, populated after. Time a million `hashCode()` calls on the same String — confirm the first is O(length), the rest O(1).
+
+9. **HashMap Node memory.** Use JOL (`jol-cli internals java.util.HashMap$Node`) to confirm the 32-byte Node layout. Then build a `HashMap` of 1M entries and measure heap before/after; confirm ~32 MB of Nodes plus the table array.
+
+10. **Force treeification.** Write a key class whose `hashCode` always returns the same value (forcing all keys into one bucket). Insert 100 keys into a `HashMap`. Use a debugger or reflection to confirm the bucket became a `TreeNode` tree. Make the key `Comparable` and observe the tree orders properly.
+
+11. **Hash flooding microbenchmark.** Insert 50,000 keys with a constant `hashCode` (all collide) into a `HashMap`; time it. Compare with 50,000 well-distributed keys. Observe the O(n²) vs O(n) difference (seconds vs milliseconds). Confirm treeification keeps the colliding case from being catastrophic.
+
+12. **Bucket distribution.** Write a poor `hashCode` that varies only in the high 16 bits (e.g., `return field &lt;&lt; 16;`). Insert keys and measure chain lengths (via reflection on the table). Then observe how `HashMap`&#x27;s spread function (`h ^ (h&gt;&gt;&gt;16)`) salvages the distribution — compare to a hypothetical no-spread map.
+
+13. **Objects.hash allocation cost.** Microbenchmark `Objects.hash(a, b, c)` vs a hand-rolled `31*...` hashCode over the same fields, called 10M times. Use `-XX:+PrintGC` or async-profiler to observe the array allocations from `Objects.hash`. Quantify the difference.
+
+14. **Records.** Convert your hand-written `Money` into `record Money(long cents, String currency)`. Verify the generated `equals`/`hashCode`/`toString` behave identically. Then make a record with an `int[]` component and demonstrate the array-reference-equality surprise; fix by switching to `List&lt;Integer&gt;`.
+
+15. **toString secret leak.** Write a `Credentials` class with a `password` field and a naive `toString` that includes it. Log an instance. Observe the password in the log. Fix by masking. Discuss why this is a common production incident.
+
+16. **End-to-end explain-it-back.** Trace `map.get(key)` for a `HashMap&lt;String,V&gt;` from source to CPU: (a) `key.hashCode()` — first call walks chars + caches in the `hash` field, later calls read 4 bytes; (b) `HashMap` spreads `h ^ (h&gt;&gt;&gt;16)`; (c) masks `&amp; (table.length-1)` — 1-cycle AND on the power-of-2 table; (d) loads `table[index]` — likely a cache miss on a large map; (e) walks the bucket chain calling `equals` — more cache misses per node; (f) returns the value or null. Give cycle estimates for the all-L1-hot case (~20 cycles) and the cold-large-map case (~150-300 cycles). Twelve sentences max.
+
+## Recap
+
+You should now be able to:
+
+**Language layer.**
+
+- State the five `equals` properties (reflexive, symmetric, transitive, consistent, non-null) and give a concrete violation and its consequence for each.
+- State the three `hashCode` clauses (consistent-with-equals, stable, collisions-allowed) and explain why &quot;override both or neither.&quot;
+- Write a contract-correct `equals` using the five-step recipe (identity check, `instanceof` type check, field comparisons cheapest-first).
+- Choose between `getClass()` and `instanceof` understanding the substitutability vs extensibility trade-off.
+- Handle the float/double trap (`Double.compare`), the array trap (`Arrays.equals`/`hashCode`), and the inheritance-transitivity trap (composition or sealed records).
+- Write a `hashCode` with the `31 * result + field` idiom or `Objects.hash`, knowing the allocation cost difference.
+- Explain why extending an instantiable class and adding a value field cannot preserve the contract.
+- Follow `toString` conventions (class + fields, no secrets, not a parseable API).
+- Recognize when to use records (preferred for value types) or Lombok/AutoValue (for non-record classes).
+
+**Memory layer.**
+
+- Locate the identity hash in the mark word (zero extra heap bytes) vs an overridden hash (recomputed each call unless cached).
+- Describe `String`&#x27;s dedicated `hash` (4 bytes) + `hashIsZero` (1 byte) fields and why they exist.
+- Describe the `HashMap.Node` layout (32 bytes: header + hash + key + value + next) and the per-entry memory cost.
+- Explain treeification: linked-list `Node` (32 B) → red-black `TreeNode` (~56 B) at bucket size 8 with table ≥ 64, for O(log n) worst-case lookup.
+- Explain why the table is a power of two (`&amp; (length-1)` masking vs modulo) and why `HashMap` spreads the hash (`h ^ (h&gt;&gt;&gt;16)`).
+
+**Architecture layer.**
+
+- Explain why 31 strength-reduces to `(i&lt;&lt;5) - i` and why that mattered (and still matters) for `String.hashCode`.
+- Explain why a `HashMap.get` on a large cold map is dominated by cache misses (~150-300 cycles, ~3 misses) despite being &quot;O(1).&quot;
+- Explain how a bad `hashCode` turns lookups into collision walks (O(n)) and how treeification bounds the damage (O(log n)).
+- Explain hash flooding as a DoS vector and why treeification (Java 8+) is a security mitigation, not just a performance one.
+- Reason about branch prediction in `equals` chains and why discriminating-field-first ordering helps.
+
+`equals`/`hashCode`/`toString` are where OOP correctness meets the collections framework and the hardware. Get the contracts right — or use records — and every `HashMap`, `HashSet`, `contains`, and `distinct()` in your program just works. Get them wrong and the failures are silent, intermittent, and maddening. This is the single highest-leverage correctness topic in core Java.
+
+## Next
+
+Continue to [static members, blocks &amp; nested classes](./T11-static-members-blocks-and-nested-classes.md) — the class-level (not instance-level) members: `static` fields and methods, `static { }` initializer blocks and their `&lt;clinit&gt;` mechanics, `static` nested classes, and where all of this lives in memory (Metaspace, the `Class` mirror, the per-class data area). After the instance-focused topics T01–T10, T11 turns to what belongs to the *class itself* rather than to its objects.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l1/c01-t09-object-class-and-its-methods.html"><div class="lbl">← Previous</div><div class="ttl">T09-object-class-and-its-methods</div><div class="sub">Object class &amp; its methods</div></a><a class="next" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><div class="lbl">Next →</div><div class="ttl">T11-static-members-blocks-and-nested-classes</div><div class="sub">static members, blocks &amp; nested classes</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-value-equality-exists-the-design-problem" data-toc-link>Why Value Equality Exists — The Design Problem</a></li><li class="lvl-3"><a href="#how-other-languages-handle-this-and-what-javas-choice-costs" data-toc-link>How Other Languages Handle This — and What Java&#x27;s Choice Costs</a></li><li class="lvl-2"><a href="#the-equals-contract-five-properties" data-toc-link>The equals Contract — Five Properties</a></li><li class="lvl-3"><a href="#1-reflexive-xequalsx-must-be-true" data-toc-link>1. Reflexive — x.equals(x) Must Be True</a></li><li class="lvl-3"><a href="#2-symmetric-xequalsy-iff-yequalsx" data-toc-link>2. Symmetric — x.equals(y) iff y.equals(x)</a></li><li class="lvl-3"><a href="#3-transitive-equal-chains-must-close" data-toc-link>3. Transitive — Equal Chains Must Close</a></li><li class="lvl-3"><a href="#4-consistent-repeated-calls-must-agree" data-toc-link>4. Consistent — Repeated Calls Must Agree</a></li><li class="lvl-3"><a href="#5-non-null-xequalsnull-must-return-false" data-toc-link>5. Non-Null — x.equals(null) Must Return False</a></li><li class="lvl-2"><a href="#writing-equals-the-canonical-recipe" data-toc-link>Writing equals — The Canonical Recipe</a></li><li class="lvl-3"><a href="#getclass-vs-instanceof-the-substitutability-trade-off" data-toc-link>getClass() vs instanceof — The Substitutability Trade-off</a></li><li class="lvl-3"><a href="#the-float-and-double-trap" data-toc-link>The Float and Double Trap</a></li><li class="lvl-3"><a href="#the-array-field-trap" data-toc-link>The Array Field Trap</a></li><li class="lvl-2"><a href="#the-hashcode-contract" data-toc-link>The hashCode Contract</a></li><li class="lvl-3"><a href="#why-forgetting-hashcode-breaks-hashmap-the-physical-mechanism" data-toc-link>Why Forgetting hashCode Breaks HashMap — The Physical Mechanism</a></li><li class="lvl-2"><a href="#writing-hashcode-the-recipe" data-toc-link>Writing hashCode — The Recipe</a></li><li class="lvl-3"><a href="#why-the-multiplier-is-31" data-toc-link>Why the Multiplier Is 31</a></li><li class="lvl-3"><a href="#caching-the-hash-for-immutable-objects" data-toc-link>Caching the Hash for Immutable Objects</a></li><li class="lvl-2"><a href="#memory-layer-where-hash-codes-physically-live" data-toc-link>Memory Layer — Where Hash Codes Physically Live</a></li><li class="lvl-3"><a href="#identity-hash-in-the-mark-word" data-toc-link>Identity Hash: In the Mark Word</a></li><li class="lvl-3"><a href="#overridden-hash-computed-each-call-unless-you-cache-it" data-toc-link>Overridden Hash: Computed Each Call, Unless You Cache It</a></li><li class="lvl-3"><a href="#strings-dedicated-hash-field-a-case-study" data-toc-link>String&#x27;s Dedicated Hash Field — A Case Study</a></li><li class="lvl-2"><a href="#memory-layer-how-hashmap-physically-stores-and-looks-up" data-toc-link>Memory Layer — How HashMap Physically Stores and Looks Up</a></li><li class="lvl-3"><a href="#the-table-and-the-node" data-toc-link>The Table and the Node</a></li><li class="lvl-3"><a href="#bucket-index-why-the-table-length-is-a-power-of-two" data-toc-link>Bucket Index — Why the Table Length Is a Power of Two</a></li><li class="lvl-3"><a href="#hash-spreading-why-hashmap-doesnt-trust-your-hashcode-directly" data-toc-link>Hash Spreading — Why HashMap Doesn&#x27;t Trust Your hashCode Directly</a></li><li class="lvl-3"><a href="#collision-chains-and-treeification" data-toc-link>Collision Chains and Treeification</a></li><li class="lvl-2"><a href="#architecture-layer-hash-performance-on-the-processor" data-toc-link>Architecture Layer — Hash Performance on the Processor</a></li><li class="lvl-3"><a href="#a-good-hash-is-a-cache-story" data-toc-link>A Good Hash Is a Cache Story</a></li><li class="lvl-3"><a href="#a-bad-hash-is-a-collision-walk" data-toc-link>A Bad Hash Is a Collision Walk</a></li><li class="lvl-3"><a href="#branch-prediction-in-equals-chains" data-toc-link>Branch Prediction in equals Chains</a></li><li class="lvl-3"><a href="#hash-flooding-when-a-bad-hash-becomes-a-security-vulnerability" data-toc-link>Hash Flooding — When a Bad Hash Becomes a Security Vulnerability</a></li><li class="lvl-2"><a href="#tostring-the-human-readable-method" data-toc-link>toString — The Human-Readable Method</a></li><li class="lvl-2"><a href="#records-and-the-auto-generated-trio" data-toc-link>Records and the Auto-Generated Trio</a></li><li class="lvl-3"><a href="#lombok-and-autovalue-generation-for-non-record-classes" data-toc-link>Lombok and AutoValue — Generation for Non-Record Classes</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

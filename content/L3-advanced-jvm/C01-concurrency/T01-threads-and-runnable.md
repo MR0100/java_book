@@ -417,6 +417,33 @@ flowchart LR
 
 This 1-to-1 mapping is why the JVM (pre-Loom) was capped around **~16,000–32,000 platform threads** before resource exhaustion — and why production tuning historically obsessed over thread-pool sizing. **Virtual threads (T14)** decouple this — millions of virtual threads multiplex onto a small pool of OS threads.
 
+### Virtual Threads — Why 1-to-1 Doesn't Bind Them (preview)
+
+Full coverage is [T14](./T14-virtual-threads-project-loom.md), but the architecture is worth previewing here because it inverts everything above. A **virtual thread** is *not* backed by an OS thread. It is a `Runnable` wrapped in a `jdk.internal.vm.Continuation` — a delimited, one-shot coroutine whose stack can be suspended and resumed:
+
+- **Mount / unmount.** To run, a virtual thread **mounts** on a **carrier** (a platform thread from a dedicated scheduler) — its frames are *thawed* onto the carrier's real OS stack. When it blocks (`park`, socket I/O, and since JDK 24 a contended `synchronized`), it **unmounts**: its live frames are *frozen* back onto the **Java heap** as stack-chunk objects, and the carrier is freed to run a different virtual thread. There is no carrier affinity — it may resume on a different one.
+- **Freeze / thaw** is just copying frames between the OS stack ("v-stack") and the heap chunk ("h-stack"). That's the whole trick: **the stack lives on the GC heap**, so it costs hundreds of bytes (and grows on demand) instead of a 1 MB reservation. Hence *millions* per JVM.
+- **The scheduler** is a dedicated `ForkJoinPool` in **FIFO** mode (distinct from the LIFO common pool that parallel streams use), with parallelism = `Runtime.availableProcessors()` by default and `maxPoolSize` 256.
+- **Switching cost** is a user-mode freeze/thaw + task hand-off — **tens to low-hundreds of nanoseconds, no syscall** — vs the ~1–2 µs kernel context switch a platform thread pays. That, not raw speed, is the win.
+
+```mermaid
+flowchart TB
+  subgraph Carriers["carrier pool (~#CPUs platform threads)"]
+    C1["carrier 1"]
+    C2["carrier 2"]
+  end
+  subgraph VTs["millions of virtual threads (heap continuations)"]
+    V1["VT (mounted on C1)"]
+    V2["VT (unmounted — frozen on heap, no OS thread)"]
+    V3["VT (unmounted)"]
+  end
+  V1 --- C1
+  Note["a VT blocking unmounts → frees its carrier → the carrier runs another VT"]
+```
+
+> [!IMPORTANT]
+> Two facts a 2026 engineer must keep current. **(1) Virtual threads are not "faster threads"** — they don't speed up CPU-bound code (same JIT'd code, same cores); they raise *throughput/scalability* for blocking I/O by removing the OS-thread ceiling. **(2) The `synchronized` pinning advice is outdated.** Pre-JDK-24, a virtual thread blocked inside `synchronized` was **pinned** (couldn't unmount, held its carrier), so the rule was "replace hot `synchronized` with `ReentrantLock`." **JEP 491 (JDK 24)** fixed this — `synchronized` no longer pins; the remaining pinning causes are **native/JNI frames and FFM downcalls**. Don't pool virtual threads, and don't reflexively de-`synchronized` on JDK 24+.
+
 ## Per-Thread Stack: Layout and `-Xss`
 
 T12 + T14 covered this; here's the multi-thread angle. Each thread gets its own stack:
@@ -447,6 +474,28 @@ flowchart TB
   Shared["shared heap (objects, static fields, JIT code cache, Metaspace)"]
   Note["heap shared; each thread has private stack — frame allocation never touches heap"]
 ```
+
+### Stack Guard Zones — How `StackOverflowError` Is Actually Thrown
+
+The "guard page" at the bottom of the stack is really **four** HotSpot-managed zones, `mprotect`-ed below the usable stack (default page counts on Linux x64, 4 KB pages):
+
+| Zone | Default | Purpose |
+|------|--------:|---------|
+| **Reserved** | 1 page (`-XX:StackReservedPages`) | JEP 270 — lets a `@ReservedStackAccess` critical section (e.g. `ReentrantLock.unlock`) *finish* instead of corrupting a lock on overflow |
+| **Yellow** | 2 pages (`-XX:StackYellowPages`) | **recoverable** — overflow here throws a catchable `StackOverflowError` |
+| **Red** | 1 page (`-XX:StackRedPages`) | **unrecoverable** — fatal; writes `hs_err_pid.log` and the VM dies |
+| **Shadow** | 20 pages (`-XX:StackShadowPages`) | headroom so a deep native/JNI call can't leap past the guards undetected |
+
+The mechanism is **stack banging**: compiled methods proactively store to a fixed offset below `%rsp` (e.g. `mov %eax,-0x14000(%rsp)`) *before* growing the frame. If that address lands in a guard page → **SIGSEGV** → HotSpot's signal handler inspects the faulting address:
+
+- **Yellow hit** → unprotect the yellow pages (give the throw-path room), unwind, throw `StackOverflowError`, **re-guard** on the way out → recoverable, catchable.
+- **Red hit** → fatal VM error (you blew past the recovery margin).
+- **Reserved hit** inside a `@ReservedStackAccess` method → defer the error so the lock op completes atomically.
+
+> [!IMPORTANT]
+> **A `StackOverflowError` is *not* a JVM crash** — yellow-zone overflow is a normal, catchable `Error` thrown on the offending thread; the JVM keeps running. Only a **red-zone** breach (you exhausted even the recovery margin) is a fatal `hs_err` crash. This is a frequent interview/code-review misconception (T14 recursion).
+
+The practical floor: `40 KB + (1+2+1+20) pages × 4 KB ≈ 136 KB`, so `-Xss` below ~136 KB is rejected. On **Apple-silicon macOS the base page is 16 KB** (not 4 KB), so the same *page counts* reserve ~4× the bytes — a concrete arch difference when you're squeezing thread counts.
 
 ## The OS Kernel Scheduler
 
@@ -496,23 +545,43 @@ When the scheduler swaps a thread off a core to run another:
 3. **TLB flush** (if address space changes — only between processes, not threads of same process).
 4. **Cache eviction** as the new thread's working set displaces the old one.
 
-Total cost: ~1–10 µs *direct* + indirect cost from cache misses (often the dominant part). For comparison: a method call is ~1–5 ns. A context switch is **1000× more expensive** than a method call.
+Total cost: ~**1.2–2.2 µs** *direct* (measured on Linux/NPTL — ~1.2–1.5 µs core-pinned, ~2.2 µs cross-core) **plus** the indirect cost of cache/TLB pollution, which often dominates. For comparison: a method call is ~1–5 ns. A context switch is roughly **1000× more expensive** than a method call — and a *virtual*-thread switch (user-mode freeze/thaw, no syscall) is ~10–100× cheaper than this kernel switch.
 
 This is why **high-rate context switching is a perf killer** — and why thread pools (which keep threads alive across many tasks) outperform spawn-thread-per-task (T05).
 
 ## Native Thread Mechanics
 
-### Linux/macOS — POSIX Threads (`pthread`)
+### The Full `start()` → `pthread_create` Chain
 
-HotSpot's `pthread_create` call:
+`Thread.start()` is not a thin wrapper — it's a multi-layer descent into the VM that allocates three coupled objects and performs a producer/consumer rendezvous:
 
-```c
-pthread_create(&tid, &attr, java_start, java_thread);
+```text
+Thread.start()                       (Java)
+  └─ Thread.start0()                 (native, @IntrinsicCandidate)
+      └─ JVM_StartThread             (hotspot/share/prims/jvm.cpp)
+          └─ new JavaThread(&entry, stack_sz)     ← the C++ VM thread object
+              └─ os::create_thread(...)
+                  └─ pthread_create(&tid, &attr, thread_native_entry, this)   (Linux/macOS)
+                     // or CreateThread / _beginthreadex on Windows
 ```
 
-- `tid` (`pthread_t`) is the OS thread handle (returned via `Thread.eetop`).
-- `attr` controls stack size, detach state, scheduling.
-- `java_start` is HotSpot's C++ entry function — sets up JVM TLS, then invokes `Thread.run()`.
+Three structures are created per platform thread:
+
+- **`JavaThread`** (C++) — the VM's thread object. Holds `_thread_state` (the `JavaThreadState`: `_thread_new`/`_thread_in_Java`/`_thread_in_vm`/`_thread_in_native`/`_thread_blocked` — used for safepoints, T02), an **`OopHandle` to the Java `Thread` `oop`** (the heap object), and the **`JavaFrameAnchor`** (`_anchor` = last_Java_sp/fp/pc — the saved boundary that lets GC and stack-walkers find Java frames from inside C++/native code).
+- **`OSThread`** (C++) — the thin OS handle: the `pthread_t` / native thread id.
+- The Java **`Thread` `oop`** on the heap (T01's ~200-byte object).
+
+**It's a rendezvous, not fire-and-forget.** The new OS thread starts in `thread_native_entry`, but immediately **blocks on a condvar** until the creating thread — holding the global `Threads_lock` — finishes wiring it into the VM's `ThreadsList`, then flips it runnable (`os::start_thread`). Only then does the child call `JavaThread::run()` → the Java `run()`. So `pthread_create` returning does *not* mean the Java code has started; there's a hand-off.
+
+### Linux/macOS — POSIX Threads (`pthread`)
+
+```c
+pthread_create(&tid, &attr, thread_native_entry, java_thread);
+```
+
+- `tid` (`pthread_t`) is the OS thread handle (HotSpot also exposes a native handle on the legacy `Thread.eetop` field).
+- `attr` controls stack size and scheduling. Notably HotSpot calls `pthread_attr_setguardsize(&attr, 0)` to **disable glibc's own guard page** — it manages its own four-zone guards (above) instead.
+- `thread_native_entry` is HotSpot's C++ entry: waits on the rendezvous, attaches TLS, then invokes the Java `run()`.
 
 ### Windows — `CreateThread`
 
@@ -546,7 +615,10 @@ Before Loom, you could expect roughly:
 | 256 KB | ~32 000 | same constraints, less per-thread cost |
 | 64 KB | ~64 000 | risky — easy to SOE |
 
-`ulimit -u` (Linux) sets a hard per-user cap on threads (often 4096 default). `ulimit -s` controls default stack size for child processes.
+`ulimit -u` (Linux) sets a hard per-user cap on threads/processes (often 4096 default). `ulimit -s` controls default stack size. A third, less-obvious wall is **`vm.max_map_count`** (default ~65 530): each thread's stack + four guard zones consume several `mmap` map entries, so a JVM spawning tens of thousands of threads can hit *"attempt to allocate stack guard pages failed"* — an `mprotect`/map-count exhaustion, not a memory shortage.
+
+> [!NOTE]
+> **"Each thread eats 1 MB" is imprecise.** That 1 MB is **reserved virtual address space**, not committed RAM — physical pages are mapped lazily as the stack is touched, so a shallow thread costs a few pages. But the 1 MB still counts against the **address space** and **`max_map_count`**, which is why the cap is about *virtual* limits, not heap. (And `-Xss` sizes the **native** OS stack — virtual-thread stacks live on the **heap**, not bounded by `-Xss`; T14.)
 
 Going past these limits → `OutOfMemoryError: unable to create new native thread` or `pthread_create failed`. The fix in modern Java is **virtual threads** (T14) — millions per JVM.
 
@@ -637,6 +709,10 @@ Foreshadowing T03 / T12: two threads writing to the same `int` produce undefined
 > 10. **What's the maximum number of threads on a JVM?** Practical cap ~16k platform threads on 64-bit Linux due to virtual address space. Virtual threads remove this cap.
 > 11. **Why is `setPriority` weak?** It maps to OS priorities which the kernel scheduler is free to interpret loosely.
 > 12. **What's the JVM's `main` thread?** The single user thread the JVM creates when starting; runs `main(String[])`. JVM exits when no user threads remain.
+> 13. **Walk `Thread.start()` to the OS.** `start()` → `start0()` → `JVM_StartThread` → `new JavaThread` → `os::create_thread` → `pthread_create`; the child blocks on a rendezvous (under `Threads_lock`) until the parent wires it into the `ThreadsList`, then runs Java `run()`.
+> 14. **Is `StackOverflowError` a crash?** No — a **yellow-zone** overflow is a catchable `Error` (the JVM unguards, throws, re-guards); only a **red-zone** breach is a fatal `hs_err` crash. HotSpot detects overflow by *stack banging* into `mprotect`-ed guard pages.
+> 15. **How do virtual threads escape the 1-to-1 cap?** They're heap `Continuation`s that mount/unmount on a small carrier pool; a blocked VT *freezes* its stack to the heap and frees its carrier — no OS thread held, so millions fit. They improve I/O throughput, not CPU speed.
+> 16. **Does `synchronized` pin a virtual thread?** Pre-JDK-24, yes (couldn't unmount → held its carrier). **JEP 491 (JDK 24)** removed that; now mostly only native/JNI frames pin. So "always swap `synchronized` for `ReentrantLock`" is outdated on 24+.
 
 ## Practice
 
