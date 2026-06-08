@@ -9,9 +9,9 @@ difficulty: advanced
 order: 3
 tags: [section-index]
 prerequisites: []
-status: planned
+status: in-progress
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-08
 ---
 
 # Advanced Java & the JVM — Design Patterns & Principles
@@ -20,10 +20,10 @@ This section covers the topics below. Each `.md` file is created as the topic is
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
-| 01 | SOLID principles | `T01-solid-principles.md` | planned |
-| 02 | DRY, KISS, YAGNI | `T02-dry-kiss-yagni.md` | planned |
-| 03 | Coupling & cohesion | `T03-coupling-and-cohesion.md` | planned |
-| 04 | Creational patterns (Singleton, Factory, Builder, Prototype) | `T04-creational-patterns-singleton-factory-builder-prototype.md` | planned |
+| 01 | SOLID principles | [`T01-solid-principles.md`](./T01-solid-principles.md) | **complete** |
+| 02 | DRY, KISS, YAGNI | [`T02-dry-kiss-yagni.md`](./T02-dry-kiss-yagni.md) | **complete** |
+| 03 | Coupling & cohesion | [`T03-coupling-and-cohesion.md`](./T03-coupling-and-cohesion.md) | **complete** |
+| 04 | Creational patterns (Singleton, Factory, Builder, Prototype) | [`T04-creational-patterns-singleton-factory-builder-prototype.md`](./T04-creational-patterns-singleton-factory-builder-prototype.md) | **complete** |
 | 05 | Structural patterns (Adapter, Decorator, Proxy, Facade) | `T05-structural-patterns-adapter-decorator-proxy-facade.md` | planned |
 | 06 | Behavioral patterns (Strategy, Observer, Command, Template) | `T06-behavioral-patterns-strategy-observer-command-template.md` | planned |
 | 07 | Dependency Injection / IoC (concept) | `T07-dependency-injection-ioc-concept.md` | planned |

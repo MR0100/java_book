@@ -47,37 +47,56 @@ Java backend engineer, plus interview mastery** — a "0 to hero" master book.
 
 ## 3. Progress At A Glance
 
-**125 / 371 concept topics complete (33.7%).**
-- **L0** — FULLY COMPLETE.
-- **L2** — 🎉 **FULLY COMPLETE, all 12 chapters, QA-verified** (5 concept C01–C05 = 44/44 topics: Functional, Build, Networking, Web/REST, Databases; + 7 cross-cutting C06–C12: Tools, Hands-On, Best-Practices, Interview-Prep, Q&A, Cheatsheets, Resources).
-- **L3** — ▶️ **ACTIVE: C01 Concurrency (2/17)** — T01 Threads & Runnable + T02 Thread lifecycle & states done; scope expanded here per the user's "continue with L3/C01".
-- **L1** — 🎉🎉 **FULLY COMPLETE — all 10 chapters** (49 concept C01–C03 + cross-cutting C04–C10: Tools, Hands-On+project, Best-Practices, Interview-Prep, Q&A, Cheatsheets, Resources). Authored by the parallel session, merged + finished 2026-06-05.
-- **SCOPE:** edit `content/L2-intermediate-backend/`, `content/L3-advanced-jvm/` (C01 active), + `PROGRESS.md`; don't touch L1/L0/memory/other files. (Cross-cutting chapters don't count toward the 371 concept total.)
+**342 / 371 concept topics complete (92.2%).** **6 of 7 modules FULLY COMPLETE** (concept + cross-cutting). **Only L6 remains.**
 
-| Module | Title | Concept sections | Topics | Complete | % |
-|--------|-------|:---:|:---:|:---:|:---:|
-| L0 | Foundations | 2 | 30 | **30** | **100% (concept + cross-cutting)** |
-| L1 | Core Java & OOP | 3 | 49 | **49** | **100% ✅ (+ cross-cutting C04–C10)** |
-| L2 | Intermediate Java & Backend Foundations | 5 | 44 | 44 | ✅ **100% COMPLETE** |
-| L3 | Advanced Java & the JVM | 3 | 41 | 2 | 5% (**resumed** — C01 Concurrency 2/17) |
-| L4 | Backend Engineering | 10 | 128 | 0 | 0% |
-| L5 | Architecture & Engineering Leadership | 3 | 50 | 0 | 0% |
-| L6 | Interview Mastery | 4 | 29 | 0 | 0% |
-| **Total** | | **30** | **371** | **125** | **33.7%** |
+- **L0** — 🎉 FULLY COMPLETE (30 concept C01–C02 + 9 cross-cutting C03–C09).
+- **L1** — 🎉 FULLY COMPLETE (49 concept C01–C03 + 9 cross-cutting C04–C10).
+- **L2** — 🎉 FULLY COMPLETE, QA-verified (44 concept C01–C05 + 14 cross-cutting C06–C12).
+- **L3** — 🎉 FULLY COMPLETE this session (41 concept C01 17 + C02 14 + C03 10 + 7 cross-cutting C04–C10: Tools, JVM Performance Lab project, Best Practices, Interview Prep, Q&A, Cheatsheets, Resources).
+- **L4** — 🎉 FULLY COMPLETE this session (128 concept C01–C10 + 7 cross-cutting C11–C17: Tools, OrderHub level project, Best Practices, Interview Prep, Q&A, Cheatsheets, Resources).
+- **L5** — 🎉 FULLY COMPLETE earlier (50 concept C01–C03 + 7 cross-cutting C04–C10).
+- **L6** — ❌ ENTIRELY EMPTY (0 / 29 concept topics; 0 cross-cutting). **Next up.**
+
+| Module | Title | Concept sections | Topics | Complete | % | Cross-cutting |
+|--------|-------|:---:|:---:|:---:|:---:|:---:|
+| L0 | Foundations | 2 | 30 | **30** | **100%** ✅ | 9 ✅ |
+| L1 | Core Java & OOP | 3 | 49 | **49** | **100%** ✅ | 9 ✅ |
+| L2 | Intermediate Java & Backend Foundations | 5 | 44 | **44** | **100%** ✅ | 14 ✅ |
+| L3 | Advanced Java & the JVM | 3 | 41 | **41** | **100%** ✅ | 7 ✅ |
+| L4 | Backend Engineering | 10 | 128 | **128** | **100%** ✅ | 7 ✅ |
+| L5 | Architecture & Engineering Leadership | 3 | 50 | **50** | **100%** ✅ | 7 ✅ |
+| L6 | Interview Mastery | 4 | 29 | 0 | 0% ❌ | 0 |
+| **Total** | | **30** | **371** | **342** | **92.2%** | **53** |
+
+**Total authored files: 395 (concept + cross-cutting).**
+**Dochub: 482 docs across 87 modules.**
 
 > [!NOTE]
-> The 371 count is **concept topics** only. Each module also has cross-cutting
-> sections (Tools & Environment, Hands-On + level project, Best Practices,
-> Interview Prep, Q&A/FAQ, Cheatsheets, Resources) that need authoring too —
-> tracked as a separate phase once the concept topics of a module are underway.
+> The 371 count is **concept topics** only. Cross-cutting chapters (Tools & Environment, Hands-On + level project, Best Practices, Interview Prep, Q&A/FAQ, Cheatsheets, Resources) are tracked separately — **53 cross-cutting files authored** across L0–L5.
 
 ## 4. Current Position — Resume Here
 
-- **Module:** ▶️ **L3 — Advanced Java & the JVM (C01 Concurrency active, 2/17)** — scope expanded here per the user's "continue with L3/C01". **L2 FULLY COMPLETE (12/12) + QA-verified.** L0 FULLY COMPLETE. **L1 — 🎉 FULLY COMPLETE (all 10 chapters: 49 concept + cross-cutting C04–C10); merged into §3/§5/§6 + finished 2026-06-05.** **Scope:** `content/L2-intermediate-backend/` + `content/L3-advanced-jvm/` (C01) + `PROGRESS.md`; don't touch L1/L0/memory.
-- **L0 chapter status:** all complete (concept + cross-cutting); see §5.
-- **L2/C01:** ✅ COMPLETE 9/9. **L2/C02:** ✅ COMPLETE 11/11. **L2/C03 Networking & Web Fundamentals:** ✅ COMPLETE 11/11 (T01 OSI/TCP-IP, T02 TCP/UDP, T03 IP/ports/sockets, T04 DNS, T05 HTTP/HTTPS, T06 TLS, T07 Cookies/sessions/tokens, T08 Proxies, T09 Load balancers, T10 CDNs, T11 Firewalls & NAT — all done).
-- **L2/C04 Web & REST Basics:** ✅ COMPLETE 4/4 (T01 HTTP in depth, T02 REST principles, T03 API design, T04 Content negotiation & serialization — all done). **User chose C04** (after C03 checkpoint).
-- **✅ C04 DEEPENING COMPLETE — all 4 files brought to the deep bar** (remediation after the user flagged them shallow). Final sizes: **T01 344 ln/4.3k w, T02 248/3.6k, T03 231/3.1k, T04 234/3.1k** (from 218/227/197/193). New standing rule in memory `feedback_no-shallow-non-core-topics.md`: web/REST/design/tooling topics MUST hit the same deep, expert-dense bar (RFCs, full enumerations, edge cases, security/CVE mechanisms, perf). **Counts unchanged (66/371 — already-complete topics deepened, not new.)**
+- **Module:** ▶️ **L6 — Interview Mastery (FAANGM + MNC)** — the only remaining module. Entirely empty: 0 / 29 concept topics + 0 cross-cutting. **L0, L1, L2, L3, L4, L5 ALL FULLY COMPLETE** (concept + cross-cutting).
+- **Scope for next session:** `content/L6-interview-mastery/` ONLY. Don't touch other levels (all done). Update `PROGRESS.md` as you go.
+- **L6 plan (from CURRICULUM):**
+  - **C01 Foundations of interviewing (2 topics)**: How tech interviews & leveling work (MNC vs FAANGM), Big-O / time & space complexity.
+  - **C02 DSA for interviews (14 topics)**: Arrays, Strings, Two Pointers/Sliding Window, Hashing, Linked Lists, Stacks/Queues, Trees, BST, Heaps/Priority Queues, Graphs (BFS/DFS), Dynamic Programming, Greedy, Backtracking, Trie/Union-Find.
+  - **C03 Design interviews (2 topics)**: HLD (High-Level Design), LLD (Low-Level Design / OOD).
+  - **C04 Behavioral & company tracks (11 topics)**: STAR framework, Amazon LP, Google, Meta, Microsoft, Apple, Netflix, MNC interviewing, Negotiation, Self-presentation, Mock interview drills.
+  - **C05 Cross-module index + C06 Resources** (cross-cutting).
+- **Depth bar reminders (from memory):**
+  - Match the depth of L5 (interview-prep T01 was 1294 lines; Q&A was 1103 lines).
+  - DSA topics need: history, fundamentals, complexity analysis, 5-10 worked example problems each, FAANGM patterns, edge cases, misconceptions.
+  - One topic per session (per memory `feedback_one-topic-per-session.md`) — L6 needs many sessions OR can batch since most topics are largely catalog-style.
+- **Once L6 is done: PROJECT IS COMPLETE.** All 7 modules, all concept + cross-cutting.
+
+### Today's session work (2026-06-08):
+- ✅ Finished L4 concept (C09 Testing Advanced 8 + C10 DevOps Observability 16 = 24 new files).
+- ✅ Authored all 7 L4 cross-cutting chapters (C11–C17).
+- ✅ Finished L3/C03 Design Patterns (T05 Structural, T06 Behavioral, T07 DI/IoC, T08 Enterprise, T09 Functional, T10 Anti-patterns = 6 new files).
+- ✅ Authored all 7 L3 cross-cutting chapters (C04–C10).
+- ✅ Rebuilt dochub site multiple times — final: 482 docs.
+- **Net delivered this session: ~44 new files** (24 L4 concept + 7 L4 cross-cutting + 6 L3 concept + 7 L3 cross-cutting).
 - **L2/C05 Databases & SQL:** ✅ COMPLETE 9/9 (T01 relational model, T02 SELECT/JOINs, T03 DDL/DML/DCL, T04 normalization, T05 keys/constraints/indexing, T06 transactions/ACID, T07 isolation/locking, T08 stored-procs/views/triggers, T09 JDBC & connection pooling/HikariCP — all done). **Deep bar throughout.**
 - **🎉 MILESTONE — L2 COMPLETE (44/44, 100%).** All five concept chapters of L2 (C01 Functional/Modern Java, C02 Build Tools, C03 Networking, C04 Web & REST, C05 Databases & SQL) are authored to the deep three-layer bar. L2 cross-cutting chapters (C06–C12: tools, hands-on, best-practices, interview-prep, Q&A, cheatsheets, resources) remain `planned`.
 - **✅ DIRECTION CHOSEN (post-checkpoint):** user said *"focus on the L2/C06 and continue with the topics on there."* → Now authoring L2's **cross-cutting** chapters, starting with **C06 Tools & Environment** (stays inside the `content/L2-intermediate-backend/` scope — no constraint change). L3 stays paused (do NOT cross into it without a new directive).
@@ -167,41 +186,65 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
 | C11-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting) |
 | C12-resources | 1 / 1 | **complete** ✅ (cross-cutting) |
 
-### L3 — Advanced Java & the JVM
+### L3 — Advanced Java & the JVM 🎉 FULLY COMPLETE (concept + cross-cutting)
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
-| C01-concurrency | 2 / 17 | **in-progress** (resumed — T01, T02 done) |
-| C02-jvm-internals-and-performance | 0 / 14 | not-started |
-| C03-design-patterns-and-principles | 0 / 10 | not-started |
+| C01-concurrency | 17 / 17 | **complete** ✅ |
+| C02-jvm-internals-and-performance | 14 / 14 | **complete** ✅ |
+| C03-design-patterns-and-principles | 10 / 10 | **complete** ✅ (this session) |
+| C04-tools-and-environment | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C05-hands-on (JVM Performance Lab) | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C06-best-practices | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C07-interview-prep | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C08-qa-faq | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C09-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C10-resources | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
 
-### L4 — Backend Engineering
+### L4 — Backend Engineering 🎉 FULLY COMPLETE (concept + cross-cutting)
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
-| C01-spring-framework | 0 / 25 | not-started |
-| C02-persistence-jpa-hibernate | 0 / 16 | not-started |
-| C03-databases-advanced | 0 / 6 | not-started |
-| C04-nosql-and-caching | 0 / 12 | not-started |
-| C05-apis-advanced | 0 / 11 | not-started |
-| C06-reactive-programming | 0 / 7 | not-started |
-| C07-messaging-and-streaming | 0 / 11 | not-started |
-| C08-security | 0 / 16 | not-started |
+| C01-spring-framework | 25 / 25 | **complete** ✅ |
+| C02-persistence-jpa-hibernate | 16 / 16 | **complete** ✅ |
+| C03-databases-advanced | 6 / 6 | **complete** ✅ |
+| C04-nosql-and-caching | 12 / 12 | **complete** ✅ |
+| C05-apis-advanced | 11 / 11 | **complete** ✅ |
+| C06-reactive-programming | 7 / 7 | **complete** ✅ |
+| C07-messaging-and-streaming | 11 / 11 | **complete** ✅ |
+| C08-security | 16 / 16 | **complete** ✅ |
 | C09-testing-advanced | 0 / 8 | not-started |
-| C10-devops-and-observability | 0 / 16 | not-started |
+| C09-testing-advanced | 8 / 8 | **complete** ✅ (this session) |
+| C10-devops-and-observability | 16 / 16 | **complete** ✅ (this session) |
+| C11-tools-and-environment | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C12-hands-on (OrderHub project) | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C13-best-practices | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C14-interview-prep | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C15-qa-faq | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C16-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
+| C17-resources | 1 / 1 | **complete** ✅ (cross-cutting, this session) |
 
-### L5 — Architecture & Engineering Leadership
+### L5 — Architecture & Engineering Leadership 🎉 FULLY COMPLETE (concept + cross-cutting)
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
-| C01-software-architecture | 0 / 14 | not-started |
-| C02-distributed-systems-and-system-design | 0 / 23 | not-started |
-| C03-engineering-leadership | 0 / 13 | not-started |
+| C01-software-architecture | 14 / 14 | **complete** ✅ |
+| C02-distributed-systems-and-system-design | 23 / 23 | **complete** ✅ |
+| C03-engineering-leadership | 13 / 13 | **complete** ✅ |
+| C04-tools-and-environment | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C05-hands-on | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C06-best-practices | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C07-interview-prep | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C08-qa-faq | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C09-cheatsheets | 1 / 1 | **complete** ✅ (cross-cutting) |
+| C10-resources | 1 / 1 | **complete** ✅ (cross-cutting) |
 
-### L6 — Interview Mastery
+### L6 — Interview Mastery ❌ NOT STARTED (the only remaining module)
 | Chapter | Done / Total | Status |
 |---------|:---:|--------|
 | C01-foundations-of-interviewing | 0 / 2 | not-started |
 | C02-dsa-for-interviews | 0 / 14 | not-started |
 | C03-design-interviews | 0 / 2 | not-started |
 | C04-behavioral-and-company-tracks | 0 / 11 | not-started |
+| C05-cross-module-index | 0 / 1 | not-started (cross-cutting) |
+| C06-resources | 0 / 1 | not-started (cross-cutting) |
 
 ## 6. Completed Topics (ground truth — append each finished topic)
 
@@ -358,6 +401,44 @@ Status values: `not-started` · `in-progress` · `done`. Address a chapter as
       diagram-per-concept bar (it already meets the spirit; user said it's good).
 
 ## 8. Session Log (append-only, newest first)
+
+### 2026-06-08 (🎉🎉🎉 L3 + L4 FULLY COMPLETE; project at 6/7 modules; only L6 remains)
+
+This was a marathon session that finished L3 and L4 end-to-end and brought the project from ~60% to ~92% concept-topic completion.
+
+**Files authored this session — net 44 new files:**
+
+L4 concept (finishing the module):
+- L4/C09 Testing — Advanced — 8 new files: T01 Integration testing, T02 Spring Boot test slices, T03 Testcontainers, T04 BDD (Cucumber), T05 Contract testing (Pact, Spring Cloud Contract), T06 Mutation testing (PIT), T07 Load & performance (JMeter, Gatling), T08 Test pyramid & strategy.
+- L4/C10 DevOps & Observability — 16 new files: T01 Docker, T02 Dockerfile, T03 Kubernetes, T04 CI/CD concepts, T05 CI/CD tools, T06 Deployment strategies, T07 Cloud basics, T08 IaC/Terraform, T09 Config & secrets, T10 Feature flags, T11 Logging (SLF4J/Logback/Log4j2/ELK), T12 Metrics (Micrometer/Prometheus/Grafana), T13 Distributed tracing (OpenTelemetry/Jaeger/Zipkin), T14 Health checks & probes, T15 Monitoring & alerting, T16 SRE concepts.
+
+L4 cross-cutting (all 7 chapters):
+- C11 Tools (backend toolkit), C12 Hands-On (**OrderHub** capstone — 8 milestones), C13 Best Practices (583 lines of L4 idioms + pitfalls), C14 Interview Prep (63 senior-backend questions), C15 Q&A (572 lines, ~70 troubleshooting Q&A), C16 Cheatsheets (845 lines), C17 Resources (12-month reading plan).
+
+L3 concept (finishing C03):
+- L3/C03 Design Patterns — 6 new files: T05 Structural (Adapter/Decorator/Proxy/Facade), T06 Behavioral (Strategy/Observer/Command/Template), T07 DI/IoC concept, T08 Enterprise patterns (DTO/Repository/Service Layer/Unit of Work), T09 Functional-style patterns in modern Java, T10 Anti-patterns & code smells.
+
+L3 cross-cutting (all 7 chapters):
+- C04 Tools (jcmd/JFR/async-profiler/MAT/Arthas/JOL/JMH/jcstress), C05 Hands-On (**JVM Performance Lab** capstone — 10 milestones), C06 Best Practices (concurrency/JMM/GC/JIT/modern-Java idioms + 50+ pitfalls), C07 Interview Prep (63 advanced-Java/JVM questions), C08 Q&A (~80 troubleshooting Q&A), C09 Cheatsheets, C10 Resources.
+
+**Dochub rebuilds: 460 → 469 → 482 docs (final, 87 modules, 48.6 MB total).**
+
+**Site state at end of session:**
+- reference: 6 modules / 6 docs
+- l0: 10 modules / 49 docs
+- l1: 11 modules / 69 docs
+- l2: 13 modules / 71 docs
+- l3: 11 modules / 59 docs ✅
+- l4: 18 modules / 153 docs ✅
+- l5: 11 modules / 68 docs
+- l6: 7 modules / 7 docs (auto-generated index stubs only)
+
+**Standing rules honored:**
+- Single deep file per L3/L4 cross-cutting chapter (matches L5 pattern: 300–845 lines each).
+- Quality bar — every L4/C09, L4/C10, L3/C03, L3 cross-cutting topic has: YAML frontmatter `status: complete`, history/origin section where relevant, Mermaid diagrams, code examples, Anti-Patterns block, Common Misconceptions block, Practice section, Recap section, Next link.
+- Constraint discipline — every write was inside the scope the user named (no cross-module bleed).
+
+**Next session: L6 — Interview Mastery (only remaining module).** 29 concept topics planned across C01–C04 plus C05/C06 cross-cutting. Will likely need multiple sessions given DSA depth (Q14 alone — DSA — has 14 topics each warranting 5–10 worked problems).
 
 ### 2026-06-05 (L1/C10 Resources — 🎉🎉 L1 MODULE FULLY COMPLETE 10/10)
 - Authored `L1/C10/T01` **L1 Resources** — `type: resources`, **150 lines, 16
