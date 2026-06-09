@@ -342,6 +342,304 @@ The questions a junior-to-mid backend developer gets — product-company screens
 
 ---
 
+## 7. Microservices & Service Integration
+
+### Q: What's a microservice, and when does the architecture pay off?
+
+**Answer.** A microservice is an independently deployable unit owning a specific business capability, communicating with peers over network APIs (REST, gRPC, messaging). Pays off when:
+- Team boundaries align with capability boundaries (Conway's Law in action).
+- Independent deploy cadence matters (one team ships hourly, another monthly).
+- Different scaling profiles (read-heavy API vs write-heavy ingestion).
+- Different tech stacks per service make sense (Python ML, Go networking, Java domain).
+
+**Doesn't pay off when**: small team (microservice tax exceeds benefit), no team boundaries, no scaling diversity. Then it's distributed monolith — all the costs, none of the wins.
+
+**Follow-ups:**
+- Distributed monolith warning signs? (Services share DB; can't deploy independently; one breaks all break.)
+- Service mesh? (Istio/Linkerd — handles mTLS, retries, observability at the network layer.)
+- When did you start splitting? (When monolith hit 50k+ LOC and deploys started taking >30 min.)
+
+### Q: REST vs gRPC vs GraphQL — when do you use each?
+
+**Answer.**
+- **REST**: text JSON over HTTP. Universal tooling, browser-native, easy debugging. Use for: public APIs, ad-hoc integrations, browser clients.
+- **gRPC**: binary protobuf over HTTP/2. Strongly-typed contracts, streaming support, ~3-10× faster than REST. Use for: internal service-to-service in microservices, mobile clients (smaller payload), high-throughput pipelines.
+- **GraphQL**: client specifies fields wanted. Solves over-fetching/under-fetching. Use for: complex client UIs with diverse needs (BFF pattern), public APIs with heterogeneous consumers.
+
+**Decision shortcut**: REST for external; gRPC for internal high-throughput; GraphQL when client diversity outweighs server complexity.
+
+**Follow-ups:**
+- gRPC vs REST performance? (gRPC is 3-10× faster on the wire — binary, multiplexed HTTP/2 streams.)
+- GraphQL N+1? (Common pitfall — use DataLoader pattern to batch requests.)
+- gRPC limitation? (Browser doesn't speak HTTP/2 raw — needs grpc-web proxy.)
+
+### Q: What's an idempotency key, and where should you use it?
+
+**Answer.** A client-supplied unique key (UUID) that the server uses to deduplicate retries. Pattern:
+1. Client generates `idempotencyKey = UUID.randomUUID()`.
+2. Sends `POST /payments` with `Idempotency-Key: <key>`.
+3. Server records `(key, result)` for ~24-72 hours.
+4. Retry with same key → server returns cached result, doesn't re-execute.
+
+**Where to use**:
+- Any POST/PUT/PATCH where the operation has side effects (charge, send email, ship order).
+- Any retry-prone integration (payment gateway, downstream API, message processing).
+
+**Storage**: Redis with TTL is the common choice (~1 ms lookup); fall back to DB table for durability.
+
+**Follow-ups:**
+- TTL choice? (24-72 hr balances dedup window vs storage cost. Stripe uses 24h.)
+- Key collision risk? (UUID v4 — collision probability ~0; use it as a primary key with unique constraint.)
+- What about GET? (GET is naturally idempotent — no key needed.)
+
+### Q: How do you handle inter-service failures gracefully?
+
+**Answer.** Four patterns:
+
+1. **Timeout** — never let a downstream call run forever (default ~5s for OkHttp/Resilience4j).
+2. **Retry with backoff + jitter** — for transient failures (503, 504, timeout). Exponential backoff (`100ms × 2^n`) + jitter (±25%) to avoid thundering herd.
+3. **Circuit breaker** — stop calling a failing service after N consecutive failures; let it recover; probe periodically. Resilience4j is the standard library.
+4. **Fallback** — return cached, default, or partial response when downstream is down.
+
+```java
+@CircuitBreaker(name = "payments", fallbackMethod = "fallback")
+@Retry(name = "payments")
+public PaymentResult charge(Order o) { ... }
+
+public PaymentResult fallback(Order o, Throwable t) {
+    return PaymentResult.queued();   // queue for later retry
+}
+```
+
+**Follow-ups:**
+- Retry budget? (Cap total retries — too many retries → DDoS your own downstream.)
+- Why jitter? (Without jitter, all clients retry at exact intervals → spikes.)
+- When NOT to retry? (4xx errors except 408, 429. Auth failures. Validation errors.)
+
+### Q: What is the saga pattern?
+
+**Answer.** A distributed transaction pattern that replaces 2PC across microservices. Each step is local + has a **compensating action**:
+
+```
+Order saga:
+  1. createOrder()       — compensate: cancelOrder()
+  2. reserveInventory()  — compensate: releaseInventory()
+  3. chargeCustomer()    — compensate: refundCustomer()
+  4. scheduleShipment()  — compensate: cancelShipment()
+```
+
+If step 3 fails, undo steps 1+2 by running their compensations in reverse.
+
+**Two implementations:**
+- **Choreographed** (event-driven): services react to events, no orchestrator. Simpler at small scale; harder to debug as the saga grows.
+- **Orchestrated** (state-machine driver): a saga orchestrator runs the steps and tracks state. Easier to debug; orchestrator is a SPOF unless replicated.
+
+**Follow-ups:**
+- When can't you use saga? (When intermediate states are observable and bad (e.g., money charged but not refunded yet visible). Then prefer 2PC or different design.)
+- Idempotency for compensations? (Critical — each compensation must be safe to retry.)
+- Outbox pattern? (Pairs with saga: writes are atomic with the event publication via DB outbox table + CDC.)
+
+## 8. Caching & Performance
+
+### Q: When do you cache, and where in the stack?
+
+**Answer.** Cache when reads dominate writes AND data has acceptable staleness AND the source query is expensive (DB, expensive computation, downstream API). Caching layers:
+
+1. **Client-side** (browser, mobile) — `Cache-Control` headers, longest TTL acceptable.
+2. **CDN** (CloudFront, Cloudflare) — static assets, public API responses. Closest to user.
+3. **Reverse proxy** (Nginx, Varnish) — protects the app server from repeated work.
+4. **Application cache** (Caffeine, Redis) — per-request memoization, hot data.
+5. **Database** (query cache, result cache) — declining importance; Postgres ditched in 9.4.
+
+**Two-tier**: Caffeine (in-process, ~100 ns) + Redis (network, ~1 ms). 80% of hits in L1, 15% in L2, 5% to DB.
+
+**Follow-ups:**
+- Cache invalidation strategies? (TTL — simplest; write-through — synchronous DB+cache write; write-behind — eventual; event-driven — pub/sub on DB CDC.)
+- "There are only two hard things in CS"? (Cache invalidation + naming things — Phil Karlton joke. The point: invalidation IS the hard part.)
+- Cache stampede? (1000 requests miss cache simultaneously → all hit DB → DB drowns. Mitigations: probabilistic early expiration, single-flight pattern, request coalescing.)
+
+### Q: What's the difference between Redis and Memcached?
+
+**Answer.**
+- **Memcached**: simple key-value, in-memory, no persistence, no replication. Just a fast cache.
+- **Redis**: same + data structures (lists, sets, hashes, sorted sets, streams, bitmaps), pub/sub, persistence, replication, clustering, Lua scripting, transactions.
+
+In 2024+, almost always Redis. Memcached is only chosen for the simplest cache cases or because of legacy infrastructure.
+
+**Follow-ups:**
+- Cluster vs Sentinel? (Cluster: data sharded across nodes — horizontal scale. Sentinel: HA via failover — vertical scale with redundancy.)
+- AOF vs RDB? (RDB: periodic snapshots, smaller, faster restore. AOF: append-only log, slower but safer. Often combine.)
+- Eviction policies? (`maxmemory-policy`: noeviction, allkeys-lru, volatile-lru, etc.)
+
+### Q: How do you size a database connection pool?
+
+**Answer.** The HikariCP recommendation: `connections = ((core_count × 2) + effective_spindle_count)`. For SSD, count as 1.
+
+For typical web service on cloud DB:
+- `4 cores × 2 + 1 (SSD) = 9` per app instance
+- Total across cluster: `pods × pool_size` should not exceed DB's `max_connections` (default 100 in Postgres).
+
+**Don't over-pool**:
+- Each connection holds memory on the DB (Postgres: ~10 MB/conn).
+- Each connection competes for CPU; ramping past optimal degrades throughput.
+- 100 connections from 1 app instance with 4 cores? Almost certainly wrong.
+
+**Symptoms of pool too small**: `HikariPool-1 - Connection is not available, request timed out after 30000ms`. Symptoms of too large: DB CPU pegged at 100% with no clear single query at fault.
+
+**Follow-ups:**
+- Idle timeout? (HikariCP default 10 min; lower for cloud DBs where connections are pricey.)
+- Pool exhaustion debugging? (Look for unclosed connections; log slow queries holding connections.)
+- PgBouncer? (Server-side connection pooler; helps when many small apps each have their own pool — multiplex onto fewer DB connections.)
+
+## 9. Observability & Operations
+
+### Q: What are the three pillars of observability?
+
+**Answer.** Logs, metrics, traces.
+- **Logs**: discrete events ("user X logged in", "DB query took 4 ms"). High volume, high detail, low queryability without structure. Use structured logging (JSON) + log aggregation (Loki/ELK).
+- **Metrics**: aggregated numeric measurements over time. Low volume, high queryability. Use Prometheus + Grafana.
+- **Traces**: end-to-end request flow across services. Use OpenTelemetry + Jaeger/Tempo.
+
+**When to use which:**
+- **Diagnosing 1 specific failed request** → logs + traces.
+- **Detecting trends, alerting on outliers** → metrics.
+- **Understanding latency distribution across hops** → traces.
+
+**The fourth pillar (modern)**: events/profiles. Continuous profiling (`async-profiler`, `pprof`) — see what code burned CPU at a specific moment.
+
+**Follow-ups:**
+- RED metrics? (Rate, Errors, Duration — minimum 3 metrics per service.)
+- USE metrics? (Utilization, Saturation, Errors — for resources like CPU, memory, disks.)
+- Cardinality explosion? (Don't tag metrics with user IDs or other high-cardinality fields. Prometheus dies on this.)
+
+### Q: What is correlation/trace ID propagation?
+
+**Answer.** A unique ID attached to a request that flows through every service touching it. All logs, traces, and metrics emit it; you can later find every event for a single user action.
+
+**Implementation:**
+- W3C `traceparent` header: `00-{trace-id}-{span-id}-{flags}` — standard since 2020.
+- Generate at the edge (API gateway / first service); propagate via HTTP headers, Kafka headers, gRPC metadata.
+- Stamp into MDC (Mapped Diagnostic Context) so every log line includes it.
+
+```java
+@Slf4j
+class OrderController {
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody Order o) {
+        log.info("Creating order");   // log automatically includes traceId via MDC
+        return orderService.create(o);
+    }
+}
+```
+
+**Follow-ups:**
+- Baggage? (W3C baggage header — propagates user-defined key-value pairs (user_id, tenant_id) alongside trace_id.)
+- Sampling? (At 100% trace volume, storage costs explode. Tail-sampling: trace everything, drop boring traces; keep errors and slow ones.)
+- vs request_id? (Same idea — trace_id is the modern term + W3C standard. request_id is the legacy variant.)
+
+### Q: How do you debug a service in production?
+
+**Answer.** Layered approach:
+
+1. **Metrics first** — RED metrics; is rate down, errors up, latency spiked?
+2. **Traces** — pull a trace from the affected time window; identify the slow span.
+3. **Logs** — pull logs by trace_id and identify exception or error context.
+4. **JVM-level** — if metrics show high CPU/memory: thread dump (`jstack`), heap histogram (`jmap -histo`), GC log analysis.
+5. **OS-level** — `vmstat`, `iostat`, `pidstat` if it's a resource bottleneck.
+
+**Tools you should know:**
+- **`jcmd <pid> Thread.print`** — thread dump
+- **`jcmd <pid> JFR.start`** — start a Java Flight Recorder session (low overhead, broad signal)
+- **`async-profiler`** — low-overhead CPU + alloc + lock profiler
+- **`tcpdump` / `wireshark`** — network-layer inspection
+- **Datadog APM / Dynatrace / New Relic** — APM with auto-instrumentation
+
+**Follow-ups:**
+- When do you take a heap dump? (When suspecting memory leak — analyze with Eclipse MAT or VisualVM.)
+- JFR overhead? (~1% for default profile — safe to leave on in production.)
+- vs strace? (`strace` shows syscalls — useful for finding blocked I/O, but high overhead.)
+
+### Q: What are SLI, SLO, and error budget?
+
+**Answer.**
+- **SLI (Service Level Indicator)**: a metric measuring reliability. Common: success rate, latency percentile.
+- **SLO (Service Level Objective)**: target for SLI. E.g., "99.5% of requests succeed within 200 ms over a 30-day window."
+- **Error budget**: 1 − SLO. With 99.5% SLO, you have a 0.5% error budget — 3.6 hours/month of failures.
+
+**How it works in practice**: when you've spent your budget, freeze risky deploys until next window. When you're under budget, you can take more risk (chaos engineering, big migrations).
+
+**Follow-ups:**
+- vs SLA? (SLA is the legal commitment to customers — usually a notch below SLO to give safety margin.)
+- Multi-window SLO? (Define SLO at multiple time scales — 1h short-term, 30d long-term — to catch acute vs chronic issues.)
+- Burn rate? (Rate of consuming error budget. High burn rate → page on-call immediately, not just at SLO violation.)
+
+## 10. Security Fundamentals
+
+### Q: How do you store passwords safely?
+
+**Answer.** **Never** in plaintext, never reversibly encrypted. Use **password-based key derivation** with a per-user salt:
+
+1. **Argon2id** (recommended by OWASP 2024+): memory-hard + side-channel resistant.
+2. **bcrypt**: ubiquitous, simple, well-tested. `BCryptPasswordEncoder(12)` in Spring.
+3. **scrypt**: memory-hard alternative.
+4. **PBKDF2**: oldest, weakest — only use if FIPS compliance required.
+
+```java
+PasswordEncoder enc = new BCryptPasswordEncoder(12);   // 12 = work factor
+String hash = enc.encode("hunter2");
+boolean ok = enc.matches("hunter2", hash);
+```
+
+**Why these and not SHA-256?**
+- SHA-256 is fast → brute force is fast → attacker tries billions of passwords/second on a GPU.
+- Argon2/bcrypt/scrypt are slow (~100ms per try) → 10 tries/second/core for attacker.
+- The salt prevents rainbow-table attacks across users with same password.
+
+**Follow-ups:**
+- How long should hashes be? (Argon2id outputs are 32+ bytes; bcrypt 60 chars including version + salt.)
+- Should you rotate hash algorithms? (Yes — store algo+work factor as part of hash string; re-hash on next login if upgraded.)
+- Why not "homemade salt + sha256"? (Fundamentally too fast — millions of tries/second on GPU. No homemade salt fixes that.)
+
+### Q: What's CSRF, and how do you defend?
+
+**Answer.** Cross-Site Request Forgery: a malicious site tricks a logged-in user's browser into sending requests to your site that perform actions.
+
+**Defense:**
+1. **CSRF tokens**: server generates a random token per session; embeds in forms; checks on POST. Without the token, request is rejected.
+2. **`SameSite=Strict` cookies** (modern browsers): cookies only sent on same-site requests. Defaults to Lax in Chrome 80+.
+3. **Custom headers** for AJAX: `X-Requested-With: XMLHttpRequest` — can't be set in a CSRF cross-origin request.
+
+Spring Security enables CSRF by default for cookie-based sessions. **Disable for stateless JWT/Bearer APIs** (no cookies = no CSRF surface).
+
+**Follow-ups:**
+- Why does SameSite help? (Browser refuses to send cookies on cross-site requests — kills CSRF entirely.)
+- Why disable CSRF for APIs? (No session cookie → no CSRF vector. The CSRF token would be pointless overhead.)
+- vs XSS? (XSS is script injection; CSRF is request forgery. Different threats, different defenses.)
+
+### Q: What is OAuth 2.0 and how is it different from authentication?
+
+**Answer.** OAuth 2.0 is an **authorization** protocol — "this user grants this app permission to access X resource on their behalf." It's NOT authentication; it's permission delegation.
+
+**Roles:**
+- **Resource owner** — the user.
+- **Client** — the app requesting access.
+- **Authorization server** — issues tokens.
+- **Resource server** — hosts the protected resource.
+
+**The flow** (Authorization Code, the modern default):
+1. App redirects user to auth server: "I want to do X on user's behalf."
+2. User logs in to auth server and approves.
+3. Auth server redirects back with a `code`.
+4. App exchanges `code` for `access_token` + `refresh_token` at auth server.
+5. App calls resource server with `Authorization: Bearer <access_token>`.
+
+**OpenID Connect (OIDC)**: built on OAuth 2 + adds an `id_token` (JWT with user info) — turns OAuth into "authorization + authentication."
+
+**Follow-ups:**
+- Why Authorization Code with PKCE? (PKCE prevents code interception in mobile/SPA. Always use it.)
+- vs API key? (API key authenticates the *app*, not a user. OAuth authorizes a *user* via an app.)
+- JWT vs opaque token? (JWT self-contained (clients verify locally); opaque token requires server lookup (revocable, more flexible).)
+
 ## Closing — the Mid-Level Differentiators
 
 What turns a passing answer into a strong one at this level:

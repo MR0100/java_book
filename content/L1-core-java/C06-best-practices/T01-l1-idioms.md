@@ -578,6 +578,197 @@ class NotificationService {
 
 ---
 
+## 30. Use `.equals()` for All Boxed Numeric and String Equality
+
+**Idiom:** never use `==` on `Integer`, `Long`, `Boolean`, `String`, or any boxed type. Use `.equals()` or `Objects.equals()`.
+
+```java
+Integer a = compute();        // boxed
+Integer b = lookup();         // boxed
+if (a.equals(b)) ...           // CORRECT — value comparison
+if (Objects.equals(a, b)) ...  // null-safe value comparison
+
+String s1 = readUser();       // could be from anywhere
+String s2 = "expected";
+if (s1.equals(s2)) ...         // CORRECT
+if ("expected".equals(s1)) ... // also safe vs s1 == null (NPE-free)
+```
+
+**Why:** the JDK caches `Integer.valueOf(n)` for −128 to +127 (and equivalents for other boxed types), so `==` works by accident inside that range and breaks silently outside it (see pitfall #43). For `String`, only literals share a pool entry; computed/deserialized strings don't (see pitfall #44). Identity comparison should be reserved for genuine identity invariants (singleton checks, sentinel objects).
+
+**Topic:** [C01/T19 Immutability](../C01-oop/T19-immutability-and-immutable-class-design.md), [pitfall #43](./T02-l1-pitfalls-catalogue.md#43-integer-cache-equality-trap-integervalueof127--integervalueof127--what-you-think), [pitfall #44](./T02-l1-pitfalls-catalogue.md#44-string-pool--interning-subtlety--vs-equals-for-string).
+
+---
+
+## 31. Pre-size Collections When You Know the Size
+
+**Idiom:** pass the expected size to the constructor for `ArrayList`, `HashMap`, `HashSet` whenever you know it (or even approximately). Avoids the resize storm.
+
+```java
+List<String> list = new ArrayList<>(expectedCount);   // skip default 10, no resizes
+Map<K, V> map = new HashMap<>(expectedCount, 0.75f);  // skip default 16, no resizes
+
+// Java 19+ helper for the exact correct map capacity:
+Map<K, V> map = HashMap.newHashMap(expectedCount);    // accounts for load factor
+```
+
+**Why:** default capacity 10 (ArrayList) or 16 (HashMap) is fine for tiny collections but causes log₂(n/initial) resizes for large ones. Each `HashMap` resize re-walks every bucket; each `ArrayList` resize allocates a 1.5× array and copies. Building a 10M-entry `HashMap` from default costs ~23 resizes, each one rehashing/copying the entire growing table.
+
+**Pre-size lookup**: for `HashMap`/`HashSet`, use **`expectedSize / 0.75 + 1`** (or, in Java 19+, `HashMap.newHashMap(expectedSize)` which does this for you). Otherwise the resize triggers at `size > capacity × 0.75`, so a `new HashMap<>(N)` still resizes around 0.75N entries.
+
+**Topic:** [C02/T04 Map](../C02-collections-and-core-apis/T04-map-hashmap-linkedhashmap-treemap.md), [C02/T02 List](../C02-collections-and-core-apis/T02-list-arraylist-linkedlist.md).
+
+---
+
+## 32. Use `EnumMap` and `EnumSet` for Enum Keys
+
+**Idiom:** `EnumMap<MyEnum, V>` and `EnumSet.of(...)` whenever keys/elements are enums.
+
+```java
+// instead of
+Map<Day, String> hours = new HashMap<>();
+Set<Day> weekend = new HashSet<>();
+
+// use
+Map<Day, String> hours = new EnumMap<>(Day.class);
+Set<Day> weekend = EnumSet.of(Day.SAT, Day.SUN);
+```
+
+**Why:** `EnumMap` is backed by a *plain array indexed by enum ordinal* — no hashing, no `Node` allocation, no buckets. A `get`/`put` is a single array access (~4 cycles vs ~20-200 for HashMap). `EnumSet` uses a single `long` (for enums with ≤64 values) or `long[]` as a bitmap — operations are bitwise. Both are far smaller and faster for enum keys/elements.
+
+This is a one-line change that's nearly always correct when keys are enums; no senior code review should let `HashMap<EnumType, V>` through without justification.
+
+**Topic:** [C01/T13 Enums](../C01-oop/T13-enum-types-with-fields-methods.md), [C02/T04 Map](../C02-collections-and-core-apis/T04-map-hashmap-linkedhashmap-treemap.md).
+
+---
+
+## 33. Use `text blocks` (Java 15+) for Multi-line Strings
+
+**Idiom:** triple-quoted string literals for SQL, JSON, HTML, error messages.
+
+```java
+// before
+String sql = "SELECT u.id, u.name, u.email\n" +
+             "FROM users u\n" +
+             "WHERE u.tenant_id = ?\n" +
+             "  AND u.status = 'ACTIVE'\n" +
+             "ORDER BY u.created_at DESC";
+
+// after
+String sql = """
+    SELECT u.id, u.name, u.email
+    FROM users u
+    WHERE u.tenant_id = ?
+      AND u.status = 'ACTIVE'
+    ORDER BY u.created_at DESC
+    """;
+```
+
+**Why:** text blocks strip common leading whitespace, preserve newlines, don't require escaping `"`. They make multi-line content readable as the literal-with-formatting that it is. No more `\n` and `+` clutter; SQL and JSON look like SQL and JSON.
+
+**Topic:** [C01/T01 Classes & Objects (Modern Java)](../C01-oop/T01-classes-and-objects.md).
+
+---
+
+## 34. Use `var` for Local Variables Where the Type Is Obvious
+
+**Idiom:** Java 10+ local-variable type inference for locals where the right-hand side makes the type clear.
+
+```java
+var users = userRepository.findAll();           // List<User> — obvious
+var inputStream = Files.newInputStream(path);   // InputStream — obvious
+var map = new HashMap<String, List<Order>>();   // saves typing the generic twice
+
+// DON'T use when the type isn't obvious:
+var result = process();                          // what's the type? unclear without IDE
+```
+
+**Why:** removes redundancy (`HashMap<String, List<Order>> map = new HashMap<String, List<Order>>()` is just noise), keeps focus on the *meaningful* part of the code. The Eclipse / IntelliJ convention "if the RHS makes the type clear, use `var`" — applied consistently — measurably reduces verbosity.
+
+**Don't use `var` when:** the RHS is opaque (a method call returning a type the reader can't infer), you need to widen (`Object o = ...`), you're declaring a `List` from a `new ArrayList<>()` and want to expose only the interface.
+
+**Topic:** [C01/T02 Fields/methods](../C01-oop/T02-fields-methods-constructors-this.md).
+
+---
+
+## 35. Use `Objects.requireNonNullElse` / `Objects.requireNonNull` for Null Checks
+
+**Idiom:** standard utilities for null validation; clear intent + good error messages.
+
+```java
+// validate non-null arg
+public void process(User user) {
+    this.user = Objects.requireNonNull(user, "user");
+    // throws NullPointerException with message "user" if null
+}
+
+// safe default
+String name = Objects.requireNonNullElse(input.name(), "anonymous");
+// or
+String name = Objects.requireNonNullElseGet(input.name(), () -> generateDefault());
+```
+
+**Why:** the standard JDK utility is readable and consistent. `Objects.requireNonNull(x, "x")` is significantly cleaner than `if (x == null) throw new NullPointerException("x");`. Modern Java's helpful NPE messages (`-XX:+ShowCodeDetailsInExceptionMessages`, default in 14+) make these even more useful.
+
+For optional-default patterns, use `requireNonNullElseGet` (lazy default) when computing the default is expensive.
+
+**Topic:** [C01/T19 Immutability](../C01-oop/T19-immutability-and-immutable-class-design.md).
+
+---
+
+## 36. Use `try-with-resources` for `ExecutorService` (Java 19+)
+
+**Idiom:** `ExecutorService` now implements `AutoCloseable` (Java 19+). Manage with try-with-resources.
+
+```java
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    var futures = tasks.stream()
+                       .map(t -> executor.submit(() -> process(t)))
+                       .toList();
+    // close() called automatically at end of block:
+    //   - calls shutdown()
+    //   - waits for tasks to complete
+    //   - throws if interrupted
+}
+```
+
+**Why:** before Java 19, `ExecutorService` required manual `shutdown()` + `awaitTermination()`. With AutoCloseable, the JDK handles graceful shutdown for you. Most relevant for virtual-thread executors (per-task, often short-lived) but works for any executor.
+
+For long-lived executors (Spring's thread pool, JDK common ForkJoinPool), this doesn't apply — they stay alive for the app's lifetime.
+
+**Topic:** [L3/C01/T05 Executors](../../L3-advanced-jvm/C01-concurrency/T05-executors-and-thread-pools.md).
+
+---
+
+## 37. Prefer Sealed + Records for Sum Types (Algebraic Data Types)
+
+**Idiom:** model "is exactly one of these types" with `sealed interface` + record implementations.
+
+```java
+sealed interface PaymentMethod permits CreditCard, BankTransfer, Wallet {}
+record CreditCard(String number, String cvv, YearMonth expiry) implements PaymentMethod {}
+record BankTransfer(String iban, String swift) implements PaymentMethod {}
+record Wallet(String provider, String token) implements PaymentMethod {}
+
+// pattern match with exhaustiveness checking
+public String describe(PaymentMethod pm) {
+    return switch (pm) {
+        case CreditCard c -> "Card ending " + c.number().substring(c.number().length() - 4);
+        case BankTransfer b -> "Bank " + b.iban();
+        case Wallet w -> w.provider() + " wallet";
+        // NO default needed — sealed type, compiler verifies all variants handled
+    };
+}
+```
+
+**Why:** sealed types give the compiler the *closed-set* knowledge it needs for **exhaustiveness checking**. Adding a new variant (`Crypto`) → every non-exhaustive switch across the codebase fails to compile, each error pointing at the case you must add. This is Java's answer to Rust enums / Haskell sum types — refactor-safe variant modeling.
+
+Use for: payment methods, message types, results (`Success`/`Failure`), state machines.
+
+**Topic:** [C01/T15 Sealed](../C01-oop/T15-sealed-classes-and-interfaces.md), [C01/T14 Records](../C01-oop/T14-record-types.md).
+
+---
+
 ## Recap
 
 If you internalise one idiom per area:

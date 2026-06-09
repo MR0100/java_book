@@ -332,6 +332,98 @@ timeout every call · backoff retry (idempotent only) · verify TLS · config in
 
 **Topic:** [C08/T02](../C08-best-practices/T02-l2-pitfalls-catalogue.md).
 
+## Distributed-Systems Patterns Quick Lookup
+
+```text
+PROBLEM                                 → PATTERN
+Need to retry POST safely               → Idempotency-Key (UUID, 24-72h dedup)
+Want atomic write + event publish       → Outbox pattern (CDC drains to Kafka)
+Cross-service transaction               → Saga (orchestrated or choreographed)
+Cascading failures from slow downstream → Circuit breaker (Resilience4j)
+Retry amplification                     → Backoff + jitter + retry budget
+Cache thundering herd                   → Single-flight loader (Caffeine LoadingCache)
+Need exactly-once messaging             → Kafka transactions OR idempotent consumer + dedup
+Distributed mutex                       → Redis Redlock + fencing token (NOT just Redlock)
+Trace requests across services          → W3C traceparent header + OpenTelemetry
+Rate limit at the edge                  → Token bucket via Redis at API gateway
+```
+
+## Caching Decision Quick Lookup
+
+```text
+SCENARIO                              → CHOICE
+Single-instance, hot read paths       → Caffeine (in-process, ~100ns)
+Shared across instances               → Redis (~1ms)
+Best of both                          → Two-tier: Caffeine L1 + Redis L2
+Session store                         → Redis (replicated, sub-ms)
+Distributed counter                   → Redis INCR or LongAdder pattern
+Large objects, infrequent access      → S3 + signed URLs (not in app cache)
+Strong-consistency lookup             → Don't cache; hit primary DB
+
+TTL guidance:
+  Mutable user data                   → 60s (or invalidate on write)
+  Reference data (countries, plans)   → 1h+
+  Computed aggregates                 → align with refresh interval
+  Negative results (404, error)       → 15-60s (short — survive recovery)
+  Cache stampede protection           → probabilistic early expiration
+```
+
+## Observability Quick Lookup
+
+```text
+THE THREE PILLARS               WHEN TO USE
+Logs (structured JSON)          Diagnose ONE specific failed request
+Metrics (Prometheus)            Detect TRENDS / outlier alerts
+Traces (OpenTelemetry)          Understand latency ACROSS hops
+
+MINIMUM ALERTS PER SERVICE
+  - p99 latency > SLO target for 5 min
+  - error rate > 1% for 5 min  
+  - request rate < 50% of baseline for 5 min (silent failure)
+  - dependency health (DB pool 90% used, Redis unreachable)
+
+NEVER ALERT ON
+  - single 500s (use burn rate)
+  - metrics with high cardinality (user_id, trace_id as labels)
+  - non-actionable thresholds (CPU > 50% with no SLO violation)
+
+ENABLE BY DEFAULT
+  -XX:+HeapDumpOnOutOfMemoryError
+  -XX:HeapDumpPath=/tmp
+  always-on JFR continuous: -XX:+FlightRecorder -XX:StartFlightRecording=name=cont,maxsize=200M
+```
+
+## Security Quick Lookup
+
+```text
+PASSWORD STORAGE          Argon2id (preferred) / BCrypt(12) (legacy)
+JWT signing                RS256/ES256 (asymmetric, JWKS rotation) NOT HS256 (shared secret)
+JWT TTL                   15 min access + 7d refresh (rotation on use)
+Cookie flags              HttpOnly + Secure + SameSite=Strict
+CSRF                      Enabled for cookie sessions; disabled for stateless JWT APIs
+CORS                      Explicit allowed origins, never "*" with credentials
+SQL injection             ALWAYS PreparedStatement / JdbcTemplate / JPA — NEVER string-concat
+Input validation          @Valid + Jakarta Validation (NotNull, Size, Email, Min/Max)
+Secrets storage           AWS Secrets Manager / Vault / Azure Key Vault — NEVER env vars in container
+TLS                       1.2+ only; HSTS header in prod
+Auth header for APIs      Authorization: Bearer <jwt>  (not custom header names)
+```
+
+## Common Performance Anti-Patterns Quick List
+
+```text
+🔴 N+1 queries                         → use @EntityGraph / JOIN FETCH / projections / @BatchSize
+🔴 SELECT *                            → project columns; saves bandwidth + enables index-only scans
+🔴 OFFSET on large pages               → keyset pagination (WHERE id > last_seen_id LIMIT N)
+🔴 Long-running transaction            → split into smaller, commit between
+🔴 Synchronous downstream call in tx   → call outside; use outbox if event needed
+🔴 Connection pool too large (>50)     → cores × 2 + spindles; 9 is usually right
+🔴 No connection-pool metrics          → expose via Micrometer + alert on saturation
+🔴 Cache stampede on miss              → single-flight (Caffeine LoadingCache.get(k, loader))
+🔴 Sync logging at INFO every request  → DEBUG happy-path; async logging (LogbackAsyncAppender)
+🔴 Reflective access in hot path       → cache Method/Field references; better: avoid reflection
+```
+
 ## Next
 
 The companion at-a-glance set is done — pair it with [C12 Resources](../C12-resources/) for where to go deeper, or jump back to any concept chapter via the topic links above.

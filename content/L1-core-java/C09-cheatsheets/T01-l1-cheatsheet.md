@@ -333,6 +333,209 @@ Use the **wrapper** (`./gradlew` / `./mvnw`) for reproducible builds. **Topic:**
 
 **Topic:** [C03/T07](../C03-testing-fundamentals/T07-test-coverage-jacoco.md) · [C04/T01](../C04-tools-and-environment/T01-build-dependencies-and-project-tooling.md).
 
+## Records & Sealed Types Quick Reference
+
+```java
+// Compact record
+public record Point(int x, int y) {}
+// Auto-generates: constructor, accessors x()/y(), equals/hashCode/toString, implicitly final
+
+// Record with validation
+public record Email(String value) {
+    public Email {                           // compact canonical constructor
+        if (!value.contains("@")) throw new IllegalArgumentException("invalid email");
+    }
+}
+
+// Record implementing interface + adding methods
+public record Money(BigDecimal amount, Currency currency) implements Comparable<Money> {
+    public static Money zero(Currency c) { return new Money(BigDecimal.ZERO, c); }
+    public Money plus(Money other) {
+        if (!currency.equals(other.currency)) throw new IllegalStateException("currency mismatch");
+        return new Money(amount.add(other.amount), currency);
+    }
+    @Override public int compareTo(Money o) { return amount.compareTo(o.amount); }
+}
+
+// Sealed interface with permits
+public sealed interface Shape permits Circle, Rectangle, Triangle {}
+public record Circle(double radius) implements Shape {}
+public record Rectangle(double width, double height) implements Shape {}
+public record Triangle(double base, double height) implements Shape {}
+
+// Exhaustive pattern match (no default needed for sealed)
+double area(Shape s) {
+    return switch (s) {
+        case Circle c       -> Math.PI * c.radius() * c.radius();
+        case Rectangle r    -> r.width() * r.height();
+        case Triangle t     -> 0.5 * t.base() * t.height();
+    };
+}
+```
+
+**Topic:** [C01/T14 Records](../C01-oop/T14-record-types.md), [C01/T15 Sealed](../C01-oop/T15-sealed-classes-and-interfaces.md).
+
+## Modern Java Language Features by Version
+
+```
+JAVA 8 (2014, LTS)    lambdas, streams, default methods, Optional, java.time, Method refs
+JAVA 9 (2017)         JPMS modules, var (later 10), private interface methods, factory methods
+JAVA 11 (2018, LTS)   HttpClient (java.net.http), var in lambdas, String methods (.strip, etc.)
+JAVA 14 (2020)        switch expressions GA, helpful NPE
+JAVA 15 (2020)        text blocks GA, sealed preview
+JAVA 16 (2021)        records GA, instanceof pattern matching
+JAVA 17 (2021, LTS)   sealed GA, switch patterns preview, foreign function API incubator
+JAVA 21 (2023, LTS)   virtual threads GA (JEP 444), structured concurrency preview,
+                      scoped values preview, record patterns GA, switch patterns GA
+JAVA 22 (2024)        unnamed variables (_), foreign function GA (preview improvements)
+JAVA 24 (2025)        ScopedValue GA, JEP 491 (synchronized doesn't pin virtual threads)
+JAVA 25 (2025, LTS)   structured concurrency GA, pattern matching primitives preview
+```
+
+**Tip:** the **LTS** versions (8, 11, 17, 21, 25) are the ones companies actually run in production. Skip-version migrations (8 → 17, 11 → 21) are normal.
+
+## `Optional` Anti-Patterns Quick List
+
+```text
+DON'T                                       DO INSTEAD
+Optional<List<T>>                           empty List<T>
+Optional<Map<K,V>>                          empty Map<K,V>
+Optional as a field type                    null + Javadoc + Bean Validation
+Optional as a method parameter              method overload OR pass null with @Nullable
+.get() without .isPresent()                 .orElseThrow() / .orElse(default)
+.orElse(expensive())                        .orElseGet(() -> expensive()) — lazy
+opt.isPresent() ? opt.get() : x             .orElse(x)
+return Optional.of(value)                   Optional.ofNullable(value)   ← unless you KNOW non-null
+```
+
+## Common Streams Patterns Quick List
+
+```java
+// counting / grouping
+Map<String, Long> wordCount = words.stream()
+    .collect(groupingBy(w -> w, counting()));
+
+// grouping with downstream
+Map<Department, List<Employee>> byDept = employees.stream()
+    .collect(groupingBy(Employee::department));
+
+// partitioning (boolean predicate)
+Map<Boolean, List<Order>> active = orders.stream()
+    .collect(partitioningBy(o -> o.status() == ACTIVE));
+
+// joining
+String csv = items.stream()
+    .map(Item::name)
+    .collect(joining(", ", "[", "]"));
+
+// to immutable
+List<Item> list = stream.toList();                       // Java 16+ (preferred)
+List<Item> list2 = stream.collect(toUnmodifiableList()); // explicit immutable
+
+// flat map (one-to-many)
+List<String> all = orders.stream()
+    .flatMap(o -> o.items().stream())
+    .map(Item::name)
+    .toList();
+
+// reduce
+int sum = numbers.stream().mapToInt(Integer::intValue).sum();
+Optional<Integer> max = numbers.stream().max(Integer::compare);
+int total = numbers.stream().reduce(0, Integer::sum);
+
+// numeric streams (no boxing)
+int total = IntStream.rangeClosed(1, 100).sum();
+double avg = scores.stream().mapToDouble(Score::value).average().orElse(0.0);
+```
+
+## Concurrency Primitives Quick Reference (L1 preview for L3)
+
+```java
+// Volatile single-writer flag
+private volatile boolean stop = false;
+
+// Atomic counter (lock-free)
+private final AtomicLong counter = new AtomicLong();
+counter.incrementAndGet();
+
+// Synchronized block (legacy)
+private final Object lock = new Object();         // ALWAYS final!
+synchronized (lock) { /* critical section */ }
+
+// ReentrantLock (preferred — supports tryLock, fair, interruptible)
+private final ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try { /* critical section */ } finally { lock.unlock(); }
+
+// ConcurrentHashMap (preferred over Hashtable/Collections.synchronizedMap)
+private final Map<K, V> map = new ConcurrentHashMap<>();
+map.computeIfAbsent(k, key -> compute(key));      // atomic
+
+// Executor (Java 21+ virtual threads)
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    var futures = tasks.stream()
+                       .map(t -> executor.submit(() -> process(t)))
+                       .toList();
+}
+
+// CompletableFuture composition
+CompletableFuture.supplyAsync(this::loadUser)
+    .thenCompose(user -> CompletableFuture.supplyAsync(() -> loadOrders(user)))
+    .thenApply(orders -> buildReport(orders))
+    .exceptionally(t -> errorReport(t))
+    .orTimeout(5, SECONDS);
+```
+
+**Topic:** L3/C01 — full coverage.
+
+## I/O Quick Reference (Modern NIO.2)
+
+```java
+// Read entire file
+String text = Files.readString(path);                    // UTF-8 default
+byte[] bytes = Files.readAllBytes(path);
+
+// Write entire file
+Files.writeString(path, content);
+Files.write(path, bytes);
+
+// Stream lines (large files)
+try (Stream<String> lines = Files.lines(path)) {
+    lines.filter(l -> l.startsWith("ERROR"))
+         .forEach(System.out::println);
+}
+
+// Read with BufferedReader (large files)
+try (var reader = Files.newBufferedReader(path)) {
+    String line;
+    while ((line = reader.readLine()) != null) { /* ... */ }
+}
+
+// Copy / Move / Delete
+Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+Files.move(src, dst, StandardCopyOption.ATOMIC_MOVE);
+Files.delete(path);
+
+// Directory walk
+try (Stream<Path> paths = Files.walk(root, maxDepth)) {
+    paths.filter(Files::isRegularFile)
+         .filter(p -> p.toString().endsWith(".java"))
+         .forEach(System.out::println);
+}
+
+// HTTP request (Java 11+)
+HttpClient client = HttpClient.newHttpClient();
+HttpRequest req = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com"))
+    .timeout(Duration.ofSeconds(10))
+    .header("Accept", "application/json")
+    .GET()
+    .build();
+HttpResponse<String> resp = client.send(req, BodyHandlers.ofString());
+```
+
+**Topic:** [C02/T13 I/O](../C02-collections-and-core-apis/T13-i-o-streams-byte-and-character.md), [C02/T14 NIO.2](../C02-collections-and-core-apis/T14-nio-2-path-files-channels.md), [C02/T22 Networking](../C02-collections-and-core-apis/T22-networking-socket-httpclient.md).
+
 ## What You DON'T Need to Memorise
 
 - Every `Collectors` / `Stream` / `Comparator` method — know the shape, let the IDE complete it.

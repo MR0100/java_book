@@ -838,6 +838,387 @@ tasks.withType<Test> { useJUnitPlatform() }
 
 ---
 
+## NoSQL Quick Reference
+
+### MongoDB
+
+```javascript
+// Common queries
+db.users.find({ status: "ACTIVE" }).limit(10).sort({ created_at: -1 })
+db.users.findOne({ _id: ObjectId("...") })
+
+// Aggregation
+db.orders.aggregate([
+  { $match: { status: "PAID", created_at: { $gte: ISODate("2024-01-01") } } },
+  { $group: { _id: "$customer_id", total: { $sum: "$amount" }, count: { $sum: 1 } } },
+  { $sort: { total: -1 } },
+  { $limit: 100 }
+])
+
+// Index
+db.users.createIndex({ tenant_id: 1, email: 1 }, { unique: true })
+db.users.getIndexes()
+
+// Explain
+db.users.find({ ... }).explain("executionStats")  // look for IXSCAN vs COLLSCAN
+```
+
+```java
+// Spring Data MongoDB
+@Document(collection = "users")
+public record User(@Id String id, @Indexed String email, String name) {}
+
+@Repository
+interface UserRepo extends MongoRepository<User, String> {
+    Optional<User> findByEmail(String email);
+    @Query("{ tenant_id: ?0, status: ?1 }")
+    List<User> findByTenantAndStatus(String tenantId, String status);
+}
+```
+
+### Cassandra
+
+```sql
+-- Schema for time-series messages
+CREATE TABLE messages (
+    chat_id UUID,
+    bucket TEXT,           -- e.g., "2024-W12"
+    msg_id TIMEUUID,
+    sender_id UUID,
+    body TEXT,
+    PRIMARY KEY ((chat_id, bucket), msg_id)
+) WITH CLUSTERING ORDER BY (msg_id DESC);
+
+-- Query (always include partition key!)
+SELECT * FROM messages
+WHERE chat_id = ? AND bucket = '2024-W12'
+LIMIT 50;
+
+-- ALLOW FILTERING is a CODE SMELL — schema is wrong
+```
+
+**Cassandra modeling rule**: design tables per query pattern. Denormalize. Partition keys determine which node holds the data.
+
+### DynamoDB
+
+```java
+// Spring Data DynamoDB (or AWS SDK directly)
+DynamoDbTable<User> table = enhancedClient.table("users",
+    TableSchema.fromBean(User.class));
+
+// Get item
+User u = table.getItem(Key.builder().partitionValue("user-123").build());
+
+// Query (must use partition key)
+table.query(QueryConditional.keyEqualTo(
+    Key.builder().partitionValue("user-123").build()
+)).items().forEach(System.out::println);
+
+// Conditional write (optimistic concurrency)
+table.updateItem(UpdateItemEnhancedRequest.builder(User.class)
+    .item(updatedUser)
+    .conditionExpression(Expression.builder()
+        .expression("version = :ver")
+        .putExpressionValue(":ver", AttributeValue.builder().n(String.valueOf(oldVersion)).build())
+        .build())
+    .build());
+```
+
+**DynamoDB sizing**: 1 RCU = 1 strongly-consistent read of 4KB; 1 WCU = 1 write of 1KB. Capacity reservations vs on-demand mode.
+
+## Cloud Quick Reference (AWS Focus)
+
+### AWS CLI Essentials
+
+```bash
+# S3
+aws s3 cp file.txt s3://my-bucket/path/
+aws s3 sync ./dist s3://my-bucket/static --delete
+aws s3 ls s3://my-bucket/path/
+
+# EC2 / EKS
+aws ec2 describe-instances --filters "Name=tag:env,Values=prod"
+aws eks update-kubeconfig --name my-cluster --region us-east-1
+
+# RDS
+aws rds describe-db-instances
+aws rds create-db-snapshot --db-instance-identifier mydb --db-snapshot-identifier mydb-pre-migration
+
+# Lambda
+aws lambda invoke --function-name MyFn --payload '{"key":"value"}' response.json
+aws lambda update-function-code --function-name MyFn --zip-file fileb://deploy.zip
+
+# Secrets Manager
+aws secretsmanager get-secret-value --secret-id prod/db/password
+aws secretsmanager rotate-secret --secret-id prod/db/password
+```
+
+### Spring Cloud AWS Quick Setup
+
+```yaml
+spring:
+  cloud:
+    aws:
+      region.static: us-east-1
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      sqs:
+        endpoint: https://sqs.us-east-1.amazonaws.com
+      s3:
+        endpoint: https://s3.us-east-1.amazonaws.com
+```
+
+```java
+@Component
+public class Worker {
+    @SqsListener("orders-queue")
+    public void process(Order order) { ... }
+}
+```
+
+### AWS Service Selection
+
+```
+Need pub/sub                  → SNS (fanout) or EventBridge (rules-based routing)
+Need work queue                → SQS (FIFO for ordering, standard for throughput)
+Need streaming                 → Kinesis (Kafka-like, ordered partitions)
+Need event bus + routing       → EventBridge (filters, schemas, multiple targets)
+Need scheduled jobs            → EventBridge Scheduler / CloudWatch Events
+Need workflow orchestration    → Step Functions
+Need API gateway               → API Gateway (REST) or App Mesh (gRPC/service mesh)
+Need cache                     → ElastiCache (Redis / Memcached managed)
+Need search                    → OpenSearch (Elasticsearch fork)
+Need OLTP                      → RDS (Postgres/MySQL) or Aurora (Postgres-compat, distributed)
+Need OLAP                      → Redshift (warehouse) or Athena (S3 + SQL)
+Need wide-column NoSQL         → DynamoDB or Keyspaces (Cassandra-managed)
+Need document NoSQL            → DocumentDB (MongoDB-API)
+Need feature flags             → AppConfig
+Need secret rotation           → Secrets Manager (with auto-rotation Lambda)
+```
+
+## Event-Sourcing / CQRS Quick Reference
+
+```java
+// Event store (append-only)
+public record OrderCreated(UUID orderId, UUID customerId, BigDecimal amount, Instant at) {}
+public record OrderPaid(UUID orderId, UUID paymentId, Instant at) {}
+public record OrderShipped(UUID orderId, String trackingNumber, Instant at) {}
+
+sealed interface OrderEvent permits OrderCreated, OrderPaid, OrderShipped {}
+
+// Append (atomic via DB transaction)
+@Transactional
+public void recordEvent(UUID streamId, OrderEvent event, long expectedVersion) {
+    long actualVersion = eventStore.versionOf(streamId);
+    if (actualVersion != expectedVersion) throw new ConcurrencyException();
+    eventStore.append(streamId, expectedVersion + 1, event);
+    eventBus.publish(event);
+}
+
+// Rebuild current state by replaying events
+public OrderState rebuild(UUID orderId) {
+    return eventStore.streamOf(orderId)
+        .stream()
+        .reduce(OrderState.initial(), this::apply, (a, b) -> b);
+}
+
+OrderState apply(OrderState state, OrderEvent event) {
+    return switch (event) {
+        case OrderCreated c  -> state.withId(c.orderId()).withStatus("CREATED");
+        case OrderPaid p     -> state.withPaymentId(p.paymentId()).withStatus("PAID");
+        case OrderShipped s  -> state.withTracking(s.trackingNumber()).withStatus("SHIPPED");
+    };
+}
+```
+
+**When event sourcing makes sense:**
+- Strong audit requirement (banks, healthcare).
+- Need temporal queries ("what was the state on Jan 1?").
+- Multiple read models from the same events.
+
+**When it doesn't:**
+- CRUD apps with no audit need.
+- Team unfamiliar with the pattern (steep learning curve).
+- Schema-evolution costs outweigh benefits.
+
+## GraphQL Quick Reference
+
+```graphql
+# Schema
+type Query {
+  user(id: ID!): User
+  users(filter: UserFilter, page: PageInput): UserPage!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  orders(status: OrderStatus): [Order!]!   # nested resolver
+}
+```
+
+```java
+// Spring for GraphQL
+@Controller
+public class UserController {
+    @QueryMapping
+    public User user(@Argument String id) { return userRepo.findById(id).orElseThrow(); }
+
+    @SchemaMapping(typeName = "User", field = "orders")
+    public List<Order> orders(User user, @Argument OrderStatus status) {
+        return orderRepo.findByUserAndStatus(user.id(), status);
+    }
+}
+```
+
+**Critical**: use **DataLoader** pattern to batch nested resolvers. Without it, querying 100 users with their orders = 100 N+1 queries.
+
+```java
+@Component
+public class OrderBatchLoader implements BatchLoader<String, List<Order>> {
+    @Override
+    public CompletionStage<List<List<Order>>> load(List<String> userIds) {
+        // ONE query for all users at once
+        Map<String, List<Order>> byUser = orderRepo.findByUserIds(userIds)
+            .stream().collect(groupingBy(Order::userId));
+        return CompletableFuture.completedFuture(
+            userIds.stream().map(id -> byUser.getOrDefault(id, List.of())).toList()
+        );
+    }
+}
+```
+
+## OpenTelemetry Quick Reference
+
+```yaml
+# application.yml
+management:
+  tracing:
+    sampling.probability: 1.0   # 100% in dev; lower in prod (e.g., 0.1)
+  otlp:
+    tracing.endpoint: http://jaeger:4318/v1/traces
+
+spring:
+  application.name: payment-service   # appears in trace
+```
+
+```java
+// Manual span (rare — Spring auto-instruments most calls)
+Tracer tracer = openTelemetry.getTracer("payment-service");
+Span span = tracer.spanBuilder("processPayment").startSpan();
+try (Scope scope = span.makeCurrent()) {
+    span.setAttribute("payment.amount", amount);
+    span.setAttribute("payment.currency", currency);
+    process();
+} finally {
+    span.end();
+}
+
+// Baggage (propagate metadata cross-service)
+Baggage baggage = Baggage.current().toBuilder()
+    .put("user.id", userId)
+    .build();
+try (Scope ignored = baggage.makeCurrent()) {
+    // downstream calls see user.id in baggage
+}
+```
+
+### W3C trace context headers
+
+```
+traceparent: 00-{trace-id-32-hex}-{span-id-16-hex}-{flags-2-hex}
+            ^^   ^^^^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^   ^^
+            version       trace id                  span id      sampled bit
+
+baggage: key1=value1,key2=value2
+```
+
+Pass via HTTP header / Kafka header / gRPC metadata. Spring Boot 3 + Micrometer Tracing handles this automatically; manual propagation only needed for custom transports.
+
+## Reactive Spring WebFlux Quick Reference (when you must use reactive)
+
+```java
+@RestController
+public class UserController {
+    @GetMapping("/users/{id}")
+    public Mono<User> get(@PathVariable String id) {
+        return userService.findById(id);
+    }
+
+    @GetMapping("/users")
+    public Flux<User> all() {
+        return userService.findAll();
+    }
+
+    @PostMapping("/users")
+    public Mono<User> create(@RequestBody Mono<CreateUser> request) {
+        return request.flatMap(userService::create);
+    }
+}
+
+// Composing
+Mono<Profile> profile = userMono
+    .zipWith(ordersFlux.collectList(), Profile::new)   // join two reactive streams
+    .timeout(Duration.ofSeconds(5))
+    .onErrorReturn(Profile.empty())
+    .doOnNext(p -> log.info("Built profile for {}", p.userId()));
+
+// Backpressure
+flux.onBackpressureBuffer(1000)
+    .onBackpressureDrop()
+    .onBackpressureLatest();
+```
+
+**Operator gotchas:**
+- `.block()` defeats reactive — only use at the edge (rare).
+- `.subscribe()` without consumer = no error handling = silent failure.
+- Sequential composition uses `.flatMap`, parallel composition uses `.parallel().runOn(scheduler)`.
+
+**Modern alternative**: Java 21 virtual threads + Spring MVC. Same throughput; no reactive complexity; normal stack traces; debugger works.
+
+## Useful Production One-Liners
+
+```bash
+# Find connection leak suspects (JDK 8+)
+jcmd <pid> Thread.print | grep -A 20 "owned by" | grep -i "Connection"
+
+# Top 10 GC-pause-causing methods (from JFR)
+jfr print --events GarbageCollection recording.jfr | head -100
+
+# Find largest objects in a heap dump
+jmap -histo:live <pid> | head -20
+
+# Top HTTP error endpoints (from access log)
+grep " 5[0-9][0-9] " access.log | awk '{print $7}' | sort | uniq -c | sort -rn | head
+
+# Slow queries from Postgres logs
+grep "duration:" postgresql.log | awk '$NF > 1000' | head
+
+# Pods consuming most memory in a namespace
+kubectl top pods -n prod --sort-by=memory | head
+
+# Live tail of a specific pod's logs filtered by ERROR
+kubectl logs -f -l app=payment-service --tail=100 | grep ERROR
+
+# Decode JWT (no signature verify — for debug)
+echo "$JWT" | cut -d. -f2 | base64 -d | jq .
+
+# What's listening on port 8080?
+lsof -i :8080
+
+# Long-running queries on Postgres
+psql -c "SELECT pid, now() - query_start AS duration, query
+         FROM pg_stat_activity
+         WHERE state = 'active' AND now() - query_start > interval '5 seconds'
+         ORDER BY duration DESC;"
+```
+
 ## Recap
 
 The chapter is dense by design. Bookmark it; return often. The interview round and the 3 AM incident are the moments these cheats earn their keep.

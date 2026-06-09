@@ -441,6 +441,130 @@ flowchart LR
 
 Trade-offs: build time grows (~30 s of extra work for a medium app); some dynamism is lost (you cannot change `@Conditional` outcomes at runtime); reflection / proxy classes that AOT did not predict must be hinted at via `@RegisterReflectionForBinding` / `RuntimeHintsRegistrar`.
 
+## Spring Boot 2 → 3 Migration — The Complete Checklist
+
+Boot 3 (GA Nov 2022) is the biggest breaking-change release since Boot 1. Every team doing Spring work in 2024-2026 will face this migration; it is **the #1 Spring-architecture interview question** at senior+ roles.
+
+### Required Migration — Five Breaking Changes
+
+**1. Java 17 baseline.** Boot 3 requires JDK 17+ (was JDK 8 for Boot 2). No exceptions. You must upgrade your toolchain first.
+
+**2. Jakarta EE namespace migration.** *Every* `javax.*` package from the Jakarta EE specs becomes `jakarta.*`:
+
+| Old (Boot 2 / Java EE) | New (Boot 3 / Jakarta EE) |
+|---|---|
+| `javax.servlet.*` | `jakarta.servlet.*` |
+| `javax.persistence.*` | `jakarta.persistence.*` |
+| `javax.validation.*` | `jakarta.validation.*` |
+| `javax.transaction.*` | `jakarta.transaction.*` |
+| `javax.annotation.PostConstruct` | `jakarta.annotation.PostConstruct` |
+| `javax.mail.*` | `jakarta.mail.*` |
+| `javax.ws.rs.*` | `jakarta.ws.rs.*` |
+
+This affects every entity, every servlet filter, every validation annotation, every `@PostConstruct`, every JMS client. The change is mechanical but pervasive — typical mid-sized app has 200-2000 import changes.
+
+**Why the rename?** Oracle owns the `javax.*` namespace and the Jakarta EE specs moved to the Eclipse Foundation in 2017. Eclipse couldn't legally evolve the `javax.*` packages, so the entire Jakarta EE 9 specification was renamed to `jakarta.*` (no API changes — just the package name). Spring 6 / Boot 3 was the first major release to require Jakarta EE 9+.
+
+**Migration tooling:**
+- **IntelliJ IDEA Migrate Action** (`Refactor → Migrate Packages and Classes...`) — built-in mapping.
+- **Eclipse Transformer** — Eclipse Foundation's official tool; can transform a JAR or source tree.
+- **OpenRewrite recipe** `org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0` — handles imports + Spring API renames + property changes in one pass. *This is what most teams use.*
+- **Spring Boot Migrator** — the official Spring-Tools project (early stage; alpha).
+
+**3. Removed deprecated APIs.** Many Spring 5.x `@Deprecated` APIs are gone:
+- `WebSecurityConfigurerAdapter` → replace with bean-based `SecurityFilterChain` config
+- `AntPathMatcher` for request mapping → switch to `PathPatternParser` (default in Boot 3)
+- `WebMvcConfigurer.addArgumentResolvers` style → mostly the same, but check Spring HATEOAS / WebFlux changes
+- `EhCache 2.x` integration → use `@CacheConfig` with EhCache 3 + JCache
+
+**4. Updated dependency baselines.** Spring 6 requires:
+- Hibernate 6+ (Hibernate 5 has a different parameter binding model; some HQL changes)
+- Jakarta JPA 3.0+
+- Servlet API 6.0+
+- Tomcat 10+, Jetty 11+, Undertow 2.3+
+- Logback 1.4+
+- Micrometer 1.10+
+
+**5. Observability rename.** `spring-cloud-sleuth` is *dead*. Boot 3 unifies on **Micrometer Tracing** (with OpenTelemetry / Brave bridges). The new dependency:
+```xml
+<dependency>
+  <groupId>io.micrometer</groupId>
+  <artifactId>micrometer-tracing-bridge-otel</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.opentelemetry</groupId>
+  <artifactId>opentelemetry-exporter-otlp</artifactId>
+</dependency>
+```
+
+### Opt-in Improvements You Should Take
+
+**Virtual threads** (Boot 3.2+, Java 21+). One property turns Tomcat from a 200-thread pool into a per-request virtual-thread model:
+
+```properties
+spring.threads.virtual.enabled=true
+```
+
+After this, every web request runs on a virtual thread; blocking calls are cheap; you can serve hundreds of thousands of concurrent requests on a small JVM. Hidden cost: `synchronized` blocks (and any code reachable from a request handler) **pin** the virtual thread to its carrier — defeating the model. Migrate `synchronized` to `ReentrantLock` for any hot path. (JDK 24 / JEP 491 fixes this for `ObjectMonitor::enter`, so the constraint relaxes.)
+
+**Native Image** (GraalVM). Boot 3 was redesigned to support GraalVM `native-image` compilation end-to-end:
+
+```bash
+./mvnw -Pnative native:compile
+./target/myapp                          # native binary
+```
+
+Result: cold start ~30 ms (vs ~1.2 s on JVM), RSS ~50 MB (vs ~200 MB), zero JIT warmup. Trade-offs: build time grows from 30 s to 3-5 min, reflection/proxy must be hinted, dynamic class-loading is forbidden. Use for CLI tools, serverless, or workloads where cold start dominates.
+
+**CRaC (Coordinated Restore at Checkpoint)** (Boot 3.2+, JDK 21+ with Azul/Spring CRaC build). Snapshots a fully-warmed JVM (post-JIT, post-cache-warm) into a file, then restores it in ~50ms. Different trade-off than native: keeps full Java semantics (no reflection limits) but needs a Linux checkpoint/restore mechanism. Most adopted by Bell-Soft, Azul, AWS Lambda SnapStart.
+
+**Problem Details (RFC 7807).** Boot 3 standardizes error responses:
+
+```yaml
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+```
+
+Now exceptions produce RFC 7807 JSON:
+```json
+{
+  "type": "https://api.example.com/errors/insufficient-funds",
+  "title": "Insufficient Funds",
+  "status": 422,
+  "detail": "Account 12345 has balance $10, needed $100",
+  "instance": "/orders/8472"
+}
+```
+
+### Decision Order for Your Migration
+
+1. Upgrade to Java 17 first (separate PR, no Spring changes).
+2. Run OpenRewrite Boot 3 recipe (handles imports + most API renames).
+3. Fix remaining compile errors (custom code using removed APIs).
+4. Update test slices for new Jakarta-EE-aware versions.
+5. Replace `spring-cloud-sleuth` with Micrometer Tracing.
+6. Run integration tests; fix Hibernate 6 query differences.
+7. Opt in to virtual threads (`spring.threads.virtual.enabled=true`) and benchmark.
+8. (Optional) Build a native image; if cold start is critical, ship it.
+
+### Common Migration Bugs
+
+| Bug | Cause | Fix |
+|---|---|---|
+| `javax.persistence.Entity not found` | Forgot to migrate to `jakarta.persistence` | OpenRewrite recipe |
+| `WebSecurityConfigurerAdapter cannot be resolved` | Removed in Spring Security 6 | Migrate to `SecurityFilterChain` bean |
+| Property paths changed silently | Some `spring.*` keys renamed/removed | `spring-boot-properties-migrator` dependency |
+| Sleuth headers stopped propagating | Sleuth is dead | Add Micrometer Tracing |
+| `JpaRepository` queries return wrong results | Hibernate 6 changed HQL parser; some implicit joins differ | Test all custom `@Query` HQL |
+| Virtual threads pin on `synchronized` | Boot 3.2 + Java 21 + `synchronized` in your code | Replace `synchronized` with `ReentrantLock` |
+| Native image fails on reflection | Class accessed reflectively without AOT hint | Add `@RegisterReflectionForBinding(MyDto.class)` |
+
+### Interview-Ready Summary
+
+> "Boot 3 requires Java 17, migrates `javax.*` → `jakarta.*` for the Jakarta EE 9+ specs, replaces `WebSecurityConfigurerAdapter` with bean-based security config, swaps Sleuth for Micrometer Tracing, and enables AOT processing for fast cold-start + GraalVM native image. The 3.2+ minor brought Spring's virtual-thread integration via `spring.threads.virtual.enabled`. Migration tooling: OpenRewrite recipe handles 80% of the mechanical changes; the remaining 20% is custom code touching removed APIs, Hibernate 6 query changes, and observability rewiring."
+
 ## Test Slices
 
 Test slices use the same conditional infrastructure to bootstrap a *partial* application context. Each slice is itself an `@AutoConfiguration`-tagged annotation that imports a specific subset:

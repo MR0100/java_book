@@ -9,9 +9,9 @@ difficulty: intermediate
 order: 0
 tags: [module-index]
 prerequisites: [l1-core-java-and-oop]
-status: complete
+status: planned
 estimated_minutes: 3
-last_updated: 2026-06-05
+last_updated: 2026-06-09
 ---
 
 # L2 — Intermediate Java & Backend Foundations
@@ -33,18 +33,18 @@ Modern idiomatic Java plus the backend vocabulary every server-side developer ne
 
 | # | Section | Type | Status |
 |---|---------|------|--------|
-| 01 | [Functional & Modern Java](C01-functional-and-modern-java/) | concept | **complete** |
-| 02 | [Build Tools & Developer Workflow](C02-build-tools-and-workflow/) | concept | **complete** |
-| 03 | [Networking & Web Fundamentals](C03-networking-fundamentals/) | concept | **complete** |
-| 04 | [Web & REST Basics](C04-web-and-rest-basics/) | concept | **complete** |
-| 05 | [Databases & SQL](C05-databases-and-sql/) | concept | **complete** |
-| 06 | [Tools & Environment](C06-tools-and-environment/) | tools | **complete** |
-| 07 | [Hands-On](C07-hands-on/) | hands-on | **complete** |
-| 08 | [Best Practices & Pitfalls](C08-best-practices/) | best-practices | **complete** |
-| 09 | [Interview Prep](C09-interview-prep/) | interview-prep | **complete** |
-| 10 | [Q&A / FAQ](C10-qa-faq/) | qa | **complete** |
-| 11 | [Cheatsheets & Reference](C11-cheatsheets/) | reference | **complete** |
-| 12 | [Resources](C12-resources/) | resources | **complete** |
+| 01 | [Functional & Modern Java](C01-functional-and-modern-java/) | concept | planned |
+| 02 | [Build Tools & Developer Workflow](C02-build-tools-and-workflow/) | concept | planned |
+| 03 | [Networking & Web Fundamentals](C03-networking-fundamentals/) | concept | planned |
+| 04 | [Web & REST Basics](C04-web-and-rest-basics/) | concept | planned |
+| 05 | [Databases & SQL](C05-databases-and-sql/) | concept | planned |
+| 06 | [Tools & Environment](C06-tools-and-environment/) | tools | planned |
+| 07 | [Hands-On](C07-hands-on/) | hands-on | planned |
+| 08 | [Best Practices & Pitfalls](C08-best-practices/) | best-practices | planned |
+| 09 | [Interview Prep](C09-interview-prep/) | interview-prep | planned |
+| 10 | [Q&A / FAQ](C10-qa-faq/) | qa | planned |
+| 11 | [Cheatsheets & Reference](C11-cheatsheets/) | reference | planned |
+| 12 | [Resources](C12-resources/) | resources | planned |
 
 ## Level project
 

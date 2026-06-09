@@ -11,7 +11,7 @@ tags: [section-index]
 prerequisites: []
 status: planned
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-09
 ---
 
 # Architecture & Engineering Leadership — Best Practices & Pitfalls

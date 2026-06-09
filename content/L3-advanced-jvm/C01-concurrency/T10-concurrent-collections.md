@@ -380,6 +380,125 @@ Compare to `HashMap`'s **fail-fast** iterator that throws `ConcurrentModificatio
 
 The ~10–30 ns `get` is *the* number that makes CHM the universal cache. A modern x86 core can do ~30 million CHM reads per second per thread, scaling near-linearly with cores for different-bucket reads.
 
+### Evolution — Java 5/7 segments → Java 8 bucket-level redesign
+
+This is the **single most-asked CHM interview question at banking & product-co interviews in India**, so we trace it fully.
+
+**Java 5 (JDK 1.5, 2004) — the original `Segment[]` design.** CHM was introduced in JDK 5 alongside the rest of `java.util.concurrent` (JSR-166, Doug Lea). The original design used a fixed array of **`Segment`s** — by default **16** — each a `ReentrantLock` *and* its own little hash table. A key was assigned to a segment by hashing into the segments array (high bits) and then to a bucket within that segment's table (low bits). A `put` acquired the segment lock for the duration of the operation; a `get` was *almost* lock-free (volatile reads on segment + table slot + entry chain) but read the `count` field per segment to verify consistency. Concurrency was bounded by the number of segments: 16 threads could write to 16 different segments in parallel; a 17th thread blocked on whichever lock it hit.
+
+```
+JDK 5 CHM (segmented):
+  Segment[] segments = new Segment[16];        // fixed 16 by default
+  each Segment extends ReentrantLock
+  each Segment has its own table: HashEntry<K,V>[] table
+
+  put(k, v):
+    int h = hash(k.hashCode());
+    Segment s = segments[(h >>> segmentShift) & segmentMask];   // pick a segment
+    s.lock();
+    try { ... insert into s.table at (h & (s.table.length-1)) ... }
+    finally { s.unlock(); }
+
+  get(k):
+    Segment s = segments[...];
+    HashEntry e = s.table[h & (s.table.length-1)];
+    while (e != null) { if (matches) return e.value; e = e.next; }
+    return null;
+```
+
+**Why the segmented design was good for its time:**
+- Concurrency level was a clear, simple knob (`concurrencyLevel` constructor arg)
+- Each segment's `ReentrantLock` was well-understood
+- Reads usually didn't lock (volatile/unsafe semantics)
+- Massively better than `Hashtable`'s single global lock
+
+**Why it became a bottleneck:**
+1. **Memory overhead.** 16 segments × a `ReentrantLock` × a `HashEntry[]` table (each at least capacity 1) = significant fixed cost. A small CHM with 4 entries paid for 16 segments worth of bookkeeping. On a microservice with 10,000 CHMs, this added up.
+2. **Concurrency cap of N segments.** 16 writer threads max parallel. Bigger machines (32, 64, 128 cores) couldn't exploit beyond that without tuning `concurrencyLevel` — and a higher `concurrencyLevel` meant *more* memory overhead.
+3. **`size()` had to lock every segment** to get a consistent snapshot — O(segments) cost on every size() call.
+4. **Hash flooding was a real DoS.** A bucket within a segment was still an unbounded linked-list chain. An attacker who could pin keys to one bucket could force O(n²) inserts on it. (This affected every chained hashmap of the era — PHP, Python, Ruby, ASP.NET, Java — 28C3 talk + CVE-2011-4858.)
+5. **The double-indirection in `get`** (segment → segment.table → chain) was 2-3 cache misses on a cold hot path.
+
+**Java 8 (JDK 8, 2014) — the bucket-level redesign.** Doug Lea + Martin Buchholz rewrote CHM from scratch. The redesign:
+
+| Aspect | JDK 5/6/7 segmented | JDK 8+ bucket-level |
+|---|---|---|
+| **Locking unit** | 16 `Segment`s, each a `ReentrantLock` | **Each bucket head Node** (synchronized on the Node) |
+| **Lock-free reads** | Volatile loads + per-segment count | **Same** — but simpler (no segment indirection) |
+| **Lock-free empty-bucket writes** | No — segment lock always | **Yes** — single CAS on the array slot |
+| **Concurrency limit** | 16 (or your tuned concurrencyLevel) | **Up to table.length** (effectively unbounded) |
+| **Bucket structure** | Linked-list chain only (O(n) worst) | Linked-list ≤ 8 → red-black tree (O(log n)) |
+| **`size()`** | Lock all segments | **`LongAdder`-style striped counter** (lock-free) |
+| **Resize** | Per-segment, blocks writers in that segment | **Cooperative** — multiple threads each claim a stride |
+| **Memory baseline** | 16-segment overhead | **Just `Node[] table` + counter cells** |
+| **Hash flooding** | O(n²) chain attack possible | **Treeification caps at O(log n)** |
+
+**Why the redesign won.** Three wins compounded:
+
+1. **Finer-grained locking.** Per-bucket instead of per-segment means contention is rare unless threads happen to hit the *same hash*. With a good hash and large enough table, contention probability is `1/table.length`. With `Segment`s it was `1/16` no matter how big the table was.
+2. **Lock-free common case.** In typical workloads, most `put`s hit an empty bucket — and those are now a single CAS instead of `lock-unlock-write`. The new path is 2-3× faster on uncontended writes.
+3. **Better worst case.** A bucket can never be O(n); it becomes a tree at 8 nodes. This wasn't just a performance fix — it neutralized the hash-flooding DoS attack vector.
+
+```
+JDK 8 CHM (bucket-level):
+  volatile Node<K,V>[] table;   // single table, power-of-2 length
+  no segments at all
+  size tracking: baseCount + CounterCell[]   (striped, lock-free)
+
+  put(k, v):
+    int h = spread(k.hashCode());
+    int i = (table.length - 1) & h;
+    Node f = tabAt(table, i);
+    if (f == null) {
+      // EMPTY BUCKET → single CAS, no lock
+      if (casTabAt(table, i, null, new Node<>(h, k, v, null))) {
+        addCount(1, ...);   // striped counter
+        return;
+      }
+      // CAS failed (race) → retry loop
+    }
+    // NON-EMPTY BUCKET → lock the bucket head node
+    synchronized (f) {
+      // walk chain or tree under the lock; insert or replace
+    }
+    if (binCount >= 8) treeifyBin(table, i);   // hash-flood defense
+    addCount(1, ...);
+
+  get(k):
+    // NO LOCK EVER. Volatile reads on table, slot, and chain/tree.
+    int h = spread(k.hashCode());
+    Node e = tabAt(table, (table.length - 1) & h);
+    while (e != null) { if (matches) return e.val; e = e.next; }
+```
+
+**The constructor compat trick.** The JDK 8 CHM still accepts a `concurrencyLevel` arg in its constructor — but it's only used as a *sizing hint* (initial capacity ≥ concurrencyLevel). The argument is no longer load-bearing. Code that passed `new ConcurrentHashMap<>(16, 0.75f, 16)` continued to compile and work; it just got a different (better) implementation under the hood.
+
+**Pre-JDK 8 specific bug worth knowing.** Pre-8 `Segment` had a `count` field per segment that `get` read to verify consistency. There were edge cases (very rare, but documented in JSR-166 discussions) where the `count` could be stale enough to make a `get` return null for a key that had just been inserted — *eventually consistent reads*. JDK 8's volatile-load-only design makes `get` **happens-before-consistent** with prior `put`s by the same thread, and **eventually-but-promptly-consistent** for cross-thread reads.
+
+```mermaid
+flowchart TB
+  J5["JDK 5/6/7 CHM"]
+  J5 --> S16["16 Segments fixed"]
+  S16 --> SL["each Segment = ReentrantLock + own table"]
+  SL --> Bnd["concurrency capped at 16 writers"]
+  SL --> MO["high fixed memory overhead"]
+  SL --> Chain["unbounded chain → O(n²) hash flood"]
+
+  J8["JDK 8+ CHM"]
+  J8 --> T1["one Node[] table"]
+  T1 --> PB["per-bucket synchronized (head Node)"]
+  T1 --> CAS["empty bucket = lock-free CAS"]
+  T1 --> Tree["chain → red-black tree at 8 (hash-flood defense)"]
+  T1 --> Lcnt["LongAdder-style striped counter"]
+  T1 --> Coop["cooperative resize (many threads help)"]
+```
+
+**The interview-style summary** (memorize this paragraph):
+
+> "Pre-JDK-8 used 16 `Segment`s, each a `ReentrantLock` with its own hash table — concurrency was capped at 16 writers and `size()` had to lock every segment. JDK 8 rewrote it to lock per-bucket: empty buckets are lock-free CAS, non-empty buckets are `synchronized` on the head node. Chains of 8+ tree-ify to red-black trees, defeating hash-flooding DoS. Reads are fully lock-free (volatile load + chain/tree walk). `size()` uses a `LongAdder`-style striped counter. Resize is cooperative — multiple threads each claim a stride of buckets to transfer. The concurrency level argument is now just a sizing hint."
+
+That paragraph answers the question at every level from Senior to Staff.
+
 ## `ConcurrentSkipListMap` — Sorted, Lock-Free, O(log n)
 
 When you need a sorted concurrent map, the choice is between:

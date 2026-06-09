@@ -856,6 +856,155 @@ mvn verify       # a globally-installed Maven of unknown version
 
 ---
 
+## 43. Integer Cache Equality Trap (`Integer.valueOf(127) == Integer.valueOf(127)` ≠ what you think)
+
+**Trap:**
+
+```java
+Integer a = 127, b = 127;
+Integer c = 128, d = 128;
+System.out.println(a == b);   // true   (!)
+System.out.println(c == d);   // false  (!!)
+
+Integer x = Integer.valueOf(200);
+Integer y = Integer.valueOf(200);
+System.out.println(x == y);   // false
+```
+
+**Why it bites:** `Integer` (and `Long`, `Short`, `Byte`, `Character`) implementations cache instances for a small range — by default **−128 to +127** — and `Integer.valueOf(n)` (and the autoboxing of literal `int → Integer`) returns the **same** instance for values in that range. For values outside it, each `valueOf` call returns a **new** `Integer`. So `==` compares the same reference inside the cache range (returns `true`) and different references outside it (returns `false`). The bug is invisible during development with small test values and shows up only when production data crosses the boundary.
+
+The cache exists for performance — most loops use small counter values, and pre-allocating 256 boxed integers saves billions of allocations across a typical JVM lifetime. The cache size can be adjusted upward with `-XX:AutoBoxCacheMax=1000` (the lower bound is always −128). `Boolean.TRUE`/`Boolean.FALSE` are singletons; `Long.valueOf`, `Short.valueOf`, `Byte.valueOf` cache the same −128..127 range.
+
+```java
+// JDK Integer.IntegerCache (simplified)
+private static class IntegerCache {
+    static final Integer[] cache;
+    static final int low = -128;
+    static final int high;   // default 127, raised by -XX:AutoBoxCacheMax
+
+    static Integer valueOf(int i) {
+        if (i >= low && i <= high) return IntegerCache.cache[i + 128];   // SAME instance
+        return new Integer(i);                                            // NEW instance
+    }
+}
+```
+
+**How to spot:** SpotBugs `RC_REF_COMPARISON` for boxed numerics; review heuristic — `==` on `Integer`/`Long`/`Short`/`Byte`/`Character` typed variables. Especially dangerous when boxed numerics come from APIs (`Map.get`, JSON deserialization, JDBC `getInt`).
+
+**Fix:** **always use `.equals()` (or `Objects.equals` for null safety) when comparing boxed numerics.** Better, use primitives (`int`, `long`) when comparing for equality — the autoboxing is the bug. `Integer.compare(a, b) == 0` works correctly for any value.
+
+```java
+if (a.equals(b))                    // correct — value equality
+if (Objects.equals(a, b))           // correct + null-safe
+if (a.intValue() == b.intValue())   // correct — explicit primitive
+if (Integer.compare(a, b) == 0)     // correct — primitive comparison
+```
+
+**Interview rationale:** This is the second-most-asked Java gotcha at India / banking interviews after equals/hashCode. Interviewers ask "what does `Integer.valueOf(127) == Integer.valueOf(127)` print? What about `Integer.valueOf(128) == Integer.valueOf(128)`?" and probe whether you know *why* one is true and one is false. The full answer includes:
+1. The −128..+127 cache (yes, both `Integer` and `Long`)
+2. Why the cache exists (autoboxing is everywhere in `Collections`, hot loops, etc.)
+3. The `-XX:AutoBoxCacheMax` knob (upper bound is tunable, lower is not)
+4. Fix: always use `.equals()` or stick to primitives
+
+**Topic:** [C01/T19 Immutability](../C01-oop/T19-immutability-and-immutable-class-design.md) — the wrapper types are immutable and cached for the same reason `String` literals are interned.
+
+---
+
+## 44. String Pool / Interning Subtlety (`==` vs `.equals()` for `String`)
+
+**Trap:**
+
+```java
+String a = "hello";
+String b = "hello";
+String c = new String("hello");
+String d = c.intern();
+
+System.out.println(a == b);   // true   (both refer to the same pool entry)
+System.out.println(a == c);   // false  (c is a separate heap object)
+System.out.println(a == d);   // true   (intern returns the pool entry)
+System.out.println(a.equals(c)); // true (value equality, always)
+
+// concatenation timing matters
+String x = "hel" + "lo";          // compile-time constant → interned literal "hello"
+System.out.println(a == x);       // true
+
+String prefix = "hel";
+String y = prefix + "lo";          // runtime concat → new String, NOT interned
+System.out.println(a == y);       // false
+```
+
+**Why it bites:** **String literals are interned** — every distinct compile-time `"..."` literal becomes a single canonical instance in the **string pool** (since Java 7, the pool lives in the heap, not Perm Gen — that's a common stale interview answer). `==` on two literals of the same value returns `true` because they're the same object. But:
+
+- `new String("hello")` *explicitly* allocates a new heap object distinct from the pool entry.
+- Runtime concatenation (`prefix + "lo"` when `prefix` is a variable) produces a *new* `String` via `StringBuilder.toString()` — *not* automatically interned.
+- `s.intern()` returns the pool's canonical instance for `s.equals(...)` — adding to the pool if absent. This is the manual route to "give me the pooled version."
+
+Conclusion: **`==` on `String` works *only* for literals you control or values you explicitly interned.** Real code mixes literals, deserialized values, computed concatenations, and substrings — `==` will silently work in dev and break in prod when an externally-sourced equal-value `String` doesn't happen to be pooled.
+
+```mermaid
+flowchart TB
+  Lit["String literal "hello""] --> Pool[("string pool (heap, JDK 7+)")]
+  CTConcat["compile-time concat "hel" + "lo""] --> Pool
+  New["new String("hello")"] --> Heap["separate heap object"]
+  RTConcat["runtime: var + "lo""] --> Heap2["separate heap object (StringBuilder.toString)"]
+  Intern[".intern() call"] --> Pool
+```
+
+**How to spot:** SpotBugs `ES_COMPARING_STRINGS_WITH_EQ`; review heuristic — `==` on a `String` reference is almost always a bug.
+
+**Fix:** **always use `.equals()` (or `equalsIgnoreCase`) for `String` comparison.** Use `Objects.equals(a, b)` for null safety. Only `==` if you have a documented reason to compare references (and even then, prefer `==` *and* explanation comment).
+
+**Storage facts worth knowing for interviews:**
+- The string pool moved from **PermGen → main heap in JDK 7** (so it's GC'd and can grow much larger).
+- Pool entries since JDK 6+ are kept in a hash table whose default size is **60013** buckets (`-XX:StringTableSize`).
+- Aggressive interning can be tuned with `-XX:+PrintStringTableStatistics` to see hit rates.
+- `String.intern()` is not free — it locks the table briefly; over-interning user input is itself a hash-flooding risk.
+
+**Topic:** [C01/T19 Immutability](../C01-oop/T19-immutability-and-immutable-class-design.md) and [C02/T16 Regex / String APIs](../C02-collections-and-core-apis/T16-regular-expressions.md).
+
+---
+
+## 45. `null` Key in `ConcurrentHashMap` vs `HashMap`
+
+**Trap:**
+
+```java
+Map<String, Integer> hm = new HashMap<>();
+hm.put(null, 1);            // OK
+hm.put("k", null);          // OK
+hm.get(null);               // 1
+hm.get("missing");          // null  ← ambiguous: missing vs present-as-null
+
+Map<String, Integer> chm = new ConcurrentHashMap<>();
+chm.put(null, 1);           // throws NullPointerException
+chm.put("k", null);         // throws NullPointerException
+```
+
+**Why it bites:** `HashMap` allows **one null key and any number of null values**, but `ConcurrentHashMap` (and `Hashtable`) forbid **both** null keys and null values, throwing `NullPointerException` on the offending `put`. The asymmetry comes from concurrency: with `containsKey` and `get` racing concurrently, a null `get` result must mean "no mapping" — but a `HashMap`-style null *value* would make that ambiguous, and a null *key* breaks several internal CAS invariants. So CHM disallows both at the API.
+
+This is a real migration hazard: code that's been a single-threaded `HashMap` for years and uses null values to mean "no data" silently breaks on conversion to `ConcurrentHashMap`. The fix is one of: (a) sentinel value like `Optional.empty()`, (b) explicit "missing" marker object, (c) use `Map<K, Optional<V>>`, (d) just remove the key when value would be null.
+
+**Fix:**
+
+```java
+// Don't put null — remove instead
+if (value == null) chm.remove(key); else chm.put(key, value);
+
+// Or wrap in Optional
+ConcurrentHashMap<String, Optional<Integer>> chm = new ConcurrentHashMap<>();
+chm.put("k", Optional.empty());
+
+// Use compute to handle the get-or-default
+Integer v = chm.computeIfAbsent("k", k -> /* compute or sentinel */);
+```
+
+**Interview rationale:** Common probe at senior interviews — "What's the difference between HashMap and ConcurrentHashMap?" Expecting the candidate to mention null-handling alongside the locking design and the size() semantics.
+
+**Topic:** [L3/C01/T10 Concurrent collections](../../L3-advanced-jvm/C01-concurrency/T10-concurrent-collections.md).
+
+---
+
 ## Recap
 
 The traps cluster into a few root causes — learn the cause, not just the 42 instances:

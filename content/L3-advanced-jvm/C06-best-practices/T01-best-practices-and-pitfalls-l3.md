@@ -569,6 +569,327 @@ public record Order(UUID id, BigDecimal total) {
 > [!WARNING]
 > **`Class.forName` per request.** Cache the class once.
 
+## Senior-Interview Anti-Pattern Catalogue (added pass)
+
+These are the patterns reviewers and interviewers flag immediately as "junior code" or "concurrency-naïve" at L3+ interviews. Each is paired with the production fix.
+
+### AP1 🔴 — `synchronized` collection wrapped, then iterated unsynchronized
+
+```java
+List<String> list = Collections.synchronizedList(new ArrayList<>());
+for (String s : list) { ... }       // BUG — iterator is not synchronized
+```
+
+**Why bad.** `Collections.synchronizedList` synchronizes only individual method calls. Iteration is composed of many `hasNext`/`next` calls; without external sync around the loop, a concurrent modification crashes with `ConcurrentModificationException` (best case) or sees torn state (worst case).
+
+**Fix.** Wrap iteration manually:
+
+```java
+synchronized (list) {
+    for (String s : list) { ... }
+}
+```
+
+Or — strongly preferred — use **`ConcurrentLinkedQueue`** / **`CopyOnWriteArrayList`** which provide weakly-consistent iterators that don't throw CME.
+
+### AP2 🔴 — Using `Vector`/`Hashtable` in new code
+
+```java
+List<String> list = new Vector<>();
+Map<String, String> map = new Hashtable<>();
+```
+
+**Why bad.** Legacy synchronized collections — every method holds a coarse lock. Worse than `synchronized(arrayList)` because the lock is exposed; worse than `ConcurrentHashMap` because there's a single global lock instead of per-bucket.
+
+**Fix.** `ArrayList` for single-threaded; `ConcurrentHashMap`/`CopyOnWriteArrayList`/`ConcurrentLinkedQueue` for concurrent. Reach for `Vector` only when integrating with very old code that demands it.
+
+### AP3 🔴 — `double`-checked locking without `volatile`
+
+```java
+public Singleton get() {
+    if (instance == null) {          // first check — no lock
+        synchronized(Singleton.class) {
+            if (instance == null) {  // second check — under lock
+                instance = new Singleton();
+            }
+        }
+    }
+    return instance;
+}
+```
+
+**Why bad pre-Java 5.** Without `volatile`, the assignment `instance = new Singleton()` can be **reordered** — another thread can see a non-null `instance` reference whose constructor hasn't finished. The first check returns a half-initialized object.
+
+**Fix Java 5+.** Mark `instance` as `volatile`:
+
+```java
+private static volatile Singleton instance;   // ← volatile fixes the JMM issue
+```
+
+**Modern preference**: use the **holder idiom** (lazy initialization without any volatile):
+
+```java
+private static class Holder { static final Singleton INSTANCE = new Singleton(); }
+public static Singleton get() { return Holder.INSTANCE; }
+```
+
+The class loader guarantees `Holder.INSTANCE` initializes once, thread-safely, lazily.
+
+### AP4 🟠 — `ThreadLocal` without `remove()` in pooled threads
+
+```java
+private static final ThreadLocal<UserContext> CTX = new ThreadLocal<>();
+
+void handle(Request req) {
+    CTX.set(new UserContext(req.userId()));
+    process();
+    // missing: CTX.remove();
+}
+```
+
+**Why bad.** In a thread pool (Tomcat, ForkJoin), threads are reused. Without `remove()`, the next request handled by this thread inherits the previous user's context — **classic data leak**.
+
+**Fix.** Always `try/finally`:
+
+```java
+CTX.set(new UserContext(req.userId()));
+try { process(); }
+finally { CTX.remove(); }
+```
+
+Or use **`ScopedValue`** (Java 21+, JEP 446) — automatic lifetime, no manual cleanup:
+
+```java
+ScopedValue.where(USER_CTX, new UserContext(req.userId()))
+           .run(() -> process());
+```
+
+### AP5 🔴 — `synchronized` on a non-final field
+
+```java
+private Object lock = new Object();
+void critical() {
+    synchronized (lock) { ... }     // BUG — lock can be reassigned
+}
+void reset() { lock = new Object(); }   // ← another thread now syncs on a DIFFERENT lock
+```
+
+**Why bad.** Re-assigning `lock` means two threads can hold "the lock" on different objects simultaneously — no mutual exclusion. Worse: it usually compiles and passes tests; only races at scale.
+
+**Fix.** Make the lock `final`:
+
+```java
+private final Object lock = new Object();
+```
+
+### AP6 🟠 — `Thread.interrupt()` swallowed in a catch
+
+```java
+try { Thread.sleep(1000); }
+catch (InterruptedException e) { /* swallowed */ }
+```
+
+**Why bad.** Interrupt is the JDK's cancellation protocol. Swallowing it means upstream cancellation requests are lost — the thread keeps doing work that should have stopped.
+
+**Fix.** Either:
+
+```java
+catch (InterruptedException e) {
+    Thread.currentThread().interrupt();  // restore the flag so callers can detect cancellation
+    return;                               // and stop early
+}
+```
+
+Or, if cancellation is invalid here, log loudly and rethrow as a `RuntimeException`. Never silently swallow.
+
+### AP7 🔴 — Mutating shared state from inside a `parallelStream`
+
+```java
+List<String> result = new ArrayList<>();
+items.parallelStream().forEach(i -> result.add(transform(i)));   // BUG
+```
+
+**Why bad.** `ArrayList.add` is not thread-safe. Under parallel iteration, multiple threads append concurrently → torn state, lost writes, `ArrayIndexOutOfBoundsException`.
+
+**Fix.** Collect into a thread-safe structure or use the reducing collector pattern:
+
+```java
+List<String> result = items.parallelStream()
+                           .map(this::transform)
+                           .toList();    // collect handles concurrency internally
+```
+
+### AP8 🟡 — `synchronized` on `Integer`/`Boolean`/`String` (boxing reuse)
+
+```java
+private final Integer counter = 0;
+synchronized (counter) { ... }   // BAD — Integer 0 is cached & shared globally!
+```
+
+**Why bad.** `Integer.valueOf(0)` returns the same cached instance across the whole JVM. Locking on it means every other place in the codebase locking on `Integer.valueOf(0)` shares the same monitor → unintended contention or deadlock. `Boolean.TRUE` and string literals have the same issue.
+
+**Fix.** Lock on a private dedicated `Object`:
+
+```java
+private final Object lock = new Object();
+synchronized (lock) { ... }
+```
+
+### AP9 🔴 — Holding a database/network resource while waiting for a lock
+
+```java
+try (Connection c = ds.getConnection()) {
+    synchronized (criticalSection) {       // BUG — waiting holds the connection
+        ... long work ...
+    }
+}
+```
+
+**Why bad.** The connection is held for the entire wait. Under contention, the connection pool exhausts long before the critical section even runs.
+
+**Fix.** Acquire the lock first; then briefly acquire the connection:
+
+```java
+synchronized (criticalSection) {
+    try (Connection c = ds.getConnection()) {
+        ... short work ...
+    }
+}
+```
+
+Or use **`ReentrantLock.tryLock(timeout)`** with a sane bound so threads release on timeout.
+
+### AP10 🟠 — `wait()` without a loop (spurious wakeups)
+
+```java
+synchronized (lock) {
+    if (!condition) lock.wait();   // BUG — spurious wakeup proceeds with false condition
+    doWork();
+}
+```
+
+**Why bad.** `Object.wait()` can return spuriously (the JVM/OS may wake a thread without `notify()`). With `if`, the code proceeds despite the condition still being false → race.
+
+**Fix.** Always loop:
+
+```java
+synchronized (lock) {
+    while (!condition) lock.wait();   // re-check after each wakeup
+    doWork();
+}
+```
+
+Or — strongly preferred — use **`Condition.await()`** with `signalAll()`, which has clear semantics:
+
+```java
+private final Lock lock = new ReentrantLock();
+private final Condition ready = lock.newCondition();
+
+lock.lock();
+try {
+    while (!isReady()) ready.await();
+    doWork();
+} finally { lock.unlock(); }
+```
+
+### AP11 🔴 — `synchronized` inside a virtual thread (pre-JDK 24)
+
+```java
+Thread.ofVirtual().start(() -> {
+    synchronized (resource) {       // PINS the virtual thread to its carrier
+        slowDownstreamCall();        // carrier blocked the whole time — defeats Loom
+    }
+});
+```
+
+**Why bad.** Pre-JDK 24, a `synchronized` block holds the virtual thread on its carrier. If a million virtual threads all hit `synchronized` simultaneously, the carrier pool (default 4-16) becomes the bottleneck — and you've gained nothing from virtual threads.
+
+**Fix.** Use `ReentrantLock` (does not pin in any version):
+
+```java
+private final ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try { slowDownstreamCall(); }
+finally { lock.unlock(); }
+```
+
+JDK 24+ (JEP 491) makes `ObjectMonitor::enter` virtual-thread-aware — `synchronized` no longer pins. Until your prod is on JDK 24+, prefer `ReentrantLock` in any code reachable from a virtual thread.
+
+### AP12 🟠 — Catching `Throwable`/`Exception` swallowing real failures
+
+```java
+try {
+    criticalWork();
+} catch (Throwable t) {
+    log.warn("oh no: {}", t.getMessage());     // swallowed OutOfMemoryError, StackOverflow, etc.
+}
+```
+
+**Why bad.** Catching `Throwable` catches `Error`s — including `OutOfMemoryError`, `StackOverflowError`, `LinkageError`. These mean the JVM is in an unrecoverable state; the right thing is to crash and let the orchestrator restart.
+
+**Fix.** Catch `Exception` (or specific sub-classes), not `Throwable`. Never catch `Error` unless you know exactly what you're doing.
+
+### AP13 🟡 — Modifying a `Map` during iteration
+
+```java
+for (Map.Entry<K, V> e : map.entrySet()) {
+    if (shouldRemove(e)) map.remove(e.getKey());   // CME
+}
+```
+
+**Why bad.** Fail-fast iterator throws CME on next iteration.
+
+**Fix.** Iterator's `remove()`:
+
+```java
+Iterator<Map.Entry<K, V>> it = map.entrySet().iterator();
+while (it.hasNext()) {
+    Map.Entry<K, V> e = it.next();
+    if (shouldRemove(e)) it.remove();
+}
+```
+
+Or **`map.entrySet().removeIf(e -> shouldRemove(e))`** (Java 8+).
+
+### AP14 🔴 — Returning a mutable internal collection
+
+```java
+public class Order {
+    private final List<Item> items = new ArrayList<>();
+    public List<Item> getItems() { return items; }   // BUG — caller can mutate
+}
+```
+
+**Why bad.** Any caller can `order.getItems().add(...)` — your internal invariants get violated.
+
+**Fix.** Return an unmodifiable view:
+
+```java
+public List<Item> getItems() { return Collections.unmodifiableList(items); }
+// or Java 10+: return List.copyOf(items);
+```
+
+`Collections.unmodifiableList` returns a wrapper view (caller mutations throw `UnsupportedOperationException`). `List.copyOf` returns an immutable copy (safer; small allocation cost).
+
+### AP15 🟠 — Heavyweight object creation in static initializer
+
+```java
+public class Config {
+    private static final BigDataLoader LOADER = new BigDataLoader();   // ← class-load delay
+}
+```
+
+**Why bad.** Runs at class load time → first class touch is slow → cascading slow startup. Worse: if it throws, the class becomes permanently un-loadable (`ExceptionInInitializerError` cached).
+
+**Fix.** Lazy init via holder idiom (deferred until first call):
+
+```java
+public class Config {
+    private static class Holder { static final BigDataLoader LOADER = new BigDataLoader(); }
+    public static BigDataLoader loader() { return Holder.LOADER; }
+}
+```
+
 ## The Senior Mindset
 
 What separates L3 from L2:

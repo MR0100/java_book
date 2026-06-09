@@ -317,6 +317,293 @@ Each tier has different limits and different state. The CDN absorbs gross abuse 
 > [!INTERVIEW]
 > Strong answers cover (a) the algorithm choice with justification, (b) the distributed-state mechanism (Redis Lua), (c) fail-open vs fail-closed, (d) layered enforcement (edge → gateway → service).
 
+## Deeper Dive — All 5 Rate-Limiting Algorithms Compared
+
+### Algorithm 1: Fixed Window Counter
+
+```
+Window: [0:00:00 - 0:00:59]   counter = 0
+Request arrives at 0:00:30    counter = 1
+... limit = 100 reached at 0:00:45
+Reject from 0:00:46 to 0:00:59
+At 0:01:00 window resets      counter = 0
+```
+
+**Code (Redis)**:
+```
+INCR ratelimit:{key}:{window_minute_epoch}
+EXPIRE ratelimit:{key}:{window_minute_epoch} 60
+```
+
+**Pros**: trivial implementation; 1 Redis op.
+
+**Cons**: **boundary burst** — 100 requests at 0:00:59 + 100 at 0:01:01 = 200 in 2 seconds, breaking spirit of the limit.
+
+### Algorithm 2: Sliding Window Log
+
+Store each request timestamp:
+```
+ZADD ratelimit:{key} NOW NOW
+ZREMRANGEBYSCORE ratelimit:{key} 0 (NOW - 60000)   # drop > 60s old
+ZCARD ratelimit:{key}                               # count in window
+EXPIRE ratelimit:{key} 60
+```
+
+**Pros**: exact precision; no boundary burst.
+
+**Cons**: O(N) memory per key (one entry per request); ZADD/ZREM on every request expensive at scale.
+
+### Algorithm 3: Sliding Window Counter (the "T18 default" above)
+
+Hybrid of fixed-window simplicity + sliding-window smoothness. Weight previous-window count by fraction of current window remaining.
+
+**Pros**: 1-2 Redis ops; smoothed; memory O(1) per key.
+
+**Cons**: approximation (assumes uniform distribution within previous window).
+
+### Algorithm 4: Token Bucket
+
+Refill tokens at a steady rate; deduct one per request; deny when bucket empty.
+
+```
+Bucket state in Redis:
+  HMSET ratelimit:{key} tokens N last_refill_ms NOW
+
+On request:
+  HMGET ratelimit:{key} tokens last_refill_ms
+  elapsed = NOW - last_refill_ms
+  new_tokens = MIN(capacity, tokens + (elapsed × refill_rate))
+  if new_tokens >= 1:
+    HMSET ratelimit:{key} tokens (new_tokens - 1) last_refill_ms NOW
+    ALLOW
+  else:
+    DENY
+```
+
+**Pros**: allows **burst** up to bucket capacity, then steady rate. Best for APIs where occasional spikes are OK but sustained abuse is not.
+
+**Cons**: 2 Redis ops; need Lua script for atomicity.
+
+**Used by**: Stripe, AWS APIs, GitHub API.
+
+### Algorithm 5: Leaky Bucket
+
+Like token bucket but enforces uniform output rate. Requests queue; processed at steady rate; queue overflow rejects.
+
+**Pros**: smooths output rate (no bursts at all).
+
+**Cons**: in-memory queue per key; doesn't fit serverless / stateless.
+
+**Used by**: traffic shaping (network routers), batch processing.
+
+### Algorithm Selection Decision
+
+| Use case | Algorithm |
+|---|---|
+| Simple internal limits, low scale | Fixed window |
+| Strict per-second precision | Sliding window log (if scale permits) |
+| Public API, large scale, smooth | Sliding window counter |
+| Want burst capacity (typical API) | Token bucket |
+| Strict output rate (e.g., outbound mailer) | Leaky bucket |
+
+## Deeper Dive — Token Bucket Production Lua Script
+
+```lua
+-- KEYS[1] = bucket key  (e.g., "tb:user:123:api")
+-- ARGV[1] = capacity (max tokens)
+-- ARGV[2] = refill rate (tokens per second)
+-- ARGV[3] = now (ms)
+-- ARGV[4] = tokens requested (usually 1)
+
+local key = KEYS[1]
+local capacity = tonumber(ARGV[1])
+local refillRate = tonumber(ARGV[2])
+local now = tonumber(ARGV[3])
+local requested = tonumber(ARGV[4])
+
+local bucket = redis.call('HMGET', key, 'tokens', 'last_refill')
+local tokens = tonumber(bucket[1]) or capacity
+local lastRefill = tonumber(bucket[2]) or now
+
+local elapsed = math.max(0, now - lastRefill)
+local newTokens = math.min(capacity, tokens + (elapsed / 1000) * refillRate)
+
+local allowed = newTokens >= requested
+if allowed then
+    newTokens = newTokens - requested
+end
+
+redis.call('HMSET', key, 'tokens', newTokens, 'last_refill', now)
+redis.call('EXPIRE', key, math.ceil(capacity / refillRate) * 2)  -- key TTL = 2× refill time
+
+return { allowed and 1 or 0, math.floor(newTokens), capacity, math.ceil((capacity - newTokens) / refillRate * 1000) }
+-- returns: allowed (1/0), remaining tokens, capacity, retry-after-ms
+```
+
+Spring Boot integration:
+```java
+@Component
+public class TokenBucketRateLimiter {
+    private static final String LUA_SCRIPT = "..."; // load from classpath
+    private final RedisTemplate<String, String> redis;
+    private final DefaultRedisScript<List> script;
+
+    public TokenBucketRateLimiter(RedisTemplate<String, String> redis) {
+        this.redis = redis;
+        this.script = new DefaultRedisScript<>(LUA_SCRIPT, List.class);
+    }
+
+    public RateLimitResult allow(String key, int capacity, int refillRatePerSec) {
+        @SuppressWarnings("unchecked")
+        List<Long> result = redis.execute(script,
+            List.of("tb:" + key),
+            String.valueOf(capacity),
+            String.valueOf(refillRatePerSec),
+            String.valueOf(System.currentTimeMillis()),
+            "1");
+        return new RateLimitResult(
+            result.get(0) == 1,    // allowed
+            result.get(1).intValue(),  // remaining
+            result.get(3).intValue()   // retry-after-ms
+        );
+    }
+}
+```
+
+## Deeper Dive — Multi-Tenant Rate Limit Design
+
+A real SaaS rate limiter handles multiple dimensions:
+
+```
+KEY HIERARCHY:
+  account:123                  → 10,000 req/sec across all users
+  account:123:user:456         → 1,000 req/sec per user
+  account:123:user:456:endpoint:/api/payments → 100 req/sec per user-endpoint
+  ip:1.2.3.4                   → 100 req/sec across all accounts from this IP
+
+ON REQUEST:
+  Check ALL applicable limits (most restrictive wins)
+  Return 429 with Retry-After from the most restrictive
+
+PIPELINE: 4 Redis Lua evaluations per request, parallelized via MULTI:
+  MULTI
+  EVALSHA token_bucket KEYS[account:123]              ...
+  EVALSHA token_bucket KEYS[account:123:user:456]     ...
+  EVALSHA token_bucket KEYS[account:123:user:456:ep]  ...
+  EVALSHA token_bucket KEYS[ip:1.2.3.4]               ...
+  EXEC
+```
+
+**Plan-based limits**:
+```
+Plan "free":     account:* → 10 req/sec
+Plan "pro":      account:* → 100 req/sec
+Plan "enterprise": account:* → 10,000 req/sec
+```
+
+Stored in a config service / DB; rate-limiter reads on first request, caches with TTL.
+
+## Deeper Dive — Response Headers (Standard)
+
+Always set these headers on every response (allowed or rejected):
+
+```
+X-RateLimit-Limit: 100           ← the limit
+X-RateLimit-Remaining: 87        ← what's left in current window
+X-RateLimit-Reset: 1700000400    ← unix timestamp when limit resets
+Retry-After: 30                  ← (on 429 only) seconds to wait
+
+(Optional, IETF draft)
+RateLimit: limit=100, remaining=87, reset=30
+RateLimit-Policy: 100;w=60       ← 100 requests per 60s window
+```
+
+This lets well-behaved clients self-throttle and reduces server load from 429-retry storms.
+
+## Deeper Dive — Distributed Rate Limiter Failure Recovery
+
+What happens when Redis flaps?
+
+```
+T+0:    Redis unreachable
+T+0:    rate limiter falls open (allow everything)
+T+5s:   alerts fire; on-call notified
+T+30s:  decide: leave fail-open or switch to fail-closed?
+
+OPTION A: Stay fail-open
+  Pro:  API stays up; users see no impact
+  Con:  attacker can abuse
+  Best for: public APIs without billing-sensitive endpoints
+
+OPTION B: Switch to local-only (each pod with own counters)
+  Pro:  approximate protection (N pods × pod_limit)
+  Con:  N times the intended limit
+  Best for: APIs where over-limit costs $$$ (payments, ML inference)
+
+OPTION C: Switch to fail-closed
+  Pro:  exact protection
+  Con:  API outage
+  Best for: rare scenarios (fraud, compliance)
+```
+
+**Spring Cloud Gateway pattern**:
+```yaml
+spring.cloud.gateway:
+  routes:
+    - id: api
+      filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            denyEmptyKey: false      # fail-open behavior
+            emptyKeyStatus: 200      # if Redis down, allow
+            # OR
+            denyEmptyKey: true
+            emptyKeyStatus: 429      # if Redis down, deny
+```
+
+## Deeper Dive — Hot-Key Problem Solutions
+
+**Scenario**: one API key sends 100k req/sec (one customer's batch job). All 100k hits one Redis node.
+
+### Solution 1: Client-side splitting
+Customer SDK splits requests across N sub-keys: `key-1`, `key-2`, ..., `key-N`. Customer's effective limit = `N × per-key-limit`. Loose but spreads load.
+
+### Solution 2: Server-side sharding
+Append a random shard suffix server-side:
+```
+client_key = "abc"
+shard = hash(request_id) % 4
+key = "ratelimit:abc:shard-" + shard
+limit_per_shard = total_limit / 4
+```
+Approximate but distributes load.
+
+### Solution 3: Two-tier counters
+Each pod maintains a local counter. Sync to Redis every 100ms (batched):
+```
+Local: increment per-key counter on each request
+Every 100ms: read all keys, INCRBY each in Redis, reset local counts
+On Redis result: if account exceeded → deny locally
+```
+Approximate ±100ms drift but very fast read path.
+
+### Solution 4: Sticky routing
+Load balancer routes same key to same pod (consistent hashing). Each pod owns a subset of keys. Eliminates cross-pod state but requires routing logic.
+
+## Deeper Dive — Real-World Rate Limiter Comparisons
+
+| Service | Algorithm | Tier | Notes |
+|---|---|---|---|
+| **Stripe API** | Token bucket | Per-key | 100 req/sec for live, 25 for test; burst capacity |
+| **GitHub API** | Sliding window | Per-token | 5000/hour authenticated; 60/hour anonymous |
+| **AWS API Gateway** | Token bucket | Per-stage + per-method | Configurable; throttle 429 |
+| **Cloudflare** | Token bucket + leaky bucket | Edge | 1B+ req/sec at edge level |
+| **Twitter API** | Sliding window | Per-endpoint | Resets in 15-min windows |
+| **Discord** | Sliding window | Per-route | Returns Retry-After in seconds |
+| **Spring Cloud Gateway** | Token bucket (default) | Configurable | Uses Redis Lua under the hood |
+
 ## Practice
 
 1. **Spec the Lua script.** Implement and test the sliding-window-counter Lua. Verify atomicity under concurrent decrement.

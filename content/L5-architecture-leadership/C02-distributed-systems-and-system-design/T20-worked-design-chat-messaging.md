@@ -428,6 +428,337 @@ E2EE (Signal, WhatsApp) means servers can't read message content. Implications:
 > [!INTERVIEW]
 > Strong candidates draw the **gateway / connection layer separately from the storage layer**, name **Kafka partition = conv_id** for ordering, and articulate **online vs offline routing**.
 
+## Deeper Dive — Full Production Implementation Sketch
+
+### WebSocket Gateway with Redis-Backed Session Registry
+
+```java
+@Component
+public class ChatGateway extends TextWebSocketHandler {
+    private final SessionRegistry registry;     // Redis-backed
+    private final MessageProducer producer;
+    private final Map<String, WebSocketSession> localSessions = new ConcurrentHashMap<>();
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        String userId = (String) session.getAttributes().get("userId");
+        String connectionId = UUID.randomUUID().toString();
+        localSessions.put(connectionId, session);
+
+        // Tell Redis: "userId is on gateway-pod=X with connection=Y"
+        registry.register(userId, podHost(), connectionId);
+    }
+
+    @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage msg) throws Exception {
+        ChatMessage chat = json.readValue(msg.getPayload(), ChatMessage.class);
+
+        // 1. Idempotency-key dedup at producer
+        if (recentMessageCache.containsKey(chat.idempotencyKey())) return;
+        recentMessageCache.put(chat.idempotencyKey(), true);
+
+        // 2. Publish to Kafka, partitioned by conv_id (preserves ordering)
+        producer.send("chat-messages", chat.convId(), chat);
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        String userId = (String) session.getAttributes().get("userId");
+        String connectionId = (String) session.getAttributes().get("connectionId");
+        localSessions.remove(connectionId);
+        registry.unregister(userId, podHost(), connectionId);
+    }
+}
+```
+
+### Session Registry (Redis)
+
+```java
+@Component
+public class SessionRegistry {
+    private final RedisTemplate<String, String> redis;
+
+    public void register(String userId, String podHost, String connectionId) {
+        // Sorted set per user: connection_id → pod_host:connection_id
+        redis.opsForHash().put(
+            "presence:" + userId,
+            connectionId,
+            podHost + ":" + Instant.now().toEpochMilli()
+        );
+        redis.expire("presence:" + userId, Duration.ofMinutes(5));
+    }
+
+    public List<UserSession> findActiveSessions(String userId) {
+        Map<Object, Object> entries = redis.opsForHash().entries("presence:" + userId);
+        return entries.entrySet().stream()
+            .map(e -> UserSession.parse((String) e.getKey(), (String) e.getValue()))
+            .filter(s -> !s.isStale(Duration.ofMinutes(5)))
+            .toList();
+    }
+
+    public void unregister(String userId, String podHost, String connectionId) {
+        redis.opsForHash().delete("presence:" + userId, connectionId);
+    }
+}
+```
+
+### Message Delivery Service (Kafka Consumer)
+
+```java
+@Component
+public class MessageDeliveryConsumer {
+    private final SessionRegistry registry;
+    private final CassandraTemplate cassandra;
+    private final PushNotificationService push;
+    private final RestTemplate restTemplate;
+
+    @KafkaListener(topics = "chat-messages", concurrency = "16")
+    public void deliver(ChatMessage msg) {
+        // 1. Persist to Cassandra (durable storage)
+        cassandra.insert(msg);   // partition_key = (conv_id, time_bucket), clustering by msg_id
+
+        // 2. Get conversation members
+        Set<String> recipients = conversationService.members(msg.convId());
+
+        // 3. For each recipient, deliver
+        recipients.parallelStream()
+            .filter(uid -> !uid.equals(msg.senderId()))
+            .forEach(uid -> deliverToUser(uid, msg));
+    }
+
+    private void deliverToUser(String userId, ChatMessage msg) {
+        List<UserSession> sessions = registry.findActiveSessions(userId);
+
+        if (sessions.isEmpty()) {
+            // OFFLINE: queue + push notification
+            offlineQueue.enqueue(userId, msg);
+            push.send(userId, buildPushPayload(msg));
+            return;
+        }
+
+        // ONLINE: deliver to each active gateway pod via RPC
+        sessions.forEach(session -> {
+            try {
+                restTemplate.postForObject(
+                    "http://" + session.podHost() + "/internal/push/" + session.connectionId(),
+                    msg,
+                    Void.class
+                );
+            } catch (Exception e) {
+                // Pod might be dying; will retry on reconnect; push fallback
+                push.send(userId, buildPushPayload(msg));
+            }
+        });
+    }
+}
+```
+
+### Cassandra Schema (Message Storage)
+
+```sql
+CREATE TABLE messages (
+    conv_id UUID,
+    time_bucket TEXT,       -- e.g., "2024-W23"  (weekly bucket prevents huge partitions)
+    msg_id TIMEUUID,
+    sender_id UUID,
+    body TEXT,
+    media_url TEXT,
+    edited_at TIMESTAMP,
+    PRIMARY KEY ((conv_id, time_bucket), msg_id)
+) WITH CLUSTERING ORDER BY (msg_id DESC);
+
+CREATE TABLE conversation_members (
+    conv_id UUID,
+    user_id UUID,
+    joined_at TIMESTAMP,
+    last_read_msg_id TIMEUUID,
+    PRIMARY KEY (conv_id, user_id)
+);
+
+CREATE TABLE user_conversations (
+    user_id UUID,
+    conv_id UUID,
+    last_msg_id TIMEUUID,
+    last_msg_preview TEXT,
+    PRIMARY KEY (user_id, conv_id)
+);
+```
+
+**Time bucketing rationale**: a chat that's been active for 2 years would create a partition with millions of rows otherwise. Weekly buckets cap partition size.
+
+## Deeper Dive — Capacity Math (WhatsApp-Scale)
+
+```
+INPUTS
+  Active users (daily)             : 2B DAU
+  Concurrent connections           : 250M (12.5% of DAU active at any moment)
+  Messages per user per day        : 40
+  Average message size             : 100 bytes
+
+WEBSOCKET GATEWAY
+  Connections per pod              : 50,000 (with tuned kernel: file descriptors, TCP buffers)
+  Pods needed                      : 250M / 50k = 5,000 gateway pods
+  AWS m6a.4xlarge cost             : ~$0.55/hr × 5000 = $66M/year just for gateways
+
+MESSAGE THROUGHPUT
+  Messages/sec (avg)               : 2B × 40 / 86400 = 925k msg/sec
+  Peak (3× avg)                    : 2.8M msg/sec
+  Kafka cluster                    : 2.8M × 100B = 280 MB/sec; 12 brokers @ 50MB/sec each
+
+STORAGE
+  Storage/day                      : 2B × 40 × 100B = 8 TB/day
+  6-month retention                : ~1.5 PB
+  Cassandra ring at 6 TB/node      : 250 nodes (with RF=3)
+
+DELIVERY LATENCY
+  Sender → Gateway                 : 5-20 ms (WS roundtrip)
+  Gateway → Kafka                  : 5-10 ms (LAN)
+  Kafka → Consumer                 : 5-10 ms
+  Consumer → Cassandra write       : 10-15 ms (RF=3)
+  Consumer → Recipient Gateway     : 5-10 ms
+  Gateway → Recipient WS frame     : 5-20 ms
+  TOTAL: ~50ms steady state
+  + Push fallback: ~1-3 seconds (APN/FCM)
+```
+
+## Deeper Dive — Group Chat at Scale (Discord-Style Servers)
+
+```
+PROBLEM: a Discord server with 1M members. Someone posts a message.
+  Naive: 1M Cassandra writes (one per recipient's inbox) → 1M pod-to-pod RPCs.
+
+DISCORD'S SOLUTION (read-side scatter):
+  Store messages ONCE per conversation (channel_id partition).
+  Recipients PULL from their channels' partitions.
+  Send "new message" notification only to ACTIVE clients (those subscribed to channel right now).
+
+KEY INSIGHT: most of 1M members aren't reading that channel right now.
+  Notification: gateway pods subscribe to "channel-X-updates" Kafka topic.
+  Gateway pods, upon seeing the event, look up which CONNECTED users
+    have this channel open → push to only those WS connections.
+```
+
+```java
+@Component
+public class ChannelSubscriptionGateway {
+    private final Map<String, Set<String>> channelToConnections = new ConcurrentHashMap<>();
+
+    public void subscribe(String userId, String connectionId, String channelId) {
+        channelToConnections.computeIfAbsent(channelId, k -> ConcurrentHashMap.newKeySet())
+            .add(connectionId);
+    }
+
+    @KafkaListener(topics = "channel-events")
+    public void onChannelEvent(ChannelEvent event) {
+        Set<String> connections = channelToConnections.get(event.channelId());
+        if (connections == null) return;
+        connections.forEach(connId -> {
+            WebSocketSession s = localSessions.get(connId);
+            if (s != null) s.sendMessage(toFrame(event));
+        });
+    }
+}
+```
+
+**Per-pod state**: which of MY connections subscribed to which channels. Kafka delivers channel events to ALL gateway pods (high topic partition count); each pod filters to its local connections.
+
+## Deeper Dive — Reliable Delivery (At-Least-Once + Dedup)
+
+Each message has a client-generated `idempotencyKey` (UUID). Server tracks recent keys per conversation.
+
+```
+CLIENT SEND
+  generates uuid; sends with message
+  retries on network failure (using SAME uuid)
+
+GATEWAY
+  receives message; checks recent-keys cache (last 5 min)
+  if duplicate → ack send, drop
+  else → produce to Kafka, ack send
+
+CASSANDRA
+  message stored with idempotencyKey as part of (or check on) msg_id
+  duplicates filtered at storage
+
+RECIPIENT GATEWAY
+  delivers to recipient WS
+  recipient ACKs reception (back through chat-acks Kafka topic)
+  on no ACK after timeout → retry delivery (recipient's deduper drops duplicates)
+```
+
+Client-side dedup:
+```javascript
+const seenMessages = new Set();
+ws.onmessage = (msg) => {
+    const chat = JSON.parse(msg.data);
+    if (seenMessages.has(chat.idempotencyKey)) return;   // already seen
+    seenMessages.add(chat.idempotencyKey);
+    renderMessage(chat);
+};
+```
+
+## Deeper Dive — Read Receipts and Typing Indicators
+
+```
+READ RECEIPTS
+  When user opens chat → client sends "read_marker" event with last_seen_msg_id
+  Stored in conversation_members table per user
+  Senders see read receipt as visualization (small avatar moves to read line)
+
+  PRIVACY: aggregate read receipts (no per-msg-per-reader granularity); option to disable
+  COST: every "read" is a Cassandra UPDATE → ~100M/sec at WhatsApp scale
+        → batch by 1-2 seconds; debounce
+
+TYPING INDICATORS
+  Client sends "typing_start"/"typing_stop" ephemeral events
+  NOT persisted; delivered via gateway → Kafka → recipient gateways
+  TTL: typing event expires 3 seconds after last "typing_start"
+  COST: small but non-trivial; channel subscription model helps
+```
+
+## Deeper Dive — End-to-End Encryption (Signal Protocol)
+
+For E2EE chats, server can't read content. Architecture changes:
+
+```
+KEY EXCHANGE (Signal's X3DH)
+  Each user uploads identity-key + signed-prekey + one-time-prekeys to server
+  Sender fetches recipient's keys, performs X3DH → shared secret
+  Establishes initial ratchet state
+
+MESSAGE ENCRYPTION (Double Ratchet)
+  Each message encrypted with per-message key (forward secrecy)
+  Server sees: ciphertext + recipient_id + ephemeral routing metadata
+  Server CANNOT read body, but DOES know:
+    - Who sends to whom
+    - Message timing
+    - Group membership
+
+WHAT BREAKS WITH E2EE
+  ❌ Server-side search (encrypted bodies)
+  ❌ Spam filtering (need client-side)
+  ❌ Federated identity (key management complexity)
+  ❌ Backups (encrypted backup with user-managed key)
+  ❌ Read-receipts (encrypted; server can't verify)
+
+SIGNAL IS REFERENCE IMPL; WhatsApp uses it; iMessage uses similar.
+```
+
+## Deeper Dive — Failure Modes Comprehensive Table
+
+| Failure | Impact | Mitigation |
+|---|---|---|
+| Gateway pod crash | 50k connections drop; clients reconnect | Clients auto-reconnect with exponential backoff; sticky LB routes to any healthy pod |
+| Kafka broker unavailable | Producers queue locally; lag grows | Producer buffer (64MB); local disk overflow; alerts |
+| Cassandra hot partition | Writes timeout on popular conversation | Time-bucketing partitions; alert on partition size |
+| Push provider (APN/FCM) down | Offline users don't get push | Queue + retry with backoff; fall back to email if critical |
+| Region failover | Users on failed region can't send | Active-active multi-region; clients connect to nearest healthy |
+| Spam attack (10M messages) | Cassandra/Kafka saturate | Rate-limit per-sender; ban senders with high spam score |
+| Synthetic message replay | Old message reappears | Server-side idempotency cache for last 5 min |
+| Connection limit reached | New users can't connect | Auto-scale gateway pods; increase ulimit/sysctl |
+| Gateway-to-gateway RPC timeout | Online delivery fails; push fallback | Push notification as universal fallback path |
+| Database schema change | Rolling deploy broken | Schema migrations are forward-compatible; expand-contract pattern |
+
 ## Practice
 
 1. **WebSocket vs SSE.** Why WebSocket and not Server-Sent Events?

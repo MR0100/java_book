@@ -432,6 +432,277 @@ The implementations are similar across languages; the backends are the constrain
 > [!INTERVIEW]
 > A common L5 prompt: "Implement a distributed lock." Strong answers (a) acknowledge GC pauses as the central failure mode, (b) describe fencing tokens, (c) recommend ZooKeeper / etcd over naive Redis, (d) name an alternative pattern (optimistic concurrency, queue) when a lock isn't actually needed.
 
+## Deeper Dive — Implementation Patterns by Backend
+
+### Redis Redlock with Fencing (Production-Grade)
+
+The Kleppmann-critique-aware implementation. **Use only when GC pause + non-monotonic clock are acceptable risks**.
+
+```java
+public class FencedRedisLock {
+    private final RedisTemplate<String, String> redis;
+    private final AtomicLong tokenSource = new AtomicLong();
+
+    private static final String ACQUIRE_LUA = """
+        local current = redis.call('GET', KEYS[1])
+        if current == false then
+          local token = ARGV[1]
+          redis.call('SET', KEYS[1], token, 'PX', ARGV[2])
+          return token
+        end
+        return nil
+        """;
+
+    private static final String RELEASE_LUA = """
+        if redis.call('GET', KEYS[1]) == ARGV[1] then
+          return redis.call('DEL', KEYS[1])
+        end
+        return 0
+        """;
+
+    public Optional<LockToken> tryAcquire(String resource, Duration ttl) {
+        long token = tokenSource.incrementAndGet();   // monotonic fencing token
+        String holder = nodeId() + ":" + token;
+        DefaultRedisScript<String> script = new DefaultRedisScript<>(ACQUIRE_LUA, String.class);
+        String result = redis.execute(script, List.of("lock:" + resource),
+                                       holder, String.valueOf(ttl.toMillis()));
+        return Optional.ofNullable(result).map(r -> new LockToken(token, holder));
+    }
+
+    public boolean release(String resource, LockToken token) {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>(RELEASE_LUA, Long.class);
+        Long deleted = redis.execute(script, List.of("lock:" + resource), token.holder());
+        return deleted != null && deleted == 1;
+    }
+}
+```
+
+**Critical**: every protected write must include the fencing token. Storage layer enforces monotonic-token-only writes:
+
+```sql
+UPDATE balances SET amount = amount + ?, fence_token = ?
+WHERE account_id = ? AND fence_token < ?;
+-- Returns 0 rows if a higher token has already written → stale; abort
+```
+
+### ZooKeeper-Based Lock (Strong Safety)
+
+```java
+public class ZkDistributedLock implements AutoCloseable {
+    private final CuratorFramework client;
+    private final InterProcessMutex lock;
+
+    public ZkDistributedLock(CuratorFramework client, String path) {
+        this.client = client;
+        this.lock = new InterProcessMutex(client, path);
+    }
+
+    public boolean tryAcquire(Duration timeout) throws Exception {
+        return lock.acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    public void release() throws Exception { lock.release(); }
+
+    @Override public void close() throws Exception { release(); }
+
+    public long getFencingToken() throws Exception {
+        // zxid (ZooKeeper transaction ID) of the lock node — monotonic
+        return client.checkExists().forPath(lock.getLockPath()).getMzxid();
+    }
+}
+
+// Usage
+try (ZkDistributedLock lock = new ZkDistributedLock(client, "/locks/account-42")) {
+    if (lock.tryAcquire(Duration.ofSeconds(5))) {
+        long fence = lock.getFencingToken();
+        protectedWrite(fence);
+    }
+}
+```
+
+**Why ZK wins on safety**: session-based ownership. If the lock holder dies (process or network partition), the session times out → ZK auto-releases. No risk of indefinite hold from a crashed holder. `zxid` is the natural fencing token.
+
+### etcd-Based Lock with Lease
+
+```java
+public class EtcdLock implements AutoCloseable {
+    private final Client etcd;
+    private final long leaseId;
+    private final ScheduledExecutorService keepAlive;
+
+    public EtcdLock(Client etcd, Duration leaseTtl) throws Exception {
+        this.etcd = etcd;
+        this.leaseId = etcd.getLeaseClient()
+            .grant(leaseTtl.getSeconds())
+            .get().getID();
+
+        // Background lease renewal — keeps lock alive while we work
+        this.keepAlive = Executors.newSingleThreadScheduledExecutor();
+        keepAlive.scheduleAtFixedRate(
+            () -> etcd.getLeaseClient().keepAliveOnce(leaseId),
+            leaseTtl.getSeconds() / 3,    // renew at 1/3 TTL
+            leaseTtl.getSeconds() / 3,
+            TimeUnit.SECONDS
+        );
+    }
+
+    public boolean tryAcquire(String resource) throws Exception {
+        LockResponse resp = etcd.getLockClient()
+            .lock(ByteSequence.from(resource, UTF_8), leaseId)
+            .get();
+        return resp != null;
+    }
+
+    public long getFencingToken() {
+        // etcd's modRevision serves as the fencing token
+        return leaseId;
+    }
+
+    @Override public void close() throws Exception {
+        keepAlive.shutdownNow();
+        etcd.getLeaseClient().revoke(leaseId);   // releases lock + lease
+    }
+}
+```
+
+### Spring + Redisson (Convenience Layer)
+
+```java
+@Configuration
+public class RedissonConfig {
+    @Bean
+    public RedissonClient redisson() {
+        Config config = new Config();
+        config.useClusterServers()
+              .addNodeAddress("redis://node1:6379", "redis://node2:6379", "redis://node3:6379")
+              .setRetryAttempts(3)
+              .setRetryInterval(500);
+        return Redisson.create(config);
+    }
+}
+
+@Service
+public class InventoryService {
+    private final RedissonClient redisson;
+
+    public boolean reserveItem(String sku, int qty) {
+        RLock lock = redisson.getLock("inventory:" + sku);
+        try {
+            if (lock.tryLock(2, 10, TimeUnit.SECONDS)) {  // wait 2s, hold 10s max
+                try {
+                    return doReserve(sku, qty);
+                } finally {
+                    lock.unlock();
+                }
+            }
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+}
+```
+
+Redisson includes automatic lease renewal (watchdog thread), reentrant locks, read-write locks, fair locks. Convenient API but still Redis-backed — not safety-critical.
+
+## Deeper Dive — Why GC Pauses Break Distributed Locks
+
+Sequence of disaster:
+
+```
+T+0    Client A: SET lock NX EX 30  → "OK"  (holds lock for 30s)
+T+1    Client A: starts work, reads X = 100 from DB
+T+2    Client A: BEGIN GC pause (Stop-The-World, 25 seconds)
+T+30   Lock TTL expires; Redis frees the lock
+T+31   Client B: SET lock NX EX 30  → "OK"
+T+31   Client B: reads X = 100 from DB; computes X = 100 + 10 = 110; writes X = 110
+T+32   Client B: finishes work, releases lock
+T+27   Client A: GC pause ENDS — wakes up at T+27 (relative wall clock) thinking it's T+2
+T+27   Client A: still thinks it holds lock; computes X = 100 + 5 = 105; writes X = 105
+
+Result: Client B's update LOST. Both writes succeeded but only one survived.
+```
+
+The lock did its job — never two holders simultaneously per Redis's view. But the holder's view of "I have the lock" got out of sync with reality.
+
+### Fencing Token Fix
+
+```
+T+0    Client A acquires, gets token = 73
+T+2    Client A pauses (25s)
+T+30   Lock expires
+T+31   Client B acquires, gets token = 74
+T+32   Client B writes: UPDATE ... WHERE token > 74-1 → succeeds, current_token = 74
+T+27   Client A wakes, writes: UPDATE ... WHERE token > 73-1 AND current_token < 73
+       → 0 rows updated; storage REJECTS the stale write.
+```
+
+The storage layer enforces "no writes from holders with older tokens than already-seen." A's write fails safely.
+
+## Deeper Dive — Lock Lifecycle Edge Cases
+
+| Edge case | What goes wrong | Mitigation |
+|---|---|---|
+| Network partition mid-critical-section | Lock can't be released; sits TTL-bound | Lease renewal + short TTL |
+| Lock holder crashes | TTL-bound delay until next acquirer | Choose TTL = max acceptable recovery time |
+| Reentrancy needed in nested method | Holder accidentally blocks itself | Use reentrant impl (Redisson, Curator); track owner+count |
+| Multiple cluster regions need the lock | Cross-region latency multiplies | Per-region lock + cross-region eventual consistency |
+| Lock contention saturates Redis CPU | Throughput degrades | Shard locks by resource hash; multiple Redis nodes |
+| Wait timeout vs hold timeout confusion | Caller blocks forever | Two distinct timeouts: `waitTime` (acquire) vs `leaseTime` (hold) |
+| Lease renewal thread dies before work done | Lock expires mid-work | Monitor renewal failures; abort work if renewal fails |
+| Clock skew between Redis nodes (Redlock) | Lock can expire on one but not another | Use single-Redis lock or move to consensus backend |
+
+## Deeper Dive — When You Genuinely Need vs Don't Need a Distributed Lock
+
+### Genuinely need a lock
+
+- **Singleton background task** across pods (cron with cluster awareness): "exactly one pod runs this job at a time."
+- **Resource that can't tolerate concurrent modification at all**: file system writes, external API with strict "one client at a time" requirement.
+- **Lease-based ownership**: "this pod owns shard X for the next 30 seconds; if it dies, another takes over."
+
+### DON'T need a lock — better alternatives
+
+| Problem | Alternative |
+|---|---|
+| "Only one process should update X" | Optimistic concurrency: `UPDATE ... WHERE version = ?` then check rows affected |
+| "Update counter atomically" | DB primitive: `UPDATE ... SET count = count + 1` or `INCR` |
+| "Order multiple writes" | Single-writer pattern: route all writes for key K to same pod (consistent hashing) |
+| "Multiple workers process tasks" | Queue + worker pattern: each task pulled by one worker |
+| "Coordinate two services" | Saga / event-driven, no shared lock |
+| "Cache update coordination" | Single-flight (Caffeine LoadingCache); first miss loads, rest wait |
+| "Daily aggregation job" | Cron with locking via DB row (FOR UPDATE SKIP LOCKED) |
+
+The recommendation: **try really hard to make the lock unnecessary**. Every alternative is operationally simpler than a distributed lock.
+
+## Deeper Dive — Real Industry Implementations
+
+| System | Backend | Mechanism | Notable |
+|---|---|---|---|
+| **Google Chubby** | Paxos | Session + ephemeral nodes | Original distributed lock service (2006) |
+| **ZooKeeper** | Zab | Sequential ephemeral znodes | The reference for safety; `zxid` as fence |
+| **etcd** | Raft | Lease + revision | gRPC API; used by Kubernetes |
+| **Consul** | Raft | Lease + session | HashiCorp; popular for K/V + lock |
+| **Redis (single-node)** | None | SET NX EX | Fast, best-effort, no consensus |
+| **Redis Redlock** | Heuristic majority | Multi-node SET NX EX | Kleppmann criticized; OK with fencing |
+| **DynamoDB conditional write** | Strong consistency | Conditional `UpdateItem` | Works as lock-like atomic check |
+| **PostgreSQL advisory lock** | DB-internal | `pg_advisory_lock()` | Free; session-bound; max simplicity |
+| **Kubernetes leases** | etcd | `coordination.k8s.io/v1` Lease | Built-in for K8s controllers |
+
+**Kubernetes Lease example** (operators use this):
+```yaml
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  name: my-controller-leader
+spec:
+  holderIdentity: pod-abc
+  leaseDurationSeconds: 30
+  renewTime: "2026-06-09T10:00:00Z"
+```
+
+Renewed every 10s by the leader. If leader dies, others see expired lease → race to update → new leader. Built on etcd's strong consistency.
+
 ## Practice
 
 1. **Trace a GC-pause incident.** Sketch the GC-pause failure mode for a Redis-based lock. Identify the time intervals where two holders coexist.

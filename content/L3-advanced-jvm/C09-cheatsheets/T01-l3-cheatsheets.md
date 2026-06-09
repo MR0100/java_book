@@ -569,6 +569,240 @@ Key concepts:
 
 ---
 
+## Virtual Threads Quick Reference (Java 21+)
+
+```java
+// Create a virtual thread
+Thread.startVirtualThread(() -> work());                  // fire and forget
+Thread.ofVirtual().start(() -> work());                    // builder
+Thread.ofVirtual().name("worker-1").start(() -> work());   // named
+
+// Executor (typical for I/O fan-out)
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    List<Future<Result>> futures = tasks.stream()
+        .map(t -> executor.submit(() -> handle(t)))
+        .toList();
+    // close() waits for all tasks (graceful)
+}
+
+// Check if current thread is virtual
+boolean virtual = Thread.currentThread().isVirtual();
+
+// Spring Boot 3.2+
+spring.threads.virtual.enabled: true   // Tomcat serves each request on a virtual thread
+```
+
+### When virtual threads PIN (defeat the model)
+
+| Cause | Pre-JDK 24 | JDK 24+ (JEP 491) |
+|---|---|---|
+| `synchronized` block | PINS | Fixed (no longer pins) |
+| Native frame (JNI/FFM) | PINS | Still pins |
+| `ParallelGC` slow phase | Briefly | Briefly |
+
+**Pre-JDK 24 fix**: replace `synchronized` with `ReentrantLock` on any code reachable from a virtual thread.
+
+```java
+// BAD pre-JDK 24
+synchronized (lock) { slowIo(); }    // pins virtual thread the whole time
+
+// GOOD any version
+ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try { slowIo(); } finally { lock.unlock(); }
+```
+
+### Verify pinning with JFR
+
+```bash
+jcmd <pid> JFR.start name=pinning settings=profile
+# do work
+jcmd <pid> JFR.dump filename=pinning.jfr
+
+# Look for events:
+#   jdk.VirtualThreadPinned
+#   jdk.VirtualThreadSubmitFailed
+```
+
+Open in JDK Mission Control; pinned events show the stack trace causing the pin.
+
+## ScopedValue vs ThreadLocal (Java 21+)
+
+```java
+// OLD: ThreadLocal — must remember to .remove() in pooled threads
+private static final ThreadLocal<UserContext> CTX = new ThreadLocal<>();
+CTX.set(new UserContext(userId));
+try { doWork(); } finally { CTX.remove(); }   // ← critical in pooled threads
+
+// NEW: ScopedValue — auto-bounded lifetime, no manual cleanup
+public static final ScopedValue<UserContext> CTX = ScopedValue.newInstance();
+ScopedValue.where(CTX, new UserContext(userId))
+           .run(() -> doWork());      // CTX is unbound when this returns
+
+// Read inside scope
+String userId = CTX.get().userId();
+```
+
+**Why ScopedValue:**
+- Immutable per-scope (no `.set()` after binding).
+- Auto-cleanup when scope ends — no `try/finally` needed.
+- Cheap with virtual threads (millions of them).
+- Inherited by child structured-concurrency scopes.
+
+## Structured Concurrency Quick Reference (Java 21+ preview, GA in 25)
+
+```java
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    var userFuture = scope.fork(() -> fetchUser(id));
+    var ordersFuture = scope.fork(() -> fetchOrders(id));
+    var prefsFuture = scope.fork(() -> fetchPreferences(id));
+
+    scope.join();                  // wait for all forks
+    scope.throwIfFailed();          // re-throw first failure
+
+    return new Profile(userFuture.get(), ordersFuture.get(), prefsFuture.get());
+}
+// If any fork fails → others are CANCELLED automatically
+// Replaces the boilerplate of CompletableFuture.allOf + manual cancellation
+```
+
+**Variants:**
+- `ShutdownOnFailure` — stop on any failure (typical).
+- `ShutdownOnSuccess` — stop on first success (race pattern).
+
+## Common GC Flags (JDK 21+)
+
+```bash
+# DEFAULTS (JDK 21)
+-XX:+UseG1GC                    # G1 is default
+-Xmx, -Xms                       # heap bounds — set in containers
+-XX:MaxRAMPercentage=75          # use 75% of container RAM
+-XX:+UseContainerSupport         # default on; honor cgroup limits
+
+# G1 TUNING
+-XX:MaxGCPauseMillis=200         # target max pause (default 200)
+-XX:G1HeapRegionSize=8M           # region size (auto-tuned; override only if humongous)
+-XX:G1NewSizePercent=20           # young gen min (default 5)
+-XX:G1MaxNewSizePercent=60        # young gen max (default 60)
+
+# SWITCH TO ZGC (sub-ms pauses, JDK 17+)
+-XX:+UseZGC                      # concurrent, sub-ms pauses
+-XX:+ZGenerational               # JDK 21+ — generational ZGC, faster for most workloads
+
+# PARALLEL GC (throughput-oriented, batch jobs)
+-XX:+UseParallelGC               # high throughput, long pauses
+
+# LOGGING
+-Xlog:gc*:file=gc.log:time,level,tags:filecount=10,filesize=10M
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/tmp
+
+# JIT
+-XX:+TieredCompilation           # default; C1 → C2
+-XX:ReservedCodeCacheSize=256M   # increase if code-cache-full warnings
+
+# CONTAINER
+-XX:ActiveProcessorCount=4       # force CPU count (rare; usually let auto-detect)
+
+# DEBUG
+-XX:+PrintFlagsFinal             # show all effective flags + sources
+-XX:+UnlockDiagnosticVMOptions
+-XX:+ShowCodeDetailsInExceptionMessages  # helpful NPE (default JDK 14+)
+
+# ALWAYS-ON JFR
+-XX:+FlightRecorder
+-XX:StartFlightRecording=name=cont,settings=default,maxsize=200M,disk=true
+```
+
+## JVM Memory Areas Quick Reference
+
+```
+HEAP (managed by GC, bounded by -Xmx)
+├── Young Generation (-XX:NewSize / -XX:MaxNewSize)
+│   ├── Eden          ← new allocations land here
+│   ├── Survivor 0    ← objects surviving minor GC
+│   └── Survivor 1    ← objects surviving more
+└── Old Generation    ← long-lived objects (tenured)
+
+OFF-HEAP
+├── Metaspace         ← class metadata (no fixed cap by default; -XX:MaxMetaspaceSize)
+├── Code Cache        ← JIT-compiled code (-XX:ReservedCodeCacheSize, default 240M)
+├── Thread Stacks     ← threads × -Xss (default 1M each)
+├── Direct Buffers    ← ByteBuffer.allocateDirect (-XX:MaxDirectMemorySize)
+├── GC Structures     ← card tables, remembered sets (~3-5% of heap)
+└── JNI / Native Libs ← driver memory, native libraries
+
+CONTAINER SIZING RULE
+  container memory ≈ Xmx × 1.5-2
+  e.g., -Xmx=4G → container limit 6-8G
+  (forgetting this = OOMKilled despite "plenty of heap")
+```
+
+## Common GC Patterns to Recognize from Logs
+
+```
+"Pause Young (G1 Evacuation Pause)"     normal young GC; <50ms typical
+"Pause Young (Concurrent Start)"        G1 marking cycle started
+"Pause Remark"                          G1 concurrent mark final pause
+"Pause Cleanup"                         G1 cleanup pause
+"Pause Full (Allocation Failure)"       BAD — full GC; should be rare with G1
+"Pause Full (Metadata GC Threshold)"    metaspace pressure
+"to-space exhausted"                    G1 couldn't find space; humongous problem
+"humongous allocation"                  object > G1 region / 2; increase G1HeapRegionSize
+```
+
+If you see "Pause Full" more than rarely with G1, something's wrong — humongous allocations, fragmentation, or undersized heap.
+
+## Reactive Streams Decision (2024+ reality)
+
+```
+WHEN TO USE WEBFLUX / REACTIVE?
+  - You're on JDK 17- and can't get to JDK 21
+  - You need streaming responses (SSE, large CSVs, video)
+  - You're integrating with reactive databases (R2DBC) end-to-end
+
+WHEN NOT TO?
+  - JDK 21+ available → use VIRTUAL THREADS instead (simpler, debuggable, same throughput)
+  - Your team isn't already reactive-fluent (steep learning curve)
+  - You'd be mixing reactive and blocking (loses the benefit, adds confusion)
+
+VIRTUAL THREADS WIN BECAUSE:
+  - Blocking code "just works" — no reactive operators needed
+  - Stack traces are normal (reactive ones are nightmarish)
+  - Debugger stops where you expect
+  - Same throughput as reactive for I/O-bound workloads
+```
+
+## ForkJoinPool Quick Reference
+
+```java
+// Use the common pool (shared across the JVM — every parallelStream uses it)
+ForkJoinPool.commonPool().submit(task);
+
+// Custom pool (better for parallel streams that need isolation)
+ForkJoinPool pool = new ForkJoinPool(4);
+pool.submit(() -> {
+    list.parallelStream().forEach(this::process);   // uses 'pool', not common pool
+}).get();
+
+// Work-stealing pattern (RecursiveTask)
+class SumTask extends RecursiveTask<Long> {
+    private final long[] arr; private final int lo, hi;
+    SumTask(long[] arr, int lo, int hi) { this.arr = arr; this.lo = lo; this.hi = hi; }
+    protected Long compute() {
+        if (hi - lo < 1000) {
+            long sum = 0; for (int i = lo; i < hi; i++) sum += arr[i]; return sum;
+        }
+        int mid = (lo + hi) >>> 1;
+        SumTask left = new SumTask(arr, lo, mid);
+        SumTask right = new SumTask(arr, mid, hi);
+        left.fork(); long r = right.compute(); long l = left.join();
+        return l + r;
+    }
+}
+long total = ForkJoinPool.commonPool().invoke(new SumTask(data, 0, data.length));
+```
+
 ## Recap
 
 Use this as a working reference. Update with your own tribal knowledge as you encounter new patterns.

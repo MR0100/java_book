@@ -480,6 +480,273 @@ If you can't observe GC pauses, you can't detect regressions. Set up Prometheus 
 
 GC tuning has long feedback cycles (minutes to hours of data). Don't iterate in 60-second windows.
 
+## Deeper Dive — Workload-Specific Tuning Recipes
+
+### Recipe 1: General Web Service (REST API, p99 < 200ms target)
+
+```bash
+java -Xms2g -Xmx2g \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=100 \
+     -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/log/jvm/heapdump.hprof \
+     -Xlog:gc*:file=/var/log/jvm/gc.log:time,level,tags:filecount=10,filesize=10M \
+     -XX:+FlightRecorder \
+     -XX:StartFlightRecording=name=cont,settings=default,maxsize=200M,disk=true \
+     -jar app.jar
+```
+
+**Why these**:
+- G1 default since Java 9; sweet spot for most web workloads.
+- 2GB heap typical for Spring Boot service handling 1-2k RPS.
+- MaxGCPauseMillis=100: tighter than default 200; usually achievable.
+- Heap dump + JFR auto-armed for the inevitable 3 AM call.
+
+### Recipe 2: Low-Latency Trading / Pricing (p99 < 10ms target)
+
+```bash
+java -Xms16g -Xmx16g \
+     -XX:+UseZGC -XX:+ZGenerational \
+     -XX:+UseLargePages -XX:+UseTransparentHugePages \
+     -XX:ConcGCThreads=4 \
+     -XX:ParallelGCThreads=8 \
+     -XX:-UsePerfData \
+     -XX:+AlwaysPreTouch \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar app.jar
+```
+
+**Why these**:
+- ZGC: sub-millisecond pauses. Generational (Java 21+) reduces CPU overhead vs single-gen ZGC.
+- 16GB heap pre-touched (`AlwaysPreTouch`) so all pages allocated at startup — no page-fault pauses.
+- Large pages (2MB) reduce TLB pressure for big heaps.
+- `-UsePerfData` disables `hsperfdata_*` files (small but eliminates one source of pauses).
+- ZGC trade-off: ~10-15% throughput hit vs G1.
+
+### Recipe 3: Batch ETL (throughput-oriented, no latency SLO)
+
+```bash
+java -Xms32g -Xmx32g \
+     -XX:+UseParallelGC \
+     -XX:ParallelGCThreads=32 \
+     -XX:NewRatio=1 \
+     -XX:+UseCompressedOops \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar etl-job.jar
+```
+
+**Why these**:
+- ParallelGC: highest throughput; pause duration not critical for batch.
+- Large heap; many parallel GC threads.
+- `NewRatio=1` gives equal young/old space — appropriate for object-graph-building workloads.
+- Skip ZGC/G1 — concurrent collection adds CPU overhead with no benefit when throughput matters.
+
+### Recipe 4: Container Kubernetes Deployment (cgroup-aware)
+
+```yaml
+# K8s Deployment
+spec:
+  containers:
+  - name: app
+    resources:
+      requests:
+        memory: "1.5Gi"
+        cpu: "1"
+      limits:
+        memory: "2Gi"
+        cpu: "2"
+    env:
+    - name: JAVA_TOOL_OPTIONS
+      value: >-
+        -XX:+UseG1GC
+        -XX:MaxRAMPercentage=70
+        -XX:MaxGCPauseMillis=150
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/tmp
+        -Xlog:gc*:stdout:time,level,tags
+        -XX:ActiveProcessorCount=2
+```
+
+**Why these**:
+- `MaxRAMPercentage=70` of 2GB limit = 1.4GB heap. Leaves room for metaspace + code cache + thread stacks + native.
+- `ActiveProcessorCount=2` matches CPU limit so ForkJoinPool / GC threads size correctly.
+- HeapDumpPath=/tmp + a PVC mount → preserves dump across restarts.
+- gc log to stdout → captured by K8s log aggregation.
+
+### Recipe 5: Microservice with Virtual Threads (Java 21+)
+
+```bash
+java -Xms1g -Xmx1g \
+     -XX:+UseG1GC \
+     --enable-preview \
+     -Dspring.threads.virtual.enabled=true \
+     -XX:MaxGCPauseMillis=100 \
+     -jar service.jar
+```
+
+**Why these**:
+- Smaller heap fine because virtual threads use ~1KB heap vs 1MB stack per platform thread.
+- Same web-service GC config — virtual threads change the thread model, not GC needs.
+
+## Deeper Dive — GC Algorithm Decision Tree
+
+```
+Pause time critical (p99 < 20ms)?
+├── YES → ZGC (or Shenandoah)
+│   ├── Heap > 1TB? → Vanilla ZGC
+│   └── Heap 4-100GB + standard workload? → ZGenerational (Java 21+, better CPU)
+│
+└── NO
+    ├── Throughput most important + can afford pauses?
+    │   └── Parallel GC — batch jobs, ETL, offline processing
+    │
+    └── Balanced (web service, microservice, default case)
+        ├── Heap ≤ 32GB? → G1 (default since Java 9)
+        ├── Heap > 32GB?
+        │   ├── Latency tolerant? → G1 (still works; longer pauses)
+        │   └── Latency sensitive? → ZGenerational (Java 21+)
+```
+
+**Avoid**: SerialGC (only for ≤100MB heaps), CMS (removed Java 14), Shenandoah (smaller installed base than ZGC).
+
+## Deeper Dive — How to Diagnose "Suddenly Slower Service"
+
+Your service was 50ms p99 yesterday. Today it's 500ms. GC suspect?
+
+```bash
+# 1. Take JFR snapshot of last 5 min
+jcmd <pid> JFR.dump filename=now.jfr maxage=5m
+
+# 2. Quickly check: any GC pauses > 200ms?
+jfr print --events GarbageCollection now.jfr | grep -E "duration|name"
+
+# 3. Allocation rate now vs baseline
+jcmd <pid> GC.class_histogram | head -20
+# Compare with yesterday's snapshot
+```
+
+**Common causes ranked by frequency**:
+
+1. **Hot endpoint started returning bigger responses** → allocation rate spike → more frequent young GC → more promotion → more old GC. Fix: profile the endpoint; reduce response size or paginate.
+
+2. **Cache invalidated en masse** → entire cache being re-populated → allocation burst. Fix: cache warm-up; staggered invalidation.
+
+3. **Memory leak slow-burning into old gen** → old gen filling → mixed GC trigger → longer pauses. Fix: heap dump + Eclipse MAT.
+
+4. **JIT decompilation** → method recompiling at low optimization tier → bad code generated → more allocation. Check `-XX:+PrintCompilation` for "made not entrant" patterns.
+
+5. **Tail-latency from minor GC growing in frequency** → CPU contention, more GC threads needed.
+
+6. **Container CPU throttling** → not GC at all; check `container_cpu_cfs_throttled_seconds_total`.
+
+## Deeper Dive — Allocation Rate Investigation
+
+Allocation rate = bytes allocated per second. Compute from GC log:
+
+```
+[3.500s][info][gc] GC(0) Pause Young (G1 Evacuation Pause) 100M->20M(2G) 50ms
+[6.500s][info][gc] GC(1) Pause Young (G1 Evacuation Pause) 100M->22M(2G) 60ms
+```
+
+Between GC 0 and GC 1: eden filled from 20M to 100M in 3 seconds.
+Allocation rate = (100 - 20) MB / 3 sec = **27 MB/sec**.
+
+**Healthy ranges**:
+- Web service: **5-50 MB/sec**
+- Stream processing: **50-200 MB/sec**
+- Batch ETL: **100-500 MB/sec**
+- Concerning: **> 1 GB/sec** (something allocating wildly)
+
+**Find allocation sources** with async-profiler:
+```bash
+async-profiler -e alloc -d 30 -f alloc.html <pid>
+```
+
+Generates flame graph of allocation sites. The hot frames are where your bytes are coming from. Typical findings:
+- String concatenation in a loop → switch to StringBuilder.
+- `new HashMap<>()` per request → reuse via ThreadLocal or cache.
+- Boxing in hot path → use primitive collections (`int[]`).
+- Stream operations creating intermediate collections → consider for-loop in hot path.
+
+## Deeper Dive — Production GC Log Analysis Workflow
+
+```bash
+# 1. Tail GC log live
+tail -f /var/log/jvm/gc.log
+
+# 2. Pause duration histogram (last 10k events)
+grep "Pause" /var/log/jvm/gc.log | awk '{print $NF}' | sort -n | awk '
+    BEGIN{count=0}
+    {a[count++]=$1}
+    END{
+        n=count
+        print "min:", a[0]
+        print "p50:", a[int(n*0.5)]
+        print "p90:", a[int(n*0.9)]
+        print "p99:", a[int(n*0.99)]
+        print "max:", a[n-1]
+    }'
+
+# 3. GC frequency over time
+grep "Pause" /var/log/jvm/gc.log | awk -F'[][]' '{print $2}' | sort | uniq -c
+
+# 4. Upload to GCEasy.io for full analysis
+curl -X POST --data-binary @gc.log https://api.gceasy.io/analyzeGC
+```
+
+**Red flags in GCEasy report**:
+- "Long GC pauses" (any > target)
+- "Allocation/Promotion rate high"
+- "Premature object promotion" (objects dying in old gen quickly = should have stayed young)
+- "Full GC happening" with G1/ZGC = critical, indicates tuning failure or memory leak
+
+## Deeper Dive — GC Tuning Anti-Patterns Quick List
+
+| Anti-pattern | Why bad | Fix |
+|---|---|---|
+| Setting `-XX:NewRatio=8` from old advice | Forces tiny young gen; bumps promotion rate | Let G1 auto-tune; or `G1NewSizePercent` |
+| `-XX:ParallelGCThreads=64` on 8-core | More threads ≠ faster; thread contention hurts | Default = `cores`; rarely override |
+| `-Xmx=16g` on 16g container | OOM-killed by container; need overhead | `-XX:MaxRAMPercentage=70` (leaves ~30% for non-heap) |
+| Long pause tuning without measuring | "Tune to taste"; no baseline | Always measure before, change one, measure after |
+| Reusing JVM args across services | Different workloads, different needs | Per-service config; review quarterly |
+| Disabling compressed oops on small heap | 8GB heap doesn't need it but default is on | Leave default; only relevant for >32GB |
+| Manual `System.gc()` | Forces full GC; wastes time | Never; remove from code |
+| `-Xss=8m` because "stack overflow" | 8M × 1000 threads = 8GB just on stacks | Default 1M usually fine; find recursion bug instead |
+
+## Deeper Dive — JVM Crash Investigation
+
+When the JVM itself crashes (not OOM, not exception — actual crash):
+
+```
+# /tmp/hs_err_pid12345.log file generated automatically
+```
+
+```
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f8b3c3f1234, pid=12345, tid=0x00007f8b3c4567
+#
+# JRE version: OpenJDK Runtime Environment (21.0.1+12) (...)
+# Problematic frame:
+# V  [libjvm.so+0x9f1234]  ParallelTaskTerminator::offer_termination+0x123
+```
+
+**Look at**:
+1. **Problematic frame**: `V` = VM internal, `J` = JIT, `C` = native, `j` = interpreted Java.
+2. **Stack**: backtrace.
+3. **Register state**: registers at crash.
+4. **JVM args**: `# Command Line:` line shows the actual flags.
+5. **Memory map**: `# /proc/self/maps`.
+6. **Native libraries loaded**: identifies third-party native code.
+
+**Common causes**:
+- **JIT bug**: rare; usually triggered by specific bytecode. Workaround: `-XX:CompileCommand=exclude,com.example.Class,methodName`.
+- **JNI bug**: native code corrupting heap. Identify the .so file in the stack.
+- **GC bug**: very rare; usually JDK Early Access or experimental flags.
+- **OS-level**: kernel issue, hardware fault, OOM-kill arriving as SIGSEGV.
+
+File JBS bug if reproducible with stock JDK and no JNI.
+
 ## Practice
 
 1. **Baseline a service.** Run a Spring Boot app under load for 1 hour with `-Xlog:gc*`. Upload to GCEasy. Identify the throughput, pause stats, anti-patterns.

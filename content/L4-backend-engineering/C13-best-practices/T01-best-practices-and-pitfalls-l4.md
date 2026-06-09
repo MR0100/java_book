@@ -150,22 +150,91 @@ List<OrderSummary> findByTenantId(String tenantId);
 
 Hibernate selects only those columns. Massive reduction in data transferred for list endpoints.
 
-### Avoid N+1
+### Avoid N+1 — The Four Fixes, Ranked
+
+**The bug.** A query that fetches N parent rows and then triggers N extra queries to fetch each parent's child collection — total N+1 queries instead of 1 or 2. Catastrophic at scale: 1000 orders = 1001 queries = ~3-5 seconds of round-trips instead of ~10 ms.
 
 ```java
-// BAD — N+1
+// BAD — N+1 (~1001 queries for 1000 orders)
 for (Order o : repo.findAll()) {
-    o.getItems().size();  // triggers query per order
+    o.getItems().size();           // triggers SELECT per order (lazy collection)
 }
 ```
 
+**Why it happens.** Hibernate maps `@OneToMany` collections as `FetchType.LAZY` by default. Touching the collection (`getItems()`, `.size()`, iteration) triggers a `SELECT * FROM items WHERE order_id = ?` *per parent row*.
+
+**How to spot it.** Three good signals:
+1. **`hibernate.generate_statistics=true`** + log Statistics.getQueryCount() before/after — see N+1 ratio explicitly.
+2. **`spring.jpa.show-sql=true`** in test profile — see the actual queries.
+3. **p99 latency that scales with collection size** — a list endpoint that's 100 ms for 10 items, 3 s for 1000 items.
+
+**Fix 1 — JPQL `JOIN FETCH` (preferred for single-query needs).**
+
 ```java
-// GOOD — fetch join
-@Query("SELECT o FROM Order o LEFT JOIN FETCH o.items WHERE o.tenantId = :tenant")
+@Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items WHERE o.tenantId = :tenant")
 List<Order> findWithItems(@Param("tenant") String tenant);
 ```
 
-Or `@EntityGraph`.
+`DISTINCT` is **required** in JPQL when fetch-joining `OneToMany` — otherwise Hibernate returns the cartesian product (each Order appears N times, once per item). The DISTINCT is *removed* from the generated SQL by `hibernate.query.passDistinctThrough=false` (default), so it doesn't slow the DB; it just deduplicates in memory.
+
+**Trade-off:** Single query, but you can only fetch **one** collection this way (Hibernate throws `MultipleBagFetchException` if you try to JOIN FETCH two `List` collections). For two collections, use Set (no MultipleBagFetchException) or split into two queries.
+
+**Fix 2 — `@EntityGraph` (recommended for reuse).**
+
+```java
+@EntityGraph(attributePaths = {"items", "items.product", "customer"})
+@Query("SELECT o FROM Order o WHERE o.tenantId = :tenant")
+List<Order> findWithGraph(@Param("tenant") String tenant);
+```
+
+`@EntityGraph` declares what to eagerly fetch *at the query level*, leaving the entity defaults `LAZY`. Same effect as `JOIN FETCH`, but:
+- Can be reused via `@NamedEntityGraph` on the entity
+- Cleaner: no JPQL string mangling
+- Multiple paths supported (item AND customer in one shot)
+- Works with derived queries too: `findByTenantId(...)` + `@EntityGraph(...)`
+
+**Fix 3 — Batch fetching with `@BatchSize` (when JOIN FETCH is too wide).**
+
+```java
+@OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+@BatchSize(size = 50)
+private List<OrderItem> items;
+```
+
+When you access `order.getItems()` on the first parent, Hibernate sees there are 50 other parents needing their items too, and emits ONE query: `SELECT * FROM items WHERE order_id IN (?, ?, ..., 50 placeholders)`. So 1000 parents = 1 parent query + 20 collection queries = 21 queries total. Still better than 1001.
+
+**When to prefer this:** Wide entities where JOIN FETCH would pull too many columns; or when the parent query is paginated (JOIN FETCH + LIMIT is buggy in Hibernate pre-6.0).
+
+**Fix 4 — DTO projection (best for read-only endpoints).**
+
+```java
+public record OrderSummary(Long id, String customerName, int itemCount, BigDecimal total) {}
+
+@Query("""
+    SELECT new com.example.OrderSummary(o.id, o.customer.name, SIZE(o.items), o.total)
+    FROM Order o
+    WHERE o.tenantId = :tenant
+    """)
+List<OrderSummary> findSummaries(@Param("tenant") String tenant);
+```
+
+For list endpoints that just need a few fields, projecting straight into a DTO sidesteps entity loading entirely — no lazy collections, no relations, just the columns you need. Often 10× less data transferred. Use Spring Data interface projections for the same effect with even less code.
+
+**Decision flowchart:**
+
+```mermaid
+flowchart TB
+  Q["N+1 detected"]
+  Q --> NeedRelations{"need related entity data?"}
+  NeedRelations -->|no — just a few cols| DTO["DTO projection (record + constructor expression)"]
+  NeedRelations -->|yes| Many{"need multiple collections?"}
+  Many -->|"one collection"| Single{"paginated?"}
+  Single -->|no| JoinFetch["JPQL JOIN FETCH or @EntityGraph"]
+  Single -->|yes| Batch["@BatchSize (JOIN FETCH + LIMIT is buggy pre-Hibernate 6)"]
+  Many -->|"multiple"| Multi["@EntityGraph with Set (not List) for OneToMany"]
+```
+
+**Common follow-up: serialization N+1.** Even with entities properly fetched, Jackson serialization of a `LAZY` relation triggers a query *per record* (Jackson calls every getter). Fix: use DTOs (`@JsonView`, `@JsonIgnore`, or — best — separate DTO classes). Never expose JPA entities directly in API responses.
 
 ### Always Page
 
@@ -561,6 +630,237 @@ Pick GC:
 
 > [!WARNING]
 > **`String` for IDs everywhere.** Use typed wrappers (`OrderId`) for type safety.
+
+## Senior-Backend Operational Anti-Patterns (added pass)
+
+These are the patterns that cause real production incidents at scale. Each is asked at senior+ backend interviews because every senior engineer has either lived through them or seen them.
+
+### AP1 🔴 — Deploying without health checks / readiness probes
+
+**Symptom.** New pods receive traffic before they're ready → 30-60 seconds of 503s during every deploy. Tail latency spikes; customer complaints.
+
+**Cause.** `livenessProbe` and `readinessProbe` not configured in K8s manifest (or just point at `/`).
+
+**Fix.** Spring Boot 2.3+ exposes proper probes via Actuator:
+```yaml
+spring:
+  application:
+    name: payments
+management:
+  endpoints.web.exposure.include: health
+  endpoint.health.probes.enabled: true
+```
+```yaml
+# K8s
+readinessProbe:
+  httpGet: { path: /actuator/health/readiness, port: 8080 }
+  initialDelaySeconds: 10
+livenessProbe:
+  httpGet: { path: /actuator/health/liveness, port: 8080 }
+  initialDelaySeconds: 30
+```
+
+**Difference between liveness and readiness**: liveness = "is the JVM alive?" (failing → restart pod). Readiness = "is this instance ready for traffic?" (failing → remove from load balancer, but don't restart). Most outages from this confusion: marking unhealthy DB as liveness fail → pod restart loop → cascading failure.
+
+### AP2 🔴 — No graceful shutdown
+
+**Symptom.** During deploys, in-flight requests get killed → 502s in user logs, half-completed DB writes, lost messages.
+
+**Cause.** App receives SIGTERM but doesn't wait for in-flight requests to finish.
+
+**Fix.** Spring Boot:
+```yaml
+server.shutdown: graceful
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+```
+
+K8s adds `terminationGracePeriodSeconds: 60` to give the pod time. The sequence: SIGTERM → readiness probe goes red → LB stops sending traffic → existing requests drain → app exits.
+
+For Kafka consumers: explicitly `consumer.close(Duration.ofSeconds(30))` in shutdown hook so the consumer offsets get committed.
+
+### AP3 🟠 — Logging configured in code, not externally
+
+**Symptom.** Need to change log level for one debugging session → requires a deploy → 30 min outage window for diagnosis.
+
+**Cause.** Log level baked into `logback.xml` shipped with the jar.
+
+**Fix.** Externalize log config via env vars / properties:
+```properties
+logging.level.com.example.payments=INFO
+```
+
+In dev/prod, change via `LOGGING_LEVEL_COM_EXAMPLE_PAYMENTS=DEBUG` env var. Spring Boot Admin lets you change log levels at runtime via Actuator.
+
+### AP4 🔴 — Single point of failure for "stateless" services
+
+**Symptom.** "Stateless" service goes down → users logged out, in-flight orders lost.
+
+**Cause.** Service holds session state in-memory (Spring Session without external store, or just `HttpSession`).
+
+**Fix.** Use Spring Session with Redis backing:
+```xml
+<dependency>
+  <groupId>org.springframework.session</groupId>
+  <artifactId>spring-session-data-redis</artifactId>
+</dependency>
+```
+Or move to JWT stateless auth entirely. Either way, never assume "stateless" without verifying — `HttpSession.setAttribute()` makes you stateful silently.
+
+### AP5 🔴 — No connection-pool monitoring → silent pool exhaustion
+
+**Symptom.** Endpoint times out under load with `HikariPool-1 - Connection is not available, request timed out after 30000ms`. Operations don't know until users complain.
+
+**Cause.** HikariCP metrics not exposed; no alert on pool utilization.
+
+**Fix.** Expose HikariCP metrics via Micrometer:
+```java
+@Bean
+public DataSource dataSource(@Autowired MeterRegistry registry) {
+    HikariDataSource ds = new HikariDataSource(config);
+    ds.setMetricRegistry(registry);
+    return ds;
+}
+```
+
+Then alert on:
+- `hikaricp_connections_active > 90%` for 2 min (approaching saturation)
+- `hikaricp_connections_pending > 0` for 1 min (queries actively waiting)
+- `hikaricp_connections_timeout > 0` (already failed)
+
+### AP6 🔴 — Reading config at startup, never re-reading
+
+**Symptom.** Feature flag flipped in config → no effect until redeploy. Config-change-induced outages because "the flag should have rolled back the bad behavior."
+
+**Cause.** `@Value` injects at startup only.
+
+**Fix.** Use **Spring Cloud Config + `@RefreshScope`** for dynamic config:
+```java
+@RefreshScope
+@Service
+public class PaymentService {
+    @Value("${feature.new-flow.enabled:false}")
+    private boolean newFlowEnabled;
+}
+```
+
+Trigger refresh with `POST /actuator/refresh`. Or, simpler: use a **feature-flag service** (Unleash, LaunchDarkly, GrowthBook) — built-in real-time updates, audit trail, gradual rollouts.
+
+### AP7 🟠 — Synchronous Kafka producer in critical request path
+
+**Symptom.** Kafka broker has a 2-second slowdown → user requests hang for 2 seconds → cascading failure.
+
+**Cause.** Synchronous `producer.send(record).get()` in the request thread.
+
+**Fix.** Use async with callback:
+```java
+producer.send(record, (metadata, exception) -> {
+    if (exception != null) log.error("Kafka send failed", exception);
+});
+```
+
+Or use the **outbox pattern**: write to DB outbox table atomically with business state; a CDC connector (Debezium) drains it to Kafka asynchronously. Then a Kafka broker outage only delays downstream notification, not the user request.
+
+### AP8 🟠 — Schema migrations that lock tables
+
+**Symptom.** Migration includes `ALTER TABLE orders ADD COLUMN status VARCHAR(20) DEFAULT 'NEW' NOT NULL` — takes 45 minutes; service is down the whole time.
+
+**Cause.** `ALTER TABLE ... ADD COLUMN ... NOT NULL DEFAULT ...` rewrites every row in older Postgres (<11). Locks the table the whole time.
+
+**Fix.** Two-phase migration:
+1. Add column nullable: `ALTER TABLE orders ADD COLUMN status VARCHAR(20)`  (fast — metadata only on Postgres 11+).
+2. Backfill in batches: `UPDATE orders SET status='NEW' WHERE status IS NULL LIMIT 10000` (loop until done).
+3. Add `NOT NULL` constraint after backfill: `ALTER TABLE orders ALTER COLUMN status SET NOT NULL`.
+
+For destructive changes (drop column, rename), use **expand-contract**: deploy code that writes both old + new → backfill → deploy code that reads new → drop old. 3 deploys, zero downtime.
+
+### AP9 🟠 — Distributed transaction (2PC) across microservices
+
+**Symptom.** Trying to "atomically" do an action across 3 services using XA transactions → coordinator becomes SPOF → outages cascade → developers fall back to local-transaction-and-pray pattern.
+
+**Cause.** XA/2PC doesn't scale across microservices — coordinator overhead + lock duration kills throughput; failures during commit phase leave state inconsistent.
+
+**Fix.** **Saga pattern** with compensating actions:
+- Choreographed: each step publishes an event; next step subscribes; failures publish compensation events.
+- Orchestrated: a saga orchestrator (state machine) tracks progress and triggers compensations.
+
+Pair with **outbox** for atomic write+event. Pair with **idempotency keys** so compensations are safe to retry.
+
+### AP10 🔴 — JWT without rotation / revocation
+
+**Symptom.** Stolen JWT remains valid until natural expiry (often 24h) — security incident becomes a 24-hour-active threat.
+
+**Cause.** Stateless JWTs by definition aren't revocable; long expiry chosen for UX.
+
+**Fix.** Multiple layers:
+- **Short access-token TTL** (15 min) + **refresh token** (revocable).
+- **Refresh token rotation** (each use issues a new pair; reuse of old one revokes session).
+- **JWKS rotation**: rotate signing key periodically (~weekly); old tokens become invalid.
+- **Denylist** for known-compromised JTI claims (kept in Redis, checked on each request — small overhead for huge security win).
+
+### AP11 🟠 — Caching the negative result without TTL
+
+**Symptom.** A 500 from downstream service is cached "forever" → service comes back up but cache still returns 500 → false outage that persists.
+
+**Cause.** Cache stores `Optional.empty()` or null without distinguishing "verified absent" from "transient error."
+
+**Fix.** Distinguish:
+- **Empty result** (verified absent): cache with long TTL (5-30 min).
+- **Error result** (downstream failure): cache with very short TTL (15-60 sec) — gives a circuit-breaker effect without persistent damage.
+
+```java
+@Cacheable(value = "user", unless = "#result.isFailure()")
+public Result<User> getUser(String id) { ... }
+```
+
+### AP12 🟠 — Aggressive retries amplifying outages
+
+**Symptom.** Downstream service has a 2-second slowdown → 1000 RPS service retries 3× each → 3000 RPS hits downstream → downstream collapses entirely.
+
+**Cause.** Retry without backoff or budget; treating slowness as failure.
+
+**Fix.** Three guards:
+1. **Exponential backoff + jitter**: `100ms × 2^attempt × (1 + random(-0.25, 0.25))`.
+2. **Retry budget**: at most 10% of requests can be retries.
+3. **Circuit breaker**: open after N consecutive failures; half-open after cool-down; closed only after probe success.
+
+Resilience4j handles all three:
+```java
+@CircuitBreaker(name = "payments", fallbackMethod = "fallback")
+@Retry(name = "payments")
+@TimeLimiter(name = "payments")
+public CompletableFuture<Result> call() { ... }
+```
+
+### AP13 🔴 — Secrets in environment variables of long-running containers
+
+**Symptom.** A container compromise leaks all env vars to attacker — including DB passwords, API keys, JWT secrets — all exposed in one go.
+
+**Cause.** Putting secrets in env vars (visible to any process on the container) makes them easy to leak via crash dumps, container introspection (`docker inspect`), or process listing.
+
+**Fix.** Use a **secret manager** (Vault, AWS Secrets Manager, Azure Key Vault) and **mount at runtime**:
+- Spring Cloud AWS Secrets Manager: `aws.secretsmanager.region=us-east-1`.
+- Bound through `application.yml` reference: `spring.datasource.password=${aws.secret:db-password}`.
+- Rotate frequently via the manager; app picks up new values via refresh.
+
+### AP14 🟠 — Database backup never tested for restore
+
+**Symptom.** Disaster strikes → tries to restore from backup → backup corrupt / incomplete / missing schema → days of data loss.
+
+**Cause.** Backup configured, never restore-tested.
+
+**Fix.** Quarterly **disaster recovery drill**: restore latest backup into a staging DB; run smoke tests; verify counts match prod. Catalog the recovery time objective (RTO) and recovery point objective (RPO) — and prove them.
+
+### AP15 🟠 — Synchronous health check for downstream availability
+
+**Symptom.** Postgres slow → health check times out → app marked unhealthy → traffic stops → load on Postgres drops → Postgres recovers → app marked healthy again — but the cycle repeats every minute.
+
+**Cause.** Liveness probe calls downstream synchronously; the app's "alive" is conflated with downstream "alive."
+
+**Fix.** Health checks should be **fast** (don't touch downstream) and **bounded** (timeout < probe timeout). Use Spring Boot's separate liveness/readiness groups:
+- **Liveness**: JVM-level only (always returns OK unless JVM dying).
+- **Readiness**: includes downstream dependencies (DB, cache, etc.).
+
+This way, slow downstream removes from LB (readiness fail) but doesn't restart the pod (liveness still OK).
 
 ## The Senior Mindset
 

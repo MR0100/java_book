@@ -241,6 +241,227 @@ Most cache implementations don't natively support tag-based; if needed, Redis wi
 > [!WARNING]
 > **Caching computed data without versioning.** Logic changes; old cached values are wrong.
 
+## Deeper Dive — Production Invalidation Patterns
+
+### Pattern 1: CDC-Driven Cache Invalidation (Most Robust)
+
+The data source of truth changes → CDC stream picks it up → invalidation event fans out:
+
+```
+Postgres → Debezium → Kafka topic `user-changes`
+                       ↓
+         All services subscribing → evict cache(user_id)
+```
+
+```java
+@Component
+@KafkaListener(topics = "user-changes", groupId = "cache-invalidator")
+public class CacheInvalidationConsumer {
+
+    @KafkaHandler
+    public void onUserChange(UserChangeEvent event) {
+        cache.evict("user:" + event.userId());
+        cache.evict("user-orders:" + event.userId());   // related caches
+    }
+}
+```
+
+**Why CDC**: write happens in DB → invalidation event is automatic → no chance of missing it. Application code doesn't need to remember to invalidate (which always fails eventually).
+
+**When to use**: high-throughput services, when consistency matters, when multiple services cache the same data.
+
+### Pattern 2: Versioned Keys for Schema Evolution
+
+```java
+// Old format
+@Cacheable(value = "user", key = "'v1:' + #id")
+public UserV1 getV1(String id) { ... }
+
+// New format — different key, both populate during rollout
+@Cacheable(value = "user", key = "'v2:' + #id")
+public UserV2 getV2(String id) { ... }
+```
+
+**Rolling deploy safety**: while v1 + v2 pods coexist, they write to different cache keys. No cross-contamination. After v1 is fully rolled out, the v1 keys naturally expire.
+
+### Pattern 3: Tag-Based Invalidation
+
+For caches with many related entries:
+
+```java
+// Cache user's orders, tag with user_id
+@Cacheable(value = "orders", key = "#orderId", tags = "{'user:' + #userId}")
+public Order getOrder(String orderId, String userId) { ... }
+
+// Invalidate ALL of a user's orders at once
+public void invalidateUserOrders(String userId) {
+    cacheTagManager.evictByTag("user:" + userId);
+}
+```
+
+Implemented at the cache layer (Caffeine extension, Redis SCAN by tag, application-level tag-key index).
+
+### Pattern 4: Race-Free Write-Through
+
+```java
+@Transactional
+@CachePut(value = "user", key = "#user.id")
+public User update(User user) {
+    User saved = userRepo.save(user);
+    return saved;   // cache updated AFTER successful save
+}
+```
+
+`@CachePut` updates cache with the new value; `@CacheEvict` removes it. Use `@CachePut` when you have the new value; use `@CacheEvict` when you don't (and next read will repopulate).
+
+**Critical**: combine with `transactionAware: true` on the cache manager so cache writes happen on transaction COMMIT, not method exit. Otherwise a rolled-back transaction can poison the cache.
+
+### Pattern 5: Eventually Consistent + Short TTL
+
+When perfect coherence is too expensive:
+
+```java
+@Cacheable(value = "users", key = "#id")
+public User get(String id) { ... }
+
+// in application.yml
+spring.cache.caffeine.spec: expireAfterWrite=30s,maximumSize=10000
+```
+
+Accept up to 30s staleness. No invalidation logic needed. For non-critical reads (profile pages, product descriptions), this is often the right answer.
+
+## Deeper Dive — TTL Selection Decision Table
+
+| Data type | Recommended TTL | Reasoning |
+|---|---|---|
+| User profile | 1-5 min | Profile changes are user-initiated and rare |
+| Product catalog | 5-30 min | Bulk updates by ops; tolerable lag |
+| Inventory count | 1-10 sec | Critical to display accurately during checkout |
+| Authentication session | session lifetime | Don't cache; if you do, only auth events invalidate |
+| Authorization permissions | 30 sec - 5 min | Permission changes shouldn't be visible long after revocation |
+| Configuration / feature flags | 30-60 sec | Need quick rollback capability |
+| News feed (Twitter-style) | 30 sec - 5 min | Acceptable lag for non-real-time |
+| Search results | 5-15 min | Indexes update incrementally |
+| Analytics dashboards | 5-60 min | Daily reports, hourly aggregates |
+| Pre-computed recommendations | 1-24 hours | ML pipelines update periodically |
+| Negative cache (404 lookups) | 15-60 sec | Short — survive backend recovery |
+| Computed price (discount applied) | until promo expires | Don't outlive the promo |
+
+**Universal rule**: TTL = (max acceptable staleness) − (worst-case invalidation propagation delay) − safety buffer.
+
+## Deeper Dive — Cache-Stampede Algorithms Compared
+
+```
+PROBLEM: hot key expires, 1000 requests miss simultaneously, all hit DB.
+
+SOLUTION 1: TTL with jitter (simplest)
+  expire = baseTTL + random(0, jitterRange)
+  spread expirations across time
+  + simple, no code change
+  − doesn't solve simultaneous misses on truly hot keys
+
+SOLUTION 2: Probabilistic early expiration
+  When reading a cached value, sometimes refresh BEFORE expiry
+  probability proportional to (age / TTL)
+  + smooths the refresh load
+  − slight CPU overhead on every read
+
+SOLUTION 3: Single-flight (preferred for cold caches)
+  First miss starts the load
+  Subsequent misses for same key wait on the same future
+  + perfect deduplication
+  − wait time for late callers (still better than DB drowning)
+
+SOLUTION 4: Distributed lock (Redis SETNX)
+  First miss acquires lock; computes value; populates cache; releases lock
+  Other misses retry GET briefly
+  + works across instances
+  − adds Redis round-trip; lock can leak on instance death (use TTL on lock)
+
+SOLUTION 5: Stale-while-revalidate
+  Serve stale value past TTL while async refreshing
+  + zero wait for callers
+  + smooths load
+  − callers see slightly stale data
+  − requires careful "what does stale mean" semantics
+
+SOLUTION 6: Pre-warm before deploy
+  Run a warm-up script that fills caches before traffic enters
+  + new pods have hot caches from minute one
+  + critical for cold starts (region failover, autoscale)
+  − requires knowing what keys will be hot
+```
+
+## Deeper Dive — The L1+L2 Coherence Problem at Scale
+
+The classic two-tier cache:
+```
+Request → Caffeine L1 (in-process, 100 ns)
+          ↓ miss
+        Redis L2 (network, 1 ms)
+          ↓ miss
+        Database (10-100 ms)
+```
+
+**Problem**: write happens via Service A. A's L1 + L2 invalidated. But Service B (different pod) has the OLD value in its L1. B's reads return stale.
+
+### Solution: Pub/Sub Coherence
+
+```java
+@Component
+public class L1Coherence {
+    @Autowired private CacheManager l1Cache;
+
+    @PostConstruct
+    void subscribe() {
+        redisPubSub.subscribe("cache-invalidations", message -> {
+            String[] parts = message.split(":");
+            l1Cache.getCache(parts[0]).evict(parts[1]);
+        });
+    }
+}
+
+// When invalidating, publish:
+public void invalidateAndPublish(String cacheName, String key) {
+    l1Cache.getCache(cacheName).evict(key);
+    l2Redis.delete(cacheName + ":" + key);
+    redisPubSub.publish("cache-invalidations", cacheName + ":" + key);
+    // every L1 across all instances now drops the key
+}
+```
+
+### Alternative: Very Short L1 TTL
+
+```yaml
+spring.cache.caffeine.spec: expireAfterWrite=10s,maximumSize=10000
+```
+
+10 seconds = max staleness across pods. No coherence machinery. Simpler. Sufficient for many use cases.
+
+### Alternative: Skip L1 for Mutable Data
+
+```java
+// Use only L2 (Redis) for user-modifiable data
+@Cacheable(value = "user", cacheManager = "redisCacheManager")
+public User get(String id) { ... }
+
+// Use L1+L2 only for relatively-static data
+@Cacheable(value = "product-catalog", cacheManager = "twoTierManager")
+public Product getProduct(String sku) { ... }
+```
+
+## Deeper Dive — When Caching Does More Harm Than Good
+
+Anti-patterns to abandon caching entirely:
+
+1. **Already-fast read** (< 5 ms DB query on a covering index): cache adds complexity for no perf win.
+2. **Per-request unique key**: cache hit rate is 0%; just adds memory + latency.
+3. **Computed-from-other-cached-data**: cascade of invalidations is worse than recomputing.
+4. **Personalized data with low repeat rate**: each user has 1 cached entry, used once.
+5. **Frequently mutated**: invalidation rate ≈ read rate; net negative.
+
+**Diagnostic**: measure cache HIT RATE. < 50% suggests caching is adding cost not value.
+
 ## Practice
 
 1. Set TTL with jitter on a `@Cacheable`. Force concurrent expirations; observe stampede vs no stampede.

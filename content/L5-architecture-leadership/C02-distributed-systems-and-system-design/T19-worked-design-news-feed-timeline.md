@@ -394,6 +394,278 @@ class TimelineService {
 > [!INTERVIEW]
 > Strong candidates draw the **fan-out diagram with the celebrity-handling branch** unprompted, propose the **hybrid push/pull** model, and articulate **why pure-push doesn't work** at scale.
 
+## Deeper Dive — End-to-End Spring Boot Implementation Sketch
+
+### Post Creation with Hybrid Fan-out
+
+```java
+@Service
+@Transactional
+public class PostService {
+    private final PostRepo postRepo;
+    private final FollowGraph followGraph;
+    private final KafkaTemplate<String, FanoutEvent> kafka;
+
+    public Post create(String userId, String content) {
+        // 1. Write the post (source of truth)
+        Post post = postRepo.save(new Post(
+            UUID.randomUUID().toString(),
+            userId,
+            content,
+            Instant.now()
+        ));
+
+        // 2. Check follower count to decide push vs pull
+        long followerCount = followGraph.followerCount(userId);
+        if (followerCount < CELEBRITY_THRESHOLD) {     // e.g., 10,000
+            // PUSH: enqueue fanout job
+            kafka.send("post-fanout", new FanoutEvent(post.id(), userId, followerCount));
+        }
+        // ELSE: PULL on read — followers' read path will query celebrity timelines
+
+        return post;
+    }
+}
+```
+
+### Fan-out Worker (Async Push to Followers' Timelines)
+
+```java
+@Component
+public class FanoutConsumer {
+    private static final int CELEBRITY_THRESHOLD = 10_000;
+    private static final int TIMELINE_MAX_SIZE = 800;
+
+    @KafkaListener(topics = "post-fanout", concurrency = "8")
+    public void consume(FanoutEvent event) {
+        // Stream followers in batches to avoid loading all into memory
+        followGraph.streamFollowers(event.authorId())
+            .buffer(1000)
+            .forEach(batch -> redis.executePipelined((RedisCallback<?>) connection -> {
+                for (String followerId : batch) {
+                    String key = "timeline:" + followerId;
+                    long score = event.timestamp().toEpochMilli();
+                    connection.zSetCommands().zAdd(
+                        key.getBytes(), score, event.postId().getBytes()
+                    );
+                    connection.zSetCommands().zRemRange(
+                        key.getBytes(), 0, -TIMELINE_MAX_SIZE - 1
+                    );
+                    connection.keyCommands().expire(key.getBytes(), Duration.ofDays(30));
+                }
+                return null;
+            }));
+    }
+}
+```
+
+**Critical**: stream followers in batches; never load 10M follower IDs into memory. Use Redis pipeline for batch ZADDs.
+
+### Read Path — Merge Push Cache + Pull from Celebrities
+
+```java
+@Service
+public class TimelineService {
+    private static final int CELEBRITY_THRESHOLD = 10_000;
+    private static final int PAGE_SIZE = 20;
+
+    public List<Post> getTimeline(String userId, String cursor, int limit) {
+        // 1. Read from user's push timeline cache
+        Set<String> cachedPostIds = redis.opsForZSet()
+            .reverseRange("timeline:" + userId, 0, 200);
+
+        // 2. Find which followed users are celebrities (need pull-side fetch)
+        List<String> celebrities = followGraph.followingsAbove(userId, CELEBRITY_THRESHOLD);
+
+        // 3. Pull recent posts from each celebrity timeline
+        List<Post> celebPosts = celebrities.parallelStream()
+            .flatMap(celebId -> postRepo.findLatestByAuthor(celebId, 100).stream())
+            .toList();
+
+        // 4. Merge + sort + paginate
+        List<Post> cachedPosts = postRepo.findByIds(cachedPostIds);
+        return Stream.concat(cachedPosts.stream(), celebPosts.stream())
+            .distinct()
+            .sorted(Comparator.comparing(Post::createdAt).reversed())
+            .skip(cursor == null ? 0 : Long.parseLong(cursor))
+            .limit(limit)
+            .toList();
+    }
+}
+```
+
+### Celebrity Cache (For Read-Side Pull Efficiency)
+
+```java
+@Service
+public class CelebrityFeedService {
+    @Cacheable(value = "celebrity-feed", key = "#celebId",
+               unless = "#result.isEmpty()")
+    public List<Post> recentPosts(String celebId, int n) {
+        return postRepo.findLatestByAuthor(celebId, n);
+    }
+}
+```
+
+Cache TTL: 30 seconds. Trade-off: ~30s staleness for hot celebrity feeds vs DB load.
+
+## Deeper Dive — Capacity Math (Twitter-scale)
+
+```
+INPUTS
+  Daily active users (DAU)     : 500M
+  Avg followers per user       : 200
+  Avg posts per user per day   : 2
+  Avg writes per user per day  : 2 posts × 200 followers = 400 timeline writes
+
+WRITE QPS
+  Posts/sec               : 500M × 2 / 86400 = 11.6k posts/sec
+  Fanout writes/sec       : 11.6k × 200 = 2.3M timeline ZADDs/sec
+  At peak (3× avg)        : ~7M ZADDs/sec
+
+Tier-1 storage (push timelines) on Redis cluster
+  Timeline size           : 800 post IDs × 30 bytes = ~24 KB per user
+  Total storage           : 500M × 24 KB = 12 TB
+  With 3× replication     : 36 TB
+  Across ~70 r6gd.4xlarge : ~500 GB each = comfortable
+
+READ QPS
+  Timeline reads/sec      : 500M × 5 (avg sessions/day) / 86400 = 29k reads/sec
+  Peak                    : ~87k reads/sec
+  P99 target              : < 200ms
+
+POST METADATA (DB)
+  Posts/day               : 500M × 2 = 1B posts/day
+  At 1KB avg              : 1 TB/day → ~365 TB/year
+  → MUST be sharded (Cassandra or Postgres + sharding proxy like Vitess)
+  Hot range partitioning by author + date
+```
+
+### Celebrity Math
+
+```
+WHAT IF NO CELEBRITY CUTOFF?
+  Justin Bieber: 100M followers
+  His one tweet → 100M Redis ZADDs
+  At 1ms per ZADD on shard, even parallelized to 1000 shards → 100k operations/shard
+  Each ZADD also evicts oldest → 200k operations/shard
+  Total Redis load for ONE Bieber tweet ≈ 200M operations
+  At 100 ZADDs/sec/shard headroom → 33 minutes of Redis saturation per tweet
+
+WITH CELEBRITY CUTOFF AT 10K:
+  Celebrity tweet → 0 fan-out writes
+  Followers' read path: 1 extra Redis lookup per celebrity-following relation
+  Net: 100M Bieber follows → 100M extra reads spread over multiple days, manageable
+```
+
+## Deeper Dive — Real-Time Push (WebSocket/SSE for "New Tweet" Notification)
+
+```java
+@Component
+public class FeedRealtimeService {
+    private final ConcurrentMap<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
+
+    public SseEmitter connect(String userId) {
+        SseEmitter emitter = new SseEmitter(Duration.ofMinutes(30).toMillis());
+        emitters.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>()).add(emitter);
+        emitter.onCompletion(() -> remove(userId, emitter));
+        emitter.onTimeout(() -> remove(userId, emitter));
+        return emitter;
+    }
+
+    @KafkaListener(topics = "new-posts-realtime")
+    public void onNewPost(NewPostEvent event) {
+        // Notify followers who are currently connected
+        followGraph.streamFollowers(event.authorId())
+            .forEach(followerId -> {
+                List<SseEmitter> userEmitters = emitters.get(followerId);
+                if (userEmitters == null) return;
+                userEmitters.removeIf(emitter -> {
+                    try {
+                        emitter.send(SseEmitter.event()
+                            .name("new-post")
+                            .data(Map.of("postId", event.postId(), "authorId", event.authorId())));
+                        return false;
+                    } catch (Exception e) {
+                        return true;   // remove dead connection
+                    }
+                });
+            });
+    }
+}
+```
+
+**For scale**: SSE emitter pool per pod, sticky LB routing (consistent hash by userId) so user's connection lands on same pod that gets their realtime events.
+
+## Deeper Dive — Ranking Pipeline
+
+```
+USER REQUESTS TIMELINE
+  ↓
+1. Candidate Generation (50ms budget)
+   - Read 200 latest items from push cache
+   - Pull 200 latest items from each followed celebrity (parallel)
+   - Merge to ~500 candidate posts
+  ↓
+2. Feature Hydration (30ms)
+   - For each candidate: pull author features, post features, viewer-author affinity
+   - Batch by feature service
+  ↓
+3. ML Ranking (50ms)
+   - Score each candidate with a learned model (TensorFlow Serving, etc.)
+   - Returns predicted engagement probability
+  ↓
+4. Re-ranking / Diversification (10ms)
+   - Apply business rules: no >3 from same author, no >2 ads in row, mix content types
+   - Diversity penalties (reduce similar posts)
+  ↓
+5. Pagination
+   - Return top 20 for this request; cache the full ranked list for next page
+   - Cache key: userId + ranking_version, TTL ~10 min
+
+Total budget: 140ms server-side. p99 wire latency ~200ms.
+```
+
+### Cold-Start for New Users
+
+```
+New user signs up → no follows → no timeline cache → empty feed?
+NO — bootstrap with:
+  - Popular posts globally (last 24h)
+  - Posts from accounts the user is likely to follow (based on signup interests)
+  - Sponsored / promotional posts
+  → Mix with explicit user feedback ("interested", "not interested")
+```
+
+## Deeper Dive — Failure Modes Comprehensive Table
+
+| Failure | Impact | Mitigation |
+|---|---|---|
+| Redis cluster down | Reads fall back to DB (~10× slower); writes lost | Fallback to DB query; queue fanout; alert on cache hit rate |
+| Fanout backlog grows | Followers see stale timelines | Scale Kafka consumers; alert on lag |
+| Celebrity threshold misconfigured | Either fan-out storms or excessive reads | A/B test threshold; monitor both sides |
+| Hot follower (read amplification) | One follower's pulls saturate Redis shard | Cache per-celebrity timeline; consistent-hash celebrity to dedicated cache |
+| Timeline cache eviction storm | Cascade reads to DB | Probabilistic early refresh + DB query rate limiting |
+| Database hot partition | Posts from popular author all in one shard | Salt the partition key with hash(post_id) |
+| Ranking model failure | Empty/wrong-order feed | Fall back to chronological |
+| WebSocket connection spike | Connection limit hit | Sticky LB + connection pool per pod + horizontal scaling |
+| Spam attack (millions of follows) | Fanout storm | Rate-limit follow creates; verify follower account before counting |
+| GDPR data deletion | Posts in millions of cached timelines | Tombstone in cache; lazy filter on read; backfill cleanup async |
+
+## Deeper Dive — Twitter vs Instagram vs LinkedIn vs Facebook News Feed
+
+| Aspect | Twitter | Instagram | LinkedIn | Facebook |
+|---|---|---|---|---|
+| Order | Reverse-chrono (option for ranked) | Algorithmic | Algorithmic | Algorithmic (heavy) |
+| Following model | Asymmetric | Asymmetric | Symmetric (connect) | Symmetric (friend) |
+| Content types | Text + media (mixed) | Photo/video first | Articles + posts | Mixed |
+| Realtime emphasis | High | Medium | Low | Medium |
+| Push vs pull | Hybrid (celebrity threshold ~10k) | Hybrid (heavy push) | Mostly pull (ranking) | Hybrid + heavy ranking |
+| Cache strategy | Per-user timeline list | Per-user list + ranking | Pre-computed buckets | Heavy ML caching |
+| Feed depth | ~800 items | ~500 items | ~200 items | 500-1000 items |
+
+**Insight**: as content per second grows (TikTok-style), pure push becomes infeasible; algorithmic timelines dominate. Twitter's purely chronological model was an anomaly that held until 2016.
+
 ## Practice
 
 1. **Set the celebrity threshold.** Justify a follower count threshold for push vs pull. What does the operational cost look like at each side?

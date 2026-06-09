@@ -553,21 +553,29 @@ MODULES = [
         "title": "Interview Mastery (FAANGM + MNC)",
         "tier": "All levels", "difficulty": "senior", "prereq": None,
         "blurb": "The dedicated interview module. Turns everything in L0–L5 into "
-                 "offers, with tracks for MNC interviews and the FAANGM bar: "
-                 "Flipkart, Apple, Amazon, Netflix, Google, Meta.",
+                 "offers, with tracks for MNC interviews and the FAANGM bar — "
+                 "Flipkart, Apple, Amazon, Netflix, Google, Meta — plus "
+                 "Microsoft, Indian unicorns, and banking/finance tech. Includes "
+                 "a dedicated Resume, Profile & Career chapter.",
         "project": "A self-graded mock-interview gauntlet: one coding round, one "
                    "design round (LLD or HLD by target level), one behavioral "
-                   "round — each with a rubric to score yourself against.",
+                   "round, plus a resume rewrite — each with a rubric to score "
+                   "yourself against.",
         "learn": [
             "How interview pipelines, levels, and rubrics actually work.",
             "DSA in Java with the patterns interviewers test for.",
             "Low-level (OOD) and high-level (system) design interviews.",
             "Behavioral interviews and company-specific expectations.",
+            "Resume, LinkedIn, GitHub, referrals, negotiation, and onboarding.",
         ],
         "concepts": [
             ("foundations-of-interviewing", "Foundations of Interviewing", [
                 "How tech interviews & leveling work (MNC vs FAANGM)",
+                "The interview funnel — recruiter, screen, loop, debrief, offer",
+                "The interviewer's rubric — signals, scoring, calibration",
                 "Big-O / time & space complexity",
+                "Communication mechanics — clarify, structure, think-aloud, recover",
+                "Prep system — weeks-out plan, mock cadence, day-of routine",
             ]),
             ("dsa-for-interviews", "DSA for Interviews (Java)", [
                 "Arrays & strings",
@@ -586,29 +594,86 @@ MODULES = [
                 "Coding interview patterns & problem-solving framework",
             ]),
             ("design-interviews", "Design Interviews (LLD & HLD)", [
-                "Low-Level Design (OOD) interviews",
-                "High-Level / System Design interviews",
+                "Low-Level Design (OOD) interviews — framework",
+                "OOD case study: Parking Lot",
+                "OOD case study: Splitwise",
+                "OOD case study: Library Management",
+                "Machine Coding round (Flipkart-style 90-minute build)",
+                "High-Level / System Design interviews — framework",
+                "HLD case study: URL shortener",
+                "HLD case study: Chat / messaging",
+                "HLD case bundle: News feed, Rate limiter, Payments, Notifications",
             ]),
             ("behavioral-and-company-tracks", "Behavioral & Company Tracks", [
-                "Behavioral interviews (STAR)",
+                "Behavioral interviews (STAR, CAR, SBI)",
                 "Java-specific interview Q&A (by level)",
-                "Company track: Flipkart",
-                "Company track: Apple",
                 "Company track: Amazon (Leadership Principles)",
-                "Company track: Netflix",
                 "Company track: Google",
                 "Company track: Meta",
-                "Resume & profile preparation",
+                "Company track: Apple",
+                "Company track: Netflix",
+                "Company track: Microsoft",
+                "Company track: Flipkart",
+                "Company track: Indian unicorns (Razorpay, PhonePe, Swiggy, Zomato, Cred, Myntra)",
+                "Company track: Banking & finance tech (Goldman, JPMC, Morgan Stanley, Barclays)",
                 "Mock interviews & self-grading rubrics",
-                "Offer & salary negotiation",
+            ]),
+            ("resume-profile-and-career", "Resume, Profile & Career Preparation", [
+                "Resume fundamentals — structure, length, ATS-friendly format",
+                "Writing impactful bullet points (XYZ formula, metrics)",
+                "Tailoring resume per company & role",
+                "LinkedIn profile & recruiter SEO",
+                "GitHub profile, projects & portfolio",
+                "Cover letters & cold outreach",
+                "Referrals — sourcing and asking",
+                "Job-search pipeline & application tracking",
+                "Offer evaluation & salary negotiation",
+                "First 90 days — onboarding & demonstrating impact",
+            ]),
+            ("staff-level-interview-question-banks",
+             "Staff-Level Interview Question Banks", [
+                "Java Language & Core — Q&A bank",
+                "Java Concurrency, JVM & Performance — Q&A bank",
+                "Collections & Data Structures — Q&A bank",
+                "Spring & Spring Boot — Q&A bank",
+                "Databases & Persistence — Q&A bank",
+                "System Design & Architecture — Q&A bank",
+                "Distributed Systems & Messaging — Q&A bank",
+                "Microservices, APIs & Cloud — Q&A bank",
+                "Security, DevOps & Observability — Q&A bank",
+                "Behavioural & Leadership (Staff / Principal) — Q&A bank",
+                "Project Management & Engineering Process — Q&A bank",
+                "Agile, Scrum & Team Practices — Q&A bank",
+                "Engineering Tools (Jira, Confluence, Git, IDE, Monitoring) — Q&A bank",
             ]),
         ],
         "cross": [
+            ("tools-and-environment", "Tools & Environment", "tools",
+             "Practice platforms (LeetCode, HackerRank, AlgoExpert, Educative), "
+             "collaborative editors (CoderPad, HackerRank Live), whiteboards "
+             "(Excalidraw, Miro), mock-interview services (Pramp, Interviewing.io), "
+             "and IDE setup for live coding."),
+            ("hands-on", "Hands-On", "hands-on",
+             "A graduated practice plan plus the module's mock-interview gauntlet "
+             "project."),
+            ("best-practices", "Best Practices & Pitfalls", "best-practices",
+             "The interviewer anti-patterns that reliably tank candidates: "
+             "silence, jumping to code, ignoring edge cases, refusing hints, "
+             "fake-perfect behavioral stories, over-engineering design rounds."),
+            ("qa-faq", "Q&A / FAQ", "qa",
+             "Quick answers to interview-prep FAQ: 'How long do I prep?', "
+             "'Should I use Java or Python?', 'Do interviewers care about "
+             "syntax?', 'What if I freeze?'"),
+            ("cheatsheets", "Cheatsheets & Reference", "reference",
+             "One-pagers: DSA pattern cheatsheet, Big-O reference, design "
+             "patterns, system-design checklist, behavioral STAR template, "
+             "Amazon LP map, negotiation script."),
             ("cross-module-index", "Cross-Module Interview Index", "reference",
-             "Consolidated Java interview Q&A pulled from each module's Interview "
-             "Prep section, grouped by experience level."),
+             "Consolidated Java interview Q&A pulled from each L0–L5 module's "
+             "Interview Prep section, grouped by experience level."),
             ("resources", "Resources", "resources",
-             "Books, courses, and practice platforms for interview prep."),
+             "Books, courses, blogs, YouTube channels, podcasts, and "
+             "leveling-data sources for interview prep."),
         ],
     },
 ]

@@ -586,6 +586,143 @@ Enables exhaustiveness checks in pattern-matching switch. The compiler knows the
 
 **Answer.** Java 21+ (JEP 441). `switch` arms can be **type patterns** — `case Circle c -> Math.PI * c.r() * c.r()` — binding the matched value to a typed variable. Guards via `when`: `case Integer i when i > 0 -> ...`. Special `case null`. Exhaustiveness checked for sealed types.
 
+### Q: What's `var` and when should you use it?
+
+- **Difficulty:** easy
+- **Asked at:** every modern Java interview
+
+**Answer.** Java 10+ (JEP 286). Local variable type inference. The compiler infers the type from the right-hand side:
+
+```java
+var list = new ArrayList<String>();   // ArrayList<String>
+var iter = list.iterator();           // Iterator<String>
+var stream = list.stream();           // Stream<String>
+```
+
+**Use** when the right-hand side makes the type obvious (constructor, fluent builder, factory). **Don't** when it makes the code less readable (`var x = compute()` — what's the type? Unknown without IDE).
+
+Cannot use for: fields, method parameters, return types, lambdas without explicit type, or null initialization (compiler can't infer).
+
+**Follow-ups:**
+- vs Kotlin/Scala `val`/`var`? (Java `var` is local-only and mutable; Kotlin `val` is immutable.)
+- Backward compat? (Source-level Java 10+; bytecode unchanged from explicit types.)
+
+### Q: What are text blocks?
+
+- **Difficulty:** easy
+- **Asked at:** Modernised teams
+
+**Answer.** Java 15+ (JEP 378). Triple-quoted multi-line strings:
+
+```java
+String json = """
+    {
+      "user": "alice",
+      "age": 30
+    }
+    """;
+```
+
+- Common leading whitespace is stripped.
+- `\n` between lines is preserved.
+- No escape needed for `"` inside.
+- Trailing newline preserved unless `\` at end of last line.
+
+Use for: JSON, SQL, HTML, error messages. Replaces the painful `"line1\n" + "line2\n"` boilerplate.
+
+**Follow-ups:**
+- How to suppress final newline? (Add `\` after last visible character — line-continuation escape.)
+- String concatenation in text blocks? (Still need `\(value)` style — Java's text blocks don't interpolate; that's coming via "String Templates" preview.)
+
+### Q: What's the new HTTP Client in Java 11?
+
+- **Difficulty:** easy
+- **Asked at:** mid-level interviews
+
+**Answer.** Java 11+ (JEP 321) replaced the ancient `HttpURLConnection`. The new `java.net.http.HttpClient` is:
+
+```java
+HttpClient client = HttpClient.newBuilder()
+    .connectTimeout(Duration.ofSeconds(5))
+    .build();
+
+HttpRequest req = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com/users"))
+    .header("Accept", "application/json")
+    .GET()
+    .build();
+
+HttpResponse<String> resp = client.send(req, BodyHandlers.ofString());
+// or async:
+CompletableFuture<HttpResponse<String>> future = client.sendAsync(req, BodyHandlers.ofString());
+```
+
+Built-in: HTTP/2 (and HTTP/1.1 fallback), WebSockets, async support via CompletableFuture. No external library needed for most HTTP needs (OkHttp, Apache HttpClient still common in legacy code).
+
+**Follow-ups:**
+- Why not OkHttp? (HttpClient is built-in; OkHttp still has more features like interceptors, advanced connection pooling. Both fine.)
+- Connection pooling? (Built-in HTTP/2 multiplexing; explicit pool config available.)
+
+### Q: What's a virtual thread?
+
+- **Difficulty:** intermediate
+- **Asked at:** Java 21 fluency probe (any modern team, 2024+)
+
+**Answer.** Java 21+ (JEP 444). A JVM-scheduled thread (not OS thread) costing ~1 KB heap instead of 1 MB OS stack. Designed for I/O-bound workloads — you can have millions of virtual threads, where you'd have a few thousand platform threads.
+
+```java
+// old: limited by platform thread count
+ExecutorService old = Executors.newFixedThreadPool(200);
+
+// new: as many concurrent tasks as you want
+ExecutorService vt = Executors.newVirtualThreadPerTaskExecutor();
+```
+
+When a virtual thread does blocking I/O (`Socket.read`, `Thread.sleep`), the JVM unmounts it from its carrier (platform thread); when the I/O completes, it remounts (possibly on a different carrier). Carrier pool is small (default = available cores).
+
+**Limitations**:
+- **Pinning** on `synchronized` (pre-JDK 24): virtual thread is held to its carrier. Use `ReentrantLock`.
+- **Native/JNI/FFM frames**: also pin.
+- **Not for CPU-bound work**: gains are zero (no I/O to overlap).
+- **ThreadLocal**: large per-thread state across millions of virtual threads = OOM. Use `ScopedValue` (Java 21+).
+
+**Follow-ups:**
+- Memory cost? (~200-1000 bytes vs 1 MB platform thread stack.)
+- Spring integration? (`spring.threads.virtual.enabled=true` in Boot 3.2+.)
+- vs Goroutines / Kotlin coroutines? (Same idea — M:N scheduling. Java's runs unmodified blocking code; coroutines need `suspend` keyword.)
+
+### Q: Sealed class + record + pattern matching together?
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** modern Java fluency probe
+
+**Answer.** Java's modern data-modeling trio gives you **algebraic data types** (ADTs):
+
+```java
+sealed interface Result<T> permits Success, Failure {}
+record Success<T>(T value) implements Result<T> {}
+record Failure<T>(String error) implements Result<T> {}
+
+// Pattern match — compiler verifies exhaustiveness
+String describe(Result<String> r) {
+    return switch (r) {
+        case Success<String> s -> "Got: " + s.value();
+        case Failure<String> f -> "Err: " + f.error();
+    };
+}
+```
+
+Rust/Haskell engineers know this as `Result<T, E>` / sum types. Java got there in 2021 with Java 17.
+
+**Why it matters**:
+- Adding a new variant to `Result` (`case Pending`) → every `switch` fails to compile → refactoring safe.
+- No null required to indicate "no value" — the type system handles it.
+- No null required for error vs success.
+
+**Follow-ups:**
+- vs Optional? (Optional is a special case of `Result<T, "absent">`.)
+- Record patterns? (Java 21+: `case Success(var v) -> ...` — extract value in the pattern.)
+
 ---
 
 ## Section J — Algorithmic / Coding (Live-coding warm-ups)
@@ -666,6 +803,412 @@ static int findMissing(int[] arr, int n) {
 ```
 
 Use `long` to avoid overflow for big n. XOR also works without overflow concern.
+
+### Q: Check if two strings are anagrams.
+
+- **Difficulty:** beginner
+- **Asked at:** TCS, Wipro, Infosys, every campus drive
+
+**Answer.** Three approaches:
+
+```java
+// Approach 1: sort and compare (O(n log n))
+static boolean isAnagram(String a, String b) {
+    if (a.length() != b.length()) return false;
+    char[] x = a.toCharArray(), y = b.toCharArray();
+    Arrays.sort(x); Arrays.sort(y);
+    return Arrays.equals(x, y);
+}
+
+// Approach 2: char-count array (O(n), best for ASCII)
+static boolean isAnagram(String a, String b) {
+    if (a.length() != b.length()) return false;
+    int[] count = new int[256];   // ASCII range
+    for (int i = 0; i < a.length(); i++) {
+        count[a.charAt(i)]++;
+        count[b.charAt(i)]--;
+    }
+    for (int c : count) if (c != 0) return false;
+    return true;
+}
+
+// Approach 3: HashMap (Unicode-friendly)
+static boolean isAnagram(String a, String b) {
+    if (a.length() != b.length()) return false;
+    Map<Character, Integer> count = new HashMap<>();
+    for (char c : a.toCharArray()) count.merge(c, 1, Integer::sum);
+    for (char c : b.toCharArray()) {
+        Integer v = count.get(c);
+        if (v == null || v == 0) return false;
+        count.put(c, v - 1);
+    }
+    return true;
+}
+```
+
+Interviewer probe: "What if Unicode?" → use HashMap or `int[] count = new int[65536]` for BMP. "What about case-insensitive / whitespace?" → preprocess.
+
+### Q: FizzBuzz — but with extensions.
+
+- **Difficulty:** beginner-to-trick
+- **Asked at:** literally every interview as a warmup
+
+**Answer.**
+
+```java
+static void fizzBuzz(int n) {
+    for (int i = 1; i <= n; i++) {
+        StringBuilder sb = new StringBuilder();
+        if (i % 3 == 0) sb.append("Fizz");
+        if (i % 5 == 0) sb.append("Buzz");
+        System.out.println(sb.length() == 0 ? String.valueOf(i) : sb.toString());
+    }
+}
+```
+
+**Why this version**: doesn't repeat the divisibility check (junior bug: `if (i % 3 == 0 && i % 5 == 0) print "FizzBuzz"` first). Easier to extend ("now add Fizz for 7s") — just add another `if`.
+
+**Common trick variant**: "make it functional" → use `Stream.range`. "Make it parallel" → `.parallel()` (warning: ordering matters; use `forEachOrdered`).
+
+### Q: Find first non-repeating character in a string.
+
+- **Difficulty:** beginner
+- **Asked at:** Cognizant, TCS Digital, online assessments
+
+**Answer.**
+
+```java
+static char firstUnique(String s) {
+    int[] count = new int[256];
+    for (char c : s.toCharArray()) count[c]++;
+    for (char c : s.toCharArray()) if (count[c] == 1) return c;
+    throw new IllegalArgumentException("no unique char");
+}
+```
+
+Two-pass: count, then find. O(n) time, O(1) extra space (256 fixed).
+
+**Variant**: LinkedHashMap to preserve insertion order — single-pass-like:
+
+```java
+static char firstUnique(String s) {
+    Map<Character, Integer> map = new LinkedHashMap<>();
+    for (char c : s.toCharArray()) map.merge(c, 1, Integer::sum);
+    return map.entrySet().stream()
+              .filter(e -> e.getValue() == 1)
+              .findFirst()
+              .map(Map.Entry::getKey)
+              .orElseThrow();
+}
+```
+
+### Q: Implement Fibonacci three ways and discuss trade-offs.
+
+- **Difficulty:** beginner-to-intermediate
+- **Asked at:** universal
+
+**Answer.**
+
+```java
+// 1. Recursive — naive, exponential O(2^n)
+int fib(int n) {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+
+// 2. Memoized recursion — O(n), O(n) space
+int fibMemo(int n, int[] memo) {
+    if (n <= 1) return n;
+    if (memo[n] != 0) return memo[n];
+    return memo[n] = fibMemo(n - 1, memo) + fibMemo(n - 2, memo);
+}
+
+// 3. Bottom-up — O(n) time, O(1) space
+int fibIter(int n) {
+    if (n <= 1) return n;
+    int a = 0, b = 1;
+    for (int i = 2; i <= n; i++) {
+        int c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}
+```
+
+**Trade-offs**:
+- Naive: simplest, but blows up past n=40. Stack overflow past n~10000 (recursion limit).
+- Memoized: O(n) but adds heap.
+- Iterative: best for production — O(n) time, O(1) space.
+
+**Trick follow-up**: "Make it tail recursive." → Java doesn't optimize tail calls. Use iteration.
+
+### Q: Count occurrences of each character / word.
+
+- **Difficulty:** beginner-intermediate
+- **Asked at:** mid-level OAs
+
+**Answer.**
+
+```java
+// Characters
+static Map<Character, Integer> charCount(String s) {
+    Map<Character, Integer> m = new HashMap<>();
+    for (char c : s.toCharArray()) m.merge(c, 1, Integer::sum);
+    return m;
+}
+
+// Words (Java 8+ stream)
+static Map<String, Long> wordCount(String text) {
+    return Arrays.stream(text.split("\\s+"))
+                 .collect(Collectors.groupingBy(w -> w, Collectors.counting()));
+}
+```
+
+**Senior probe**: "How would you sort by count?" → stream of entrySet, sort by `Map.Entry.comparingByValue().reversed()`.
+
+### Q: Validate balanced parentheses `"()[]{}"`.
+
+- **Difficulty:** intermediate
+- **Asked at:** Razorpay, Flipkart, Amazon, Microsoft (junior–mid)
+
+**Answer.** Use a stack:
+
+```java
+static boolean isValid(String s) {
+    Deque<Character> stack = new ArrayDeque<>();
+    Map<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');
+    for (char c : s.toCharArray()) {
+        if (pairs.containsValue(c)) {
+            stack.push(c);                  // opening
+        } else if (pairs.containsKey(c)) {
+            if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false;
+        }
+    }
+    return stack.isEmpty();
+}
+```
+
+Push openings, pop on close + match. Final stack must be empty. O(n) time, O(n) space.
+
+**Use `ArrayDeque`, NOT `Stack`** — `Stack` is a synchronized legacy class.
+
+### Q: Implement `Integer.parseInt` from scratch.
+
+- **Difficulty:** intermediate
+- **Asked at:** Goldman Sachs, Microsoft
+
+**Answer.**
+
+```java
+static int parseInt(String s) {
+    if (s == null || s.isEmpty()) throw new NumberFormatException();
+    int i = 0;
+    boolean negative = false;
+    if (s.charAt(0) == '-') { negative = true; i++; }
+    else if (s.charAt(0) == '+') i++;
+
+    long result = 0;
+    while (i < s.length()) {
+        char c = s.charAt(i);
+        if (c < '0' || c > '9') throw new NumberFormatException();
+        result = result * 10 + (c - '0');
+        if (negative && -result < Integer.MIN_VALUE) throw new NumberFormatException();
+        if (!negative && result > Integer.MAX_VALUE) throw new NumberFormatException();
+        i++;
+    }
+    return (int) (negative ? -result : result);
+}
+```
+
+**Edge cases interviewer probes**:
+- Empty / null
+- Just "+"  or just "-"
+- Overflow ("9999999999")
+- `Integer.MIN_VALUE` (asymmetric — abs of MIN_VALUE doesn't fit in int)
+- Leading whitespace / non-digit characters
+
+### Q: Find the maximum in a window of size `k` as it slides through an array (sliding window max).
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** Amazon, Microsoft (mid+)
+
+**Answer.** Use a monotonic deque holding indices, decreasing values:
+
+```java
+static int[] slidingMax(int[] nums, int k) {
+    int n = nums.length;
+    int[] result = new int[n - k + 1];
+    Deque<Integer> dq = new ArrayDeque<>();   // holds INDICES
+
+    for (int i = 0; i < n; i++) {
+        // remove indices outside the window
+        while (!dq.isEmpty() && dq.peekFirst() < i - k + 1) dq.pollFirst();
+        // remove indices whose values are smaller than current (they can never be max again)
+        while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i]) dq.pollLast();
+        dq.offerLast(i);
+        if (i >= k - 1) result[i - k + 1] = nums[dq.peekFirst()];
+    }
+    return result;
+}
+```
+
+O(n) — each index pushed and popped at most once. The deque always has the candidates in decreasing order; max is always at the front.
+
+**Why this is interesting**: a brute-force `O(n*k)` solution is the "junior" answer; the monotonic deque is the "I know data structures" answer.
+
+### Q: Merge two sorted arrays into one.
+
+- **Difficulty:** beginner-intermediate
+- **Asked at:** every junior interview (the merge step of merge sort)
+
+**Answer.**
+
+```java
+static int[] merge(int[] a, int[] b) {
+    int[] result = new int[a.length + b.length];
+    int i = 0, j = 0, k = 0;
+    while (i < a.length && j < b.length) {
+        result[k++] = (a[i] <= b[j]) ? a[i++] : b[j++];
+    }
+    while (i < a.length) result[k++] = a[i++];
+    while (j < b.length) result[k++] = b[j++];
+    return result;
+}
+```
+
+Two-pointer merge — O(n+m) time.
+
+**Variant: in-place merge** (when `a` has space): traverse from the back to avoid overwriting:
+
+```java
+static void mergeInPlace(int[] a, int m, int[] b, int n) {
+    int i = m - 1, j = n - 1, k = m + n - 1;
+    while (j >= 0) {
+        if (i >= 0 && a[i] > b[j]) a[k--] = a[i--];
+        else a[k--] = b[j--];
+    }
+}
+```
+
+### Q: Find duplicates in an array of N integers where values are in `[0, N-1]`.
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** Amazon, Microsoft (clever-trick probe)
+
+**Answer.** Use the array itself as a hash set:
+
+```java
+// O(n) time, O(1) extra space — array-as-hash trick
+static List<Integer> findDuplicates(int[] nums) {
+    List<Integer> dups = new ArrayList<>();
+    for (int i = 0; i < nums.length; i++) {
+        int idx = Math.abs(nums[i]) - 1;
+        if (nums[idx] < 0) dups.add(idx + 1);   // already visited
+        else nums[idx] = -nums[idx];             // mark as visited by negating
+    }
+    return dups;
+}
+```
+
+The trick: use the value as an index, mark visited by negating. O(n) time, O(1) extra space — vs the obvious HashSet which is O(n) extra.
+
+If the interviewer says "values not allowed to be mutated": offer HashSet (O(n) space) instead.
+
+### Q: Detect a cycle in a linked list (Floyd's Tortoise and Hare).
+
+- **Difficulty:** intermediate
+- **Asked at:** universal
+
+**Answer.**
+
+```java
+static boolean hasCycle(Node head) {
+    Node slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+```
+
+Two pointers, one moving 1× and other 2×. If there's a cycle, they meet. O(n) time, O(1) space.
+
+**Extension probe**: "Find where the cycle starts." → after meeting, reset one pointer to head, advance both at 1×; they meet at cycle start (mathematical proof: distance from head to cycle start = distance from meeting point to cycle start going forward).
+
+```java
+static Node cycleStart(Node head) {
+    Node slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) {
+            // found cycle; now find start
+            slow = head;
+            while (slow != fast) { slow = slow.next; fast = fast.next; }
+            return slow;
+        }
+    }
+    return null;
+}
+```
+
+### Q: Print the level-order traversal of a binary tree.
+
+- **Difficulty:** intermediate
+- **Asked at:** Razorpay, Flipkart, Amazon (mid-level)
+
+**Answer.** BFS with a queue:
+
+```java
+static List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) return result;
+    Queue<TreeNode> q = new ArrayDeque<>();
+    q.offer(root);
+    while (!q.isEmpty()) {
+        int size = q.size();   // ← key: snapshot count BEFORE adding children
+        List<Integer> level = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            TreeNode node = q.poll();
+            level.add(node.val);
+            if (node.left != null) q.offer(node.left);
+            if (node.right != null) q.offer(node.right);
+        }
+        result.add(level);
+    }
+    return result;
+}
+```
+
+**Key trick**: snapshot `q.size()` at the START of each level — that's how many nodes are AT this level (don't iterate adds within the same level into the next iteration).
+
+### Q: Convert a sorted array to a balanced BST.
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, Microsoft
+
+**Answer.** Recursively pick the middle as root:
+
+```java
+static TreeNode sortedArrayToBST(int[] nums) {
+    return build(nums, 0, nums.length - 1);
+}
+static TreeNode build(int[] nums, int lo, int hi) {
+    if (lo > hi) return null;
+    int mid = lo + (hi - lo) / 2;   // ← avoid overflow vs (lo+hi)/2
+    TreeNode root = new TreeNode(nums[mid]);
+    root.left = build(nums, lo, mid - 1);
+    root.right = build(nums, mid + 1, hi);
+    return root;
+}
+```
+
+O(n) time, O(log n) recursion depth. The middle-element strategy guarantees balance.
+
+**Why `lo + (hi - lo) / 2`?** When `lo` and `hi` are near `Integer.MAX_VALUE`, `lo + hi` overflows; the alternative form doesn't. This is the same bug that Joshua Bloch found in Java's `Arrays.binarySearch` in 2006.
 
 ---
 

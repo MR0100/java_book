@@ -297,6 +297,107 @@ c.prepareStatement("... WHERE name = ?")      // ✓
 
 ---
 
+## 7. Distributed-Systems Traps (added pass)
+
+### P39 🔴 — Non-idempotent retry on POST
+
+**Symptom.** A user is charged twice; an email is sent twice; an inventory item is reserved twice. Network flickers in transit are getting retried at the client OR at a proxy / load-balancer.
+**Cause.** The endpoint does state mutation without an idempotency key, and the client/transport retries on timeout (which doesn't distinguish "server didn't receive" from "server processed but reply was lost").
+**Fix.** Idempotency-key pattern: client sends UUID per logical action; server records `(key, result)` for ~24-72h; retries with same key return the cached result. Pair with **outbox** (`L4/C04`) for downstream dispatch.
+
+### P40 🟠 — Polling instead of long-polling/WebSocket/server-sent events
+
+**Symptom.** A "live feed" endpoint hit every 2 seconds by 100k clients = 50k RPS just to *check* for updates; 99% of polls return "nothing new."
+**Cause.** Default to simple polling for "real-time" features.
+**Fix.** WebSocket or Server-Sent Events for push semantics; long-polling as a middle ground; event sourcing with downstream notification.
+
+### P41 🟡 — Microservice has its own DB but borrows another's tables
+
+**Symptom.** A "microservice" can't deploy independently because schema migrations on the shared DB break others. Outages cascade across services.
+**Cause.** Distributed monolith — services are split in code but not in data ownership.
+**Fix.** Each service owns its tables exclusively. Cross-service data goes via API/events. Migration to this is hard — incremental: extract one bounded context at a time.
+
+### P42 🔴 — Synchronous chain of microservices
+
+**Symptom.** A single user request hits 6 services in a chain. If any one fails (or is slow), the user's request hangs/fails. Latency = sum of all services. p99 = ~5×p50 because tail latency multiplies.
+**Cause.** Naive translation of monolith call graph into microservice call graph.
+**Fix.** Reduce hops (cache aggregated data); use async/queue between non-critical steps; circuit breakers at each hop; consider request-level fanout (parallel where possible).
+
+### P43 🟠 — No correlation/trace ID
+
+**Symptom.** "User X says they got an error at 14:32 — can you find the logs?" — and you have to grep 6 services for ~10k log lines each, with no way to link them.
+**Cause.** Logs don't carry a trace_id (or there's no trace_id at all).
+**Fix.** Generate trace_id at the edge (API gateway); propagate via W3C `traceparent` header; stamp into MDC so every log line emits it. OpenTelemetry SDK handles this automatically for Spring Boot.
+
+### P44 🔴 — Time-bomb on a single Kafka consumer lag
+
+**Symptom.** One consumer slow / down → Kafka topic backs up → producer eventually OOM / disk full / rejects new events.
+**Cause.** No monitoring on consumer lag; no policy for "what happens when consumer is N hours behind."
+**Fix.** Alert on consumer lag > threshold. Pre-decide policy: pause producers? Drop oldest? Compact topic? Move to dead-letter? Each has a trade-off.
+
+### P45 🟠 — Distributed lock without fencing
+
+**Symptom.** A "distributed mutex" in Redis sometimes still allows two clients to hold the lock simultaneously (rare but real). Causes double-processing or split-brain writes.
+**Cause.** Naive Redlock without fencing tokens. Client A acquires lock, GC pauses for 20s, lock expires, Client B acquires, both write to the resource thinking they own it.
+**Fix.** Fence the lock with a monotonic token: each acquisition increments a counter; the resource server rejects writes with stale tokens. (Martin Kleppmann's "How to do distributed locking" describes this in detail.)
+
+## 8. Caching Traps (added pass)
+
+### P46 🟠 — Cache stampede (thundering herd)
+
+**Symptom.** A popular cache entry expires; 1000 simultaneous requests miss the cache; all 1000 hit the DB; DB drowns; multiple cascading failures across the platform.
+**Cause.** No protection against simultaneous misses for the same key.
+**Fix.** Three patterns:
+1. **Probabilistic early expiration** — refresh the cache before TTL with probability proportional to TTL remaining.
+2. **Single-flight** — first miss starts the load; subsequent misses wait on the same future. Caffeine `loadingCache.get(key, loader)` does this.
+3. **Stale-while-revalidate** — serve stale value while refreshing in background.
+
+### P47 🟡 — Caching the wrong thing (mutable state)
+
+**Symptom.** Stale data appears even after an update. User sees old profile picture / old price / old availability after a write.
+**Cause.** Caching mutable data without invalidation; cache TTL is the only freshness guarantee.
+**Fix.** Write-through cache (invalidate or update on write); event-driven invalidation (DB CDC → Kafka → cache invalidation); short TTL for highly mutable data.
+
+### P48 🟠 — Cache-stampede *across* services
+
+**Symptom.** Service A's cache miss triggers a downstream call to Service B; Service B's cache miss triggers a call to Service C; etc. One miss at the top cascades.
+**Cause.** Each layer has its own cache but no propagated cache-key. A single user action can result in multiple downstream cache misses simultaneously.
+**Fix.** Coalesce cache layers; preload caches; warm caches in deployment; circuit-break downstream calls.
+
+### P49 🔴 — Caching personal data (privacy violation)
+
+**Symptom.** User A sees user B's data — even briefly — because the cache key wasn't user-scoped.
+**Cause.** Cache key based on path (`/api/profile`) instead of `(user_id, path)`. A cache hit serves the previous user's data.
+**Fix.** Always scope cache keys by tenant/user. Use Vary headers for HTTP caches. Use private cache zones (per-user) for sensitive data.
+
+## 9. Observability Traps (added pass)
+
+### P50 🟠 — High-cardinality metrics → Prometheus OOM
+
+**Symptom.** Prometheus is using 40+ GB of memory and falling over; queries timeout. The cause is one metric `requests_total{user_id="...",endpoint="..."}`.
+**Cause.** Tagging metrics with high-cardinality values (user_id, trace_id, full URL paths with IDs). Each unique combination is a separate time series; storage explodes.
+**Fix.** Tag with low-cardinality only (status, endpoint pattern, region). Move high-cardinality data to traces/logs, not metrics.
+
+### P51 🟡 — Logging at INFO every request
+
+**Symptom.** Log storage grows to TBs/day; ELK/Loki costs explode; queries take minutes.
+**Cause.** `log.info("Request: ...")` on every request, including healthchecks.
+**Fix.** Log at DEBUG for happy-path; INFO for state changes; WARN for unusual but handled; ERROR for unhandled. Use sampling for hot paths (1 in 100, etc.).
+
+### P52 🟠 — No SLO → unaccountable degradation
+
+**Symptom.** "The service is sometimes slow" — but no one can say if it's gotten worse, by how much, or whether to alert.
+**Cause.** No explicit Service Level Objective; relying on subjective feel.
+**Fix.** Define SLO ("99.5% of requests succeed within 200 ms over 30 days"). Track SLI. Alert on budget burn rate.
+
+### P53 🟡 — Alerts on individual errors instead of trends
+
+**Symptom.** On-call gets paged 50 times/day at 3am for transient 503s; alert fatigue; real incidents missed in the noise.
+**Cause.** Alerts fire on single events ("any 5xx in last 60s") instead of trends/rates.
+**Fix.** Alert on burn-rate / sustained anomalies: "error rate > 1% for 5 min" not "error count > 0 in 1 min". Multi-window alerts (short window for fast detection, long for fewer false positives).
+
+---
+
 ## Severity-Sorted Quick Index
 
 When triaging code, scan the 🔴 list first — these lose data or breach security.

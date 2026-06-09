@@ -595,6 +595,744 @@ L1 interviews probe judgement: "Why a `HashMap` not a `TreeMap`?", "Why immutabl
 - How does DI aid testing? (Swap real collaborators for doubles at the seam.)
 - Do you need a framework for DI? (No — plain constructor parameters suffice.)
 
+## Section F — Java 8+ Modern Features
+
+### Q: What are lambda expressions and how are they compiled?
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, TCS, Infosys, Accenture, Razorpay (mid-level)
+
+**Answer.** A lambda is shorthand for an instance of a **functional interface** (an interface with exactly one abstract method). The compiler treats `(x) -> x + 1` as an implementation of any single-method interface whose method has matching signature. Under the hood, lambdas don't generate one anonymous class per lambda site (that would bloat class files); instead, the compiler emits an `invokedynamic` instruction that uses the `LambdaMetafactory` (JDK 8 bootstrap) to produce a lightweight wrapper at first invocation, then caches it. So a stateless lambda is roughly **one shared instance** — far cheaper than an anonymous class per call site.
+
+**Follow-ups:**
+- Difference from anonymous class? (Lambda has no `this` capture of enclosing class; `this` inside a lambda refers to the enclosing class instance, not a generated inner-class instance.)
+- Memory cost? (Stateless lambdas — singleton-cached; capturing lambdas — one per capture set.)
+- Why `Runnable r = () -> {...}` works? (Runnable is a functional interface; compiler infers target type.)
+
+### Q: What are method references and the four kinds?
+
+- **Difficulty:** easy
+- **Asked at:** TCS, Infosys, Wipro, Capgemini (junior)
+
+**Answer.** Method reference is a compact lambda when the lambda just delegates to an existing method. Four kinds:
+1. **Static method**: `Integer::parseInt` ≡ `s -> Integer.parseInt(s)`
+2. **Bound instance method**: `instance::toString` ≡ `() -> instance.toString()`
+3. **Unbound instance method**: `String::length` ≡ `s -> s.length()` (the receiver becomes the first arg)
+4. **Constructor**: `ArrayList::new` ≡ `() -> new ArrayList<>()`
+
+**Follow-ups:**
+- When NOT to use? (When the lambda does more than just-call-a-method.)
+- Why do they perform identically? (Compile to the same `invokedynamic` instruction.)
+
+### Q: What's the difference between `Function`, `Consumer`, `Supplier`, `Predicate`?
+
+- **Difficulty:** easy
+- **Asked at:** every Java interview at junior level
+
+**Answer.** They're the four built-in functional interfaces in `java.util.function`:
+- **`Function<T, R>`**: takes `T`, returns `R` — `apply()`. Transformations.
+- **`Consumer<T>`**: takes `T`, returns nothing — `accept()`. Side effects.
+- **`Supplier<T>`**: takes nothing, returns `T` — `get()`. Lazy values, factories.
+- **`Predicate<T>`**: takes `T`, returns `boolean` — `test()`. Conditions, filters.
+
+Plus primitive variants (`IntFunction`, `LongConsumer`, etc.) avoiding autoboxing, and `BiFunction`/`BiConsumer`/`BiPredicate` for two-arg versions.
+
+**Follow-ups:**
+- Why primitive variants exist? (Avoid boxing in hot loops.)
+- `Function.identity()` use? (`stream.map(x -> x)` written as `stream.map(Function.identity())`.)
+
+### Q: What's Stream API and lazy evaluation?
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, Razorpay, Flipkart, Cred, Atlassian (junior–mid)
+
+**Answer.** A Stream is a sequence of values supporting functional-style operations. Three categories of ops:
+1. **Sources**: `collection.stream()`, `Arrays.stream()`, `Stream.of()`, `IntStream.range()`.
+2. **Intermediate** (lazy, returns Stream): `filter`, `map`, `flatMap`, `sorted`, `distinct`, `limit`, `skip`, `peek`.
+3. **Terminal** (eager, returns concrete result): `collect`, `forEach`, `reduce`, `count`, `findFirst`, `anyMatch`, `toList()`.
+
+**Lazy evaluation**: intermediate ops don't execute until a terminal op forces evaluation. The pipeline fuses internally — the stream walks each element through `filter→map→...→collect` in one pass per element, not N passes. This is why filtering before mapping is essentially free (no extra pass).
+
+**Follow-ups:**
+- Why streams aren't reusable? (Once terminal op runs, the stream is consumed; throws `IllegalStateException` on second use.)
+- Stream vs Collection? (Collections store; streams compute. Collections are eager; streams are lazy.)
+- Performance? (~30-50% slower than for-loops for simple ops on small data; competitive or better on large parallel data.)
+
+### Q: When should you use `parallelStream()`?
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, Microsoft, Google (senior probe)
+
+**Answer.** Rarely. `parallelStream()` uses the common `ForkJoinPool` (shared with every other parallel stream in the JVM). You should use it only when **all** of:
+1. The data is **large enough** that the split + merge overhead is worth it (~10k+ elements for simple work).
+2. Each element's work is **CPU-bound** and **stateless** (no shared mutable state, no I/O).
+3. The collection has a **good `Spliterator`** (`ArrayList`, arrays, `IntStream.range` — good; `LinkedList` — bad, sequential splitter).
+4. You can tolerate **non-deterministic ordering** in side-effect ops.
+
+**Don't use it for I/O-bound work** (use virtual threads). Don't use it where the common pool's parallelism (`cores - 1`) matters — concurrent parallel streams starve each other.
+
+**Follow-ups:**
+- How do you size? (`Runtime.getRuntime().availableProcessors() - 1` by default — the common pool's parallelism.)
+- Override pool? (Wrap in `ForkJoinPool#submit` — gives you a dedicated pool.)
+
+### Q: What is `Optional` and three common anti-patterns?
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, Razorpay, Flipkart (mid–senior)
+
+**Answer.** `Optional<T>` is a container that either holds a value or doesn't, providing a type-safe alternative to returning null. Use `.map`, `.flatMap`, `.orElse`, `.orElseGet`, `.ifPresent` to operate on it.
+
+**Three anti-patterns:**
+1. **Field/parameter type**: `class User { Optional<String> middleName; }` — adds serialization complexity, breaks `Serializable`, doubles allocations. Use null + Javadoc.
+2. **`.get()` without `.isPresent()`**: equivalent to NPE-but-worse (`NoSuchElementException`). Use `.orElse(default)` or `.orElseThrow(() -> new MyException())`.
+3. **`.orElse(expensive())`**: `.orElse` is eager — `expensive()` runs even if value is present. Use `.orElseGet(() -> expensive())`.
+
+**Follow-ups:**
+- Should `Optional` collections be empty or `Optional.empty()`? (Always empty collection — avoid `Optional<List<T>>`.)
+- Why not chain `.get()`? (Defeats the purpose; the whole point is to encode "might be absent" into the type.)
+
+### Q: What's a `record`, and what does it auto-generate?
+
+- **Difficulty:** intermediate
+- **Asked at:** Amazon, Microsoft, Flipkart (asked at mid+ for Java 17/21 fluency)
+
+**Answer.** `record Point(int x, int y) {}` is a compact way to declare an immutable data carrier. The compiler generates:
+- **Constructor** with all fields
+- **`equals()`** based on all components
+- **`hashCode()`** based on all components
+- **`toString()`** with `Point[x=1, y=2]` format
+- **Accessor methods**: `x()`, `y()` (not `getX()`)
+- **Implicit `final class`** that extends `Record` (cannot be extended further)
+
+You can add static methods, instance methods, additional constructors, and compact-canonical constructors for validation: `public Point { if (x < 0) throw new IAE(); }`.
+
+**Follow-ups:**
+- Can records have instance fields? (No — only the declared components.)
+- Can records implement interfaces? (Yes — fully.)
+- Why is `equals` based on components, not identity? (Records are value-like; identity makes no sense.)
+
+### Q: What is pattern matching and `switch` expressions?
+
+- **Difficulty:** intermediate
+- **Asked at:** Microsoft, Amazon, Google (Java 17+ fluency probe)
+
+**Answer.** Two related features:
+
+1. **`switch` expressions** (Java 14+, GA Java 17): switch can now return a value, uses arrow syntax (no fall-through), and is **exhaustive** for sealed types and enums.
+```java
+String day = switch (d) {
+    case MONDAY, TUESDAY -> "early week";
+    case WEDNESDAY -> "midweek";
+    default -> "later";
+};
+```
+2. **Pattern matching** (`instanceof` Java 16+, switch Java 21+): tests type AND extracts value in one step.
+```java
+if (obj instanceof String s && s.length() > 0) { ... s.toUpperCase() ... }
+
+return switch (shape) {
+    case Circle c -> Math.PI * c.radius() * c.radius();
+    case Rectangle r -> r.width() * r.height();
+    case Triangle t -> 0.5 * t.base() * t.height();
+};
+```
+
+With sealed types + records + pattern matching, you get full **algebraic data types** like in ML/Haskell — exhaustiveness checked at compile time.
+
+**Follow-ups:**
+- When does the switch need a `default`? (When the type isn't sealed/enum — i.e., extensible to unknown subtypes.)
+- How does the compiler verify exhaustiveness? (Via the sealed type's `permits` clause — every variant must have a case.)
+- Java 21 `record patterns`? (`case Point(var x, var y) ->` deconstructs the record in the pattern.)
+
+### Q: What are sealed classes and when do you use them?
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** Amazon, Microsoft, Google (asked when discussing modern Java design)
+
+**Answer.** `sealed` restricts which classes/interfaces can extend or implement a type. Each permitted child must itself be `final`, `sealed`, or explicitly `non-sealed`:
+
+```java
+sealed interface Shape permits Circle, Rectangle, Triangle {}
+final record Circle(double radius) implements Shape {}
+final record Rectangle(double width, double height) implements Shape {}
+final record Triangle(double base, double height) implements Shape {}
+```
+
+Use cases:
+- Closed hierarchies where you want exhaustive `switch` (sum types).
+- API design — restrict implementers to a known set without sealing the entire hierarchy.
+- Domain modeling — `sealed interface Result permits Success, Failure {}` is a Rust-like `Result<T, E>` pattern.
+
+**Follow-ups:**
+- Difference from `final`? (`final` allows zero subtypes; `sealed` allows a specific set.)
+- Why must permitted subtypes seal too? (Otherwise the closure leaks — someone could extend transitively.)
+- `non-sealed` purpose? (Intentional escape hatch — "this branch is open for extension.")
+
+### Q: What's the difference between `String`, `StringBuilder`, `StringBuffer`?
+
+- **Difficulty:** easy
+- **Asked at:** every entry-level Java interview
+
+**Answer.**
+- **`String`**: immutable. Every concatenation creates a new instance. Safe to share, share-cached via the pool (literals).
+- **`StringBuilder`**: mutable, not thread-safe. Use for building a string in a single thread.
+- **`StringBuffer`**: mutable, thread-safe (every method `synchronized`). Used pre-Java-5; today, `StringBuilder` is the default and you reach for `StringBuffer` only when multiple threads write to one buffer (rare; usually wrong design).
+
+**Why `String` is immutable** (and how interviewers probe this):
+1. **Thread safety** — share freely without sync.
+2. **String pool / caching** — same literal = same instance.
+3. **Hash code caching** — `String.hashCode()` is cached because the value never changes.
+4. **Security** — String passed to `ClassLoader`, `File`, network, SQL — if mutable, could be changed after validation.
+
+**Follow-ups:**
+- `"a" + "b"` cost? (Compile-time concatenation — single `"ab"` literal. No StringBuilder.)
+- `s = s + "x"` in a loop? (Each iteration: `new StringBuilder().append(s).append("x").toString()` — allocates a new builder + new String. Use StringBuilder explicitly.)
+
+## Section G — JDK Internals & Memory
+
+### Q: What's the difference between heap, stack, and metaspace?
+
+- **Difficulty:** intermediate
+- **Asked at:** banking (Goldman, JPMC), product cos (Amazon, Razorpay)
+
+**Answer.**
+- **Stack**: per-thread, holds method-call frames + local variables + operand stack. LIFO; fast; auto-cleaned on method return. `-Xss` controls size (~512 KB-1 MB per thread).
+- **Heap**: shared, holds all objects. Garbage-collected. `-Xmx` controls max size. Subdivided into Young Gen (Eden + Survivor S0/S1) and Old Gen for generational collectors.
+- **Metaspace** (Java 8+): off-heap, holds class metadata (Class objects, method bytecode, constant pool). Replaced PermGen. Default unbounded (limited by OS memory); can cap with `-XX:MaxMetaspaceSize`.
+
+**Where do String literals live?** Pool moved from PermGen to heap in **JDK 7**. Class objects: metaspace. Static fields: heap (the static field itself is on the heap, the Class object pointing to it is in metaspace).
+
+**Follow-ups:**
+- Why was PermGen problematic? (Fixed size — OOMs on heavy class loading like hot reloading or dynamic proxies; couldn't be tuned per-workload.)
+- Stack OOM? (`StackOverflowError`, distinct from `OutOfMemoryError`. Caused by deep/infinite recursion.)
+- Compressed oops? (4-byte refs instead of 8-byte for heaps ≤ 32 GB — `-XX:+UseCompressedOops`, default on.)
+
+### Q: What does `equals` and `hashCode` need to satisfy?
+
+- **Difficulty:** intermediate
+- **Asked at:** every Java interview at mid+ (foundational)
+
+**Answer.** **`equals` contract — five properties:**
+1. **Reflexive**: `x.equals(x)` is true
+2. **Symmetric**: `x.equals(y)` iff `y.equals(x)`
+3. **Transitive**: if `x.equals(y)` and `y.equals(z)` then `x.equals(z)`
+4. **Consistent**: repeated calls return same result (if state unchanged)
+5. **Non-null**: `x.equals(null)` is false
+
+**`hashCode` contract:**
+1. Repeated calls return the same value (if state unchanged)
+2. If `x.equals(y)` is true, `x.hashCode()` must equal `y.hashCode()`
+3. If `x.equals(y)` is false, hash codes can be equal (collisions OK) but should be unequal for good distribution.
+
+**Classic violation**: override `equals` without `hashCode`. Result: object goes into a `HashSet`, then `set.contains(equalObject)` returns false because they land in different buckets.
+
+**Classic asymmetry violation**: `subclass.equals(parent)` returns true but `parent.equals(subclass)` returns false (because parent uses `getClass`-based check). Joshua Bloch's recommendation: use `instanceof` (allows polymorphism) OR use `getClass` (strict identity); just don't mix.
+
+**Follow-ups:**
+- What if you mutate a HashMap key after `put`? (Entry is "lost" — still in the map but `get` looks in wrong bucket; memory leak.)
+- Why 31 in `hashCode`? (Prime × power-of-2 distribution; `31 * x` = `(x << 5) - x` — fast on old CPUs.)
+- Records' equals/hashCode? (Auto-generated, component-based, correct by construction.)
+
+### Q: What is autoboxing, and what's the Integer cache trap?
+
+- **Difficulty:** intermediate
+- **Asked at:** Indian product cos (Razorpay, Flipkart, Swiggy), banking
+
+**Answer.** Autoboxing converts a primitive to its wrapper automatically: `Integer i = 42;` is rewritten as `Integer i = Integer.valueOf(42);`. Unboxing is the reverse: `int j = i;` becomes `int j = i.intValue();`.
+
+**The Integer cache trap.** `Integer.valueOf(n)` caches instances for **−128 to +127**:
+```java
+Integer a = 127, b = 127;
+Integer c = 128, d = 128;
+System.out.println(a == b);   // true   (cached → same instance)
+System.out.println(c == d);   // false  (outside cache → new instances)
+```
+
+Cache exists because most loops use small values. Same applies to `Long`, `Short`, `Byte`, `Character`. Tunable upper bound: `-XX:AutoBoxCacheMax=1000` (lower is fixed at -128).
+
+**Fix**: use `.equals()` for boxed numerics; use primitives where possible; use `Integer.compare(a, b) == 0` for explicit primitive comparison.
+
+**Follow-ups:**
+- Performance impact? (Autoboxing in a hot loop creates millions of short-lived `Integer` objects; can dominate GC.)
+- `Map<String, Integer>` access? (Each `map.get(k)` returns Integer; if you do `int v = map.get(k)`, you unbox — NPE if absent.)
+- `getOrDefault(k, 0)` saves you? (Yes — returns the Integer 0 (cached), no NPE.)
+
+### Q: How does the JVM handle null pointer access?
+
+- **Difficulty:** intermediate
+- **Asked at:** Goldman Sachs, Morgan Stanley (banking interview)
+
+**Answer.** Accessing a member through a null reference throws `NullPointerException`. Mechanically, the JVM doesn't add an explicit null check before every `getfield`/`invokevirtual`; instead, it uses an OS-level **SIGSEGV handler**:
+1. The CPU traps when the program reads from address 0 (or any unmapped page).
+2. The JVM's signal handler catches the SIGSEGV.
+3. The handler checks if the faulting instruction is in JIT-compiled code at a known nullable site.
+4. If yes, the JVM materializes an `NullPointerException` and rethrows it; if no, the JVM crashes the process.
+
+This makes null checks **free in the common case** — no extra instruction. (The optimization is called *implicit null check* or *implicit exception*.)
+
+**JDK 14+ helpful NPE**: `-XX:+ShowCodeDetailsInExceptionMessages` (default on in 14+) — instead of `NullPointerException: null`, you get `Cannot invoke "String.length()" because "user.name" is null`.
+
+**Follow-ups:**
+- Why not check explicitly? (Cost: extra branch per access — billions per second. SIGSEGV trap is zero-cost when null is rare.)
+- Cost when null happens? (~10-50 µs for the signal handler round-trip; expensive but rare.)
+- How does Optional avoid this? (Encodes presence in the type — compile-time signal that NPE is possible.)
+
+### Q: What's the difference between `==` and `.equals()`?
+
+- **Difficulty:** easy
+- **Asked at:** every Java interview
+
+**Answer.**
+- **`==`**: identity comparison. For primitives, value equality. For objects, **reference equality** — true only if both refer to the same instance.
+- **`.equals()`**: value/content equality. Object default is `==`; meaningful classes override to define their notion of equality.
+
+```java
+String a = new String("hi"), b = new String("hi");
+a == b;          // false (different objects)
+a.equals(b);     // true  (same content)
+"hi" == "hi";    // true  (both literals → same pool entry)
+```
+
+**Follow-ups:**
+- When does `==` work for Strings? (Interned literals; explicitly `.intern()`'d strings. Don't rely on this.)
+- `Objects.equals(a, b)`? (Null-safe; equivalent to `(a == b) || (a != null && a.equals(b))`.)
+- `==` on `Integer`? (See Integer cache trap — works for −128..127, breaks outside.)
+
+## Section H — Collection Gotchas Deep Dive
+
+### Q: How does `HashMap` actually work in Java 8+?
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** **MOST-ASKED India interview question** (every product co, banking, FAANGM)
+
+**Answer.** `HashMap` is a `Node[]` table where each bucket holds a linked list (or red-black tree). Step-by-step `put`:
+
+1. **Hash spread**: `h ^ (h >>> 16)` — mixes high bits into low bits (the bucket mask uses only low bits).
+2. **Bucket index**: `(table.length - 1) & spread` — power-of-2 table → AND instead of modulo.
+3. **Empty bucket** → insert new `Node` directly.
+4. **Non-empty bucket** → walk the chain. If key matches (`==` or `.equals()`), replace value. Else append.
+5. **Chain length ≥ 8 AND table.length ≥ 64**: **treeify** the bucket → red-black tree (O(log n) instead of O(n)).
+6. **size > capacity × loadFactor (default 0.75)**: **resize** — double the table, redistribute using lo/hi single-bit split (no rehashing).
+
+**Key constants:**
+- `TREEIFY_THRESHOLD = 8` — when to convert chain → tree
+- `UNTREEIFY_THRESHOLD = 6` — when to revert tree → chain (hysteresis)
+- `MIN_TREEIFY_CAPACITY = 64` — small tables resize instead of treeifying
+- `DEFAULT_LOAD_FACTOR = 0.75f`
+
+**Treeification's secondary purpose**: defends against **hash flooding** (attacker keys all colliding → O(n²) DoS). With treeification, the worst case becomes O(n log n).
+
+**Memory**: a `Node` is 32 bytes (12 header + 4 hash + 4 key ref + 4 value ref + 4 next + 4 padding). A `TreeNode` is ~56 bytes. So treeification ~doubles per-entry memory but bounds worst-case lookup.
+
+**Follow-ups:**
+- Why power-of-2 length? (`(length - 1) & hash` works as a low-bit mask; replaces 20-cycle modulo with 1-cycle AND.)
+- Why `h ^ (h >>> 16)`? (Mixes high bits into the low bits; salvages poor `hashCode`s where high bits vary but low don't.)
+- Resize without rehashing? (Doubling means one more bit of hash matters; entries go to either "stays" or "stays + oldCapacity" — determined by `(hash & oldCapacity)`.)
+
+### Q: `ArrayList` vs `LinkedList` — when does each win?
+
+- **Difficulty:** easy
+- **Asked at:** every Java junior interview
+
+**Answer.** `ArrayList` almost always wins.
+
+| Operation | `ArrayList` | `LinkedList` |
+|---|---|---|
+| Random access (`get(i)`) | O(1) | O(n) |
+| Append (`add(e)`) | Amortized O(1) | O(1) |
+| Insert middle | O(n) shift | O(n) walk to position + O(1) insert |
+| Remove middle | O(n) shift | O(n) walk + O(1) unlink |
+| Memory per element | 4 bytes (ref) + slight slack | 24 bytes (Node header + 2 refs) |
+| Cache locality | excellent (contiguous) | terrible (heap-scattered nodes) |
+
+**When `LinkedList` wins**: implementing a **queue** at head + tail. Use `ArrayDeque` — same operations but contiguous and faster. Honestly, you should almost never reach for `LinkedList`.
+
+**Follow-ups:**
+- Resize cost? (Amortized O(1) — when the array fills, allocate 1.5× (Java) or 2× (Java 8+ HashMap), copy. Pre-size with `new ArrayList<>(expectedSize)` to avoid.)
+- `Collections.singletonList`? (Read-only single-element list, no array allocation — perfect for `Collection.contains` checks against one value.)
+
+### Q: Why use `LinkedHashMap` for LRU cache?
+
+- **Difficulty:** intermediate
+- **Asked at:** Razorpay, Flipkart, Amazon, banking (classic LLD)
+
+**Answer.** `LinkedHashMap` threads all entries into a doubly-linked list. With `accessOrder=true`, every `get`/`put` moves the entry to the MRU (most-recently-used) end. Then override `removeEldestEntry`:
+
+```java
+class LRUCache<K, V> extends LinkedHashMap<K, V> {
+    private final int capacity;
+    LRUCache(int capacity) {
+        super(16, 0.75f, true);   // accessOrder = true ← KEY
+        this.capacity = capacity;
+    }
+    @Override protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() > capacity;
+    }
+}
+```
+
+`put` over capacity → `removeEldestEntry` returns true → LRU entry evicted from the linked-list head.
+
+**Limitations:**
+- Single-threaded (use external sync for shared cache).
+- No expiration (just LRU). For TTL, use Caffeine.
+- No async refresh, stats, etc. — for production caching, use Caffeine.
+
+**Follow-ups:**
+- Default order? (insertion-order — `accessOrder=false`.)
+- What if you only need bounded eviction without LRU semantics? (`new LinkedHashMap<>(16, 0.75f, false)` — bounded by insertion, FIFO eviction.)
+- Production replacement? (Caffeine — async, TTL, stats, ~5× faster than LRUCache.)
+
+### Q: What is `ConcurrentModificationException` and why does it happen?
+
+- **Difficulty:** intermediate
+- **Asked at:** TCS, Infosys, Razorpay, Amazon (mid level)
+
+**Answer.** Thrown when a collection is structurally modified while being iterated. Detected via the **fail-fast** mechanism:
+- Collections keep a `modCount` field, incremented on every `add`/`remove`.
+- When you create an iterator, it snapshots `modCount` into its `expectedModCount`.
+- On every `next()`, the iterator checks `modCount == expectedModCount`. Mismatch → CME.
+
+```java
+List<String> list = new ArrayList<>(List.of("a", "b", "c"));
+for (String s : list) {
+    if (s.equals("b")) list.remove(s);   // modCount++ but iterator's expectedModCount stale → CME on next iteration
+}
+```
+
+**Fixes:**
+1. **`Iterator.remove()`** — updates expectedModCount in lockstep.
+2. **`removeIf()`** (Java 8+) — collection-level batch removal.
+3. **`CopyOnWriteArrayList`** — write copies the whole array; iterators are snapshot, never throw CME.
+4. **Collect-then-modify** — iterate first, collect targets, modify after the loop.
+
+**Follow-ups:**
+- Fail-fast vs fail-safe? (Fail-fast throws CME on detection. Fail-safe — like CHM iterators — show snapshot data without throwing; "weakly consistent.")
+- Is CME guaranteed? (No — fail-fast detection is best-effort. Don't rely on the exception for correctness.)
+- Why not "fail-safe everywhere"? (Snapshot overhead; doesn't catch the bug. CME exists to surface programming errors.)
+
+### Q: How does `ConcurrentHashMap` (Java 8+) work internally?
+
+- **Difficulty:** advanced
+- **Asked at:** banking (Goldman, Morgan Stanley), product cos at senior level
+
+**Answer.** Java 8 rewrote CHM from segments to **per-bucket locking**:
+
+1. **Empty bucket write**: lock-free CAS on the array slot.
+2. **Non-empty bucket write**: `synchronized` on the bucket head Node.
+3. **Read**: fully lock-free (volatile load on table slot + chain/tree walk).
+4. **Chain ≥ 8**: treeify to red-black tree (same as HashMap, with hash-flooding defense).
+5. **Resize**: cooperative — multiple threads each claim a stride of buckets to transfer.
+6. **size()**: `LongAdder`-style striped counter — `baseCount` + array of `CounterCell`s.
+
+**Pre-JDK 8 (segmented)**: 16 `Segment`s, each a `ReentrantLock` with its own table. Concurrency capped at 16 writers; `size()` had to lock every segment. JDK 8 fixes both.
+
+**Constraints**: no null keys or values (concurrency-induced — null `get` must unambiguously mean "absent").
+
+**Follow-ups:**
+- Why no null in CHM? (Concurrency: null `get` must mean "missing"; ambiguous if null is also a legal value.)
+- How fast is `get`? (~10-30 ns — single volatile load + chain walk on a hot table.)
+- vs `Hashtable`? (Hashtable uses single global `synchronized` — strictly worse than CHM.)
+
+## Section I — Exceptions, IO, and Edge Cases
+
+### Q: When does a `finally` block NOT run?
+
+- **Difficulty:** easy-intermediate
+- **Asked at:** every Java interview (junior probe)
+
+**Answer.** Almost always. Specifically NOT in these cases:
+1. **`System.exit(0)`** in the try (kills the JVM).
+2. **JVM crash** (SIGSEGV, OOM that the OS kills, hardware failure).
+3. **`Thread.stop()`** (deprecated since Java 1.2, removed Java 21).
+4. **Infinite loop / `Thread.sleep(forever)`** inside try — finally is unreachable until interrupted.
+
+In all other cases — `return`, `break`, `continue`, thrown exception (caught or uncaught) — finally runs.
+
+**Gotcha**: `try { return 1; } finally { return 2; }` — returns 2. The finally `return` overrides try `return`. Considered bad style — never put `return` in finally.
+
+**Follow-ups:**
+- try-with-resources? (Compiler injects finally that calls `close()` — handles `AutoCloseable`/`Closeable`.)
+- Suppressed exceptions? (If try threw an exception AND `close()` threw — primary thrown, secondary attached via `addSuppressed()` — accessible via `getSuppressed()`.)
+- Modifying a try `return` value in finally? (Doesn't work for primitives/immutables; can modify the contents of mutable returned objects.)
+
+### Q: Checked vs unchecked exceptions — when do you throw each?
+
+- **Difficulty:** intermediate
+- **Asked at:** every Java interview (mid+ probe)
+
+**Answer.**
+- **Checked** (`Exception` and subclasses except RuntimeException): must be declared/caught at compile time. Use for **recoverable** conditions — file not found, network timeout. The caller MIGHT have a strategy.
+- **Unchecked** (`RuntimeException`, `Error`): no compile-time obligation. Use for **programming errors** — null arg, illegal state, broken invariant. The caller probably can't recover; just fail.
+
+**Modern Java practice**: lean unchecked. Checked exceptions don't compose well with lambdas, streams, generics, or async (functional interfaces can't throw checked). Wrap checked exceptions from libraries into RuntimeException at boundaries. Spring uses unchecked everywhere.
+
+**Follow-ups:**
+- `Error` vs `RuntimeException`? (Error: don't catch — JVM-level (OOM, StackOverflow). RuntimeException: programming bug — catch only for logging/replying.)
+- Why does `Function.apply` not throw checked? (Backward compatibility constraint; checked exceptions don't work in lambdas without a custom interface.)
+- Library convention? (`IOException` checked for compat with old code; new code wraps with `UncheckedIOException`.)
+
+### Q: What is try-with-resources, and what are suppressed exceptions?
+
+- **Difficulty:** intermediate
+- **Asked at:** TCS, Infosys, Razorpay, Amazon (mid level)
+
+**Answer.** Try-with-resources auto-closes anything `AutoCloseable`:
+
+```java
+try (var in = Files.newInputStream(path);
+     var out = Files.newOutputStream(target)) {
+    in.transferTo(out);
+}
+// implicit: out.close(); in.close();  (reverse order)
+// implicit: if any throws on close, primary exception suppresses secondary
+```
+
+**Suppressed exceptions**: if the try body throws AND a `close()` also throws, the JVM:
+1. Re-throws the **try-body** exception (primary).
+2. Adds the `close()` exceptions to the primary via `addSuppressed()`.
+
+Access them: `for (Throwable t : ex.getSuppressed()) { ... }`.
+
+Without try-with-resources, you'd either lose one exception or write extensive boilerplate to handle both.
+
+**Follow-ups:**
+- Effectively final since Java 9? (Pre-Java 9 required declaring the resource in the try; Java 9+ allows referring to an already-declared effectively-final variable.)
+- `AutoCloseable` vs `Closeable`? (Closeable: `throws IOException`; AutoCloseable: `throws Exception` — broader.)
+
+### Q: What's the difference between `Files.readString` and `Files.readAllBytes`?
+
+- **Difficulty:** intermediate
+- **Asked at:** mid-level Java interviews
+
+**Answer.**
+- **`Files.readAllBytes(path)`** — raw bytes, returns `byte[]`. Useful for binary or charset-uncertain data.
+- **`Files.readString(path)`** (Java 11+) — reads as UTF-8 (default) into String. Convenient for text.
+- **`Files.lines(path)`** — streams line by line, lazy. Use for huge files to avoid loading all in memory.
+
+**Cost considerations**:
+- `readAllBytes` / `readString` allocate the whole file in memory. Don't use for >100 MB files.
+- For large files, prefer `Files.lines` (streaming) or `BufferedReader.readLine()`.
+
+**Follow-ups:**
+- Charset handling? (Default UTF-8 for `readString`; pass explicit `Charset` for others.)
+- Memory-mapped reading? (`FileChannel.map()` — for huge files; OS pages in on access.)
+
+## Section J — Java Tooling & Build
+
+### Q: Maven vs Gradle — when does each fit?
+
+- **Difficulty:** intermediate
+- **Asked at:** Infosys, TCS, Razorpay (mid+)
+
+**Answer.**
+- **Maven**: XML config, declarative, plugin ecosystem mature. Easy to read for new joiners. The "default" choice for Java enterprise.
+- **Gradle**: Groovy or Kotlin DSL, code-as-config, more expressive. Faster (incremental compilation, build cache). Android default. More flexible for complex builds.
+
+**Use Maven when**: simplicity matters, you're using Spring Boot (the wrapper, Spring Initializr defaults to Maven), team familiarity with XML.
+
+**Use Gradle when**: build performance matters (large multi-module projects), you need custom build logic, you're shipping Android or want better dependency analytics.
+
+**Follow-ups:**
+- Wrapper file (`mvnw`/`gradlew`)? (Bundled with the project; ensures everyone uses the same build version. Commit `mvnw`/`gradlew` and the wrapper files; not the binaries.)
+- Reproducible builds? (Set timestamps deterministically; pin all transitive deps; use Maven Enforcer for version conflicts.)
+
+### Q: What's the JDK module system (JPMS), and is it adopted?
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** banking, Microsoft (senior probe)
+
+**Answer.** Java 9 introduced JPMS — a module system at the language and JVM level. Modules declared in `module-info.java`:
+
+```java
+module com.example.payment {
+    requires com.example.common;
+    exports com.example.payment.api;
+    // anything not exported is invisible to other modules
+}
+```
+
+**Goals**: encapsulation (truly hide internals), reliable configuration (explicit dependencies), scaling (jlink — strip unused JDK modules for smaller images).
+
+**Adoption**: low in application code; high in the JDK itself (the JDK is internally modularized — `java.base`, `java.sql`, etc.). Most Spring apps still use the classpath, not modules. Modules pay off when:
+- You ship a CLI / desktop app via `jlink` (smaller distribution).
+- You're a library and want to prevent users from accessing internals.
+
+**Follow-ups:**
+- `--add-opens` / `--add-exports`? (Workarounds when an app needs reflective access to internal JDK APIs — common before Java 17 became LTS.)
+- `Automatic-Module-Name`? (Manifest entry naming a JAR as an automatic module — lets pre-modular libraries be `require`-able.)
+
+### Q: How do annotations get processed at compile time vs runtime?
+
+- **Difficulty:** advanced
+- **Asked at:** Spring shops (Razorpay, Amazon, banking)
+
+**Answer.** Annotations have a `RetentionPolicy`:
+- **`SOURCE`** (e.g., `@Override`): visible to the compiler only. Discarded after compilation.
+- **`CLASS`** (e.g., Lombok's `@Getter`): in the `.class` file but not accessible via reflection. Annotation processors and bytecode tools see them.
+- **`RUNTIME`** (e.g., `@Transactional`, `@Test`): accessible via reflection at runtime. Frameworks scan classes for them.
+
+**Annotation processing (compile time, JSR 269)**: the compiler runs registered `Processor`s during compilation. Generate code (Lombok, MapStruct, immutables.org), validate code (NullAway), or trigger build errors. Annotation processors are how `@Builder` generates a builder class — it isn't reflection; it's code-gen at javac time.
+
+**Runtime annotation handling**: typically via `Class.getAnnotations()`, `Method.getAnnotation(MyAnn.class)`. Spring's `@Transactional` aspect uses runtime reflection to find annotated methods + wrap them with proxies.
+
+**Follow-ups:**
+- AOT-friendly? (Annotation processing — yes, runs at build time. Runtime reflection — works against native-image AOT with hints.)
+- Lombok controversy? (Modifies bytecode at compile time — fragile across javac versions; some teams ban it.)
+- MapStruct vs reflection-based mapping? (MapStruct generates code at compile time — type-safe + zero-cost. ModelMapper uses reflection — slower + less safe.)
+
+## Section K — Concurrency Foundations (preview for L3)
+
+### Q: What's the difference between a process and a thread?
+
+- **Difficulty:** easy
+- **Asked at:** every Java interview at junior
+
+**Answer.**
+- **Process**: independent execution unit with its own memory space, file descriptors, etc. Heavy to create (~1 ms, ~1-10 MB initial RSS).
+- **Thread**: runs inside a process, shares the process's memory. Lightweight (~50-100 µs to create, ~1 MB stack).
+
+In Java, every thread shares the JVM's heap. Communication between threads is via shared memory (regulated by `synchronized`, volatile, `java.util.concurrent`).
+
+**Follow-ups:**
+- Virtual thread? (JVM-managed thread that costs ~1 KB heap, not 1 MB stack — multiplexes onto carrier platform threads.)
+- Daemon thread? (`thread.setDaemon(true)` — doesn't keep JVM alive on shutdown. Use for background work (loggers, GC threads).)
+- When does the JVM exit? (When all non-daemon threads have terminated, or `System.exit()` is called.)
+
+### Q: What does `synchronized` do, and what's a monitor?
+
+- **Difficulty:** intermediate
+- **Asked at:** every Java interview at mid
+
+**Answer.** `synchronized` acquires the **monitor** (intrinsic lock) of an object, providing:
+1. **Mutual exclusion**: only one thread holds the monitor at a time.
+2. **Memory visibility**: writes before release are visible to reads after acquire (happens-before relationship).
+
+```java
+synchronized(obj) { ... }                  // monitor = obj
+synchronized void method() { ... }          // monitor = this
+synchronized static void method() { ... }    // monitor = MyClass.class
+```
+
+Every object has a monitor (header bit pattern reserves space). Acquisition uses **biased locking** (no contention assumed) → **thin lock** (CAS) → **inflated lock** (full OS-level mutex via `ObjectMonitor`) under contention.
+
+**Limitations of `synchronized`**:
+- No timeout (`ReentrantLock` has `tryLock(timeout)`).
+- No fairness option (`ReentrantLock` has fair mode).
+- Cannot interrupt a waiting thread (`Lock.lockInterruptibly`).
+- **Pins virtual threads** to carrier (pre-JDK-24).
+
+**Follow-ups:**
+- Reentrant? (Yes — same thread can re-acquire the same monitor without deadlocking. Lock count incremented.)
+- What if you throw inside? (Monitor auto-released. Try/finally not needed for this.)
+- `wait()` / `notify()` requirement? (Must hold the object's monitor; else `IllegalMonitorStateException`.)
+
+### Q: What is `volatile` and when do you use it?
+
+- **Difficulty:** intermediate-advanced
+- **Asked at:** banking (Goldman, Morgan Stanley), Microsoft
+
+**Answer.** `volatile` provides two guarantees:
+1. **Visibility**: writes by one thread are immediately visible to reads by other threads (no caching in registers/CPU cache).
+2. **Ordering**: reads/writes are not reordered with surrounding code. Establishes happens-before.
+
+Does NOT provide atomicity for compound operations (`v++` is not atomic; use `AtomicInteger`).
+
+**Classic use cases:**
+- Status flag: `volatile boolean shutdown` — reader thread sees the write.
+- Singleton DCL: `private static volatile Singleton instance;`
+- One-time publication: write a value once, read freely from many threads.
+
+**Don't use it for**:
+- Compound operations (use atomic classes).
+- Anything mutating reference's content (volatile only protects the reference, not what it points to).
+
+**Follow-ups:**
+- vs `AtomicReference`? (AtomicReference is volatile + provides CAS; volatile alone has no CAS.)
+- Cost? (~1-2 ns per access on x86 — memory fence after write, no fence on read.)
+- vs synchronized? (synchronized is mutex + visibility; volatile is visibility-only — no exclusion.)
+
+## Section L — Real Indian Interview Patterns
+
+### Q: A `HashMap` interview gauntlet from Razorpay/Flipkart
+
+The interviewer might walk you through this entire sequence:
+
+1. "What's a HashMap?" → key-value store, O(1) average lookup.
+2. "How does it work internally?" → spread hash → bucket index → chain/tree.
+3. "What happens when two keys collide?" → form a chain at the bucket. Java 8+ treeifies at 8 + table ≥ 64.
+4. "Why power-of-2 capacity?" → `(length-1) & hash` ≡ `hash % length` — 1-cycle AND vs 20-cycle mod.
+5. "What's the load factor?" → 0.75 default. Resize at `size > capacity × loadFactor`.
+6. "How does resize work?" → double capacity, redistribute via single-bit split — no rehash.
+7. "What if you override equals without hashCode?" → entry "lost" — `get` looks in wrong bucket.
+8. "What if you mutate the key after `put`?" → same — entry orphaned.
+9. "Memory cost per entry?" → 32 bytes (Node) + 4 bytes (table slot at LF 0.75) — ~36 B/entry.
+10. "vs ConcurrentHashMap?" → CHM: per-bucket synchronized, lock-free CAS for empty buckets, lock-free reads, no nulls allowed.
+11. "Implement an LRU cache." → `LinkedHashMap` with `accessOrder=true` + `removeEldestEntry`.
+
+Be ready to whiteboard the internal structure — buckets, chain, tree — and trace a `put` through it.
+
+### Q: What's `serialVersionUID` and why does it matter?
+
+- **Difficulty:** intermediate
+- **Asked at:** banking interview (legacy systems)
+
+**Answer.** When a class implements `Serializable`, the JVM computes a hash of its structure (`serialVersionUID`) at runtime if not explicitly declared. This hash is included in serialized streams. On deserialization, mismatch → `InvalidClassException`.
+
+```java
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;   // ← explicit
+    private String name;
+}
+```
+
+**Without explicit `serialVersionUID`**: the hash changes when you add/remove a field. Old serialized data can't be read by the new class. With explicit value: you control compatibility — only bump it when you make a breaking change.
+
+**Modern practice**: avoid Java serialization. Use JSON, Protobuf, Avro. Java serialization has security risks (deserialization gadgets → RCE).
+
+**Follow-ups:**
+- `transient` keyword? (Field not serialized — for passwords, caches, expensive-to-recompute fields.)
+- Readable from old format? (Yes, if `serialVersionUID` matches AND field signatures are compatible.)
+- Why is Java serialization deprecated for new code? (Deserialization can instantiate arbitrary classes → RCE attack vector. Use safer formats.)
+
+### Q: Explain `==` vs `.equals()` for these tricky cases:
+
+- **Difficulty:** intermediate
+- **Asked at:** Indian product cos (gauntlet probe)
+
+```java
+String a = "hello";
+String b = "hello";
+String c = new String("hello");
+Integer x = 100, y = 100;
+Integer p = 200, q = 200;
+```
+
+What does each print?
+- `a == b` → **true** (both interned, same pool entry)
+- `a == c` → **false** (`new String` allocates a new heap object)
+- `a.equals(c)` → **true** (value equality)
+- `x == y` → **true** (within −128..127 cache)
+- `p == q` → **false** (outside cache, distinct Integer objects)
+- `x.equals(y)` → **true** (always — value equality)
+- `p.equals(q)` → **true** (always — value equality)
+
+The rule: **always use `.equals()` for value comparison; reserve `==` for null checks or known identity invariants.**
+
+## Final Tally: 100+ Q&A Across Java/OOP Core
+
+Sections A-L now cover 100+ questions across:
+- OOP fundamentals (A)
+- Contracts, records, enums, immutability (B)
+- Collections (C, H)
+- Generics, exceptions, APIs (D, I)
+- Testing (E)
+- Java 8+ modern features (F)
+- JDK internals & memory (G)
+- Tooling & build (J)
+- Concurrency foundations (K)
+- Real Indian interview patterns (L)
+
 ## Next
 
 This is the L1 interview question set. Continue to **[L1/C08 Q&A / FAQ](../C08-qa-faq/README.md)** for the quick-reference question-to-answer lookup, and revisit the [Idioms](../C06-best-practices/T01-l1-idioms.md) and [Pitfalls Catalogue](../C06-best-practices/T02-l1-pitfalls-catalogue.md) — interviewers probe exactly those "do this / not that" judgements. For the deep mechanism behind any answer, follow the topic links in C01–C03.

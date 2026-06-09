@@ -519,6 +519,335 @@ Frequent deopts visible in `-XX:+PrintCompilation` are a red flag. Diagnose them
 
 The defaults are excellent. Tuning rarely helps; you're likely making startup worse.
 
+## Deeper Dive — Reading PrintCompilation Output
+
+```bash
+java -XX:+PrintCompilation -jar app.jar
+```
+
+Sample output:
+```
+     34    1       3       java.lang.String::hashCode (55 bytes)
+     45    2     n 0       java.lang.Object::hashCode (native)
+    101    3       3       java.lang.String::charAt (29 bytes)
+    102    4       4       java.lang.String::hashCode (55 bytes)
+    102    1       3       java.lang.String::hashCode (55 bytes)   made not entrant
+    110    5     s 4       java.util.HashMap::put (300 bytes)
+    115    6       4       java.lang.String::charAt (29 bytes)
+    115    3       3       java.lang.String::charAt (29 bytes)   made not entrant
+    432    7 %     4       com.example.MyClass::hotLoop @ 21 (80 bytes)
+```
+
+**Column breakdown**:
+1. **Timestamp (ms)**: when this event fired
+2. **Compile ID**: unique sequence number
+3. **Attributes**: 
+   - `s` = synchronized method
+   - `!` = exception handling
+   - `n` = native method
+   - `b` = blocking compile
+   - `%` = OSR (on-stack replacement)
+4. **Tier**: 3 = C1+profile, 4 = C2 full
+5. **Method**: class::method (bytecode_size)
+6. **Suffix actions**:
+   - `made not entrant` — old version deopt'd; new compilation will replace
+   - `made zombie` — old version GC-eligible (after grace period)
+
+**What to look for**:
+- **Lots of "made not entrant"** → unstable inline caches, frequent deopt → consider why types are changing
+- **Same method recompiled many times** → bad PGO data; profile not stabilizing
+- **`%` markers** → OSR happening; long loops in non-hot methods
+- **C2 compilation for hot methods absent** → method too large (default `MaxInlineSize=325 bytes`), or hitting compile queue saturation
+
+## Deeper Dive — JITWatch Workflow for Production Analysis
+
+```bash
+# 1. Run target app with LogCompilation
+java -XX:+UnlockDiagnosticVMOptions \
+     -XX:+LogCompilation \
+     -XX:LogFile=jitlog.xml \
+     -jar app.jar
+
+# 2. Open JITWatch (downloadable JAR)
+java -jar jitwatch.jar
+# Load: Sandbox → Open Log → select jitlog.xml + source/classes paths
+
+# 3. Inspect compilations
+# - "Tri-View" shows source + bytecode + assembly side-by-side for each compiled method
+# - "Suggestions" panel highlights:
+#     * methods that should have inlined but didn't
+#     * megamorphic call sites
+#     * eliminated allocations
+```
+
+**Common JITWatch insights**:
+- A method has 10x identical small methods; JIT inlined some but not others (random based on hot-path discovery)
+- A virtual call has 5 types in cache → megamorphic → no devirtualization
+- Allocation site was scalar-replaced → no heap allocation in steady state
+- Lock was elided via escape analysis → synchronized was free
+
+## Deeper Dive — Common JIT Pitfalls and Their Fixes
+
+### Pitfall 1: Megamorphic Call Site
+
+```java
+// BAD: 5+ implementations of Handler
+interface Handler { void handle(Event e); }
+class OrderHandler implements Handler { ... }
+class PaymentHandler implements Handler { ... }
+class ShipmentHandler implements Handler { ... }
+class RefundHandler implements Handler { ... }
+class InventoryHandler implements Handler { ... }
+
+void process(Event e) {
+    Handler handler = registry.get(e.type());
+    handler.handle(e);   // megamorphic — no devirtualization
+}
+```
+
+**Why bad**: with 5+ types at the call site, JIT gives up on inline-caching and falls back to vtable lookup. Misses inlining opportunity.
+
+**Fix 1 — Sealed types** (Java 17+):
+```java
+sealed interface Handler permits OrderHandler, PaymentHandler, ... {}
+// Compiler can narrow the type; JIT can use closed-set assumption
+```
+
+**Fix 2 — Switch on enum/type** (turn dynamic dispatch into static):
+```java
+void process(Event e) {
+    switch (e.type()) {
+        case ORDER -> orderHandler.handle(e);
+        case PAYMENT -> paymentHandler.handle(e);
+        // ... each call is monomorphic
+    }
+}
+```
+
+**Fix 3 — Split call sites** (turn one megamorphic site into 5 monomorphic):
+```java
+void processOrder(Event e) { orderHandler.handle(e); }
+void processPayment(Event e) { paymentHandler.handle(e); }
+// Each site only ever sees ONE type → monomorphic → fully inlined
+```
+
+### Pitfall 2: Method Too Large to Inline
+
+C2 inlines methods up to `MaxInlineSize=325` bytes by default. If your hot method is 400 bytes, JIT can't inline it into callers.
+
+```java
+// Long method with many branches
+void processOrder(Order o) {
+    if (o.type == NORMAL) { /* 100 bytes */ }
+    if (o.type == PRIORITY) { /* 100 bytes */ }
+    if (o.type == BULK) { /* 100 bytes */ }
+    if (o.type == REFUND) { /* 100 bytes */ }
+    // 400+ bytes total — won't inline
+}
+```
+
+**Fix**: extract each branch into its own method (each small enough to inline). Counter-intuitive — more methods = better performance.
+
+```java
+void processOrder(Order o) {
+    switch (o.type) {
+        case NORMAL -> processNormal(o);
+        case PRIORITY -> processPriority(o);
+        case BULK -> processBulk(o);
+        case REFUND -> processRefund(o);
+    }
+}
+private void processNormal(Order o) { /* 100 bytes — inlinable */ }
+```
+
+Or increase the inline size:
+```bash
+-XX:MaxInlineSize=500
+```
+
+(Use with caution; bigger inline blowups code cache.)
+
+### Pitfall 3: Deopt Storm
+
+```java
+abstract class Animal { abstract void sound(); }
+class Dog extends Animal { void sound() { ... } }
+class Cat extends Animal { void sound() { ... } }
+class Cow extends Animal { void sound() { ... } }
+
+void processAll(List<Animal> animals) {
+    for (Animal a : animals) a.sound();   // monomorphic with Dog initially
+}
+```
+
+If you call this with 1000 Dogs (JIT specializes to Dog), then 1 Cat appears → deopt → recompile.
+If Cat appears occasionally and other animals too → constant deopt storm.
+
+**Diagnose**: lots of `made not entrant` in PrintCompilation.
+
+**Fix**: profile-guided refactor. Make the call site sealed, or split into per-type dispatch.
+
+### Pitfall 4: Reflective Code in Hot Path
+
+```java
+// BAD: reflection bypasses JIT optimization
+Method m = userClass.getMethod("toString");
+String result = (String) m.invoke(user);    // can't inline, slow
+```
+
+**Fix**: cache the `MethodHandle` (post-JDK-7) — JIT can inline through it:
+```java
+private static final MethodHandle TO_STRING;
+static {
+    TO_STRING = MethodHandles.lookup()
+        .findVirtual(User.class, "toString", MethodType.methodType(String.class));
+}
+String result = (String) TO_STRING.invokeExact(user);   // JIT can inline
+```
+
+Better yet: use the interface directly if possible.
+
+### Pitfall 5: Hot Code in Static Initializer
+
+Static blocks are interpreted on first class touch (no compilation). For huge initialization:
+```java
+class Tables {
+    static final int[] PRIMES = new int[10_000];
+    static {
+        // Computed in interpreter on first reference — slow startup
+        for (int i = 2, n = 0; n < PRIMES.length; i++) {
+            if (isPrime(i)) PRIMES[n++] = i;
+        }
+    }
+}
+```
+
+**Fix**: pre-compute at build time + load from resource:
+```java
+class Tables {
+    static final int[] PRIMES = loadFromResource("primes.bin");
+}
+```
+
+Or use CDS / AOT (`-XX:+AutoLoadCDS`) for the JVM to share these tables across instances.
+
+## Deeper Dive — Inline Caching Mechanics
+
+```
+Call site: a.method() where a is some interface/abstract type
+
+MONOMORPHIC (1 type seen)
+  Inline cache stores: [Type pointer, jump address]
+  Hot path: check type matches → direct jump (1-2 cycles)
+  ~95% of call sites in typical code are monomorphic
+
+BIMORPHIC (2 types seen)
+  Inline cache: [TypeA, addrA, TypeB, addrB]
+  Two type checks; otherwise still fast
+
+MEGAMORPHIC (3+ types)
+  Falls back to vtable lookup
+  Slower but still pretty fast (~5-10 cycles)
+  JIT gives up on devirtualization
+
+DEOPT
+  When inline cache "guess" is wrong:
+    JIT compiled assuming type X
+    Suddenly type Y appears at runtime
+    JIT triggers DEOPT → unwind to interpreter → re-profile → maybe recompile
+```
+
+**Cost of deopt**:
+- The deopt itself: ~1-10 µs
+- Re-profile period: 10K-100K invocations before re-compile (Tier 3 → Tier 4)
+- During re-profile: ~5-10× slower interpreted code
+
+So a deopt storm (one per 100K calls) at 1M ops/sec = 10 deopts/sec = costly.
+
+## Deeper Dive — Escape Analysis in Practice
+
+JIT proves an object doesn't escape its allocating method → eliminate allocation entirely.
+
+```java
+public int sumPair() {
+    int[] pair = { 5, 7 };   // allocation!
+    return pair[0] + pair[1];
+}
+```
+
+C2 sees `pair` never escapes → eliminates the `int[]` allocation entirely. The two ints live in registers. Zero heap pressure.
+
+```bash
+# Verify with diagnostic flags
+java -XX:+UnlockDiagnosticVMOptions \
+     -XX:+PrintEscapeAnalysis \
+     -XX:+PrintEliminateAllocations \
+     -jar app.jar
+```
+
+**What breaks escape analysis**:
+- Storing object in a field of another object that escapes
+- Returning the object
+- Passing to a method whose body JIT can't see (interface call, native, abstract that's polymorphic)
+- Synchronization on the object (well, this gets *lock elided* if eligible)
+
+**Common pattern that benefits**: short-lived `Pair`, `Optional`, `Iterator`, lambda capture — all routinely scalar-replaced.
+
+## Deeper Dive — When to Reach for GraalVM JIT
+
+GraalVM JIT (Java-implemented C2 replacement, available via `-XX:+UseJVMCICompiler`).
+
+```
+WIN cases (~5-15% throughput gain):
+  - Streams-heavy code (better partial escape analysis)
+  - Polyglot integration (calls into JS/Python/Ruby)
+  - Highly polymorphic code that vanilla C2 can't devirtualize
+  - Code with lots of small lambdas
+
+LOSE cases:
+  - Tight numeric loops (C2 is mature here)
+  - Already-well-optimized code (margins shrink)
+  - Memory-constrained envs (Graal uses more code cache)
+
+OPERATIONAL:
+  - GraalVM CE (Community): free, comparable to OpenJDK
+  - GraalVM EE (Enterprise): paid, additional optimizations
+  - LibGraal: Graal compiled to native, lower JIT-thread memory footprint
+```
+
+Benchmark with JMH before swapping. Many teams stick with C2 because the difference is small and C2 is well-known.
+
+## Deeper Dive — Code Cache Tuning
+
+JIT compiled code lives in the code cache. Default size: 240 MB.
+
+```bash
+# Symptoms of code-cache pressure
+# Look for in logs:
+"CodeCache is full. Compiler has been disabled."
+"Try increasing the code cache size using -XX:ReservedCodeCacheSize="
+```
+
+When code cache fills:
+1. JIT stops compiling new methods
+2. Code cache sweeper runs to evict cold compiled code
+3. If can't free enough → app falls back to interpreter for new methods
+4. Throughput tanks
+
+**Fix**:
+```bash
+-XX:ReservedCodeCacheSize=512m    # double default
+-XX:InitialCodeCacheSize=64m       # start with more
+```
+
+Code cache is **off-heap** — sized in addition to `-Xmx`. A 4G heap app with 512m code cache needs ~4.5G total in the container.
+
+**Monitor**:
+```bash
+jcmd <pid> Compiler.codecache
+# Or via JMX/Prometheus: jvm_compiler_codecache_*
+```
+
 ## Practice
 
 1. **Print compilation log.** Run any Java app with `-XX:+PrintCompilation`. Identify Tier 3 and Tier 4 compilations. Watch which methods get hot.

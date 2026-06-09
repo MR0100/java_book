@@ -435,6 +435,370 @@ Failover code exists. It's never been exercised. Game day reveals it doesn't wor
 > [!INTERVIEW]
 > A common L5 prompt: "How would you design for 99.99% availability?" Strong answers (a) state the cost in minutes (~4 min/month), (b) name the architecture (multi-region, active-passive with automated failover), (c) mention error budgets, observability, runbooks, chaos engineering, (d) refuse to commit five nines unprompted unless asked.
 
+## Deeper Dive — Implementing SLI/SLO with Prometheus
+
+### Defining SLIs
+
+Three classes of SLI (Google SRE Workbook):
+1. **Request-driven**: success rate of HTTP requests
+2. **Pipeline-driven**: data freshness, processing throughput
+3. **Synchronous**: end-to-end function call success
+
+### Availability SLI in Prometheus
+
+```promql
+# Success rate over 5 min sliding window
+sum(rate(http_server_requests_seconds_count{
+  status!~"5..", uri!~"/actuator/.*"
+}[5m]))
+/
+sum(rate(http_server_requests_seconds_count{
+  uri!~"/actuator/.*"
+}[5m]))
+```
+
+The numerator counts non-5xx (plus excludes health checks); denominator counts all real requests.
+
+### Latency SLI
+
+```promql
+# p99 latency over 5 min
+histogram_quantile(0.99,
+  sum(rate(http_server_requests_seconds_bucket[5m])) by (le)
+)
+```
+
+Or as success against threshold (more interpretable):
+```promql
+# % of requests under 200ms
+sum(rate(http_server_requests_seconds_bucket{le="0.2"}[5m]))
+/
+sum(rate(http_server_requests_seconds_count[5m]))
+```
+
+### Spring Boot Configuration
+
+```yaml
+management:
+  endpoints.web.exposure.include: health,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram.http.server.requests: true
+      sla.http.server.requests: 50ms,100ms,200ms,500ms,1s,2s,5s
+    tags:
+      application: ${spring.application.name}
+      env: ${ENV:dev}
+      region: ${REGION:us-east-1}
+```
+
+### Burn Rate Alerting (The Modern Standard)
+
+```yaml
+# SLO: 99.9% availability over 30 days
+# Error budget: 0.1% of total requests = 43.2 minutes/month
+
+groups:
+- name: slo-burn-rate
+  rules:
+  # Page on FAST burn (consuming a month's budget in hours)
+  - alert: HighBurnRate_Fast
+    expr: |
+      (
+        sum(rate(http_server_requests_seconds_count{status=~"5.."}[1h]))
+        /
+        sum(rate(http_server_requests_seconds_count[1h]))
+      ) > 0.0144  # 14.4× normal error rate
+    for: 2m
+    labels: { severity: page }
+    annotations:
+      summary: "Service consuming SLO error budget at 14.4× rate (1h window)"
+      description: "At this rate, full month budget exhausted in ~2 hours"
+
+  # Page on SLOW burn (consuming a month's budget over days)
+  - alert: HighBurnRate_Slow
+    expr: |
+      (
+        sum(rate(http_server_requests_seconds_count{status=~"5.."}[6h]))
+        /
+        sum(rate(http_server_requests_seconds_count[6h]))
+      ) > 0.001  # 1× normal error rate
+    for: 1h
+    labels: { severity: ticket }
+```
+
+Google SRE's **multi-window, multi-burn-rate** approach: fast burn pages immediately, slow burn opens tickets. Avoids both alert fatigue and missed-incident risk.
+
+## Deeper Dive — Calculating Error Budgets (Concrete Examples)
+
+For 99.9% SLO over 30 days (43,200 minutes):
+
+```
+Allowed downtime: 0.1% × 43,200 min = 43.2 minutes/month
+Allowed failure rate: 0.1% of requests can fail
+
+For a service handling 1M requests/day:
+  30M requests/month × 0.1% = 30,000 failures allowed/month
+  At ~1000 req/sec sustained, that's 30 seconds of total downtime per month
+
+For a 99.99% SLO:
+  Downtime budget: 4.32 minutes/month
+  Failures: 3,000/month for the same 30M request volume
+  → 3 seconds of total outage
+```
+
+**Burn rate** = current consumption rate / sustainable rate:
+- Burn rate 1.0 = consuming exactly what you can afford
+- Burn rate 10.0 = consuming 10× sustainable; you'll be out in 3 days (10% of month)
+- Burn rate 100.0 = consuming month's budget in ~7 hours
+
+### Error Budget Policy (Document This)
+
+```markdown
+# SLO Policy — Order Service
+
+## SLO
+- Availability: 99.9% over rolling 30 days
+- Latency: 95% of requests < 500ms over rolling 30 days
+
+## Error Budget Actions
+| Budget remaining | Action |
+|---|---|
+| >75% | Normal velocity; ship freely |
+| 50-75% | Normal; postmortem any incidents |
+| 25-50% | Slow risky deploys; increase canary % time |
+| 10-25% | Freeze non-critical changes; focus on stability |
+| <10% | Freeze all but P0 fixes; mandatory postmortem review |
+| 0% | Stop deploys until budget recovers |
+
+## Escalation
+- 24h after policy violation: tech lead notified
+- 72h: engineering manager
+- 168h (1 week): director
+```
+
+## Deeper Dive — Multi-Region Failover Patterns
+
+### Active-Passive (DR Standby)
+
+```
+PRIMARY (us-east-1) — serves all traffic
+SECONDARY (us-west-2) — replicates from primary, ready to take over
+
+NORMAL: 100% to primary
+FAILOVER:
+  1. Detect primary failure (health checks, alerts)
+  2. Promote secondary database (e.g., AWS RDS Multi-Region failover or manual promote)
+  3. Update DNS / load balancer to direct traffic to secondary
+  4. RTO: 5-30 minutes typically
+  5. RPO: depends on replication lag (usually <1 second async)
+```
+
+**Costs**: ~1.5× single-region (secondary mostly idle but provisioned).
+
+### Active-Active (Both Serve)
+
+```
+us-east-1 ←→ us-west-2 ←→ eu-west-1
+  Both regions serve traffic concurrently
+  Bi-directional replication (CRDT or conflict-free schemas)
+
+NORMAL: split traffic by:
+  - Geographic (route nearest region)
+  - Latency-based (route fastest)
+  - Account-shard (each account "homed" to a region)
+
+FAILOVER:
+  1. Detect region failure
+  2. Redistribute traffic to surviving regions
+  3. RTO: seconds (DNS TTL + LB drain)
+  4. RPO: 0 (if data was already replicated)
+```
+
+**Costs**: ~2-3× single-region. Requires conflict-free design.
+
+**Challenges**:
+- Data conflicts (two writers update same row in different regions)
+- Cross-region latency (~100ms for transactions touching multiple regions)
+- Eventual consistency for reads (read-your-own-writes guarantee complicates routing)
+
+### Cell-Based (AWS-style)
+
+```
+us-east-1 has multiple "cells":
+  cell-a (10% of traffic)
+  cell-b (10%)
+  ... cell-j (10%)
+
+Each cell is INDEPENDENT — own DB, own service instances
+One cell failure → 10% of users impacted, NOT 100%
+"Blast radius" contained
+```
+
+Used by AWS S3, DynamoDB, AWS Lambda. Massive reliability gains; massive operational complexity.
+
+## Deeper Dive — Chaos Engineering Practice
+
+### Failure Modes to Inject
+
+| Tier | Failure | Tool | Severity |
+|---|---|---|---|
+| Network | Latency injection (100ms-5s) | Toxiproxy, Chaos Mesh | Medium |
+| Network | Packet loss (5-30%) | tc-netem | Medium |
+| Network | Partition (region from region) | iptables, Chaos Mesh | High |
+| Process | SIGKILL pod | Chaos Monkey | Low (test self-healing) |
+| Resource | CPU exhaustion (stress 100% one core) | stress-ng | Medium |
+| Resource | Memory pressure (allocate 2GB) | stress-ng | Medium |
+| Resource | Disk fill (fill /tmp) | dd | Low |
+| Database | Slow queries (sleep 10s) | toxic query proxy | High |
+| Database | Disconnection (kill all connections) | manual pg_terminate_backend | High |
+| Cache | Cache flush (DEL *) | redis-cli | High |
+| Time | Clock skew (ntpdate-d offset 30s) | manual | Medium |
+| Cloud | AZ outage simulation | AWS FIS | High |
+
+### Sample Chaos Day Plan
+
+```markdown
+# Chaos Day — Order Service — 2024-Q2
+
+## Scope
+- Order service + payment integration + inventory service
+- 2pm-4pm IST, all engineers + on-call present
+- Production-like staging environment
+
+## Hypotheses to Test
+1. If primary DB fails over, transactions complete with <5s pause
+2. If Redis cache fails entirely, latency grows but service stays up
+3. If payment provider is slow (5s), circuit breaker opens within 30s
+4. If one of 3 K8s nodes dies, pods reschedule within 2 minutes
+
+## Schedule
+14:00 Kick-off; on-call confirms monitoring active
+14:10 Hypothesis 1: ToxicProxy adds 2s latency to DB → escalate to full DB kill
+14:30 Hypothesis 2: redis-cli FLUSHALL → observe cache miss spike + latency
+14:50 Hypothesis 3: Add 5s sleep to payment provider stub
+15:10 Hypothesis 4: Delete a node
+15:30 Coffee break, share observations
+15:45 Postmortem-style review: did each system behave as expected?
+16:00 Action items captured
+```
+
+## Deeper Dive — Postmortem Template
+
+```markdown
+# Incident YYYY-MM-DD — [Title]
+
+## Summary
+[1-2 sentence describing impact]
+
+## Impact
+- Customers affected: X (out of Y total)
+- Duration: HH:MM — HH:MM UTC (T hours)
+- Revenue impact: $X (if calculable)
+- Data loss: Y/N (and what)
+- SLO budget consumed: Z% of monthly budget
+
+## Timeline
+- HH:MM Alert fired
+- HH:MM On-call paged
+- HH:MM Initial diagnosis (...)
+- HH:MM Root cause identified
+- HH:MM Mitigation applied
+- HH:MM Verified recovery
+
+## Root Cause
+[Detailed technical explanation. Not blame.]
+
+## Contributing Factors
+- [Things that made this worse than necessary]
+
+## What Went Well
+- [Quick alerting, runbook worked, etc.]
+
+## What Could Have Gone Better
+- [Things to improve]
+
+## Action Items
+| Item | Owner | Priority | Due |
+|---|---|---|---|
+| Fix root cause | @alice | P0 | 2024-MM-DD |
+| Improve detection | @bob | P1 | 2024-MM-DD |
+| Update runbook | @carol | P2 | 2024-MM-DD |
+| Chaos test the fix | @dave | P1 | 2024-MM-DD |
+
+## Lessons Learned
+[Patterns to apply elsewhere. Industry-shareable insights.]
+
+## Blameless Reflection
+[How systems/processes need to change to prevent this whole class of issue]
+```
+
+## Deeper Dive — Real-World Reliability Numbers
+
+| Service | Stated SLA | Real Track Record (last 12mo) |
+|---|---|---|
+| AWS S3 | 99.9% | ~99.95% |
+| AWS DynamoDB | 99.999% (multi-region) | ~99.99% |
+| AWS RDS Multi-AZ | 99.95% | ~99.9% |
+| AWS Lambda | 99.95% | ~99.9% |
+| Google Cloud Storage | 99.9% (multi-region) | ~99.95% |
+| GitHub | (no contractual SLA) | ~99.5% |
+| Slack | (no contractual SLA) | ~99% |
+| Stripe API | 99.99% | ~99.99% |
+| Twilio | 99.95% | ~99.9% |
+| Cloudflare | 100% (workers) | ~99.99% |
+| Postmark email | 99.99% | ~99.95% |
+
+**Insight**: even the most reliable cloud services have a real track record below their stated SLA. Plan for that. Vendor SLAs include extensive carve-outs (planned maintenance, force majeure, etc.).
+
+## Deeper Dive — On-Call Operations
+
+### Tier Definitions
+
+```
+P0 (Critical): customer-facing outage, data loss risk
+  Response: page immediately, declare incident, all-hands
+  Examples: API returning 500 to all users, DB corruption, data exfil
+
+P1 (High): major degradation, partial outage
+  Response: page on-call, notify EM
+  Examples: p99 latency >10× normal, 10% error rate, single region down
+
+P2 (Medium): degradation in non-critical features
+  Response: ticket for next business day
+  Examples: notification delays >5min, search re-ranking offline
+
+P3 (Low): minor issues without customer impact
+  Response: backlog
+  Examples: dashboard graph wrong, dev environment issue
+```
+
+### On-Call Rotation Best Practices
+
+```
+ROTATION SHAPE
+  Primary: 1 person, 1 week (M-M)
+  Secondary: 1 person, 1 week (covers if primary unreachable)
+  Manager: rotation lead (decides escalation)
+
+HANDOFF
+  Monday morning sync (10 min)
+  Outgoing on-call walks through:
+    - Active incidents
+    - Recently-resolved issues that might recur
+    - Pending changes likely to cause issues
+
+COMPENSATION
+  Stipend per week of on-call ($200-500 typical)
+  Comp time for hours worked overnight
+  Strict "no work calls outside on-call week"
+
+HEALTHY ROTATION
+  Frequency: weekly or biweekly
+  Team size: 5-8 engineers (1-in-5 frequency tolerable; 1-in-3 causes burnout)
+  Incident load: target <2 pages/week; >5 is unsustainable
+  No incidents the previous month → rotation may be over-staffed
+```
+
 ## Practice
 
 1. **Set an SLO.** For a service you operate, define an availability SLI (which requests count?) and a target SLO. Calculate the error budget.

@@ -540,6 +540,146 @@ These rounds test ownership, judgment, communication. Use STAR (Situation, Task,
 - Strengths and weaknesses (specific).
 - Questions you have for the interviewer.
 
+## Production Incident Scenarios (added pass — 8 questions)
+
+These are real production-incident-debugging questions that come up at senior+ backend interviews. They test whether you can think through a system under fire.
+
+### Q64. The checkout endpoint p99 jumped from 200ms to 4s after Tuesday's deploy. Walk me through your investigation.
+
+**Answer**:
+1. **Confirm with metrics**: when exactly did p99 climb? Match deploy timestamp.
+2. **What's the deploy diff?** `git log --oneline last_good..HEAD` — what changed? Usually a query, a downstream call, a cache key, or a serialization.
+3. **Profile the new latency**: APM trace of a slow request — which span got slower?
+4. **Top suspects in order**:
+   - **Slow query** (added a JOIN, lost an index hint, query plan regressed)
+   - **Downstream latency** (added a call to a slower service)
+   - **Cache miss rate** (cache key changed; hit rate dropped from 90% → 30%)
+   - **Serialization** (added a deep relation that Jackson now traverses)
+5. **Rollback if not obvious**: if root cause unclear in 15 min, roll back the deploy. Investigate offline.
+6. **Communicate**: open incident channel; status updates every 15 min; declare resolved + write postmortem after.
+
+**Follow-ups**:
+- What if no deploy? (Look at infra: DB autoscale, network changes, downstream deploy, traffic shape.)
+- What if rollback didn't help? (Suggests an external factor — DB version upgrade, dependency hot-patch, infra change.)
+
+### Q65. Service starts OOMing in production but not in load tests. Why might that be?
+
+**Answer**:
+- **Real data shape**: prod has skewed distribution (1 user with 100k orders); test data is uniform.
+- **Real concurrency**: load tests use predictable patterns; prod has long-tail of slow requests holding memory.
+- **Long-lived objects**: tests don't run for days; a slow leak only manifests after hours.
+- **Cache filling**: cache cold-start in tests; warm/full in prod.
+- **Stale data accumulation**: prod has data from years of usage; tests start fresh.
+- **Threadlocal leaks**: prod thread pool reuses threads for thousands of requests; tests recycle quickly.
+- **Direct buffer leak**: Netty/JDBC pooling differs in pool size.
+- **JVM args differ**: dev has `-Xmx=4G`, prod has `-Xmx=2G` but more pods.
+
+**Methodology**: enable always-on JFR in prod (low overhead); reproduce by running test against a snapshot of prod data with prod-realistic concurrency.
+
+### Q66. You've enabled virtual threads (`spring.threads.virtual.enabled=true`) and now things are SLOWER. What happened?
+
+**Answer**: Virtual threads only help when **threads block on I/O**. They don't help (and can hurt) when:
+
+1. **CPU-bound work**: virtual threads add scheduling overhead with no benefit. Use parallel streams or `ForkJoinPool` for CPU work.
+2. **`synchronized` everywhere** (pre-JDK-24): pins virtual thread to carrier → carrier pool (small) becomes bottleneck.
+3. **`ThreadLocal` usage** (large per-thread state): each virtual thread carries the same ThreadLocal memory. 10k virtual threads × 10MB ThreadLocal = 100GB.
+4. **JNI / FFM calls**: pin during native frames.
+5. **Connection pool**: still bounded. 10k virtual threads can't get 10k DB connections; they queue.
+
+**Diagnose**:
+- JFR `JFR.start` with `virtual-thread-pinned` events → look for stack traces causing pinning.
+- `jcmd <pid> Thread.print` → are most virtual threads parked or pinned?
+
+**Fix**:
+- Replace `synchronized` with `ReentrantLock` (until JDK 24).
+- Replace `ThreadLocal` with `ScopedValue` (JDK 21+).
+- Use semaphore-based limiters around scarce resources (DB connections) instead of relying on virtual-thread availability.
+
+### Q67. Kafka consumer lag is climbing steadily. Investigate.
+
+**Answer**:
+1. **What's the lag?** `kafka-consumer-groups --describe --group <g>` — lag per partition.
+2. **Is the consumer healthy?** Logs show consume errors? `MessageProcessor` slow?
+3. **Throughput diagnosis**: messages/sec consumed vs produced. If consume < produce, lag grows.
+4. **Why slow?**
+   - **Single-threaded processing**: one thread per partition is the cap. Add partitions or use `ConcurrentMessageListenerContainer` to fan out within one partition.
+   - **Downstream slowness**: each message triggers a slow DB write or API call. Trace a single message.
+   - **Rebalance storms**: consumer group constantly rebalancing → no progress. Check `consumer-group-rebalance-total` metric.
+   - **Poison message**: one bad record blocks the partition. Look at error logs; add a DLQ.
+5. **Mitigations**:
+   - Scale up consumer pods (up to partition count).
+   - Increase `max.poll.records` (process more per poll).
+   - Add a DLQ to skip poison messages.
+   - Async processing within consumer (careful with order + ack semantics).
+   - Re-partition the topic if persistent skew.
+
+**Follow-up**: What if you can't fall behind for compliance reasons? (Pre-decided policy: pause producers? Reject writes? Scale up consumers automatically?)
+
+### Q68. After a region failover, requests fail for 60 seconds. Why?
+
+**Answer**: DNS TTL + connection-pool warm-up + retry storm.
+
+1. **DNS TTL**: client resolved old IP; takes up to TTL (often 60s) before re-resolving.
+2. **Connection pools**: cached connections to old region → all fail. Pool needs to drain + create new connections.
+3. **Retry storm**: every client retries simultaneously → new region gets 10× normal traffic during warm-up → crashes again.
+4. **Cold caches**: new region's app caches are cold; Redis cold; DB query cache cold.
+5. **JIT cold**: new region's JVMs haven't seen production traffic → uncompiled code paths.
+
+**Mitigations**:
+- Short DNS TTL (10-30s) for failover-sensitive services.
+- Pre-warm new region before declaring it primary (synthetic traffic).
+- Coordinated failover (not all-or-nothing — gradual traffic shift).
+- Connection pool tested for fast recovery (`HikariCP.validationTimeout` short).
+- CRaC / native-image for fast startup in new region.
+
+### Q69. You're seeing 5xx errors only from one specific user account. How do you debug?
+
+**Answer**:
+1. **Find their trace_id**: in logs, search by user_id → find recent failed request → extract trace_id.
+2. **Pull the trace**: APM tool (Datadog/Jaeger) shows the full request path.
+3. **Look at request shape**: their input causing it? Use a "replay" tool to send the same request from a test environment.
+4. **Look at their data**: do they have unusual data (1M items in cart, special characters in name, multi-byte chars)?
+5. **Bisect**: is it ALL their requests, or just specific endpoints? Specific times?
+
+**Common single-user bugs**:
+- **N+1 query** triggers OOM only for users with 10k+ items.
+- **Charset issue**: their name has emoji → DB column is VARCHAR not utf8mb4.
+- **Old data**: their account predates a schema change; nullable field is actually null.
+- **Pagination**: their account has 100k+ rows; OFFSET 100000 is slow.
+- **Authorization race**: their session is being modified concurrently across tabs.
+
+**Fix locally with their data**: pull a sanitized copy of their relevant rows; reproduce.
+
+### Q70. Your service was working fine, then started getting 429s from downstream. What now?
+
+**Answer**:
+1. **Confirm the 429**: source of the rate limit (downstream service? API gateway? Cloudflare?).
+2. **What's the limit?** Read response headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`).
+3. **Why now?** Traffic spike? Code that started looping? Cache miss storm?
+4. **Mitigations**:
+   - **Backoff**: respect `Retry-After`; exponential backoff with jitter.
+   - **Cache**: if downstream is read-heavy, cache aggressively (with appropriate TTL).
+   - **Batch**: combine N calls into 1 (downstream may support bulk endpoint).
+   - **Circuit break**: open circuit; serve degraded response (cached / default).
+   - **Negotiate higher limit**: talk to downstream owner if persistent.
+
+**Anti-pattern**: just retry indefinitely. Amplifies the load and gets your IP banned.
+
+### Q71. Service deployed to 100 pods. 5 pods are 10× slower than others. Why?
+
+**Answer**: Noisy neighbor or instance-specific issue.
+
+1. **Group by node**: are the slow pods on the same K8s node? → noisy neighbor on that node.
+2. **Group by AZ**: are they in same availability zone? → AZ-level issue (network, DB replica lag).
+3. **Group by image**: are they running the same image hash? → maybe one node's image is corrupt or old.
+4. **Resource limits**: are slow pods being CPU-throttled? Check `container_cpu_cfs_throttled_seconds_total`.
+5. **Connection skew**: load balancer not distributing evenly? Check requests-per-pod metric.
+6. **State drift**: did some pods take more traffic + filled their cache + others didn't (just started)?
+
+**Quick mitigation**: terminate slow pods → K8s reschedules elsewhere → cleaner state.
+
+**Long-term**: pod anti-affinity (spread across nodes), better LB algorithm (least-conn vs round-robin), workload isolation (dedicated node pools).
+
 ## Common Failure Modes
 
 What gets candidates dinged in L4 interviews:

@@ -11,7 +11,7 @@ tags: [module-index]
 prerequisites: []
 status: planned
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-09
 ---
 
 # L0 — Foundations
@@ -33,15 +33,15 @@ The starting line. Assumes zero programming experience. By the end you can insta
 
 | # | Section | Type | Status |
 |---|---------|------|--------|
-| 01 | [CS & Programming Foundations](C01-cs-foundations/) | concept | **complete (11/11)** |
-| 02 | [Java Language — Core](C02-java-core/) | concept | **complete (19/19)** |
-| 03 | [Tools & Environment](C03-tools-and-environment/) | tools | **complete** |
-| 04 | [Hands-On](C04-hands-on/) | hands-on | **complete** |
-| 05 | [Best Practices & Pitfalls](C05-best-practices/) | best-practices | **complete** |
-| 06 | [Interview Prep](C06-interview-prep/) | interview-prep | **complete** |
-| 07 | [Q&A / FAQ](C07-qa-faq/) | qa | **complete** |
-| 08 | [Cheatsheets & Reference](C08-cheatsheets/) | reference | **complete** |
-| 09 | [Resources](C09-resources/) | resources | **complete** |
+| 01 | [CS & Programming Foundations](C01-cs-foundations/) | concept | planned |
+| 02 | [Java Language — Core](C02-java-core/) | concept | planned |
+| 03 | [Tools & Environment](C03-tools-and-environment/) | tools | planned |
+| 04 | [Hands-On](C04-hands-on/) | hands-on | planned |
+| 05 | [Best Practices & Pitfalls](C05-best-practices/) | best-practices | planned |
+| 06 | [Interview Prep](C06-interview-prep/) | interview-prep | planned |
+| 07 | [Q&A / FAQ](C07-qa-faq/) | qa | planned |
+| 08 | [Cheatsheets & Reference](C08-cheatsheets/) | reference | planned |
+| 09 | [Resources](C09-resources/) | resources | planned |
 
 ## Level project
 

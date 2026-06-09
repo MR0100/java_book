@@ -11,17 +11,11 @@ tags: [section-index]
 prerequisites: []
 status: planned
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-09
 ---
 
 # Foundations — Interview Prep
 
-Interview questions asked at Indian MNCs (TCS / Infosys / Wipro / Accenture / Cognizant / Capgemini) and most entry-level screens. Each Q follows CONVENTIONS §9: difficulty + "Asked at" + answer + follow-ups. Distilled from the INTERVIEW callouts across L0 concept topics.
-
-## Topics
-
-| # | Topic | File | Status |
-|---|-------|------|--------|
-| 01 | Foundations Interview Questions | [`T01-foundations-questions.md`](./T01-foundations-questions.md) | complete |
+Interview questions asked at MNCs for this experience level. Use the fixed Q&A format in CONVENTIONS.md (section 9).
 
 [Back to L0 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

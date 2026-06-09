@@ -425,6 +425,480 @@ Marketing pushes 100M emails. Strategies:
 > [!INTERVIEW]
 > Strong candidates separate the **router** from the **per-channel senders** and address **user preferences and throttling** as first-class concerns.
 
+## Deeper Dive — End-to-End Spring Boot Implementation
+
+### Notification Router (Decouples Source from Channels)
+
+```java
+@Component
+public class NotificationRouter {
+    private final UserPreferenceService preferences;
+    private final NotificationDedupCache dedup;
+    private final ThrottleService throttle;
+    private final KafkaTemplate<String, ChannelMessage> kafka;
+    private final TemplateService templates;
+
+    @KafkaListener(topics = "notifications.triggered", concurrency = "16")
+    public void route(NotificationEvent event) {
+        // 1. Dedup: same (event_type, user_id, dedup_key) within window
+        if (dedup.alreadySent(event.eventType(), event.userId(), event.dedupKey())) {
+            log.debug("Dedup skip: {}", event);
+            return;
+        }
+
+        // 2. Get user preferences for this event_type
+        UserPreferences prefs = preferences.findByUserId(event.userId());
+        Set<Channel> enabledChannels = prefs.channelsFor(event.eventType());
+
+        if (enabledChannels.isEmpty()) {
+            log.debug("All channels opted out: {}", event);
+            return;
+        }
+
+        // 3. Throttle check per channel
+        for (Channel channel : enabledChannels) {
+            if (!throttle.tryAcquire(event.userId(), channel, event.eventType())) {
+                continue;   // throttle hit; skip this channel
+            }
+
+            // 4. Render template for channel
+            RenderedMessage rendered = templates.render(
+                event.eventType(), channel, event.payload(), prefs.locale()
+            );
+
+            // 5. Dispatch to channel-specific topic
+            ChannelMessage msg = new ChannelMessage(
+                UUID.randomUUID(),
+                event.userId(),
+                channel,
+                rendered,
+                event.eventType(),
+                event.dedupKey()
+            );
+            kafka.send("notifications.channel." + channel.name().toLowerCase(),
+                       event.userId(), msg);
+        }
+
+        // 6. Mark as sent in dedup cache
+        dedup.markSent(event.eventType(), event.userId(), event.dedupKey());
+    }
+}
+```
+
+### Email Sender (SendGrid Integration)
+
+```java
+@Component
+public class EmailSender {
+    private final SendGrid sendgrid;
+    private final DeliveryLogRepo deliveryLogRepo;
+    private final UserContactRepo userContactRepo;
+
+    @KafkaListener(topics = "notifications.channel.email", concurrency = "32")
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
+    public void send(ChannelMessage msg) {
+        String email = userContactRepo.findEmailByUserId(msg.userId());
+        if (email == null) {
+            recordDelivery(msg, "FAILED", "NO_EMAIL_ON_FILE");
+            return;
+        }
+
+        try {
+            Mail mail = new Mail();
+            mail.setFrom(new Email("notifications@example.com"));
+            mail.addPersonalization(buildPersonalization(email, msg.payload()));
+            mail.setSubject(msg.rendered().subject());
+            mail.addContent(new Content("text/html", msg.rendered().htmlBody()));
+            mail.addCustomArg("notification_id", msg.id().toString());  // for webhook correlation
+
+            Request req = new Request();
+            req.setMethod(Method.POST);
+            req.setEndpoint("mail/send");
+            req.setBody(mail.build());
+
+            Response resp = sendgrid.api(req);
+            if (resp.getStatusCode() >= 200 && resp.getStatusCode() < 300) {
+                recordDelivery(msg, "SENT", resp.getHeaders().get("X-Message-Id"));
+            } else {
+                throw new EmailDeliveryException("SendGrid " + resp.getStatusCode());
+            }
+        } catch (Exception e) {
+            recordDelivery(msg, "FAILED", e.getMessage());
+            throw e;   // trigger retry
+        }
+    }
+
+    @Recover
+    public void recover(EmailDeliveryException e, ChannelMessage msg) {
+        // After 3 retries; send to DLQ for ops review
+        recordDelivery(msg, "PERMANENTLY_FAILED", e.getMessage());
+        dlqProducer.send("notifications.dlq.email", msg);
+    }
+}
+```
+
+### Push Sender (FCM + APN with Token Lifecycle)
+
+```java
+@Component
+public class PushSender {
+    private final FirebaseMessaging fcm;
+    private final ApnsClient apn;
+    private final PushTokenRepo tokenRepo;
+
+    @KafkaListener(topics = "notifications.channel.push")
+    public void send(ChannelMessage msg) {
+        List<PushToken> tokens = tokenRepo.activeTokensFor(msg.userId());
+        if (tokens.isEmpty()) return;
+
+        tokens.parallelStream().forEach(token -> {
+            switch (token.platform()) {
+                case ANDROID -> sendFCM(msg, token);
+                case IOS -> sendAPN(msg, token);
+            }
+        });
+    }
+
+    private void sendFCM(ChannelMessage msg, PushToken token) {
+        Message fcmMsg = Message.builder()
+            .setToken(token.value())
+            .putData("type", msg.eventType().name())
+            .putData("payload", json.write(msg.rendered().data()))
+            .setNotification(Notification.builder()
+                .setTitle(msg.rendered().title())
+                .setBody(msg.rendered().body())
+                .build())
+            .build();
+
+        try {
+            String response = fcm.send(fcmMsg);
+            recordDelivery(msg, "SENT", response);
+        } catch (FirebaseMessagingException e) {
+            handleFcmError(e, token);
+        }
+    }
+
+    private void handleFcmError(FirebaseMessagingException e, PushToken token) {
+        switch (e.getErrorCode()) {
+            case UNREGISTERED, INVALID_ARGUMENT ->
+                tokenRepo.markInvalid(token);   // permanent failure; clean up
+            case INTERNAL, UNAVAILABLE ->
+                // transient; rely on Kafka retry
+                throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+### SMS Sender (Twilio with Cost Awareness)
+
+```java
+@Component
+public class SmsSender {
+    private final TwilioRestClient twilio;
+    private final SmsCostTracker costTracker;
+
+    @KafkaListener(topics = "notifications.channel.sms")
+    public void send(ChannelMessage msg) {
+        // SMS is expensive ($0.01-0.05 per msg); rate-limit aggressively
+        if (!costTracker.tryAllocateBudget(msg.userId(), msg.eventType())) {
+            log.warn("SMS budget exceeded for user {}", msg.userId());
+            recordDelivery(msg, "SKIPPED", "BUDGET_EXCEEDED");
+            return;
+        }
+
+        String phone = userContactRepo.findPhoneByUserId(msg.userId());
+        if (phone == null || !isValidPhone(phone)) return;
+
+        try {
+            Message smsResult = Message.creator(
+                new PhoneNumber(phone),
+                new PhoneNumber("+15555551212"),       // from
+                msg.rendered().body()
+            ).setStatusCallback(URI.create("https://api.example.com/webhooks/twilio/status"))
+             .create();
+
+            recordDelivery(msg, "SENT", smsResult.getSid());
+        } catch (ApiException e) {
+            recordDelivery(msg, "FAILED", e.getMessage());
+            throw e;
+        }
+    }
+}
+```
+
+### Webhook Receiver (Delivery Status from Providers)
+
+```java
+@RestController
+@RequestMapping("/webhooks")
+public class WebhookController {
+
+    @PostMapping("/sendgrid/events")
+    public ResponseEntity<Void> handleSendGrid(@RequestBody List<SendGridEvent> events,
+                                                 @RequestHeader("X-Twilio-Email-Event-Webhook-Signature") String sig,
+                                                 @RequestHeader("X-Twilio-Email-Event-Webhook-Timestamp") String ts,
+                                                 @RequestBody byte[] rawBody) {
+        // Verify signature
+        if (!sendGridVerifier.verify(rawBody, sig, ts)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        for (SendGridEvent event : events) {
+            String notificationId = event.getCustomArg("notification_id");
+            switch (event.event()) {
+                case "delivered" -> deliveryLogService.markDelivered(notificationId, event.timestamp());
+                case "open" -> deliveryLogService.markOpened(notificationId, event.timestamp());
+                case "click" -> deliveryLogService.markClicked(notificationId, event.url(), event.timestamp());
+                case "bounce", "dropped" -> {
+                    deliveryLogService.markFailed(notificationId, event.reason());
+                    if ("hard".equals(event.bounceClass())) {
+                        userContactRepo.markEmailInvalid(notificationId);
+                    }
+                }
+                case "unsubscribe" -> preferenceService.markUnsubscribed(notificationId, event.url());
+            }
+        }
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+## Deeper Dive — Multi-Provider Failover
+
+```java
+@Component
+public class EmailProviderRouter {
+    private final List<EmailProvider> providers = List.of(
+        new SendGridProvider(),       // primary
+        new MailgunProvider(),        // secondary
+        new AmazonSESProvider()       // tertiary
+    );
+    private final HealthCheckService healthCheck;
+
+    public DeliveryResult send(EmailMessage msg) {
+        for (EmailProvider provider : providers) {
+            if (!healthCheck.isHealthy(provider)) continue;
+
+            try {
+                return provider.send(msg);
+            } catch (TransientException e) {
+                log.warn("Provider {} failed transiently, trying next", provider.name());
+                continue;
+            } catch (PermanentException e) {
+                return DeliveryResult.failed(e.getMessage());
+            }
+        }
+        throw new AllProvidersDownException();
+    }
+}
+```
+
+**Cost vs reliability**: each provider has slightly different rates. Routing strategy:
+- 95% to primary (best rate)
+- 5% to secondary as ongoing warm-up
+- Failover automatic on errors
+
+## Deeper Dive — Template System
+
+Templates need versioning, A/B testing, and i18n.
+
+```sql
+CREATE TABLE notification_templates (
+    template_id TEXT NOT NULL,           -- e.g., "order.shipped"
+    locale TEXT NOT NULL,                -- "en", "es", "ja"
+    channel TEXT NOT NULL,                -- "email", "sms", "push", "in_app"
+    version INT NOT NULL,
+    subject TEXT,                         -- email only
+    body_template TEXT NOT NULL,          -- with {{variables}}
+    metadata JSONB,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (template_id, locale, channel, version)
+);
+```
+
+```java
+@Service
+public class TemplateService {
+    private final TemplateRepo repo;
+    private final Handlebars handlebars = new Handlebars();   // or Thymeleaf, Mustache, etc.
+
+    @Cacheable(value = "templates", key = "#templateId + ':' + #locale + ':' + #channel")
+    public RenderedMessage render(String templateId, Channel channel, Map<String, Object> data, String locale) {
+        Template template = repo.findActiveOrFallback(templateId, locale, channel);
+        Template compiled = handlebars.compileInline(template.bodyTemplate());
+
+        return new RenderedMessage(
+            template.subject() != null ? handlebars.compileInline(template.subject()).apply(data) : null,
+            compiled.apply(data),
+            template.version()
+        );
+    }
+}
+```
+
+**A/B testing**: store template variants with weight; user-id-based bucketing for consistency:
+
+```java
+public Template findActiveOrFallback(String templateId, String locale, Channel channel) {
+    List<Template> variants = repo.findActiveVariants(templateId, locale, channel);
+    if (variants.size() == 1) return variants.get(0);
+
+    // Consistent hashing: user always sees same variant for same template
+    int variant = Math.abs(userId.hashCode()) % weightSum(variants);
+    return pickByWeight(variants, variant);
+}
+```
+
+## Deeper Dive — Bulk Sending (1M Emails in One Job)
+
+```java
+@Service
+public class BulkNotificationService {
+
+    public BulkJob startBulk(BulkRequest request) {
+        BulkJob job = jobRepo.save(new BulkJob(
+            UUID.randomUUID(),
+            request.eventType(),
+            request.audience(),  // segment definition
+            "QUEUED"
+        ));
+
+        // Run in chunks asynchronously
+        bulkExecutor.submit(() -> processBulk(job, request));
+
+        return job;
+    }
+
+    private void processBulk(BulkJob job, BulkRequest request) {
+        long total = audienceService.count(request.audience());
+        jobRepo.updateTotal(job.id(), total);
+
+        AtomicLong sent = new AtomicLong();
+        audienceService.streamUserIds(request.audience())
+            .buffer(1000)
+            .forEach(batch -> {
+                List<CompletableFuture<Void>> futures = batch.stream()
+                    .map(userId -> CompletableFuture.runAsync(() -> {
+                        // Same router as transactional, with bulk_job_id for tracking
+                        NotificationEvent event = new NotificationEvent(
+                            request.eventType(),
+                            userId,
+                            "bulk:" + job.id() + ":" + userId,  // dedup key
+                            request.payload()
+                        );
+                        notificationRouter.route(event);
+                    }, bulkExecutor))
+                    .toList();
+                CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+                jobRepo.updateProgress(job.id(), sent.addAndGet(batch.size()));
+            });
+
+        jobRepo.updateStatus(job.id(), "COMPLETED");
+    }
+}
+```
+
+**Throttling for bulk**: send in chunks with delay to respect provider rate limits + spread spike load. SendGrid allows ~10K emails/sec, FCM ~1M push/sec, Twilio ~100 SMS/sec per account.
+
+## Deeper Dive — User Preferences System
+
+```sql
+CREATE TABLE user_notification_preferences (
+    user_id UUID NOT NULL,
+    event_type TEXT NOT NULL,
+    channel TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL,
+    schedule_window JSONB,        -- "do not send before 9 AM" etc.
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, event_type, channel)
+);
+
+-- Defaults table
+CREATE TABLE default_notification_preferences (
+    event_type TEXT NOT NULL,
+    channel TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL,
+    description TEXT,
+    PRIMARY KEY (event_type, channel)
+);
+```
+
+```java
+@Service
+public class UserPreferenceService {
+    public Set<Channel> channelsFor(String userId, EventType eventType) {
+        Map<Channel, Boolean> userPrefs = prefRepo.findForUser(userId, eventType);
+        Map<Channel, Boolean> defaults = defaultPrefRepo.findForEvent(eventType);
+
+        Set<Channel> enabled = new HashSet<>();
+        for (Channel channel : Channel.values()) {
+            boolean isEnabled = userPrefs.getOrDefault(channel, defaults.get(channel));
+            if (isEnabled && respectsScheduleWindow(userId, channel)) {
+                enabled.add(channel);
+            }
+        }
+        return enabled;
+    }
+
+    private boolean respectsScheduleWindow(String userId, Channel channel) {
+        ScheduleWindow window = prefRepo.findScheduleWindow(userId, channel);
+        if (window == null) return true;
+
+        ZoneId userZone = userRepo.findTimezone(userId);
+        LocalTime userTime = LocalTime.now(userZone);
+        return window.contains(userTime);
+    }
+}
+```
+
+## Deeper Dive — Capacity Math (Notification-Scale)
+
+```
+INPUTS
+  Transactional notifications      : 1B/day (order, login, security alerts)
+  Marketing notifications          : 5B/day (broadcasts, drip campaigns)
+  Channel breakdown                : 60% email, 25% in-app, 10% push, 5% SMS
+  TOTAL                            : ~6B/day
+
+THROUGHPUT (peak)
+  Avg 6B / 86400                   : ~70K/sec
+  Peak (5× avg during campaign)    : ~350K/sec
+  Email: 350K × 60% = 210K/sec
+  SMS: 350K × 5% = 17.5K/sec       ← Twilio account rate limits, multiple accounts
+  Push: 350K × 10% = 35K/sec
+  In-app: 350K × 25% = 87.5K/sec
+
+PROVIDER COSTS (per day at 6B notifications)
+  Email (SendGrid Enterprise)      : 3.6B × $0.0001 = $360,000/day
+  SMS (Twilio US)                  : 300M × $0.01 = $3,000,000/day  ← biggest cost driver!
+  Push (FCM/APN)                   : free
+  TOTAL                            : ~$3M+/day notification costs
+
+STORAGE (delivery logs)
+  Records/day                      : 6B
+  At 200 bytes/record              : 1.2 TB/day
+  90-day retention                 : ~108 TB
+  → ClickHouse or BigQuery, not Postgres
+```
+
+## Deeper Dive — Failure Modes Comprehensive Table
+
+| Failure | Impact | Mitigation |
+|---|---|---|
+| SendGrid outage | Email backlog grows | Multi-provider failover (Mailgun, SES); queue size alert |
+| Bad template change deployed | All notifications fail to render | Template versioning + rollback; canary deploy; per-template error rate alert |
+| Push token churn (invalid) | Push delivery rate drops | Mark token invalid on hard failure; periodic cleanup of >30-day-stale tokens |
+| Twilio rate limit hit | SMS delivery fails 429 | Multiple Twilio sub-accounts; rate-limit-aware throttling per account |
+| Throttle bypass (misconfigured) | 1M notifications to one user | Per-user-per-channel daily throttle as universal safety net |
+| User opt-out not respected | Compliance issue (CAN-SPAM, GDPR) | Preferences checked in router BEFORE channel queue; audit every send decision |
+| Webhook signature failure | Can't process delivery events | Reject + log + alert; only accept signed events; manual recovery via provider dashboard |
+| Bulk job stuck | Queued notifications never sent | Job timeout + auto-resume; dead-job detection |
+| Delivery log write fails | Lost audit trail | Async write with retry to DLQ; eventually consistent log |
+| In-app + push race | User sees both | Coordinator: in-app delivery suppresses scheduled push for 30s |
+
 ## Practice
 
 1. **Idempotency key strategy.** What's the dedup window? 24 hours? Forever? Justify.

@@ -11,7 +11,7 @@ tags: [module-index]
 prerequisites: [l3-advanced-java-and-the-jvm]
 status: planned
 estimated_minutes: 3
-last_updated: 2026-05-29
+last_updated: 2026-06-09
 ---
 
 # L4 — Backend Engineering

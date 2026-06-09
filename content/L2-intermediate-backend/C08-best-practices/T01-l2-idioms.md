@@ -279,6 +279,340 @@ Test libraries are `test` scope, not shipped ([C07/T02](../C07-hands-on/T02-proj
 
 ---
 
+## 11. Distributed-Systems Idioms (added pass)
+
+### Idempotency-Key Pattern for Side-Effect Endpoints
+
+Every POST/PUT/PATCH that has side effects should accept an idempotency key from the client:
+
+```java
+@PostMapping("/payments")
+public Payment charge(@RequestHeader("Idempotency-Key") UUID key,
+                      @Valid @RequestBody ChargeRequest req) {
+    return paymentService.chargeIdempotent(key, req);
+}
+```
+
+Server-side:
+
+```java
+public Payment chargeIdempotent(UUID key, ChargeRequest req) {
+    // Atomic claim of the key
+    Optional<Payment> existing = idempotencyRepo.findByKey(key);
+    if (existing.isPresent()) return existing.get();   // retry — return prior result
+
+    Payment p = doCharge(req);
+    idempotencyRepo.save(new IdempotencyRecord(key, p, Instant.now().plus(72, HOURS)));
+    return p;
+}
+```
+
+**Why:** network retries (HTTP client retry, LB retry, browser refresh) without an idempotency key cause double-charges. The key + dedup window (24-72h) eliminates this whole class of bug. **Stripe / Square / Razorpay all do this** — your payment endpoint should too.
+
+### Outbox Pattern for Atomic Write + Event
+
+Write business state and the event to publish in the same transaction. A separate process drains the outbox:
+
+```java
+@Transactional
+public Order create(OrderRequest req) {
+    Order saved = orderRepo.save(new Order(req));
+    outboxRepo.save(new OutboxRecord(
+        "OrderCreated",
+        saved.getId().toString(),
+        toJson(new OrderCreatedEvent(saved))
+    ));
+    return saved;
+}
+```
+
+A separate worker (or CDC like Debezium) reads `outbox` table, publishes to Kafka, marks rows sent. **At-least-once delivery is guaranteed** by the DB transaction.
+
+**Why:** publishing directly to Kafka inside `@Transactional` is a distributed-transaction problem (Kafka write succeeds, DB rolls back → orphan event; or vice versa → missed event). Outbox isolates the inconsistency to a single DB — either both write together or neither does.
+
+### Circuit Breaker on Every Downstream Call
+
+Resilience4j circuit breaker, configured per downstream:
+
+```java
+@CircuitBreaker(name = "payments-gateway", fallbackMethod = "queueForLater")
+@Retry(name = "payments-gateway")
+@TimeLimiter(name = "payments-gateway")
+public CompletableFuture<Result> charge(Charge c) { ... }
+
+public CompletableFuture<Result> queueForLater(Charge c, Throwable t) {
+    return CompletableFuture.completedFuture(Result.queued(c));
+}
+```
+
+`application.yml`:
+
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      payments-gateway:
+        slidingWindowSize: 10
+        failureRateThreshold: 50      # open after 5/10 fail
+        waitDurationInOpenState: 30s   # cool down
+        permittedNumberOfCallsInHalfOpenState: 3
+```
+
+**Why:** without a circuit breaker, a slow downstream backs up your service's thread pool → cascading failure. The breaker isolates the failure; the fallback degrades gracefully.
+
+### Trace ID Propagation Across All Calls
+
+Every inbound + outbound HTTP/Kafka/gRPC call carries the W3C `traceparent` header:
+
+```java
+// HTTP client (RestTemplate / WebClient with Spring observability auto-config)
+@Bean
+public RestClient.Builder restClientBuilder(ObservationRegistry obs) {
+    return RestClient.builder().observationRegistry(obs);
+}
+
+// Kafka producer
+@Bean
+public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> pf,
+                                                    ObservationRegistry obs) {
+    KafkaTemplate<String, Object> kt = new KafkaTemplate<>(pf);
+    kt.setObservationEnabled(true);
+    return kt;
+}
+```
+
+Logs auto-include trace_id via MDC. **Outcome:** one trace_id, one request, all services. `grep traceparent_value across log aggregator → entire request flow`.
+
+**Why:** debugging a single user request across 6 microservices without trace IDs requires manually correlating timestamps across 6 log streams — minutes. With trace IDs: seconds.
+
+---
+
+## 12. Caching Idioms (added pass)
+
+### Two-Tier Cache (L1 In-Process + L2 Distributed)
+
+```java
+@Bean
+public Cache<String, User> l1Cache() {
+    return Caffeine.newBuilder()
+        .maximumSize(1000)
+        .expireAfterWrite(30, SECONDS)
+        .build();
+}
+
+public User getUser(String id) {
+    return l1Cache().get(id, k -> {
+        return l2Redis.get(k).orElseGet(() -> {
+            User u = userRepo.findById(k).orElseThrow();
+            l2Redis.put(k, u, Duration.ofMinutes(3));
+            return u;
+        });
+    });
+}
+```
+
+**Why:** L1 (~100ns) absorbs 80%+ of hits; L2 (~1ms) absorbs the rest; DB is rare. Pareto-distributed access patterns make this hugely effective. Just-Redis alone is 10× slower than two-tier; just-Caffeine doesn't survive restarts and is per-instance.
+
+### Single-Flight (Prevent Stampede on Cache Miss)
+
+```java
+private final LoadingCache<String, User> cache = Caffeine.newBuilder()
+    .maximumSize(10_000)
+    .expireAfterWrite(5, MINUTES)
+    .build(key -> loadUserFromDb(key));   // ← loader is single-flighted
+
+public User get(String id) { return cache.get(id); }
+```
+
+Caffeine's `LoadingCache.get(key, loader)` guarantees only **one** thread runs `loader(key)` per key at a time; other threads wait for the result. Prevents 1000 simultaneous misses from sending 1000 DB queries.
+
+**Why:** without single-flight, cache expiry on a hot key sends a thundering herd to the DB.
+
+### Cache the Result of Expensive Computation, Not Just DB Reads
+
+```java
+@Cacheable(value = "recommendations", key = "#userId")
+public List<Product> getRecommendations(String userId) {
+    // expensive ML inference / aggregation
+    return mlEngine.recommend(userId);
+}
+```
+
+Spring `@Cacheable` works for **any** method — DB queries, downstream API calls, computations. Set TTL per cache via configuration; never let a cache grow unbounded.
+
+---
+
+## 13. Observability Idioms (added pass)
+
+### RED Metrics for Every Endpoint
+
+Three metrics per service, exposed at `/actuator/prometheus`:
+
+- **Rate**: `http_server_requests_seconds_count` (requests/sec)
+- **Errors**: `http_server_requests_seconds_count{outcome="SERVER_ERROR"}`
+- **Duration**: `http_server_requests_seconds{quantile="0.99"}`
+
+Spring Boot Actuator + Micrometer Prometheus exposes these by default. Just add:
+
+```xml
+<dependency>
+  <groupId>io.micrometer</groupId>
+  <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+```
+
+```yaml
+management:
+  endpoints.web.exposure.include: health,prometheus,metrics
+  metrics.distribution.percentiles-histogram.http.server.requests: true
+```
+
+**Why:** RED is the minimum-viable observability for any service. Without it, you can't tell "is it slow today?" — let alone alert on it.
+
+### Structured Logging (JSON) From Day One
+
+```yaml
+logging:
+  pattern.console: '%date{HH:mm:ss.SSS} %-5level [%thread] %X{traceId} %logger{36} - %msg%n'
+```
+
+For JSON output (better for Loki / ELK / Datadog):
+
+```xml
+<dependency>
+  <groupId>net.logstash.logback</groupId>
+  <artifactId>logstash-logback-encoder</artifactId>
+</dependency>
+```
+
+```xml
+<!-- logback.xml -->
+<appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+  <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+    <includeMdc>true</includeMdc>
+  </encoder>
+</appender>
+```
+
+**Why:** plain-text logs require grep/awk to query. JSON logs are indexed structurally — query `level=ERROR AND user_id=12345 AND duration > 1000ms` in one line. Trace IDs (MDC) flow through automatically.
+
+### Alert on Burn Rate, Not Single Errors
+
+Don't alert on every 5xx. Alert on sustained anomalies:
+
+```yaml
+# Prometheus alert rule
+- alert: HighErrorRate
+  expr: |
+    rate(http_server_requests_seconds_count{outcome="SERVER_ERROR"}[5m])
+    / rate(http_server_requests_seconds_count[5m])
+    > 0.01
+  for: 5m
+```
+
+Multi-window: short-window (fast detection) + long-window (low false-positive). Google SRE Workbook documents the canonical burn-rate alert pattern.
+
+**Why:** alerting on every transient 503 = alert fatigue → on-call ignores alerts → real outage missed. Sustained anomaly = real problem.
+
+---
+
+## 14. Security Idioms (added pass)
+
+### Argon2id for Password Hashing (or BCrypt If Stuck on Legacy)
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    // OWASP 2024+ recommended: Argon2id
+    return new Argon2PasswordEncoder(16, 32, 1, 1 << 14, 2);
+    // params: saltLength, hashLength, parallelism, memoryCost (16MB), iterations
+}
+
+// or, if legacy constraints:
+return new BCryptPasswordEncoder(12);   // work factor 12 = ~250 ms
+```
+
+**Why:** SHA-256 is fast → GPU brute-force is fast. Argon2id is memory-hard → GPU can't parallelize as effectively. Spring Security's `DelegatingPasswordEncoder` lets you migrate from BCrypt to Argon2id transparently (upgrade on next login).
+
+### SameSite=Strict + HttpOnly Cookies for Session Tokens
+
+```java
+@Bean
+public CookieSerializer cookieSerializer() {
+    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    serializer.setCookieName("SESSION");
+    serializer.setUseHttpOnlyCookie(true);      // not visible to JS — XSS protection
+    serializer.setUseSecureCookie(true);         // HTTPS only
+    serializer.setSameSite("Strict");            // CSRF protection
+    return serializer;
+}
+```
+
+Modern best-practice trifecta:
+- **HttpOnly**: stops XSS from stealing the cookie.
+- **Secure**: only sent over HTTPS.
+- **SameSite=Strict**: only sent on same-site requests (kills CSRF).
+
+For OAuth flows that need cross-site cookies, use `SameSite=Lax`.
+
+### Refresh Token Rotation
+
+```java
+public TokenPair refresh(String refreshToken) {
+    RefreshTokenRecord record = refreshRepo.findById(refreshToken).orElseThrow();
+    if (record.used()) {
+        // ALERT: refresh token reused → session compromised → revoke all
+        refreshRepo.revokeAllForUser(record.userId());
+        throw new SecurityException("Token reuse detected");
+    }
+    record.markUsed();
+    return new TokenPair(
+        accessTokenService.create(record.userId(), Duration.ofMinutes(15)),
+        refreshTokenService.create(record.userId(), Duration.ofDays(7))
+    );
+}
+```
+
+**Why:** if a refresh token is stolen, both attacker and legitimate user will eventually try to use it. The second use triggers detection → revoke session. Window of attack reduced from "until natural expiry" to "until next legitimate use."
+
+### Input Validation as Code, Not Comments
+
+```java
+record CreateUser(
+    @NotBlank @Size(min = 1, max = 100) String name,
+    @Email @NotBlank String email,
+    @NotNull @Min(0) @Max(150) Integer age
+) {}
+
+@PostMapping("/users")
+public User create(@Valid @RequestBody CreateUser req) { ... }
+```
+
+Spring Boot + Jakarta Validation validates *before* the controller body runs. Invalid input → 400 with field-level errors. Don't write `if (req.name() == null) throw new ...` — let Bean Validation do it.
+
+### Rate Limiting at the Edge
+
+```yaml
+# Spring Cloud Gateway
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-rate-limit
+          uri: lb://backend
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+```
+
+Token bucket via Redis. Per-user/per-IP rate limit at gateway prevents abuse before traffic reaches backend services.
+
+---
+
 ## The Reflex List
 
 A scan-able summary — if these are automatic, you're operating at L2:
