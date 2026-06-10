@@ -422,6 +422,440 @@ The architectural lesson: **design data models with partitioning in mind from da
 > [!INTERVIEW]
 > A common L5 prompt: "Explain consistent hashing." Strong answers (a) describe the ring, (b) explain why naive modulo fails (99% data movement), (c) cite virtual nodes for distribution, (d) name a production system that uses it (Cassandra, DynamoDB, Akamai). Mentioning jump consistent hash or rendezvous unprompted signals senior depth.
 
+## Deeper Dive — Java Implementation of Consistent Hash Ring with Vnodes
+
+```java
+public class ConsistentHashRing<T> {
+    private final SortedMap<Long, T> ring = new TreeMap<>();
+    private final int vnodesPerNode;
+    private final HashFunction hashFn;
+
+    public ConsistentHashRing(int vnodesPerNode, HashFunction hashFn) {
+        this.vnodesPerNode = vnodesPerNode;
+        this.hashFn = hashFn;
+    }
+
+    public void addNode(T node) {
+        for (int i = 0; i < vnodesPerNode; i++) {
+            long hash = hashFn.hash(node.toString() + "#" + i);
+            ring.put(hash, node);
+        }
+    }
+
+    public void removeNode(T node) {
+        for (int i = 0; i < vnodesPerNode; i++) {
+            long hash = hashFn.hash(node.toString() + "#" + i);
+            ring.remove(hash);
+        }
+    }
+
+    public T getNode(String key) {
+        if (ring.isEmpty()) return null;
+        long hash = hashFn.hash(key);
+
+        // Find next node clockwise on the ring
+        SortedMap<Long, T> tail = ring.tailMap(hash);
+        Long nodeHash = tail.isEmpty() ? ring.firstKey() : tail.firstKey();
+        return ring.get(nodeHash);
+    }
+
+    // Get N nodes for replication
+    public List<T> getNodes(String key, int n) {
+        if (ring.isEmpty()) return List.of();
+        long hash = hashFn.hash(key);
+
+        List<T> result = new ArrayList<>(n);
+        Set<T> seen = new HashSet<>();
+
+        SortedMap<Long, T> tail = ring.tailMap(hash);
+        // Iterate clockwise until we find n distinct nodes
+        Iterator<T> iter = Stream.concat(tail.values().stream(), ring.values().stream()).iterator();
+        while (iter.hasNext() && result.size() < n) {
+            T node = iter.next();
+            if (seen.add(node)) result.add(node);
+        }
+        return result;
+    }
+}
+```
+
+### Murmur3 as the Hash Function
+
+```java
+public interface HashFunction {
+    long hash(String key);
+}
+
+public class Murmur3Hash implements HashFunction {
+    @Override
+    public long hash(String key) {
+        return com.google.common.hash.Hashing.murmur3_128()
+            .hashString(key, StandardCharsets.UTF_8)
+            .asLong();
+    }
+}
+```
+
+**Why Murmur3**: fast (~5ns per hash), very good distribution, used by Cassandra and Kafka internally.
+
+### Vnode Count Tradeoff
+
+```
+LOW vnodes (e.g., 10 per node):
+  + Lower memory (TreeMap entries × 10 instead of × 256)
+  - Uneven distribution (some nodes get more keys)
+  - Big load jumps during node addition
+
+HIGH vnodes (e.g., 256 per node):
+  + Smooth distribution (within ±5% of mean)
+  + Predictable rebalance during membership changes
+  - More TreeMap entries (256 × N) → larger memory
+  - More expensive lookup (still O(log n))
+
+PRODUCTION GUIDANCE:
+  Cassandra default: 256 vnodes (called "num_tokens")
+  Most systems: 100-256
+  Sweet spot: ~128 (good distribution + memory)
+```
+
+## Deeper Dive — Real System Partitioning Strategies
+
+### Cassandra — Partition Key + Murmur3 Hash
+
+```sql
+-- Schema with partition + clustering
+CREATE TABLE messages (
+    chat_id UUID,
+    bucket TEXT,                  -- partition key
+    msg_id TIMEUUID,              -- clustering key
+    body TEXT,
+    PRIMARY KEY ((chat_id, bucket), msg_id)  -- (partition_key, clustering_key)
+);
+
+-- (chat_id, bucket) is hashed via Murmur3 → mapped to vnode → which is owned by a node
+-- Same chat_id but different bucket → DIFFERENT partition (and possibly different node)
+-- Different chat_id with same bucket → ALSO different partition
+```
+
+**Cassandra's gotcha**: choosing the partition key is the most important schema decision. Hot partition (one chat with millions of messages all on same node) cripples performance.
+
+### Kafka — Producer-Side Key Hashing
+
+```java
+ProducerRecord<String, String> record = new ProducerRecord<>("orders",
+    customerId,    // ← this is the KEY
+    orderJson);    //   value
+
+producer.send(record);
+
+// Internally:
+// partition = Math.abs(Murmur2(customerId).hashCode()) % numPartitions
+// SAME key → SAME partition → SAME order guaranteed
+// Different keys → likely different partitions → parallel processing
+```
+
+**Kafka tip**: if you don't supply a key, partitioning is sticky/round-robin (~50ms batches). Use key for ordering guarantees; let Kafka pick partition otherwise.
+
+### DynamoDB — Hash Key + Optional Sort Key
+
+```
+Single-partition design:
+  PK = "ORDER#order-123"
+
+Multi-row partition design:
+  PK = "USER#user-456"
+  SK = "ORDER#2024-06-09T14:32"
+  SK = "ORDER#2024-06-09T14:33"
+  → Both items in same partition (same hash key)
+  → Sort key provides ordering + range queries
+
+DynamoDB's adaptive capacity:
+  Default: 1000 WCU/sec per partition
+  Hot partition? DynamoDB auto-splits if able
+  Hot key (single item) is bad → use write sharding
+```
+
+### Redis Cluster — Hash Slots
+
+```
+16384 hash slots total
+Each node owns a subset
+Key → CRC16(key) mod 16384 → slot → node
+
+MULTI-KEY OPERATIONS REQUIRE SAME SLOT:
+  hash tags force colocation:
+    user:{123}:profile  → slot for "{123}"
+    user:{123}:orders   → slot for "{123}"
+    Both end up on SAME node → MGET safe
+
+RESHARD:
+  MOVE slot from node A to B incrementally
+  Clients are redirected via MOVED responses
+```
+
+## Deeper Dive — Hot Partition Diagnosis and Fixes
+
+### Symptoms
+
+```
+Symptoms in Cassandra:
+  - One node has 10× more compactions
+  - Tombstone warnings in logs
+  - Specific node always high latency
+  - "Partition too large" warnings (>100MB)
+
+Symptoms in Kafka:
+  - One consumer constantly lagging
+  - Topic-partition lag uneven (one partition huge)
+  - Consumer group rebalance to "fix" doesn't help
+
+Symptoms in DynamoDB:
+  - ProvisionedThroughputExceededException on specific keys
+  - "Hot key" notification from AWS
+  - 90%+ of throttling on small subset of items
+```
+
+### Fix Patterns
+
+```
+PATTERN 1: SALT THE KEY
+  Old:  PK = "user-123"
+  New:  PK = (hash(timestamp) % N) + ":user-123"
+  → Spreads across N partitions
+  → Trade-off: must query N partitions to find all user data
+
+PATTERN 2: TIME-BUCKETING
+  Old:  PK = chat_id  (grows forever)
+  New:  PK = (chat_id, week_bucket)
+  → Each week is its own partition
+  → Trade-off: cross-week queries need union
+
+PATTERN 3: WRITE SHARDING
+  Old:  Counter for "global_visit_count" on one row
+  New:  Counter on rows "visit_count_0" through "visit_count_99"
+        Aggregate at read time: SUM(*)
+  → Trade-off: read complexity
+
+PATTERN 4: TWO-TIER HOT KEY HANDLING
+  Detect hot key in real-time
+  Write to local cache (per-pod aggregation)
+  Sync to backing store every N seconds
+  Hot keys see 100× write reduction
+```
+
+## Deeper Dive — Resharding Strategies
+
+### Cassandra: Add a Node (Vnodes Make This Easy)
+
+```bash
+# 1. Configure new node with same cluster name + seeds
+echo "cluster_name: 'my-cluster'" >> /etc/cassandra/cassandra.yaml
+echo "seeds: 'cassandra-1,cassandra-2'" >> /etc/cassandra/cassandra.yaml
+
+# 2. Start new node — Cassandra automatically:
+#    - Bootstraps token ranges (its assigned vnodes)
+#    - Streams data FROM existing nodes
+#    - Joins ring once data caught up
+systemctl start cassandra
+
+# 3. Monitor progress
+nodetool netstats
+nodetool status
+
+# Streaming completes → node serves
+# NO downtime; gradual rebalance
+```
+
+### Kafka: Increase Partitions (Forward-Only!)
+
+```bash
+# WARNING: increasing partitions changes key→partition mapping
+# Old data stays on old partitions; new data uses new mapping
+# ORDERING WITHIN A KEY MAY BE LOST
+
+# To safely increase:
+kafka-topics --bootstrap-server localhost:9092 \
+    --alter --topic orders --partitions 30
+# Was 10; now 30
+
+# RIGHT WAY for production:
+# 1. Create new topic with desired partitions
+# 2. Run dual-write app (writes to both old + new)
+# 3. Consumer migrates to new topic
+# 4. Eventually decommission old topic
+```
+
+### DynamoDB: Auto-Split (Mostly Transparent)
+
+```
+DynamoDB SDK / GUI: just increase ProvisionedThroughput
+AWS internally splits partitions as needed
+Trade-off: split takes minutes; throttling possible during
+
+Best practice: design for write-sharding from the start
+```
+
+### Sharded SQL (Vitess / Citus): More Manual
+
+```
+Citus example:
+SELECT create_distributed_table('orders', 'customer_id');
+
+To reshard:
+SELECT rebalance_table_shards('orders');
+# Moves shards to balance; can take hours for large datasets
+```
+
+## Deeper Dive — Partition Count Decision Math
+
+### Kafka
+
+```
+INPUTS:
+  Peak throughput               : 100K msg/sec
+  Per-partition throughput cap  : ~10K msg/sec (single consumer thread)
+  Consumer parallelism desired   : N consumers in same group
+
+MIN partitions = max(throughput / per-partition cap, desired parallelism)
+              = max(10, N)
+
+Add headroom for future:
+  - Difficult to ADD partitions later (breaks key ordering)
+  - Easy to RUN with fewer consumers than partitions
+  → Start with 2-4× expected partition count
+
+Typical production: 12-48 partitions per topic
+```
+
+### Cassandra (Token Count)
+
+```
+num_tokens (vnodes per node) = 256 (default)
+Total tokens = num_tokens × num_nodes
+For 100-node cluster: 25600 tokens
+
+Each token range = ~1/25600 of full ring
+Adding a node = ~1/100 of total data moves
+
+GOOD distribution at this scale; no tuning needed
+```
+
+### DynamoDB
+
+```
+WCU/RCU determines internal partition count
+WCU = 1000 per partition
+RCU = 3000 per partition
+
+If you provision 10K WCU, DynamoDB creates ~10 partitions
+Hot key concentrated in one partition = throttling at 1000 WCU per item
+
+Mitigation: design for write-sharding (key prefix with salt)
+```
+
+## Deeper Dive — Cross-Partition Operations (The Hidden Tax)
+
+```
+SINGLE-PARTITION READ: 1-10ms (single network round-trip)
+MULTI-PARTITION READ: scatter-gather pattern
+
+Multi-partition pattern in Cassandra/DynamoDB:
+  1. Query coordinator dispatches to each partition node
+  2. Wait for ALL responses (or quorum)
+  3. Merge results
+  Latency = MAX(partition latencies) + merge overhead
+  ~10-30ms typical
+  Tail-latency amplification: slow partition = slow whole query
+
+DESIGN FOR SINGLE-PARTITION:
+  Cassandra: include partition key in WHERE clause
+  DynamoDB: use Query (single partition) not Scan (all partitions)
+  Kafka: read from specific partition by key
+  Redis Cluster: hash tags to colocate
+
+WHEN MULTI-PARTITION IS UNAVOIDABLE:
+  Use parallel queries
+  Set timeout per partition
+  Use CL=LOCAL_ONE in Cassandra for relaxed consistency
+  Have async backup via stream processing
+```
+
+## Deeper Dive — Real Cross-Partition Patterns
+
+### Pattern: Materialized Views
+
+```
+WRITE PATH (single-partition):
+  Order arrives → store by order_id (partition by order_id)
+  → ALSO produce event "OrderCreated"
+
+PROJECTION (separate consumer):
+  Listen to OrderCreated events
+  Maintain "orders_by_customer" with partition key = customer_id
+  Maintain "orders_by_date" with partition key = date
+
+READ PATH:
+  Need single order → query by order_id (single partition)
+  Need customer's orders → query orders_by_customer (single partition)
+  Need orders in date range → query orders_by_date (single partition)
+
+TRADE-OFF: Storage 3×; eventual consistency on read
+WIN: every query is single-partition and fast
+```
+
+### Pattern: Read-Through Aggregation
+
+```
+SHARDED COUNTERS:
+  Don't increment single "total" key
+  Increment 100 sharded counters: "total_0" through "total_99"
+  Read: SUM(*) across all shards
+  Trade-off: write distributes across partitions; read needs all
+
+EXAMPLE:
+  Increment one of 100 shards per write
+  At read: parallel queries to all 100 shards
+  Sum: ~50ms
+  Reading less often is OK; high write throughput is critical
+```
+
+## Deeper Dive — Partition Scheme Decision Flowchart
+
+```
+What's your access pattern?
+│
+├── Range queries (recent N items, time-series)?
+│   ├── Range partitioning by time
+│   │   PostgreSQL: PARTITION BY RANGE (created_at)
+│   │   Cassandra: clustering key by time DESC
+│   │   InfluxDB / TimescaleDB designed for this
+│   └── Trade-off: hot partition (latest time slice gets all writes)
+│
+├── Lookup by unique ID?
+│   ├── Hash partitioning by ID
+│   │   Even load distribution
+│   │   Easy horizontal scale
+│   └── Trade-off: no range queries
+│
+├── Multi-tenant (per-customer data)?
+│   ├── Composite key: (tenant_id, ...) for partition
+│   │   Each tenant's data stays local
+│   │   Easy backup/restore per tenant
+│   └── Trade-off: hot tenant possible
+│
+├── Geographic / regional access?
+│   ├── Geo-based partitioning
+│   │   Data near users
+│   │   Multi-region active-active
+│   └── Trade-off: cross-region operations expensive
+│
+└── Mixed access patterns?
+    ├── Materialized views (different partition key per query)
+    │   Storage cost N× (for N views)
+    │   Each query single-partition
+    └── Adopt vendor solution: Spanner, CockroachDB (auto-shard)
+```
+
 ## Practice
 
 1. **Naive mod failure.** For a cluster of 10 nodes with 1 million keys, simulate the rebalance when one node is added using `hash mod N`. Count keys moved.

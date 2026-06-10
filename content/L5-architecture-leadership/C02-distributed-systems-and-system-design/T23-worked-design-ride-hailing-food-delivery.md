@@ -480,6 +480,434 @@ class MatchingEngine {
 > [!INTERVIEW]
 > Strong candidates name **H3 / geohash / S2** for spatial indexing, describe **single-offer-at-a-time** matching, draw the **state machine for ride lifecycle**, and address **location-update throughput** with a Redis + Kafka pattern.
 
+## Deeper Dive — Complete Spring Boot Implementation
+
+### Location Update Service (Driver → Server, 4 sec/update)
+
+```java
+@RestController
+@RequestMapping("/api/v1/driver")
+public class DriverLocationController {
+    private final LocationUpdateService service;
+
+    @PostMapping("/{driverId}/location")
+    public ResponseEntity<Void> updateLocation(
+            @PathVariable UUID driverId,
+            @Valid @RequestBody LocationUpdate update) {
+
+        if (Math.abs(update.lat()) > 90 || Math.abs(update.lon()) > 180) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Fire-and-forget — accept fast, process async
+        service.updateAsync(driverId, update);
+        return ResponseEntity.accepted().build();
+    }
+}
+
+@Service
+public class LocationUpdateService {
+    private final KafkaTemplate<String, LocationUpdate> kafka;
+    private final RedisTemplate<String, String> redis;
+
+    @Async
+    public void updateAsync(UUID driverId, LocationUpdate update) {
+        // 1. Publish to Kafka (durable, ordered per driver)
+        kafka.send("location-updates", driverId.toString(), update);
+
+        // 2. Update Redis GEO immediately (live view)
+        redis.opsForGeo().add("drivers:available",
+            new Point(update.lon(), update.lat()),
+            driverId.toString());
+
+        // 3. Set TTL — driver considered stale after 30s
+        redis.expire("driver:" + driverId, Duration.ofSeconds(30));
+    }
+}
+```
+
+### H3 Spatial Indexing (Uber's Library)
+
+```java
+@Component
+public class H3SpatialIndex {
+    private final H3Core h3;
+
+    public H3SpatialIndex() throws IOException {
+        this.h3 = H3Core.newInstance();
+    }
+
+    public long encode(double lat, double lon, int resolution) {
+        return h3.latLngToCell(lat, lon, resolution);
+    }
+
+    public List<Long> kRing(long h3Cell, int k) {
+        // Returns all cells within k rings from the center
+        return h3.gridDisk(h3Cell, k);
+    }
+
+    public List<UUID> findNearbyDrivers(double lat, double lon, int radiusMeters) {
+        int resolution = 9;   // ~150m hex
+        long center = encode(lat, lon, resolution);
+        // 1 ring = ~150m, 2 rings = ~450m, 3 rings = ~750m
+        int kRings = Math.max(1, radiusMeters / 150);
+
+        List<Long> cells = kRing(center, kRings);
+        return cells.stream()
+            .flatMap(cell -> driverIndexRepo.findByCell(cell).stream())
+            .toList();
+    }
+}
+```
+
+**Why H3 over geohash**: hexagonal cells have **uniform neighbor distance** (geohash neighbors vary 30-50%); critical for evenly-distributed search.
+
+### Matching Loop (Per-Region, Driven by Pending Rides)
+
+```java
+@Component
+public class RideMatcher {
+    private final RideRepo rideRepo;
+    private final H3SpatialIndex h3Index;
+    private final DriverOfferService offerService;
+    private final RideStateMachine stateMachine;
+
+    @Scheduled(fixedDelay = 1000)   // every second
+    public void matchPendingRides() {
+        List<Ride> pending = rideRepo.findByStatusAndCreatedBefore(
+            RideStatus.PENDING_MATCH,
+            Instant.now().minusSeconds(30)
+        );
+
+        pending.parallelStream().forEach(this::tryMatch);
+    }
+
+    private void tryMatch(Ride ride) {
+        if (!stateMachine.canTransitionTo(ride, RideStatus.OFFERED)) return;
+
+        // Search expanding radius
+        List<DriverCandidate> candidates = findCandidates(ride, 500);  // 500m
+        if (candidates.isEmpty()) candidates = findCandidates(ride, 1500);
+        if (candidates.isEmpty()) candidates = findCandidates(ride, 3000);
+
+        if (candidates.isEmpty()) {
+            // No driver available; will retry next tick
+            return;
+        }
+
+        // Sort by ETA (distance is a proxy; route engine is better)
+        DriverCandidate best = candidates.stream()
+            .min(Comparator.comparingDouble(DriverCandidate::estimatedEta))
+            .get();
+
+        // Offer to the best driver
+        boolean accepted = offerService.offer(best.driverId(), ride.id(),
+            Duration.ofSeconds(10));
+
+        if (accepted) {
+            stateMachine.transitionTo(ride, RideStatus.OFFERED);
+            ride.setDriverId(best.driverId());
+            rideRepo.save(ride);
+        }
+        // Else: try next-best driver next tick
+    }
+
+    private List<DriverCandidate> findCandidates(Ride ride, int radiusMeters) {
+        return h3Index.findNearbyDrivers(ride.pickupLat(), ride.pickupLon(), radiusMeters)
+            .stream()
+            .filter(driverId -> isAvailable(driverId))
+            .map(driverId -> new DriverCandidate(
+                driverId,
+                estimateEta(driverId, ride.pickupLat(), ride.pickupLon())
+            ))
+            .toList();
+    }
+}
+```
+
+### Ride State Machine
+
+```java
+@Component
+public class RideStateMachine {
+
+    private final Map<RideStatus, Set<RideStatus>> validTransitions = Map.of(
+        RideStatus.PENDING_MATCH, Set.of(RideStatus.OFFERED, RideStatus.CANCELLED),
+        RideStatus.OFFERED, Set.of(RideStatus.ACCEPTED, RideStatus.PENDING_MATCH, RideStatus.CANCELLED),
+        RideStatus.ACCEPTED, Set.of(RideStatus.DRIVER_ARRIVED, RideStatus.CANCELLED),
+        RideStatus.DRIVER_ARRIVED, Set.of(RideStatus.IN_PROGRESS, RideStatus.CANCELLED),
+        RideStatus.IN_PROGRESS, Set.of(RideStatus.COMPLETED),
+        RideStatus.COMPLETED, Set.of(),
+        RideStatus.CANCELLED, Set.of()
+    );
+
+    @Transactional
+    public boolean transitionTo(Ride ride, RideStatus newStatus) {
+        Set<RideStatus> allowed = validTransitions.get(ride.status());
+        if (allowed == null || !allowed.contains(newStatus)) {
+            return false;
+        }
+
+        // Atomic state transition with optimistic locking
+        int updated = rideRepo.updateStatusIfCurrent(
+            ride.id(),
+            ride.status(),    // expected current
+            newStatus,
+            Instant.now()
+        );
+
+        if (updated == 1) {
+            publisher.publish(new RideStateChangedEvent(ride.id(), ride.status(), newStatus));
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+```sql
+-- Optimistic locking via WHERE current_status = ?
+UPDATE rides
+SET status = ?, version = version + 1, updated_at = ?
+WHERE id = ? AND status = ? AND version = ?
+RETURNING id;
+```
+
+## Deeper Dive — Surge Pricing Implementation
+
+```java
+@Component
+public class SurgePricingService {
+    private final RedisTemplate<String, String> redis;
+    private final H3SpatialIndex h3Index;
+
+    public BigDecimal computeMultiplier(double lat, double lon) {
+        long cell = h3Index.encode(lat, lon, 7);   // ~5km hex
+
+        Integer demand = redis.opsForValue().get("demand:" + cell);
+        Integer supply = redis.opsForValue().get("supply:" + cell);
+
+        if (demand == null || supply == null || supply == 0) {
+            return BigDecimal.ONE;
+        }
+
+        // Ratio of pending rides to available drivers
+        double ratio = (double) demand / supply;
+
+        // Surge formula: max(1.0, min(5.0, ratio * 0.5 + 0.5))
+        double multiplier = Math.max(1.0, Math.min(5.0, ratio * 0.5 + 0.5));
+        return BigDecimal.valueOf(multiplier).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Scheduled(fixedDelay = 60_000)   // refresh every minute
+    public void recomputeSurgeGrid() {
+        // Iterate active cells; recompute multiplier
+        Set<Long> activeCells = redis.keys("supply:*").stream()
+            .map(k -> Long.parseLong(k.substring(7)))
+            .collect(Collectors.toSet());
+
+        for (Long cell : activeCells) {
+            // Cached for client polling
+            BigDecimal multiplier = computeMultiplier(...);
+            redis.opsForValue().set("surge:" + cell, multiplier.toString(),
+                Duration.ofMinutes(2));
+        }
+    }
+}
+```
+
+## Deeper Dive — Real-Time Communication via WebSocket
+
+```java
+@Component
+public class RideEventBroadcaster {
+    private final SimpMessagingTemplate messagingTemplate;
+
+    @EventListener
+    public void onRideStateChanged(RideStateChangedEvent event) {
+        // Send to rider
+        messagingTemplate.convertAndSendToUser(
+            event.riderId().toString(),
+            "/queue/ride-events",
+            new RideEventDto(event.rideId(), event.newStatus(), event.timestamp())
+        );
+
+        // Send to driver
+        messagingTemplate.convertAndSendToUser(
+            event.driverId().toString(),
+            "/queue/ride-events",
+            new RideEventDto(event.rideId(), event.newStatus(), event.timestamp())
+        );
+    }
+
+    @EventListener
+    public void onDriverLocationUpdate(LocationUpdate update) {
+        // Find active ride for this driver
+        Ride activeRide = rideRepo.findActiveByDriver(update.driverId());
+        if (activeRide == null) return;
+
+        // Send driver location to rider in real time
+        messagingTemplate.convertAndSendToUser(
+            activeRide.riderId().toString(),
+            "/queue/driver-location",
+            new DriverLocationDto(update.lat(), update.lon(), Instant.now())
+        );
+    }
+}
+```
+
+## Deeper Dive — Capacity Planning Math
+
+```
+SCALE TARGET: Uber-class
+  100M users globally
+  Peak active drivers: 1M
+  Peak active rides: 500K
+  Location updates: 1M drivers × 1 update / 4 sec = 250K writes/sec
+
+LOCATION UPDATE THROUGHPUT
+  250K writes/sec to Redis GEO
+  → Need Redis Cluster with 5-10 shards
+  → Each shard handles 25-50K writes/sec
+  
+KAFKA
+  250K events/sec × 200 bytes = 50 MB/sec
+  → 5-broker cluster handles this with headroom
+  
+MATCHING
+  500K active rides × 1 match/sec attempt = 500K spatial queries/sec
+  → Use H3 cells; each cell has small number of drivers
+  → Per-region matching service; horizontal scale by region
+  
+DATABASE
+  500K rides/day × 5 state changes = 2.5M row updates/day
+  Each update: ~100 bytes
+  → Single Postgres or sharded by ride_id
+
+STORAGE
+  Rides: 500K × 1KB × 365 days × 5 years = 900 GB
+  Location history: 1M × 21K updates/day × 100 bytes = 2 TB/day
+  → Time-bucketed Cassandra for location history
+```
+
+## Deeper Dive — Common Pitfalls
+
+### Pitfall 1: Synchronous Matching Blocks Driver Updates
+
+```java
+// BAD: Matching call in driver location update path
+@PostMapping("/{driverId}/location")
+public void updateLocation(...) {
+    redis.geoAdd(...);
+    rideMatcher.tryMatchAllPending();   // 5-10 second delay!
+    return ok();
+}
+
+// GOOD: Decouple via scheduled matcher
+@PostMapping("/{driverId}/location")
+public void updateLocation(...) {
+    redis.geoAdd(...);   // <1ms
+    return ok();
+}
+
+@Scheduled(fixedDelay = 1000)
+public void matchPendingRides() { ... }
+```
+
+### Pitfall 2: Polling Instead of WebSocket
+
+```
+WITH POLLING:
+  1M riders × poll every 5s = 200K req/sec
+  Even with response 99% empty
+  Bandwidth: 200K × 500B = 100 MB/sec
+
+WITH WEBSOCKET:
+  1M persistent connections
+  Push only on state change
+  Bandwidth: ~1 MB/sec (only events)
+```
+
+### Pitfall 3: Storing Location History in Postgres
+
+```
+1M drivers × 21K updates/day × 100B = 2 TB/day in Postgres
+→ Database explodes; queries slow down
+→ Use Cassandra with time-bucketed partition key
+→ Or ClickHouse for analytics queries
+→ TTL the data (typically 30 days for ride disputes)
+```
+
+### Pitfall 4: Single Matcher Instance
+
+```
+Single matcher = single point of failure
++ Throughput limited to one instance's CPU
+
+FIX: 
+- Partition by H3 region or city
+- Run multiple matcher instances
+- Each owns a subset of regions
+- Coordination via Kafka consumer groups or leader election
+```
+
+### Pitfall 5: Surge Pricing Hurting User Trust
+
+```
+PURE SURGE FORMULA:
+  Demand 5× Supply → 3× price
+  Users see "3x surge"
+  
+RESULT: outrage, negative press, regulator scrutiny
+
+REAL UBER:
+  - Cap at 1.5-3× in most jurisdictions
+  - Show "surge zones" visually (not %)
+  - Subsidize during onboarding
+  - "Express Pool" alternative without surge
+```
+
+## Deeper Dive — Food Delivery Variant Differences
+
+```
+KEY DIFFERENCES FROM RIDE-HAILING:
+
+3-PARTY MODEL:
+  Customer ↔ Restaurant ↔ Driver
+  All three must be coordinated
+
+STATE MACHINE:
+  PLACED → ACCEPTED_BY_RESTAURANT → PREPARING → READY_FOR_PICKUP
+  → DRIVER_ASSIGNED → PICKED_UP → IN_TRANSIT → DELIVERED
+
+DOUBLE-MATCHING:
+  Match restaurant to driver (driver near restaurant)
+  Match driver to delivery (after pickup)
+
+PEAK PATTERNS:
+  Lunch + dinner spikes (vs ride-hailing's commute spikes)
+  Friday/Saturday/Sunday peaks
+
+BATCHING:
+  Driver picks up 2-3 orders from same restaurant
+  Optimize for restaurant capacity + delivery efficiency
+
+REAL EXAMPLES:
+  DoorDash, Uber Eats, Grubhub, Swiggy, Zomato
+```
+
+## Deeper Dive — Real-World Companies and Their Designs
+
+| Company | Notable Engineering |
+|---|---|
+| **Uber** | Created H3 library; per-city matching; surge pricing pioneer |
+| **Lyft** | Heavy Spark + Flink for surge; Envoy mesh |
+| **Ola** | India-specific: cash payments, scooter/auto/cab |
+| **DoorDash** | Dasher AI for batching; 100K+ engineers' codebase |
+| **Grab** | Southeast Asia: ride + food + payments super-app |
+| **Bolt** (Taxify) | EU-focused; cheaper alternatives to Uber |
+| **Didi** | Chinese market; 580M+ users; multiple service tiers |
+
 ## Practice
 
 1. **Geohash exercise.** Compute the geohash for a coordinate. Find the 9 cells covering a search radius.

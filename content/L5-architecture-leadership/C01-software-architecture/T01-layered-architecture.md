@@ -781,6 +781,681 @@ The pattern survives because in *most* of these trade-offs, layering wins by a m
 > [!INTERVIEW]
 > A common L5 interview prompt: "Describe the architecture of a service you have built." A weak answer lists the frameworks (Spring, Postgres, Kafka). A strong answer names **the layers, the dependency rule, what each layer owns, where DTOs sit, and one trade-off the team chose to live with**. Interviewers are testing whether you can articulate *why* the structure is the way it is — the rule, not the diagram.
 
+## Deeper Dive — Complete Layered Architecture in Spring Boot
+
+### Standard Package Structure
+
+```
+src/main/java/com/example/orders/
+├── controller/                   # Presentation Layer
+│   ├── OrderController.java
+│   ├── dto/
+│   │   ├── PlaceOrderRequest.java
+│   │   ├── OrderResponse.java
+│   │   └── OrderLineDto.java
+│   └── exception/
+│       └── GlobalExceptionHandler.java
+│
+├── service/                       # Business Logic Layer
+│   ├── OrderService.java
+│   ├── InventoryService.java
+│   ├── PaymentService.java
+│   └── NotificationService.java
+│
+├── repository/                    # Data Access Layer
+│   ├── OrderRepository.java
+│   ├── OrderLineRepository.java
+│   └── CustomerRepository.java
+│
+├── entity/                        # Domain Model
+│   ├── Order.java
+│   ├── OrderLine.java
+│   ├── Customer.java
+│   └── enums/
+│       └── OrderStatus.java
+│
+└── config/                        # Configuration
+    ├── SecurityConfig.java
+    ├── DatabaseConfig.java
+    └── RestTemplateConfig.java
+```
+
+### Controller Layer (Presentation)
+
+```java
+@RestController
+@RequestMapping("/api/v1/orders")
+@Validated
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @PostMapping
+    public ResponseEntity<OrderResponse> placeOrder(
+            @Valid @RequestBody PlaceOrderRequest request,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        
+        Order order = orderService.placeOrder(
+            user.getId(),
+            request.toServiceCommand()
+        );
+        
+        return ResponseEntity
+            .created(URI.create("/api/v1/orders/" + order.getId()))
+            .body(OrderResponse.fromEntity(order));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
+        Order order = orderService.findById(id);
+        return ResponseEntity.ok(OrderResponse.fromEntity(order));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable Long id,
+            @RequestParam(required = false) String reason) {
+        orderService.cancelOrder(id, reason);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(OrderNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse("ORDER_NOT_FOUND", ex.getMessage()));
+    }
+}
+```
+
+### Service Layer (Business Logic)
+
+```java
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final CustomerRepository customerRepository;
+    private final InventoryService inventoryService;
+    private final PaymentService paymentService;
+    private final NotificationService notificationService;
+
+    public Order placeOrder(Long customerId, PlaceOrderCommand command) {
+        // 1. Load customer
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+        // 2. Verify inventory
+        for (OrderLineCommand line : command.getLines()) {
+            if (!inventoryService.isAvailable(line.getProductId(), line.getQuantity())) {
+                throw new InsufficientInventoryException(line.getProductId());
+            }
+        }
+
+        // 3. Calculate totals
+        BigDecimal total = command.getLines().stream()
+            .map(line -> line.getPrice().multiply(BigDecimal.valueOf(line.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 4. Create order entity
+        Order order = new Order();
+        order.setCustomer(customer);
+        order.setStatus(OrderStatus.PENDING);
+        order.setTotal(total);
+        order.setLines(command.getLines().stream()
+            .map(this::toOrderLine)
+            .collect(Collectors.toList()));
+        order.setCreatedAt(Instant.now());
+
+        // 5. Persist
+        Order savedOrder = orderRepository.save(order);
+
+        // 6. Process payment
+        try {
+            paymentService.charge(savedOrder.getId(), total);
+            savedOrder.setStatus(OrderStatus.PAID);
+        } catch (PaymentFailedException e) {
+            savedOrder.setStatus(OrderStatus.PAYMENT_FAILED);
+            throw e;
+        }
+
+        // 7. Reserve inventory
+        inventoryService.reserve(savedOrder.getId(), savedOrder.getLines());
+
+        // 8. Send confirmation
+        notificationService.sendOrderConfirmation(customer, savedOrder);
+
+        return savedOrder;
+    }
+
+    @Transactional(readOnly = true)
+    public Order findById(Long id) {
+        return orderRepository.findById(id)
+            .orElseThrow(() -> new OrderNotFoundException(id));
+    }
+
+    public void cancelOrder(Long id, String reason) {
+        Order order = findById(id);
+        
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Cannot cancel delivered order");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setCancellationReason(reason);
+        
+        inventoryService.releaseReservation(id);
+        paymentService.refund(id);
+        notificationService.sendOrderCancellation(order.getCustomer(), order);
+    }
+}
+```
+
+### Repository Layer (Data Access)
+
+```java
+public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
+
+    Optional<Order> findByIdAndCustomerId(Long id, Long customerId);
+
+    @Query("SELECT o FROM Order o " +
+           "JOIN FETCH o.lines " +
+           "WHERE o.customer.id = :customerId " +
+           "AND o.createdAt > :since " +
+           "ORDER BY o.createdAt DESC")
+    List<Order> findRecentByCustomer(
+        @Param("customerId") Long customerId,
+        @Param("since") Instant since);
+
+    @Modifying
+    @Query("UPDATE Order o SET o.status = :status WHERE o.id = :id")
+    int updateStatus(@Param("id") Long id, @Param("status") OrderStatus status);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status = :status")
+    long countByStatus(@Param("status") OrderStatus status);
+}
+```
+
+### Entity Layer (Domain Model)
+
+```java
+@Entity
+@Table(name = "orders")
+@Getter
+@Setter
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal total;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderLine> lines = new ArrayList<>();
+
+    private String cancellationReason;
+
+    @Column(nullable = false)
+    private Instant createdAt;
+
+    @Version
+    private Long version;
+}
+```
+
+### DTOs (Layer Boundaries)
+
+```java
+// Request DTO - presentation layer
+public record PlaceOrderRequest(
+    @NotEmpty List<@Valid OrderLineRequest> lines,
+    @Valid @NotNull ShippingAddressRequest shippingAddress
+) {
+    public PlaceOrderCommand toServiceCommand() {
+        return new PlaceOrderCommand(
+            lines.stream()
+                .map(l -> new OrderLineCommand(l.productId(), l.quantity(), l.price()))
+                .toList(),
+            shippingAddress.toAddress()
+        );
+    }
+}
+
+// Service command - service layer input
+public record PlaceOrderCommand(
+    List<OrderLineCommand> lines,
+    Address shippingAddress
+) {}
+
+// Response DTO - presentation layer output
+public record OrderResponse(
+    Long id,
+    String status,
+    BigDecimal total,
+    List<OrderLineResponse> lines,
+    Instant createdAt
+) {
+    public static OrderResponse fromEntity(Order order) {
+        return new OrderResponse(
+            order.getId(),
+            order.getStatus().name(),
+            order.getTotal(),
+            order.getLines().stream()
+                .map(OrderLineResponse::fromEntity)
+                .toList(),
+            order.getCreatedAt()
+        );
+    }
+}
+```
+
+### Configuration
+
+```java
+@Configuration
+@EnableJpaRepositories(basePackages = "com.example.orders.repository")
+public class DatabaseConfig {
+    // JPA configuration
+}
+
+@Configuration
+public class RestTemplateConfig {
+    
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+            .setConnectTimeout(Duration.ofSeconds(5))
+            .setReadTimeout(Duration.ofSeconds(10))
+            .errorHandler(new CustomErrorHandler())
+            .build();
+    }
+}
+```
+
+## Deeper Dive — ArchUnit Enforcement of Layer Rules
+
+```java
+@AnalyzeClasses(packages = "com.example.orders")
+class LayeredArchitectureTest {
+
+    @ArchTest
+    static final ArchRule layered_architecture =
+        layeredArchitecture()
+            .consideringAllDependencies()
+            .layer("Controller").definedBy("..controller..")
+            .layer("Service").definedBy("..service..")
+            .layer("Repository").definedBy("..repository..")
+            .layer("Entity").definedBy("..entity..")
+            .whereLayer("Controller").mayNotBeAccessedByAnyLayer()
+            .whereLayer("Service").mayOnlyBeAccessedByLayers("Controller")
+            .whereLayer("Repository").mayOnlyBeAccessedByLayers("Service")
+            .whereLayer("Entity").mayOnlyBeAccessedByLayers("Controller", "Service", "Repository");
+
+    @ArchTest
+    static final ArchRule controllers_should_not_use_servlet_api =
+        noClasses()
+            .that().resideInAPackage("..controller..")
+            .should().dependOnClassesThat()
+            .resideInAPackage("javax.servlet..");
+
+    @ArchTest
+    static final ArchRule services_should_not_use_http_types =
+        noClasses()
+            .that().resideInAPackage("..service..")
+            .should().dependOnClassesThat()
+            .haveSimpleName("HttpServletRequest")
+            .orShould().dependOnClassesThat()
+            .haveSimpleName("ResponseEntity");
+
+    @ArchTest
+    static final ArchRule repositories_should_not_call_services =
+        noClasses()
+            .that().resideInAPackage("..repository..")
+            .should().dependOnClassesThat()
+            .resideInAPackage("..service..");
+
+    @ArchTest
+    static final ArchRule controllers_should_return_dtos_not_entities =
+        methods()
+            .that().areDeclaredInClassesThat().resideInAPackage("..controller..")
+            .and().arePublic()
+            .should().notHaveRawReturnType(resideInAPackage("..entity.."));
+
+    @ArchTest
+    static final ArchRule services_should_be_annotated =
+        classes()
+            .that().resideInAPackage("..service..")
+            .and().haveSimpleNameEndingWith("Service")
+            .should().beAnnotatedWith(Service.class);
+}
+```
+
+## Deeper Dive — Layered Anti-Pattern Detection
+
+### Anti-Pattern 1: Layer Bypass (Controller → Repository)
+
+```java
+// BAD: Controller skipping service layer
+@RestController
+public class OrderController {
+    @Autowired
+    private OrderRepository orderRepository;  // ← Bypassing service!
+
+    @GetMapping("/{id}")
+    public Order getOrder(@PathVariable Long id) {
+        return orderRepository.findById(id)
+            .orElseThrow();
+    }
+}
+
+// GOOD: Through service layer
+@RestController
+public class OrderController {
+    private final OrderService orderService;
+
+    @GetMapping("/{id}")
+    public OrderResponse getOrder(@PathVariable Long id) {
+        Order order = orderService.findById(id);
+        return OrderResponse.fromEntity(order);
+    }
+}
+```
+
+### Anti-Pattern 2: Returning Entities from Controllers
+
+```java
+// BAD: Exposes internal model
+@GetMapping("/{id}")
+public Order getOrder(@PathVariable Long id) {
+    return orderService.findById(id);  // ← Entity exposed!
+}
+
+// Issues:
+//   - Lazy loading exceptions in JSON serialization
+//   - Internal fields leaked (version, internal_notes, etc.)
+//   - API breaks when entity changes
+//   - Bidirectional relationships cause infinite loops
+
+// GOOD: DTO conversion
+@GetMapping("/{id}")
+public OrderResponse getOrder(@PathVariable Long id) {
+    return OrderResponse.fromEntity(orderService.findById(id));
+}
+```
+
+### Anti-Pattern 3: God Service
+
+```java
+// BAD: 4000-line service doing everything
+@Service
+public class OrderService {
+    public Order place(...) { /* 200 lines */ }
+    public Order cancel(...) { /* 150 lines */ }
+    public Order ship(...) { /* 180 lines */ }
+    public void notifyCustomer(...) { /* 100 lines */ }
+    public void calculateShipping(...) { /* 120 lines */ }
+    public Report generateMonthlyReport(...) { /* 300 lines */ }
+    // ... 40 more methods
+}
+
+// GOOD: Decomposed by capability
+@Service
+public class OrderPlacementService { ... }
+
+@Service
+public class OrderCancellationService { ... }
+
+@Service
+public class OrderShippingService { ... }
+
+@Service
+public class OrderReportingService { ... }
+```
+
+### Anti-Pattern 4: Anemic Domain Model
+
+```java
+// BAD: Entity is just data, business logic in service
+@Entity
+public class Order {
+    private OrderStatus status;
+    // Just getters and setters
+}
+
+@Service
+public class OrderService {
+    public void cancel(Long id) {
+        Order order = repo.findById(id).orElseThrow();
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Already delivered");
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        repo.save(order);
+    }
+}
+
+// GOOD: Entity has behavior
+@Entity
+public class Order {
+    private OrderStatus status;
+    
+    public void cancel() {
+        if (status == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Already delivered");
+        }
+        this.status = OrderStatus.CANCELLED;
+    }
+}
+
+@Service
+public class OrderService {
+    public void cancel(Long id) {
+        Order order = repo.findById(id).orElseThrow();
+        order.cancel();  // ← Business rule in domain
+        repo.save(order);
+    }
+}
+```
+
+### Anti-Pattern 5: Cross-Layer Transaction Boundaries
+
+```java
+// BAD: Transaction starts at controller
+@RestController
+@Transactional  // ← Wrong layer!
+public class OrderController {
+    // ...
+}
+
+// GOOD: Transaction at service layer
+@RestController
+public class OrderController {
+    private final OrderService service;
+}
+
+@Service
+@Transactional  // ← Correct layer
+public class OrderService {
+    // ...
+}
+```
+
+## Deeper Dive — When to Use Each Layering Approach
+
+### Strict Layered (Standard Spring Boot)
+
+**Best for**:
+- Single-team projects
+- Standard CRUD + business logic apps
+- Teams new to Spring Boot
+- Most enterprise applications
+
+**Trade-offs**: Most common, easiest to teach, well-understood
+
+### Relaxed Layered (Skip Service for Simple CRUD)
+
+**Best for**:
+- Admin tools
+- Read-only APIs
+- Pure data exposure services
+
+**Example**:
+```java
+@RestController
+public class ProductReadController {
+    private final ProductRepository repo;
+
+    @GetMapping("/{id}")
+    public Product get(@PathVariable Long id) {
+        // OK to skip service layer for pure CRUD reads
+        return repo.findById(id).orElseThrow();
+    }
+}
+```
+
+### No Service Layer (Direct DAO Access)
+
+**Best for**:
+- Reports/Analytics endpoints
+- Database admin tools
+- Microservices that just expose tables
+
+**Risk**: Easy to drift into business logic in controllers
+
+## Deeper Dive — Real Production Layered Examples
+
+### Spring PetClinic (Reference Implementation)
+
+```
+PetClinic is the canonical Spring Boot example:
+- Controller layer: handles web requests
+- Service layer: business logic
+- Repository layer: JPA repositories
+- Domain layer: JPA entities
+
+Outcomes:
+  - Easy to teach Spring concepts
+  - Most enterprise Spring tutorials reference it
+  - Standard for "starter" architecture
+```
+
+### Netflix's Initial Architecture
+
+```
+Netflix started with layered monolith:
+  - Standard 3-tier architecture
+  - PHP/Spring layers
+  - Massive engineering team scaled with layers
+
+Eventually migrated to microservices (different topic),
+but layered was their starting point.
+```
+
+### Banks and Insurance Companies
+
+```
+Almost all enterprise Java applications start with layered:
+  - Strict controller/service/repository separation
+  - Heavy use of DTOs
+  - ArchUnit or similar enforcement
+  - 10-15 year application lifetimes
+  - Multiple teams contributing
+```
+
+## Deeper Dive — DTO Mapping Strategies
+
+### Strategy 1: Manual Mapping (Most Performant)
+
+```java
+public static OrderResponse fromEntity(Order order) {
+    return new OrderResponse(
+        order.getId(),
+        order.getStatus().name(),
+        order.getTotal(),
+        order.getLines().stream()
+            .map(line -> new OrderLineResponse(
+                line.getProductId(),
+                line.getQuantity(),
+                line.getPrice()
+            ))
+            .toList(),
+        order.getCreatedAt()
+    );
+}
+
+// Performance: ~50ns per mapping (no reflection)
+// Pro: Fastest, type-safe, refactor-safe
+// Con: Boilerplate
+```
+
+### Strategy 2: MapStruct (Best Default)
+
+```java
+@Mapper(componentModel = "spring")
+public interface OrderMapper {
+    OrderResponse toResponse(Order order);
+    List<OrderResponse> toResponses(List<Order> orders);
+}
+
+// Generated code at compile time
+// Performance: ~50ns per mapping (same as manual)
+// Pro: Fast, type-safe, compile-time errors
+// Con: Generated code can be confusing
+```
+
+### Strategy 3: ModelMapper (Easy but Slow)
+
+```java
+@Bean
+public ModelMapper modelMapper() {
+    return new ModelMapper();
+}
+
+OrderResponse response = modelMapper.map(order, OrderResponse.class);
+
+// Performance: ~1500ns per mapping (uses reflection)
+// Pro: Zero configuration, automatic
+// Con: 30× slower than MapStruct, runtime errors
+```
+
+### Strategy 4: ObjectMapper (Custom Use Cases)
+
+```java
+@Autowired private ObjectMapper objectMapper;
+
+// Entity → JSON → DTO (slow but flexible)
+String json = objectMapper.writeValueAsString(order);
+OrderResponse response = objectMapper.readValue(json, OrderResponse.class);
+
+// Performance: ~5000ns per mapping
+// Pro: Handles complex transformations
+// Con: Very slow, error-prone
+```
+
+### Choice Matrix
+
+```
+SCENARIO                    BEST CHOICE
+< 5 fields                  Manual mapping
+5-30 fields                 MapStruct
+> 30 fields                 MapStruct or split DTO
+Need complex transformations Manual mapping
+Prototype/MVP                ModelMapper (initial only)
+Production code              MapStruct
+```
+
 ## Practice
 
 1. **The God Class.** Sketch (on paper, no IDE) a 4-method controller-service-repository slice for a `POST /accounts` endpoint that creates a bank account, calls a KYC API, and persists. Now collapse it into a single class. Write down five concrete things that get harder.

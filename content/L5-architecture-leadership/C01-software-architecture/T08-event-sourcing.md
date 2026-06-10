@@ -643,6 +643,568 @@ Elixir/Commanded deserves attention: the actor model gives each aggregate a proc
 > [!INTERVIEW]
 > A common L5 prompt: "When would you choose event sourcing?" A weak answer recites benefits (audit, time travel). A strong answer (a) names the *specific domain properties* that justify it (regulated, multiple-consumer view shapes, history-informed behavior), (b) explicitly cites the costs (schema evolution, GDPR, projection management), and (c) refuses ES for the 80% of services where simpler patterns suffice.
 
+## Deeper Dive — Production Event Store with Postgres
+
+### Schema
+
+```sql
+-- Event store table
+CREATE TABLE event_stream (
+    sequence_number BIGSERIAL PRIMARY KEY,         -- global ordering
+    stream_id UUID NOT NULL,                       -- aggregate ID
+    stream_version BIGINT NOT NULL,                -- version within stream
+    event_type TEXT NOT NULL,
+    event_data JSONB NOT NULL,
+    event_metadata JSONB,                          -- correlation_id, causation_id, user_id
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    UNIQUE (stream_id, stream_version)             -- optimistic concurrency
+);
+
+CREATE INDEX idx_stream ON event_stream(stream_id, stream_version);
+CREATE INDEX idx_global ON event_stream(sequence_number);
+CREATE INDEX idx_event_type ON event_stream(event_type);
+CREATE INDEX idx_created ON event_stream(created_at);
+
+-- Snapshots table for performance
+CREATE TABLE snapshot_store (
+    stream_id UUID NOT NULL,
+    stream_version BIGINT NOT NULL,
+    aggregate_state JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (stream_id, stream_version)
+);
+
+-- Projection checkpoints
+CREATE TABLE projection_checkpoints (
+    projection_name TEXT PRIMARY KEY,
+    last_processed_sequence BIGINT NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### Event Store Repository
+
+```java
+@Repository
+public class PostgresEventStore {
+    private final JdbcTemplate jdbc;
+    private final ObjectMapper objectMapper;
+
+    @Transactional
+    public void appendToStream(UUID streamId, long expectedVersion,
+                                List<DomainEvent> events) {
+        if (events.isEmpty()) return;
+
+        // Validate expected version
+        Long currentVersion = jdbc.queryForObject(
+            "SELECT COALESCE(MAX(stream_version), -1) FROM event_stream WHERE stream_id = ?",
+            Long.class,
+            streamId
+        );
+
+        if (currentVersion != expectedVersion) {
+            throw new OptimisticConcurrencyException(
+                streamId, expectedVersion, currentVersion
+            );
+        }
+
+        long version = expectedVersion;
+        for (DomainEvent event : events) {
+            version++;
+            jdbc.update("""
+                INSERT INTO event_stream (stream_id, stream_version, event_type,
+                                         event_data, event_metadata)
+                VALUES (?, ?, ?, ?::jsonb, ?::jsonb)
+                """,
+                streamId, version, event.getClass().getSimpleName(),
+                objectMapper.writeValueAsString(event),
+                objectMapper.writeValueAsString(event.metadata())
+            );
+        }
+    }
+
+    public List<DomainEvent> readStream(UUID streamId) {
+        return jdbc.query(
+            "SELECT event_type, event_data FROM event_stream WHERE stream_id = ? ORDER BY stream_version",
+            new EventRowMapper(objectMapper),
+            streamId
+        );
+    }
+
+    public List<DomainEvent> readStreamFromVersion(UUID streamId, long fromVersion) {
+        return jdbc.query("""
+            SELECT event_type, event_data
+            FROM event_stream
+            WHERE stream_id = ? AND stream_version > ?
+            ORDER BY stream_version
+            """,
+            new EventRowMapper(objectMapper),
+            streamId, fromVersion
+        );
+    }
+
+    public List<EventEnvelope> readGlobalFrom(long sequenceNumber, int limit) {
+        return jdbc.query("""
+            SELECT sequence_number, stream_id, stream_version, event_type, event_data
+            FROM event_stream
+            WHERE sequence_number > ?
+            ORDER BY sequence_number
+            LIMIT ?
+            """,
+            new GlobalEventRowMapper(objectMapper),
+            sequenceNumber, limit
+        );
+    }
+}
+```
+
+### Event-Sourced Aggregate: Order
+
+```java
+public abstract class AggregateRoot {
+    private final List<DomainEvent> uncommittedEvents = new ArrayList<>();
+    protected long version = -1;
+
+    protected void raiseEvent(DomainEvent event) {
+        applyEvent(event);
+        uncommittedEvents.add(event);
+    }
+
+    public abstract void applyEvent(DomainEvent event);
+
+    public List<DomainEvent> getUncommittedEvents() {
+        return uncommittedEvents;
+    }
+
+    public void markEventsAsCommitted() {
+        uncommittedEvents.clear();
+    }
+
+    public void loadFromHistory(List<DomainEvent> events) {
+        for (DomainEvent event : events) {
+            applyEvent(event);
+            version++;
+        }
+    }
+}
+
+public class Order extends AggregateRoot {
+    private OrderId id;
+    private CustomerId customerId;
+    private OrderStatus status;
+    private List<OrderItem> items = new ArrayList<>();
+    private Money total;
+
+    // Constructors
+    public Order() {}   // for reconstruction from events
+
+    public static Order create(OrderId id, CustomerId customerId,
+                                List<OrderItem> items) {
+        Order order = new Order();
+        order.raiseEvent(new OrderCreated(id, customerId, items, calculateTotal(items),
+            Instant.now()));
+        return order;
+    }
+
+    public void addItem(OrderItem item) {
+        if (status != OrderStatus.DRAFT) {
+            throw new IllegalStateException("Cannot add items to non-draft order");
+        }
+        raiseEvent(new ItemAddedToOrder(id, item, Instant.now()));
+    }
+
+    public void place() {
+        if (status != OrderStatus.DRAFT) {
+            throw new IllegalStateException("Order already placed");
+        }
+        if (items.isEmpty()) {
+            throw new IllegalStateException("Cannot place empty order");
+        }
+        raiseEvent(new OrderPlaced(id, total, Instant.now()));
+    }
+
+    public void cancel(String reason) {
+        if (status == OrderStatus.COMPLETED || status == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot cancel " + status);
+        }
+        raiseEvent(new OrderCancelled(id, reason, Instant.now()));
+    }
+
+    public void markPaymentReceived(PaymentId paymentId, Money amount) {
+        if (status != OrderStatus.PLACED) {
+            throw new IllegalStateException("Order not awaiting payment");
+        }
+        raiseEvent(new PaymentReceived(id, paymentId, amount, Instant.now()));
+    }
+
+    @Override
+    public void applyEvent(DomainEvent event) {
+        switch (event) {
+            case OrderCreated e -> apply(e);
+            case ItemAddedToOrder e -> apply(e);
+            case OrderPlaced e -> apply(e);
+            case OrderCancelled e -> apply(e);
+            case PaymentReceived e -> apply(e);
+            default -> throw new IllegalArgumentException("Unknown event: " + event);
+        }
+    }
+
+    private void apply(OrderCreated e) {
+        this.id = e.orderId();
+        this.customerId = e.customerId();
+        this.items.addAll(e.items());
+        this.total = e.total();
+        this.status = OrderStatus.DRAFT;
+    }
+
+    private void apply(ItemAddedToOrder e) {
+        this.items.add(e.item());
+        this.total = calculateTotal(this.items);
+    }
+
+    private void apply(OrderPlaced e) {
+        this.status = OrderStatus.PLACED;
+    }
+
+    private void apply(OrderCancelled e) {
+        this.status = OrderStatus.CANCELLED;
+    }
+
+    private void apply(PaymentReceived e) {
+        this.status = OrderStatus.PAID;
+    }
+
+    private static Money calculateTotal(List<OrderItem> items) {
+        return items.stream()
+            .map(OrderItem::price)
+            .reduce(Money.ZERO, Money::add);
+    }
+}
+
+// Domain events
+public sealed interface DomainEvent permits OrderCreated, ItemAddedToOrder,
+                                            OrderPlaced, OrderCancelled, PaymentReceived {
+    Instant occurredAt();
+    default EventMetadata metadata() {
+        return new EventMetadata(UUID.randomUUID(), null, "system");
+    }
+}
+
+public record OrderCreated(
+    OrderId orderId, CustomerId customerId, List<OrderItem> items,
+    Money total, Instant occurredAt
+) implements DomainEvent {}
+```
+
+### Repository (Persisting / Loading Aggregates)
+
+```java
+@Service
+public class OrderRepository {
+    private final PostgresEventStore eventStore;
+    private final SnapshotStore snapshotStore;
+
+    public Optional<Order> findById(OrderId id) {
+        UUID streamId = id.toUUID();
+
+        // Try snapshot first for performance
+        Optional<Snapshot<Order>> snapshot = snapshotStore.loadLatest(streamId);
+
+        Order order = new Order();
+        long fromVersion = -1;
+
+        if (snapshot.isPresent()) {
+            order = snapshot.get().state();
+            fromVersion = snapshot.get().version();
+        }
+
+        // Load events since snapshot
+        List<DomainEvent> events = eventStore.readStreamFromVersion(streamId, fromVersion);
+        if (events.isEmpty() && snapshot.isEmpty()) {
+            return Optional.empty();
+        }
+
+        order.loadFromHistory(events);
+        return Optional.of(order);
+    }
+
+    @Transactional
+    public void save(Order order) {
+        UUID streamId = order.id().toUUID();
+        long expectedVersion = order.version();
+
+        eventStore.appendToStream(
+            streamId,
+            expectedVersion,
+            order.getUncommittedEvents()
+        );
+
+        order.markEventsAsCommitted();
+
+        // Snapshot every N events
+        if (shouldSnapshot(order)) {
+            snapshotStore.save(streamId, order.version(), order);
+        }
+    }
+
+    private boolean shouldSnapshot(Order order) {
+        return order.version() > 0 && order.version() % 100 == 0;
+    }
+}
+```
+
+## Deeper Dive — Projection Management
+
+### Projector Infrastructure
+
+```java
+@Component
+public class ProjectionRunner {
+    private final PostgresEventStore eventStore;
+    private final JdbcTemplate jdbc;
+    private final List<EventProjector> projectors;
+
+    @Scheduled(fixedDelay = 100)   // poll every 100ms
+    @Transactional
+    public void runProjections() {
+        for (EventProjector projector : projectors) {
+            try {
+                runProjector(projector);
+            } catch (Exception e) {
+                log.error("Projector {} failed", projector.name(), e);
+                // Continue with other projectors
+            }
+        }
+    }
+
+    private void runProjector(EventProjector projector) {
+        long checkpoint = getCheckpoint(projector.name());
+        List<EventEnvelope> batch = eventStore.readGlobalFrom(checkpoint, 100);
+
+        if (batch.isEmpty()) return;
+
+        for (EventEnvelope envelope : batch) {
+            projector.handle(envelope.event());
+        }
+
+        long newCheckpoint = batch.get(batch.size() - 1).sequenceNumber();
+        updateCheckpoint(projector.name(), newCheckpoint);
+    }
+
+    private long getCheckpoint(String projectorName) {
+        return jdbc.queryForObject(
+            "SELECT COALESCE(MAX(last_processed_sequence), 0) FROM projection_checkpoints WHERE projection_name = ?",
+            Long.class, projectorName
+        );
+    }
+
+    private void updateCheckpoint(String projectorName, long sequence) {
+        jdbc.update("""
+            INSERT INTO projection_checkpoints (projection_name, last_processed_sequence)
+            VALUES (?, ?)
+            ON CONFLICT (projection_name) DO UPDATE SET
+                last_processed_sequence = EXCLUDED.last_processed_sequence,
+                updated_at = NOW()
+            """, projectorName, sequence);
+    }
+}
+
+public interface EventProjector {
+    String name();
+    void handle(DomainEvent event);
+}
+```
+
+### Concrete Projector
+
+```java
+@Component
+public class ActiveOrdersByCustomerProjector implements EventProjector {
+    private final JdbcTemplate jdbc;
+
+    @Override
+    public String name() { return "active-orders-by-customer"; }
+
+    @Override
+    public void handle(DomainEvent event) {
+        switch (event) {
+            case OrderPlaced e -> {
+                jdbc.update("""
+                    INSERT INTO active_orders (order_id, customer_id, total, status, placed_at)
+                    VALUES (?, ?, ?, 'PLACED', ?)
+                    """, e.orderId(), getCustomerId(e.orderId()), e.total(), e.occurredAt());
+            }
+            case OrderCancelled e -> {
+                jdbc.update("DELETE FROM active_orders WHERE order_id = ?", e.orderId());
+            }
+            case PaymentReceived e -> {
+                jdbc.update("UPDATE active_orders SET status = 'PAID' WHERE order_id = ?",
+                    e.orderId());
+            }
+            default -> { /* ignore */ }
+        }
+    }
+}
+```
+
+## Deeper Dive — Schema Evolution / Event Upcasting
+
+### Strategy 1: Default Values for New Fields
+
+```java
+// Original event V1 (2023)
+public record OrderPlacedV1(
+    OrderId orderId,
+    Money total,
+    Instant occurredAt
+) implements DomainEvent {}
+
+// V2 (2024) — added shippingMethod
+public record OrderPlacedV2(
+    OrderId orderId,
+    Money total,
+    String shippingMethod,    // new field
+    Instant occurredAt
+) implements DomainEvent {}
+```
+
+### Strategy 2: Upcaster Function
+
+```java
+@Component
+public class EventUpcaster {
+
+    public DomainEvent upcast(String eventType, int version, JsonNode data) {
+        if (eventType.equals("OrderPlaced") && version == 1) {
+            return upcastOrderPlacedV1ToV2(data);
+        }
+        // ... other versions
+        return objectMapper.treeToValue(data, getClassForType(eventType, version));
+    }
+
+    private OrderPlacedV2 upcastOrderPlacedV1ToV2(JsonNode data) {
+        return new OrderPlacedV2(
+            new OrderId(UUID.fromString(data.get("orderId").asText())),
+            Money.fromJson(data.get("total")),
+            "STANDARD",   // default for old events
+            Instant.parse(data.get("occurredAt").asText())
+        );
+    }
+}
+```
+
+### Strategy 3: Snapshot After Upcasting
+
+```sql
+-- When upcaster is added, take new snapshots for active aggregates
+-- to avoid recomputing upcasting on every load
+INSERT INTO snapshot_store (stream_id, stream_version, aggregate_state)
+SELECT 
+  stream_id,
+  MAX(stream_version),
+  /* serialized aggregate computed via load_and_apply */
+FROM event_stream
+GROUP BY stream_id
+HAVING MAX(created_at) > NOW() - INTERVAL '30 days';
+```
+
+## Deeper Dive — GDPR Compliance Patterns
+
+### Pattern 1: Crypto-Shredding
+
+```java
+@Service
+public class PersonalDataEventEncryption {
+    private final EncryptionKeyStore keyStore;
+
+    public DomainEvent encrypt(DomainEvent event, UserId userId) {
+        if (event instanceof CustomerRegistered registered) {
+            EncryptionKey key = keyStore.getOrCreate(userId);
+            return new CustomerRegistered(
+                registered.customerId(),
+                encryptField(registered.email(), key),
+                encryptField(registered.fullName(), key),
+                registered.occurredAt()
+            );
+        }
+        return event;
+    }
+
+    public DomainEvent decrypt(DomainEvent event, UserId userId) {
+        if (event instanceof CustomerRegistered encrypted) {
+            EncryptionKey key = keyStore.get(userId)
+                .orElseThrow(() -> new KeyMissingException("PII deleted"));
+            return new CustomerRegistered(
+                encrypted.customerId(),
+                decryptField(encrypted.email(), key),
+                decryptField(encrypted.fullName(), key),
+                encrypted.occurredAt()
+            );
+        }
+        return event;
+    }
+}
+
+// GDPR Delete Request:
+// 1. Delete encryption key for user
+// 2. All PII in event store becomes unreadable (cryptographic deletion)
+// 3. Event aggregate IDs and structural data preserved
+// 4. Compliance: PII effectively deleted; audit trail intact
+public void handleGdprDeleteRequest(UserId userId) {
+    keyStore.delete(userId);
+    // Mark in tombstone table for audit
+    tombstoneRepo.save(new GdprTombstone(userId, Instant.now()));
+}
+```
+
+### Pattern 2: Separate PII Storage
+
+```
+ARCHITECTURE:
+  - event_stream: contains ONLY anonymized data + PII references
+  - pii_table: contains personal data, keyed by userId
+  
+GDPR DELETE:
+  - DELETE FROM pii_table WHERE user_id = ?
+  - Event stream still references user_id, but PII is gone
+```
+
+## Deeper Dive — When NOT to Use Event Sourcing
+
+```
+DON'T USE ES IF:
+
+1. CRUD admin tool
+   - No need for history
+   - Just use Postgres + audit table
+
+2. Simple cache layer
+   - Just use Redis with invalidation
+
+3. Read-heavy with stable schema
+   - Use standard DB + materialized views
+
+4. Team unfamiliar with the pattern
+   - Steep learning curve (3-6 months for team)
+   - Operational complexity
+
+5. Reporting/BI
+   - Use ETL/ELT to data warehouse
+   - Not ES
+
+6. Short-lived projects
+   - Time-to-value matters
+   - ES overhead unwarranted
+
+USE ES WHEN ALL OF:
+  ✓ Audit / regulatory requirement
+  ✓ Need temporal queries ("state at point in time")
+  ✓ Multiple read models from same data
+  ✓ Team capable of ES operations
+  ✓ Domain has clear event boundaries
+```
+
 ## Practice
 
 1. **Sketch an event-sourced aggregate.** Take any domain you know (orders, accounts, courses, posts). Define the lifecycle as a sequence of events. Name each event in past tense; specify its payload. Run a hand-replay over a hypothetical history to confirm you can reconstruct current state.

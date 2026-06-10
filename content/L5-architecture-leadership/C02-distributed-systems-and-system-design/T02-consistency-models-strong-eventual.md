@@ -502,6 +502,386 @@ The discipline is independent of language: read the database's contract; set the
 > [!INTERVIEW]
 > A common L5 prompt: "What's the difference between strong and eventual consistency?" Strong answers walk the *full* spectrum (linearizable, sequential, causal, read-your-writes, monotonic, eventual), name the anomalies each prevents, and give a real-system example for each. Naming write skew unprompted signals senior depth.
 
+## Deeper Dive — The 6 Classic Anomalies with Concrete Examples
+
+### Anomaly 1: Dirty Read
+
+```
+Tx A: BEGIN
+Tx A:   UPDATE accounts SET balance = balance - 100 WHERE id = 1
+Tx B: BEGIN
+Tx B:   SELECT balance FROM accounts WHERE id = 1    -- sees uncommitted change!
+Tx B: COMMIT (acts on stale data)
+Tx A: ROLLBACK (the deduction never happened)
+
+EFFECT: Tx B made a decision based on data that was never real.
+PREVENTS AT: READ COMMITTED or higher
+```
+
+### Anomaly 2: Non-Repeatable Read
+
+```
+Tx A: BEGIN
+Tx A:   SELECT balance FROM accounts WHERE id = 1  -- $100
+Tx B: BEGIN
+Tx B:   UPDATE accounts SET balance = 200 WHERE id = 1
+Tx B: COMMIT
+Tx A:   SELECT balance FROM accounts WHERE id = 1  -- $200 (DIFFERENT!)
+Tx A:   -- Tx A's logic was based on $100, now sees $200
+
+EFFECT: Same query in same transaction returns different results.
+PREVENTS AT: REPEATABLE READ or higher
+```
+
+### Anomaly 3: Phantom Read
+
+```
+Tx A: BEGIN
+Tx A:   SELECT COUNT(*) FROM orders WHERE status = 'PENDING'  -- 5
+Tx B: BEGIN
+Tx B:   INSERT INTO orders (..., status='PENDING')
+Tx B: COMMIT
+Tx A:   SELECT COUNT(*) FROM orders WHERE status = 'PENDING'  -- 6 (PHANTOM!)
+
+EFFECT: Range query returns different rows on re-read.
+PREVENTS AT: SERIALIZABLE (or REPEATABLE READ with range locks)
+```
+
+### Anomaly 4: Lost Update
+
+```
+Tx A: BEGIN
+Tx A:   SELECT balance FROM accounts WHERE id = 1  -- $100
+Tx A:   (in memory: balance = 100 + 50 = 150)
+Tx B: BEGIN
+Tx B:   SELECT balance FROM accounts WHERE id = 1  -- $100
+Tx B:   (in memory: balance = 100 + 30 = 130)
+Tx A:   UPDATE accounts SET balance = 150
+Tx A: COMMIT
+Tx B:   UPDATE accounts SET balance = 130           -- OVERWRITES A!
+Tx B: COMMIT
+
+EFFECT: Tx A's $50 deposit is LOST.
+PREVENTS AT: SNAPSHOT ISOLATION (with explicit conflict detection) or SERIALIZABLE
+FIX: Use atomic UPDATE balance = balance + delta, or version checks
+```
+
+### Anomaly 5: Write Skew (The Senior Trap)
+
+```
+INVARIANT: at least one doctor must be on call at any time
+
+Initial: Doctor A on call = TRUE, Doctor B on call = TRUE
+
+Tx A: BEGIN
+Tx A:   SELECT COUNT(*) FROM doctors WHERE on_call = TRUE  -- 2 (sees both)
+Tx A:   -- "There are 2; safe for me to go off-call"
+Tx B: BEGIN
+Tx B:   SELECT COUNT(*) FROM doctors WHERE on_call = TRUE  -- 2 (sees both)
+Tx B:   -- "There are 2; safe for me to go off-call"
+Tx A:   UPDATE doctors SET on_call = FALSE WHERE name = 'A'
+Tx B:   UPDATE doctors SET on_call = FALSE WHERE name = 'B'
+Tx A: COMMIT
+Tx B: COMMIT
+
+RESULT: NOBODY on call. Invariant violated.
+
+EFFECT: Both transactions read consistent data, write to different rows,
+        but VIOLATE A GLOBAL INVARIANT.
+NOT PREVENTED BY: SNAPSHOT ISOLATION (this is the famous SI anomaly)
+PREVENTS AT: SERIALIZABLE (true serializability)
+FIX in Postgres: SERIALIZABLE isolation, or row-level locks (SELECT ... FOR UPDATE)
+```
+
+### Anomaly 6: Read Skew (a.k.a. Inconsistent Snapshot)
+
+```
+Tx A: BEGIN
+Tx A:   SELECT balance FROM accounts WHERE id = 1  -- $500
+Tx B: BEGIN
+Tx B:   UPDATE accounts SET balance = balance - 100 WHERE id = 1
+Tx B:   UPDATE accounts SET balance = balance + 100 WHERE id = 2
+Tx B: COMMIT
+Tx A:   SELECT balance FROM accounts WHERE id = 2  -- $600 (post-transfer)
+Tx A:   -- Sum of A+B = 1100 (WRONG! Should be 1000)
+
+EFFECT: Read across multiple rows sees inconsistent snapshot.
+PREVENTS AT: REPEATABLE READ (uses MVCC snapshot) or higher
+```
+
+## Deeper Dive — Anomaly Prevention Matrix
+
+| Isolation Level | Dirty | Non-Rep | Phantom | Lost Update | Write Skew | Read Skew |
+|---|---|---|---|---|---|---|
+| READ UNCOMMITTED | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| READ COMMITTED | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| REPEATABLE READ | ✅ | ✅ | ❌¹ | ❌ | ❌ | ✅ |
+| SNAPSHOT (MVCC) | ✅ | ✅ | ✅ | ❌² | ❌ | ✅ |
+| SERIALIZABLE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+¹ MySQL InnoDB REPEATABLE READ prevents phantoms via gap locks; standard SQL allows them.
+² Postgres SI detects some lost update cases; MySQL InnoDB doesn't.
+
+## Deeper Dive — Real Database Isolation Levels (Surprising Reality)
+
+```
+POSTGRES DEFAULT: READ COMMITTED
+  - Each statement sees a fresh snapshot
+  - Multiple SELECTs in one tx can see different data
+  - No phantom protection
+  
+POSTGRES REPEATABLE READ: actually SNAPSHOT ISOLATION
+  - Whole tx sees one snapshot taken at first read
+  - Subject to WRITE SKEW
+  - Allows phantoms in the strict sense (but rare in practice)
+  
+POSTGRES SERIALIZABLE: SSI (Serializable Snapshot Isolation, Cahill 2008)
+  - Detects conflict patterns; aborts one tx
+  - Pay-for-real-serializability via abort overhead
+  - About 5-15% slower than RR in benchmarks
+
+MYSQL INNODB DEFAULT: REPEATABLE READ (NOT standard SQL RR)
+  - Uses next-key locks → prevents phantoms
+  - Stronger than standard RR; closer to serializable
+  - Subject to deadlock from gap locks
+
+SQL SERVER DEFAULT: READ COMMITTED
+  - Optional: READ_COMMITTED_SNAPSHOT_ISOLATION (RCSI) — MVCC variant
+  
+ORACLE DEFAULT: READ COMMITTED (multiversion)
+  - Each statement: own snapshot
+  - SERIALIZABLE = SI; no SSI
+
+MONGODB:
+  - Per-document atomicity by default
+  - Multi-document transactions: snapshot isolation
+  - Optional: readConcern=linearizable for true linearizable reads
+
+CASSANDRA / DYNAMODB:
+  - Quorum-based; READ_QUORUM + WRITE_QUORUM with W+R > N for strong reads
+  - LWT (lightweight transactions): linearizable via Paxos (slow)
+```
+
+### MySQL InnoDB Quirk: Phantom Protection via Gap Locks
+
+```
+Tx A: SELECT * FROM orders WHERE id BETWEEN 10 AND 20 FOR UPDATE
+
+InnoDB places GAP LOCKS on the index range
+→ Tx B's INSERT INTO orders (id=15, ...) BLOCKS until Tx A commits
+→ Prevents phantoms
+
+Side effect: GAP LOCKS frequently cause deadlock in concurrent INSERTs
+Mitigation: tune transactions or use NO INDEX / RC isolation
+```
+
+## Deeper Dive — Choosing Consistency Per Operation (Real E-Commerce)
+
+```
+OPERATION: User views product page
+  CONSISTENCY: Eventual (showing 5-min-old price is OK)
+  STORE: DynamoDB cache, refresh every 5 min
+  RATIONALE: Million reads/sec; latency-critical; staleness OK
+
+OPERATION: User adds to cart
+  CONSISTENCY: Read-your-writes (must see what you just added)
+  STORE: Redis with session affinity (sticky)
+  RATIONALE: Same user must see consistent view of their own cart
+
+OPERATION: User checks out (creates order)
+  CONSISTENCY: Linearizable (price must be current; inventory must be available)
+  STORE: PostgreSQL with SERIALIZABLE isolation
+  RATIONALE: Money + inventory; mistakes have legal cost
+
+OPERATION: Order placed → inventory decrement
+  CONSISTENCY: Linearizable across product
+  STORE: PostgreSQL with FOR UPDATE row lock
+  RATIONALE: Prevent overselling; serialize concurrent purchases of same item
+
+OPERATION: Order history shown to user
+  CONSISTENCY: Eventual (within seconds is OK)
+  STORE: Read replica of orders DB
+  RATIONALE: Old data acceptable for non-critical view
+
+OPERATION: Inventory reorder threshold check
+  CONSISTENCY: Eventual (aggregate snapshot)
+  STORE: Materialized view, refresh hourly
+  RATIONALE: Reorder decisions are slow; precision not needed
+
+OPERATION: Loyalty points
+  CONSISTENCY: Causal (if I see points spent, I should see balance update)
+  STORE: Causally consistent K/V store (e.g., MongoDB causal session)
+  RATIONALE: User-visible consistency for money-adjacent feature
+```
+
+## Deeper Dive — Programming Models for Each Consistency Level
+
+### Linearizable (Strong Consistency)
+
+```java
+@Service
+@Transactional(isolation = Isolation.SERIALIZABLE)
+public class PaymentService {
+    public void transfer(String fromAccount, String toAccount, BigDecimal amount) {
+        // SQL: SELECT ... FOR UPDATE on both rows
+        Account from = accountRepo.findByIdForUpdate(fromAccount);
+        Account to = accountRepo.findByIdForUpdate(toAccount);
+        
+        if (from.balance().compareTo(amount) < 0) {
+            throw new InsufficientFundsException();
+        }
+        
+        from.debit(amount);
+        to.credit(amount);
+        accountRepo.save(from);
+        accountRepo.save(to);
+        // Both rows locked; no concurrent modification possible
+    }
+}
+```
+
+### Snapshot Isolation (MVCC)
+
+```java
+@Service
+@Transactional(isolation = Isolation.REPEATABLE_READ)
+public class OrderHistoryService {
+    public OrderHistory getHistory(String userId, LocalDate start, LocalDate end) {
+        // All reads in this tx see a consistent snapshot
+        List<Order> orders = orderRepo.findByUserAndDateRange(userId, start, end);
+        BigDecimal totalSpent = orders.stream()
+            .map(Order::amount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        int orderCount = orders.size();
+        return new OrderHistory(userId, totalSpent, orderCount, orders);
+        // All values consistent with each other
+    }
+}
+```
+
+### Read-Your-Writes
+
+```java
+@Service
+public class UserProfileService {
+    // Mark tx as "must use primary" so user sees their own writes
+    @Transactional
+    @ReadFromPrimary    // custom annotation routing to primary
+    public UserProfile updateProfile(String userId, ProfileUpdate update) {
+        UserProfile profile = userRepo.findById(userId);
+        profile.applyUpdate(update);
+        userRepo.save(profile);
+        return profile;   // returns the updated state to caller
+    }
+    
+    // After write, route subsequent reads to primary briefly
+    @Transactional(readOnly = true)
+    public UserProfile getMyProfile(String userId) {
+        if (recentlyWroteByUser.contains(userId, Duration.ofSeconds(5))) {
+            return userRepoPrimary.findById(userId);   // primary
+        }
+        return userRepoReplica.findById(userId);       // replica
+    }
+}
+```
+
+### Causal Consistency (MongoDB)
+
+```java
+@Service
+public class MongoOrderService {
+
+    public void placeOrderAndNotifyCausally(String userId, OrderRequest req) {
+        try (ClientSession session = mongoClient.startSession(
+                ClientSessionOptions.builder().causallyConsistent(true).build())) {
+
+            // Operation 1: insert order
+            orderCollection.insertOne(session, new Order(userId, req));
+            
+            // Operation 2: insert notification — happens-after order
+            notificationCollection.insertOne(session, new Notification(userId, "Order placed"));
+            
+            // Any subsequent read in this session is GUARANTEED to see both
+            // (or neither — atomicity not promised, but causal order is)
+        }
+    }
+}
+```
+
+### Eventual Consistency
+
+```java
+@Service
+public class AnalyticsService {
+
+    public DashboardStats getDashboard(String userId) {
+        // Read from materialized view (eventually consistent)
+        // May lag DB by minutes
+        DashboardStats stats = analyticsRepo.findCachedStats(userId);
+        if (stats.isStale(Duration.ofMinutes(15))) {
+            // Trigger async refresh
+            CompletableFuture.runAsync(() -> refreshDashboard(userId));
+        }
+        return stats;
+    }
+}
+```
+
+## Deeper Dive — Jepsen Findings on Real Databases
+
+Jepsen has tested many databases and found surprising consistency violations:
+
+| Database | Claim | Jepsen Finding |
+|---|---|---|
+| **MongoDB 3.x** | "writeConcern majority = linearizable" | Found stale reads + lost writes; required readConcern=linearizable explicitly |
+| **Redis Sentinel** | "high availability" | Not consensus-safe; can lose acknowledged writes during failover |
+| **Aerospike** | "ACID for single record" | Found violations in 2018; fixed in later versions |
+| **CockroachDB** | "Serializable" | Generally passes; documented edge cases |
+| **etcd** | "Linearizable" | Generally passes; failures during pathological partitions |
+| **PostgreSQL** | "SERIALIZABLE = SSI" | Passes most tests; one historical bug fixed |
+| **YugabyteDB** | "Strong consistency" | Generally passes |
+| **TiDB** | "Snapshot Isolation" | Some lost-update issues fixed; ongoing |
+| **Kafka** | "Exactly-once" | Generally works with EOS=v2; subtle edge cases reported |
+
+**Lesson**: vendor claims often differ from reality. Read Jepsen reports before depending on a database's strongest consistency guarantee.
+
+## Deeper Dive — The Cost of Strong Consistency
+
+```
+LATENCY COST
+  Linearizable single-key: ~10ms (quorum write + read)
+  Linearizable cross-region: 50-100ms (replication round-trip)
+  Spanner global linearizable: ~100ms (TrueTime commit-wait)
+  
+THROUGHPUT COST
+  Single-key writes: limited by leader (10K-50K writes/sec)
+  Multi-key transactions: limited by conflict detection (5K-20K)
+  Cross-region writes: limited by quorum across regions
+  
+AVAILABILITY COST
+  CP system: brief unavailability during failover (10-30s typical)
+  AP system: always available but eventually consistent
+  
+COMPLEXITY COST
+  Application code must handle: optimistic concurrency conflicts, retry logic,
+  unique constraint violations, deadlocks (in RDBMS)
+```
+
+### When Strong Consistency IS Worth It
+
+- **Money**: account balances, transfers, inventory
+- **Identity**: user authentication, authorization decisions
+- **Compliance**: audit logs (no missing events), regulatory data
+- **Critical state**: leader election, cluster membership
+
+### When Strong Consistency Is NOT Worth It
+
+- Page views, clicks, analytics
+- Cache, search index, recommendations
+- Notifications, emails (have their own dedup)
+- Social media feeds, follower counts
+- Anywhere "approximately right" is fine
+
 ## Practice
 
 1. **Read the docs.** Pick three databases you operate. Find each one's exact consistency contract in the official docs. Write down the model in PACELC + the named anomalies it prevents.

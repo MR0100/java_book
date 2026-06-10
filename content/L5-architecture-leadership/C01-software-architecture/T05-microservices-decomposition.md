@@ -523,6 +523,392 @@ The senior judgment: **use the lens that best matches your most stable property.
 > [!INTERVIEW]
 > A common L5 prompt: "How do you decide where to split a monolith?" Strong answers (a) name DDD bounded contexts as the primary unit, (b) explicitly call out data-ownership and transactional-consistency as constraints that cannot be broken, (c) describe a strangler-fig migration approach, (d) state — unprompted — at least one anti-pattern (entity services, distributed n-tier) and why it fails.
 
+## Deeper Dive — Concrete Decomposition Process
+
+### Step-by-Step: Decomposing an E-Commerce Monolith
+
+```
+SCENARIO: 5-year-old e-commerce monolith
+  - 800K LOC Spring Boot
+  - 600 controllers, 200 services
+  - Single Postgres database, 450 tables
+  - 15 engineers across 4 teams
+  - 1 deploy/day (when nothing breaks)
+  - p99 latency 800ms; goal 200ms
+
+STEP 1: EVENT STORMING (1-2 weeks)
+  Cross-functional workshop with engineers + product + ops
+  Map the business processes as events:
+    "Customer registered" → "Email verified" → "Cart created"
+    "Item added to cart" → "Checkout initiated" → "Payment received"
+    "Order placed" → "Inventory reserved" → "Shipment scheduled"
+  
+  Identify aggregates by clustering related events:
+    Customer aggregate: registration, profile, addresses
+    Cart aggregate: items, quantities, promotions
+    Order aggregate: placement, payment, fulfillment
+    Inventory aggregate: stock levels, reservations
+    Shipment aggregate: routing, tracking
+
+STEP 2: BOUNDED CONTEXT MAPPING (1 week)
+  For each cluster, identify the team that owns its bounded context:
+    Customer context     → Identity team
+    Cart context         → Web team
+    Order context        → Order team  
+    Inventory context    → Inventory team
+    Shipment context     → Logistics team
+  
+  Map the relationships between contexts:
+    Cart → Customer (uses customer ID — Customer/Supplier)
+    Order → Cart (consumes cart at checkout — Customer/Supplier)
+    Order → Inventory (reserves stock — Customer/Supplier)
+    Order → Shipment (initiates fulfillment — Customer/Supplier)
+
+STEP 3: PRIORITIZE EXTRACTION (1 day)
+  Rank by extraction value vs cost:
+    1. Customer service     (high value, clear boundary, isolated data)
+    2. Inventory service    (high value, performance-critical, isolated tables)
+    3. Shipment service     (medium value, complex integration with carriers)
+    4. Order service        (high value, BUT highly connected; extract last)
+  
+  RULE: Start with leaf services (few inbound dependencies), end with core services.
+
+STEP 4: EXTRACT CUSTOMER SERVICE (4-6 weeks)
+  Week 1: Build new Customer service alongside monolith
+    - Same database initially (shared connection)
+    - New Customer service handles registration + profile endpoints
+    - Routes via API gateway by URL prefix
+    
+  Week 2: Customer service owns its tables
+    - Move customer-related tables to dedicated schema/database
+    - Monolith calls Customer service for customer data instead of querying DB
+    - Use ACL pattern to translate
+    
+  Week 3-4: Migrate read traffic to Customer service
+    - Customer service serves reads
+    - Monolith still does writes (gradual cutover)
+    
+  Week 5-6: Migrate writes to Customer service
+    - Monolith no longer writes customer tables
+    - Final cutover; monolith uses HTTP to Customer service
+    
+  CRITICAL: each week leaves system in working state
+
+STEP 5: REPEAT FOR EACH CONTEXT
+  Inventory: ~4 weeks
+  Shipment: ~6 weeks (carrier integrations)
+  Order: ~8 weeks (high integration complexity)
+
+TOTAL: 6-9 months for 5 services
+
+POSITIVE OUTCOMES:
+  - Each team deploys independently (4×/day vs 1×/day)
+  - Failure isolation (Inventory outage doesn't crash checkout)
+  - Polyglot persistence (Inventory uses Cassandra; Order stays Postgres)
+  - Team velocity (no cross-team coordination on most changes)
+
+NEGATIVE OUTCOMES:
+  - Distributed debugging (need OpenTelemetry tracing)
+  - Latency budget tighter (was 10ms call vs 5-50ms RPC)
+  - Operational cost (5 services vs 1 monolith)
+  - Eventual consistency where transactions used to be
+```
+
+## Deeper Dive — Anti-Pattern Detection
+
+### Entity Service Smell
+
+```
+SMELL: ProductService has these endpoints:
+  GET    /products/{id}
+  GET    /products
+  POST   /products
+  PUT    /products/{id}
+  DELETE /products/{id}
+
+That's pure CRUD. What does it OWN beyond data access?
+  
+NOT A SERVICE: it's a database wrapper.
+
+REAL SERVICE: PricingService that owns:
+  - GetPriceForCustomer(productId, customerId)
+  - ApplyDiscount(orderId, promoCode)
+  - CalculateTax(orderId, address)
+  
+That's a BUSINESS CAPABILITY, not entity persistence.
+
+FIX:
+  Option A: Merge "ProductService" into the consumer (it was just a remote DAO)
+  Option B: Replace with a library or shared schema
+  Option C: Find the REAL service hiding (e.g., merge into Catalog,
+            Pricing, Inventory) by what business question it answers
+```
+
+### Distributed N-Tier Smell
+
+```
+SMELL: 
+  WebService → BusinessLogicService → DataAccessService
+
+Each service is one layer. Every business operation makes
+  3 sequential hops with same data flowing through.
+  
+WHY IT'S BAD:
+  - 3× latency (each hop 5-50ms)
+  - 3× failure surface
+  - No team boundary (one team owns all 3)
+  - Same deploy cadence (changes touch all 3)
+  
+FIX:
+  Each business capability gets ONE service
+  Each service has its own layers internally (controller/service/repo)
+  Only split where BUSINESS boundaries exist (Order ≠ Inventory)
+```
+
+### Service-Per-Org-Chart Smell
+
+```
+SMELL: Team structure:
+  Team A: API Service
+  Team B: Database Service
+  Team C: Cache Service
+  Team D: Notification Service
+  
+That's not domain decomposition; it's tooling-by-team.
+
+WHY IT'S BAD:
+  - "Database Service" is a layer, not a capability
+  - Conway's Law works in reverse: bad team structure → bad architecture
+  
+FIX:
+  Reorganize teams around domains:
+    Team A: Orders (frontend + business logic + database for orders)
+    Team B: Inventory (frontend + business logic + database for inventory)
+  Each team owns its full stack.
+```
+
+### Service-Per-Endpoint Smell
+
+```
+SMELL:
+  GetUserService
+  UpdateUserService
+  DeleteUserService
+  ListUsersService
+  
+4 microservices for 1 entity. Operational nightmare; minimal value.
+
+FIX:
+  ONE UserService owning the User domain
+  4 services makes sense when:
+    - GetUserService is "User Read" (read-heavy, cached)
+    - UpdateUserService is "User Mutation" (audit + validation)
+    - These are CQRS-style. NOT independent services per endpoint.
+```
+
+## Deeper Dive — Team Topologies for Microservices
+
+```
+MATTHEW SKELTON + MANUEL PAIS, 2019:
+  Four team types + three interaction modes that work at scale
+
+TEAM TYPES:
+
+1. STREAM-ALIGNED TEAMS
+   - Aligned to a business flow / domain
+   - Most teams should be this
+   - Examples: Order Team, Payment Team, Notification Team
+
+2. ENABLING TEAMS
+   - Help stream-aligned teams adopt new capabilities
+   - Temporary engagement (e.g., 6-12 weeks)
+   - Examples: Cloud Platform team helping team migrate to K8s
+
+3. COMPLICATED-SUBSYSTEM TEAMS
+   - Own a deep technical capability
+   - Provides abstraction to stream-aligned teams
+   - Examples: ML/Recommendation team, GIS team, payment gateway team
+
+4. PLATFORM TEAMS
+   - Provides internal services (CI/CD, observability, security)
+   - Self-service for stream-aligned teams
+   - Examples: SRE/Platform Engineering team
+
+INTERACTION MODES:
+
+1. COLLABORATION — two teams work closely together for a few weeks
+2. X-AS-A-SERVICE — one team consumes another team's product via API
+3. FACILITATING — enabling team teaches stream-aligned team a new skill
+
+FAILURE MODE:
+  Stream-aligned teams trying to do everything (no platform team)
+  → Each team reinvents observability, CI/CD, etc.
+  → 50% of work is infrastructure, not features
+  
+SOLUTION:
+  Invest in platform team early (5-10% of engineering)
+  Stream-aligned teams use platform's offerings
+```
+
+## Deeper Dive — Operationalization Checklist
+
+```
+NEW MICROSERVICE LAUNCH CHECKLIST:
+
+ARCHITECTURE:
+[ ] Bounded context clearly documented
+[ ] Owns its own database (no shared DB with other services)
+[ ] API specification (OpenAPI/AsyncAPI) version-controlled
+[ ] ADR exists explaining why this is a separate service
+
+OPERATIONS:
+[ ] Has dedicated team responsible (in PagerDuty)
+[ ] Owns its runbook
+[ ] Service-level objectives defined
+[ ] Alerts configured (SLO burn rate)
+[ ] Logs structured + searchable (centralized aggregation)
+[ ] Metrics emitted (RED + USE)
+[ ] Distributed tracing enabled
+[ ] On-call rotation established
+
+DEPLOY/CHANGE:
+[ ] CI/CD pipeline (build + test + deploy)
+[ ] Canary deploy capability
+[ ] Easy rollback (1 command)
+[ ] Database migrations automated
+[ ] Schema changes reviewed
+
+SECURITY:
+[ ] Authentication required for all endpoints
+[ ] Authorization rules defined per endpoint
+[ ] Secrets in Vault (not in env or code)
+[ ] HTTPS/mTLS for all traffic
+[ ] Dependencies scanned for CVEs
+
+RELIABILITY:
+[ ] Health/readiness probes
+[ ] Graceful shutdown
+[ ] Timeouts on all downstream calls
+[ ] Circuit breakers configured
+[ ] Idempotency for state-changing operations
+
+COMMUNICATION:
+[ ] Service discovery configured
+[ ] Load balancing configured
+[ ] Rate limiting on public endpoints
+[ ] Event schemas registered (if applicable)
+```
+
+## Deeper Dive — Conway's Law in Action
+
+```
+CONWAY'S LAW (1968):
+  "Organizations that design systems are constrained to produce designs
+   which are copies of the communication structures of these organizations."
+
+REAL EXAMPLES:
+
+NETFLIX:
+  Org structure: small autonomous teams
+  Architecture: small autonomous microservices
+  Result: works because both organize for autonomy
+
+AMAZON:
+  Org structure: "two-pizza" teams
+  Architecture: services sized to 2-pizza team capacity
+  Result: AWS is a collection of small autonomous teams' products
+
+LARGE BANK:
+  Org structure: Bond Trading, Equity Trading, FX, etc.
+  Architecture: separate systems per asset class
+  Result: deep specialization + slow inter-system change
+
+LARGE TELECOM:
+  Org structure: separate teams for billing, network, customer service
+  Architecture: separate billing system, network management, CRM
+  Result: when customer asks "why was I charged for service that didn't work?"
+           it requires cross-team coordination
+
+INVERSE CONWAY'S LAW:
+  If you want a particular architecture, design the org first
+  Or: re-org to match the architecture you want
+
+LESSON: architecture and organization co-evolve. Major refactors usually
+require major reorgs.
+```
+
+## Deeper Dive — Migration Patterns
+
+### Strangler Fig (Martin Fowler, 2004)
+
+```
+PROBLEM: monolith handles checkout; want to extract into Order Service
+
+PHASE 1: NEW SERVICE LIVE BUT INACTIVE
+  - Build Order Service
+  - Deploy alongside monolith
+  - Order Service can handle requests
+  - But routing still goes to monolith
+
+PHASE 2: TRAFFIC ROUTING (FEATURE FLAG)
+  - API gateway routes /orders/* based on user ID
+  - 1% of users → Order Service
+  - 99% → monolith
+  - Monitor: are responses identical? Errors comparable?
+
+PHASE 3: SHADOWING
+  - 100% to monolith (handles request)
+  - Also send to Order Service (response discarded)
+  - Compare responses; log diffs
+  - Build confidence in Order Service correctness
+
+PHASE 4: GRADUAL ROLLOUT
+  - 5% → 10% → 25% → 50% → 100% to Order Service
+  - At each step: monitor errors, latency
+  - Rollback if issues
+
+PHASE 5: STRANGLER COMPLETE
+  - 100% of /orders/* traffic to Order Service
+  - Monolith's order code is dead
+  - Remove monolith's order endpoints
+  - Remove monolith's order tables (after grace period)
+
+TOTAL TIME: 3-6 months for one capability
+```
+
+### Branch by Abstraction (Jez Humble, 2013)
+
+```
+PROBLEM: change implementation of payment provider from custom to Stripe
+
+PHASE 1: CREATE ABSTRACTION
+  - Define PaymentGatewayPort interface
+  - Refactor existing code to use it
+  - All implementations behind this interface
+
+PHASE 2: NEW IMPLEMENTATION
+  - StripePaymentGatewayAdapter implements PaymentGatewayPort
+  - Existing tests still pass with old impl
+  - New tests written for new impl
+
+PHASE 3: GRADUAL CUTOVER
+  - Use Spring profile or feature flag to choose impl
+  - 1% Stripe traffic, 99% old
+  - Monitor errors, latency, business metrics
+  - Gradual rollout
+
+PHASE 4: DECOMMISSION
+  - 100% Stripe
+  - Delete old implementation
+  - Delete feature flag
+
+ADVANTAGES OVER BIG-BANG:
+  - Always working state
+  - Easy rollback
+  - Gradual confidence building
+  - No long-lived feature branch
+```
+
 ## Practice
 
 1. **Spot the anti-strategy.** Find a microservices architecture diagram from any source (your team, an open-source project, a conference talk). Identify which of the four anti-strategies it tends toward and the symptoms.

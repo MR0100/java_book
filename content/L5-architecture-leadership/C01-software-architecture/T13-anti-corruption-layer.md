@@ -509,6 +509,476 @@ Rust's trait system makes ACLs natural: the `PaymentGateway` trait lives in the 
 > [!INTERVIEW]
 > A common L5 prompt: "When would you use an Anti-Corruption Layer?" Strong answers (a) cite the DDD context map's eight relationships, (b) explicitly identify the conformist alternative and when it's correct, (c) explain that an "SDK wrapper" returning foreign types is not an ACL, (d) name the four corruptions (vocabulary, semantic, shape, error model) the ACL prevents.
 
+## Deeper Dive — Complete Stripe ACL Implementation
+
+### Step 1: Domain Port (No Stripe Types)
+
+```java
+// src/main/java/com/example/payments/domain/PaymentGatewayPort.java
+package com.example.payments.domain;
+
+public interface PaymentGatewayPort {
+    ChargeResult charge(Money amount, PaymentMethod method, IdempotencyKey key);
+    RefundResult refund(ChargeId chargeId, Money amount, IdempotencyKey key);
+    Optional<Charge> getCharge(ChargeId chargeId);
+}
+
+// Domain types — all OUR vocabulary
+public record Money(BigDecimal amount, Currency currency) {
+    public static Money of(BigDecimal amount, String iso) {
+        return new Money(amount, Currency.getInstance(iso));
+    }
+}
+
+public record PaymentMethod(PaymentMethodType type, String token) {}
+
+public enum PaymentMethodType { CARD, BANK_TRANSFER, WALLET }
+
+public record ChargeResult(
+    ChargeId chargeId,
+    ChargeStatus status,
+    Money amount,
+    Instant chargedAt,
+    Optional<String> declineReason
+) {}
+
+public enum ChargeStatus { 
+    SUCCEEDED, PENDING, REQUIRES_ACTION, DECLINED, FAILED 
+}
+
+// Domain exception hierarchy — NO Stripe types
+public sealed class PaymentException extends RuntimeException
+    permits InsufficientFundsException, CardDeclinedException, 
+            FraudDetectedException, PaymentGatewayUnavailableException {
+}
+
+public final class InsufficientFundsException extends PaymentException {}
+public final class CardDeclinedException extends PaymentException {
+    private final String declineCode;
+    // ...
+}
+public final class FraudDetectedException extends PaymentException {}
+public final class PaymentGatewayUnavailableException extends PaymentException {}
+```
+
+### Step 2: ACL Implementation (Stripe Types Only Here)
+
+```java
+// src/main/java/com/example/payments/adapter/stripe/StripePaymentGatewayAdapter.java
+package com.example.payments.adapter.stripe;
+
+import com.stripe.Stripe;
+import com.stripe.model.PaymentIntent;
+import com.stripe.exception.StripeException;
+import com.stripe.exception.CardException;
+import com.stripe.exception.RateLimitException;
+// ... all Stripe imports ONLY here
+
+@Component
+public class StripePaymentGatewayAdapter implements PaymentGatewayPort {
+    private final StripeClient stripeClient;
+    private final StripeErrorTranslator errorTranslator;
+
+    public StripePaymentGatewayAdapter(StripeClient stripeClient,
+                                       StripeErrorTranslator errorTranslator) {
+        this.stripeClient = stripeClient;
+        this.errorTranslator = errorTranslator;
+    }
+
+    @Override
+    public ChargeResult charge(Money amount, PaymentMethod method, IdempotencyKey key) {
+        try {
+            // Translate domain → Stripe
+            PaymentIntent intent = createStripePaymentIntent(amount, method, key);
+
+            // Translate Stripe → domain
+            return translateToChargeResult(intent);
+
+        } catch (CardException e) {
+            // Translate Stripe exception → domain exception
+            throw errorTranslator.toDomainException(e);
+        } catch (RateLimitException e) {
+            throw new PaymentGatewayUnavailableException(e);
+        } catch (StripeException e) {
+            throw errorTranslator.toDomainException(e);
+        }
+    }
+
+    @Override
+    public RefundResult refund(ChargeId chargeId, Money amount, IdempotencyKey key) {
+        try {
+            Refund refund = stripeClient.refunds().create(
+                RefundCreateParams.builder()
+                    .setPaymentIntent(chargeId.value())
+                    .setAmount(amount.amount().multiply(BigDecimal.valueOf(100)).longValue())
+                    .build(),
+                RequestOptions.builder()
+                    .setIdempotencyKey(key.value())
+                    .build()
+            );
+
+            return new RefundResult(
+                new RefundId(refund.getId()),
+                refund.getStatus().equals("succeeded") ? RefundStatus.SUCCEEDED : RefundStatus.PENDING,
+                Money.of(BigDecimal.valueOf(refund.getAmount()).movePointLeft(2),
+                         refund.getCurrency().toUpperCase()),
+                Instant.ofEpochSecond(refund.getCreated())
+            );
+        } catch (StripeException e) {
+            throw errorTranslator.toDomainException(e);
+        }
+    }
+
+    private PaymentIntent createStripePaymentIntent(Money amount, PaymentMethod method,
+                                                     IdempotencyKey key) throws StripeException {
+        return stripeClient.paymentIntents().create(
+            PaymentIntentCreateParams.builder()
+                .setAmount(amount.amount().multiply(BigDecimal.valueOf(100)).longValue())
+                .setCurrency(amount.currency().getCurrencyCode().toLowerCase())
+                .setPaymentMethod(method.token())
+                .setConfirm(true)
+                .build(),
+            RequestOptions.builder()
+                .setIdempotencyKey(key.value())
+                .build()
+        );
+    }
+
+    private ChargeResult translateToChargeResult(PaymentIntent intent) {
+        return new ChargeResult(
+            new ChargeId(intent.getId()),
+            translateStatus(intent.getStatus()),
+            Money.of(BigDecimal.valueOf(intent.getAmount()).movePointLeft(2),
+                    intent.getCurrency().toUpperCase()),
+            Instant.ofEpochSecond(intent.getCreated()),
+            Optional.ofNullable(intent.getLastPaymentError())
+                .map(e -> e.getCode())
+        );
+    }
+
+    private ChargeStatus translateStatus(String stripeStatus) {
+        return switch (stripeStatus) {
+            case "succeeded" -> ChargeStatus.SUCCEEDED;
+            case "processing" -> ChargeStatus.PENDING;
+            case "requires_action", "requires_payment_method" -> ChargeStatus.REQUIRES_ACTION;
+            case "canceled" -> ChargeStatus.DECLINED;
+            default -> ChargeStatus.FAILED;
+        };
+    }
+}
+```
+
+### Step 3: Error Translator
+
+```java
+@Component
+public class StripeErrorTranslator {
+
+    public PaymentException toDomainException(StripeException e) {
+        if (e instanceof CardException cardEx) {
+            return translateCardException(cardEx);
+        }
+        if (e instanceof RateLimitException) {
+            return new PaymentGatewayUnavailableException("Rate limited", e);
+        }
+        if (e instanceof IdempotencyException) {
+            return new IdempotencyConflictException(e.getMessage(), e);
+        }
+        if (e instanceof ApiConnectionException) {
+            return new PaymentGatewayUnavailableException("Network failure", e);
+        }
+        // Default: wrap as generic gateway failure
+        return new PaymentGatewayUnavailableException("Unexpected gateway error", e);
+    }
+
+    private PaymentException translateCardException(CardException e) {
+        return switch (e.getCode()) {
+            case "card_declined" -> {
+                String declineCode = e.getDeclineCode();
+                yield switch (declineCode) {
+                    case "insufficient_funds" -> new InsufficientFundsException(e.getMessage());
+                    case "fraudulent" -> new FraudDetectedException(e.getMessage());
+                    default -> new CardDeclinedException(declineCode, e.getMessage());
+                };
+            }
+            case "expired_card" -> new CardDeclinedException("expired_card", "Card expired");
+            case "incorrect_cvc" -> new CardDeclinedException("incorrect_cvc", "Invalid CVC");
+            case "processing_error" -> new PaymentGatewayUnavailableException("Processing error", e);
+            default -> new CardDeclinedException(e.getCode(), e.getMessage());
+        };
+    }
+}
+```
+
+### Step 4: Domain Service (No Knowledge of Stripe)
+
+```java
+@Service
+public class CheckoutService {
+    private final PaymentGatewayPort paymentGateway;   // ← interface only
+    private final OrderRepository orderRepo;
+
+    @Transactional
+    public Order checkout(CheckoutRequest req) {
+        Order order = orderRepo.save(new Order(req));
+
+        ChargeResult result = paymentGateway.charge(
+            order.totalAmount(),
+            req.paymentMethod(),
+            IdempotencyKey.of(order.id())
+        );
+
+        order.applyChargeResult(result);
+        return orderRepo.save(order);
+    }
+}
+```
+
+### Step 5: ArchUnit Test Enforcing the ACL
+
+```java
+class AntiCorruptionLayerTests {
+
+    @Test
+    void stripe_types_should_only_appear_in_stripe_adapter() {
+        ArchRule rule = noClasses()
+            .that().resideOutsideOfPackage("..adapter.stripe..")
+            .should().dependOnClassesThat().resideInAPackage("com.stripe..");
+
+        rule.check(new ClassFileImporter().importPackages("com.example.payments"));
+    }
+
+    @Test
+    void domain_should_not_depend_on_any_adapter() {
+        ArchRule rule = noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAPackage("..adapter..");
+
+        rule.check(new ClassFileImporter().importPackages("com.example.payments"));
+    }
+}
+```
+
+## Deeper Dive — Testing the ACL
+
+### Unit Test: Translation Logic Only (No Network)
+
+```java
+@ExtendWith(MockitoExtension.class)
+class StripePaymentGatewayAdapterTest {
+
+    @Mock private StripeClient stripeClient;
+    @InjectMocks private StripeErrorTranslator translator;
+    private StripePaymentGatewayAdapter adapter;
+
+    @BeforeEach
+    void setUp() {
+        adapter = new StripePaymentGatewayAdapter(stripeClient, translator);
+    }
+
+    @Test
+    void successful_charge_translates_correctly() throws StripeException {
+        PaymentIntent stripeResponse = mock(PaymentIntent.class);
+        when(stripeResponse.getId()).thenReturn("pi_123");
+        when(stripeResponse.getStatus()).thenReturn("succeeded");
+        when(stripeResponse.getAmount()).thenReturn(10000L);
+        when(stripeResponse.getCurrency()).thenReturn("usd");
+        when(stripeResponse.getCreated()).thenReturn(1234567890L);
+
+        PaymentIntents intentsApi = mock(PaymentIntents.class);
+        when(stripeClient.paymentIntents()).thenReturn(intentsApi);
+        when(intentsApi.create(any(), any())).thenReturn(stripeResponse);
+
+        ChargeResult result = adapter.charge(
+            Money.of(BigDecimal.valueOf(100), "USD"),
+            new PaymentMethod(PaymentMethodType.CARD, "pm_card_visa"),
+            IdempotencyKey.of("order-123")
+        );
+
+        assertThat(result.chargeId().value()).isEqualTo("pi_123");
+        assertThat(result.status()).isEqualTo(ChargeStatus.SUCCEEDED);
+        assertThat(result.amount().amount()).isEqualTo(new BigDecimal("100.00"));
+    }
+
+    @Test
+    void card_declined_due_to_insufficient_funds_throws_domain_exception() throws StripeException {
+        CardException cardException = mock(CardException.class);
+        when(cardException.getCode()).thenReturn("card_declined");
+        when(cardException.getDeclineCode()).thenReturn("insufficient_funds");
+
+        when(stripeClient.paymentIntents()).thenReturn(mock(PaymentIntents.class));
+        when(stripeClient.paymentIntents().create(any(), any())).thenThrow(cardException);
+
+        assertThatThrownBy(() -> adapter.charge(...))
+            .isInstanceOf(InsufficientFundsException.class);
+    }
+
+    @Test
+    void rate_limit_translates_to_unavailable() throws StripeException {
+        // ... verify translation
+    }
+}
+```
+
+### Integration Test (Real Stripe Test Mode)
+
+```java
+@SpringBootTest
+@ActiveProfiles("test")
+@TestPropertySource(properties = {
+    "stripe.api-key=${STRIPE_TEST_KEY}",
+    "stripe.test-mode=true"
+})
+class StripePaymentGatewayIntegrationTest {
+
+    @Autowired private PaymentGatewayPort gateway;
+
+    @Test
+    void real_stripe_test_card_succeeds() {
+        ChargeResult result = gateway.charge(
+            Money.of(BigDecimal.valueOf(10), "USD"),
+            new PaymentMethod(PaymentMethodType.CARD, "pm_card_visa"),
+            IdempotencyKey.of(UUID.randomUUID().toString())
+        );
+
+        assertThat(result.status()).isEqualTo(ChargeStatus.SUCCEEDED);
+    }
+}
+```
+
+## Deeper Dive — Common ACL Patterns by System Type
+
+### Pattern 1: ACL for Vendor SDK (Stripe, AWS, etc.)
+
+```
+DOMAIN PORT: PaymentGatewayPort
+ADAPTER: StripePaymentGatewayAdapter
+TRANSLATION: 
+  - Domain Money ↔ Stripe amount in cents
+  - Domain PaymentMethod ↔ Stripe payment_method_id
+  - Domain exception hierarchy ↔ Stripe exception hierarchy
+
+SWAP STORY: Replace adapter with AdyenPaymentGatewayAdapter; domain code unchanged.
+```
+
+### Pattern 2: ACL for Legacy Database
+
+```
+DOMAIN PORT: OrderRepository  
+ADAPTER: LegacyOrderRepositoryAdapter
+TRANSLATION:
+  - Domain Order ↔ legacy 47-column SQL table
+  - Domain OrderStatus enum ↔ legacy string status codes "PEND"/"SHIP"/"DELV"
+  - Domain LineItem ↔ legacy ORDER_DETAILS table
+
+USE WHEN: Inheriting legacy data; can't change DB schema; need clean domain model.
+```
+
+### Pattern 3: ACL for External REST API
+
+```
+DOMAIN PORT: ShippingProviderPort
+ADAPTER: FedExShippingAdapter
+TRANSLATION:
+  - Domain Address ↔ FedEx address object
+  - Domain ShipmentSpec ↔ FedEx shipment request XML
+  - Domain TrackingNumber ↔ FedEx tracking_number string
+
+USE WHEN: Provider's REST API is large; you only need 10% of it.
+```
+
+### Pattern 4: ACL for Message Queue
+
+```
+DOMAIN PORT: OrderEventPublisher
+ADAPTER: KafkaOrderEventPublisher
+TRANSLATION:
+  - Domain OrderCreatedEvent ↔ Avro message with schema
+  - Domain envelope ↔ Kafka ProducerRecord with headers
+  - Domain retry policy ↔ Kafka producer config
+
+USE WHEN: Want to swap Kafka ↔ RabbitMQ ↔ NATS in the future.
+```
+
+### Pattern 5: ACL for Authentication
+
+```
+DOMAIN PORT: AuthenticationProvider
+ADAPTER: Auth0AuthenticationAdapter / KeycloakAuthenticationAdapter
+TRANSLATION:
+  - Domain User ↔ Auth0 user profile
+  - Domain Permission ↔ Auth0 scopes
+  - Domain TokenClaims ↔ JWT claims
+
+USE WHEN: SSO with external IDP; vendor-specific tokens.
+```
+
+## Deeper Dive — When ACL Is Overkill
+
+```
+DON'T USE ACL FOR:
+
+1. Internal microservices in same team
+   - You control both sides
+   - Schema evolution coordinated
+   - Use a shared schema library (Avro, Protobuf)
+
+2. Standard widely-adopted libraries
+   - SLF4J for logging
+   - Jackson for JSON
+   - JUnit for testing
+   - These are "the standard" — no vendor lock-in concern
+
+3. Spring Framework itself
+   - Not "external" in the lock-in sense
+   - Migrating away from Spring is a different beast
+
+4. Database via Spring Data JPA
+   - JPA IS the abstraction
+   - Adding ACL on top is doubled indirection
+
+5. Short-lived projects / MVPs
+   - Time to value matters more than future-proofing
+   - Add ACL when actual vendor switch becomes likely
+```
+
+## Deeper Dive — ACL Maintenance Discipline
+
+```
+QUARTERLY REVIEW:
+
+1. Check ArchUnit / similar:
+   - Has anything bypassed the ACL?
+   - Any new direct imports?
+
+2. Vendor SDK version updates:
+   - Are we still on supported version?
+   - Any deprecated methods we're using?
+
+3. Test coverage:
+   - Are all error paths translated?
+   - Are new SDK error codes mapped?
+
+4. Translation completeness:
+   - Are there fields we silently drop?
+   - Are there domain concepts that don't fit Stripe yet?
+
+5. Performance:
+   - Is translation a bottleneck? (rare but check)
+   - Are we creating excess objects in hot paths?
+```
+
+## Deeper Dive — Real ACL Examples in Production
+
+| Company | Domain Port | Adapters |
+|---|---|---|
+| **Stripe** | `Provider` | Bank-specific implementations (Adyen, Worldpay, etc.) |
+| **Shopify** | `PaymentGateway` | 100+ payment provider adapters |
+| **Uber** | `PricingEngine` | City-specific pricing algorithms |
+| **Spotify** | `MusicLibrary` | Different content vendors (Sony, UMG, indie) |
+| **GitHub** | `IdentityProvider` | GitHub, Google, Microsoft, SAML, custom OIDC |
+| **AWS SDK v2** | Service clients | Auto-generated; ACL pattern for AWS APIs |
+
 ## Practice
 
 1. **Find a leak.** In any Spring service you know, search for imports of third-party SDK types in the `service/` or `domain/` packages. Each is a missing ACL. Pick one; sketch the ACL.

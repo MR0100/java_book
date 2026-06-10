@@ -741,6 +741,653 @@ Event Storming (Alberto Brandolini, 2013) is the popular workshop format that im
 
 The pattern's value is highest where the domain itself is complex and durable. For everything else, hexagonal-with-anemic-services is the honest middle ground.
 
+## Deeper Dive — Complete DDD Bounded Context in Spring Boot
+
+### Order Bounded Context: Aggregate Root
+
+```java
+@Entity
+@Table(name = "orders")
+public class Order extends AggregateRoot {
+    
+    @EmbeddedId
+    private OrderId id;
+    
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "customer_id"))
+    private CustomerId customerId;
+    
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+    
+    @Embedded
+    private Money totalAmount;
+    
+    @ElementCollection
+    @CollectionTable(name = "order_lines", joinColumns = @JoinColumn(name = "order_id"))
+    private List<OrderLine> lines = new ArrayList<>();
+    
+    @Embedded
+    private ShippingAddress shippingAddress;
+    
+    @Version
+    private Long version;  // Optimistic locking
+    
+    // Private constructor — only created via factory
+    protected Order() {}
+    
+    public static Order place(
+            CustomerId customerId,
+            List<OrderLineRequest> items,
+            ShippingAddress address
+    ) {
+        // Domain rules at construction
+        if (items.isEmpty()) {
+            throw new DomainException("Order must have at least one item");
+        }
+        if (items.size() > 100) {
+            throw new DomainException("Order cannot exceed 100 items");
+        }
+        
+        Order order = new Order();
+        order.id = OrderId.newId();
+        order.customerId = customerId;
+        order.status = OrderStatus.DRAFT;
+        order.shippingAddress = address;
+        order.lines = items.stream()
+            .map(req -> new OrderLine(req.productId(), req.quantity(), req.unitPrice()))
+            .toList();
+        order.totalAmount = order.calculateTotal();
+        
+        order.registerEvent(new OrderPlacedEvent(order.id, order.customerId, order.totalAmount));
+        return order;
+    }
+    
+    public void addLine(OrderLine line) {
+        // Invariant: can't modify confirmed order
+        if (status != OrderStatus.DRAFT) {
+            throw new DomainException("Cannot modify order in status " + status);
+        }
+        
+        // Invariant: max 100 lines
+        if (lines.size() >= 100) {
+            throw new DomainException("Order cannot exceed 100 items");
+        }
+        
+        // Invariant: no duplicate products
+        if (lines.stream().anyMatch(l -> l.productId().equals(line.productId()))) {
+            throw new DomainException("Product already in order: " + line.productId());
+        }
+        
+        lines.add(line);
+        totalAmount = calculateTotal();
+        
+        registerEvent(new OrderLineAddedEvent(id, line));
+    }
+    
+    public void confirm() {
+        if (status != OrderStatus.DRAFT) {
+            throw new DomainException("Order already confirmed");
+        }
+        if (lines.isEmpty()) {
+            throw new DomainException("Cannot confirm empty order");
+        }
+        if (totalAmount.isZeroOrNegative()) {
+            throw new DomainException("Cannot confirm order with zero total");
+        }
+        
+        status = OrderStatus.CONFIRMED;
+        registerEvent(new OrderConfirmedEvent(id, totalAmount));
+    }
+    
+    public void cancel(String reason) {
+        if (status == OrderStatus.SHIPPED || status == OrderStatus.DELIVERED) {
+            throw new DomainException("Cannot cancel " + status + " order");
+        }
+        if (status == OrderStatus.CANCELLED) {
+            throw new DomainException("Order already cancelled");
+        }
+        
+        status = OrderStatus.CANCELLED;
+        registerEvent(new OrderCancelledEvent(id, reason));
+    }
+    
+    public void markPaid(PaymentId paymentId) {
+        if (status != OrderStatus.CONFIRMED) {
+            throw new DomainException("Cannot mark unconfirmed order as paid");
+        }
+        
+        status = OrderStatus.PAID;
+        registerEvent(new OrderPaidEvent(id, paymentId, totalAmount));
+    }
+    
+    private Money calculateTotal() {
+        return lines.stream()
+            .map(OrderLine::subtotal)
+            .reduce(Money.ZERO, Money::add);
+    }
+}
+
+// Value object embedded in Order
+@Embeddable
+public class OrderLine {
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "product_id"))
+    private ProductId productId;
+    
+    private int quantity;
+    
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "unit_price"))
+    @AttributeOverride(name = "currency", column = @Column(name = "currency"))
+    private Money unitPrice;
+    
+    public OrderLine(ProductId productId, int quantity, Money unitPrice) {
+        if (quantity <= 0) throw new DomainException("Quantity must be positive");
+        if (unitPrice.isZeroOrNegative()) throw new DomainException("Price must be positive");
+        
+        this.productId = productId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+    }
+    
+    public Money subtotal() {
+        return unitPrice.multiply(quantity);
+    }
+}
+```
+
+### Value Objects
+
+```java
+@Embeddable
+public record OrderId(UUID value) {
+    public static OrderId newId() {
+        return new OrderId(UUID.randomUUID());
+    }
+    
+    public static OrderId of(String value) {
+        return new OrderId(UUID.fromString(value));
+    }
+}
+
+@Embeddable
+public record CustomerId(UUID value) {
+    public static CustomerId of(String value) {
+        return new CustomerId(UUID.fromString(value));
+    }
+}
+
+@Embeddable
+public class Money {
+    private BigDecimal amount;
+    
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+    
+    public static final Money ZERO = new Money(BigDecimal.ZERO, Currency.USD);
+    
+    public Money(BigDecimal amount, Currency currency) {
+        if (amount.scale() > currency.getDefaultFractionDigits()) {
+            throw new DomainException("Amount has too many decimal places");
+        }
+        this.amount = amount.setScale(currency.getDefaultFractionDigits(), RoundingMode.HALF_UP);
+        this.currency = currency;
+    }
+    
+    public Money add(Money other) {
+        if (!currency.equals(other.currency)) {
+            throw new DomainException("Cannot add different currencies");
+        }
+        return new Money(amount.add(other.amount), currency);
+    }
+    
+    public Money subtract(Money other) {
+        if (!currency.equals(other.currency)) {
+            throw new DomainException("Cannot subtract different currencies");
+        }
+        return new Money(amount.subtract(other.amount), currency);
+    }
+    
+    public Money multiply(int factor) {
+        return new Money(amount.multiply(BigDecimal.valueOf(factor)), currency);
+    }
+    
+    public boolean isZeroOrNegative() {
+        return amount.compareTo(BigDecimal.ZERO) <= 0;
+    }
+    
+    public boolean isGreaterThan(Money other) {
+        if (!currency.equals(other.currency)) {
+            throw new DomainException("Cannot compare different currencies");
+        }
+        return amount.compareTo(other.amount) > 0;
+    }
+}
+
+@Embeddable
+public class ShippingAddress {
+    private String street;
+    private String city;
+    private String state;
+    private String zipCode;
+    private String country;
+    
+    public ShippingAddress(String street, String city, String state, String zipCode, String country) {
+        if (street == null || street.isBlank()) throw new DomainException("Street required");
+        if (city == null || city.isBlank()) throw new DomainException("City required");
+        if (zipCode == null || !isValidZipCode(zipCode, country)) {
+            throw new DomainException("Invalid zip code for country");
+        }
+        // ... assignments
+    }
+}
+```
+
+### Domain Events
+
+```java
+public sealed interface DomainEvent 
+    permits OrderPlacedEvent, OrderConfirmedEvent, OrderPaidEvent, OrderCancelledEvent {
+    Instant occurredAt();
+    UUID eventId();
+}
+
+public record OrderPlacedEvent(
+    OrderId orderId,
+    CustomerId customerId,
+    Money totalAmount,
+    Instant occurredAt,
+    UUID eventId
+) implements DomainEvent {
+    public OrderPlacedEvent(OrderId orderId, CustomerId customerId, Money totalAmount) {
+        this(orderId, customerId, totalAmount, Instant.now(), UUID.randomUUID());
+    }
+}
+```
+
+### Aggregate Root Base Class
+
+```java
+public abstract class AggregateRoot {
+    @Transient
+    private List<DomainEvent> events = new ArrayList<>();
+    
+    protected void registerEvent(DomainEvent event) {
+        events.add(event);
+    }
+    
+    public List<DomainEvent> domainEvents() {
+        return Collections.unmodifiableList(events);
+    }
+    
+    public void clearEvents() {
+        events.clear();
+    }
+}
+```
+
+### Repository (Just for Aggregate Root)
+
+```java
+public interface OrderRepository {
+    Optional<Order> findById(OrderId id);
+    Order save(Order order);
+    void delete(Order order);
+    List<Order> findByCustomer(CustomerId customerId);
+}
+
+@Repository
+public class JpaOrderRepository implements OrderRepository {
+    private final JpaOrderEntityRepository jpaRepo;
+    private final ApplicationEventPublisher eventPublisher;
+    
+    @Override
+    @Transactional
+    public Order save(Order order) {
+        Order saved = jpaRepo.save(order);
+        
+        // Publish domain events AFTER transaction commits
+        order.domainEvents().forEach(eventPublisher::publishEvent);
+        order.clearEvents();
+        
+        return saved;
+    }
+}
+```
+
+### Application Service (Thin Layer)
+
+```java
+@Service
+public class OrderApplicationService {
+    private final OrderRepository orderRepo;
+    private final CustomerRepository customerRepo;
+    private final ProductRepository productRepo;
+    
+    @Transactional
+    public OrderId placeOrder(PlaceOrderCommand cmd) {
+        // 1. Validate command
+        // 2. Load referenced aggregates by ID (don't traverse)
+        Customer customer = customerRepo.findById(cmd.customerId())
+            .orElseThrow(() -> new ApplicationException("Customer not found"));
+        
+        // 3. Load product info for pricing (could be cached)
+        List<OrderLineRequest> lines = cmd.items().stream()
+            .map(item -> {
+                Product product = productRepo.findById(item.productId())
+                    .orElseThrow(() -> new ApplicationException("Product not found"));
+                return new OrderLineRequest(
+                    item.productId(),
+                    item.quantity(),
+                    product.currentPrice()
+                );
+            })
+            .toList();
+        
+        // 4. Delegate to aggregate
+        Order order = Order.place(cmd.customerId(), lines, cmd.shippingAddress());
+        
+        // 5. Persist
+        orderRepo.save(order);
+        
+        return order.id();
+    }
+    
+    @Transactional
+    public void confirmOrder(OrderId orderId) {
+        Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new ApplicationException("Order not found"));
+        
+        order.confirm();   // Domain rule in aggregate
+        
+        orderRepo.save(order);
+    }
+}
+```
+
+### Event Handlers (Cross-Aggregate Coordination)
+
+```java
+@Component
+public class OrderEventHandlers {
+    private final InventoryService inventoryService;
+    private final NotificationService notificationService;
+    
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void on(OrderPlacedEvent event) {
+        // Cross-aggregate: reserve inventory
+        inventoryService.reserveForOrder(event.orderId(), event.lines());
+    }
+    
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void on(OrderConfirmedEvent event) {
+        // Cross-aggregate: send confirmation
+        notificationService.sendConfirmation(event.customerId(), event.orderId());
+    }
+    
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void on(OrderCancelledEvent event) {
+        // Cross-aggregate: release inventory + refund
+        inventoryService.release(event.orderId());
+        paymentService.refundForOrder(event.orderId());
+    }
+}
+```
+
+## Deeper Dive — Aggregate Design Decisions
+
+### Decision Tree: What Goes Inside an Aggregate?
+
+```
+QUESTION 1: Does this entity have its own identity that matters outside the parent?
+  YES → Reference by ID, separate aggregate
+  NO → Could be value object inside aggregate
+
+QUESTION 2: Can the parent enforce a critical invariant only if it contains this entity?
+  YES → Inside aggregate (transactionally)
+  NO → Reference by ID
+
+QUESTION 3: Is this entity modified frequently independently of the parent?
+  YES → Separate aggregate (avoid lock contention)
+  NO → Inside aggregate
+
+QUESTION 4: Does the parent always need this entity to function?
+  YES → Inside aggregate
+  NO → Reference by ID
+```
+
+### Aggregate Size: How Big is Too Big?
+
+```
+SIGNS YOUR AGGREGATE IS TOO BIG:
+  - Loading takes >100ms
+  - 10+ entities related
+  - Frequent concurrent modification conflicts
+  - Methods >50 lines
+  - Lots of "optional" fields
+
+GUIDELINE: < 7 child entity types, < 1000 child instances typical
+
+ALTERNATIVE: split into multiple aggregates with eventual consistency
+  - User aggregate (profile, settings)
+  - UserSubscription aggregate (separate lifecycle)
+  - UserActivity aggregate (high-volume)
+```
+
+## Deeper Dive — Bounded Context Integration Patterns
+
+```
+CUSTOMER/SUPPLIER:
+  Two contexts, one upstream and one downstream
+  Upstream changes need to consider downstream impact
+  Example: Order Service (downstream) consumes from Catalog (upstream)
+
+CONFORMIST:
+  Downstream conforms to upstream's model entirely
+  Used when upstream is a vendor or you have no influence
+  Example: Salesforce API as upstream
+
+SHARED KERNEL:
+  Two contexts share a small subset of models
+  Both teams must agree to changes
+  Example: Address value object shared across Order, Customer, Shipping
+
+ANTI-CORRUPTION LAYER (ACL):
+  Translation layer between contexts
+  Prevents upstream model from polluting downstream
+  Example: Stripe API → our Payment domain
+  (See T13 for full details)
+
+OPEN HOST SERVICE:
+  Upstream defines a stable API for many consumers
+  Example: AWS S3 API
+
+PUBLISHED LANGUAGE:
+  Shared schema for asynchronous communication
+  Example: AVRO schema for Kafka events
+
+PARTNERSHIP:
+  Two contexts have to coordinate strategically
+  Example: Customer Service ↔ Order Service for "VIP customer rules"
+
+SEPARATE WAYS:
+  No integration; teams diverge intentionally
+  Example: marketing tools ↔ engineering systems
+```
+
+## Deeper Dive — DDD Anti-Patterns Java Teams Hit
+
+### Anti-Pattern 1: Anemic Domain Model
+
+```java
+// BAD: just getters/setters
+@Entity
+public class Order {
+    private OrderStatus status;
+    private List<OrderLine> lines;
+    
+    // Just getters and setters
+    public void setStatus(OrderStatus status) { this.status = status; }
+    public void setLines(List<OrderLine> lines) { this.lines = lines; }
+}
+
+@Service
+public class OrderService {
+    public void confirm(OrderId id) {
+        Order order = repo.findById(id);
+        
+        // Business logic in service, not entity!
+        if (order.getLines().isEmpty()) {
+            throw new RuntimeException("Empty order");
+        }
+        if (order.getStatus() != OrderStatus.DRAFT) {
+            throw new RuntimeException("Not draft");
+        }
+        
+        order.setStatus(OrderStatus.CONFIRMED);
+        repo.save(order);
+    }
+}
+
+// GOOD: business logic in entity
+@Entity
+public class Order {
+    public void confirm() {
+        if (lines.isEmpty()) throw new DomainException("Empty order");
+        if (status != OrderStatus.DRAFT) throw new DomainException("Not draft");
+        
+        this.status = OrderStatus.CONFIRMED;
+        registerEvent(new OrderConfirmedEvent(this.id));
+    }
+}
+```
+
+### Anti-Pattern 2: Repository Per Entity
+
+```java
+// BAD: 12 repositories for 12 tables
+public interface OrderRepository extends JpaRepository<Order, Long> {}
+public interface OrderLineRepository extends JpaRepository<OrderLine, Long> {}
+public interface ShippingAddressRepository extends JpaRepository<ShippingAddress, Long> {}
+
+// GOOD: One repository per AGGREGATE ROOT
+public interface OrderRepository {  // Just Order, not its parts
+    Optional<Order> findById(OrderId id);  // Returns full aggregate
+    Order save(Order order);  // Saves full aggregate
+}
+```
+
+### Anti-Pattern 3: Transactions Spanning Aggregates
+
+```java
+// BAD: Modifying two aggregates in one transaction
+@Service
+public class OrderService {
+    @Transactional
+    public void placeOrder(...) {
+        // Modify Order aggregate
+        Order order = Order.place(...);
+        orderRepo.save(order);
+        
+        // ALSO modify Customer aggregate
+        customer.addOrder(order.id());  // ← Different aggregate!
+        customerRepo.save(customer);
+    }
+}
+
+// GOOD: One aggregate per transaction
+@Service
+public class OrderService {
+    @Transactional
+    public OrderId placeOrder(...) {
+        Order order = Order.place(...);
+        orderRepo.save(order);
+        return order.id();
+    }
+}
+
+// Separate handler updates Customer eventually
+@TransactionalEventListener(phase = AFTER_COMMIT)
+public void on(OrderPlacedEvent event) {
+    Customer customer = customerRepo.findById(event.customerId());
+    customer.recordOrder(event.orderId());
+    customerRepo.save(customer);
+}
+```
+
+## Deeper Dive — When NOT to Use DDD
+
+```
+DDD IS WRONG WHEN:
+
+1. Pure CRUD application
+   - Forms in, forms out
+   - No business logic to model
+   - Use anemic + Spring Data
+
+2. Throwaway/MVP
+   - Need to ship fast
+   - May discard the design later
+   - Use anemic + iterate
+
+3. Very small team (<5 engineers)
+   - Coordination overhead unnecessary
+   - Direct communication trumps ceremony
+   - Modeling can be informal
+
+4. No domain expertise available
+   - Without experts, modeling becomes guessing
+   - Better to build minimum viable + learn
+
+5. Static, well-known domain
+   - E.g., simple accounting with strict rules
+   - Existing patterns sufficient
+
+6. Performance-critical hot paths
+   - Aggregate-loading overhead is real
+   - Consider CQRS read sides or denormalization
+```
+
+## Deeper Dive — DDD Modeling Workshop
+
+### Event Storming Session (3 hours)
+
+```
+PARTICIPANTS:
+  - 1 domain expert (essential)
+  - 1-2 engineers
+  - 1 facilitator
+
+TOOLS:
+  - Large wall (physical or virtual whiteboard)
+  - Many colored stickies:
+    Orange: Events (past tense: "Order placed", "Payment received")
+    Blue: Commands (present tense: "Place order")
+    Yellow: Actors/users
+    Purple: Policies/business rules
+    Pink: Hot spots/uncertainties
+
+PHASE 1 (45 min): Chaotic exploration
+  - All participants add events freely
+  - No ordering yet
+  - Capture as much as possible
+
+PHASE 2 (45 min): Timeline
+  - Arrange events chronologically
+  - Identify causality (one event triggers another)
+
+PHASE 3 (60 min): Aggregates
+  - Group related events
+  - Identify boundaries
+  - Name aggregates and bounded contexts
+
+PHASE 4 (30 min): Reflection
+  - Hot spots: what needs more discussion?
+  - Uncertainties: assumptions to validate?
+  - Next steps: which contexts to model deeper?
+```
+
 ## Practice
 
 1. **Find a core subdomain.** Take a company you know (your employer, an open-source project, a public business). Identify what you believe is its *core* subdomain (the differentiator). Justify by writing what changes if a competitor gets to that subdomain first.

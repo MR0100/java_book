@@ -713,6 +713,740 @@ For everything else — Java backends with non-trivial business logic and a mult
 > [!INTERVIEW]
 > Two common L5 interview prompts: (1) "What's the difference between hexagonal, clean, and onion architecture?" — strong answer: same idea, three names, ports/adapters is the most concrete vocabulary. (2) "How do you keep Spring's `@Transactional` out of your domain?" — strong answer: annotate the adapter, or wrap with a `@Transactional` decorator at the boundary; the domain stays framework-free.
 
+## Deeper Dive — Complete Hexagonal Architecture in Spring Boot
+
+### Package Structure
+
+```
+src/main/java/com/example/orders/
+│
+├── domain/                       # Pure business logic - no Spring, no JPA
+│   ├── Order.java                # Aggregate root
+│   ├── OrderId.java
+│   ├── OrderStatus.java
+│   ├── OrderLine.java
+│   ├── Money.java
+│   ├── CustomerId.java
+│   ├── ProductId.java
+│   ├── DomainEvent.java
+│   ├── OrderPlacedEvent.java
+│   │
+│   └── ports/                    # Interfaces (ports)
+│       ├── in/                   # Input ports (use cases)
+│       │   ├── PlaceOrderUseCase.java
+│       │   ├── CancelOrderUseCase.java
+│       │   └── GetOrderUseCase.java
+│       │
+│       └── out/                  # Output ports (dependencies)
+│           ├── OrderRepositoryPort.java
+│           ├── EventPublisherPort.java
+│           ├── ProductCatalogPort.java
+│           └── PaymentGatewayPort.java
+│
+├── application/                  # Use case implementations
+│   ├── PlaceOrderService.java
+│   ├── CancelOrderService.java
+│   └── GetOrderService.java
+│
+├── adapters/                     # Adapter implementations
+│   ├── in/
+│   │   ├── web/
+│   │   │   ├── OrderController.java
+│   │   │   ├── PlaceOrderRequest.java
+│   │   │   └── OrderResponse.java
+│   │   │
+│   │   └── messaging/
+│   │       └── OrderEventListener.java
+│   │
+│   └── out/
+│       ├── persistence/
+│       │   ├── OrderJpaRepository.java
+│       │   ├── OrderEntity.java
+│       │   ├── OrderEntityMapper.java
+│       │   └── OrderRepositoryAdapter.java
+│       │
+│       ├── messaging/
+│       │   └── KafkaEventPublisherAdapter.java
+│       │
+│       ├── external/
+│       │   ├── ProductCatalogClient.java
+│       │   └── StripePaymentGatewayAdapter.java
+│       │
+│       └── inmemory/                  # For testing
+│           └── InMemoryOrderRepository.java
+│
+└── config/
+    ├── HexagonalConfig.java      # Wiring
+    └── PersistenceConfig.java
+```
+
+### Pure Domain (No Spring)
+
+```java
+package com.example.orders.domain;
+
+// Pure Java - no annotations, no framework
+public class Order {
+    private final OrderId id;
+    private final CustomerId customerId;
+    private OrderStatus status;
+    private List<OrderLine> lines;
+    private Money total;
+    private final Instant createdAt;
+    private final List<DomainEvent> events = new ArrayList<>();
+    
+    // Factory method
+    public static Order place(
+            CustomerId customerId,
+            List<OrderLine> lines
+    ) {
+        if (lines.isEmpty()) {
+            throw new DomainException("Order must have items");
+        }
+        
+        Order order = new Order(
+            OrderId.newId(),
+            customerId,
+            OrderStatus.PLACED,
+            lines,
+            Instant.now()
+        );
+        order.events.add(new OrderPlacedEvent(order.id, order.customerId, order.total));
+        return order;
+    }
+    
+    private Order(OrderId id, CustomerId customerId, OrderStatus status,
+                  List<OrderLine> lines, Instant createdAt) {
+        this.id = id;
+        this.customerId = customerId;
+        this.status = status;
+        this.lines = lines;
+        this.createdAt = createdAt;
+        this.total = lines.stream()
+            .map(OrderLine::subtotal)
+            .reduce(Money.ZERO, Money::add);
+    }
+    
+    public void cancel(String reason) {
+        if (status == OrderStatus.SHIPPED || status == OrderStatus.DELIVERED) {
+            throw new DomainException("Cannot cancel " + status);
+        }
+        this.status = OrderStatus.CANCELLED;
+        this.events.add(new OrderCancelledEvent(this.id, reason));
+    }
+    
+    public List<DomainEvent> pullEvents() {
+        List<DomainEvent> copy = new ArrayList<>(events);
+        events.clear();
+        return copy;
+    }
+}
+```
+
+### Input Port (Use Case Interface)
+
+```java
+package com.example.orders.domain.ports.in;
+
+public interface PlaceOrderUseCase {
+    OrderId execute(PlaceOrderCommand command);
+    
+    record PlaceOrderCommand(
+        CustomerId customerId,
+        List<OrderLineCommand> lines,
+        ShippingAddress shippingAddress
+    ) {}
+    
+    record OrderLineCommand(
+        ProductId productId,
+        int quantity
+    ) {}
+}
+```
+
+### Output Ports (Dependencies)
+
+```java
+package com.example.orders.domain.ports.out;
+
+public interface OrderRepositoryPort {
+    Optional<Order> findById(OrderId id);
+    Order save(Order order);
+    void delete(OrderId id);
+}
+
+public interface EventPublisherPort {
+    void publish(DomainEvent event);
+    void publishAll(List<DomainEvent> events);
+}
+
+public interface ProductCatalogPort {
+    Optional<ProductInfo> findById(ProductId id);
+    
+    record ProductInfo(
+        ProductId id,
+        String name,
+        Money price,
+        int availableStock
+    ) {}
+}
+
+public interface PaymentGatewayPort {
+    ChargeResult charge(ChargeRequest request);
+    RefundResult refund(ChargeId chargeId, Money amount);
+}
+```
+
+### Use Case Implementation
+
+```java
+package com.example.orders.application;
+
+// No Spring annotations on the interface implementation either!
+public class PlaceOrderService implements PlaceOrderUseCase {
+    
+    private final OrderRepositoryPort orderRepo;
+    private final EventPublisherPort eventPublisher;
+    private final ProductCatalogPort productCatalog;
+    private final PaymentGatewayPort paymentGateway;
+    
+    public PlaceOrderService(
+            OrderRepositoryPort orderRepo,
+            EventPublisherPort eventPublisher,
+            ProductCatalogPort productCatalog,
+            PaymentGatewayPort paymentGateway
+    ) {
+        this.orderRepo = orderRepo;
+        this.eventPublisher = eventPublisher;
+        this.productCatalog = productCatalog;
+        this.paymentGateway = paymentGateway;
+    }
+    
+    @Override
+    public OrderId execute(PlaceOrderCommand command) {
+        // 1. Load product info from catalog
+        List<OrderLine> lines = command.lines().stream()
+            .map(lineCmd -> {
+                ProductInfo product = productCatalog.findById(lineCmd.productId())
+                    .orElseThrow(() -> new DomainException("Product not found: " + lineCmd.productId()));
+                
+                if (product.availableStock() < lineCmd.quantity()) {
+                    throw new DomainException("Insufficient stock for: " + lineCmd.productId());
+                }
+                
+                return new OrderLine(
+                    lineCmd.productId(),
+                    lineCmd.quantity(),
+                    product.price()
+                );
+            })
+            .toList();
+        
+        // 2. Create order (domain logic)
+        Order order = Order.place(command.customerId(), lines);
+        
+        // 3. Charge payment
+        ChargeResult charge = paymentGateway.charge(new ChargeRequest(
+            order.id(),
+            order.total(),
+            command.customerId()
+        ));
+        
+        if (!charge.successful()) {
+            throw new DomainException("Payment failed: " + charge.reason());
+        }
+        
+        order.markPaid(charge.chargeId());
+        
+        // 4. Persist
+        orderRepo.save(order);
+        
+        // 5. Publish events
+        eventPublisher.publishAll(order.pullEvents());
+        
+        return order.id();
+    }
+}
+```
+
+### Web Adapter (Input)
+
+```java
+package com.example.orders.adapters.in.web;
+
+@RestController
+@RequestMapping("/api/v1/orders")
+public class OrderController {
+    
+    private final PlaceOrderUseCase placeOrderUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
+    private final GetOrderUseCase getOrderUseCase;
+    
+    public OrderController(PlaceOrderUseCase placeOrderUseCase,
+                          CancelOrderUseCase cancelOrderUseCase,
+                          GetOrderUseCase getOrderUseCase) {
+        this.placeOrderUseCase = placeOrderUseCase;
+        this.cancelOrderUseCase = cancelOrderUseCase;
+        this.getOrderUseCase = getOrderUseCase;
+    }
+    
+    @PostMapping
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
+        OrderId orderId = placeOrderUseCase.execute(new PlaceOrderCommand(
+            new CustomerId(request.customerId()),
+            request.lines().stream()
+                .map(l -> new OrderLineCommand(new ProductId(l.productId()), l.quantity()))
+                .toList(),
+            request.shippingAddress().toDomain()
+        ));
+        
+        return ResponseEntity.created(URI.create("/api/v1/orders/" + orderId.value()))
+            .body(new OrderResponse(orderId.value().toString()));
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelOrder(@PathVariable String id) {
+        cancelOrderUseCase.execute(new CancelOrderCommand(new OrderId(UUID.fromString(id))));
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+### Persistence Adapter (Output)
+
+```java
+package com.example.orders.adapters.out.persistence;
+
+// JPA entity (separate from domain)
+@Entity
+@Table(name = "orders")
+class OrderEntity {
+    @Id
+    private UUID id;
+    private UUID customerId;
+    
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+    
+    @Column(name = "total_amount")
+    private BigDecimal totalAmount;
+    
+    @Column(name = "total_currency")
+    private String totalCurrency;
+    
+    @ElementCollection
+    @CollectionTable(name = "order_lines", joinColumns = @JoinColumn(name = "order_id"))
+    private List<OrderLineEntity> lines;
+    
+    private Instant createdAt;
+    
+    // getters/setters for JPA
+}
+
+@Component
+class OrderRepositoryAdapter implements OrderRepositoryPort {
+    private final OrderJpaRepository jpaRepo;
+    private final OrderEntityMapper mapper;
+    
+    public OrderRepositoryAdapter(OrderJpaRepository jpaRepo, OrderEntityMapper mapper) {
+        this.jpaRepo = jpaRepo;
+        this.mapper = mapper;
+    }
+    
+    @Override
+    public Optional<Order> findById(OrderId id) {
+        return jpaRepo.findById(id.value())
+            .map(mapper::toDomain);
+    }
+    
+    @Override
+    @Transactional   // Transaction at adapter layer, not domain
+    public Order save(Order order) {
+        OrderEntity entity = mapper.toEntity(order);
+        OrderEntity saved = jpaRepo.save(entity);
+        return mapper.toDomain(saved);
+    }
+}
+
+@Component
+class OrderEntityMapper {
+    Order toDomain(OrderEntity entity) {
+        return Order.reconstitute(
+            new OrderId(entity.getId()),
+            new CustomerId(entity.getCustomerId()),
+            entity.getStatus(),
+            entity.getLines().stream()
+                .map(this::toDomainLine)
+                .toList(),
+            entity.getCreatedAt()
+        );
+    }
+    
+    OrderEntity toEntity(Order order) {
+        OrderEntity entity = new OrderEntity();
+        entity.setId(order.id().value());
+        entity.setCustomerId(order.customerId().value());
+        entity.setStatus(order.status());
+        // ... map other fields
+        return entity;
+    }
+}
+```
+
+### Configuration (Wiring)
+
+```java
+package com.example.orders.config;
+
+@Configuration
+public class HexagonalConfig {
+    
+    @Bean
+    public PlaceOrderUseCase placeOrderUseCase(
+            OrderRepositoryPort orderRepo,
+            EventPublisherPort eventPublisher,
+            ProductCatalogPort productCatalog,
+            PaymentGatewayPort paymentGateway
+    ) {
+        // Spring wires concrete adapters to ports
+        return new PlaceOrderService(
+            orderRepo, eventPublisher, productCatalog, paymentGateway
+        );
+    }
+    
+    @Bean
+    public CancelOrderUseCase cancelOrderUseCase(
+            OrderRepositoryPort orderRepo,
+            EventPublisherPort eventPublisher
+    ) {
+        return new CancelOrderService(orderRepo, eventPublisher);
+    }
+}
+```
+
+## Deeper Dive — Testing in Hexagonal
+
+### Unit Test (Pure Domain - No Spring)
+
+```java
+class OrderTest {
+    @Test
+    void place_creates_order_with_correct_total() {
+        // Given
+        List<OrderLine> lines = List.of(
+            new OrderLine(new ProductId(UUID.randomUUID()), 2, Money.usd(BigDecimal.TEN)),
+            new OrderLine(new ProductId(UUID.randomUUID()), 1, Money.usd(BigDecimal.valueOf(20)))
+        );
+        
+        // When
+        Order order = Order.place(new CustomerId(UUID.randomUUID()), lines);
+        
+        // Then
+        assertEquals(Money.usd(BigDecimal.valueOf(40)), order.total());
+        assertEquals(OrderStatus.PLACED, order.status());
+        assertEquals(1, order.pullEvents().size());
+        assertInstanceOf(OrderPlacedEvent.class, order.pullEvents().get(0));
+    }
+    
+    @Test
+    void cancel_throws_when_already_shipped() {
+        Order order = givenShippedOrder();
+        
+        assertThrows(DomainException.class, () -> order.cancel("changed mind"));
+    }
+}
+```
+
+### Use Case Test (With Test Doubles)
+
+```java
+class PlaceOrderServiceTest {
+    
+    private InMemoryOrderRepository orderRepo;
+    private FakeEventPublisher eventPublisher;
+    private FakeProductCatalog productCatalog;
+    private FakePaymentGateway paymentGateway;
+    private PlaceOrderService useCase;
+    
+    @BeforeEach
+    void setUp() {
+        orderRepo = new InMemoryOrderRepository();
+        eventPublisher = new FakeEventPublisher();
+        productCatalog = new FakeProductCatalog();
+        paymentGateway = new FakePaymentGateway();
+        
+        useCase = new PlaceOrderService(orderRepo, eventPublisher, productCatalog, paymentGateway);
+    }
+    
+    @Test
+    void places_order_successfully() {
+        // Given
+        ProductId productId = new ProductId(UUID.randomUUID());
+        productCatalog.add(new ProductInfo(productId, "Widget", Money.usd(BigDecimal.TEN), 100));
+        paymentGateway.acceptCharges();
+        
+        PlaceOrderCommand command = new PlaceOrderCommand(
+            new CustomerId(UUID.randomUUID()),
+            List.of(new OrderLineCommand(productId, 2)),
+            new ShippingAddress("123 Main", "Anywhere", "US")
+        );
+        
+        // When
+        OrderId orderId = useCase.execute(command);
+        
+        // Then
+        assertNotNull(orderId);
+        Order saved = orderRepo.findById(orderId).orElseThrow();
+        assertEquals(Money.usd(BigDecimal.valueOf(20)), saved.total());
+        assertEquals(1, eventPublisher.publishedEvents().size());
+    }
+    
+    @Test
+    void rejects_when_payment_fails() {
+        // Given
+        ProductId productId = new ProductId(UUID.randomUUID());
+        productCatalog.add(new ProductInfo(productId, "Widget", Money.usd(BigDecimal.TEN), 100));
+        paymentGateway.rejectAllCharges();
+        
+        PlaceOrderCommand command = new PlaceOrderCommand(
+            new CustomerId(UUID.randomUUID()),
+            List.of(new OrderLineCommand(productId, 2)),
+            new ShippingAddress("123 Main", "Anywhere", "US")
+        );
+        
+        // When/Then
+        DomainException ex = assertThrows(DomainException.class,
+            () -> useCase.execute(command));
+        assertTrue(ex.getMessage().contains("Payment failed"));
+    }
+}
+```
+
+Test runtime: **~5ms per test** vs ~500ms with full Spring context.
+
+## Deeper Dive — Common Hexagonal Anti-Patterns
+
+### Anti-Pattern 1: Anemic Use Cases
+
+```java
+// BAD: Use case just delegates - all logic in entity
+public OrderId execute(PlaceOrderCommand cmd) {
+    return repo.save(Order.place(cmd)).id();
+}
+
+// GOOD: Use case orchestrates multiple operations
+public OrderId execute(PlaceOrderCommand cmd) {
+    // 1. Validate command
+    // 2. Load supporting data
+    // 3. Domain logic
+    // 4. Persist
+    // 5. Publish events
+    // 6. Side effects
+}
+```
+
+### Anti-Pattern 2: Domain Importing Framework
+
+```java
+// BAD: domain depends on Spring
+package com.example.orders.domain;
+
+@Component   // ← Forbidden in domain!
+public class Order {
+    @Autowired private SomeService service;   // ← Forbidden!
+}
+
+// GOOD: pure domain
+package com.example.orders.domain;
+
+public class Order {
+    // No annotations
+    // Constructor injection or factory methods
+}
+```
+
+### Anti-Pattern 3: Ports as Repository Pass-Throughs
+
+```java
+// BAD: just JPA wrapped in port
+public interface OrderRepositoryPort extends JpaRepository<Order, OrderId> {
+    // Inherits all JPA methods
+}
+
+// GOOD: domain-language port
+public interface OrderRepositoryPort {
+    Optional<Order> findById(OrderId id);
+    Order save(Order order);
+    List<Order> findByCustomerIdAndDateRange(CustomerId customerId, LocalDate from, LocalDate to);
+}
+```
+
+### Anti-Pattern 4: Adapters Importing Domain
+
+```java
+// BAD: persistence layer imports domain
+@Entity
+public class OrderEntity {
+    @Embedded
+    private Money totalAmount;   // ← Domain Money in JPA!
+}
+
+// GOOD: persistence has its own model
+@Entity
+class OrderEntity {
+    private BigDecimal totalAmount;
+    private String currency;
+    // Mapper converts to/from domain Money
+}
+```
+
+### Anti-Pattern 5: Too Many Ports
+
+```java
+// BAD: every external dep gets a port
+public interface LoggerPort {
+    void info(String msg);
+}
+
+public interface ClockPort {
+    Instant now();
+}
+
+public interface UuidPort {
+    UUID generate();
+}
+
+// GOOD: not every dependency needs port abstraction
+// Loggers, Clocks, UUID generators can be static or use standard libraries
+```
+
+## Deeper Dive — Migration: Layered → Hexagonal
+
+### Phase 1: Add Domain Package
+
+```
+Existing structure:
+  com.example.orders.controller
+  com.example.orders.service
+  com.example.orders.repository
+  com.example.orders.model         # Has both JPA + business logic
+
+New addition:
+  com.example.orders.domain         # Pure domain classes
+  com.example.orders.domain.ports.in
+  com.example.orders.domain.ports.out
+```
+
+### Phase 2: Extract Domain Logic
+
+```java
+// BEFORE: service has business logic
+@Service
+public class OrderService {
+    public Order createOrder(...) {
+        Order order = new Order();
+        // 50 lines of business rules
+        order.setStatus(OrderStatus.PLACED);
+        // ...
+        repo.save(order);
+        return order;
+    }
+}
+
+// AFTER: business logic moved to domain
+public class OrderService implements PlaceOrderUseCase {
+    public OrderId execute(PlaceOrderCommand cmd) {
+        Order order = Order.place(cmd.customerId(), cmd.items());  // ← Domain logic
+        repo.save(order);
+        return order.id();
+    }
+}
+```
+
+### Phase 3: Introduce Ports
+
+```java
+// BEFORE: depends on JPA repository directly
+@Service
+public class OrderService {
+    @Autowired private OrderJpaRepository repo;
+}
+
+// AFTER: depends on port
+public class OrderService implements PlaceOrderUseCase {
+    private final OrderRepositoryPort repo;
+}
+```
+
+### Phase 4: Refactor Adapters
+
+```
+ControllerAdapter implements input ports
+RepositoryAdapter implements output ports
+External service adapters implement integration ports
+```
+
+### Phase 5: Add ArchUnit Tests
+
+```java
+@AnalyzeClasses(packages = "com.example.orders")
+class HexagonalArchTest {
+    
+    @ArchTest
+    ArchRule domain_should_not_depend_on_adapters =
+        noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat()
+            .resideInAnyPackage("..adapters..", "..application..");
+    
+    @ArchTest
+    ArchRule domain_should_not_depend_on_spring =
+        noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat()
+            .resideInAPackage("org.springframework..");
+    
+    @ArchTest
+    ArchRule application_should_only_depend_on_domain =
+        classes()
+            .that().resideInAPackage("..application..")
+            .should().onlyDependOnClassesThat()
+            .resideInAnyPackage("..application..", "..domain..", "java..");
+}
+```
+
+## Deeper Dive — Real Hexagonal Adoptions
+
+### Company: Trivago
+
+```
+ARCHITECTURE: Hexagonal for hotel pricing/booking
+SCALE: Millions of searches per day
+KEY DECISIONS:
+  - Pure domain (no Spring) for pricing logic
+  - Separate models for: domain, JPA, REST DTOs, Kafka events
+  - 4-5× more files but tests 10× faster
+
+OUTCOMES:
+  - Easier to test pricing scenarios
+  - Easy to swap PostgreSQL ↔ Cassandra for cache layer
+  - Higher onboarding time but maintainable long-term
+```
+
+### Company: ING Bank
+
+```
+ARCHITECTURE: Hexagonal across most services
+KEY DECISIONS:
+  - Mandatory architecture pattern for new services
+  - Domain layer is core differentiator
+  - Adapters can be replaced without touching business logic
+
+OUTCOMES:
+  - Faster regulatory compliance changes (new tax rules = adapter change)
+  - Easier to onboard new countries (new external integrations only)
+```
+
 ## Practice
 
 1. **Convert a layered slice.** Take a `Controller → Service → Repository` slice from any open-source Spring service. Rewrite it as hexagonal: identify the use case, define the input and output ports, move the service into a pure-Java implementation, and write the wiring `@Configuration`. Measure: number of files, lines per file, test runtime before vs after.

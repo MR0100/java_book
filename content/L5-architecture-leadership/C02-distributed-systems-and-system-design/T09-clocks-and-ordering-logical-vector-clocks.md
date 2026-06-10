@@ -490,6 +490,365 @@ The algorithms are independent of language; implementations are a few hundred li
 > [!INTERVIEW]
 > A common L5 prompt: "Why don't you just use timestamps?" Strong answers (a) name clock skew, NTP adjustments, leap seconds, virtualization drift; (b) cite a real failure (Cassandra LWW lost-write); (c) propose Lamport / vector / HLC / TrueTime as the alternatives by use case.
 
+## Deeper Dive — Lamport Clock Java Implementation
+
+```java
+public class LamportClock {
+    private final AtomicLong counter = new AtomicLong();
+
+    public long tick() {
+        return counter.incrementAndGet();
+    }
+
+    public long onReceive(long messageTimestamp) {
+        long updated;
+        while (true) {
+            long current = counter.get();
+            updated = Math.max(current, messageTimestamp) + 1;
+            if (counter.compareAndSet(current, updated)) break;
+        }
+        return updated;
+    }
+
+    public long current() {
+        return counter.get();
+    }
+}
+
+// Usage in a distributed service
+@Service
+public class OrderedEventService {
+    private final LamportClock clock = new LamportClock();
+    private final EventRepo repo;
+    private final KafkaTemplate<String, Event> kafka;
+
+    public void publish(Event event) {
+        long ts = clock.tick();
+        event.setLamportTs(ts);
+        repo.save(event);
+        kafka.send("events", event);
+    }
+
+    @KafkaListener(topics = "events")
+    public void onEvent(Event event) {
+        clock.onReceive(event.lamportTs());   // sync clock to received message
+        process(event);
+    }
+}
+```
+
+**Property**: if A causally precedes B (A → B), then `L(A) < L(B)`. The converse is NOT true (smaller timestamp doesn't imply causality). For that, use vector clocks.
+
+## Deeper Dive — Vector Clock Java Implementation
+
+```java
+public class VectorClock {
+    private final Map<String, Long> clock = new ConcurrentHashMap<>();
+    private final String nodeId;
+
+    public VectorClock(String nodeId) {
+        this.nodeId = nodeId;
+        clock.put(nodeId, 0L);
+    }
+
+    public synchronized VectorClock tick() {
+        clock.merge(nodeId, 1L, Long::sum);
+        return this;
+    }
+
+    public synchronized VectorClock merge(VectorClock other) {
+        for (Map.Entry<String, Long> e : other.clock.entrySet()) {
+            clock.merge(e.getKey(), e.getValue(), Long::max);
+        }
+        clock.merge(nodeId, 1L, Long::sum);   // tick our own
+        return this;
+    }
+
+    public synchronized Ordering compare(VectorClock other) {
+        boolean thisLess = false, thisGreater = false;
+        Set<String> allNodes = new HashSet<>(clock.keySet());
+        allNodes.addAll(other.clock.keySet());
+
+        for (String node : allNodes) {
+            long thisVal = clock.getOrDefault(node, 0L);
+            long otherVal = other.clock.getOrDefault(node, 0L);
+
+            if (thisVal < otherVal) thisLess = true;
+            if (thisVal > otherVal) thisGreater = true;
+        }
+
+        if (!thisLess && !thisGreater) return Ordering.EQUAL;
+        if (thisLess && !thisGreater) return Ordering.BEFORE;   // this happened before other
+        if (!thisLess && thisGreater) return Ordering.AFTER;    // this happened after other
+        return Ordering.CONCURRENT;                              // truly concurrent
+    }
+
+    public enum Ordering { BEFORE, AFTER, EQUAL, CONCURRENT }
+}
+```
+
+### Concrete Trace
+
+```
+Initial:  N1: {N1:0, N2:0, N3:0}
+         N2: {N1:0, N2:0, N3:0}
+         N3: {N1:0, N2:0, N3:0}
+
+T1 — N1 does local event:
+  N1: {N1:1, N2:0, N3:0}
+
+T2 — N1 sends msg to N2 with VC:
+  N2 receives, merges + ticks:
+  N2: {N1:1, N2:1, N3:0}
+
+T3 — N3 does local event (CONCURRENT with N1's event):
+  N3: {N1:0, N2:0, N3:1}
+
+T4 — Compare N2.VC vs N3.VC:
+  N2: {N1:1, N2:1, N3:0}
+  N3: {N1:0, N2:0, N3:1}
+  N2 has N1:1 > N3 has N1:0 (this greater)
+  N2 has N2:1 > N3 has N2:0 (this greater)
+  N2 has N3:0 < N3 has N3:1 (this less)
+  → CONCURRENT (some greater, some less)
+
+  These events cannot be totally ordered; they happened in parallel.
+```
+
+## Deeper Dive — HLC (Hybrid Logical Clock) Java Implementation
+
+```java
+public class HybridLogicalClock {
+    private long lastPhysical = 0;
+    private long lastLogical = 0;
+
+    public synchronized Timestamp now() {
+        long currentPhysical = System.currentTimeMillis();
+        long newPhysical = Math.max(currentPhysical, lastPhysical);
+        long newLogical = (newPhysical == lastPhysical) ? lastLogical + 1 : 0;
+
+        lastPhysical = newPhysical;
+        lastLogical = newLogical;
+
+        return new Timestamp(newPhysical, newLogical);
+    }
+
+    public synchronized Timestamp onReceive(Timestamp received) {
+        long currentPhysical = System.currentTimeMillis();
+        long newPhysical = Math.max(
+            Math.max(currentPhysical, lastPhysical),
+            received.physical()
+        );
+
+        long newLogical;
+        if (newPhysical == lastPhysical && newPhysical == received.physical()) {
+            newLogical = Math.max(lastLogical, received.logical()) + 1;
+        } else if (newPhysical == lastPhysical) {
+            newLogical = lastLogical + 1;
+        } else if (newPhysical == received.physical()) {
+            newLogical = received.logical() + 1;
+        } else {
+            newLogical = 0;
+        }
+
+        lastPhysical = newPhysical;
+        lastLogical = newLogical;
+        return new Timestamp(newPhysical, newLogical);
+    }
+
+    public record Timestamp(long physical, long logical) implements Comparable<Timestamp> {
+        @Override
+        public int compareTo(Timestamp other) {
+            int physCmp = Long.compare(physical, other.physical);
+            if (physCmp != 0) return physCmp;
+            return Long.compare(logical, other.logical);
+        }
+    }
+}
+```
+
+**Used by**: CockroachDB (timestamps for MVCC), YugabyteDB, MongoDB (causally consistent reads).
+
+**Property**: HLC timestamps are close to wall-clock time (within bounded skew) AND preserve causal ordering — best of both worlds.
+
+## Deeper Dive — Production Failures from Wall-Clock Reliance
+
+### Cassandra LWW Lost Write
+
+```
+SCENARIO: 2 nodes, NTP drift of 50ms
+
+Node A clock: 10:00:00.000
+Node B clock: 10:00:00.050
+
+User updates Profile.name = "Alice" at Node A → ts=10:00:00.001
+User updates Profile.name = "Bob" at Node B → ts=10:00:00.020
+
+Both writes propagate via gossip.
+Cassandra LWW: max timestamp wins.
+A's "Alice" has ts 10:00:00.001
+B's "Bob" has ts 10:00:00.020
+→ Bob wins everywhere (RIGHT, since clock-wise it's earlier on B)
+
+BUT WAIT: in REAL time, the "Alice" write at Node A happened SECOND.
+The user's last action was "set name to Alice".
+Cassandra silently chose "Bob" (the older intent).
+
+FIX:
+  - Use unique timestamps with node ID tiebreaker
+  - Use external timestamp source (NTP master)
+  - Use HLC or vector clocks for true causality
+  - Use TrueTime-style bounded uncertainty
+  - Don't use LWW for important data
+```
+
+### Leap-Second Backward Jump (2012, 2015, 2016 incidents)
+
+```
+TIMELINE:
+  June 30, 2012 23:59:60 UTC — leap second inserted
+  Many Linux systems handled it as a backward jump
+  
+WHAT BROKE:
+  - JVM HashMap concurrent access → infinite loops (locks deadlocked)
+  - Java application timestamps went backwards
+  - Hadoop tasks failed (timestamp comparisons)
+  - Java EE app servers crashed
+  
+FIX MOVES:
+  - Google Spanner: leap-second smearing over hours
+  - AWS: smearing over 24 hours
+  - JVM: java.time.Clock.systemUTC() now leap-second-aware (since Java 9)
+  
+PREVENTION:
+  - Use monotonic clocks for elapsed time: System.nanoTime()
+  - Don't rely on wall-clock for ordering
+  - Use HLC for distributed ordering
+```
+
+### VM Snapshot Resume Time Jump
+
+```
+SCENARIO:
+  VM is snapshotted at 10:00:00
+  Resumed at 14:00:00 (4 hours later)
+  
+WHAT BREAKS:
+  - Timers/timeouts that were scheduled before snapshot
+  - Cache TTLs (everything expires immediately)
+  - Token expiration checks (all invalid)
+  - Heartbeats appear stale → forced re-election
+
+FIX:
+  - Use elapsed time (System.nanoTime()) for timeouts
+  - Re-validate session state on resume
+  - Cloud platforms now have "pause/resume" hooks for JVMs
+```
+
+## Deeper Dive — Distributed ID Generation Patterns
+
+### Snowflake (Twitter)
+
+```
+64-bit ID layout:
+  ┌─────────┬──────────────────────────────────────┬────────┬──────────┐
+  │ unused  │ timestamp (41 bits)                  │ machine│ sequence │
+  │ (1 bit) │ ms since custom epoch                │ ID     │ counter  │
+  │         │                                      │ (10b)  │ (12 bits)│
+  └─────────┴──────────────────────────────────────┴────────┴──────────┘
+
+PROPERTIES:
+  - Sortable by time (recent IDs > older IDs)
+  - 4096 IDs/ms/machine → 4M IDs/sec/machine
+  - 1024 machines max per cluster
+  - 69 years from custom epoch (e.g., 2024-01-01)
+
+JAVA IMPLEMENTATION:
+public class SnowflakeId {
+    private final long machineId;       // 0-1023
+    private long lastTimestamp = -1;
+    private long sequence = 0;
+
+    public synchronized long next() {
+        long ts = System.currentTimeMillis() - EPOCH;
+        if (ts < lastTimestamp) {
+            // Clock went backwards! Wait or throw
+            throw new IllegalStateException("Clock skew detected");
+        }
+        if (ts == lastTimestamp) {
+            sequence = (sequence + 1) & 0xFFF;
+            if (sequence == 0) {
+                ts = waitNextMs(ts);   // sequence exhausted in this ms
+            }
+        } else {
+            sequence = 0;
+        }
+        lastTimestamp = ts;
+        return (ts << 22) | (machineId << 12) | sequence;
+    }
+}
+```
+
+### UUID v7 (Time-Sortable, 2022 RFC)
+
+```
+128-bit UUID with time ordering:
+  ┌──────────────────────────────┬───────────────────────────┐
+  │ 48 bits: unix timestamp ms   │ 74 bits: random + version │
+  └──────────────────────────────┴───────────────────────────┘
+
+ADVANTAGES OVER UUID v4:
+  - Time-ordered (better B-tree index locality)
+  - Still globally unique
+  - 122 bits of randomness > Snowflake's 12-bit sequence
+
+JAVA (Java 21+ via libraries):
+  UUID id = UuidCreator.getTimeOrderedEpoch();
+```
+
+### ULID (Universally Unique Lexicographically Sortable Identifier)
+
+```
+26-character Base32 ID:
+  ┌────────────────────┬─────────────────┐
+  │ 10 chars timestamp │ 16 chars random │
+  └────────────────────┴─────────────────┘
+
+Like UUID v7 but text-friendly.
+Example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+```
+
+## Deeper Dive — Ordering in Real Systems
+
+| System | Mechanism | Why |
+|---|---|---|
+| **Kafka** | Per-partition offset (monotonic) | Single sequencer per partition; no clock needed |
+| **Postgres MVCC** | Transaction ID (xid) | Sequence per server |
+| **CockroachDB** | HLC timestamps | Distributed ordering with bounded uncertainty |
+| **Spanner** | TrueTime (GPS+atomic) | Real-time order globally |
+| **Cassandra** | Wall-clock + node ID | LWW; subject to clock skew |
+| **DynamoDB** | Server-side timestamp | Authoritative; no client clock issues |
+| **MongoDB** | Oplog timestamp + HLC | Causally consistent reads |
+| **Redis** | No global order | Per-key; clients manage if needed |
+| **Etcd/ZK** | Modify-revision (sequence) | Consensus log index |
+| **Snowflake/UUID v7** | Time + counter + node | Sortable distributed IDs |
+
+## Deeper Dive — Choosing the Right Clock for Your Use Case
+
+```
+NEED                                  USE
+─────────────────────────────────────────────────────────
+Elapsed time (timeout)                System.nanoTime()
+Wall clock display                    System.currentTimeMillis()
+Distributed event ordering            Lamport clock OR HLC
+Causally consistent reads             Vector clock OR HLC
+LWW conflict resolution               HLC (better than wall-clock)
+Global real-time order                TrueTime (Spanner only)
+Distributed unique sortable ID        Snowflake OR UUID v7
+Optimistic concurrency control        Version counter per row
+Distributed pub/sub ordering          Kafka partition offset
+```
+
 ## Practice
 
 1. **Trace a Lamport clock.** Sketch three processes exchanging five messages; trace L at each process. Identify which events are causally related and which are concurrent.

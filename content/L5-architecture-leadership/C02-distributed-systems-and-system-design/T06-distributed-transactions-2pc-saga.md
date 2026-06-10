@@ -418,6 +418,456 @@ Java's JTA is the most mature native support; even so, the modern Java microserv
 > [!INTERVIEW]
 > A common L5 prompt: "Why don't we just use 2PC?" Strong answers (a) name the coordinator-crash + in-doubt-blocking failure mode, (b) cite the XA support gap in modern data stores, (c) propose sagas as the practical alternative, (d) optionally name Paxos Commit as the theoretical fix.
 
+## Deeper Dive — XA / JTA in Spring Boot (When You Genuinely Need It)
+
+### Atomikos Configuration for Two-PostgreSQL Setup
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jta-atomikos</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+  </dependency>
+</dependencies>
+```
+
+```yaml
+spring:
+  jta:
+    atomikos:
+      properties:
+        log-base-dir: /var/log/atomikos
+        default-jta-timeout: 60s
+        serial-jta-transactions: false
+```
+
+```java
+@Configuration
+public class XADataSourceConfig {
+
+    @Bean(initMethod = "init", destroyMethod = "close")
+    public DataSource ordersDataSource() {
+        PGXADataSource pgxa = new PGXADataSource();
+        pgxa.setUrl("jdbc:postgresql://orders-db:5432/orders");
+        pgxa.setUser("app");
+        pgxa.setPassword("${ORDERS_DB_PASSWORD}");
+
+        AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
+        ds.setXaDataSource(pgxa);
+        ds.setUniqueResourceName("orders-xa");
+        ds.setPoolSize(10);
+        return ds;
+    }
+
+    @Bean(initMethod = "init", destroyMethod = "close")
+    public DataSource inventoryDataSource() {
+        PGXADataSource pgxa = new PGXADataSource();
+        pgxa.setUrl("jdbc:postgresql://inventory-db:5432/inventory");
+        pgxa.setUser("app");
+        pgxa.setPassword("${INVENTORY_DB_PASSWORD}");
+
+        AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
+        ds.setXaDataSource(pgxa);
+        ds.setUniqueResourceName("inventory-xa");
+        ds.setPoolSize(10);
+        return ds;
+    }
+}
+
+@Service
+public class OrderService {
+
+    @Transactional   // JTA transaction spans both DBs
+    public Order placeOrder(OrderRequest req) {
+        Order order = ordersRepo.save(new Order(req));
+        inventoryRepo.decrementStock(req.itemId(), req.quantity());
+        return order;
+        // Either both succeed (2PC commit) or both roll back
+    }
+}
+```
+
+### What XA Adds Operationally
+
+```
+NORMAL OPERATION:
+  Per-transaction overhead: ~20-50% latency hit
+  Coordinator log writes (synchronous to disk)
+  Two phases × N participants = 2N network round-trips
+
+WHEN XA IS WORTH IT:
+  - All resources are XA-capable (enterprise JDBC drivers, JMS, etc.)
+  - Latency overhead is acceptable
+  - You have the operational maturity to handle in-doubt recovery
+  - Failure semantics demand strict atomicity (financial, regulatory)
+
+WHEN XA IS NOT WORTH IT:
+  - Microservices (most participants don't support XA)
+  - Cloud-native (RDS supports XA but managed coordinators are rare)
+  - High-throughput services (the latency hit kills you)
+  - Modern stacks (Kafka, MongoDB community, DynamoDB don't speak XA)
+```
+
+### In-Doubt Transaction Recovery
+
+```bash
+# PostgreSQL: list in-doubt transactions
+SELECT gid, prepared, owner, database FROM pg_prepared_xacts;
+
+# Result:
+#  gid                   | prepared              | owner | database
+#  tx-1234-coordinator-A | 2024-06-09 14:32:00  | app   | orders
+
+# These are transactions PREPARED but never COMMITted or ROLLed back
+# (coordinator crashed mid-protocol)
+
+# Manual resolution (one of):
+COMMIT PREPARED 'tx-1234-coordinator-A';
+ROLLBACK PREPARED 'tx-1234-coordinator-A';
+
+# CRITICAL: must do the SAME action on every participant DB!
+# Atomikos log directory has the coordinator's decision (commit/abort)
+# Read the log; force the matching action everywhere
+```
+
+## Deeper Dive — Saga Pattern Full Implementation (Spring Boot)
+
+### Orchestrated Saga with State Machine
+
+```java
+@Service
+public class OrderSagaOrchestrator {
+    private final SagaStateRepo sagaRepo;
+    private final InventoryClient inventoryClient;
+    private final PaymentClient paymentClient;
+    private final ShippingClient shippingClient;
+    private final OrderRepo orderRepo;
+
+    public OrderResult placeOrder(OrderRequest req) {
+        SagaState saga = sagaRepo.save(new SagaState(
+            UUID.randomUUID(),
+            "PLACE_ORDER",
+            "STARTED",
+            json.write(req)
+        ));
+
+        try {
+            // Step 1: Reserve inventory
+            saga.markStep("INVENTORY_RESERVED", "PROCESSING");
+            ReservationId resId = inventoryClient.reserve(req.itemId(), req.quantity());
+            saga.recordCompensation("releaseInventory", resId.value());
+            saga.markStep("INVENTORY_RESERVED", "COMPLETED");
+
+            // Step 2: Charge payment
+            saga.markStep("PAYMENT_CHARGED", "PROCESSING");
+            ChargeId chargeId = paymentClient.charge(req.customerId(), req.amount());
+            saga.recordCompensation("refundPayment", chargeId.value());
+            saga.markStep("PAYMENT_CHARGED", "COMPLETED");
+
+            // Step 3: Create order
+            saga.markStep("ORDER_CREATED", "PROCESSING");
+            Order order = orderRepo.save(new Order(req, resId, chargeId));
+            saga.recordCompensation("cancelOrder", order.id().toString());
+            saga.markStep("ORDER_CREATED", "COMPLETED");
+
+            // Step 4: Schedule shipment
+            saga.markStep("SHIPMENT_SCHEDULED", "PROCESSING");
+            ShipmentId shipId = shippingClient.schedule(order.id());
+            saga.recordCompensation("cancelShipment", shipId.value());
+            saga.markStep("SHIPMENT_SCHEDULED", "COMPLETED");
+
+            saga.markComplete();
+            return OrderResult.success(order.id());
+
+        } catch (Exception e) {
+            // Run compensations in reverse order
+            sagaRepo.save(saga.markFailed(e.getMessage()));
+            compensate(saga);
+            return OrderResult.failed(e.getMessage());
+        }
+    }
+
+    private void compensate(SagaState saga) {
+        List<CompensationStep> steps = saga.compensations();
+        Collections.reverse(steps);   // reverse order
+
+        for (CompensationStep step : steps) {
+            try {
+                switch (step.action()) {
+                    case "releaseInventory" -> inventoryClient.release(new ReservationId(step.refId()));
+                    case "refundPayment" -> paymentClient.refund(new ChargeId(step.refId()));
+                    case "cancelOrder" -> orderRepo.markCancelled(UUID.fromString(step.refId()));
+                    case "cancelShipment" -> shippingClient.cancel(new ShipmentId(step.refId()));
+                }
+                saga.markCompensationCompleted(step);
+            } catch (Exception e) {
+                // Compensation MUST be idempotent and retry-safe
+                // Failed compensations alert ops for manual cleanup
+                saga.markCompensationFailed(step, e.getMessage());
+                ops.alert("Saga compensation failed: " + saga.id() + " step=" + step);
+                throw e;   // halt further compensation
+            }
+        }
+    }
+}
+```
+
+### Choreographed Saga (Event-Driven)
+
+```java
+// Each service listens to events from the previous step
+@Component
+public class InventoryEventHandler {
+    @KafkaListener(topics = "order.created")
+    public void onOrderCreated(OrderCreatedEvent event) {
+        try {
+            ReservationId resId = inventoryService.reserve(event.itemId(), event.quantity());
+            kafka.send("inventory.reserved", event.orderId(), new InventoryReservedEvent(
+                event.orderId(), resId
+            ));
+        } catch (Exception e) {
+            kafka.send("inventory.reservation_failed", event.orderId(), new InventoryReservationFailedEvent(
+                event.orderId(), e.getMessage()
+            ));
+        }
+    }
+}
+
+@Component
+public class PaymentEventHandler {
+    @KafkaListener(topics = "inventory.reserved")
+    public void onInventoryReserved(InventoryReservedEvent event) {
+        try {
+            ChargeId chargeId = paymentService.charge(...);
+            kafka.send("payment.charged", event.orderId(), ...);
+        } catch (Exception e) {
+            kafka.send("payment.failed", event.orderId(), ...);
+            // Triggers compensation: inventory listens to payment.failed and releases
+        }
+    }
+}
+
+@Component
+public class InventoryCompensationHandler {
+    @KafkaListener(topics = "payment.failed")
+    public void onPaymentFailed(PaymentFailedEvent event) {
+        inventoryService.release(event.reservationId());
+    }
+}
+```
+
+**Trade-offs**:
+- **Orchestrated**: easier to debug (one state machine), single point of failure for the saga state
+- **Choreographed**: more decoupled, harder to debug (event chains across services), no single saga state
+
+### Saga Compensations — Critical Properties
+
+Every compensation must be:
+
+1. **Idempotent** — safe to run twice. Use unique compensation IDs + idempotency tracking.
+2. **Always succeed eventually** — retried until success. Manual intervention if truly stuck.
+3. **Semantic, not literal undo** — "refundPayment" not "deleteRow"; the original event still happened.
+4. **Independent of original step's state** — must work even if the original step is partially in-flight.
+
+```java
+// GOOD compensation
+public void refundPayment(ChargeId chargeId) {
+    // Idempotent: check if already refunded
+    if (refundRepo.existsByChargeId(chargeId)) return;
+    Refund refund = pspAdapter.refund(chargeId);
+    refundRepo.save(refund);
+}
+
+// BAD compensation (not idempotent)
+public void refundPayment(ChargeId chargeId) {
+    pspAdapter.refund(chargeId);   // double-refund possible on retry
+}
+```
+
+## Deeper Dive — Outbox Pattern (The Production Saga Pre-Requisite)
+
+The outbox pattern is what makes sagas work reliably in microservices. It guarantees atomic "write to DB + publish event" without distributed transactions.
+
+```sql
+CREATE TABLE outbox (
+    id UUID PRIMARY KEY,
+    aggregate_type TEXT NOT NULL,        -- "Order"
+    aggregate_id TEXT NOT NULL,           -- "order-123"
+    event_type TEXT NOT NULL,             -- "OrderCreated"
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    published_at TIMESTAMPTZ              -- NULL until published
+);
+
+CREATE INDEX idx_outbox_unpublished ON outbox(created_at) WHERE published_at IS NULL;
+```
+
+```java
+@Service
+@Transactional
+public class OrderService {
+
+    public Order create(OrderRequest req) {
+        // Both writes are in the same DB transaction → atomic
+        Order order = orderRepo.save(new Order(req));
+        outboxRepo.save(new OutboxRecord(
+            UUID.randomUUID(),
+            "Order",
+            order.id().toString(),
+            "OrderCreated",
+            json.write(new OrderCreatedEvent(order))
+        ));
+        return order;
+    }
+}
+```
+
+```java
+// Separate process — drains outbox to Kafka
+@Component
+public class OutboxRelay {
+
+    @Scheduled(fixedDelay = 100)   // poll every 100ms
+    @Transactional
+    public void relay() {
+        List<OutboxRecord> unpublished = outboxRepo.findUnpublished(100);
+        for (OutboxRecord record : unpublished) {
+            try {
+                kafka.send(record.eventType().toLowerCase(),
+                          record.aggregateId(),
+                          record.payload()).get();   // sync ack from Kafka
+                record.markPublished();
+                outboxRepo.save(record);
+            } catch (Exception e) {
+                // Will be retried next poll
+                log.warn("Outbox relay failed for {}", record.id(), e);
+            }
+        }
+    }
+}
+```
+
+### Outbox with CDC (Production-Grade)
+
+```yaml
+# Debezium PostgreSQL connector config
+name: outbox-connector
+config:
+  connector.class: io.debezium.connector.postgresql.PostgresConnector
+  database.hostname: postgres
+  database.dbname: orders
+  table.include.list: public.outbox
+  # Routes outbox.aggregate_type → Kafka topic name
+  transforms: outbox
+  transforms.outbox.type: io.debezium.transforms.outbox.EventRouter
+  transforms.outbox.route.by.field: aggregate_type
+  transforms.outbox.table.field.event.id: id
+  transforms.outbox.table.field.event.payload: payload
+```
+
+Debezium reads the Postgres WAL → publishes to Kafka. Zero application-side polling.
+
+## Deeper Dive — 2PC vs Saga vs Outbox Decision Tree
+
+```
+Need atomicity across multiple resources?
+│
+├── All within ONE database (multiple tables)?
+│   └── USE: Local transaction (@Transactional)
+│
+├── Multiple databases, all XA-capable, enterprise stack?
+│   └── USE: 2PC via JTA/Atomikos
+│       PROS: True atomicity, minimal app code
+│       CONS: 20-50% latency, in-doubt recovery, weak ecosystem support
+│
+├── Database + external API (payment gateway, email, etc.)?
+│   ├── External API supports cancel/refund?
+│   │   └── USE: Saga with compensations
+│   └── External API is one-shot (sent email can't unsend)?
+│       └── USE: Outbox for "atomic at DB layer" + accept that external action is async
+│
+├── Multiple microservices, each with own DB?
+│   ├── Acceptable to be eventually consistent?
+│   │   └── USE: Saga (orchestrated or choreographed) + Outbox per service
+│   └── Need strict atomicity?
+│       └── RECONSIDER: probably wrong service boundaries
+│       └── If unavoidable: Saga + idempotency-key based dedup + heavy reconciliation
+│
+└── Distributed scale with global consistency requirement?
+    └── USE: Spanner / CockroachDB (managed strong consistency at scale)
+```
+
+## Deeper Dive — Saga State Recovery After Crash
+
+When a saga orchestrator crashes mid-saga:
+
+```java
+@Component
+public class SagaRecoveryService {
+
+    @Scheduled(fixedDelay = 30000)   // every 30s
+    public void recoverStuckSagas() {
+        List<SagaState> stuck = sagaRepo.findStuckSagas(Duration.ofMinutes(5));
+        // "stuck" = STARTED but not in COMPLETE/FAILED/COMPENSATED for >5 min
+
+        for (SagaState saga : stuck) {
+            log.info("Recovering stuck saga: {}", saga.id());
+
+            // Determine current step from saga state
+            String currentStep = saga.lastCompletedStep();
+
+            // Two recovery options:
+            // 1. Continue forward (if last step was successful)
+            // 2. Compensate backward (if last step was uncertain)
+
+            if (saga.status() == "PROCESSING") {
+                // Check downstream to see if step actually completed
+                if (verifyStepCompleted(currentStep, saga)) {
+                    // Resume from next step
+                    continueFromStep(saga, currentStep);
+                } else {
+                    // Roll back
+                    orchestrator.compensate(saga);
+                }
+            }
+        }
+    }
+}
+```
+
+**Critical**: every step must be idempotent — recovery may re-execute steps that already completed but weren't recorded due to crash.
+
+## Deeper Dive — When XA Still Makes Sense (2024+)
+
+Despite the saga shift, XA is still appropriate in narrow cases:
+
+| Use case | Why XA wins |
+|---|---|
+| **Legacy enterprise app refactoring** | All resources XA-capable; rewriting to sagas isn't justified |
+| **Tight database fleet** (2-3 PostgreSQL, all in-house) | Manageable failure modes; small team |
+| **Banking core systems** | Strict atomicity demanded by regulators; XA is well-understood |
+| **Single team owns all participants** | In-doubt recovery is just an internal escalation |
+| **Throughput is low** (< 100 tx/sec) | Latency hit doesn't matter at this volume |
+
+In all other cases (microservices, cloud-native, high throughput, mixed stacks), saga + outbox + idempotency is the modern answer.
+
+## Deeper Dive — Real Production Saga Examples
+
+| System | Saga implementation | Notable |
+|---|---|---|
+| **Uber** | Cadence (now Temporal) | Workflows-as-code; deterministic replay |
+| **Netflix** | Conductor | JSON-defined workflows; battle-tested at scale |
+| **Airbnb** | Maestro (internal) | Reservation flow uses saga + ML for compensations |
+| **Stripe** | Internal saga framework | Payment flows; heavy idempotency-key usage |
+| **Amazon** | Step Functions | Managed orchestration; visual workflow editor |
+| **AWS** | Step Functions + Lambda | Common for "X happens then Y" cross-service work |
+
+Frameworks like **Temporal**, **Axon Framework** (Java/Spring), **MicroProfile LRA**, and **Eventuate Tram** make sagas easier in Java; Temporal is the leading choice in 2024+.
+
 ## Practice
 
 1. **Trace a 2PC failure.** Walk through 2PC for a coordinator + two participants. Inject a coordinator crash between Phase 1 and Phase 2. Trace what each participant does.

@@ -403,6 +403,369 @@ Each of T17–T23 walks the full framework on one of these.
 > [!INTERVIEW]
 > A common L5 prompt: an open-ended "design X." Strong candidates (a) ask requirements before drawing, (b) calculate scale with sanity checks, (c) name trade-offs explicitly, (d) deep-dive the highest-risk component, (e) address failure modes unprompted.
 
+## Deeper Dive — Full Worked Example: "Design Twitter"
+
+A complete 45-min interview run through all 7 steps with concrete numbers and commentary.
+
+### Step 1: Clarify Requirements (5 min)
+
+```
+INTERVIEWER: "Design Twitter."
+
+YOU: "Let me clarify scope.
+
+  FUNCTIONAL REQUIREMENTS:
+  - Post tweets (text + media)
+  - Follow users
+  - View timeline (tweets from people you follow, ordered by time)
+  - Search? Notifications? Direct messages?
+
+  Let's focus on the core: post tweets, follow, view timeline.
+  
+  NON-FUNCTIONAL:
+  - Scale: how many users? Let's assume 500M DAU like real Twitter.
+  - Read-heavy vs write-heavy? Likely 100:1 read:write
+  - Latency target? Sub-200ms for timeline reads
+  - Consistency? Eventually consistent OK for timeline
+  - Availability? 99.9% (8.76 hr/year)
+
+  CONSTRAINTS:
+  - Mobile app, web app, API for third parties
+  - Global users → multi-region considerations
+  - Media (images, videos) requires CDN
+
+  Anything I'm missing?"
+```
+
+### Step 2: Capacity Estimation (5 min)
+
+```
+USERS
+  500M DAU
+  Peak concurrent users: 50M (10% online at any moment)
+
+POSTS
+  Avg 2 tweets/user/day = 1B tweets/day = 11.6K tweets/sec
+  Peak 3× avg: 35K tweets/sec
+
+READS
+  Avg 5 timeline views/user/day = 2.5B reads/day = 29K reads/sec
+  Peak: 90K reads/sec
+
+STORAGE
+  Tweet size: 280 chars × 4 bytes UTF-8 ≈ 1 KB (with metadata)
+  Plus 20% with media (avg 100 KB)
+  Storage/day: 1B × 1 KB + 0.2B × 100 KB = 1 TB + 20 TB ≈ 21 TB/day
+  5-year: 21 × 365 × 5 ≈ 38 PB
+
+FOLLOWERS
+  Avg 200 followers/user → 100B follow relationships
+  Total: ~5 TB indexed
+
+TIMELINE FANOUT
+  If pure push: 1B tweets/day × avg 200 followers = 200B timeline writes/day
+  At peak: 7M timeline-writes/sec
+  → Need hybrid push/pull at celebrity threshold
+```
+
+### Step 3: API Design (5 min)
+
+```
+POST /tweets
+  Headers: Authorization: Bearer <jwt>, Idempotency-Key: <uuid>
+  Body: { "text": "Hello", "media_ids": ["abc"] }
+  Response 201: { "tweet_id": "tw-123", "created_at": "..." }
+  Rate limit: 100/hour/user
+
+GET /timeline?cursor=<cursor>&limit=20
+  Headers: Authorization: Bearer <jwt>
+  Response 200: {
+    "tweets": [...],
+    "next_cursor": "..."
+  }
+  Cacheable: max-age=30s
+
+POST /follows
+  Body: { "user_id": "u-456" }
+  Response 204
+
+DELETE /follows/{user_id}
+  Response 204
+
+GET /users/{user_id}/tweets?cursor=&limit=20
+  Same shape as timeline
+```
+
+### Step 4: Data Model (5 min)
+
+```
+TWEETS (Cassandra — write-heavy, no strict schema)
+  CREATE TABLE tweets (
+    tweet_id UUID,
+    user_id UUID,
+    week_bucket TEXT,        -- partition key for time-bucketing
+    created_at TIMESTAMP,
+    text TEXT,
+    media JSONB,
+    PRIMARY KEY ((user_id, week_bucket), tweet_id)
+  ) WITH CLUSTERING ORDER BY (tweet_id DESC);
+
+FOLLOWS (PostgreSQL — relational queries, strong consistency for "who do I follow")
+  CREATE TABLE follows (
+    follower_id UUID,
+    followee_id UUID,
+    created_at TIMESTAMPTZ,
+    PRIMARY KEY (follower_id, followee_id)
+  );
+  CREATE INDEX ON follows(followee_id);
+
+TIMELINE CACHE (Redis sorted set per user)
+  Key: "timeline:user-123"
+  Score: timestamp
+  Value: tweet_id
+  Trimmed to ~800 entries
+
+CELEBRITY LIST (Redis set or PostgreSQL)
+  Users with >10K followers; their tweets are pulled at read time, not pushed
+```
+
+### Step 5: High-Level Architecture (5 min)
+
+```
+                 ┌─────────────┐
+                 │  Mobile/Web │
+                 └──────┬──────┘
+                        │
+                 ┌──────▼──────┐
+                 │ API Gateway │ (auth, rate limit, routing)
+                 └──────┬──────┘
+                        │
+        ┌───────────────┼───────────────┐
+        │               │               │
+   ┌────▼────┐     ┌────▼────┐     ┌────▼────┐
+   │ Tweet   │     │ Timeline│     │ Social  │
+   │ Service │     │ Service │     │ Service │
+   └────┬────┘     └────┬────┘     └────┬────┘
+        │               │               │
+   ┌────▼────┐     ┌────▼────┐     ┌────▼────┐
+   │Cassandra│     │ Redis   │     │Postgres │
+   │ Tweets  │     │Timelines│     │ Follows │
+   └─────────┘     └─────────┘     └─────────┘
+        │
+   ┌────▼────┐
+   │ Kafka   │ (tweet events for fan-out)
+   └────┬────┘
+        │
+   ┌────▼──────────┐
+   │ Fan-out Worker │ (push to followers' timelines)
+   └────────────────┘
+```
+
+### Step 6: Deep Dive — Fan-out Service (10 min)
+
+```
+WHY: most-asked component in this design
+
+PUSH FAN-OUT (for normal users):
+  Tweet posted by user U with N followers
+  Worker pushes tweet_id to each follower's Redis timeline:
+    ZADD timeline:follower-N score=timestamp tweet_id
+    Trim to top 800
+
+  Cost: O(N) Redis writes per tweet
+  For 200 avg followers, 11.6K tweets/sec → 2.3M Redis writes/sec
+  Doable with Redis cluster
+
+CELEBRITY HANDLING (>10K followers):
+  Don't push at write time
+  At read time, merge user's push-cached timeline with celebrity tweets
+  Read from celebrity user's tweet table directly + sort
+
+CODE:
+  publish-tweet flow:
+    1. Save to Cassandra
+    2. Publish to Kafka 'tweet-events' topic
+    3. Fan-out worker subscribes:
+       - For each follower:
+         - If user is below celebrity threshold: ZADD to follower's timeline
+         - Else: skip (will be pulled at read)
+
+  read-timeline flow:
+    1. ZREVRANGE timeline:user-X 0 19 → list of tweet_ids
+    2. MGET tweet contents from cache + Cassandra fallback
+    3. Get user's followed celebrities (small set)
+    4. For each celebrity, fetch their recent tweets
+    5. Merge by timestamp, return top 20
+```
+
+### Step 7: Trade-Offs & Bottlenecks (5 min)
+
+```
+TRADE-OFF: HYBRID PUSH/PULL
+  PRO: handles celebrities without write storm
+  CON: read path more complex; needs merging
+  ALTERNATIVE: pure pull → simpler but high read fan-out
+  ALTERNATIVE: pure push → can't handle 100M-follower accounts
+
+BOTTLENECKS:
+  1. Redis cluster write capacity at 2-3M ops/sec peak
+     Solution: shard by user_id; multiple clusters
+  2. Cassandra hot partitions for power users
+     Solution: time-bucketing partition key (week)
+  3. Fan-out worker lag during traffic spike
+     Solution: autoscale Kafka consumers; alert on lag
+
+OPEN QUESTIONS:
+  - Search? Would be separate Elasticsearch cluster
+  - Notifications? Separate notification service
+  - Direct messages? Different model (1-1 chat)
+  - Media storage? S3 + CDN, separate from tweet text
+
+NEXT-LEVEL CONCERNS:
+  - Multi-region deployment for global latency
+  - GDPR / data residency
+  - Content moderation pipeline
+  - Spam / abuse detection
+```
+
+## Deeper Dive — Time Budget Per Step (45-min Interview)
+
+```
+TOTAL: 45 min
+
+CLARIFY (5 min)     ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+CAPACITY (5 min)    ░░░░████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+API (5 min)         ░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+DATA (5 min)        ░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+HIGH-LEVEL (5 min)  ░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░░
+DEEP DIVE (15 min)  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░████████████░░░░░
+TRADE-OFFS (5 min)  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░████░
+
+WARNINGS:
+  - Spending >7 min on requirements → drawing too late, interviewer's worried
+  - Skipping capacity → looks junior, every senior asks numbers
+  - 20+ min on high-level diagram → not enough depth on interesting parts
+  - 0 min on trade-offs → you don't think like a senior
+```
+
+## Deeper Dive — The Senior Differentiator Phrases
+
+What separates Senior from Staff-level answers:
+
+### Senior phrases (cover the basics)
+```
+"I'll use Kafka here for the message bus."
+"This needs to be at least 99.9% available."
+"We'll use Redis for caching."
+```
+
+### Staff phrases (show systems thinking)
+```
+"Kafka with exactly-once + idempotent consumer; the 10% throughput hit is
+acceptable because financial reconciliation can't tolerate duplicates."
+
+"99.9% means 43 min downtime/month. Burn rate alert at 14× normal triggers
+within 2 hours if we deploy something bad. Error budget policy: freeze
+deploys when at 25% remaining."
+
+"Caching strategy: Caffeine L1 (in-process, 100ns) absorbs 80% of hits;
+Redis L2 (network, 1ms) absorbs the rest. Invalidation via Postgres CDC →
+Kafka → cross-instance pub/sub. Trade-off: 2× infrastructure cost for the
+two tiers, but 10× latency improvement."
+
+"This service has 3 downstream dependencies. Compound availability is
+99.9%³ = 99.7% — we'd need 99.99% per dependency to maintain 99.9% overall.
+Mitigation: async (Kafka) for the non-blocking dependency, circuit breaker
++ fallback for the rest."
+```
+
+The pattern: **specific trade-offs with numbers**, not abstract design choices.
+
+## Deeper Dive — Common Interview Questions and Their Pattern Reduction
+
+| Question | Reduces to |
+|---|---|
+| Design Twitter | Push/pull timeline + fan-out |
+| Design Instagram | Same as Twitter + media + ML ranking |
+| Design WhatsApp | Persistent connections + Kafka + Cassandra time-series |
+| Design Uber | Geospatial index + real-time matching + multi-region |
+| Design Netflix | CDN + recommendation + adaptive bitrate |
+| Design Slack | Persistent connections + channel subscription pattern |
+| Design Tinder | Geospatial index + matching algorithm + chat |
+| Design YouTube | Video upload + transcoding pipeline + CDN + analytics |
+| Design Google Drive | Object storage + delta sync + sharing model |
+| Design Yelp | Geospatial + reviews + ratings + search |
+| Design Spotify | Audio streaming + recommendations + offline sync |
+| Design URL Shortener | Snowflake ID + base62 + Redis cache + analytics |
+| Design Rate Limiter | Token bucket + Redis Lua + multi-tier |
+| Design Distributed Cache | Consistent hashing + replication + invalidation |
+| Design Web Crawler | Distributed queue + politeness + dedup + storage |
+| Design Logging Pipeline | Kafka + ElasticSearch + retention policies |
+| Design Search Autocomplete | Trie + ranking + Redis cache |
+| Design Notification System | Multi-channel + dedup + preferences (T22) |
+| Design Payment System | Double-entry + idempotency + saga (T21) |
+| Design News Feed | Timeline fan-out + ranking (T19) |
+
+**Pattern recognition**: most "design X" reduces to 5-7 fundamental patterns. Build mental indexes from pattern → variants → trade-offs.
+
+## Deeper Dive — Anti-Patterns to Avoid
+
+### "Just use microservices"
+
+Don't decompose unless you can articulate WHY for each service. Bad: "well, we should microservices because that's modern." Good: "User service is its own deploy because authentication has different SLO requirements; we can deploy it independently from feature work."
+
+### Drawing before discussing
+
+Wait until requirements + capacity are clear before drawing boxes. Drawing too early signals you're going to design what you've memorized, not what the problem needs.
+
+### Forgetting failure modes
+
+Every component you add has a failure mode. "Use Redis" — what if Redis is down? "Use Kafka" — what about consumer lag? "Use Postgres" — failover time? Senior candidates address these unprompted.
+
+### Equating throughput with QPS
+
+"10K QPS" isn't a target unless you specify latency. "10K QPS at p99 < 200ms" is. Senior candidates always pair throughput with latency.
+
+### Cargo-culting trendy tech
+
+"We'll use Kafka, gRPC, GraphQL, Kubernetes." Why? If you can't explain the trade-off for each, you're cargo-culting. Senior candidates pick boring technology unless there's specific justification.
+
+## Deeper Dive — Interview Performance Tips
+
+```
+THINK OUT LOUD
+  "OK, I'm calculating storage. 1B writes × 1 KB = 1 TB/day..."
+  Interviewer hears your reasoning; can correct if wrong.
+
+ASK FOR HELP STRATEGICALLY
+  "I'm not sure about the optimal cache TTL here — what's the
+   business tolerance for stale data?"
+  Shows you ask the right questions.
+
+PRIORITIZE DEPTH
+  Better to deep-dive ONE component well than skim five.
+  Senior phrases: "I'll skip the API tier — it's standard. The
+  interesting part is the fan-out."
+
+ACKNOWLEDGE LIMITS
+  "I'd want to look at real production traffic patterns before
+   committing to this celebrity threshold."
+  Honesty > false confidence.
+
+USE THE WHITEBOARD WELL
+  Erase early sketches; redraw cleanly mid-interview.
+  Color-code: blue for services, red for hot paths, green for caches.
+  Annotate numbers: "100K TPS", "200ms p99".
+
+PRACTICE COMMON PATTERNS
+  - Read-modify-write (idempotency, CAS)
+  - Fan-out (push, pull, hybrid)
+  - Geospatial (S2, quadtree, geohash)
+  - Pub/sub (Kafka, fanout)
+  - Distributed state (consensus, CRDT)
+  Most "design X" problems use these patterns.
+```
+
 ## Practice
 
 1. **Run the framework cold.** Pick a system you've never designed (a chess server, a polling app, a CDN). Run the seven steps in 45 minutes. Time each step.

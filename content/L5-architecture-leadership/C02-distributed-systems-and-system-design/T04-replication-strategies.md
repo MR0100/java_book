@@ -462,6 +462,450 @@ In leaderless systems, all writes to a particular key go to the same N replicas.
 > [!INTERVIEW]
 > A common L5 prompt: "How does Postgres replication work?" Strong answers (a) describe WAL streaming, (b) name `synchronous_commit` modes, (c) explain replica lag and how it's monitored, (d) describe failover (manual, Patroni, repmgr), (e) call out fencing / split-brain prevention.
 
+## Deeper Dive — PostgreSQL Replication Production Configuration
+
+### Primary Configuration
+
+```ini
+# /etc/postgresql/16/main/postgresql.conf
+wal_level = replica                    # required for streaming replication
+max_wal_senders = 10                   # max concurrent replicas
+wal_keep_size = 1024                   # MB of WAL kept (avoid replica falling off)
+synchronous_commit = on                # default; durable but waits for replication
+                                       # off: faster but possible data loss
+                                       # remote_write: replica received WAL but not applied
+                                       # remote_apply: replica applied; full consistency
+synchronous_standby_names = 'replica1,replica2'  # which standbys must ack
+                                                 # 'FIRST 2 (replica1,replica2,replica3)' = quorum
+```
+
+```sql
+-- Create replication user
+CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD 'secret';
+
+-- Allow replica connections
+-- /etc/postgresql/16/main/pg_hba.conf
+host replication replicator 10.0.0.0/24 scram-sha-256
+```
+
+### Replica Configuration
+
+```bash
+# Initialize replica from primary
+pg_basebackup -h primary-host -D /var/lib/postgresql/16/main \
+    -U replicator -X stream -W
+
+# /var/lib/postgresql/16/main/postgresql.auto.conf (added by pg_basebackup)
+primary_conninfo = 'host=primary-host port=5432 user=replicator password=secret'
+primary_slot_name = 'replica_slot_1'
+```
+
+### Monitoring Replica Lag
+
+```sql
+-- On primary: see all replicas + their lag
+SELECT
+    client_addr,
+    state,
+    sync_state,                       -- 'sync', 'async', 'potential'
+    pg_wal_lsn_diff(pg_current_wal_lsn(), sent_lsn) AS sent_lag_bytes,
+    pg_wal_lsn_diff(pg_current_wal_lsn(), write_lsn) AS write_lag_bytes,
+    pg_wal_lsn_diff(pg_current_wal_lsn(), flush_lsn) AS flush_lag_bytes,
+    pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn) AS replay_lag_bytes,
+    write_lag,                        -- duration the standby has been falling behind
+    flush_lag,
+    replay_lag
+FROM pg_stat_replication;
+
+-- On replica: check lag from replica's view
+SELECT
+    pg_last_wal_receive_lsn(),
+    pg_last_wal_replay_lsn(),
+    EXTRACT(EPOCH FROM (now() - pg_last_xact_replay_timestamp())) AS lag_seconds;
+```
+
+```promql
+# Prometheus alerts for replication lag
+- alert: ReplicationLagHigh
+  expr: pg_replication_lag_seconds > 30
+  for: 5m
+  annotations:
+    summary: "Replica {{$labels.client_addr}} is {{$value}}s behind primary"
+```
+
+### Failover with Patroni
+
+```yaml
+# patroni.yml
+scope: postgres-cluster
+namespace: /service/
+name: postgres-1
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 10.0.0.1:8008
+
+etcd:
+  hosts: etcd1:2379,etcd2:2379,etcd3:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    master_start_timeout: 300
+    synchronous_mode: true             # ALWAYS keep one sync standby
+    postgresql:
+      use_pg_rewind: true              # fast resync of old primary
+      parameters:
+        wal_level: replica
+        max_wal_senders: 10
+        synchronous_commit: on
+        synchronous_standby_names: '*'
+
+postgresql:
+  listen: 0.0.0.0:5432
+  data_dir: /var/lib/postgresql/16/main
+  authentication:
+    replication:
+      username: replicator
+      password: secret
+```
+
+**Patroni's failover flow**:
+1. Distributed lock via etcd/Consul/ZooKeeper
+2. Health check timeouts → failover triggered
+3. Patroni promotes most up-to-date replica (highest LSN)
+4. Old primary becomes replica via `pg_rewind`
+5. DNS / VIP updated to point at new primary
+6. **Typical RTO: 15-30 seconds**
+
+### Connection Routing for Read Replicas
+
+```yaml
+# HikariCP for primary + replica
+spring:
+  datasource:
+    primary:
+      url: jdbc:postgresql://primary-host:5432/orders
+      username: app
+      password: ${DB_PASSWORD}
+    replica:
+      url: jdbc:postgresql://replica-host:5432/orders
+      username: app_readonly
+      password: ${REPLICA_DB_PASSWORD}
+```
+
+```java
+@Configuration
+public class RoutingDataSourceConfig {
+
+    @Bean
+    @Primary
+    public DataSource routingDataSource(
+            @Qualifier("primaryDataSource") DataSource primary,
+            @Qualifier("replicaDataSource") DataSource replica) {
+
+        ReplicaAwareRoutingDataSource routing = new ReplicaAwareRoutingDataSource();
+        Map<Object, Object> targets = new HashMap<>();
+        targets.put(DataSourceType.PRIMARY, primary);
+        targets.put(DataSourceType.REPLICA, replica);
+        routing.setTargetDataSources(targets);
+        routing.setDefaultTargetDataSource(primary);
+        return routing;
+    }
+}
+
+public class ReplicaAwareRoutingDataSource extends AbstractRoutingDataSource {
+    @Override
+    protected Object determineCurrentLookupKey() {
+        return TransactionSynchronizationManager.isCurrentTransactionReadOnly()
+            ? DataSourceType.REPLICA
+            : DataSourceType.PRIMARY;
+    }
+}
+
+// Now @Transactional(readOnly = true) routes to replica
+@Service
+public class OrderQueryService {
+    @Transactional(readOnly = true)
+    public List<Order> findOrders(String userId) { ... }   // → replica
+}
+
+@Service
+public class OrderCommandService {
+    @Transactional
+    public Order createOrder(OrderRequest req) { ... }      // → primary
+}
+```
+
+## Deeper Dive — Read-Your-Writes Pattern
+
+The classic problem: write to primary, immediately read from replica, get stale data.
+
+```java
+@Service
+public class OrderService {
+    private final OrderRepo orderRepo;
+    private final Map<String, Long> writeTimestamps = new ConcurrentHashMap<>();
+
+    @Transactional
+    public Order createOrder(OrderRequest req, String userId) {
+        Order order = orderRepo.save(new Order(req));
+        // Record write time for this user
+        writeTimestamps.put(userId, System.currentTimeMillis());
+        return order;
+    }
+
+    public List<Order> getMyOrders(String userId) {
+        Long writeTime = writeTimestamps.get(userId);
+        long timeSinceWrite = writeTime != null
+            ? System.currentTimeMillis() - writeTime
+            : Long.MAX_VALUE;
+
+        if (timeSinceWrite < 5_000) {           // within 5 sec of write
+            return orderRepo.findByUserId(userId);   // primary
+        } else {
+            return orderRepoReplica.findByUserId(userId);  // replica
+        }
+    }
+}
+```
+
+**Alternative**: pass LSN to replica.
+
+```java
+// After write, capture current LSN
+public Order createOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+    long lsn = jdbcTemplate.queryForObject(
+        "SELECT pg_current_wal_lsn()::text::pg_lsn", Long.class);
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-Min-LSN", String.valueOf(lsn));
+    return order;
+}
+
+// Client sends X-Min-LSN; server routes to replica only if replica caught up
+public List<Order> getOrders(String userId, @RequestHeader("X-Min-LSN") long minLsn) {
+    long replicaLsn = getReplicaLsn();
+    if (replicaLsn >= minLsn) {
+        return replicaRepo.findByUserId(userId);
+    }
+    return primaryRepo.findByUserId(userId);   // replica hasn't caught up
+}
+```
+
+## Deeper Dive — Multi-Leader Conflict Resolution Patterns
+
+### Last-Writer-Wins (LWW) with Timestamps
+
+```sql
+CREATE TABLE products (
+    product_id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    last_update_time TIMESTAMPTZ NOT NULL,
+    last_update_node TEXT NOT NULL
+);
+
+-- On conflict during replication merge:
+INSERT INTO products (product_id, name, last_update_time, last_update_node)
+VALUES (...)
+ON CONFLICT (product_id) DO UPDATE
+SET name = EXCLUDED.name,
+    last_update_time = EXCLUDED.last_update_time,
+    last_update_node = EXCLUDED.last_update_node
+WHERE EXCLUDED.last_update_time > products.last_update_time
+   OR (EXCLUDED.last_update_time = products.last_update_time
+       AND EXCLUDED.last_update_node > products.last_update_node);
+```
+
+**Limitation**: lost data — one update silently overwritten. Use only when occasional loss is acceptable.
+
+### CRDT — Conflict-Free Replicated Data Types
+
+```java
+// G-Counter (grow-only counter) — conflict-free merge
+public class GCounter {
+    private final Map<String, Long> counts = new HashMap<>();
+    private final String nodeId;
+
+    public GCounter(String nodeId) { this.nodeId = nodeId; }
+
+    public void increment() {
+        counts.merge(nodeId, 1L, Long::sum);
+    }
+
+    public long value() {
+        return counts.values().stream().mapToLong(Long::longValue).sum();
+    }
+
+    public GCounter merge(GCounter other) {
+        GCounter merged = new GCounter(nodeId);
+        Set<String> allNodes = new HashSet<>(counts.keySet());
+        allNodes.addAll(other.counts.keySet());
+        for (String node : allNodes) {
+            long maxCount = Math.max(
+                counts.getOrDefault(node, 0L),
+                other.counts.getOrDefault(node, 0L)
+            );
+            merged.counts.put(node, maxCount);
+        }
+        return merged;
+    }
+}
+
+// Replicas converge regardless of merge order
+GCounter a = new GCounter("node-a");
+a.increment(); a.increment(); a.increment();
+
+GCounter b = new GCounter("node-b");
+b.increment(); b.increment();
+
+GCounter merged = a.merge(b);
+System.out.println(merged.value());   // 5
+```
+
+**Real CRDT systems**: Riak DT, Yjs, Automerge, Redis CRDT.
+
+### Application-Level Resolution
+
+```java
+// Shopping cart example
+@Service
+public class ShoppingCartService {
+
+    public Cart resolveCart(Cart localCart, Cart remoteCart) {
+        // Strategy: union of items, max quantity per item
+        Map<ProductId, CartItem> merged = new HashMap<>();
+        for (CartItem item : localCart.items()) {
+            merged.put(item.productId(), item);
+        }
+        for (CartItem item : remoteCart.items()) {
+            merged.merge(item.productId(), item, (a, b) ->
+                new CartItem(a.productId(), Math.max(a.quantity(), b.quantity()))
+            );
+        }
+        return new Cart(localCart.userId(), List.copyOf(merged.values()));
+    }
+}
+```
+
+**This is the Amazon Dynamo paper's "shopping cart" pattern**: never lose an "add to cart" event.
+
+## Deeper Dive — Cassandra Tunable Consistency Recipes
+
+```
+N=3 cluster (replication factor 3)
+
+RECIPE: STRONG CONSISTENCY EVERYWHERE
+  W=QUORUM (2), R=QUORUM (2)
+  → 2+2 > 3 → every read sees latest write
+  → Latency: medium write, medium read
+  → Use for: financial data, identity, anywhere "wrong answer" is unacceptable
+
+RECIPE: WRITE-HEAVY (e.g., audit logs)
+  W=ONE (1), R=ALL (3)
+  → 1+3 > 3 → strongly consistent at read
+  → Latency: very fast write, slow read
+  → Trade-off: any node down blocks reads
+  → Use for: writes far exceed reads; rare consistent reads needed
+
+RECIPE: READ-HEAVY (e.g., product catalog)
+  W=ALL (3), R=ONE (1)
+  → 3+1 > 3 → strongly consistent at read
+  → Latency: slow write, very fast read
+  → Trade-off: any node down blocks writes
+  → Use for: rare writes (catalog updates), heavy reads
+
+RECIPE: AVAILABILITY OVER CONSISTENCY
+  W=ONE, R=ONE
+  → 1+1 = 2 ≤ 3 → eventually consistent
+  → Latency: very fast write + read
+  → Always available even with 2/3 nodes down
+  → Use for: caches, page views, "likes"
+
+RECIPE: MULTI-REGION
+  W=LOCAL_QUORUM, R=LOCAL_QUORUM
+  → Strong consistency within region
+  → Eventual cross-region (via cluster replication)
+  → Use for: globally distributed services
+
+RECIPE: WRITE THEN READ-YOUR-WRITES
+  W=QUORUM, R=LOCAL_ONE
+  → Write strongly consistent
+  → Read fast on local node (which usually has latest if you write here)
+  → Add sticky routing per session
+  → Use for: typical web app where user reads their own data
+```
+
+## Deeper Dive — Real-World Replication Lag Stories
+
+| System | Typical lag | What goes wrong at this lag |
+|---|---|---|
+| **PostgreSQL streaming async** | 10-100ms | None for most apps |
+| **PostgreSQL streaming with load** | 1-10s | Read-your-writes broken; dashboard staleness |
+| **PostgreSQL logical (CDC)** | 100ms-1s | Eventually-consistent downstream OK |
+| **MySQL async** | 10-500ms | Same as Postgres |
+| **MongoDB replica** | <100ms typical | Use `readPreference=primaryPreferred` |
+| **Cassandra eventual consistency** | <1s with read repair | Always assume some staleness |
+| **DynamoDB Global Tables** | <1s typical | Geographic eventual consistency |
+| **Redis async replication** | ms range | Cache may be stale briefly during write spike |
+
+### When Lag Becomes a Real Problem
+
+```
+LAG > 5 SECONDS:
+  - Bug in application code (a session's read after write)
+  - Slack from "I created my order and it's not there" complaints
+
+LAG > 30 SECONDS:
+  - Replica falling behind under load
+  - WAL retention may be exhausted (replica needs full re-sync)
+  - Network slowdown between primary/replica
+
+LAG > 5 MINUTES:
+  - Replica disk full
+  - Replica process hung
+  - Network partition
+
+LAG GROWING UNBOUNDED:
+  - Replica can't keep up with write rate
+  - Need to scale (bigger replica, multiple read paths, or migrate to sharded system)
+```
+
+## Deeper Dive — Choosing the Right Replication Strategy
+
+```
+WHAT'S YOUR REQUIREMENT?
+│
+├── Strong consistency + simple ops?
+│   └── Single-leader (Postgres, MySQL with sync standby)
+│       Pro: ACID, easy mental model
+│       Con: Primary is SPOF; failover unavailability
+│
+├── Geographic distribution + local writes?
+│   └── Multi-leader
+│       Pro: Local write latency in every region
+│       Con: Conflict resolution complexity
+│       Recommend: CRDT or LWW for conflict-tolerant data
+│                  Eventual consistency for everything else
+│
+├── Massive scale + high availability + can tolerate eventual?
+│   └── Leaderless (Cassandra, DynamoDB)
+│       Pro: Always available; horizontal scale
+│       Con: Eventually consistent by default
+│
+├── Need both strong consistency AND geo-distribution AND scale?
+│   └── Use distributed strong-consistency: Spanner, CockroachDB
+│       Pro: All three guarantees
+│       Con: Cost; complex pricing; vendor lock-in
+│
+└── Caching with low consistency requirement?
+    └── Single-leader Redis with replication
+        Pro: Sub-ms reads everywhere
+        Con: Brief staleness during failover
+```
+
 ## Practice
 
 1. **Tune `synchronous_commit`.** For a Postgres deployment, decide on the right mode. Justify in two paragraphs: throughput vs lost-write tolerance.

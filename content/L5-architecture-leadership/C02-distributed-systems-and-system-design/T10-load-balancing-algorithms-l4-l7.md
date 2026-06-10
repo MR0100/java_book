@@ -448,6 +448,471 @@ The `/health` endpoint queries a slow database; the health check times out; the 
 > [!INTERVIEW]
 > A common L5 prompt: "What load-balancing algorithm would you use?" Strong answers (a) ask about the backends' health and uniformity, (b) propose P2C as the modern default at scale, (c) name the L4-vs-L7 distinction, (d) mention slow-start and per-request timeouts as the operational details.
 
+## Deeper Dive — Algorithm Implementations in Java
+
+### Round-Robin (Naive Baseline)
+
+```java
+public class RoundRobinLoadBalancer<T> {
+    private final List<T> backends;
+    private final AtomicInteger counter = new AtomicInteger();
+
+    public RoundRobinLoadBalancer(List<T> backends) {
+        this.backends = List.copyOf(backends);
+    }
+
+    public T pick() {
+        int idx = Math.abs(counter.getAndIncrement() % backends.size());
+        return backends.get(idx);
+    }
+}
+```
+
+**Problem**: ignores backend load. A slow backend gets the same number of requests as a fast one.
+
+### Weighted Round-Robin
+
+```java
+public class WeightedRoundRobinLoadBalancer<T> {
+    private final List<WeightedBackend<T>> backends;
+    private final AtomicInteger counter = new AtomicInteger();
+    private final int totalWeight;
+
+    public T pick() {
+        int target = Math.abs(counter.getAndIncrement() % totalWeight);
+        int cumulative = 0;
+        for (WeightedBackend<T> b : backends) {
+            cumulative += b.weight();
+            if (target < cumulative) return b.backend();
+        }
+        return backends.get(backends.size() - 1).backend();   // safety
+    }
+
+    record WeightedBackend<T>(T backend, int weight) {}
+}
+```
+
+**Use when**: heterogeneous hardware. Give 2× weight to 2× CPU machines.
+
+### Least Connections
+
+```java
+public class LeastConnectionsLoadBalancer<T> {
+    private final ConcurrentHashMap<T, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
+    private final List<T> backends;
+
+    public LeastConnectionsLoadBalancer(List<T> backends) {
+        this.backends = List.copyOf(backends);
+        for (T b : backends) activeConnections.put(b, new AtomicInteger());
+    }
+
+    public T pick() {
+        return backends.stream()
+            .min(Comparator.comparingInt(b -> activeConnections.get(b).get()))
+            .orElseThrow();
+    }
+
+    public void onRequestStart(T backend) {
+        activeConnections.get(backend).incrementAndGet();
+    }
+
+    public void onRequestComplete(T backend) {
+        activeConnections.get(backend).decrementAndGet();
+    }
+}
+```
+
+**Use when**: variable request processing times. Always balances by actual load.
+
+**Limitation**: counter coordination across LB instances. Each LB sees only its own connection count.
+
+### Power of Two Choices (P2C) — Modern Default
+
+```java
+public class P2CLoadBalancer<T> {
+    private final ConcurrentHashMap<T, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
+    private final List<T> backends;
+    private final Random random = ThreadLocalRandom.current();
+
+    public T pick() {
+        if (backends.size() == 1) return backends.get(0);
+
+        // Random pick of 2 candidates
+        int i = random.nextInt(backends.size());
+        int j;
+        do { j = random.nextInt(backends.size()); } while (j == i);
+
+        T candidate1 = backends.get(i);
+        T candidate2 = backends.get(j);
+
+        // Pick the less-loaded of the two
+        int load1 = activeConnections.get(candidate1).get();
+        int load2 = activeConnections.get(candidate2).get();
+
+        return load1 <= load2 ? candidate1 : candidate2;
+    }
+
+    public void onRequestStart(T backend) { activeConnections.get(backend).incrementAndGet(); }
+    public void onRequestComplete(T backend) { activeConnections.get(backend).decrementAndGet(); }
+}
+```
+
+**Why P2C wins**: pairing random picks with least-loaded-of-two approaches optimal with much less coordination overhead than true least-connections. Used by NGINX `least_conn`, AWS ALB "least outstanding requests", Envoy, Linkerd.
+
+### Consistent Hashing for Cache Affinity
+
+```java
+public class ConsistentHashLoadBalancer<T> {
+    private final SortedMap<Long, T> ring = new TreeMap<>();
+    private final HashFunction hashFn = Hashing.murmur3_128();
+
+    public ConsistentHashLoadBalancer(List<T> backends, int vnodesPerNode) {
+        for (T backend : backends) {
+            for (int i = 0; i < vnodesPerNode; i++) {
+                long hash = hashFn.hashString(backend + "#" + i, UTF_8).asLong();
+                ring.put(hash, backend);
+            }
+        }
+    }
+
+    public T pick(String key) {
+        if (ring.isEmpty()) return null;
+        long hash = hashFn.hashString(key, UTF_8).asLong();
+        SortedMap<Long, T> tail = ring.tailMap(hash);
+        Long nodeHash = tail.isEmpty() ? ring.firstKey() : tail.firstKey();
+        return ring.get(nodeHash);
+    }
+}
+```
+
+**Use when**: backends maintain per-key state (cache, session). Same client/user/request → same backend.
+
+## Deeper Dive — Spring Cloud LoadBalancer Customization
+
+### Default Spring Cloud LB (Round-Robin)
+
+```java
+@SpringBootApplication
+public class ClientApp {
+    @Bean
+    @LoadBalanced
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
+}
+
+@Service
+public class OrderClient {
+    private final WebClient webClient;
+
+    public OrderClient(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://orders-service").build();
+    }
+
+    public Order getOrder(String orderId) {
+        return webClient.get()
+            .uri("/orders/{id}", orderId)
+            .retrieve()
+            .bodyToMono(Order.class)
+            .block();
+    }
+}
+```
+
+### Custom P2C-Style Load Balancer
+
+```java
+@Configuration
+@LoadBalancerClient(name = "orders-service", configuration = OrdersLBConfig.class)
+public class ClientApp { ... }
+
+public class OrdersLBConfig {
+    @Bean
+    public ServiceInstanceListSupplier serviceInstanceListSupplier(
+            ConfigurableApplicationContext context) {
+        return ServiceInstanceListSupplier.builder()
+            .withDiscoveryClient()
+            .withCaching()
+            .withHealthChecks()
+            .build(context);
+    }
+
+    @Bean
+    public ReactorLoadBalancer<ServiceInstance> p2cLoadBalancer(
+            Environment env,
+            LoadBalancerClientFactory clientFactory) {
+        return new P2CReactiveLoadBalancer(
+            clientFactory.getLazyProvider("orders-service", ServiceInstanceListSupplier.class),
+            "orders-service"
+        );
+    }
+}
+
+public class P2CReactiveLoadBalancer implements ReactorServiceInstanceLoadBalancer {
+    private final ObjectProvider<ServiceInstanceListSupplier> supplierProvider;
+    private final String serviceId;
+    private final ConcurrentHashMap<String, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
+
+    @Override
+    public Mono<Response<ServiceInstance>> choose(Request request) {
+        return supplierProvider.getIfAvailable().get()
+            .next()
+            .map(instances -> {
+                if (instances.isEmpty()) return new EmptyResponse();
+                if (instances.size() == 1) return new DefaultResponse(instances.get(0));
+
+                ThreadLocalRandom random = ThreadLocalRandom.current();
+                int i = random.nextInt(instances.size());
+                int j;
+                do { j = random.nextInt(instances.size()); } while (j == i);
+
+                ServiceInstance c1 = instances.get(i);
+                ServiceInstance c2 = instances.get(j);
+
+                int load1 = activeConnections.computeIfAbsent(c1.getInstanceId(), k -> new AtomicInteger()).get();
+                int load2 = activeConnections.computeIfAbsent(c2.getInstanceId(), k -> new AtomicInteger()).get();
+
+                return new DefaultResponse(load1 <= load2 ? c1 : c2);
+            });
+    }
+}
+```
+
+### Sticky Session via Consistent Hashing
+
+```java
+public Mono<Response<ServiceInstance>> choose(Request request) {
+    return supplierProvider.getIfAvailable().get()
+        .next()
+        .map(instances -> {
+            String hashKey = extractHashKey(request);   // e.g., user_id from session
+            return new DefaultResponse(consistentHash.pick(hashKey, instances));
+        });
+}
+```
+
+## Deeper Dive — Production NGINX / Envoy Configurations
+
+### NGINX Upstream with Health Checking and Slow Start
+
+```nginx
+upstream backend {
+    least_conn;                           # algorithm: least-connections (close to P2C)
+    server backend1.example.com max_fails=3 fail_timeout=30s slow_start=30s weight=2;
+    server backend2.example.com max_fails=3 fail_timeout=30s slow_start=30s weight=2;
+    server backend3.example.com max_fails=3 fail_timeout=30s slow_start=30s weight=1 backup;
+
+    keepalive 32;                         # connection pool to backends
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";    # for keepalive
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 10s;
+        proxy_next_upstream error timeout http_502 http_503;
+    }
+
+    location /healthz {
+        access_log off;
+        proxy_pass http://backend/actuator/health;
+    }
+}
+```
+
+**`slow_start=30s`**: ramps traffic gradually over 30 seconds when a backend rejoins after failure or first-time addition. Prevents JIT cold-start latency spikes.
+
+### Envoy Production Configuration
+
+```yaml
+static_resources:
+  clusters:
+  - name: orders-service
+    type: STRICT_DNS
+    lb_policy: LEAST_REQUEST              # Envoy's P2C
+    least_request_lb_config:
+      choice_count: 2                    # P2C default
+    health_checks:
+    - timeout: 1s
+      interval: 10s
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      http_health_check:
+        path: /actuator/health/readiness
+    outlier_detection:
+      consecutive_5xx: 5
+      interval: 30s
+      base_ejection_time: 30s
+      max_ejection_percent: 50
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 1024
+        max_pending_requests: 1024
+        max_requests: 1024
+        max_retries: 3
+    load_assignment:
+      cluster_name: orders-service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: { address: orders-1, port_value: 8080 }
+```
+
+## Deeper Dive — Tail-Latency Math
+
+```
+SCENARIO: round-robin LB across 5 backends, processing time skewed
+
+Backend latencies: 50, 60, 70, 80, 500 ms (one slow)
+
+ROUND-ROBIN OUTCOME:
+  Average: (50+60+70+80+500)/5 = 152 ms
+  p99: 500 ms (1/5 of requests hit slow backend)
+  Tail-latency: bad
+
+LEAST CONNECTIONS OUTCOME:
+  Slow backend has more queued connections → fewer new requests
+  Average: ~80 ms
+  p99: ~150 ms
+  Tail-latency: much better
+
+P2C OUTCOME:
+  Probability of picking slow backend = (1/5)² + 2×(1/5)×(4/5)×0 = ~4%
+  vs round-robin 20%
+  p99: ~120 ms
+  Tail-latency: excellent
+
+THE EFFECT IS REAL:
+  Twitter's 2014 paper: P2C reduces p99 by 50%+ vs round-robin
+  Linkerd uses P2C with peak EWMA (exponentially weighted moving average of latency)
+  AWS ALB "least outstanding requests" = P2C-style
+```
+
+## Deeper Dive — Health Check Patterns
+
+### Spring Boot Multi-Level Health Endpoints
+
+```java
+@RestController
+public class HealthController {
+
+    // Cheap liveness check — JVM is responding
+    @GetMapping("/livez")
+    public ResponseEntity<String> livez() {
+        return ResponseEntity.ok("LIVE");
+    }
+
+    // Full readiness check — service can serve traffic
+    @GetMapping("/readyz")
+    public ResponseEntity<HealthStatus> readyz() {
+        HealthStatus status = new HealthStatus();
+
+        status.database = checkDatabase();
+        status.cache = checkCache();
+        status.downstream = checkDownstream();
+
+        if (!status.allHealthy()) {
+            return ResponseEntity.status(503).body(status);
+        }
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/startupz")
+    public ResponseEntity<String> startupz() {
+        // Returns 200 only AFTER warmup complete (JIT warm, caches populated)
+        if (!warmupComplete.get()) {
+            return ResponseEntity.status(503).body("WARMING UP");
+        }
+        return ResponseEntity.ok("READY");
+    }
+}
+```
+
+### Spring Boot Actuator Built-in Probes
+
+```yaml
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+```
+
+```yaml
+# K8s manifest
+livenessProbe:
+  httpGet: { path: /actuator/health/liveness, port: 8080 }
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet: { path: /actuator/health/readiness, port: 8080 }
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 2
+
+startupProbe:
+  httpGet: { path: /actuator/health/readiness, port: 8080 }
+  failureThreshold: 30
+  periodSeconds: 10
+```
+
+**Key distinction**:
+- **Liveness fail** → restart pod (something's broken)
+- **Readiness fail** → remove from LB (temporary; will recover)
+- **Startup fail** → kill pod (initial startup failed)
+
+Most common bug: pointing liveness at a check that depends on downstream → downstream slow → pods restart → cascade.
+
+## Deeper Dive — Load Balancer Comparison Matrix
+
+| LB | Layer | Algorithms | Health Check | Sticky | Slow Start | Used For |
+|---|---|---|---|---|---|---|
+| **AWS ALB** | L7 | RR, LOR (~P2C) | HTTP probes | Cookie or app-defined | Yes | AWS-native HTTPS |
+| **AWS NLB** | L4 | Hash, flow hash | TCP probes | Source IP | Yes | TCP, high throughput |
+| **NGINX** | L4/L7 | RR, weighted, least_conn, hash | Active + passive | IP hash, cookie | Yes | On-prem, multi-cloud |
+| **HAProxy** | L4/L7 | All standard | Active checks | Source IP, cookie | Yes (with patch) | Highest TPS need |
+| **Envoy** | L4/L7 | Round-robin, P2C, ring-hash, Maglev | Active + passive | Various | Yes | Service mesh sidecar |
+| **Istio gateway** | L7 | Envoy-based | Envoy-based | Envoy-based | Envoy-based | K8s service mesh |
+| **Cloudflare** | L7 (edge) | Geo-based, latency-based, weighted | Active | Cookie | Yes | Global edge |
+| **Google Cloud LB** | L4/L7 | Various | Active | Session affinity | Yes | GCP-native |
+| **Spring Cloud LB** | L7 (client-side) | RR + custom | Discovery client | Custom | Custom | Spring microservices |
+
+### When to Pick Each
+
+```
+EDGE / INTERNET-FACING:
+  - Single cloud: native LB (ALB, GCP LB)
+  - Multi-cloud: Cloudflare, Fastly, AWS Global Accelerator
+
+INTERNAL / SERVICE MESH:
+  - K8s: Istio + Envoy
+  - Spring-native: Spring Cloud LB
+
+TCP / NON-HTTP:
+  - High throughput: NLB or HAProxy in L4 mode
+  - Latency-critical (DB connections): close-to-app NGINX or HAProxy
+
+VERY HIGH TPS:
+  - HAProxy (millions/sec on big hardware)
+  - Envoy (specialized for sidecar density)
+```
+
 ## Practice
 
 1. **Algorithm benchmark.** Implement round-robin, least-connections, and P2C in Java. Simulate 1000 requests across 5 backends with skewed processing times. Compare tail latencies.

@@ -435,6 +435,371 @@ java -agentlib:native-image-agent=config-output-dir=meta -jar myapp.jar
 
 Records all reflection/proxy/resource accesses to JSON files. Use to bootstrap hints for legacy code.
 
+## Deeper Dive — Spring Boot 3 Native Image End-to-End
+
+### Maven Project Setup
+
+```xml
+<project>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.0</version>
+  </parent>
+
+  <properties>
+    <java.version>21</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <configuration>
+              <buildArgs>
+                <buildArg>--enable-preview</buildArg>
+                <buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory</buildArg>
+                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                <buildArg>-H:+InstallExitHandlers</buildArg>
+              </buildArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
+```
+
+### Building and Running
+
+```bash
+# Install GraalVM 21 (Liberica NIK includes native-image)
+sdk install java 21.0.1-graalce
+sdk use java 21.0.1-graalce
+
+# Build (takes 3-8 minutes for typical Spring Boot)
+./mvnw -Pnative native:compile
+
+# Result: ./target/myapp (single ELF binary, no JVM needed)
+ls -lh target/myapp
+# -rwxr-xr-x ... 65M target/myapp
+
+# Run
+./target/myapp
+# Started MyApp in 0.038 seconds (vs 1.2s on JVM)
+# RSS: 50 MB (vs 200 MB on JVM)
+```
+
+### Adding Reflection Hints (When Auto-Detection Misses)
+
+```java
+// For a class that uses reflection at runtime
+@RegisterReflectionForBinding({
+    User.class,
+    Order.class,
+    Payment.class
+})
+@Configuration
+public class NativeHints {
+    // Spring Boot 3 reads this annotation at AOT time
+}
+
+// For lower-level control via RuntimeHintsRegistrar
+@Configuration
+public class CustomHints {
+    @Bean
+    public RuntimeHintsRegistrar customHints() {
+        return (hints, classLoader) -> {
+            hints.reflection().registerType(MyDynamicClass.class,
+                MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                MemberCategory.INVOKE_PUBLIC_METHODS);
+            hints.resources().registerPattern("config/.*\\.properties");
+            hints.proxies().registerJdkProxy(MyInterface.class);
+            hints.serialization().registerType(MySerializable.class);
+        };
+    }
+}
+```
+
+### Using the Tracing Agent for Legacy Code
+
+```bash
+# Run JVM-mode with tracing agent enabled
+java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image \
+     -jar target/myapp.jar
+
+# Exercise all features
+curl http://localhost:8080/api/users
+curl http://localhost:8080/api/orders
+# ... cover all endpoints
+
+# Stop app; check generated config files
+ls src/main/resources/META-INF/native-image/
+# reflect-config.json
+# resource-config.json
+# proxy-config.json
+# jni-config.json
+# serialization-config.json
+
+# Rebuild native-image; agent's hints are picked up automatically
+./mvnw -Pnative native:compile
+```
+
+## Deeper Dive — CRaC (Coordinated Restore at Checkpoint)
+
+Different trade-off than native-image: keeps full Java semantics but snapshots a warmed JVM.
+
+### How CRaC Works
+
+```
+NORMAL JVM STARTUP:
+  T+0      java -jar app.jar
+  T+1s     Class loading, JIT warm-up
+  T+2s     First requests served (slow, interpreted)
+  T+30s    JIT fully warmed (Tier 4 compilation done)
+  T+30s+   Steady state
+
+WITH CRaC:
+  PHASE 1 — Warm + checkpoint (done once during build/deploy):
+    java -XX:CRaCCheckpointTo=/tmp/snapshot -jar app.jar
+    # Warm up via test traffic
+    # Snapshot via jcmd <pid> JDK.checkpoint
+    # JVM serializes: heap + JIT code + class data → /tmp/snapshot
+
+  PHASE 2 — Restore (each new pod startup):
+    java -XX:CRaCRestoreFrom=/tmp/snapshot
+    T+50ms   Heap + JIT code restored
+    T+50ms+  First request served at steady-state performance
+```
+
+### Use Cases
+
+```
+AWS LAMBDA SnapStart (uses CRaC internally):
+  - Lambda warms function instances
+  - Snapshots them; restores from snapshot on cold start
+  - Cold start: 1-3s → 100-300ms
+
+KUBERNETES PODS:
+  - Pre-warmed snapshot in container image
+  - New pod: restore in 100ms vs cold-start 5-15s
+
+AZUL OPENJDK + AWS:
+  - Production-ready CRaC in OpenJDK 17+
+  - Azul: own implementation; Liberica also supports
+
+SPRING BOOT 3.2+ INTEGRATION:
+  spring:
+    main:
+      keep-alive: true   # explicit lifecycle hooks
+  # Add CRaC dependency
+  <dependency>
+    <groupId>org.crac</groupId>
+    <artifactId>crac</artifactId>
+    <version>1.4.0</version>
+  </dependency>
+```
+
+### CRaC Constraints
+
+```
+WHAT BREAKS BEFORE CHECKPOINT:
+  - Open files / sockets / DB connections
+  - In-flight requests
+  - Thread state (must be safe to suspend)
+
+CRaC REQUIRES:
+  - Resources implement org.crac.Resource interface
+  - beforeCheckpoint() releases native handles
+  - afterRestore() re-acquires them
+
+SPRING HANDLES THIS:
+  - HikariCP: closes connections; reopens on restore
+  - Tomcat: drains in-flight; reaccepts on restore
+  - Most Spring components: native CRaC support in Boot 3.2+
+```
+
+## Deeper Dive — Project Leyden (Future of Java Startup)
+
+**Status**: in development, parts shipping in JDK 25+ as preview.
+
+### What Leyden Is
+
+Java's strategic answer to AOT — incremental, opt-in static-image approach. Different from full GraalVM:
+
+- **Doesn't require closed-world assumption** (full JVM features kept)
+- **Layered**: choose how much static analysis to do
+- **AOT cache** (JEP 483, JDK 24): pre-compile classes for fast startup
+- **Stable image** (future): native-image-like binary but with JVM features
+
+```
+THE LAYERS:
+
+Layer 1 (JDK 21+): AppCDS — shares class metadata
+Layer 2 (JDK 24): AOT cache (JEP 483) — pre-compiles classes + reduces warmup
+Layer 3 (Future): Stable image — closer to native-image but keeps JVM features
+Layer 4 (Future): Static image — fully static, no JVM
+```
+
+### Practical Impact
+
+```bash
+# JDK 24 AOT cache (preview)
+java -XX:AOTMode=record -XX:AOTConfiguration=app.aotconf -jar app.jar
+# Profile generated
+
+java -XX:AOTMode=create -XX:AOTConfiguration=app.aotconf -XX:AOTCache=app.aot -jar app.jar
+# Cache created
+
+java -XX:AOTCache=app.aot -jar app.jar
+# Faster startup using cache; full JVM features intact
+```
+
+Result: 30-50% startup reduction; modest steady-state changes (full JIT still runs).
+
+## Deeper Dive — Comparison Matrix (2026 Reality)
+
+| Approach | Startup | Throughput | Memory | Java Features | Build Time | Use For |
+|---|---:|---:|---:|---|---:|---|
+| **JVM-mode** | ~1-3s | 100% | ~200 MB | Full | 30s | Long-running services |
+| **JVM + AppCDS** | ~0.5-1.5s | 100% | ~180 MB | Full | 35s | Modest startup wins |
+| **JVM + Leyden AOT cache** | ~0.5-1s | 100% | ~190 MB | Full | 1 min | Future default Java approach |
+| **CRaC restore** | ~50-300ms | 100% | ~200 MB | Full | + snapshot phase | Lambda SnapStart, K8s |
+| **GraalVM native-image** | ~30-100ms | 80-95% | ~50 MB | Closed world | 3-8 min | Serverless, CLI, K8s churn |
+| **GraalVM EE + PGO** | ~30-100ms | 95-100% | ~50 MB | Closed world | 5-15 min | Production native; needs license |
+
+## Deeper Dive — Real-World Native-Image Adoption Stories
+
+### Quarkus (Red Hat)
+
+```
+QUARKUS BUILT FOR NATIVE FROM DAY ONE
+- "Supersonic, Subatomic Java"
+- Compile-time framework: very little reflection needed
+- 12ms startup, 12 MB binary, 25 MB RSS typical
+- Default for new Java FaaS / serverless workloads in Red Hat ecosystem
+- Spring-compatible via Quarkus Spring extensions
+```
+
+### Spring Boot 3+ Native
+
+```
+SPRING NATIVE (now integrated into Spring Boot 3)
+- AOT processing engine generates hints automatically
+- Most common dependencies work out of the box
+- Some edge cases need manual hints
+- 65-150 MB binary, 50-100 MB RSS
+- ~40-80ms startup typical
+- Adoption growing; not yet default for most Spring apps
+```
+
+### Micronaut
+
+```
+MICRONAUT (Object Computing)
+- Pioneered annotation-processor-driven DI
+- Zero reflection in framework code
+- 12 MB binary, ~30 MB RSS, ~20ms startup
+- Strong adoption in cloud-native + serverless
+- Spring developers find it familiar
+```
+
+### Helidon (Oracle)
+
+```
+HELIDON (Oracle's MicroProfile + reactive)
+- MP edition: native-friendly
+- SE edition: very low overhead
+- Used internally at Oracle Cloud
+```
+
+## Deeper Dive — When to Choose Each
+
+```
+STARTUP MATTERS MOST (FaaS, CLI, batch K8s):
+  → GraalVM native-image
+  → Quarkus or Micronaut if greenfield
+  → Spring Boot 3 native if existing Spring code
+
+WANT BOTH FAST START + FULL JAVA:
+  → CRaC (AWS Lambda SnapStart works this way)
+  → Or wait for Leyden to mature
+
+MIGRATING LEGACY SPRING APP TO LOW-LATENCY:
+  → Don't go native-image first; too much hint config
+  → Use Spring Boot 3 + virtual threads first (latency gains for free)
+  → Then add native-image if startup is still a concern
+
+DON'T NEED THIS:
+  → Long-running service (5+ min lifecycle): JVM mode is great
+  → Reflection-heavy code (Lombok-heavy DTOs, etc.): friction not worth it
+  → Frequent dependency upgrades: each upgrade needs native-image testing
+```
+
+## Deeper Dive — Practical Build Configurations
+
+### Dockerfile for Native Spring Boot
+
+```dockerfile
+# Multi-stage build: GraalVM build + minimal runtime image
+FROM ghcr.io/graalvm/graalvm-community:21 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN ./mvnw -Pnative native:compile
+
+FROM gcr.io/distroless/base
+COPY --from=build /app/target/myapp /app/myapp
+EXPOSE 8080
+ENTRYPOINT ["/app/myapp"]
+```
+
+Result: ~80 MB final image (vs ~300 MB JVM-based).
+
+### GitHub Actions for Native Build
+
+```yaml
+name: Native Build
+on: push
+
+jobs:
+  native-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          components: 'native-image'
+      - name: Build native image
+        run: ./mvnw -Pnative native:compile
+      - name: Test native image
+        run: ./target/myapp &
+              sleep 2
+              curl -f http://localhost:8080/actuator/health
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-binary
+          path: target/myapp
+```
+
 ## Practice
 
 1. **Build a native-image of "Hello World".** Install GraalVM; `native-image -jar HelloWorld.jar`. Measure startup time vs JVM-mode.

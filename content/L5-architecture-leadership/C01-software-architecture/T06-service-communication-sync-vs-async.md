@@ -620,6 +620,555 @@ The "sync at the edges, async between" pattern is the canonical shape.
 > [!INTERVIEW]
 > A common L5 prompt: "When would you use Kafka vs REST?" Strong answers (a) identify temporal coupling as the deciding question, (b) name at-least-once + idempotency as Kafka's discipline, (c) name circuit breakers + timeouts as REST's discipline, (d) describe a hybrid system that uses both deliberately.
 
+## Deeper Dive — Spring Boot REST Client Patterns
+
+### WebClient (Reactive — Modern Default)
+
+```java
+@Configuration
+public class WebClientConfig {
+
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        ConnectionProvider provider = ConnectionProvider.builder("custom")
+            .maxConnections(500)
+            .maxIdleTime(Duration.ofSeconds(30))
+            .maxLifeTime(Duration.ofMinutes(5))
+            .pendingAcquireTimeout(Duration.ofSeconds(60))
+            .pendingAcquireMaxCount(1000)
+            .evictInBackground(Duration.ofSeconds(120))
+            .build();
+
+        HttpClient httpClient = HttpClient.create(provider)
+            .responseTimeout(Duration.ofSeconds(10))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000);
+
+        return WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(httpClient));
+    }
+}
+
+@Service
+public class PaymentClient {
+    private final WebClient webClient;
+
+    public PaymentClient(WebClient.Builder builder) {
+        this.webClient = builder
+            .baseUrl("http://payment-service")
+            .filter(retryFilter())
+            .filter(circuitBreakerFilter())
+            .build();
+    }
+
+    public Mono<ChargeResult> charge(ChargeRequest req) {
+        return webClient.post()
+            .uri("/api/v1/charges")
+            .header("Idempotency-Key", req.idempotencyKey())
+            .bodyValue(req)
+            .retrieve()
+            .onStatus(HttpStatus::is4xxClientError, response ->
+                Mono.error(new ClientException("Bad request"))
+            )
+            .onStatus(HttpStatus::is5xxServerError, response ->
+                Mono.error(new ServerException("Downstream error"))
+            )
+            .bodyToMono(ChargeResult.class)
+            .timeout(Duration.ofSeconds(5))
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                .filter(throwable -> throwable instanceof ServerException));
+    }
+}
+```
+
+### gRPC Client and Server (Spring Boot)
+
+```java
+// Protobuf definition (payments.proto)
+/*
+service PaymentService {
+    rpc Charge(ChargeRequest) returns (ChargeResponse);
+    rpc StreamCharges(stream ChargeRequest) returns (stream ChargeResponse);
+}
+*/
+
+@GrpcService
+public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBase {
+    private final PaymentProcessor processor;
+
+    @Override
+    public void charge(ChargeRequest request, StreamObserver<ChargeResponse> responseObserver) {
+        try {
+            ChargeResult result = processor.process(toModel(request));
+            responseObserver.onNext(toProtoResponse(result));
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                .withDescription(e.getMessage())
+                .asRuntimeException());
+        }
+    }
+}
+
+@Service
+public class PaymentGrpcClient {
+    @GrpcClient("payment-service")
+    private PaymentServiceGrpc.PaymentServiceBlockingStub blockingStub;
+
+    @GrpcClient("payment-service")
+    private PaymentServiceGrpc.PaymentServiceStub asyncStub;
+
+    public ChargeResponse charge(ChargeRequest req) {
+        return blockingStub
+            .withDeadline(Deadline.after(5, TimeUnit.SECONDS))
+            .charge(req);
+    }
+
+    public CompletableFuture<ChargeResponse> chargeAsync(ChargeRequest req) {
+        CompletableFuture<ChargeResponse> future = new CompletableFuture<>();
+        asyncStub.charge(req, new StreamObserver<>() {
+            @Override
+            public void onNext(ChargeResponse response) {
+                future.complete(response);
+            }
+            @Override
+            public void onError(Throwable t) {
+                future.completeExceptionally(t);
+            }
+            @Override
+            public void onCompleted() {}
+        });
+        return future;
+    }
+}
+```
+
+### Performance Comparison (Real Numbers)
+
+```
+WORKLOAD: 10K req/s of small payloads (1KB)
+
+REST (Spring MVC + Jackson):
+  Wire format: JSON
+  Serialization CPU: ~30% on producer + consumer
+  Wire payload: ~1.2 KB
+  Latency p99: ~5ms (local), 50ms (cross-region)
+  
+gRPC (Protobuf):
+  Wire format: Protobuf binary
+  Serialization CPU: ~5% (10× more efficient)
+  Wire payload: ~0.4 KB (3× smaller)
+  Latency p99: ~3ms (local), 40ms (cross-region)
+  
+REST with HTTP/2 + GraalVM native + binary JSON:
+  Latency p99: ~3-4ms (local)
+  Almost matches gRPC
+  
+CONCLUSION:
+  - gRPC wins on bandwidth + CPU efficiency
+  - REST wins on debuggability + ecosystem
+  - For most teams, REST is fine; gRPC for high-volume internal
+```
+
+## Deeper Dive — Spring Kafka Producer/Consumer Best Practices
+
+### Producer Configuration
+
+```java
+@Configuration
+public class KafkaProducerConfig {
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate(
+            ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-1:9092,kafka-2:9092,kafka-3:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        
+        // Durability
+        props.put(ProducerConfig.ACKS_CONFIG, "all");                  // wait for all in-sync replicas
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);    // exactly-once semantics
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
+        props.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
+        
+        // Performance
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 10);
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 32 * 1024);
+        
+        // Reliability
+        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 120_000);
+        props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30_000);
+        
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+}
+
+@Service
+public class OrderEventPublisher {
+    private final KafkaTemplate<String, Object> kafka;
+
+    public CompletableFuture<SendResult<String, Object>> publish(OrderEvent event) {
+        return kafka.send("orders", event.orderId().toString(), event)
+            .toCompletableFuture()
+            .whenComplete((result, ex) -> {
+                if (ex != null) {
+                    log.error("Failed to publish event {}", event, ex);
+                } else {
+                    log.debug("Published to {}-{} offset={}",
+                        result.getRecordMetadata().topic(),
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+                }
+            });
+    }
+}
+```
+
+### Consumer Configuration with Idempotency
+
+```java
+@Configuration
+@EnableKafka
+public class KafkaConsumerConfig {
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, OrderEvent>
+            kafkaListenerContainerFactory(ConsumerFactory<String, OrderEvent> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, OrderEvent> factory =
+            new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        factory.setConcurrency(3);   // 3 consumer threads
+        factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
+        
+        // Error handling
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(
+            (record, exception) -> {
+                // Move to dead letter topic
+                deadLetterPublisher.publish(record, exception);
+            },
+            new FixedBackOff(1000L, 3L)   // 3 retries with 1s delay
+        );
+        factory.setCommonErrorHandler(errorHandler);
+        
+        return factory;
+    }
+}
+
+@Service
+public class OrderEventConsumer {
+    private final DedupRepo dedupRepo;
+
+    @KafkaListener(topics = "orders", groupId = "order-processor")
+    @Transactional
+    public void consume(ConsumerRecord<String, OrderEvent> record,
+                        Acknowledgment ack) {
+        UUID eventId = record.value().eventId();
+        
+        // Idempotency check
+        boolean isNew = dedupRepo.tryInsert(eventId, Instant.now());
+        if (!isNew) {
+            log.info("Duplicate event {} skipped", eventId);
+            ack.acknowledge();
+            return;
+        }
+        
+        try {
+            processEvent(record.value());
+            ack.acknowledge();
+        } catch (Exception e) {
+            log.error("Failed to process {}", eventId, e);
+            throw e;   // will trigger retry / DLT
+        }
+    }
+}
+```
+
+## Deeper Dive — Outbox Pattern (Production Quality)
+
+```java
+@Entity
+@Table(name = "outbox_events")
+public class OutboxEvent {
+    @Id @GeneratedValue
+    private Long id;
+    private String aggregateType;
+    private String aggregateId;
+    private String eventType;
+    private String payload;
+    private Instant createdAt;
+    private Instant publishedAt;
+    private Integer publishAttempts;
+}
+
+@Service
+public class OrderService {
+    private final OrderRepo orderRepo;
+    private final OutboxEventRepo outboxRepo;
+
+    @Transactional
+    public Order create(CreateOrderRequest req) {
+        // Both inserts happen in same DB transaction — atomic
+        Order order = orderRepo.save(new Order(req));
+        
+        outboxRepo.save(new OutboxEvent(
+            "Order",
+            order.id().toString(),
+            "OrderCreated",
+            json.write(new OrderCreatedEvent(order)),
+            Instant.now()
+        ));
+        
+        return order;
+    }
+}
+
+// Separate process to publish to Kafka
+@Component
+public class OutboxPublisher {
+    private final OutboxEventRepo outboxRepo;
+    private final KafkaTemplate<String, String> kafka;
+
+    @Scheduled(fixedDelay = 100)   // poll every 100ms
+    @Transactional
+    public void publish() {
+        List<OutboxEvent> unpublished = outboxRepo.findUnpublished(100);
+        
+        for (OutboxEvent event : unpublished) {
+            try {
+                kafka.send(
+                    event.aggregateType().toLowerCase() + "-events",
+                    event.aggregateId(),
+                    event.payload()
+                ).get();
+                
+                event.markPublished();
+                outboxRepo.save(event);
+            } catch (Exception e) {
+                event.incrementAttempts();
+                outboxRepo.save(event);
+                log.error("Failed to publish event {}", event.id(), e);
+            }
+        }
+    }
+}
+
+// Even better: use Debezium CDC instead of polling
+// 1. Debezium watches outbox_events table via WAL
+// 2. Automatically publishes to Kafka topic
+// 3. No polling overhead; sub-second latency
+```
+
+## Deeper Dive — Decision Framework with Real Examples
+
+```
+DECISION FRAMEWORK:
+
+USE SYNC (REST/gRPC) WHEN:
+  ✓ Need immediate response (user is waiting)
+  ✓ Strong consistency required
+  ✓ Request-response semantics natural
+  ✓ Low volume (<10K req/s)
+  ✓ Simple integration patterns
+  
+  EXAMPLES:
+  - User login/auth
+  - Loading product details
+  - Confirming order placement
+  - Reading account balance
+
+USE ASYNC (Kafka/SQS) WHEN:
+  ✓ Decouple producer from consumer
+  ✓ Producer doesn't need response
+  ✓ Multiple consumers of same event
+  ✓ High volume (>1K events/s)
+  ✓ Tolerance for eventual consistency
+  ✓ Need replay/audit capability
+  
+  EXAMPLES:
+  - Sending notifications
+  - Analytics events
+  - Inventory updates after order
+  - Email/SMS triggers
+
+USE HYBRID WHEN:
+  ✓ Need both immediate feedback AND eventual processing
+  
+  EXAMPLE: Order placement
+    1. User clicks "Place Order"
+    2. SYNC: Validate inventory, charge payment, create order
+    3. Return 201 Created to user (sync)
+    4. ASYNC: Publish OrderPlaced event
+    5. Notification service consumes async → emails
+    6. Analytics service consumes async → dashboards
+    7. Shipping service consumes async → fulfillment
+```
+
+## Deeper Dive — Common Pitfalls
+
+### Pitfall 1: Long Synchronous Chains
+
+```
+BAD:
+  Order Service → Inventory Service → Pricing Service → Tax Service → 
+  Notification Service → Email Service
+
+Each call: 50ms. Total: 250ms. p99: easily 500ms+.
+Any service slow = whole chain slow.
+Any service down = whole request fails.
+
+FIX:
+  - Reduce hops where possible (consolidate services)
+  - Make later services async (notification, email)
+  - Cache stable data (tax rates, pricing rules)
+  - Use circuit breakers + timeouts
+```
+
+### Pitfall 2: Sync When Async Is Right
+
+```
+BAD:
+  Order Service synchronously calls Email Service
+  Email Service down → order placement fails!
+
+FIX:
+  Order Service publishes OrderPlaced event to Kafka
+  Email Service consumes event asynchronously
+  Email failures don't affect order placement
+```
+
+### Pitfall 3: Async When Sync Is Right
+
+```
+BAD:
+  User clicks "Buy" → published to Kafka
+  No feedback to user immediately
+  User clicks "Buy" again → duplicate order
+
+FIX:
+  Critical UX flows need sync confirmation
+  Use sync for the order creation
+  Use async for downstream notifications
+```
+
+### Pitfall 4: No Idempotency in Async Consumers
+
+```
+BAD:
+  Kafka consumer processes "Send Welcome Email" event
+  Crashes after email sent, before commit
+  Restarts, re-reads event, sends email again
+  → User gets two welcome emails
+
+FIX:
+  - Idempotency key in event
+  - Dedup store (Redis or DB)
+  - Or: at-least-once + idempotent operations
+```
+
+### Pitfall 5: No Backpressure
+
+```
+BAD:
+  Producer publishes 100K events/sec
+  Consumer can only process 10K/sec
+  Kafka topic backs up → disk full → broker dies
+
+FIX:
+  - Monitor consumer lag
+  - Scale consumer group
+  - Add bounded retention
+  - Alert on lag threshold
+```
+
+## Deeper Dive — Real Production Architectures
+
+### Architecture 1: E-Commerce (Hybrid)
+
+```
+USER FACING (SYNC):
+  - Browse products (REST)
+  - Add to cart (REST)
+  - Checkout (REST + sync payment)
+  
+INTERNAL (ASYNC):
+  - Order created → Kafka → multiple consumers
+    - Inventory: decrement stock
+    - Notifications: email + SMS
+    - Analytics: real-time dashboard
+    - Shipping: schedule fulfillment
+    - Fraud detection: scan for anomalies
+```
+
+### Architecture 2: Financial Services (Mostly Sync)
+
+```
+USER FACING (SYNC):
+  - Login (REST + JWT)
+  - View balance (REST)
+  - Transfer money (gRPC for strong consistency)
+  - Investment trades (gRPC + strict ACID)
+  
+INTERNAL (CAREFULLY ASYNC):
+  - Settlement events (Kafka with exactly-once)
+  - Audit log (Kafka)
+  - Compliance reports (Kafka → data warehouse)
+  
+  Strict requirement: financial events must be perfectly ordered
+```
+
+### Architecture 3: Social Network (Mostly Async)
+
+```
+USER FACING:
+  - Feed loading (REST + cache)
+  - Post creation (REST + immediate publish)
+  
+INTERNAL (HEAVY ASYNC):
+  - Post published → Kafka topic
+  - Fanout service: write to follower timelines
+  - Notification service: alert followers
+  - Trending: analyze engagement
+  - Recommendations: update ML features
+  - Search: index post
+```
+
+## Deeper Dive — Operational Cost Comparison
+
+```
+SCENARIO: 100 microservices, 1M req/s total
+
+SYNC-DOMINANT (90% REST):
+  Infrastructure: more instances (no event buffer)
+  Latency: P99 cascading effects
+  Failure handling: complex retry logic in every service
+  Onboarding: simpler (familiar REST)
+  
+  ESTIMATED COST: $500K/month
+
+ASYNC-DOMINANT (90% Kafka):
+  Infrastructure: less instances (events buffer load)
+  Latency: better p99 isolation
+  Failure handling: standard at-least-once + idempotency
+  Onboarding: steeper (Kafka concepts)
+  Kafka cluster: 12-broker cluster ($30K/month)
+  
+  ESTIMATED COST: $400K/month + Kafka complexity
+
+HYBRID (BEST PRACTICE):
+  ~50% sync, ~50% async
+  Best of both worlds
+  
+  ESTIMATED COST: $450K/month
+  
+LESSON: hybrid wins for most real systems
+```
+
 ## Practice
 
 1. **Trace a REST call.** Use Wireshark or `tcpdump` to capture one REST call between two of your services. Identify the TCP handshake, TLS handshake, request headers, body, response. Measure each step's contribution to total latency.

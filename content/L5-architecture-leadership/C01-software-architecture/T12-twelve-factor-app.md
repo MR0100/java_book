@@ -458,6 +458,422 @@ The methodology's universality is its strength. **A Spring Boot service that fol
 > [!INTERVIEW]
 > A common L5 prompt: "What's the difference between a cloud-ready and a cloud-native app?" Strong answers (a) cite the twelve-factor methodology, (b) name the *specific* factors most often violated by lift-and-shift projects (config, processes, disposability, logs), (c) describe the audit process, (d) acknowledge the post-2011 additions (API first, telemetry, auth) that round out the modern bar.
 
+## Deeper Dive — Twelve-Factor Compliance Checklist for Spring Boot
+
+### Factor I: Codebase
+
+```bash
+# ONE repo per service; check for "monorepo with N apps but no clear boundaries"
+git rev-parse --show-toplevel    # one repo
+# Multiple deploys (dev/staging/prod) from SAME code via config
+
+GOOD:
+  github.com/myorg/orders-service
+    deploy → dev, staging, prod (same code, different config)
+
+BAD:
+  github.com/myorg/all-services
+    contains: orders/, payments/, accounts/ (separate apps in one repo)
+  → Each service must be independently deployable
+```
+
+### Factor II: Dependencies
+
+```xml
+<!-- All deps explicit in pom.xml or build.gradle -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+  <version>3.2.0</version>   <!-- EXPLICIT version, NOT "LATEST" -->
+</dependency>
+
+<!-- Use Maven Wrapper to pin Maven version -->
+$ ./mvnw --version
+```
+
+```bash
+# Check: no "system" classpath dependencies
+find . -name "lib/" -type d
+# Check: no shell commands assuming installed tools
+grep -r "sh\|bash\|curl" src/
+```
+
+### Factor III: Config
+
+```yaml
+# application.yml — ALL config externalized
+spring:
+  datasource:
+    url: ${DATABASE_URL}              # env var
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  redis:
+    host: ${REDIS_HOST:localhost}     # default for local dev
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS}
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+```
+
+```bash
+# NEVER in source:
+grep -rE '(jdbc:|http://|https://[a-z]+\.amazonaws\.com)' src/
+# Should find ZERO hardcoded URLs/connection strings
+```
+
+### Factor IV: Backing Services
+
+```java
+// Service depends on URL, not specific implementation
+@Configuration
+public class DataSourceConfig {
+    @Bean
+    public DataSource dataSource(@Value("${DATABASE_URL}") String url) {
+        // Works for: local Postgres, RDS, Aurora, CockroachDB — all via URL
+        return DataSourceBuilder.create().url(url).build();
+    }
+}
+
+// Same for: Redis (lettuce auto-config), Kafka (bootstrap-servers), S3 (endpoint)
+// SWAPPABLE without code changes
+```
+
+### Factor V: Build, Release, Run
+
+```bash
+# BUILD stage (CI)
+$ ./mvnw clean package
+# Produces: target/orders-service-1.0.0.jar
+
+# RELEASE stage (CD)
+$ docker build -t orders-service:1.0.0 .
+$ docker tag orders-service:1.0.0 registry.example.com/orders-service:1.0.0
+# Combines: build artifact + config = release artifact
+
+# RUN stage (production)
+$ kubectl apply -f deployment.yaml
+# Pulls image; injects env from ConfigMap + Secrets
+```
+
+### Factor VI: Processes (Stateless)
+
+```java
+// BAD: stateful in-memory cache (lost on restart, doesn't scale)
+@Component
+public class UserCache {
+    private Map<String, User> cache = new HashMap<>();   // ← in-memory state
+}
+
+// GOOD: backed by Redis or similar shared cache
+@Service
+public class UserService {
+    @Cacheable(value = "users", key = "#id")
+    public User getUser(String id) { return userRepo.findById(id).orElseThrow(); }
+    // Uses RedisCacheManager configured externally
+}
+
+// BAD: storing file uploads on local disk
+@PostMapping("/upload")
+public void upload(@RequestParam MultipartFile file) {
+    file.transferTo(Path.of("/tmp/uploads/" + file.getOriginalFilename()));
+}
+
+// GOOD: upload to S3 / GCS / cloud storage
+@Autowired private S3Client s3;
+public void upload(MultipartFile file) {
+    s3.putObject(...);
+}
+```
+
+### Factor VII: Port Binding
+
+```yaml
+# Spring Boot embeds Tomcat — exports HTTP via port binding
+server:
+  port: ${PORT:8080}     # honor PORT env var (Heroku convention)
+```
+
+```dockerfile
+# No external web server needed; the app IS the server
+FROM eclipse-temurin:21
+COPY target/orders-service.jar /app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+### Factor VIII: Concurrency (Scale Out)
+
+```yaml
+# Kubernetes scale-out
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service
+spec:
+  replicas: 5    # scale horizontally; each pod is identical
+  template:
+    spec:
+      containers:
+      - name: orders
+        image: orders-service:1.0.0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: orders-hpa
+spec:
+  scaleTargetRef:
+    name: orders-service
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+```
+
+### Factor IX: Disposability
+
+```yaml
+# Fast startup
+spring:
+  main:
+    lazy-initialization: true     # lazy init non-critical beans
+
+# Graceful shutdown
+server:
+  shutdown: graceful
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+```
+
+```java
+@Component
+public class GracefulShutdown {
+    @PreDestroy
+    public void cleanup() {
+        // Close DB connections, drain Kafka consumer, flush logs
+        log.info("Graceful shutdown initiated");
+    }
+}
+```
+
+```yaml
+# K8s
+spec:
+  terminationGracePeriodSeconds: 30
+  containers:
+  - lifecycle:
+      preStop:
+        exec:
+          command: ["/bin/sh", "-c", "sleep 10"]   # drain LB before kill
+```
+
+### Factor X: Dev/Prod Parity
+
+```yaml
+# Use real services in tests via Testcontainers
+@SpringBootTest
+@Testcontainers
+class IntegrationTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @Container
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7")
+        .withExposedPorts(6379);
+
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+    }
+}
+```
+
+```bash
+# Avoid H2 / embedded Mongo / SimpleRedis — use REAL Postgres/Redis/Kafka via containers
+docker-compose -f docker-compose.dev.yml up
+# Same containers used in dev, CI, staging
+```
+
+### Factor XI: Logs
+
+```yaml
+# Logback-spring.xml — JSON to stdout
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <includeMdc>true</includeMdc>
+      <fieldNames>
+        <timestamp>@timestamp</timestamp>
+        <message>message</message>
+        <thread>thread</thread>
+        <logger>logger</logger>
+      </fieldNames>
+    </encoder>
+  </appender>
+
+  <!-- Don't use RollingFileAppender — let the orchestrator handle log rotation -->
+  
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>
+```
+
+```java
+// MDC for structured context
+@Component
+public class TraceIdFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp,
+                                     FilterChain chain) throws IOException, ServletException {
+        String traceId = req.getHeader("X-Request-ID");
+        if (traceId == null) traceId = UUID.randomUUID().toString();
+        MDC.put("traceId", traceId);
+        try {
+            chain.doFilter(req, resp);
+        } finally {
+            MDC.clear();
+        }
+    }
+}
+```
+
+### Factor XII: Admin Processes
+
+```bash
+# Migrations as Flyway/Liquibase
+$ ./mvnw flyway:migrate
+
+# Spring Boot can also run migrations on startup:
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+# One-off admin tasks via:
+$ ./mvnw spring-boot:run -Dspring-boot.run.profiles=admin -Dspring-boot.run.arguments=--task=reindex
+```
+
+```java
+@Component
+@Profile("admin")
+public class AdminTaskRunner implements CommandLineRunner {
+    @Override
+    public void run(String... args) {
+        String task = Stream.of(args)
+            .filter(a -> a.startsWith("--task="))
+            .map(a -> a.substring(7))
+            .findFirst()
+            .orElseThrow();
+
+        switch (task) {
+            case "reindex" -> reindexService.reindexAll();
+            case "cleanup" -> cleanupService.removeOldRecords();
+            default -> throw new IllegalArgumentException("Unknown task: " + task);
+        }
+    }
+}
+```
+
+## Deeper Dive — 20-Minute Audit Template
+
+```
+SERVICE: ___________________
+DATE: ___________________
+AUDITED BY: ___________________
+
+I. Codebase:                  [✅] one repo  [❌] multi-repo  [✅] git
+II. Dependencies:             [✅] pom.xml   [✅] wrapper       [❌] unmanaged
+III. Config:                  [✅] env vars  [⚠️] some in code  [❌] hardcoded
+IV. Backing Services:         [✅] URL-based [⚠️] some embedded
+V. Build/Release/Run:         [✅] separate stages
+VI. Processes:                [✅] stateless [⚠️] some local cache
+VII. Port Binding:            [✅] embedded server
+VIII. Concurrency:            [✅] scale via HPA
+IX. Disposability:            [⚠️] graceful shutdown configured but slow
+X. Dev/Prod Parity:           [⚠️] H2 in tests; real Postgres in prod
+XI. Logs:                     [✅] JSON stdout [⚠️] some file logs
+XII. Admin Processes:         [✅] Flyway     [⚠️] some manual SQL
+
+POST-12 FACTORS:
+XIII. API First:              [⚠️] OpenAPI exists but not version-controlled
+XIV. Telemetry:               [❌] no metrics endpoint
+XV. Auth/Z:                   [⚠️] auth on perimeter only
+
+SCORE: 7/15 strong, 6/15 weak, 2/15 broken
+TOP ACTIONS:
+1. Move H2 to Testcontainers for dev/prod parity
+2. Add Prometheus metrics endpoint
+3. Stop using RollingFileAppender; logback to stdout
+4. Externalize remaining hardcoded values
+```
+
+## Deeper Dive — Real Failures Tied to Factor Violations
+
+| Factor | Real Failure |
+|---|---|
+| III (Config) | 2017 GitHub: hardcoded production URL in dev → production credentials exposed in test environment access |
+| VI (Stateless) | 2019 healthcare app: user sessions in-memory; scale-up lost active sessions for 30 min during deploy |
+| IX (Disposability) | 2018 financial service: 60s slow startup; HPA scaled up but new pods served 503s during warmup |
+| X (Dev/Prod Parity) | 2015 e-commerce: in-memory H2 in tests masked SQL bug; broke production at checkout |
+| XI (Logs) | 2020 SaaS: file-based logging on container restart; ~10K log entries lost per restart |
+
+## Deeper Dive — Kubernetes as the Twelve-Factor Enforcer
+
+```
+TWELVE-FACTOR PRINCIPLE        →  KUBERNETES ENFORCEMENT
+
+I. One codebase                →  Single Deployment YAML per service
+II. Explicit dependencies      →  Container image pins everything
+III. Config in env             →  ConfigMap + Secret → env vars
+IV. Backing services           →  Service abstraction (orders-db service)
+V. Build/Release/Run           →  Image build / kubectl apply / Pod
+VI. Stateless                  →  Pod can be killed/restarted anytime
+VII. Port binding              →  Service exposes containerPort
+VIII. Scale out                →  Deployment replicas + HPA
+IX. Disposability              →  preStop hooks, terminationGracePeriod
+X. Dev/Prod parity             →  Same image in dev/staging/prod
+XI. Logs to stdout             →  Fluentd/Promtail tails container stdout
+XII. Admin as one-off          →  Kubernetes Job
+XIII. API first                →  Helm charts as service contract
+XIV. Telemetry                 →  Prometheus + Grafana scrape /metrics
+XV. Auth/Z                     →  Service mesh (Istio) mTLS + JWT
+```
+
+## Deeper Dive — Spring Boot Twelve-Factor Cheatsheet
+
+```
+III  Config       →  @Value, @ConfigurationProperties, application.yml + env vars
+IV   Backing Svc  →  spring-boot-starter-data-* (URL-based)
+V    Build/Run    →  ./mvnw package → docker → kubectl apply
+VI   Stateless    →  Don't put state in fields; use @Cacheable to Redis
+VII  Port Binding →  server.port (embedded Tomcat)
+VIII Concurrency  →  K8s replicas + HPA
+IX   Disposability →  server.shutdown: graceful + @PreDestroy
+X    Parity       →  Testcontainers
+XI   Logs         →  Logback to stdout, JSON encoder, MDC
+XII  Admin        →  Flyway/Liquibase, Spring Batch jobs
+```
+
 ## Practice
 
 1. **Audit a real service.** Take any Spring Boot service you have access to. Run through all fifteen factors in 20 minutes. Score: how many does it satisfy?

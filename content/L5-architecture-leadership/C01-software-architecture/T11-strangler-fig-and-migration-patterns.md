@@ -544,6 +544,514 @@ The cross-language note is mainly that **Debezium, Kafka, and the open-source se
 > [!INTERVIEW]
 > A common L5 prompt: "How would you migrate a 2M-line monolith to microservices?" Strong answers (a) refuse the big-bang rewrite, (b) sketch a strangler-fig sequence with the routing mechanism, (c) include data-migration with expand-contract, (d) name the failure modes (stuck strangler, wrong-thing-first), (e) commit to ship in week one and continuously thereafter.
 
+## Deeper Dive — Complete Migration Plan: Monolith → Microservices
+
+### Initial State
+
+```
+LEGACY MONOLITH:
+  - 1.5M LOC Spring Boot 1.5 (Java 8)
+  - Single PostgreSQL with 600 tables
+  - 1 deploy per week (afraid to deploy more)
+  - 25 engineers across 5 teams
+  - p99 latency 3 seconds
+  - Frequent production incidents from one team's changes affecting another's
+
+TARGET STATE:
+  - Modular monolith first (intermediate state)
+  - Then selective microservice extraction
+  - Each team deploys daily, independently
+  - p99 latency 200ms
+  - Failure isolation between teams
+```
+
+### Phase 0: Foundation (Months 1-2)
+
+```yaml
+goals:
+  - CI/CD pipeline
+  - Observability (metrics + logs + traces)
+  - Feature flag system
+  - Database migration framework
+  - Performance baseline
+
+deliverables:
+  - GitHub Actions CI with all tests passing
+  - Prometheus + Grafana + Jaeger setup
+  - Unleash/LaunchDarkly integrated
+  - Flyway for DB migrations
+  - Load tests measuring current p99/throughput
+
+investment: 4 engineers × 2 months = 8 engineer-months
+risk: low
+```
+
+### Phase 1: Modular Monolith (Months 3-6)
+
+```java
+// BEFORE: tangled package structure
+com.example.app.controller.UserController     // calls everything directly
+com.example.app.controller.OrderController
+com.example.app.service.UserService           // imports OrderService, PaymentService
+com.example.app.service.OrderService          // imports UserService, ProductService
+com.example.app.repository.UserRepository
+com.example.app.repository.OrderRepository
+// ... 200 classes in flat structure
+
+// AFTER: bounded contexts
+com.example.app.user
+  .User (entity)
+  .UserController
+  .UserService
+  .UserRepository
+  .UserApi (public interface)
+
+com.example.app.order
+  .Order
+  .OrderController
+  .OrderService                      // ONLY imports UserApi, not UserService
+  .OrderRepository
+  .OrderApi
+
+// Enforce via ArchUnit
+@Test
+void module_boundaries_should_be_respected() {
+    ArchRule rule = classes()
+        .that().resideInAPackage("..order..")
+        .should().onlyAccessClassesThat()
+        .resideInAnyPackage("..order..", "..common..", "..user.api..", "java..");
+    rule.check(classes);
+}
+```
+
+### Phase 2: Database Module Separation (Months 6-9)
+
+```
+GOAL: prevent cross-module DB access at the schema level
+
+STEP 1: ASSIGN TABLES TO MODULES
+  user module: users, user_addresses, user_preferences
+  order module: orders, order_items, order_status_history
+  product module: products, product_variants, inventory
+  payment module: payments, refunds, payment_methods
+
+STEP 2: ENFORCE BOUNDARIES
+  - Each module gets its own DB schema
+  - Module A cannot SELECT from module B's schema
+  - Cross-module data via APIs only
+  
+STEP 3: VERIFY
+  - DBA grants schema-level permissions per app user
+  - Code review catches direct cross-schema queries
+  - Tests verify no foreign keys cross schema boundaries
+```
+
+### Phase 3: First Service Extraction (Months 9-12)
+
+```
+TARGET: Extract Notification module (least coupled, highest extraction value)
+
+WEEK 1-2: Create Notification Service skeleton
+  - New Spring Boot project
+  - Connects to same DB initially (notification tables only)
+  - Exposes API: POST /notifications
+
+WEEK 3-4: Deploy alongside monolith
+  - K8s deployment
+  - Feature flag: route 1% of notification work to new service
+  - Monitor: comparable error rates, latencies
+
+WEEK 5-6: Increase traffic
+  - 5% → 25% → 50%
+  - Validate at each step
+
+WEEK 7-8: Full migration
+  - 100% to Notification Service
+  - Monolith's notification code in dead-code state
+  - Notification Service owns its DB schema
+
+WEEK 9-12: Cleanup + lessons
+  - Delete monolith's notification code
+  - Document the playbook
+  - Refine for next extraction
+```
+
+### Phase 4: Extract More Services (Months 12-24)
+
+```
+PRIORITY ORDER:
+  1. ✅ Notifications (done)
+  2. Authentication / User
+  3. Inventory
+  4. Product Catalog
+  5. Search
+  6. Shipping
+  7. Payment processing
+  8. Order management (last - most coupled)
+
+EACH SERVICE: 8-12 weeks
+TOTAL: 8 services × 10 weeks = 80 weeks ≈ 18 months
+WITH PARALLELISM: 3-4 teams × 6 months = 12 months
+```
+
+## Deeper Dive — Routing Mechanisms in Detail
+
+### Pattern 1: API Gateway Routing
+
+```yaml
+# Spring Cloud Gateway
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: notifications-legacy
+          uri: http://monolith:8080
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - StripPrefix=0
+          metadata:
+            connect-timeout: 5000
+            
+        - id: notifications-new
+          uri: http://notification-service:8081
+          predicates:
+            - Path=/notifications/**
+            - Weight=notifications, 30   # 30% to new service
+          filters:
+            - StripPrefix=0
+```
+
+### Pattern 2: Application-Level Feature Flag
+
+```java
+@Service
+public class NotificationDispatcher {
+    private final FeatureFlagService flagService;
+    private final LegacyNotificationSender legacySender;
+    private final NewNotificationClient newServiceClient;
+    
+    public void send(Notification notification) {
+        boolean useNewService = flagService.isEnabled(
+            "notification-new-service",
+            notification.userId(),
+            FlagContext.of("country", notification.country())
+        );
+        
+        if (useNewService) {
+            try {
+                newServiceClient.send(notification);
+            } catch (Exception e) {
+                log.warn("New service failed, falling back to legacy", e);
+                legacySender.send(notification);   // safety net
+            }
+        } else {
+            legacySender.send(notification);
+        }
+    }
+}
+```
+
+### Pattern 3: Database-Driven Routing
+
+```java
+@Service
+public class TenantRouter {
+    
+    public PaymentGateway getGateway(UUID tenantId) {
+        TenantConfig config = tenantConfigRepo.findById(tenantId);
+        
+        if (config.useNewPaymentGateway()) {
+            return newPaymentGateway;
+        }
+        return legacyPaymentGateway;
+    }
+}
+
+// Migrate tenant-by-tenant
+UPDATE tenant_config SET use_new_payment_gateway = true
+WHERE tier = 'free' AND created_after > '2024-01-01'
+LIMIT 100;
+```
+
+## Deeper Dive — Data Migration Patterns
+
+### Pattern 1: Dual Write
+
+```java
+@Service
+public class OrderService {
+    private final LegacyOrderRepo legacyRepo;
+    private final NewOrderRepo newRepo;
+    private final FeatureFlagService flagService;
+
+    @Transactional
+    public Order create(CreateOrderRequest req) {
+        // Always write to both during migration
+        Order order = legacyRepo.save(toLegacyEntity(req));
+        
+        try {
+            newRepo.save(toNewEntity(req, order.id()));
+        } catch (Exception e) {
+            log.error("Failed to write to new repo", e);
+            metrics.increment("dual_write_failures");
+            
+            if (flagService.isEnabled("dual-write-strict")) {
+                throw e;  // strict mode: fail entire transaction
+            }
+            // Lenient mode: log + reconcile later
+        }
+        
+        return order;
+    }
+}
+```
+
+### Pattern 2: Backfill + Continuous Sync
+
+```bash
+# Step 1: Backfill historical data
+PGDUMP_TS=$(date -u +%s)
+
+pg_dump --data-only --table=orders --table=order_items legacy_db \
+  | psql new_db
+
+# Step 2: Catch up changes since dump (via WAL replay)
+debezium-connect-cli \
+  --start-from-lsn=$(get_lsn_at_timestamp $PGDUMP_TS) \
+  --target-topic=order-events \
+  --source-table=orders
+
+# Step 3: Continuous sync
+# Debezium streams changes
+# Consumer applies them to new DB
+
+# Step 4: Verify
+psql -c "SELECT COUNT(*) FROM legacy.orders" 
+psql -c "SELECT COUNT(*) FROM new.orders"
+# Verify match within delta < N (acceptable lag)
+
+# Step 5: Switch reads to new DB
+# Step 6: Switch writes to new DB
+# Step 7: Decommission legacy
+```
+
+### Pattern 3: Schema Evolution (Expand-Contract)
+
+```
+GOAL: Change column type from VARCHAR(50) to JSONB
+
+STEP 1: Expand — add new column
+  ALTER TABLE orders ADD COLUMN metadata_new JSONB;
+
+STEP 2: Dual write — write to both old + new
+  UPDATE OrderService:
+    void save(Order order) {
+      order.metadata = order.legacyMetadata;
+      order.metadataNew = parseJson(order.legacyMetadata);
+      repo.save(order);
+    }
+
+STEP 3: Backfill — populate new column for old rows
+  UPDATE orders SET metadata_new = parse_json(metadata_legacy)
+  WHERE metadata_new IS NULL;
+
+STEP 4: Read from new — switch all reads
+  void read(OrderId id) {
+    Order o = repo.findById(id);
+    return o.metadataNew;  // not metadataLegacy
+  }
+
+STEP 5: Stop writing to old
+  UPDATE OrderService:
+    void save(Order order) {
+      order.metadataNew = parseJson(order.metadata);
+      repo.save(order);
+    }
+
+STEP 6: Contract — drop old column
+  ALTER TABLE orders DROP COLUMN metadata_legacy;
+
+TIMING: each step is its own deploy. Total: 6-12 weeks for safety.
+```
+
+## Deeper Dive — Anti-Patterns and How to Avoid
+
+### Anti-Pattern 1: The Stuck Strangler
+
+```
+SYMPTOM:
+  Strangler started 18 months ago
+  New service exists but handles only 5% of traffic
+  Migration "in progress" indefinitely
+  
+WHY IT GOT STUCK:
+  - No clear migration deadline
+  - Risk-averse team won't increase traffic
+  - Edge cases caused initial rollback
+  - Team moved to other priorities
+  
+HOW TO UNSTUCK:
+  - Set hard deadline (e.g., "100% by end of Q2")
+  - Senior leadership accountability
+  - Block other work until done
+  - Or: explicitly cancel the migration
+```
+
+### Anti-Pattern 2: Wrong Extraction First
+
+```
+SYMPTOM:
+  Extracted "User Service" but it's deeply coupled with everything
+  Now every other extraction depends on User Service
+  Coordination overhead crushes velocity
+  
+WHY IT WAS WRONG:
+  - User Service is core, not leaf
+  - Should have extracted leaf services first
+  
+HOW TO FIX:
+  - Start over with leaf services
+  - Treat User Service as last to extract
+  - Keep User code in monolith until other services done
+```
+
+### Anti-Pattern 3: Too Many Concurrent Extractions
+
+```
+SYMPTOM:
+  5 teams extracting 5 services simultaneously
+  Each extraction depends on others
+  Constant cross-team blocking
+  Production incidents from incomplete migrations
+  
+HOW TO FIX:
+  - Sequence extractions
+  - One extraction completes before next starts
+  - Use the same playbook each time
+```
+
+### Anti-Pattern 4: No Rollback Plan
+
+```
+SYMPTOM:
+  New service has bugs in production
+  Can't quickly revert to monolith
+  Long outage during rollback
+  
+HOW TO PREVENT:
+  - Feature flag MUST be reversible
+  - Both code paths must work concurrently
+  - Test rollback procedure in staging
+  - Keep dual-write active until confident
+```
+
+### Anti-Pattern 5: Big-Bang Database Migration
+
+```
+SYMPTOM:
+  "We'll migrate all 600 tables this weekend"
+  Production outage extends days
+  Reverting is impossible due to data divergence
+  
+HOW TO PREVENT:
+  - Migrate tables incrementally
+  - Use expand-contract for schema changes
+  - Always have dual-read capability
+  - Practice migration on copy of production
+```
+
+## Deeper Dive — Real Migration Case Studies
+
+### Airbnb: Rails → Service-Oriented Architecture (2012-2018)
+
+```
+SCALE: ~1M Lines of Ruby → 100+ services in Java, Python, Scala
+DURATION: 6 years
+TEAM SIZE: peaked at 500+ engineers
+APPROACH:
+  - Strangler fig
+  - Service per bounded context
+  - Apache Thrift for inter-service
+  - Built internal tooling (SmartStack for service discovery)
+  
+LESSONS:
+  - Started before they were ready (less coordination tools)
+  - Created service explosion (some too small)
+  - Eventually consolidated some back
+  - Net positive: faster team velocity
+```
+
+### Shopify: Monolith Stayed (2010-Present)
+
+```
+SCALE: 2M+ lines of Ruby ("Majestic Monolith")
+DURATION: Continuous since 2010
+APPROACH: 
+  - Deliberately stayed monolithic
+  - Modular monolith with strong internal boundaries
+  - Extracted only when absolutely necessary
+  - Used Component-based architecture in Rails
+
+LESSONS:
+  - Monolith can scale to massive size with discipline
+  - Deployment automation makes monolith feasible
+  - Avoided microservices complexity
+  - Team coordination easier than distributed system
+```
+
+### Amazon: Forced Microservices (2002 Bezos Memo)
+
+```
+SCALE: From monolith to thousands of services
+DURATION: 2002-2010
+APPROACH:
+  - Two-pizza teams + service-oriented architecture mandate
+  - Strict API-only inter-team communication
+  - Each team owns infrastructure + deploys
+  
+LESSONS:
+  - Required organizational change first
+  - Two-pizza teams worked because of strict accountability
+  - Created service explosion (1000s of services)
+  - Now: AWS as a service catalog
+```
+
+### Stripe: Mostly Monolith (2010-Present)
+
+```
+SCALE: Large Ruby monolith + selective extractions
+DURATION: Continuous
+APPROACH:
+  - Started with monolith
+  - Extract only when team scaling demands it
+  - Strong code review + ownership
+  
+LESSONS:
+  - For payment systems, monolith provides strong ACID
+  - Fewer moving parts = fewer failure modes
+  - Team scaling solved through better tools, not splits
+```
+
+### Twitter: Rewrite (Failed 2012, Succeeded 2013-2018)
+
+```
+ATTEMPT 1 (2012): Rewrite Ruby monolith in Scala — FAILED
+  - Big bang
+  - Many bugs
+  - Reverted
+
+ATTEMPT 2 (2013-2018): Strangler fig with Scala
+  - Service by service migration
+  - Worked but took 5+ years
+  - Eventually all services Scala
+
+LESSONS:
+  - Big bang rewrites usually fail
+  - Strangler fig takes longer but more reliable
+  - Both work eventually but cost differs hugely
+```
+
 ## Practice
 
 1. **Read your last big project.** Was it a rewrite or a strangler fig? Walk through the actual sequence of commits. How many concentrated big-bang risks were there?

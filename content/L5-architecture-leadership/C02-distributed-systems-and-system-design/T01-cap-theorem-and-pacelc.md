@@ -441,6 +441,360 @@ The same conscientiousness applies regardless of language — the JVM is exposin
 > [!INTERVIEW]
 > A common L5 prompt: "Explain CAP." Strong answers (a) give the precise statement (not three-of-three but C-or-A during a partition), (b) add PACELC for the non-partition case, (c) name a real system per axis, (d) call out at least one common misreading. The interviewer is testing whether you understand the theorem or just its name.
 
+## Deeper Dive — Database Choice by PACELC Profile
+
+### PostgreSQL — PC/EL (Strong consistency primary, low latency steady-state)
+
+```
+NORMAL OPERATION (E):
+  Primary serves writes + strong reads
+  Read replicas serve eventually-consistent reads
+  Replication is async by default (logical/physical)
+  → Latency: writes ~5-20ms; reads ~1-10ms (primary)
+
+ON PARTITION (P):
+  If replicas can't reach primary: replicas stay AVAILABLE (serve stale reads)
+  Primary unchanged
+  If primary down + sync replication: writes BLOCK (CP)
+  If primary down + async replication: failover, possible data loss
+
+CONFIGURATION KNOBS:
+  synchronous_commit = on     ← stronger; slower
+  synchronous_commit = off    ← faster; brief data loss window
+  synchronous_standby_names   ← which replicas must ack
+
+USE FOR: traditional OLTP — orders, accounts, inventory, anything ACID matters
+AVOID: massive distributed scale (CP cost grows with cluster size)
+```
+
+### MongoDB — PC/EC by default (configurable per-operation)
+
+```
+NORMAL OPERATION (E):
+  Primary serves all writes
+  Read preference determines reads: primary, primaryPreferred, secondary, nearest
+  Default writeConcern=majority (CP for that write)
+  Default readConcern=local (read latest local, possibly stale)
+
+ON PARTITION (P):
+  Replica set election; majority side has primary; minority becomes read-only
+  If majority writeConcern: writes BLOCK on partitioned secondaries
+  Reads on minority: stale (read-only mode)
+
+TUNING PER-WRITE:
+  w: 0      ← ack on send (AP — strongest perf, weakest durability)
+  w: 1      ← ack from primary only (some AP)
+  w: majority ← ack from majority (CP — wait for quorum)
+
+USE FOR: document model with mixed-priority writes
+AVOID: when you want database-default to be strong-consistent (need per-write tuning)
+```
+
+### Cassandra — PA/EL (Always available, tunable consistency)
+
+```
+NORMAL OPERATION (E):
+  Coordinator routes to replicas based on consistency level (CL)
+  CL=ONE: 1 ack, fast (~1-5ms)
+  CL=QUORUM: majority ack, slower (~5-15ms)
+  CL=ALL: all replicas ack, slowest (~20-100ms)
+
+ON PARTITION (P):
+  AP: every replica serves regardless
+  Eventually consistent via gossip + read repair + hinted handoff
+
+TUNING:
+  Write CL + Read CL such that W + R > RF ensures strong consistency
+  RF=3, W=QUORUM (2), R=QUORUM (2): consistent reads/writes
+  RF=3, W=ONE, R=ONE: AP, eventual consistency
+
+USE FOR: write-heavy, multi-region active-active, massive scale
+AVOID: strong transactions across rows (no ACID across partition keys)
+```
+
+### DynamoDB — PA/EL (default), PA/EC (with strong reads)
+
+```
+NORMAL OPERATION (E):
+  Default: eventually consistent reads (1ms p50)
+  Optional strong reads (10ms p50 — 5-10× cost in RCUs)
+  Writes always quorum (2/3 AZs ack)
+  Single-region: implicit quorum
+  Global tables: multi-region async replication; eventual
+
+ON PARTITION (P):
+  Region-internal: continues; quorum survives one AZ
+  Cross-region (Global Tables): each region operates independently → AP
+
+OPTIONS:
+  Strong read: ConsistentRead=true (cost more, slower, single-region)
+  Transactions: 2× cost, all-or-nothing within region
+  Global Tables: AP; last-writer-wins per-attribute; no cross-region txns
+
+USE FOR: serverless, key-value at scale, predictable performance
+AVOID: complex queries (limited query model), strong cross-region
+```
+
+### Google Spanner — PC/EC (Strong consistency at global scale)
+
+```
+NORMAL OPERATION (E):
+  Strict serializability (linearizability + serializability)
+  Multi-region writes coordinated via Paxos
+  TrueTime API uses GPS + atomic clocks for bounded clock uncertainty
+  Latency: writes 10-100ms (cross-region commit-wait), reads ~5-10ms
+
+ON PARTITION (P):
+  Paxos quorum survives partition tolerance
+  Minority side: temporarily unavailable for writes; can serve stale reads
+
+THE TRICK:
+  TrueTime "commit wait" — after commit, wait for clock uncertainty to pass
+  Ensures any read after a write sees its effect (linearizability)
+  Cost: ~7ms extra per commit
+
+USE FOR: globally-distributed strong-consistency (financial, regulatory)
+AVOID: cost-sensitive workloads (Spanner is expensive)
+```
+
+### Redis — Single Node CP, Replicated AP
+
+```
+SINGLE NODE:
+  Strong consistency (no replicas to disagree)
+  Single point of failure
+
+REDIS SENTINEL (HA with primary + replicas):
+  Async replication → slight inconsistency window during failover
+  Brief unavailability during election (~10-30s)
+  PACELC: PA/EL (async)
+
+REDIS CLUSTER (sharded):
+  Per-key consistency depends on slot operations
+  Cross-slot operations not atomic
+  PACELC: PA/EL with eventual replica consistency per shard
+
+USE FOR: cache (always); session store; rate limiting; distributed lock (carefully — see T08)
+AVOID: source of truth for mission-critical data without backup to durable store
+```
+
+## Deeper Dive — Per-Operation CAP Decision in E-Commerce
+
+```
+SCENARIO: e-commerce platform under partition
+
+CRITICAL (CP — must be consistent):
+  - Place order            → reject during partition, retry later
+  - Charge payment         → block; retry; never double-charge
+  - Inventory decrement    → don't oversell
+  - Account balance        → can't be wrong
+  - User authentication    → security-critical
+
+AVAILABLE (AP — degrade gracefully):
+  - View product listings  → serve cached pages; users browse
+  - View order history     → show what we have; eventual fresh
+  - Search                 → serve last-known-good index
+  - Recommendations        → fall back to popular items
+  - Activity log           → buffer locally; flush when partition heals
+  - Email notifications    → queue; send when downstream available
+  - Analytics events       → buffer; some duplicates OK
+  - Wishlists / "saved"    → local-first; merge later
+```
+
+**Mixed implementation**: place these operations on different infrastructure:
+- CP operations: PostgreSQL with sync replication, fail-closed
+- AP operations: Cassandra/DynamoDB, serve stale cheerfully
+- Some operations can use both (synchronous CP write → async AP read replica)
+
+## Deeper Dive — Consistency Model Spectrum (Beyond CAP)
+
+```
+STRONGEST                                                          WEAKEST
+─────────────────────────────────────────────────────────────────────────►
+
+Strict Serializability — Spanner
+  Linearizability + Serializability — global total order
+
+Linearizability — single-key strong consistency
+  "Real-time order" — any read after a write sees it
+
+Sequential Consistency — same order observed by all clients
+  No real-time guarantee but consistent ordering
+
+Causal Consistency — preserves causal relationships
+  If A happened before B, all clients see A before B
+  Concurrent operations may appear in different orders
+
+Eventual Consistency — replicas converge
+  Without further updates, all replicas eventually agree
+  Reads can be arbitrarily stale; writes can be lost
+
+Weak Consistency — no guarantees beyond "eventually"
+  Used for cache, logs, metrics where stale is OK
+```
+
+**Reading guide**: each level adds guarantees over the one below. Each level also adds latency/availability cost.
+
+### Real-System Mapping
+
+| Consistency Level | Example Systems |
+|---|---|
+| Strict Serializability | Spanner, CockroachDB (default) |
+| Linearizability | etcd, ZooKeeper, single PostgreSQL primary |
+| Sequential | TSO-based shared logs, single Kafka partition |
+| Causal | CockroachDB (snapshot), some MongoDB modes |
+| Eventual | DynamoDB Global Tables, Cassandra, Riak |
+| Weak | DNS, cache, CDN |
+
+## Deeper Dive — Cassandra Tunable Consistency Math (W+R > RF)
+
+```
+SETUP: RF=3 (3 replicas)
+
+CONFIG 1: W=ONE, R=ONE (1+1 = 2, not > 3 → eventually consistent)
+  Write to 1 replica; read from 1 (possibly different) replica
+  Risk: stale reads, conflicting writes possible until repair
+  Latency: lowest
+
+CONFIG 2: W=QUORUM, R=ONE (2+1 = 3, NOT strictly > 3)
+  Write to 2 of 3; read from 1
+  Possible stale read (read picks the 1 replica that hasn't received the write yet)
+  Latency: medium write, low read
+
+CONFIG 3: W=QUORUM, R=QUORUM (2+2 = 4 > 3 → strongly consistent)
+  Write to 2 of 3; read from 2 of 3; intersection guaranteed
+  Always sees latest committed write
+  Latency: medium write, medium read
+  ← THE STANDARD CHOICE for consistent Cassandra
+
+CONFIG 4: W=ALL, R=ONE (3+1 = 4 > 3 → strongly consistent but fragile)
+  Write to all 3; read from 1
+  Strong consistency, but ANY replica down blocks writes
+  Latency: high write, low read
+
+CONFIG 5: W=ONE, R=ALL (1+3 = 4 > 3 → strongly consistent but read-heavy fragile)
+  Write to 1; read from all 3
+  Strong consistency at high read cost; ANY replica down blocks reads
+  Latency: low write, high read
+```
+
+**Formula**: `W + R > RF` ensures any read overlaps with any write → strong consistency at read time.
+
+## Deeper Dive — Linearizability vs Serializability
+
+These are often conflated but distinct:
+
+**Linearizability** — about single-object real-time order
+- "Reads after a write see the new value, immediately"
+- Per-key guarantee
+- Doesn't say anything about multi-object transactions
+
+**Serializability** — about multi-object transaction order
+- "Concurrent transactions appear to run one at a time, in some order"
+- Per-transaction guarantee
+- Doesn't say what real-time order they should be in
+
+**Strict Serializability** = Linearizability + Serializability
+- Multi-object transactions appear sequential
+- AND in real-time order
+- Spanner's "external consistency" is this
+
+Example difference:
+```
+SERIALIZABLE but NOT LINEARIZABLE:
+  Tx1 transfers $100 from A to B at 10:00:00
+  Tx2 reads A's balance at 10:00:01
+  Tx2 sees the OLD balance ($X)
+  Tx1's effects appear in some "serial order" that puts it AFTER Tx2
+  Even though Tx1 actually committed first in real time
+
+This is valid serializable but violates real-time order.
+```
+
+## Deeper Dive — When CAP Misleads You
+
+### Misreading 1: "We chose AP, so we're always available"
+
+False. AP means: during a partition, the system stays available. It doesn't mean immune to other failures (bad nodes, software bugs, capacity limits, DDoS). Most "outages" aren't partitions.
+
+### Misreading 2: "Spanner violates CAP by being CA"
+
+False. Spanner is CP. Its high availability comes from massive engineering investment (Paxos quorums, fast failover, multi-region) that makes the partition probability extremely low. CAP says nothing about how *often* you give up A.
+
+### Misreading 3: "We need both consistency and availability"
+
+What you mean: low partition probability + strong consistency when networks work. That's PACELC: choose PC/EL or PA/EL — both can exist.
+
+### Misreading 4: "We use Kafka, which is AP"
+
+Kafka is more nuanced. Brokers are CP (Zookeeper/KRaft quorum), but consumers can choose: read uncommitted (AP-like) or read committed (CP-like). The full system has different CAP profiles at different levels.
+
+### Misreading 5: "MongoDB is CP"
+
+By default-ish (writeConcern=majority, readConcern=local), MongoDB is configurable. You can run it as CP (majority writes + linearizable reads) or AP (writeConcern=0 + readPreference=secondary). The setting matters more than the brand.
+
+## Deeper Dive — The Modern Reality (Beyond CAP)
+
+The 2020s reality of distributed systems:
+
+1. **Most "outages" aren't partitions** — they're slow code, bad deploys, capacity, DDoS, certificate expiry. CAP is most relevant for designing for the *rare* partition.
+
+2. **PACELC matters more than CAP for daily operations** — the latency-vs-consistency trade-off applies every millisecond, not just during partitions.
+
+3. **Per-operation tuning is standard** — any production system uses different consistency levels for different operations (Strong for payments, Eventual for view counters).
+
+4. **Geographic distribution complicates everything** — multi-region active-active forces explicit consistency choices for cross-region operations.
+
+5. **Newer systems blur the lines** — CockroachDB is CP but offers serializable-snapshot isolation with bounded staleness; YugabyteDB similar; FaunaDB calc-and-prove globally.
+
+## Deeper Dive — Architecture Decision Template
+
+When choosing a data store for a new service:
+
+```markdown
+# Data Store Decision — [Service Name]
+
+## Use case
+[1-2 sentences]
+
+## Consistency requirements
+- Strong: [list operations]
+- Eventual: [list operations]
+- Custom: [list operations with details]
+
+## Availability requirements
+- SLO: 99.X% over 30 days
+- Acceptable downtime: X minutes/month
+- Partition behavior expectation: serve stale | block | partial
+
+## Latency budget
+- Read p99: Xms
+- Write p99: Yms
+
+## Scale
+- Reads: X /sec
+- Writes: Y /sec
+- Storage: Z TB
+- Growth: K /year
+
+## Candidate stores
+| Store | CAP | PACELC | Pros | Cons | Cost |
+|-------|-----|--------|------|------|------|
+| PostgreSQL primary | CP | PC/EL | ACID, mature | Failover blocks ~30s | $$ |
+| DynamoDB | AP | PA/EL | Serverless, fast | Limited queries | $$$ |
+| Cassandra | AP | PA/EL | Multi-region, write-heavy | Operational complexity | $$$ |
+| MongoDB | configurable | PC/EC default | Document model | Per-op tuning needed | $$$ |
+
+## Decision: [Choice]
+
+## Rationale
+[Why this choice fits the requirements better than alternatives]
+
+## Trade-offs accepted
+- [Conscious trade-off 1]
+- [Conscious trade-off 2]
+```
+
 ## Practice
 
 1. **Real systems audit.** For three data stores you use in production (PostgreSQL, Redis, DynamoDB, MongoDB, Kafka, etc.), classify each under PACELC. Defend each classification.

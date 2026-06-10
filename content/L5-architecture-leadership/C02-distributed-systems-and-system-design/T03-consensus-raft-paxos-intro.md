@@ -529,6 +529,408 @@ For ordinary enterprise infrastructure, crash-fault-tolerant consensus (Raft, Pa
 > [!INTERVIEW]
 > A common L5 prompt: "Explain Raft." Strong answers cover (a) the three roles (leader, follower, candidate), (b) terms and the safety property they enforce, (c) the majority quorum and its `2f+1` justification, (d) what happens on partition (minority can't elect; majority continues), (e) at least one real-world consequence (etcd is the Kubernetes substrate).
 
+## Deeper Dive — Raft Protocol Walkthrough (Concrete Example)
+
+### 5-Node Cluster Normal Operation
+
+```
+INITIAL STATE: 5 nodes (N1, N2, N3, N4, N5)
+  All start as followers, term = 0
+
+LEADER ELECTION:
+  T+150ms (random election timeout) → N3 becomes candidate
+  N3 increments term to 1, votes for itself
+  N3 sends RequestVote to N1, N2, N4, N5
+  N1, N2, N4 respond YES (3 votes including N3 = majority)
+  N5 was offline; N3 still wins
+
+  N3 becomes LEADER (term 1)
+
+NORMAL WRITE FLOW:
+  Client sends "SET x = 5" to N3 (leader)
+
+  Step 1: APPEND TO LEADER LOG
+    N3 appends log entry {term: 1, index: 1, cmd: "SET x = 5"}
+    N3 log is now: [{1, 1, "SET x = 5"}]
+
+  Step 2: REPLICATE TO FOLLOWERS
+    N3 sends AppendEntries(term=1, leaderId=N3, prevIndex=0, entries=[...]) to all
+    N1, N2, N4 append entry to their logs
+    N5 still offline
+
+  Step 3: WAIT FOR MAJORITY ACK
+    N1, N2, N4 send ACK to N3
+    N3 has 4/5 nodes acked (including self) → MAJORITY
+
+  Step 4: COMMIT
+    N3 commits entry (commitIndex = 1)
+    N3 applies "SET x = 5" to state machine
+    N3 responds OK to client
+
+  Step 5: NOTIFY FOLLOWERS OF COMMIT
+    Next heartbeat carries commitIndex = 1
+    N1, N2, N4 commit + apply to their state machines
+    N5 will catch up when reconnected
+```
+
+### Leader Election Sequence (Leader Crash)
+
+```
+N3 (leader, term 1) crashes at T+5s
+
+FOLLOWER TIMEOUTS:
+  T+5.3s — N1's election timeout expires (random 150-300ms)
+  N1 increments term to 2, becomes candidate
+  N1 votes for itself, sends RequestVote(term=2) to others
+
+  T+5.31s — N2 receives RequestVote(term=2)
+    N2 has not voted in term 2 → grants vote
+    N2 updates its term to 2
+  Same for N4
+
+  N1 has 3 votes (self + N2 + N4) = MAJORITY of 5
+  N1 BECOMES LEADER (term 2)
+
+  T+5.32s — N1 sends initial heartbeat as leader
+
+WHAT IF SPLIT VOTE?
+  At T+5.3s, both N1 AND N5 timeout simultaneously
+  Each becomes candidate in term 2, votes for self
+  N2 votes for whichever's RequestVote it received first (e.g., N1)
+  N4 votes for the other (e.g., N5)
+  Neither gets majority → election fails
+  Both wait random timeout, retry in term 3
+  Eventually one wins (randomization breaks ties)
+```
+
+### Network Partition Scenario
+
+```
+SCENARIO: N3 (leader) and N4, N5 partitioned from N1, N2
+
+PARTITION SIDE A (N3, N4, N5) — has 3 nodes
+  N3 is leader; can append entries to log
+  But CAN'T COMMIT — needs majority (3 of 5)
+  Wait, N3 has 3 nodes, that's majority! → Can commit if all 3 ack
+
+  ACTUALLY: depends on which nodes are on which side
+
+PARTITION SIDE B (N1, N2) — has 2 nodes
+  Election timeout fires; N1 or N2 starts election
+  N1 increments term to 2, requests votes
+  Only N2 can respond on this side
+  2/5 votes = no majority → election FAILS
+  Side B is UNAVAILABLE for writes; can serve stale reads
+
+PARTITION HEALS:
+  N3 still leader (term 1)
+  N1 incremented term during failed elections (now term N)
+  When N3 sees higher term → steps down
+  New election happens; new leader is whoever has most up-to-date log
+  Cluster resumes normal operation
+```
+
+## Deeper Dive — Java Consensus Library Examples
+
+### Apache Curator (ZooKeeper) Leader Election
+
+```java
+@Component
+public class LeaderElectionService implements LeaderSelectorListener {
+
+    private final CuratorFramework client;
+    private final LeaderSelector leaderSelector;
+    private final AtomicBoolean isLeader = new AtomicBoolean();
+
+    public LeaderElectionService() {
+        this.client = CuratorFrameworkFactory.newClient(
+            "zk1:2181,zk2:2181,zk3:2181",
+            new ExponentialBackoffRetry(1000, 3)
+        );
+        client.start();
+
+        this.leaderSelector = new LeaderSelector(client, "/election/my-app", this);
+        leaderSelector.autoRequeue();   // re-enter election if I lose leadership
+    }
+
+    @PostConstruct
+    public void start() {
+        leaderSelector.start();
+    }
+
+    @Override
+    public void takeLeadership(CuratorFramework client) throws Exception {
+        isLeader.set(true);
+        log.info("I am now the leader!");
+
+        try {
+            // Do leader-only work; e.g., periodic batch job
+            while (!Thread.currentThread().isInterrupted()) {
+                doLeaderWork();
+                Thread.sleep(10_000);
+            }
+        } finally {
+            isLeader.set(false);
+            log.info("I am no longer the leader");
+        }
+    }
+
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
+        if (newState != ConnectionState.RECONNECTED) {
+            // Lost connection; we may no longer be leader
+            isLeader.set(false);
+        }
+    }
+}
+```
+
+### etcd jetcd Leader Election
+
+```java
+@Component
+public class EtcdLeaderElection {
+    private final Client etcd;
+    private LeaderKey leadership;
+
+    public EtcdLeaderElection() {
+        this.etcd = Client.builder()
+            .endpoints("http://etcd1:2379", "http://etcd2:2379", "http://etcd3:2379")
+            .build();
+    }
+
+    public CompletableFuture<Void> campaignAsLeader() {
+        // Lease — releases leadership if we crash
+        return etcd.getLeaseClient().grant(30)
+            .thenCompose(leaseResp -> {
+                long leaseId = leaseResp.getID();
+
+                // Renew lease in background
+                etcd.getLeaseClient().keepAlive(leaseId, ...);
+
+                // Campaign
+                return etcd.getElectionClient()
+                    .campaign(
+                        ByteSequence.from("/elections/my-app", UTF_8),
+                        leaseId,
+                        ByteSequence.from(myNodeId, UTF_8)
+                    )
+                    .thenAccept(resp -> {
+                        leadership = resp.getLeader();
+                        log.info("Elected as leader: {}", leadership);
+                        doLeaderWork();
+                    });
+            });
+    }
+}
+```
+
+### Spring Cloud Kubernetes Leader Election
+
+```yaml
+spring:
+  cloud:
+    kubernetes:
+      leader:
+        enabled: true
+        config-map-name: my-app-leader
+        namespace: default
+```
+
+```java
+@Component
+public class K8sLeaderElection {
+    @EventListener
+    public void onGranted(OnGrantedEvent event) {
+        log.info("I am the leader");
+        startLeaderWork();
+    }
+
+    @EventListener
+    public void onRevoked(OnRevokedEvent event) {
+        log.info("I am no longer the leader");
+        stopLeaderWork();
+    }
+}
+```
+
+K8s ConfigMap-based leader election; uses K8s API resource versioning for atomic CAS. Simpler than ZK/etcd for K8s-native apps.
+
+## Deeper Dive — When You Need Consensus
+
+### Need consensus
+
+| Use case | Why |
+|---|---|
+| **Leader election** | Need to agree on which node is primary |
+| **Distributed lock** | Mutual exclusion across processes |
+| **Configuration storage** | All nodes must see same config eventually + atomically |
+| **Service discovery** | Single source of truth for what's running where |
+| **Cluster membership** | Who's in the cluster — agreed upon |
+| **State machine replication** | Replicated DB with linearizable writes |
+| **Sequence numbers / IDs** | Unique monotonic IDs across cluster |
+| **Replicated log** | Cross-replica ordered command sequence |
+
+### Don't need consensus
+
+| Use case | Better approach |
+|---|---|
+| Distributed cache | LRU eviction; eventually consistent OK |
+| Counters | CRDT or sharded counters |
+| Read replicas | Primary + async replication |
+| Idempotent operations | Idempotency key + retry |
+| Eventually consistent K/V | DynamoDB, Cassandra (quorum reads) |
+| Async messaging | Kafka (uses consensus internally for metadata only) |
+| Sharded data | Per-shard consensus, not global |
+
+## Deeper Dive — Consensus System Comparison Matrix
+
+| System | Algorithm | Best for | Throughput | Latency | API Style |
+|---|---|---|---|---|---|
+| **etcd** | Raft | K8s coordination, config | ~10K writes/sec | ~10ms | gRPC + HTTP/JSON |
+| **ZooKeeper** | Zab (Paxos variant) | Hadoop/Kafka coordination | ~10K writes/sec | ~10ms | Tree-of-nodes API |
+| **Consul** | Raft | Service mesh, service discovery | ~5K writes/sec | ~10ms | HTTP/JSON + DNS |
+| **etcd-raft library** | Raft | Embed in your service | varies | varies | Go library |
+| **Hashicorp Raft** | Raft | Embed in Go service | varies | varies | Go library |
+| **Atomix** | Raft | Java distributed primitives | ~5-20K ops/sec | ~10-50ms | Java embedded |
+| **Apache Ratis** | Raft | Embedded in Hadoop/Ozone | varies | varies | Java library |
+| **CockroachDB** | Raft per-range | Distributed strong-consistency DB | Millions/sec total | ~10ms reads, ~100ms cross-region writes | SQL |
+| **Spanner** | Paxos per-tablet | Global strong-consistency DB | Millions/sec total | ~10ms reads, ~100ms cross-region writes | SQL |
+| **TiDB** | Raft per-region | MySQL-compatible distributed DB | Millions/sec | ~10ms | MySQL protocol |
+
+## Deeper Dive — Operational Considerations
+
+### Cluster Sizing
+
+```
+NODES vs FAILURE TOLERANCE:
+  3 nodes: tolerates 1 failure
+  5 nodes: tolerates 2 failures
+  7 nodes: tolerates 3 failures
+  9 nodes: tolerates 4 failures
+
+WHY ODD NUMBER:
+  4 nodes: needs majority (3) — same tolerance as 5 (2 failures)
+  So 4 wastes a node; 5 gives same protection for 1 more
+
+DON'T GO TOO BIG:
+  Each write needs majority ack
+  More nodes = more parallel acks = MORE LATENCY (not less)
+  5-7 is sweet spot for most use cases
+  9 only for very high reliability requirements
+```
+
+### Geographic Distribution
+
+```
+SINGLE REGION:
+  All nodes in same AZ → AZ failure kills cluster
+  AZ-distributed: 3 AZs × 1 node = tolerates AZ outage
+
+MULTI-REGION:
+  Cross-region latency adds to consensus
+  Typically 50-100ms RTT
+  Every write commit pays this round-trip
+  → Latency-sensitive workloads stay single-region
+  → Spanner's TrueTime amortizes this; CockroachDB allows lease moves
+
+WITNESS NODES:
+  Light nodes that participate in voting but don't store data
+  Used to break ties without paying full data cost
+```
+
+### Snapshotting and Log Compaction
+
+```
+PROBLEM: log grows forever; full log replay on new-node bootstrap is slow
+
+SNAPSHOT:
+  Periodically (e.g., every 10K entries) take state machine snapshot
+  Compact log: discard entries before snapshot
+  New nodes restore from snapshot + apply remaining log entries
+
+ETCD SNAPSHOT INTERVAL:
+  --snapshot-count=100000  (default 10K)
+
+ZOOKEEPER SNAPSHOT:
+  After N transactions or M minutes
+```
+
+### Common Operational Pitfalls
+
+```
+1. ELECTION TIMEOUT TOO LOW
+   Symptom: leader churn during normal operation
+   Cause: network jitter > timeout
+   Fix: timeout should be 10-20× max network RTT
+
+2. ELECTION TIMEOUT TOO HIGH
+   Symptom: long unavailability after leader crash
+   Cause: too conservative
+   Fix: tune to your network; etcd default 1000ms is usually fine
+
+3. SLOW DISK
+   Symptom: high latency, occasional unavailability
+   Cause: fsync per commit; slow disk blocks everything
+   Fix: SSD; tune --max-snapshot-files / --max-wal-files
+
+4. CROSS-REGION PRIMARY
+   Symptom: high write latency
+   Cause: replicas need to round-trip cross-region
+   Fix: keep primary co-located with most writes; use lease-based primary moves
+
+5. OUT-OF-DATE NODE REJOINS
+   Symptom: long delay after node restart
+   Cause: log replay from start
+   Fix: snapshot + send to new node; faster than log replay
+```
+
+## Deeper Dive — Real-World Consensus Failures
+
+### Split-Brain (Pre-Consensus Era)
+
+```
+SCENARIO: 2-node "active-passive" cluster
+  Active node crashes
+  Passive promotes itself
+  Network heals
+  Original "crashed" node comes back, still thinks it's active
+  Now BOTH nodes accept writes → data corruption
+
+LESSON: 2-node clusters can't be properly highly available
+Need 3+ for proper consensus
+```
+
+### Mongo's 2018 Election Storm
+
+```
+SCENARIO: MongoDB replica set with election timeout 5s
+  Network blip > 5s on primary
+  Secondaries elect new primary
+  Primary recovers, network heals
+  Old primary's writes get rolled back
+  Some writes LOST despite "majority" write concern
+
+FIX:
+  Set writeConcern: majority + wtimeout
+  Use journaled writes (j: true)
+  Monitor election count; alert on >1/day
+```
+
+### etcd Disk-Full Incident
+
+```
+SCENARIO: etcd cluster disk fills
+  Leader can't fsync; commits fail
+  K8s control plane becomes unresponsive
+  Mass pod evictions trigger (controllers can't update status)
+
+PREVENTION:
+  Alert on etcd disk > 80%
+  Use defragmentation (etcdctl defrag) periodically
+  Compact history (etcdctl compact <revision>)
+```
+
 ## Practice
 
 1. **Walk a Raft trace.** Sketch a 5-node Raft cluster. Trace a write through it, naming the AppendEntries messages and acks. Now trace a leader crash and election. Now trace a partition that isolates the leader.

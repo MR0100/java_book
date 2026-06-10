@@ -468,6 +468,512 @@ The pattern is universal; the implementation is a few hundred lines plus storage
 > [!INTERVIEW]
 > A common L5 prompt: "How do you make a payment API idempotent?" Strong answers (a) name the Idempotency-Key header pattern, (b) describe the dedup store and its TTL, (c) handle concurrent retries via DB unique constraint, (d) name the storage / response cache details. Mentioning the transactional outbox unprompted shows depth.
 
+## Deeper Dive — Spring Boot Idempotency Middleware Implementation
+
+### Idempotency Interceptor with Redis Backing
+
+```java
+@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+    private final RedisTemplate<String, String> redis;
+    private final ObjectMapper json;
+
+    private static final Duration TTL = Duration.ofHours(72);
+
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        // Only enforce on mutating methods
+        String method = req.getMethod();
+        if (!Set.of("POST", "PUT", "PATCH", "DELETE").contains(method)) return true;
+
+        String key = req.getHeader("Idempotency-Key");
+        if (key == null) {
+            // No key → reject mutating requests (strict mode)
+            resp.setStatus(400);
+            resp.getWriter().write("Idempotency-Key header required");
+            return false;
+        }
+
+        // Validate key format
+        try { UUID.fromString(key); }
+        catch (IllegalArgumentException e) {
+            resp.setStatus(400);
+            resp.getWriter().write("Idempotency-Key must be UUID");
+            return false;
+        }
+
+        // Cache key combines method + path + idempotency key
+        String cacheKey = "idem:" + method + ":" + req.getRequestURI() + ":" + key;
+
+        // Compute hash of request body for change detection
+        byte[] body = StreamUtils.copyToByteArray(req.getInputStream());
+        String requestHash = DigestUtils.sha256Hex(body);
+
+        // Atomic: SET NX with hash + expiry
+        String existing = redis.opsForValue().get(cacheKey);
+
+        if (existing != null) {
+            // Replay: check hash matches
+            IdempotencyRecord record = json.readValue(existing, IdempotencyRecord.class);
+
+            if (!record.requestHash().equals(requestHash)) {
+                resp.setStatus(422);
+                resp.getWriter().write("Idempotency-Key reused with different body");
+                return false;
+            }
+
+            if (record.status().equals("COMPLETED")) {
+                // Return cached response
+                resp.setStatus(record.statusCode());
+                record.headers().forEach(resp::setHeader);
+                resp.getWriter().write(record.responseBody());
+                return false;
+            }
+            if (record.status().equals("PROCESSING")) {
+                resp.setStatus(409);
+                resp.getWriter().write("Request in progress");
+                return false;
+            }
+        }
+
+        // Mark as PROCESSING; wrap request to capture body + response
+        IdempotencyRecord processing = new IdempotencyRecord(
+            key, requestHash, "PROCESSING", null, null, null, Instant.now()
+        );
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(processing), TTL);
+
+        // Store in request attribute for post-handler use
+        req.setAttribute("idem_cache_key", cacheKey);
+        req.setAttribute("idem_request_hash", requestHash);
+
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest req, HttpServletResponse resp,
+                                  Object handler, Exception ex) throws Exception {
+        String cacheKey = (String) req.getAttribute("idem_cache_key");
+        String requestHash = (String) req.getAttribute("idem_request_hash");
+        if (cacheKey == null) return;
+
+        // Cache the response for future retries
+        String responseBody = captureResponseBody(resp);   // requires response wrapping
+        Map<String, String> responseHeaders = captureHeaders(resp);
+
+        IdempotencyRecord completed = new IdempotencyRecord(
+            UUID.fromString(req.getHeader("Idempotency-Key")).toString(),
+            requestHash,
+            ex == null && resp.getStatus() < 500 ? "COMPLETED" : "FAILED",
+            resp.getStatus(),
+            responseHeaders,
+            responseBody,
+            Instant.now()
+        );
+
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(completed), TTL);
+    }
+}
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Autowired private IdempotencyInterceptor interceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(interceptor)
+            .addPathPatterns("/api/**")
+            .excludePathPatterns("/api/health", "/api/metrics");
+    }
+}
+
+public record IdempotencyRecord(
+    String key,
+    String requestHash,
+    String status,             // PROCESSING / COMPLETED / FAILED
+    Integer statusCode,
+    Map<String, String> headers,
+    String responseBody,
+    Instant createdAt
+) {}
+```
+
+### Database-Backed Idempotency (Stronger Durability)
+
+For payment APIs where Redis loss is unacceptable:
+
+```sql
+CREATE TABLE idempotency_keys (
+    key UUID PRIMARY KEY,
+    request_hash CHAR(64) NOT NULL,
+    request_method TEXT NOT NULL,
+    request_path TEXT NOT NULL,
+    response_status INTEGER,
+    response_headers JSONB,
+    response_body TEXT,
+    status TEXT NOT NULL,                          -- PROCESSING / COMPLETED / FAILED
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL                -- typically created_at + 72h
+);
+
+CREATE INDEX idx_idem_expires ON idempotency_keys(expires_at);
+```
+
+```java
+@Service
+@Transactional
+public class IdempotencyService {
+
+    public Optional<IdempotencyRecord> reserveOrGet(String key, String requestHash,
+                                                      String method, String path) {
+        // Try INSERT ON CONFLICT for atomic claim
+        int rows = jdbc.update("""
+            INSERT INTO idempotency_keys (key, request_hash, request_method,
+                                         request_path, status, expires_at)
+            VALUES (?, ?, ?, ?, 'PROCESSING', NOW() + INTERVAL '72 hours')
+            ON CONFLICT (key) DO NOTHING
+            """,
+            UUID.fromString(key), requestHash, method, path);
+
+        if (rows == 1) {
+            return Optional.empty();   // we got the lock; proceed with request
+        }
+
+        // Key existed; return current state
+        return repo.findById(UUID.fromString(key));
+    }
+
+    public void recordCompletion(String key, int status,
+                                  Map<String, String> headers, String body) {
+        jdbc.update("""
+            UPDATE idempotency_keys
+            SET response_status = ?, response_headers = ?::jsonb,
+                response_body = ?, status = 'COMPLETED'
+            WHERE key = ?
+            """,
+            status, json.writeValueAsString(headers), body, UUID.fromString(key));
+    }
+}
+```
+
+## Deeper Dive — Kafka Consumer Idempotency Pattern
+
+```java
+@Component
+public class IdempotentKafkaConsumer {
+
+    @Autowired private DedupRepo dedupRepo;
+    @Autowired private OrderService orderService;
+
+    @KafkaListener(topics = "orders", groupId = "order-processor")
+    @Transactional
+    public void consume(ConsumerRecord<String, Order> record,
+                        Acknowledgment ack) {
+        // Extract dedup key from message header or compute from content
+        UUID dedupKey = extractDedupKey(record);
+
+        // Try to record this message as processed
+        boolean isNew = dedupRepo.tryInsert(dedupKey, Instant.now());
+
+        if (!isNew) {
+            log.info("Duplicate message {} skipped", dedupKey);
+            ack.acknowledge();
+            return;
+        }
+
+        try {
+            // Process — same DB transaction as dedup insert
+            orderService.processOrder(record.value());
+            ack.acknowledge();
+        } catch (Exception e) {
+            // DB transaction rolls back BOTH the dedup insert AND business state
+            // Message will be re-delivered; will retry
+            throw e;
+        }
+    }
+}
+
+@Repository
+public class DedupRepo {
+    @Autowired private JdbcTemplate jdbc;
+
+    public boolean tryInsert(UUID key, Instant timestamp) {
+        try {
+            int rows = jdbc.update(
+                "INSERT INTO message_dedup (msg_id, processed_at) VALUES (?, ?)",
+                key, Timestamp.from(timestamp));
+            return rows == 1;
+        } catch (DuplicateKeyException e) {
+            return false;   // already processed
+        }
+    }
+}
+```
+
+### Dedup Table Cleanup
+
+```sql
+-- Periodically clean old dedup records
+DELETE FROM message_dedup
+WHERE processed_at < NOW() - INTERVAL '7 days';
+
+-- Or use partition pruning for large-scale dedup
+CREATE TABLE message_dedup_2024_06 PARTITION OF message_dedup
+FOR VALUES FROM ('2024-06-01') TO ('2024-07-01');
+
+-- Drop old partitions monthly
+DROP TABLE message_dedup_2024_03;
+```
+
+## Deeper Dive — Common Idempotency Bugs
+
+### Bug 1: Idempotency Key Without Body Check
+
+```java
+// BAD: same key, different body → returns CACHED response anyway
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    return cache.get(key).orElseGet(() -> {
+        Response r = doCharge(req);
+        cache.put(key, r);
+        return r;
+    });
+}
+
+// Attack scenario:
+// 1. Client sends ChargeRequest($100) with key "abc"
+// 2. Cache stores the result
+// 3. Client mistakenly sends ChargeRequest($1000) with SAME key "abc"
+// 4. Server returns cached "charged $100" response BUT $1000 was the actual intent
+//    → Silent loss; user gets wrong charge confirmation
+```
+
+```java
+// GOOD: hash the body; reject on mismatch
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    String bodyHash = sha256(json.write(req));
+
+    Optional<CachedResponse> cached = cache.get(key);
+    if (cached.isPresent()) {
+        if (!cached.get().bodyHash().equals(bodyHash)) {
+            throw new IdempotencyKeyConflictException();
+        }
+        return cached.get().response();
+    }
+
+    Response r = doCharge(req);
+    cache.put(key, new CachedResponse(bodyHash, r));
+    return r;
+}
+```
+
+### Bug 2: Race Between Concurrent Requests with Same Key
+
+```java
+// BAD: both requests check cache, both proceed, both execute
+if (cache.get(key).isPresent()) return cache.get(key);
+Response r = doCharge(req);   // ← TWO concurrent calls execute
+cache.put(key, r);
+```
+
+```java
+// GOOD: atomic insert + state machine
+boolean isFirstRequest = cache.insertIfAbsent(key, "PROCESSING");
+if (!isFirstRequest) {
+    // Another request is processing or completed
+    waitForResult(key);   // or return 409 / 202 "Accepted, processing"
+}
+
+try {
+    Response r = doCharge(req);
+    cache.update(key, "COMPLETED", r);
+    return r;
+} catch (Exception e) {
+    cache.update(key, "FAILED", null);
+    throw e;
+}
+```
+
+### Bug 3: Idempotency Without Considering Downstream Calls
+
+```java
+// BAD: server-side dedup but downstream calls happen multiple times
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+    paymentClient.charge(order.id());          // ← What if THIS retries?
+    inventoryClient.reserve(order.id());        // ← Or THIS?
+    notificationClient.send(order.id());        // ← Or THIS?
+    return order;
+}
+```
+
+```java
+// GOOD: each downstream call has its own idempotency
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+
+    // Each call uses order_id as idempotency key
+    paymentClient.charge(order.id(), order.id().toString());
+    inventoryClient.reserve(order.id(), order.id().toString());
+    notificationClient.send(order.id(), order.id().toString());
+
+    return order;
+}
+```
+
+### Bug 4: TTL Too Short
+
+```
+Idempotency TTL: 1 hour
+Customer service uses webhook retries with 24-hour backoff
+After 1 hour, webhook fires → idempotency cache empty → DUPLICATE charge
+
+LESSON: TTL must exceed maximum retry window of all sources
+RECOMMENDATION: 72-168 hours for payment-critical operations
+```
+
+## Deeper Dive — Idempotency for Different Operation Types
+
+```
+INSERT (CREATE):
+  Strategy: Unique constraint on natural key + idempotency key
+    INSERT INTO orders (..., idempotency_key)
+    VALUES (...)
+    ON CONFLICT (idempotency_key) DO UPDATE
+    SET retry_count = retry_count + 1
+    RETURNING ...
+  
+  Or: separate idempotency table that maps key → resource ID
+    INSERT INTO idempotency (key, resource_id) ON CONFLICT DO NOTHING
+
+UPDATE:
+  Strategy 1: Naturally idempotent via SET
+    UPDATE users SET email = 'new@example.com' WHERE id = ?
+    → Multiple retries produce same end state
+  
+  Strategy 2: Version check (optimistic locking)
+    UPDATE users SET email = ?, version = ? + 1
+    WHERE id = ? AND version = ?
+    → Stale retries fail safely
+
+DELETE:
+  Strategy: Naturally idempotent
+    DELETE FROM users WHERE id = ?
+    → Repeating gives same result (id no longer exists)
+  
+  Or: Soft delete with idempotency
+    UPDATE users SET deleted_at = NOW()
+    WHERE id = ? AND deleted_at IS NULL
+
+EVENT EMISSION:
+  Strategy: Outbox pattern
+    INSERT INTO outbox (event_id, payload) ON CONFLICT DO NOTHING
+    → Idempotent at DB layer
+    → Relay handles at-least-once Kafka delivery
+    → Consumers must dedup
+
+INCREMENT/DECREMENT:
+  Strategy: Idempotency key + recorded operation
+    INSERT INTO operations (key, account_id, delta)
+    VALUES (?, ?, ?) ON CONFLICT DO NOTHING
+    UPDATE balances SET amount = (SELECT SUM(delta) FROM operations WHERE account_id = ?)
+    WHERE id = ?
+    → Sum-based; replays don't double-count
+
+SEND EMAIL / SMS:
+  Strategy: Track sends by idempotency key
+    INSERT INTO email_sends (key, recipient, sent_at)
+    VALUES (?, ?, NOW()) ON CONFLICT (key) DO NOTHING
+    → If row inserted, fire the send
+    → If conflict, the send already happened
+```
+
+## Deeper Dive — When Idempotency Is Genuinely Hard
+
+### The Email Send Problem
+
+```
+SEND EMAIL CALLS THIRD-PARTY API
+  SES.send(...) → returns message_id
+  Network failure → did SES receive it?
+  
+  OPTION A: dedupTable + retry-on-success
+    Before SES call: INSERT INTO email_sends (key, status='PENDING')
+    Call SES
+    On success: UPDATE status='SENT', message_id=...
+    On failure: DELETE the row → can retry
+    On timeout: leave as PENDING; reconciliation job
+    
+    Risk: 5% double-send on uncertain timeout
+  
+  OPTION B: Use provider's idempotency
+    AWS SES supports Idempotency-Key header (recently added)
+    Stripe also supports
+
+  REAL-WORLD: most teams accept rare double-send rather than complexity
+```
+
+### The Money-Send Problem
+
+```
+WIRE TRANSFER VIA EXTERNAL BANK
+  Bank API: no idempotency support
+  Retry → DOUBLE TRANSFER
+  
+  WHAT BANKS ACTUALLY DO:
+    Reconcile via wire confirmation file (daily batch)
+    Detect duplicates via amount + recipient + memo
+    Manual intervention for ambiguous cases
+    
+  ARCHITECTURE: explicit RECONCILIATION step
+    Wire request → record intent → submit to bank
+    Daily: compare intent ledger vs bank confirmation file
+    Mismatch → on-call alert + manual resolution
+```
+
+### The Push Notification Problem
+
+```
+FCM/APN: cannot guarantee delivery exactly once
+  Retry → DOUBLE PUSH
+  
+  MITIGATION:
+    1. Server-side dedup window: only attempt send if not sent in last 10s
+    2. Client-side dedup: notification_id in payload; ignore duplicates
+    3. Accept rare duplicates as acceptable UX cost
+```
+
+## Deeper Dive — Production Idempotency Architecture Decision
+
+```
+DECISION TREE:
+
+Is the operation a simple CRUD?
+├── Yes
+│   ├── CREATE → unique constraint or idempotency table
+│   ├── UPDATE → naturally idempotent if SET-based, or optimistic lock
+│   └── DELETE → naturally idempotent
+│
+└── No (complex business logic)
+    ├── Single-DB? → Idempotency table + transaction
+    ├── Cross-service? → Saga + outbox + per-step idempotency
+    └── Cross-DB without distributed tx?
+        ├── 2PC available? → JTA/Atomikos (rare modern use)
+        └── No → idempotency-key + reconciliation
+
+Cross-system call (external API)?
+├── External API supports idempotency? → use their key
+├── External API doesn't? 
+│   ├── Acceptable to rare-duplicate? → accept it
+│   ├── Critical (money)? → reconciliation pattern
+│   └── Notification? → server-side rate limit + client dedup
+
+Storage layer?
+├── Single source of truth (Postgres)? → Easy
+├── Multi-region replicated? → CDC + idempotent consumer
+└── Cache layer? → Invalidate on write success only
+```
+
 ## Practice
 
 1. **Audit an API.** For five POST endpoints in any system you know, identify which are idempotent and which aren't. For the non-idempotent ones, propose a fix.

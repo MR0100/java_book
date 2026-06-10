@@ -590,6 +590,480 @@ The diagonal: **start single-model. Move to CQRS without ES when measured read/w
 > [!INTERVIEW]
 > A common L5 prompt: "How would you implement CQRS in Spring?" A weak answer cites the buzzwords. A strong answer (a) decides whether to pair with event sourcing or use CDC (and justifies), (b) names a specific propagation pipeline (outbox + Debezium + Kafka + ES, or Axon's buses), (c) addresses read-your-writes explicitly, (d) identifies the operational ownership of the read store as a real concern.
 
+## Deeper Dive — Complete CQRS Implementation Walkthrough
+
+### Architecture: E-Commerce Product Catalog
+
+```
+WRITE SIDE (Command):
+  - PostgreSQL primary
+  - Spring Data JPA repositories
+  - Aggregate: Product (with versions, variants, attributes)
+  
+READ SIDE (Query):
+  - Elasticsearch for product search
+  - PostgreSQL read replica for admin views
+  - Redis for hot-product lookups
+  
+PROPAGATION:
+  - Postgres outbox table for events
+  - Debezium captures changes
+  - Kafka topic "product-events"
+  - 3 projectors (one per read store)
+```
+
+### Write Side: Command Handler
+
+```java
+@RestController
+@RequestMapping("/api/v1/products")
+public class ProductCommandController {
+    private final ProductCommandService commandService;
+
+    @PostMapping
+    public ResponseEntity<ProductCreatedResponse> create(
+            @Valid @RequestBody CreateProductCommand cmd) {
+        ProductId id = commandService.create(cmd);
+        return ResponseEntity.accepted()
+            .body(new ProductCreatedResponse(id, "Processing"));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(
+            @PathVariable ProductId id,
+            @Valid @RequestBody UpdateProductCommand cmd) {
+        commandService.update(id, cmd);
+        return ResponseEntity.accepted().build();
+    }
+}
+
+@Service
+public class ProductCommandService {
+    private final ProductRepository productRepo;
+    private final OutboxEventRepository outboxRepo;
+
+    @Transactional
+    public ProductId create(CreateProductCommand cmd) {
+        // Domain logic: validate, create aggregate
+        Product product = Product.create(
+            new ProductId(UUID.randomUUID()),
+            cmd.name(),
+            cmd.category(),
+            cmd.price()
+        );
+        productRepo.save(product);
+
+        // Outbox event in same transaction
+        outboxRepo.save(new OutboxEvent(
+            UUID.randomUUID(),
+            "ProductCreated",
+            product.id().toString(),
+            json.write(new ProductCreatedEvent(
+                product.id(),
+                product.name(),
+                product.category(),
+                product.price(),
+                Instant.now()
+            )),
+            Instant.now()
+        ));
+
+        return product.id();
+    }
+
+    @Transactional
+    public void update(ProductId id, UpdateProductCommand cmd) {
+        Product product = productRepo.findById(id)
+            .orElseThrow(() -> new ProductNotFoundException(id));
+
+        product.update(cmd);   // domain logic
+        productRepo.save(product);
+
+        outboxRepo.save(new OutboxEvent(
+            UUID.randomUUID(),
+            "ProductUpdated",
+            product.id().toString(),
+            json.write(new ProductUpdatedEvent(...)),
+            Instant.now()
+        ));
+    }
+}
+```
+
+### Debezium / Outbox Configuration
+
+```yaml
+# Debezium PostgreSQL connector
+name: product-outbox-connector
+config:
+  connector.class: io.debezium.connector.postgresql.PostgresConnector
+  database.hostname: postgres
+  database.dbname: products
+  table.include.list: public.outbox_events
+  
+  transforms: outbox
+  transforms.outbox.type: io.debezium.transforms.outbox.EventRouter
+  transforms.outbox.route.by.field: event_type
+  transforms.outbox.table.field.event.id: id
+  transforms.outbox.table.field.event.payload: payload
+```
+
+### Read Projector: Elasticsearch
+
+```java
+@Component
+public class ProductSearchProjector {
+    private final ElasticsearchClient esClient;
+
+    @KafkaListener(topics = "ProductCreated", containerFactory = "kafkaListenerFactory")
+    public void onProductCreated(ProductCreatedEvent event) throws IOException {
+        IndexRequest<ProductSearchDocument> req = IndexRequest.of(b -> b
+            .index("products")
+            .id(event.id().toString())
+            .document(new ProductSearchDocument(
+                event.id().toString(),
+                event.name(),
+                event.category(),
+                event.price().doubleValue(),
+                Instant.now(),
+                buildSearchKeywords(event)
+            ))
+        );
+        esClient.index(req);
+    }
+
+    @KafkaListener(topics = "ProductUpdated")
+    public void onProductUpdated(ProductUpdatedEvent event) throws IOException {
+        UpdateRequest<ProductSearchDocument, ProductSearchDocumentUpdate> req =
+            UpdateRequest.of(b -> b
+                .index("products")
+                .id(event.id().toString())
+                .doc(new ProductSearchDocumentUpdate(...))
+            );
+        esClient.update(req, ProductSearchDocument.class);
+    }
+}
+
+// Search-optimized document
+public record ProductSearchDocument(
+    String id,
+    String name,
+    String category,
+    double price,
+    Instant updatedAt,
+    List<String> searchKeywords
+) {}
+```
+
+### Read Side: Search Query API
+
+```java
+@RestController
+@RequestMapping("/api/v1/products")
+public class ProductQueryController {
+    private final ElasticsearchClient esClient;
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchResults> search(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        SearchResponse<ProductSearchDocument> response = esClient.search(
+            s -> s.index("products")
+                .query(q1 -> q1.multiMatch(m -> m
+                    .query(q)
+                    .fields("name^2", "category", "searchKeywords")
+                ))
+                .from(page * size)
+                .size(size)
+                .sort(so -> so.field(f -> f.field("price")))
+            , ProductSearchDocument.class
+        );
+
+        return ResponseEntity.ok(new SearchResults(
+            response.hits().hits().stream()
+                .map(Hit::source)
+                .toList(),
+            response.hits().total().value()
+        ));
+    }
+}
+```
+
+### Cache Projector: Redis
+
+```java
+@Component
+public class ProductCacheProjector {
+    private final RedisTemplate<String, Product> redis;
+
+    @KafkaListener(topics = "ProductCreated")
+    public void onProductCreated(ProductCreatedEvent event) {
+        redis.opsForValue().set(
+            "product:" + event.id(),
+            buildCachedProduct(event),
+            Duration.ofHours(24)
+        );
+    }
+
+    @KafkaListener(topics = "ProductUpdated")
+    public void onProductUpdated(ProductUpdatedEvent event) {
+        redis.opsForValue().set(
+            "product:" + event.id(),
+            buildCachedProduct(event),
+            Duration.ofHours(24)
+        );
+    }
+
+    @KafkaListener(topics = "ProductDeleted")
+    public void onProductDeleted(ProductDeletedEvent event) {
+        redis.delete("product:" + event.id());
+    }
+}
+```
+
+## Deeper Dive — Handling Read-Your-Writes
+
+The classic CQRS bug: user creates product, immediately queries — sees nothing.
+
+```java
+@RestController
+public class ProductController {
+
+    @PostMapping("/products")
+    public ResponseEntity<ProductResponse> create(@RequestBody CreateProductCommand cmd) {
+        ProductId id = commandService.create(cmd);
+        
+        // OPTION 1: Wait for projection (synchronous CQRS bug)
+        // BAD: blocks request; couples client to projection time
+        
+        // OPTION 2: Return the command result as the response
+        // GOOD: tell client the canonical state from the write side
+        return ResponseEntity.accepted()
+            .header("X-Created-Id", id.toString())
+            .body(ProductResponse.fromCommand(cmd, id));
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ProductResponse> get(@PathVariable ProductId id,
+                                                @RequestHeader(value = "X-Wait-For-Projection", required = false) Boolean wait) {
+        if (Boolean.TRUE.equals(wait)) {
+            // Short-poll until projection catches up (with timeout)
+            return waitForProjection(id, Duration.ofSeconds(5));
+        }
+        
+        // Default: return whatever's in the read model (eventually consistent)
+        return readModelRepo.findById(id)
+            .map(p -> ResponseEntity.ok(p))
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    private ResponseEntity<ProductResponse> waitForProjection(ProductId id, Duration timeout) {
+        long deadline = System.currentTimeMillis() + timeout.toMillis();
+        while (System.currentTimeMillis() < deadline) {
+            Optional<ProductResponse> result = readModelRepo.findById(id);
+            if (result.isPresent()) return ResponseEntity.ok(result.get());
+            try { Thread.sleep(50); } catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+        }
+        return ResponseEntity.status(202).build();   // Accepted, not yet available
+    }
+}
+```
+
+### Alternative: Optimistic UI
+
+```
+Client UI:
+  1. User clicks "Save Product"
+  2. UI immediately shows "Saved!" (optimistic)
+  3. UI sends command to server
+  4. Server returns 202 Accepted
+  5. UI continues to function
+  6. If server eventually returns error, UI shows error notification
+  7. Otherwise, UI silently transitions to authoritative state
+
+ADVANTAGES:
+  - Perceived latency is 0
+  - User doesn't wait for projection
+  - Works on slow networks
+
+DISADVANTAGES:
+  - UI must handle conflict/error gracefully
+  - State is briefly speculative
+```
+
+### Alternative: Read Your Own Writes from Command Store
+
+```java
+@GetMapping("/products/{id}")
+public ResponseEntity<ProductResponse> get(@PathVariable ProductId id,
+                                            @RequestParam(required = false) Boolean fresh) {
+    if (Boolean.TRUE.equals(fresh)) {
+        // Read from write side (Postgres primary) — guaranteed up-to-date
+        return commandService.findById(id)
+            .map(p -> ResponseEntity.ok(p))
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    // Default: read from optimized read model (Elasticsearch)
+    return readModelRepo.findById(id)
+        .map(p -> ResponseEntity.ok(p))
+        .orElse(ResponseEntity.notFound().build());
+}
+```
+
+## Deeper Dive — Replay and Rebuild
+
+### Scenario: Add a New Read Store
+
+```
+SCENARIO: 6 months in production. Adding analytics dashboard requires 
+  new ClickHouse projection. 1M products, 10M events.
+
+STEP 1: BUILD NEW PROJECTOR
+  - Subscribe to existing event topics
+  - Project to new ClickHouse table
+
+STEP 2: REPLAY HISTORICAL EVENTS
+  - Read all events from Kafka topic (from offset 0)
+  - Process through new projector
+  - Takes ~6 hours for 10M events
+
+STEP 3: SWITCH OVER
+  - At cutover time, new projector caught up to head
+  - Dashboard reads from ClickHouse
+```
+
+```java
+@Component
+public class ProjectionRebuilder {
+    private final KafkaConsumer<String, ProductEvent> consumer;
+    private final ClickHouseProjector projector;
+
+    public void rebuildClickHouse() {
+        consumer.subscribe(List.of("product-events"));
+        consumer.seekToBeginning(consumer.assignment());
+
+        AtomicLong processed = new AtomicLong();
+        long start = System.currentTimeMillis();
+
+        while (true) {
+            ConsumerRecords<String, ProductEvent> records = consumer.poll(Duration.ofMillis(100));
+            if (records.isEmpty() && isCaughtUp()) break;
+
+            for (ConsumerRecord<String, ProductEvent> record : records) {
+                projector.project(record.value());
+                if (processed.incrementAndGet() % 100_000 == 0) {
+                    long elapsed = (System.currentTimeMillis() - start) / 1000;
+                    log.info("Projected {} events in {}s ({}/sec)",
+                        processed.get(), elapsed, processed.get() / Math.max(elapsed, 1));
+                }
+            }
+        }
+    }
+
+    private boolean isCaughtUp() {
+        Map<TopicPartition, Long> endOffsets = consumer.endOffsets(consumer.assignment());
+        return consumer.assignment().stream()
+            .allMatch(tp -> consumer.position(tp) >= endOffsets.get(tp));
+    }
+}
+```
+
+## Deeper Dive — CQRS Anti-Patterns
+
+### Anti-Pattern 1: CQRS for Simple CRUD
+
+```
+SYMPTOM: Every entity has CQRS, even those with no read/write asymmetry
+RESULT: Operational complexity without benefit
+FIX: Identify entities with REAL asymmetry first
+  - Search-heavy (CMS, catalog, blog)
+  - Reporting/analytics
+  - Caching with invalidation challenges
+For others: use single model (CRUD)
+```
+
+### Anti-Pattern 2: CQRS as Decoration
+
+```
+SYMPTOM: "We have CQRS" but read side is same DB, same tables
+RESULT: Just added a "Reader" class for organization
+FIX: Either commit to genuine separation OR call it what it is (good organization)
+```
+
+### Anti-Pattern 3: Synchronous Projection
+
+```
+SYMPTOM: Command and projection run in same transaction
+RESULT: Lost half the benefits (no async, no separate scaling)
+FIX: Outbox + Kafka + separate projector consumer
+```
+
+### Anti-Pattern 4: No Replay Capability
+
+```
+SYMPTOM: Projection corrupted; no way to rebuild
+RESULT: Operational nightmare; can't add new read stores
+FIX: Event log retention + replay tooling from day one
+```
+
+### Anti-Pattern 5: Schema Changes Across Stores
+
+```
+SYMPTOM: Add field to event → must update 5 projectors + retrigger backfill
+RESULT: Slow evolution; high coordination cost
+FIX: Schema registry; backwards-compatible event versions
+```
+
+## Deeper Dive — When to Use CQRS (Decision Framework)
+
+```
+QUESTION: Do read and write workloads differ by 10× or more?
+
+  YES → CQRS likely beneficial
+  NO → Single model probably fine
+
+QUESTION: Are read queries dominantly different from write entities?
+
+  YES → CQRS likely beneficial
+  NO → Single model probably fine
+
+QUESTION: Do you need audit log or temporal queries?
+
+  YES → Event Sourcing + CQRS
+  NO → CQRS without ES might suffice
+
+QUESTION: Multiple downstream consumers with different read needs?
+
+  YES → CQRS beneficial
+  NO → Single model + caching might suffice
+
+QUESTION: Team capability for distributed systems operations?
+
+  YES → CQRS feasible
+  NO → Single model (improve maturity first)
+
+CONCRETE GUIDANCE:
+  - E-commerce catalog: CQRS without ES (Elasticsearch for search)
+  - Banking ledger: CQRS WITH event sourcing (audit + temporal)
+  - Simple admin tool: Single model (CRUD)
+  - User profile: Single model + Redis cache
+  - Order/payment: CQRS without ES (Postgres + outbox)
+  - Reporting/BI: CQRS to OLAP (Snowflake/BigQuery)
+```
+
+## Deeper Dive — Real CQRS Adopters
+
+| Company | What They CQRS | Why |
+|---|---|---|
+| **GOV.UK (UK Government)** | Forms / policy lookups | Read-heavy, multi-format outputs |
+| **Walmart** | Catalog, recommendations | Different read shapes for site vs mobile |
+| **Bank of America** | Account / ledger | Audit + multiple query shapes |
+| **Spotify** | Music search | Specialized search vs CRUD library |
+| **Microsoft Cosmos DB** | Backing pattern | Multiple consistency models, change feed |
+
 ## Practice
 
 1. **Identify the asymmetry.** In any system you know, pick one entity. List five queries the read side runs against it and the shape each query wants. Compare to the write-side shape. Identify the friction.

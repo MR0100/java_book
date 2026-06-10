@@ -715,6 +715,454 @@ The diagonal is the only honest summary: **start in the column on the left; move
 > [!INTERVIEW]
 > A common L5 prompt: "When would you choose microservices over a monolith?" A weak answer recites benefits (scaling, polyglot). A strong answer recites *pressures* — independent deployment cadence, independent scaling at 10×+ asymmetry, hard team boundaries — and explicitly says "if none of these apply, a modular monolith is the better choice in 2026." Strong answers also name a real migration story (Segment, Prime Video, Istio) to ground the position.
 
+## Deeper Dive — Spring Modulith Modular Monolith
+
+### Setup
+
+```xml
+<!-- pom.xml -->
+<dependency>
+    <groupId>org.springframework.modulith</groupId>
+    <artifactId>spring-modulith-starter-core</artifactId>
+    <version>1.2.0</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.modulith</groupId>
+    <artifactId>spring-modulith-starter-test</artifactId>
+    <version>1.2.0</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.modulith</groupId>
+    <artifactId>spring-modulith-events-kafka</artifactId>
+    <version>1.2.0</version>
+</dependency>
+```
+
+### Module Definition via Package Structure
+
+```
+src/main/java/com/example/shop/
+├── ShopApplication.java
+│
+├── catalog/                      # Module: Product Catalog
+│   ├── Product.java              # Internal — not exposed
+│   ├── ProductRepository.java    # Internal
+│   ├── ProductService.java       # Internal
+│   │
+│   └── api/                      # Public API
+│       ├── ProductApi.java       # Interface other modules use
+│       └── ProductView.java      # DTO other modules see
+│
+├── orders/                       # Module: Orders
+│   ├── Order.java
+│   ├── OrderRepository.java
+│   ├── OrderService.java
+│   │
+│   └── api/
+│       ├── OrderApi.java
+│       └── OrderEvents.java      # Events published
+│
+├── inventory/                    # Module: Inventory
+│   ├── ...
+│   └── api/
+│       └── InventoryApi.java
+│
+└── payments/                     # Module: Payments
+    └── ...
+```
+
+### Module Verification Test
+
+```java
+@SpringBootTest
+class ApplicationModulesTests {
+    
+    @Test
+    void verifyModuleStructure() {
+        ApplicationModules.of(ShopApplication.class).verify();
+    }
+    
+    @Test
+    void documentModules() {
+        Documenter documenter = new Documenter(ApplicationModules.of(ShopApplication.class));
+        documenter.writeDocumentation();   // Generates module diagrams
+    }
+}
+```
+
+### Module Boundaries Enforced
+
+```java
+// Inside catalog module
+package com.example.shop.catalog;
+
+@Service
+public class ProductService {
+    private final ProductRepository repo;   // Same module: OK
+    private final InventoryService inv;     // ← FORBIDDEN!
+                                            // Cross-module direct reference
+                                            // verify() will FAIL
+}
+
+// Correct: use API
+@Service
+public class ProductService {
+    private final ProductRepository repo;
+    private final InventoryApi inventoryApi;  // ← Use API interface
+}
+```
+
+### Cross-Module Communication via Events
+
+```java
+// In catalog module - publishes event
+package com.example.shop.catalog;
+
+@Service
+public class ProductService {
+    private final ApplicationEventPublisher events;
+    
+    @Transactional
+    public void publishProduct(Product product) {
+        repo.save(product);
+        events.publishEvent(new ProductPublishedEvent(product.getId(), product.getName()));
+    }
+}
+
+// In inventory module - listens
+package com.example.shop.inventory;
+
+@Component
+class InventoryListener {
+    
+    @ApplicationModuleListener   // Spring Modulith handles transactional boundary
+    void on(ProductPublishedEvent event) {
+        // Runs in own transaction after catalog's commit
+        inventoryService.createInventoryEntry(event.productId(), 0);
+    }
+}
+```
+
+## Deeper Dive — Distributed Monolith Anti-Pattern in Detail
+
+### Signs You Have a Distributed Monolith
+
+```
+TEST 1: Can you deploy service A without coordinating with anyone?
+  ❌ "We need to deploy A and B together" → distributed monolith
+
+TEST 2: Does service A's database schema change require service B to update?
+  ❌ Yes → distributed monolith (shared coupling)
+
+TEST 3: When service A is down, does service B's user request fail?
+  ❌ Yes for non-critical features → over-coupling
+
+TEST 4: Does a request to your system synchronously call 5+ services?
+  ❌ Yes → high coupling
+
+TEST 5: Do you have shared utility libraries that all services depend on?
+  ❌ Updates require all services to redeploy → coupling
+
+TEST 6: Do tests require multiple services to be running together?
+  ❌ Yes for unit tests → bad isolation
+```
+
+### Real Example: Segment's Mistake
+
+```
+SEGMENT (2018):
+  Had monolith handling event ingestion
+  Migrated to 140+ microservices
+  
+PROBLEMS:
+  - Operational complexity exploded
+  - Deploy times got slower (had to deploy in coordination)
+  - Cost ballooned (140 services × infrastructure)
+  - Customer complaints about reliability
+  
+SOLUTION (2019):
+  Reverted to single "centrifuge" service
+  Consolidated 140 services back into 1
+  Result: better reliability, lower cost, faster deploys
+  
+LESSON: microservices have a real operational tax. If you don't 
+need them, you're paying without benefit.
+```
+
+## Deeper Dive — Migration Decision Framework
+
+### Diagnostic Questions
+
+```
+1. TEAM SIZE
+   < 10 engineers:         MONOLITH
+   10-30:                  MODULAR MONOLITH
+   30-100:                 CONSIDER MICROSERVICES
+   100+:                   MICROSERVICES LIKELY
+
+2. DEPLOYMENT VELOCITY
+   1 deploy/week or less:  MONOLITH FINE
+   Multiple/day per team:  MICROSERVICES MIGHT HELP
+   
+3. INDEPENDENT SCALING
+   All components scale together: MONOLITH
+   10× asymmetry between components: MICROSERVICES
+
+4. POLYGLOT NEEDS
+   Single language fine:    MONOLITH or MODULAR
+   Need Python ML + Java API + Go networking: MICROSERVICES
+
+5. REGULATORY/COMPLIANCE
+   Same compliance for all: MONOLITH OK
+   Different (PCI for payment, GDPR for user): SEPARATE SERVICES
+
+6. FAILURE ISOLATION
+   Failure of any feature OK if all fail: MONOLITH
+   Critical to isolate: payment failure shouldn't break catalog: MICROSERVICES
+
+7. DEPLOYMENT INDEPENDENCE
+   Single ship cycle: MONOLITH
+   Teams need to ship independently: MICROSERVICES
+
+8. ORGANIZATIONAL READINESS
+   No platform team yet: STAY MONOLITH
+   Platform team + SRE established: MICROSERVICES READY
+```
+
+### Cost-Benefit Calculation
+
+```
+MONOLITH (50 services equivalent):
+  Infrastructure: $20K/month
+  Engineers needed: 30
+  Operational overhead: low
+  
+MODULAR MONOLITH (50 modules equivalent):
+  Infrastructure: $25K/month (slight overhead)
+  Engineers needed: 35
+  Operational overhead: low-medium
+  
+MICROSERVICES (50 services):
+  Infrastructure: $100K/month (5×)
+  Engineers needed: 60 (extra ops)
+  Operational overhead: high
+  Tooling investment: $500K initial
+  
+ROI MICROSERVICES:
+  Velocity gain: ~30% per service per month
+  But requires: independent teams, mature ops
+  Break-even point: usually 50+ engineers, 5+ teams
+```
+
+## Deeper Dive — Migrating Between Shapes
+
+### Monolith → Modular Monolith (4-6 months)
+
+```
+PHASE 1: Establish module boundaries
+  - Add Spring Modulith
+  - Declare modules via packages
+  - Add ArchUnit/Modulith tests
+  - CI enforces boundaries
+
+PHASE 2: Extract internal modules
+  - For each domain: refactor into module
+  - Move tests with module
+  - Document module APIs
+
+PHASE 3: Internal events
+  - Convert sync calls between modules → events where appropriate
+  - Use @TransactionalEventListener
+
+RESULT: Clear internal architecture; deploy as monolith
+```
+
+### Modular Monolith → Microservices (selective, ongoing)
+
+```
+TRIGGER: Specific module has different scaling/team needs
+
+PROCESS (per module):
+  Month 1: Build deployment infrastructure
+  Month 2: Create separate service skeleton, share DB initially
+  Month 3: Migrate data to own DB
+  Month 4: Strangler fig traffic (1% → 100%)
+  Month 5: Decommission code in monolith
+  Month 6: Lessons learned, prepare next extraction
+
+DON'T: Extract everything at once
+DO: Extract one module per quarter
+```
+
+### Microservices → Modular Monolith (Consolidation)
+
+```
+WHY: Team realized microservices was overkill
+
+PROCESS:
+  Month 1: Identify services to merge (often 5-10 related)
+  Month 2: Create new "combined" service
+  Month 3: Migrate data to single schema
+  Month 4: Migrate traffic from old services
+  Month 5: Decommission old services
+  Month 6: Repeat for next group
+
+EXAMPLE: Prime Video's audio-video monitoring service (T04 sidebar)
+  Started as microservices
+  Realized: AWS Lambda + Step Functions costs were enormous
+  Consolidated into monolith on EC2
+  Result: 90% cost reduction, similar performance
+```
+
+## Deeper Dive — Real Production Stories
+
+### Shopify (Majestic Monolith)
+
+```
+COMPANY: Shopify
+SIZE: 1M+ merchants, 10K+ engineers
+ARCHITECTURE: Massive Ruby monolith (2.8M LOC by 2020)
+KEY DECISION: Stayed monolithic deliberately
+
+WHY IT WORKS:
+  - Strong testing culture (millions of tests)
+  - Excellent CI/CD (deploys every 10 minutes)
+  - Modular code organization (components)
+  - Decoupled UI from monolith
+  - Selectively extracted ONLY when needed
+
+LESSON: Monolith can scale to enormous size with discipline
+```
+
+### Amazon (Forced Microservices)
+
+```
+COMPANY: Amazon
+SIZE: 1M+ employees
+ARCHITECTURE: Thousands of microservices
+KEY DECISION: 2002 Bezos memo mandating service-oriented architecture
+
+WHY IT WORKS:
+  - Two-pizza teams + strict accountability
+  - API-only communication between teams
+  - Strong DevOps culture (each team owns deploy)
+  - Built tools to manage complexity (AWS as side effect)
+
+LESSON: Microservices need organizational change to work
+```
+
+### Twitter (Failed Rewrite + Success)
+
+```
+2012: Tried big-bang rewrite (Ruby → Scala) — FAILED
+2013-2018: Strangler fig migration — SUCCEEDED
+2023+: Reorganization caused some consolidation again
+
+LESSON: Big-bang rewrites usually fail; strangler fig works
+        Architecture must serve current organization, not theoretical
+```
+
+### Stripe (Mostly Monolith)
+
+```
+COMPANY: Stripe
+SIZE: 5K+ engineers
+ARCHITECTURE: Large Ruby monolith for core payments + select services
+KEY DECISION: Stay monolithic for payments (ACID + simplicity)
+
+WHY IT WORKS:
+  - Payments need strong consistency
+  - Core team can iterate quickly
+  - Selective extraction (e.g., specific PCI workloads)
+
+LESSON: Right tool for right job — monolith for financial transactions
+```
+
+## Deeper Dive — Spring Modulith Production Patterns
+
+### Module-Level Configuration
+
+```java
+// orders module
+package com.example.shop.orders;
+
+@Configuration
+@ConfigurationProperties("shop.orders")
+public class OrdersConfiguration {
+    private int maxOrderItems = 100;
+    private Duration paymentTimeout = Duration.ofMinutes(15);
+    // getters/setters
+}
+```
+
+### Module Event Externalization
+
+```java
+// Internal event becomes external Kafka event
+@ApplicationModuleListener
+@Externalized("order-events::#{#this.orderId}")
+public void on(OrderPlacedEvent event) {
+    // Spring Modulith publishes to Kafka topic "order-events"
+    // with key = event.orderId()
+}
+```
+
+### Module Testing in Isolation
+
+```java
+@SpringBootTest
+@ApplicationModuleTest(BootstrapMode.STANDALONE)
+class OrderModuleTest {
+    
+    @Autowired private OrderService orderService;
+    
+    @Test
+    void placeOrderTriggersEvents(Scenario scenario) {
+        scenario.publish(new OrderPlacedEvent(OrderId.of("123")))
+            .andWaitForEventOfType(InventoryReservedEvent.class)
+            .toArriveAndVerify(event -> {
+                assertEquals(OrderId.of("123"), event.orderId());
+            });
+    }
+}
+```
+
+## Deeper Dive — The Conway's Law Practical Application
+
+### Designing Teams to Produce Architecture
+
+```
+DESIRED ARCHITECTURE: 
+  - 5 bounded contexts
+  - Independent deployment
+  - Polyglot allowed but discouraged
+
+REQUIRED TEAM STRUCTURE:
+  Team A: Owns "Catalog" context, deploys independently
+  Team B: Owns "Orders" context, deploys independently
+  Team C: Owns "Payments" context, deploys independently  
+  Team D: Owns "Notifications" context, deploys independently
+  Team E: Owns "Search" context, deploys independently
+  
+  + Platform Team: Provides CI/CD, observability, IDP
+
+  + Architecture Council: Cross-team coordination quarterly
+```
+
+### Anti-Pattern: Mismatched Conway's Law
+
+```
+SYMPTOM: 
+  Team structure has 1 large platform team + 1 product team
+  Architecture is 50 microservices
+  Result: chaos
+  
+EITHER: 
+  Reorganize teams to match architecture (10 small teams)
+  OR: Consolidate architecture (3-5 services matching team boundaries)
+```
+
 ## Practice
 
 1. **Read your team.** Sketch your team's communication structure (who pairs with whom, who reviews whom). Predict the system structure that Conway's Law implies. Compare to the actual system. Where do they diverge?

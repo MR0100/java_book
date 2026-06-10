@@ -504,6 +504,463 @@ The patterns are universal; implementation libraries differ.
 > [!INTERVIEW]
 > A common L5 prompt: "Walk me through resilience patterns." Strong answers (a) name all five with the failure each prevents, (b) emphasize idempotency as the precondition for retries, (c) order them: timeout always, retry where idempotent, circuit breaker on shaky dependencies, bulkhead when isolating, backpressure on streams, (d) cite a real incident.
 
+## Deeper Dive — Resilience4j Complete Configuration
+
+### YAML Configuration (Spring Boot)
+
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-gateway:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED        # or TIME_BASED
+        sliding-window-size: 100
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50              # 50% failures open the circuit
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 80            # 80% slow calls = open
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        ignore-exceptions:
+          - com.example.BusinessException        # 4xx errors don't trigger CB
+
+  retry:
+    instances:
+      payment-gateway:
+        max-attempts: 3
+        wait-duration: 1s
+        exponential-backoff-multiplier: 2
+        randomization-factor: 0.5               # jitter
+        retry-exceptions:
+          - java.io.IOException
+        ignore-exceptions:
+          - com.example.NonRetryableException
+
+  ratelimiter:
+    instances:
+      payment-gateway:
+        limit-for-period: 100                    # 100 calls per
+        limit-refresh-period: 1s                 # 1 second
+        timeout-duration: 0                      # fail fast if rate-limited
+
+  bulkhead:
+    instances:
+      payment-gateway:
+        max-concurrent-calls: 20                 # max 20 concurrent calls
+        max-wait-duration: 100ms                 # wait briefly for slot
+      payment-gateway-tp:
+        type: THREADPOOL                          # thread-pool bulkhead
+        max-thread-pool-size: 20
+        core-thread-pool-size: 10
+        queue-capacity: 50
+
+  timelimiter:
+    instances:
+      payment-gateway:
+        timeout-duration: 5s
+        cancel-running-future: true
+```
+
+### Service Code with Stacked Annotations
+
+```java
+@Service
+public class PaymentClient {
+
+    @CircuitBreaker(name = "payment-gateway", fallbackMethod = "fallbackCharge")
+    @Retry(name = "payment-gateway", fallbackMethod = "fallbackCharge")
+    @RateLimiter(name = "payment-gateway")
+    @Bulkhead(name = "payment-gateway")
+    @TimeLimiter(name = "payment-gateway")
+    public CompletableFuture<ChargeResult> charge(ChargeRequest req) {
+        return CompletableFuture.supplyAsync(() ->
+            restTemplate.postForObject(
+                "/api/charges",
+                req,
+                ChargeResult.class
+            ));
+    }
+
+    public CompletableFuture<ChargeResult> fallbackCharge(ChargeRequest req, Throwable t) {
+        // Graceful degradation
+        if (t instanceof CallNotPermittedException) {
+            // Circuit breaker OPEN — service is failing
+            log.warn("Payment gateway circuit OPEN; queueing request for later");
+            paymentQueue.enqueue(req);
+            return CompletableFuture.completedFuture(ChargeResult.queued(req));
+        }
+        if (t instanceof BulkheadFullException) {
+            // Too many concurrent calls
+            return CompletableFuture.completedFuture(ChargeResult.tryLater());
+        }
+        if (t instanceof RequestNotPermitted) {
+            // Rate limit hit
+            return CompletableFuture.completedFuture(ChargeResult.rateLimited());
+        }
+        // Other failures: fall back to cached or default
+        return CompletableFuture.completedFuture(ChargeResult.degraded(req));
+    }
+}
+```
+
+**Order of annotations** (critical):
+1. `@CircuitBreaker` — outermost; short-circuits before doing anything else
+2. `@Retry` — retries the inner call (within the CB)
+3. `@RateLimiter` — drops if over rate (with or without retry)
+4. `@Bulkhead` — limits concurrency
+5. `@TimeLimiter` — bounded duration for each attempt
+
+## Deeper Dive — Circuit Breaker State Machine
+
+```
+              ┌─────────────────┐
+              │     CLOSED      │
+              │ (normal, allow) │
+              └────────┬────────┘
+                       │
+                       │ failure rate >= 50%
+                       │ (over sliding window)
+                       ▼
+              ┌─────────────────┐
+              │      OPEN       │
+              │ (reject calls)  │
+              └────────┬────────┘
+                       │
+                       │ wait 30s
+                       ▼
+              ┌─────────────────┐
+              │   HALF-OPEN     │
+              │  (probe with 5  │
+              │   test calls)   │
+              └────┬────────┬───┘
+                   │        │
+            success│        │ failure
+                   │        │
+                   ▼        ▼
+              CLOSED      OPEN
+```
+
+### Spring Actuator Health View
+
+```yaml
+management:
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+```
+
+```json
+GET /actuator/health/circuitBreakers
+
+{
+  "status": "UP",
+  "details": {
+    "payment-gateway": {
+      "status": "UP",
+      "details": {
+        "state": "CLOSED",
+        "failureRate": "3.0%",
+        "slowCallRate": "0.0%",
+        "bufferedCalls": 100,
+        "failedCalls": 3,
+        "notPermittedCalls": 0
+      }
+    }
+  }
+}
+```
+
+## Deeper Dive — Retry Strategy with Jitter
+
+```java
+public class ExponentialBackoffWithJitter {
+    private final int maxRetries;
+    private final long baseMs;
+    private final long maxMs;
+    private final Random random = new Random();
+
+    public <T> T retry(Supplier<T> operation) {
+        Throwable lastError = null;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                return operation.get();
+            } catch (Throwable t) {
+                if (!isRetryable(t)) throw new RuntimeException(t);
+                lastError = t;
+
+                if (attempt < maxRetries) {
+                    long backoff = computeBackoff(attempt);
+                    try {
+                        Thread.sleep(backoff);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("Interrupted", e);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Retries exhausted", lastError);
+    }
+
+    private long computeBackoff(int attempt) {
+        // Exponential: base × 2^(attempt-1)
+        long exponential = baseMs * (long) Math.pow(2, attempt - 1);
+        long capped = Math.min(exponential, maxMs);
+
+        // Full jitter: random(0, capped) — best to avoid thundering herd
+        return random.nextLong(0, capped + 1);
+    }
+}
+
+// Configuration: max 5 retries, 100ms base, 30s max
+new ExponentialBackoffWithJitter(5, 100, 30_000);
+// Retries at: random(0, 100), random(0, 200), random(0, 400), random(0, 800), random(0, 1600)
+```
+
+### Jitter Strategies Compared
+
+```
+NO JITTER:
+  100ms, 200ms, 400ms, 800ms ← all clients retry simultaneously
+  → thundering herd → cascading failures
+
+EQUAL JITTER:
+  random(50, 150), random(100, 300), ...
+  → some spread but still synchronized somewhat
+
+FULL JITTER (RECOMMENDED):
+  random(0, 100), random(0, 200), ...
+  → maximum spread; complete de-synchronization
+
+DECORRELATED JITTER:
+  next = random(base, prev * 3)
+  → adapts based on previous backoff
+  → avoids accidental synchronization
+```
+
+## Deeper Dive — Retry Budget Pattern (Prevent Retry Amplification)
+
+```java
+@Component
+public class RetryBudgetManager {
+    private final AtomicLong totalCalls = new AtomicLong();
+    private final AtomicLong totalRetries = new AtomicLong();
+
+    private static final double MAX_RETRY_RATIO = 0.10;   // max 10% of calls can be retries
+
+    public boolean shouldRetry() {
+        long calls = totalCalls.get();
+        long retries = totalRetries.get();
+
+        if (calls == 0) return true;
+
+        double currentRatio = (double) retries / calls;
+        return currentRatio < MAX_RETRY_RATIO;
+    }
+
+    public void recordCall() { totalCalls.incrementAndGet(); }
+    public void recordRetry() {
+        if (shouldRetry()) {
+            totalRetries.incrementAndGet();
+        }
+    }
+
+    // Reset periodically
+    @Scheduled(fixedRate = 60_000)
+    public void reset() {
+        totalCalls.set(0);
+        totalRetries.set(0);
+    }
+}
+```
+
+**Why budget matters**: a service handling 1000 RPS that retries 3× per failure during outage = 3000 RPS hitting failing downstream = amplifies the problem.
+
+## Deeper Dive — Hedged Requests Pattern
+
+```java
+public class HedgedRequest<T> {
+    private final ExecutorService executor;
+
+    public T executeHedged(Supplier<T> primary, Supplier<T> secondary,
+                           Duration hedgeDelay) {
+        CompletableFuture<T> primaryFuture = CompletableFuture.supplyAsync(primary, executor);
+        CompletableFuture<T> secondaryFuture = new CompletableFuture<>();
+
+        // Schedule secondary call after delay if primary hasn't completed
+        executor.schedule(() -> {
+            if (!primaryFuture.isDone()) {
+                try {
+                    secondaryFuture.complete(secondary.get());
+                } catch (Throwable t) {
+                    secondaryFuture.completeExceptionally(t);
+                }
+            }
+        }, hedgeDelay.toMillis(), TimeUnit.MILLISECONDS);
+
+        // Return whichever completes first
+        return CompletableFuture.anyOf(primaryFuture, secondaryFuture)
+            .thenApply(result -> (T) result)
+            .join();
+    }
+}
+
+// Usage: if primary doesn't return in 50ms, also fire secondary
+T result = hedge.executeHedged(
+    () -> serviceClient.get(id),     // primary call
+    () -> serviceClient.get(id),     // secondary (different instance via LB)
+    Duration.ofMillis(50)
+);
+```
+
+**Benefit**: p99 latency drops significantly (2 chances at fast response).
+**Cost**: ~5-10% extra load (only fires on slow responses).
+**Used by**: Google search, Bing, many high-availability systems.
+
+## Deeper Dive — Bulkhead Pattern Variants
+
+### Semaphore Bulkhead (Lightweight)
+
+```java
+@Bulkhead(name = "payment-gateway")    // semaphore-based by default
+public ChargeResult charge(ChargeRequest req) { ... }
+```
+
+**Use when**: limit concurrent invocations within current thread. Suitable for synchronous calls.
+
+### Thread-Pool Bulkhead (Strong Isolation)
+
+```java
+@Bulkhead(name = "payment-gateway", type = Bulkhead.Type.THREADPOOL)
+public CompletableFuture<ChargeResult> charge(ChargeRequest req) {
+    return CompletableFuture.supplyAsync(() -> restTemplate.post(...));
+}
+```
+
+**Use when**: isolate slow calls from main thread pool. Caller threads can do other work while waiting.
+
+**Cost**: extra thread management; ~10ms latency overhead per call.
+
+### Explicit Connection Pool Limits
+
+```yaml
+# HTTP client per-host limits
+spring.cloud.openfeign.client.config:
+  payment-gateway:
+    connection-pool:
+      max-connections-per-host: 50    # bulkhead via HTTP pool
+      max-connections: 200
+```
+
+## Deeper Dive — Real-World Resilience Failures
+
+### Cascading Failure: 2017 GitLab Database Loss
+
+```
+SCENARIO: Slow database replication → primary blocked → replicas lag → cascade
+
+NO RESILIENCE:
+  All clients hammer with retries
+  DB CPU 100% → can't keep up
+  Eventually data loss during recovery
+
+LESSONS:
+  - Circuit breaker on DB calls would have shed load
+  - Bulkhead would have isolated impact
+  - Retry budget would have limited amplification
+```
+
+### Cascade Failure: 2019 Cloudflare 30-min Outage
+
+```
+SCENARIO: Regex CPU spike → some workers OOM
+  → load balancer routed away from failing workers
+  → healthy workers received more load
+  → MORE workers OOM → cascade
+
+LESSONS:
+  - Bulkhead per-customer would have contained blast radius
+  - Circuit breaker on individual regex execution
+  - Resource quotas (CPU/memory per request) would have limited damage
+```
+
+### AWS DynamoDB 2015 Outage
+
+```
+SCENARIO: Metadata service became slow
+  → DynamoDB requests slowed
+  → clients retried more aggressively
+  → metadata service became slower
+  → death spiral
+
+LESSONS:
+  - Adaptive retry (slow when many failures)
+  - Backpressure (signal client to slow down)
+  - Service-side rate limiting
+  - Circuit breakers in clients
+```
+
+## Deeper Dive — Production Health-Check Integration
+
+```java
+@Component
+public class ResilienceHealthIndicator implements HealthIndicator {
+    @Autowired private CircuitBreakerRegistry cbRegistry;
+
+    @Override
+    public Health health() {
+        Map<String, Object> details = new HashMap<>();
+
+        boolean allHealthy = true;
+        for (CircuitBreaker cb : cbRegistry.getAllCircuitBreakers()) {
+            CircuitBreaker.Metrics metrics = cb.getMetrics();
+            String state = cb.getState().toString();
+
+            Map<String, Object> cbDetails = Map.of(
+                "state", state,
+                "failureRate", metrics.getFailureRate(),
+                "slowCallRate", metrics.getSlowCallRate(),
+                "bufferedCalls", metrics.getNumberOfBufferedCalls()
+            );
+
+            details.put(cb.getName(), cbDetails);
+
+            // Service unhealthy if any critical CB is OPEN
+            if (state.equals("OPEN") && cb.getName().startsWith("critical-")) {
+                allHealthy = false;
+            }
+        }
+
+        return allHealthy
+            ? Health.up().withDetails(details).build()
+            : Health.outOfService().withDetails(details).build();
+    }
+}
+```
+
+## Deeper Dive — Resilience Patterns Decision Matrix
+
+| Scenario | Pattern | Configuration |
+|---|---|---|
+| External API call | Timeout + Retry + CB | timeout 5s, retry 3×, CB at 50% failure |
+| Database query | Timeout + Connection Pool | timeout 30s, pool size cores×2 |
+| Background job | Retry + DLQ | retry 3×, send to DLQ if fails |
+| Stream processing | Backpressure | onBackpressureBuffer or onBackpressureDrop |
+| User-facing search | Hedged Request | 50ms hedge delay |
+| Cache lookup | Single-flight + Fallback | LoadingCache + DB fallback |
+| Notification send | Retry + Idempotency | exponential backoff + dedup table |
+| Internal microservice | Timeout + CB + Bulkhead | timeout 2s, CB, semaphore 20 |
+| Async pipeline | Retry + DLQ | max 5 retries, DLQ for ops review |
+
 ## Practice
 
 1. **Audit timeouts.** In your service, find every network call. Verify each has both connect and read timeouts. Set explicit values for any that don't.

@@ -494,6 +494,562 @@ Rate-limit state is in Redis sharded by tenant; one tenant has 99% of traffic; o
 > [!INTERVIEW]
 > A common L5 prompt: "Design a rate limiter." Strong answers (a) pick an algorithm justified by burst tolerance and fairness, (b) handle the distributed-state problem (Redis Lua, sharded sentinel), (c) return 429 with Retry-After, (d) name the layer (CDN, gateway, app) where each limit lives.
 
+## Deeper Dive — All Five Algorithms in Java
+
+### Algorithm 1: Fixed Window Counter
+
+```java
+public class FixedWindowRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final AtomicLong windowStart;
+    private final AtomicInteger count;
+
+    public FixedWindowRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.windowStart = new AtomicLong(System.currentTimeMillis());
+        this.count = new AtomicInteger(0);
+    }
+
+    public boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+        
+        if (windowStart.get() < currentWindow) {
+            // Reset window
+            windowStart.set(currentWindow);
+            count.set(0);
+        }
+        
+        if (count.incrementAndGet() <= limit) {
+            return true;
+        }
+        return false;
+    }
+}
+
+// Usage
+FixedWindowRateLimiter limiter = new FixedWindowRateLimiter(100, 60_000);
+
+// PROBLEM: Boundary burst
+// At 11:59:59 — 100 requests allowed (window: 11:59:00-12:00:00)
+// At 12:00:00 — 100 more allowed (new window: 12:00:00-12:01:00)
+// Result: 200 requests in 1 second (2× the intended rate)
+```
+
+### Algorithm 2: Sliding Window Log
+
+```java
+public class SlidingWindowLogRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final ConcurrentLinkedDeque<Long> requestTimestamps;
+
+    public SlidingWindowLogRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.requestTimestamps = new ConcurrentLinkedDeque<>();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long windowStart = now - windowMs;
+        
+        // Remove timestamps outside window
+        while (!requestTimestamps.isEmpty() && requestTimestamps.peekFirst() < windowStart) {
+            requestTimestamps.pollFirst();
+        }
+        
+        if (requestTimestamps.size() < limit) {
+            requestTimestamps.offerLast(now);
+            return true;
+        }
+        return false;
+    }
+}
+
+// Pros: Exact - no boundary issues
+// Cons: O(N) memory per key (every request stored)
+//       At 1M req/s × 60s window = 60M entries per key
+```
+
+### Algorithm 3: Sliding Window Counter (Recommended Default)
+
+```java
+public class SlidingWindowCounterRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private long previousWindowCount;
+    private long currentWindowCount;
+    private long currentWindowStart;
+
+    public SlidingWindowCounterRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.currentWindowStart = currentWindow();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+        
+        if (currentWindow > currentWindowStart) {
+            // Shift windows
+            previousWindowCount = currentWindowCount;
+            currentWindowCount = 0;
+            currentWindowStart = currentWindow;
+        }
+        
+        // Calculate effective count using weighted previous window
+        long elapsedInCurrent = now - currentWindowStart;
+        double fractionOfCurrent = (double) elapsedInCurrent / windowMs;
+        double fractionOfPrevious = 1.0 - fractionOfCurrent;
+        
+        double effectiveCount = currentWindowCount + 
+            previousWindowCount * fractionOfPrevious;
+        
+        if (effectiveCount < limit) {
+            currentWindowCount++;
+            return true;
+        }
+        return false;
+    }
+
+    private long currentWindow() {
+        long now = System.currentTimeMillis();
+        return now - (now % windowMs);
+    }
+}
+
+// Pros: O(1) memory, O(1) time
+//       Smooths boundary issue (interpolates)
+//       Default choice for HTTP APIs
+// Cons: Approximation (assumes uniform distribution in previous window)
+```
+
+### Algorithm 4: Token Bucket
+
+```java
+public class TokenBucketRateLimiter {
+    private final long capacity;
+    private final long refillTokensPerInterval;
+    private final long refillIntervalMs;
+    private double tokens;
+    private long lastRefillTimestamp;
+
+    public TokenBucketRateLimiter(long capacity, long refillTokensPerInterval, long refillIntervalMs) {
+        this.capacity = capacity;
+        this.refillTokensPerInterval = refillTokensPerInterval;
+        this.refillIntervalMs = refillIntervalMs;
+        this.tokens = capacity;
+        this.lastRefillTimestamp = System.currentTimeMillis();
+    }
+
+    public synchronized boolean allowRequest(long tokensRequested) {
+        refill();
+        
+        if (tokens >= tokensRequested) {
+            tokens -= tokensRequested;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean allowRequest() {
+        return allowRequest(1);
+    }
+
+    private void refill() {
+        long now = System.currentTimeMillis();
+        long elapsed = now - lastRefillTimestamp;
+        
+        double tokensToAdd = ((double) elapsed / refillIntervalMs) * refillTokensPerInterval;
+        tokens = Math.min(capacity, tokens + tokensToAdd);
+        lastRefillTimestamp = now;
+    }
+}
+
+// Pros: Configurable burst (capacity vs steady rate)
+//       Stripe, AWS use this
+// Cons: Slightly more complex
+```
+
+### Algorithm 5: Leaky Bucket
+
+```java
+public class LeakyBucketRateLimiter {
+    private final long capacity;
+    private final long leakRatePerSecond;
+    private final BlockingQueue<Request> queue;
+    private final ExecutorService leaker;
+
+    public LeakyBucketRateLimiter(long capacity, long leakRatePerSecond) {
+        this.capacity = capacity;
+        this.leakRatePerSecond = leakRatePerSecond;
+        this.queue = new ArrayBlockingQueue<>((int) capacity);
+        this.leaker = Executors.newSingleThreadExecutor();
+        startLeaker();
+    }
+
+    public boolean allowRequest(Request request) {
+        return queue.offer(request);  // Returns false if full
+    }
+
+    private void startLeaker() {
+        leaker.submit(() -> {
+            long intervalNs = TimeUnit.SECONDS.toNanos(1) / leakRatePerSecond;
+            while (!Thread.currentThread().isInterrupted()) {
+                Request req = queue.poll();
+                if (req != null) {
+                    req.process();
+                }
+                LockSupport.parkNanos(intervalNs);
+            }
+        });
+    }
+}
+
+// Pros: Smooths bursts into steady output rate
+//       Ideal for traffic shaping into a fixed-rate downstream
+// Cons: Adds latency (requests wait in queue)
+//       Not ideal for user-facing APIs
+```
+
+## Deeper Dive — Distributed Rate Limiter (Redis Lua)
+
+### Sliding Window Counter in Redis
+
+```lua
+-- KEYS[1] = bucket key
+-- ARGV[1] = max requests
+-- ARGV[2] = window in seconds
+-- ARGV[3] = current timestamp in ms
+
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local window = tonumber(ARGV[2]) * 1000
+local now = tonumber(ARGV[3])
+local currentWindowStart = math.floor(now / window) * window
+local previousWindowStart = currentWindowStart - window
+
+local currentCount = tonumber(redis.call('GET', key .. ':' .. currentWindowStart) or "0")
+local previousCount = tonumber(redis.call('GET', key .. ':' .. previousWindowStart) or "0")
+
+local elapsedInCurrent = now - currentWindowStart
+local fractionOfCurrent = elapsedInCurrent / window
+local fractionOfPrevious = 1.0 - fractionOfCurrent
+
+local effectiveCount = currentCount + previousCount * fractionOfPrevious
+
+if effectiveCount < limit then
+    redis.call('INCR', key .. ':' .. currentWindowStart)
+    redis.call('EXPIRE', key .. ':' .. currentWindowStart, math.ceil(window * 2 / 1000))
+    return {1, limit - math.floor(effectiveCount) - 1}
+else
+    return {0, 0}
+end
+```
+
+### Spring Boot Integration
+
+```java
+@Service
+public class RedisRateLimiter {
+    private final StringRedisTemplate redis;
+    private final DefaultRedisScript<List> script;
+
+    public RedisRateLimiter(StringRedisTemplate redis) {
+        this.redis = redis;
+        this.script = new DefaultRedisScript<>();
+        script.setLocation(new ClassPathResource("rate-limiter.lua"));
+        script.setResultType(List.class);
+    }
+
+    public RateLimitResult checkLimit(String key, int limit, long windowSeconds) {
+        Long now = System.currentTimeMillis();
+        
+        List<Long> result = redis.execute(
+            script,
+            List.of(key),
+            String.valueOf(limit),
+            String.valueOf(windowSeconds),
+            String.valueOf(now)
+        );
+        
+        boolean allowed = result.get(0) == 1L;
+        long remaining = result.get(1);
+        
+        return new RateLimitResult(allowed, remaining);
+    }
+}
+
+public record RateLimitResult(boolean allowed, long remaining) {}
+```
+
+## Deeper Dive — Spring Cloud Gateway Configuration
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-route
+          uri: lb://api-service
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userKeyResolver}"
+```
+
+```java
+@Configuration
+public class RateLimitConfig {
+    
+    @Bean
+    public KeyResolver userKeyResolver() {
+        // Per-user rate limiting
+        return exchange -> Mono.just(
+            exchange.getRequest().getHeaders().getFirst("X-User-Id")
+        );
+    }
+    
+    @Bean
+    public KeyResolver ipKeyResolver() {
+        // Per-IP rate limiting
+        return exchange -> Mono.just(
+            exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+        );
+    }
+}
+```
+
+## Deeper Dive — Bucket4j Library (Java Token Bucket)
+
+```java
+@Service
+public class Bucket4jRateLimiter {
+    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+
+    public Bucket newBucket(String key, int limit, Duration window) {
+        return Bucket.builder()
+            .addLimit(Bandwidth.simple(limit, window))
+            .build();
+    }
+
+    public boolean tryConsume(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key, 
+            k -> newBucket(k, limit, window));
+        return bucket.tryConsume(1);
+    }
+
+    public ConsumptionProbe tryConsumeWithProbe(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key,
+            k -> newBucket(k, limit, window));
+        return bucket.tryConsumeAndReturnRemaining(1);
+    }
+}
+
+// Web filter usage
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    private final Bucket4jRateLimiter limiter;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     FilterChain chain) throws ServletException, IOException {
+        String key = extractKey(req);
+        
+        ConsumptionProbe probe = limiter.tryConsumeWithProbe(key, 100, Duration.ofMinutes(1));
+        
+        if (probe.isConsumed()) {
+            resp.setHeader("X-RateLimit-Remaining", String.valueOf(probe.getRemainingTokens()));
+            chain.doFilter(req, resp);
+        } else {
+            long waitMs = probe.getNanosToWaitForRefill() / 1_000_000;
+            resp.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            resp.setHeader("Retry-After", String.valueOf(waitMs / 1000));
+            resp.getWriter().write("Rate limit exceeded");
+        }
+    }
+}
+```
+
+## Deeper Dive — Multi-Layer Rate Limiting
+
+```
+LAYER 1: CDN / WAF (Cloudflare, AWS WAF)
+  - Coarse: 1000 req/sec per IP
+  - Blocks volumetric DDoS
+  - At edge for low latency
+
+LAYER 2: API Gateway (Kong, AWS API Gateway, Spring Cloud Gateway)
+  - Medium: 100 req/sec per API key
+  - Enforces per-tenant quotas
+  - Returns 429 with Retry-After
+
+LAYER 3: Application
+  - Fine: 10 req/sec per user per endpoint
+  - Business logic constraints
+  - Cost controls (e.g., expensive ML calls)
+
+LAYER 4: Database
+  - Backstop: query cost limits
+  - Connection pool limits
+  - Slow query timeouts
+```
+
+### Multi-Tenant Per-Endpoint Configuration
+
+```java
+@Service
+public class TenantRateLimiter {
+    
+    public RateLimit getLimit(String tenantId, String endpoint) {
+        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow();
+        TenantPlan plan = tenant.getPlan();
+        
+        return switch (plan) {
+            case FREE -> getFreeLimit(endpoint);
+            case STARTER -> getStarterLimit(endpoint);
+            case ENTERPRISE -> getEnterpriseLimit(endpoint);
+        };
+    }
+    
+    private RateLimit getFreeLimit(String endpoint) {
+        return switch (endpoint) {
+            case "/api/search" -> new RateLimit(10, Duration.ofMinutes(1));
+            case "/api/ml-inference" -> new RateLimit(5, Duration.ofMinutes(1));
+            default -> new RateLimit(100, Duration.ofMinutes(1));
+        };
+    }
+}
+```
+
+## Deeper Dive — HTTP Semantics for Rate Limiting
+
+### Response Headers
+
+```
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1700000060
+Retry-After: 60
+RateLimit-Policy: 100;w=60
+RateLimit-Limit: 100
+RateLimit-Remaining: 0
+RateLimit-Reset: 60
+
+{
+  "error": "rate_limited",
+  "message": "Too many requests. Try again in 60 seconds."
+}
+```
+
+### Client Implementation
+
+```java
+@Component
+public class RateLimitAwareHttpClient {
+    private final RestTemplate restTemplate;
+
+    public <T> T request(String url, Class<T> responseType) {
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                return restTemplate.getForObject(url, responseType);
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                String retryAfter = e.getResponseHeaders()
+                    .getFirst(HttpHeaders.RETRY_AFTER);
+                
+                long waitSeconds = parseRetryAfter(retryAfter);
+                if (waitSeconds > 60) {
+                    throw new RateLimitExceededException("Wait too long", e);
+                }
+                
+                try {
+                    Thread.sleep(Duration.ofSeconds(waitSeconds).toMillis());
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(ie);
+                }
+            }
+        }
+        throw new RateLimitExceededException("Max retries reached");
+    }
+}
+```
+
+## Deeper Dive — Common Failure Modes and Solutions
+
+### Failure Mode 1: Boundary Burst (Fixed Window)
+
+```
+PROBLEM:
+  Window: 1 minute, limit: 100 req/min
+  At 11:59:59 - 100 requests allowed
+  At 12:00:00 - new window, 100 more allowed
+  → 200 requests in 1 second
+
+SOLUTION: Use sliding window counter instead
+```
+
+### Failure Mode 2: Distributed Inconsistency
+
+```
+PROBLEM:
+  Multiple app instances, each enforcing 100 req/sec locally
+  Actual rate: 100 × (instances) = 1000 req/sec
+
+SOLUTION: Centralized state in Redis with Lua scripts
+```
+
+### Failure Mode 3: Memory Explosion (Sliding Window Log)
+
+```
+PROBLEM:
+  Store every request timestamp
+  Hot endpoint: 10K req/sec × 60s window = 600K entries per key
+  10K hot keys = 6B entries
+
+SOLUTION: Use sliding window counter (O(1) memory) or token bucket
+```
+
+### Failure Mode 4: Clock Skew
+
+```
+PROBLEM:
+  Distributed systems with different clocks
+  One node thinks "now" is 12:00:00
+  Another thinks 12:00:01
+  Rate limit calculations diverge
+
+SOLUTION: Use single source of time (Redis timestamps)
+          Don't trust client/local clocks
+```
+
+### Failure Mode 5: Hot Key
+
+```
+PROBLEM:
+  One API key sends 1M req/sec
+  All hashed to same Redis shard
+  Shard saturates
+
+SOLUTION: 
+  - Pre-shard hot keys (key1#shard1, key1#shard2)
+  - Local approximate limit + periodic sync
+  - Reject early at gateway
+```
+
 ## Practice
 
 1. **Implement each algorithm.** In Java, implement fixed window, sliding-window counter, token bucket. Run a microbenchmark; compare allowed/rejected counts under a burst.

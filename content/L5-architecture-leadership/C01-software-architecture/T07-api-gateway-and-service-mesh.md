@@ -584,6 +584,517 @@ For 10 services with shared resilience policy, this is fine. For 100, the policy
 > [!INTERVIEW]
 > A common L5 prompt: "Why would you use Istio?" Strong answers (a) specify the team size and service count where it pays, (b) explicitly call out the operational cost, (c) name the simpler alternative (Linkerd, Cilium, or in-code Resilience4j), (d) describe a real incident or trade-off they've observed.
 
+## Deeper Dive — Spring Cloud Gateway Complete Configuration
+
+### Production Gateway YAML
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      # Global defaults
+      default-filters:
+        - AddRequestHeader=X-Gateway-Source, spring-cloud-gateway
+        - PreserveHostHeader
+      
+      # Route definitions
+      routes:
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: order-cb
+                fallbackUri: forward:/fallback/orders
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                redis-rate-limiter.requestedTokens: 1
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 1s
+                  factor: 2
+            - SetResponseHeader=X-Response-From, order-service
+            
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+            - Header=Authorization, Bearer .*
+          filters:
+            - StripPrefix=2
+            - name: TokenRelay   # forwards OAuth2 token
+            
+        - id: search-service
+          uri: lb://search-service
+          predicates:
+            - Path=/api/v1/search/**
+          filters:
+            - StripPrefix=2
+            # Aggressive caching for search results
+            - SetResponseHeader=Cache-Control, "public, max-age=60"
+
+  redis:
+    host: redis-master.svc.cluster.local
+    port: 6379
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWT_ISSUER_URI}/protocol/openid-connect/certs
+```
+
+### Custom Filter: Request Logging + Trace Propagation
+
+```java
+@Component
+public class TraceLoggingGatewayFilter implements GlobalFilter, Ordered {
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest req = exchange.getRequest();
+        String traceId = req.getHeaders().getFirst("X-Request-ID");
+        if (traceId == null) {
+            traceId = UUID.randomUUID().toString();
+            req = req.mutate().header("X-Request-ID", traceId).build();
+            exchange = exchange.mutate().request(req).build();
+        }
+
+        long startMs = System.currentTimeMillis();
+        String finalTraceId = traceId;
+
+        return chain.filter(exchange).doFinally(signal -> {
+            ServerHttpResponse resp = exchange.getResponse();
+            long elapsedMs = System.currentTimeMillis() - startMs;
+            log.info("gateway request method={} path={} status={} elapsed={}ms trace_id={}",
+                req.getMethod(), req.getPath(), resp.getStatusCode(), elapsedMs, finalTraceId);
+        });
+    }
+
+    @Override
+    public int getOrder() { return Ordered.HIGHEST_PRECEDENCE; }
+}
+```
+
+### Custom Filter: BFF Response Aggregation
+
+```java
+@Component
+public class OrderDetailsBffFilter implements GatewayFilter {
+    private final WebClient orderClient;
+    private final WebClient customerClient;
+    private final WebClient inventoryClient;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String orderId = exchange.getRequest().getQueryParams().getFirst("orderId");
+
+        Mono<Order> orderMono = orderClient.get()
+            .uri("/orders/{id}", orderId)
+            .retrieve()
+            .bodyToMono(Order.class);
+
+        Mono<Customer> customerMono = orderMono.flatMap(o ->
+            customerClient.get()
+                .uri("/customers/{id}", o.customerId())
+                .retrieve()
+                .bodyToMono(Customer.class)
+        );
+
+        Mono<List<InventoryStatus>> inventoryMono = orderMono.flatMap(o ->
+            Flux.fromIterable(o.items())
+                .flatMap(item -> inventoryClient.get()
+                    .uri("/inventory/{sku}", item.sku())
+                    .retrieve()
+                    .bodyToMono(InventoryStatus.class))
+                .collectList()
+        );
+
+        return Mono.zip(orderMono, customerMono, inventoryMono)
+            .map(tuple -> new OrderDetailsBffResponse(
+                tuple.getT1(), tuple.getT2(), tuple.getT3()
+            ))
+            .flatMap(response -> writeResponse(exchange.getResponse(), response));
+    }
+}
+```
+
+## Deeper Dive — Istio Service Mesh Configuration
+
+### Installation and Setup
+
+```bash
+# Install Istio
+istioctl install --set profile=production
+
+# Enable sidecar injection for namespace
+kubectl label namespace production istio-injection=enabled
+
+# Restart pods to receive sidecars
+kubectl rollout restart deployment -n production
+```
+
+### VirtualService — Routing Rules
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: order-service
+  namespace: production
+spec:
+  hosts:
+    - order-service
+  http:
+    # Canary deployment: 5% to v2, 95% to v1
+    - match:
+        - headers:
+            x-canary:
+              exact: "true"
+      route:
+        - destination:
+            host: order-service
+            subset: v2
+            
+    - route:
+        - destination:
+            host: order-service
+            subset: v1
+          weight: 95
+        - destination:
+            host: order-service
+            subset: v2
+          weight: 5
+      timeout: 5s
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: 5xx,reset,connect-failure
+```
+
+### DestinationRule — Traffic Policies
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: order-service
+spec:
+  host: order-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        h2UpgradePolicy: UPGRADE
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+    loadBalancer:
+      simple: LEAST_REQUEST
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+```
+
+### PeerAuthentication — mTLS Everywhere
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: production
+spec:
+  mtls:
+    mode: STRICT   # require mTLS for all in-namespace traffic
+```
+
+### AuthorizationPolicy — Service-to-Service Authorization
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: payment-service-access
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: payment-service
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              - "cluster.local/ns/production/sa/order-service"
+              - "cluster.local/ns/production/sa/refund-service"
+      to:
+        - operation:
+            methods: ["POST"]
+            paths: ["/api/v1/charges/*"]
+```
+
+### Telemetry Configuration
+
+```yaml
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: default
+spec:
+  metrics:
+    - providers:
+        - name: prometheus
+    - overrides:
+        - match:
+            metric: REQUEST_COUNT
+          tagOverrides:
+            request_method:
+              value: "request.method"
+            response_code:
+              value: "response.code"
+  tracing:
+    - providers:
+        - name: jaeger
+      randomSamplingPercentage: 1.0   # 1% sampling
+```
+
+## Deeper Dive — Mesh vs Code Trade-off
+
+### Resilience4j (In-Code)
+
+```java
+@Service
+public class PaymentClient {
+    
+    @CircuitBreaker(name = "payment-cb", fallbackMethod = "queuePayment")
+    @Retry(name = "payment-retry")
+    @TimeLimiter(name = "payment-timeout")
+    public CompletableFuture<PaymentResult> charge(Money amount) {
+        return CompletableFuture.supplyAsync(() ->
+            webClient.post()
+                .uri("/payments")
+                .bodyValue(new ChargeRequest(amount))
+                .retrieve()
+                .bodyToMono(PaymentResult.class)
+                .block()
+        );
+    }
+}
+```
+
+### Same Behavior via Istio (No Code)
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+spec:
+  host: payment-service
+  trafficPolicy:
+    connectionPool:
+      http:
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 5
+      baseEjectionTime: 30s
+    
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+spec:
+  http:
+    - timeout: 3s
+      retries:
+        attempts: 3
+        perTryTimeout: 1s
+        retryOn: 5xx
+```
+
+### Trade-off
+
+```
+RESILIENCE4J (In-Code):
+  + Application-level: knows business context (idempotency, retry logic)
+  + Granular: per-method config
+  + Fallback methods: return cached, default, queued
+  + No mesh required
+  
+  - Code complexity in every client
+  - Library/version coordination across services
+  - Per-language implementations needed
+
+ISTIO (Mesh):
+  + Polyglot: works for any language
+  + Centralized: ops team can adjust without redeploy
+  + Standardized: same patterns across services
+  - Less context-aware (just HTTP status)
+  - Operational complexity (control plane)
+  - Sidecar latency tax (~1-3ms per hop)
+  - Hard to express fallback logic (just retry/circuit-break)
+
+HYBRID (BEST FOR MOST):
+  Istio handles: mTLS, basic retry, basic circuit breaker, observability
+  Code handles: business-specific fallback (queue, cache, default), idempotency
+```
+
+## Deeper Dive — Production Operational Concerns
+
+### Sidecar Resource Overhead
+
+```
+PER POD:
+  Envoy sidecar: ~30 MB memory, ~0.05 CPU
+  
+100 PODS:
+  Mesh overhead: 3 GB memory + 5 CPU
+  
+SCALING:
+  At 10K pods: 300 GB + 500 CPU just for sidecars
+  
+COMPARISON:
+  In-code Resilience4j: ~5 MB extra per pod (library)
+  10K pods: 50 GB
+  
+TIPPING POINT:
+  At <50 services: in-code wins
+  At 50-200 services: depends on team / polyglot
+  At 200+ services: mesh usually wins
+```
+
+### Control Plane Failure Modes
+
+```
+WHAT BREAKS IF ISTIOD GOES DOWN:
+  ✓ Existing pods continue working (sidecars cached config)
+  ✓ Established mTLS connections continue
+  ✗ New pods can't get sidecar config
+  ✗ New routes can't be added
+  ✗ Certificate rotation breaks after cert expires (~24 hours)
+
+DISASTER RECOVERY:
+  - Run multiple istiod instances (3+)
+  - Etcd backup for config
+  - Monitor istiod CPU/memory aggressively
+  - Test istiod-down scenarios in chaos drills
+```
+
+### Cost Analysis at Scale
+
+```
+SCENARIO: 100-service cluster, 5 pods each = 500 pods
+
+ISTIO COSTS:
+  Sidecar overhead: 500 × 30MB = 15 GB extra memory ($150/month)
+  Sidecar CPU: 500 × 0.05 = 25 CPU ($500/month)
+  Latency tax: 1-3ms per hop × avg 5 hops = 5-15ms p99 added
+  Control plane: 3 istiod instances ($300/month)
+  
+TOTAL: ~$1K/month + observability infrastructure
+
+WITHOUT ISTIO (using Resilience4j):
+  Library overhead: minimal ($0)
+  Team build/maintain in-code: ~1 engineer-week per quarter ($20K/year)
+  
+ROI BREAK-EVEN:
+  At 30+ services where ops team can handle mesh
+  At 5+ teams (cross-team consistency value)
+  At polyglot (Java + Go + Python): mesh wins
+```
+
+## Deeper Dive — Linkerd vs Istio vs Cilium
+
+| Aspect | Istio | Linkerd | Cilium Service Mesh |
+|---|---|---|---|
+| **Data plane** | Envoy sidecars | Lightweight Rust proxy | eBPF in kernel + Envoy where needed |
+| **Latency overhead** | 1-3ms | <0.5ms | Near-zero (kernel-level) |
+| **Memory per pod** | 30-100 MB | 10-20 MB | 0 (no sidecar) |
+| **Feature richness** | Most | Less | Growing |
+| **Configuration** | Complex | Simple | Simple to moderate |
+| **mTLS** | Yes (manual cert setup) | Yes (zero-config) | Yes |
+| **L7 routing** | Yes | Yes | Limited |
+| **Operational complexity** | High | Low-medium | Medium |
+| **Multi-cluster** | Excellent | Good | Good |
+| **Adoption** | Largest | Active | Growing fast |
+
+**Decision shortcut**:
+- Need many features, polyglot, large platform team → Istio
+- Simple needs, fewer services, JVM/Go primarily → Linkerd
+- Performance-critical, latency-sensitive → Cilium
+- Just need cross-service mTLS + observability → Linkerd
+
+## Deeper Dive — Real Production Incidents
+
+### Incident 1: Istio Cert Rotation Failure (2020)
+
+```
+SCENARIO:
+  Production cluster running Istio 1.6
+  Certificate rotation cron job failed silently for 7 days
+  Sidecar certs expired
+  All mTLS connections failed simultaneously
+  Cascading failure across cluster
+
+IMPACT: 90-minute outage during East Coast business hours
+
+LESSONS:
+  - Alert on certificate expiry well in advance
+  - Monitor istio-citadel pod health
+  - Test cert rotation in dev/staging
+  - Have rollback plan
+```
+
+### Incident 2: Gateway as Single Point of Failure
+
+```
+SCENARIO:
+  Single API gateway pod (no HA)
+  Memory leak in custom filter
+  Gateway crashed
+  ALL traffic stopped (no other ingress path)
+
+IMPACT: 45-minute total outage
+
+LESSONS:
+  - Always run 3+ gateway replicas
+  - Health checks on gateway itself
+  - Monitor gateway memory/CPU
+  - Have backup ingress path (e.g., direct service ingresses)
+```
+
+### Incident 3: Sidecar Resource Exhaustion
+
+```
+SCENARIO:
+  Spike in traffic at 5pm
+  Sidecars hit CPU limit (0.05 → 0.1 needed)
+  Sidecar throttling caused timeouts
+  Cascading retry storms
+
+LESSONS:
+  - Don't undersized sidecars
+  - Monitor sidecar CPU/memory utilization
+  - Set VPA (vertical pod autoscaler) on sidecars
+```
+
 ## Practice
 
 1. **Trace your own gateway.** Find your team's API gateway. Read its config (Spring Cloud Gateway YAML, Kong's declarative file, AWS API Gateway routes). Map every cross-cutting concern it handles. List which would otherwise live in services.

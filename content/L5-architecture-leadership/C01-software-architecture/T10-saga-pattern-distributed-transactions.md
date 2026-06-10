@@ -595,6 +595,601 @@ Temporal has rapidly become the cross-language canonical choice. It supports SDK
 > [!INTERVIEW]
 > A common L5 prompt: "Why not just use 2PC?" Strong answers explain (a) the coordinator single-point-of-failure problem, (b) lock-hold time, (c) participant-protocol cost, (d) why most modern data stores don't support XA. And: "How do you handle a saga step that can't be compensated (like a sent email)?" — strong answers reorder the saga to put irreversible steps last, or wrap them in deliberate delay-and-confirm patterns.
 
+## Deeper Dive — Complete Orchestrated Saga in Spring Boot
+
+### Saga State Machine
+
+```java
+@Entity
+@Table(name = "saga_state")
+public class SagaState {
+    @Id
+    private UUID sagaId;
+    
+    @Enumerated(EnumType.STRING)
+    private SagaType type;
+    
+    @Enumerated(EnumType.STRING)
+    private SagaStatus status;
+    
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> context;
+    
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private List<CompensationStep> compensationStack;
+    
+    private Instant startedAt;
+    private Instant lastUpdatedAt;
+    private int version;
+    
+    @Version
+    private Long optimisticLockVersion;
+}
+
+public enum SagaStatus {
+    STARTED,
+    EXECUTING_STEP,
+    COMPENSATING,
+    COMPLETED,
+    FAILED_COMPENSATED,
+    FAILED_INCONSISTENT
+}
+
+public record CompensationStep(
+    String stepName,
+    Map<String, Object> data
+) {}
+```
+
+### Orchestrator Implementation
+
+```java
+@Service
+public class OrderSagaOrchestrator {
+    private final SagaStateRepo sagaRepo;
+    private final InventoryService inventoryService;
+    private final PaymentService paymentService;
+    private final ShippingService shippingService;
+    private final NotificationService notificationService;
+    private final SagaEventPublisher eventPublisher;
+
+    public CompletableFuture<OrderResult> placeOrder(PlaceOrderRequest req) {
+        SagaState saga = startSaga(SagaType.PLACE_ORDER, req);
+        return executeSaga(saga);
+    }
+
+    @Transactional
+    private SagaState startSaga(SagaType type, Object initialData) {
+        SagaState saga = new SagaState();
+        saga.setSagaId(UUID.randomUUID());
+        saga.setType(type);
+        saga.setStatus(SagaStatus.STARTED);
+        saga.setContext(Map.of("request", initialData));
+        saga.setCompensationStack(new ArrayList<>());
+        saga.setStartedAt(Instant.now());
+        saga.setLastUpdatedAt(Instant.now());
+        
+        return sagaRepo.save(saga);
+    }
+
+    private CompletableFuture<OrderResult> executeSaga(SagaState saga) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                // Step 1: Reserve inventory
+                ReservationResult reservation = executeStep(
+                    saga,
+                    "reserve-inventory",
+                    () -> inventoryService.reserve(extractItems(saga.getContext())),
+                    result -> new CompensationStep(
+                        "release-inventory",
+                        Map.of("reservationId", result.reservationId())
+                    )
+                );
+
+                // Step 2: Charge payment
+                ChargeResult payment = executeStep(
+                    saga,
+                    "charge-payment",
+                    () -> paymentService.charge(extractAmount(saga.getContext())),
+                    result -> new CompensationStep(
+                        "refund-payment",
+                        Map.of("chargeId", result.chargeId())
+                    )
+                );
+
+                // Step 3: Schedule shipping
+                ShipmentResult shipment = executeStep(
+                    saga,
+                    "schedule-shipping",
+                    () -> shippingService.schedule(extractShippingDetails(saga.getContext())),
+                    result -> new CompensationStep(
+                        "cancel-shipment",
+                        Map.of("shipmentId", result.shipmentId())
+                    )
+                );
+
+                // Step 4: Send notification (irreversible - put LAST)
+                notificationService.sendOrderConfirmation(
+                    extractCustomerId(saga.getContext()),
+                    reservation.orderId()
+                );
+
+                // Mark complete
+                markSagaComplete(saga, reservation.orderId());
+                return OrderResult.success(reservation.orderId());
+
+            } catch (SagaStepFailureException e) {
+                compensate(saga, e);
+                return OrderResult.failed(e.getMessage());
+            }
+        });
+    }
+
+    private <T> T executeStep(SagaState saga,
+                               String stepName,
+                               Supplier<T> action,
+                               Function<T, CompensationStep> compensationBuilder) {
+        log.info("Executing step {} for saga {}", stepName, saga.getSagaId());
+        
+        try {
+            T result = action.get();
+            
+            // Record compensation BEFORE marking step complete
+            saga.getCompensationStack().add(compensationBuilder.apply(result));
+            saga.setStatus(SagaStatus.EXECUTING_STEP);
+            saga.setLastUpdatedAt(Instant.now());
+            sagaRepo.save(saga);
+            
+            eventPublisher.publishStepCompleted(saga.getSagaId(), stepName, result);
+            return result;
+            
+        } catch (Exception e) {
+            log.error("Step {} failed", stepName, e);
+            eventPublisher.publishStepFailed(saga.getSagaId(), stepName, e.getMessage());
+            throw new SagaStepFailureException(stepName, e);
+        }
+    }
+
+    @Transactional
+    private void compensate(SagaState saga, SagaStepFailureException originalFailure) {
+        saga.setStatus(SagaStatus.COMPENSATING);
+        sagaRepo.save(saga);
+
+        // Execute compensations in REVERSE order
+        List<CompensationStep> reversedStack = new ArrayList<>(saga.getCompensationStack());
+        Collections.reverse(reversedStack);
+
+        for (CompensationStep step : reversedStack) {
+            try {
+                executeCompensation(step);
+                eventPublisher.publishCompensationCompleted(saga.getSagaId(), step.stepName());
+            } catch (Exception compensationError) {
+                // Compensation failed - this is bad
+                log.error("CRITICAL: compensation {} failed for saga {}", 
+                    step.stepName(), saga.getSagaId(), compensationError);
+                
+                saga.setStatus(SagaStatus.FAILED_INCONSISTENT);
+                sagaRepo.save(saga);
+                
+                eventPublisher.publishSagaInconsistent(saga.getSagaId(), step.stepName());
+                alertOpsTeam(saga, step, compensationError);
+                throw new SagaCompensationFailureException(saga.getSagaId(), step, compensationError);
+            }
+        }
+
+        saga.setStatus(SagaStatus.FAILED_COMPENSATED);
+        saga.setLastUpdatedAt(Instant.now());
+        sagaRepo.save(saga);
+    }
+
+    private void executeCompensation(CompensationStep step) {
+        switch (step.stepName()) {
+            case "release-inventory" -> {
+                UUID reservationId = (UUID) step.data().get("reservationId");
+                inventoryService.releaseReservation(reservationId);
+            }
+            case "refund-payment" -> {
+                UUID chargeId = (UUID) step.data().get("chargeId");
+                paymentService.refund(chargeId);
+            }
+            case "cancel-shipment" -> {
+                UUID shipmentId = (UUID) step.data().get("shipmentId");
+                shippingService.cancel(shipmentId);
+            }
+            default -> throw new IllegalStateException("Unknown compensation: " + step.stepName());
+        }
+    }
+}
+```
+
+### Saga Recovery on Crash
+
+```java
+@Component
+public class SagaRecoveryScheduler {
+    private final SagaStateRepo sagaRepo;
+    private final OrderSagaOrchestrator orchestrator;
+
+    @Scheduled(fixedDelay = 60_000)   // every minute
+    public void recoverIncompleteSagas() {
+        // Find sagas that started > 5 minutes ago and aren't terminal
+        Instant cutoff = Instant.now().minus(Duration.ofMinutes(5));
+        List<SagaState> stuck = sagaRepo.findByStatusNotInAndLastUpdatedAtBefore(
+            List.of(SagaStatus.COMPLETED, SagaStatus.FAILED_COMPENSATED, SagaStatus.FAILED_INCONSISTENT),
+            cutoff
+        );
+
+        for (SagaState saga : stuck) {
+            log.warn("Recovering stuck saga: {}", saga.getSagaId());
+            
+            switch (saga.getStatus()) {
+                case STARTED, EXECUTING_STEP -> {
+                    // Resume execution from last known state
+                    orchestrator.resumeSaga(saga);
+                }
+                case COMPENSATING -> {
+                    // Continue compensation
+                    orchestrator.resumeCompensation(saga);
+                }
+            }
+        }
+    }
+}
+```
+
+## Deeper Dive — Choreographed Saga with Spring + Kafka
+
+### Producer (Order Service)
+
+```java
+@Service
+public class OrderService {
+    private final OrderRepo orderRepo;
+    private final KafkaTemplate<String, Object> kafka;
+
+    @Transactional
+    public Order create(PlaceOrderRequest req) {
+        Order order = orderRepo.save(new Order(req, OrderStatus.PENDING));
+        
+        // Publish event - other services react
+        kafka.send("order-events", order.id().toString(),
+            new OrderCreatedEvent(order.id(), req.items(), req.customerId()));
+        
+        return order;
+    }
+}
+```
+
+### Inventory Service Reacts
+
+```java
+@Service
+public class InventoryEventHandler {
+    private final InventoryService inventoryService;
+    private final KafkaTemplate<String, Object> kafka;
+
+    @KafkaListener(topics = "order-events")
+    public void on(OrderCreatedEvent event) {
+        try {
+            ReservationResult reservation = inventoryService.reserve(event.items());
+            
+            kafka.send("inventory-events", event.orderId().toString(),
+                new InventoryReservedEvent(event.orderId(), reservation.reservationId()));
+                
+        } catch (InsufficientInventoryException e) {
+            kafka.send("inventory-events", event.orderId().toString(),
+                new InventoryReservationFailedEvent(event.orderId(), e.getMessage()));
+        }
+    }
+}
+```
+
+### Payment Service Reacts
+
+```java
+@Service
+public class PaymentEventHandler {
+    private final PaymentService paymentService;
+    private final KafkaTemplate<String, Object> kafka;
+
+    @KafkaListener(topics = "inventory-events")
+    public void on(InventoryReservedEvent event) {
+        try {
+            ChargeResult charge = paymentService.charge(getAmount(event.orderId()));
+            
+            kafka.send("payment-events", event.orderId().toString(),
+                new PaymentChargedEvent(event.orderId(), charge.chargeId()));
+                
+        } catch (PaymentFailedException e) {
+            // Trigger compensation: release inventory
+            kafka.send("payment-events", event.orderId().toString(),
+                new PaymentFailedEvent(event.orderId(), e.getMessage()));
+        }
+    }
+}
+```
+
+### Compensation Handler
+
+```java
+@Service
+public class CompensationEventHandler {
+    private final InventoryService inventoryService;
+
+    @KafkaListener(topics = "payment-events")
+    public void on(PaymentFailedEvent event) {
+        // Compensation: release the inventory that was reserved
+        UUID reservationId = lookupReservationId(event.orderId());
+        inventoryService.releaseReservation(reservationId);
+        
+        log.info("Released inventory for failed order {}", event.orderId());
+    }
+}
+```
+
+## Deeper Dive — Temporal Implementation (Modern Way)
+
+```java
+@WorkflowInterface
+public interface OrderWorkflow {
+    @WorkflowMethod
+    OrderResult placeOrder(PlaceOrderRequest req);
+}
+
+public class OrderWorkflowImpl implements OrderWorkflow {
+    
+    private final InventoryActivities inventoryActivities = 
+        Workflow.newActivityStub(InventoryActivities.class,
+            ActivityOptions.newBuilder()
+                .setStartToCloseTimeout(Duration.ofSeconds(30))
+                .setRetryOptions(RetryOptions.newBuilder()
+                    .setMaximumAttempts(3)
+                    .build())
+                .build());
+    
+    private final PaymentActivities paymentActivities = 
+        Workflow.newActivityStub(PaymentActivities.class,
+            ActivityOptions.newBuilder()
+                .setStartToCloseTimeout(Duration.ofSeconds(30))
+                .build());
+
+    @Override
+    public OrderResult placeOrder(PlaceOrderRequest req) {
+        // Reserve inventory
+        ReservationResult reservation = inventoryActivities.reserve(req.items());
+        
+        // Saga step with compensation
+        Saga saga = new Saga(new Saga.Options.Builder().build());
+        try {
+            saga.addCompensation(() -> 
+                inventoryActivities.release(reservation.reservationId()));
+            
+            // Charge payment
+            ChargeResult charge = paymentActivities.charge(req.amount());
+            saga.addCompensation(() -> 
+                paymentActivities.refund(charge.chargeId()));
+            
+            // Schedule shipping
+            ShipmentResult shipment = shippingActivities.schedule(req.address());
+            saga.addCompensation(() -> 
+                shippingActivities.cancel(shipment.shipmentId()));
+            
+            return new OrderResult(reservation.orderId());
+            
+        } catch (Exception e) {
+            saga.compensate();   // Temporal handles all compensation
+            throw e;
+        }
+    }
+}
+
+// Activities are just regular methods
+public class InventoryActivitiesImpl implements InventoryActivities {
+    @Override
+    public ReservationResult reserve(List<OrderItem> items) {
+        // Implementation
+        return inventoryRepo.reserve(items);
+    }
+}
+```
+
+**Why Temporal**: handles all the hard parts (state persistence, retries, compensations, recovery) automatically. Used by Uber, Snap, Stripe.
+
+## Deeper Dive — Avoiding the Irreversible Step Problem
+
+### The Problem
+
+```
+SAGA STEPS:
+  1. Reserve inventory     - Reversible (release)
+  2. Charge payment        - Reversible (refund)
+  3. Send confirmation email  - IRREVERSIBLE
+  4. Schedule shipping     - Reversible (cancel)
+
+PROBLEM: If step 4 fails after step 3, you've sent an email confirming
+the order, but you need to compensate. You can't "unsend" the email.
+
+You'd have to send: "Sorry, we cancelled the order we just confirmed."
+That's a terrible UX.
+```
+
+### Solution 1: Reorder
+
+```
+BETTER SAGA STEPS:
+  1. Reserve inventory     - Reversible
+  2. Charge payment        - Reversible
+  3. Schedule shipping     - Reversible
+  4. Send confirmation email  - LAST (only after everything else succeeds)
+```
+
+### Solution 2: Delay + Confirm
+
+```java
+@Service
+public class NotificationScheduler {
+    
+    public void scheduleConfirmation(OrderId orderId, Duration delay) {
+        // Queue a delayed email
+        delayedQueue.enqueue(
+            new SendConfirmationEmailTask(orderId),
+            delay
+        );
+    }
+    
+    @Scheduled(fixedDelay = 1000)
+    public void processQueue() {
+        List<DelayedTask> ready = delayedQueue.pollReady();
+        for (DelayedTask task : ready) {
+            Order order = orderRepo.findById(task.orderId());
+            if (order.status() == OrderStatus.CONFIRMED) {
+                emailService.sendConfirmation(order);
+            }
+            // If status changed to CANCELLED during delay, don't send
+        }
+    }
+}
+
+// In saga:
+// Step 1-3: reserve, charge, ship
+// Step 4: notificationScheduler.scheduleConfirmation(orderId, Duration.ofMinutes(5))
+// If compensation happens within 5 min, email never sent
+```
+
+### Solution 3: Quarantine Period
+
+```
+For really critical operations:
+- Order placed but stored as PENDING
+- 10-minute "cooling off" period
+- If no cancellation during that time, send confirmation
+- This is how Amazon "delivery in 30 seconds" works at low volumes
+```
+
+## Deeper Dive — Saga Anti-Patterns
+
+### Anti-Pattern 1: Single-Service "Saga"
+
+```
+SCENARIO: One service with multiple DB tables uses a "saga"
+
+WHY IT'S WRONG:
+  - You have @Transactional - use it!
+  - Sagas exist for CROSS-service consistency
+  - Within one service: ACID is available
+```
+
+### Anti-Pattern 2: Cross-Saga Coupling
+
+```
+SCENARIO: Saga A waits for events from Saga B
+
+WHY IT'S WRONG:
+  - Creates tight coupling
+  - Failure in B blocks A
+  - Hard to reason about
+
+BETTER: explicit handoff with idempotency
+```
+
+### Anti-Pattern 3: Silent Failures
+
+```
+SCENARIO: Compensation fails, saga marked "complete" anyway
+
+WHY IT'S WRONG:
+  - System ends up inconsistent
+  - No one knows about the inconsistency
+  - Customer service learns about it from customer
+
+BETTER: 
+  - Mark saga FAILED_INCONSISTENT
+  - Alert ops team
+  - Don't proceed silently
+```
+
+### Anti-Pattern 4: No Saga State Persistence
+
+```
+SCENARIO: Saga state in memory only
+
+WHY IT'S WRONG:
+  - Service crash = saga lost forever
+  - No recovery possible
+  - System left in unknown state
+
+BETTER: persist saga state to durable storage with each step
+```
+
+### Anti-Pattern 5: Sequential When Parallel Works
+
+```
+SCENARIO: All saga steps run sequentially even when independent
+
+WHY IT'S WRONG:
+  - Adds unnecessary latency
+  - Misses parallel opportunities
+
+BETTER: identify independent steps, run in parallel
+  Example: send notification email AND schedule shipping in parallel
+```
+
+## Deeper Dive — Real Saga Implementations
+
+### Uber: Cadence/Temporal Adoption
+
+```
+USE CASE: Trip lifecycle (rider request → driver match → pickup → drop-off → payment)
+SCALE: Billions of trips/year
+APPROACH:
+  - Cadence (their open-source version of what became Temporal)
+  - Each trip is a workflow
+  - State persisted to Cassandra
+  - Activities are independent services (matching, payment, etc.)
+
+RESULTS:
+  - 99.99% reliability
+  - Easy to add new steps
+  - Automatic recovery from crashes
+  - Visualization of in-flight workflows
+```
+
+### Netflix: Conductor
+
+```
+USE CASE: Content encoding pipeline (upload → transcode → CDN distribute → notify)
+SCALE: Thousands of new pieces of content daily
+APPROACH:
+  - Conductor (their open-source orchestrator)
+  - JSON-defined workflows
+  - Task workers can be any language
+
+RESULTS:
+  - Decoupled workflow definition from execution
+  - Easy to add new workflow types
+  - Visibility into in-flight workflows
+```
+
+### Stripe: Saga for Payments
+
+```
+USE CASE: Payment intent lifecycle (require_payment_method → require_confirmation → 
+  processing → succeeded/canceled)
+SCALE: Trillions in payment volume
+APPROACH:
+  - Hand-rolled state machines
+  - Strong idempotency
+  - Compensation = refunds
+  - All state persisted
+
+RESULTS:
+  - 99.9999% reliability
+  - Compensations are themselves auditable
+  - Customer service can replay events
+```
+
 ## Practice
 
 1. **Design a saga.** For a "transfer money between accounts at two banks" operation, design the saga: list the steps, the compensations, and the failure modes for each.

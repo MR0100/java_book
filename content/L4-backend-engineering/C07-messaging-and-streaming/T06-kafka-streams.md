@@ -262,6 +262,408 @@ For most Spring teams in 2026: **Kafka Streams**. T11 covers Flink briefly.
 > [!WARNING]
 > **Choosing Kafka Streams for non-Kafka inputs.** Wrong tool.
 
+## Deeper Dive — End-to-End Spring Boot Kafka Streams
+
+### Complete Topology — Real-Time Order Analytics
+
+```java
+@Configuration
+@EnableKafkaStreams
+public class OrderAnalyticsTopology {
+
+    @Bean
+    public KStream<String, Order> orderStream(StreamsBuilder builder) {
+        // Input stream from "orders" topic
+        KStream<String, Order> orders = builder.stream("orders",
+            Consumed.with(Serdes.String(), JsonSerde.of(Order.class)));
+
+        // Branch 1: high-value orders → priority topic
+        orders
+            .filter((key, order) -> order.amount().compareTo(BigDecimal.valueOf(1000)) > 0)
+            .to("high-value-orders", Produced.with(Serdes.String(), JsonSerde.of(Order.class)));
+
+        // Branch 2: per-customer aggregation (KTable)
+        KTable<String, CustomerStats> customerStats = orders
+            .selectKey((key, order) -> order.customerId())
+            .groupByKey(Grouped.with(Serdes.String(), JsonSerde.of(Order.class)))
+            .aggregate(
+                CustomerStats::empty,
+                (customerId, order, stats) -> stats.addOrder(order),
+                Materialized.<String, CustomerStats, KeyValueStore<Bytes, byte[]>>
+                    as("customer-stats-store")
+                    .withKeySerde(Serdes.String())
+                    .withValueSerde(JsonSerde.of(CustomerStats.class))
+            );
+
+        // Branch 3: 5-minute tumbling window aggregation
+        orders
+            .groupBy((key, order) -> order.category(),
+                     Grouped.with(Serdes.String(), JsonSerde.of(Order.class)))
+            .windowedBy(TimeWindows.ofSizeAndGrace(
+                Duration.ofMinutes(5), Duration.ofMinutes(1)))
+            .aggregate(
+                CategoryStats::empty,
+                (category, order, stats) -> stats.add(order),
+                Materialized.<String, CategoryStats, WindowStore<Bytes, byte[]>>
+                    as("category-stats-windowed")
+                    .withRetention(Duration.ofHours(24))
+            )
+            .toStream()
+            .map((wk, stats) -> new KeyValue<>(
+                wk.key() + ":" + wk.window().startTime(),
+                stats))
+            .to("category-analytics", Produced.with(Serdes.String(), JsonSerde.of(CategoryStats.class)));
+
+        return orders;
+    }
+
+    @Bean
+    public KafkaStreamsConfiguration kStreamsConfig() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "order-analytics");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+
+        // Reliability
+        props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, EXACTLY_ONCE_V2);
+        props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
+
+        // Performance
+        props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 4);   // 4 worker threads
+        props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 16 * 1024 * 1024); // 16 MB cache
+
+        // Recovery
+        props.put(StreamsConfig.NUM_STANDBY_REPLICAS_CONFIG, 1);   // hot standby per partition
+        props.put(StreamsConfig.STATE_DIR_CONFIG, "/var/lib/kafka-streams");
+
+        return new KafkaStreamsConfiguration(props);
+    }
+}
+```
+
+### Stream-Table Join — Enrich Orders with Customer Data
+
+```java
+@Bean
+public KStream<String, EnrichedOrder> enrichmentTopology(StreamsBuilder builder) {
+    // Customer data as GlobalKTable (replicated to all instances)
+    GlobalKTable<String, Customer> customers = builder.globalTable("customers",
+        Consumed.with(Serdes.String(), JsonSerde.of(Customer.class)),
+        Materialized.as("customers-global-store"));
+
+    KStream<String, Order> orders = builder.stream("orders",
+        Consumed.with(Serdes.String(), JsonSerde.of(Order.class)));
+
+    // Stream-GlobalKTable join — no co-partitioning needed
+    return orders.join(
+        customers,
+        (orderId, order) -> order.customerId(),         // key extractor for join
+        (order, customer) -> new EnrichedOrder(order, customer)
+    );
+}
+```
+
+**Why GlobalKTable**: Customer data is small (millions, not billions) and read-heavy. Replicate full table to every instance → join requires no network call.
+
+### Stream-Stream Join — Click Followed by Purchase Within 30 Min
+
+```java
+KStream<String, Click> clicks = builder.stream("clicks");
+KStream<String, Purchase> purchases = builder.stream("purchases");
+
+KStream<String, AttributedPurchase> attributed = clicks.join(
+    purchases,
+    (click, purchase) -> new AttributedPurchase(click.productId(), purchase),
+    JoinWindows.ofTimeDifferenceAndGrace(Duration.ofMinutes(30), Duration.ofMinutes(5)),
+    StreamJoined.with(Serdes.String(), JsonSerde.of(Click.class), JsonSerde.of(Purchase.class))
+);
+
+attributed.to("purchase-attribution");
+```
+
+## Deeper Dive — State Store Recovery and Standby Replicas
+
+### How State Stores Recover
+
+```
+NORMAL OPERATION:
+  - Stream task processes records
+  - State changes written to:
+    a) Local RocksDB instance
+    b) Changelog topic on Kafka (replicated)
+
+CRASH RECOVERY:
+  - Task reassigned to another instance
+  - That instance reads changelog topic FROM BEGINNING
+  - Rebuilds local RocksDB state
+  - Resumes processing from last committed offset
+  - DURATION: 30s - 30min depending on state size
+
+WITH STANDBY REPLICAS (num.standby.replicas=1):
+  - Standby instance maintains live copy of state
+  - Reads changelog topic continuously (kept in sync)
+  - On primary failure: standby promoted INSTANTLY
+  - DURATION: 0s (already warm)
+  - COST: 2× state storage
+```
+
+### Monitoring State Store Health
+
+```java
+@Component
+public class StateStoreHealthIndicator implements HealthIndicator {
+    private final StreamsBuilderFactoryBean streamsBuilder;
+
+    @Override
+    public Health health() {
+        KafkaStreams streams = streamsBuilder.getKafkaStreams();
+        if (streams == null) return Health.down().withDetail("reason", "Not started").build();
+
+        State state = streams.state();
+        if (state != State.RUNNING) {
+            return Health.down().withDetail("state", state.name()).build();
+        }
+
+        // Check assignment
+        Set<ThreadMetadata> threads = streams.metadataForLocalThreads();
+        long activeTasks = threads.stream()
+            .mapToLong(t -> t.activeTasks().size()).sum();
+
+        return Health.up()
+            .withDetail("state", state.name())
+            .withDetail("active-tasks", activeTasks)
+            .build();
+    }
+}
+```
+
+## Deeper Dive — Interactive Queries (REST API over State)
+
+```java
+@RestController
+public class StateQueryController {
+    private final StreamsBuilderFactoryBean factory;
+
+    @GetMapping("/api/customer/{customerId}/stats")
+    public CustomerStats getCustomerStats(@PathVariable String customerId) {
+        KafkaStreams streams = factory.getKafkaStreams();
+
+        // Find which instance owns this customer's partition
+        KeyQueryMetadata metadata = streams.queryMetadataForKey(
+            "customer-stats-store",
+            customerId,
+            Serdes.String().serializer()
+        );
+
+        if (metadata == null) {
+            return CustomerStats.empty();   // not yet partitioned
+        }
+
+        HostInfo activeHost = metadata.activeHost();
+        if (activeHost.equals(thisHostInfo())) {
+            // Local query
+            ReadOnlyKeyValueStore<String, CustomerStats> store = streams.store(
+                StoreQueryParameters.fromNameAndType(
+                    "customer-stats-store",
+                    QueryableStoreTypes.keyValueStore()
+                )
+            );
+            CustomerStats stats = store.get(customerId);
+            return stats != null ? stats : CustomerStats.empty();
+        } else {
+            // Forward to remote instance
+            return forwardToRemote(activeHost, customerId);
+        }
+    }
+
+    private CustomerStats forwardToRemote(HostInfo host, String customerId) {
+        return restTemplate.getForObject(
+            "http://" + host.host() + ":" + host.port() + "/api/customer/" + customerId + "/stats",
+            CustomerStats.class
+        );
+    }
+}
+```
+
+**Pattern**: each instance owns its partition's state; queries route to the right instance via metadata.
+
+## Deeper Dive — Common Topologies
+
+### Pattern 1: Event Sourcing Projection
+
+```java
+// Build current state projection from event stream
+KStream<String, AccountEvent> events = builder.stream("account-events");
+
+KTable<String, AccountState> accountState = events
+    .groupByKey()
+    .aggregate(
+        AccountState::initial,
+        (accountId, event, state) -> state.apply(event),
+        Materialized.as("account-state-store")
+    );
+
+// Now query current state via interactive queries
+```
+
+### Pattern 2: Real-Time Counters
+
+```java
+KStream<String, PageView> views = builder.stream("page-views");
+
+KTable<Windowed<String>, Long> viewCounts = views
+    .groupBy((key, view) -> view.pageUrl())
+    .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1)))
+    .count();
+
+viewCounts.toStream()
+    .foreach((wk, count) -> metrics.recordPageViews(wk.key(), count));
+```
+
+### Pattern 3: Fraud Detection Pipeline
+
+```java
+KStream<String, Transaction> txns = builder.stream("transactions");
+
+// Compute rolling statistics per user
+KTable<String, UserStats> userStats = txns
+    .groupBy((k, txn) -> txn.userId())
+    .aggregate(
+        UserStats::empty,
+        (userId, txn, stats) -> stats.addTransaction(txn),
+        Materialized.as("user-stats")
+    );
+
+// Join transactions with their user stats; flag anomalies
+txns
+    .selectKey((k, txn) -> txn.userId())
+    .join(userStats, (txn, stats) -> new TxnWithStats(txn, stats))
+    .filter((userId, t) -> t.stats().isAnomalous(t.txn()))
+    .to("flagged-transactions");
+```
+
+### Pattern 4: Stream-Stream Inner Join (Common: Click → Conversion Attribution)
+
+```java
+KStream<String, AdImpression> impressions = builder.stream("ad-impressions");
+KStream<String, Click> clicks = builder.stream("clicks");
+
+KStream<String, Attribution> attributions = impressions.join(
+    clicks,
+    (impression, click) -> new Attribution(impression, click),
+    JoinWindows.ofTimeDifferenceAndGrace(Duration.ofHours(1), Duration.ofMinutes(5)),
+    StreamJoined.with(Serdes.String(), JsonSerde.of(AdImpression.class), JsonSerde.of(Click.class))
+);
+
+attributions.to("attribution-events");
+```
+
+## Deeper Dive — Exactly-Once Processing (EOS)
+
+```
+TRADITIONAL CONSUME-PROCESS-PRODUCE has TWO consistency issues:
+  1. Process completed but offset commit failed → re-process on restart
+  2. Produce succeeded but commit failed → duplicate output
+
+KAFKA TRANSACTIONS solve this:
+  - Producer marked transactional
+  - Consumer reads only committed messages
+  - Offset commits happen WITHIN the producer transaction
+
+KAFKA STREAMS abstracts this:
+  - Set processing.guarantee=exactly_once_v2 (since Kafka 2.5+)
+  - Streams handles transactional producer/consumer internally
+  - Trade-off: ~10-15% throughput hit
+  - Recommended for: financial, idempotency-critical pipelines
+```
+
+```java
+props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
+```
+
+## Deeper Dive — Kafka Streams vs Flink (Detailed Decision)
+
+| Aspect | Kafka Streams | Flink |
+|---|---|---|
+| **Deployment** | Embedded library | Cluster (JobManager + TaskManagers) |
+| **Input/Output** | Kafka only | Kafka + many connectors (JDBC, S3, Kinesis) |
+| **Windowing** | Tumbling, hopping, session, sliding | All + custom + side outputs |
+| **State** | RocksDB local | RocksDB + State Backends + Savepoints |
+| **EOS** | Yes (within Kafka) | Yes (across all connectors) |
+| **Throughput** | Per-instance (1-100K msg/sec/thread) | Distributed cluster (millions+) |
+| **Latency** | Sub-second | Sub-second |
+| **Learning curve** | Low (Kafka + DSL) | Moderate to high |
+| **Operational complexity** | Low | Moderate to high |
+| **Cost** | Free | Free OSS but needs cluster |
+| **Use for** | Microservice-scale streaming | Heavy analytics, multi-source ETL |
+
+**Decision shortcut**:
+- Inputs are all Kafka, small-to-medium scale → Kafka Streams
+- Need diverse inputs/outputs, complex windowing, savepoints → Flink
+- Want managed → AWS Kinesis Analytics, Confluent Cloud Streams, Google Dataflow
+
+## Deeper Dive — Spring Cloud Stream Functional Style
+
+```java
+@SpringBootApplication
+public class OrderApp {
+    public static void main(String[] args) { SpringApplication.run(OrderApp.class, args); }
+
+    @Bean
+    public Function<KStream<String, Order>, KStream<String, EnrichedOrder>> enrichOrders() {
+        return orders -> orders
+            .filter((k, order) -> order.amount().signum() > 0)
+            .mapValues(order -> new EnrichedOrder(order, lookupCustomer(order.customerId())));
+    }
+}
+```
+
+```yaml
+spring:
+  cloud:
+    stream:
+      bindings:
+        enrichOrders-in-0.destination: orders
+        enrichOrders-out-0.destination: enriched-orders
+      kafka:
+        streams:
+          binder:
+            applicationId: order-app
+            brokers: kafka:9092
+            configuration:
+              processing.guarantee: exactly_once_v2
+              num.standby.replicas: 1
+```
+
+Spring Cloud Stream binds the function name to input/output topics; no manual StreamsBuilder needed.
+
+## Deeper Dive — Production Operational Checklist
+
+```
+BEFORE DEPLOYING TO PRODUCTION:
+  ☐ NUM_STANDBY_REPLICAS_CONFIG = 1 (or 2 for critical)
+  ☐ REPLICATION_FACTOR_CONFIG = 3
+  ☐ PROCESSING_GUARANTEE_CONFIG set appropriately
+  ☐ STATE_DIR_CONFIG on durable volume (not /tmp!)
+  ☐ Metrics exposed via JMX → Prometheus
+  ☐ Alert on:
+    - State stores in RESTORING longer than expected (initial startup is OK)
+    - Process latency p99 > target
+    - Consumer lag growing on input topics
+    - Rebalance frequency > expected
+    - JVM heap / GC pressure
+
+ON DEPLOY:
+  ☐ Rolling restart with rebalance.protocol=cooperative
+  ☐ Verify state stores fully restored before serving queries
+  ☐ Smoke-test interactive queries
+
+ON-CALL RUNBOOK CONSIDERATIONS:
+  ☐ How to scale up: increase NUM_STREAM_THREADS or add instances
+  ☐ How to reset offsets: kafka-streams-application-reset.sh
+  ☐ How to debug a stuck topology: jstack + thread dump
+  ☐ How to roll back if state was corrupted: redeploy with reset + standby promotion
+```
+
 ## Practice
 
 1. Build a topology: filter + map + write to output topic. Run with embedded Kafka.

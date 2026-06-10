@@ -504,6 +504,412 @@ A URL shortener at 1B redirects/day fits in a moderate-sized infrastructure: one
 > [!INTERVIEW]
 > Strong candidates focus on the **read path with caching layers** (this is where the QPS lives), the **short-code generation strategy** (with collision discussion), and the **async analytics path**. Weak candidates over-engineer the data model and skip caching.
 
+## Deeper Dive — Complete Spring Boot Implementation
+
+### Short Code Generation (Snowflake + Base62)
+
+```java
+@Component
+public class ShortCodeGenerator {
+    private final SnowflakeIdGenerator snowflake;
+    private static final String BASE62 =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public String generate() {
+        long id = snowflake.nextId();
+        return encodeBase62(id);
+    }
+
+    private String encodeBase62(long id) {
+        StringBuilder sb = new StringBuilder(11);   // ~10-11 chars for 64-bit IDs
+        while (id > 0) {
+            sb.append(BASE62.charAt((int) (id % 62)));
+            id /= 62;
+        }
+        return sb.reverse().toString();
+    }
+
+    public long decodeBase62(String code) {
+        long id = 0;
+        for (char c : code.toCharArray()) {
+            id = id * 62 + BASE62.indexOf(c);
+        }
+        return id;
+    }
+}
+```
+
+**Why Snowflake**: avoids collision-check round-trip. Random codes need DB collision check; Snowflake is unique by construction.
+
+### Write Path (POST /shorten)
+
+```java
+@RestController
+@RequestMapping("/api/v1")
+public class ShortenController {
+    private final ShortLinkService service;
+
+    @PostMapping("/shorten")
+    public ResponseEntity<ShortenResponse> shorten(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @RequestBody ShortenRequest req) {
+        ShortLink link = service.shorten(userId, req.url(), req.customAlias());
+        return ResponseEntity.created(URI.create("/" + link.code()))
+            .body(new ShortenResponse(
+                link.code(),
+                "https://short.example.com/" + link.code(),
+                link.createdAt()
+            ));
+    }
+}
+
+@Service
+public class ShortLinkService {
+    private final ShortLinkRepo repo;
+    private final ShortCodeGenerator generator;
+    private final CacheManager cacheManager;
+    private final UrlValidator urlValidator;
+
+    @Transactional
+    public ShortLink shorten(String userId, String url, String customAlias) {
+        if (!urlValidator.isValid(url)) {
+            throw new InvalidUrlException(url);
+        }
+
+        // Check for blocked / malicious URLs
+        if (phishingDetector.isPhishing(url)) {
+            throw new PhishingUrlException(url);
+        }
+
+        String code;
+        if (customAlias != null) {
+            if (!isValidAlias(customAlias)) throw new InvalidAliasException();
+            if (repo.existsByCode(customAlias)) throw new AliasAlreadyExistsException();
+            code = customAlias;
+        } else {
+            code = generator.generate();
+        }
+
+        ShortLink link = new ShortLink(code, url, userId, Instant.now());
+        repo.save(link);
+
+        // Pre-warm cache
+        cacheManager.getCache("short-links").put(code, link);
+
+        return link;
+    }
+}
+```
+
+### Read Path (GET /{code}) — The Critical Hot Path
+
+```java
+@Controller
+public class RedirectController {
+    private final ShortLinkService service;
+    private final ClickEventPublisher clickPublisher;
+
+    @GetMapping("/{code:[a-zA-Z0-9]{1,11}}")
+    public ResponseEntity<Void> redirect(
+            @PathVariable String code,
+            @RequestHeader(value = "User-Agent", required = false) String userAgent,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            HttpServletRequest req) {
+
+        Optional<ShortLink> link = service.getActive(code);
+
+        if (link.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Fire-and-forget analytics — don't block redirect
+        clickPublisher.publishAsync(new ClickEvent(
+            code,
+            req.getRemoteAddr(),
+            userAgent,
+            referer,
+            Instant.now()
+        ));
+
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+            .location(URI.create(link.get().originalUrl()))
+            .cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS))   // Cache at CDN
+            .build();
+    }
+}
+
+@Service
+public class ShortLinkService {
+
+    @Cacheable(value = "short-links", key = "#code", unless = "#result == null")
+    public Optional<ShortLink> getActive(String code) {
+        return repo.findByCodeAndExpiresAtAfter(code, Instant.now())
+            .filter(link -> link.status() == ACTIVE);
+    }
+}
+```
+
+### Analytics Pipeline (Kafka → ClickHouse)
+
+```java
+@Component
+public class ClickEventPublisher {
+    private final KafkaTemplate<String, ClickEvent> kafka;
+
+    @Async
+    public CompletableFuture<Void> publishAsync(ClickEvent event) {
+        return CompletableFuture.runAsync(() -> {
+            kafka.send("click-events", event.code(), event);
+        });
+    }
+}
+
+// Consumer writes to ClickHouse
+@Component
+public class ClickEventConsumer {
+    private final ClickHouseRepository clickHouse;
+
+    @KafkaListener(topics = "click-events", concurrency = "8")
+    public void consume(ConsumerRecord<String, ClickEvent> record) {
+        clickHouse.insertBatch(List.of(record.value()));
+    }
+}
+```
+
+```sql
+-- ClickHouse table optimized for analytics
+CREATE TABLE click_events (
+    code String,
+    timestamp DateTime,
+    ip_address IPv4,
+    user_agent String,
+    referer String,
+    country String,
+    device_type String
+) ENGINE = MergeTree()
+PARTITION BY toYYYYMM(timestamp)
+ORDER BY (code, timestamp)
+TTL timestamp + INTERVAL 1 YEAR;
+```
+
+## Deeper Dive — Caching Strategy in Detail
+
+```
+LAYER 1: CDN (Cloudflare / Fastly)
+  Cache hit: ~10ms (edge location)
+  TTL: 1 hour (set via Cache-Control header)
+  Bypass: query string ?no_cache=1
+  Invalidation: purge API on delete
+
+LAYER 2: Redis Cluster
+  Cache hit: ~1ms
+  TTL: 24 hours
+  Hot set: top 1M codes (Pareto)
+  
+LAYER 3: PostgreSQL with Read Replicas
+  Cache hit: 5-10ms
+  Async replication; consistent enough for redirects
+  
+LAYER 4: Source DB (PostgreSQL primary)
+  ~10-20ms
+  Final source of truth
+```
+
+### Cache Hit Rate Calculation
+
+```
+Assumptions:
+  - 1B redirects/day
+  - 100M unique codes
+  - Pareto: top 10% of codes get 90% of traffic
+
+Cache sizing for 90% hit rate:
+  Top 10% = 10M codes × 200 bytes = 2 GB Redis
+  
+Cache sizing for 95% hit rate:
+  Top 20% = 20M codes × 200 bytes = 4 GB Redis
+
+Cost:
+  4 GB ElastiCache Redis: ~$120/mo
+  ROI: saves 950M DB queries/day
+```
+
+## Deeper Dive — Capacity Planning Math
+
+```
+TARGET: 1B redirects/day, 10M new short URLs/day
+
+QPS
+  Avg redirects/sec: 1B / 86,400 = 11,574 QPS
+  Peak (5×): ~60,000 QPS
+  Avg writes/sec: 10M / 86,400 = ~116 QPS
+
+STORAGE
+  Per link: code (11) + URL (avg 100B) + metadata (50B) = ~160B + indexes ≈ 300B
+  10M new/day × 300B = 3 GB/day new data
+  5-year retention: ~5.5 TB
+  Single PostgreSQL handles this easily
+
+KAFKA
+  Click events: 1B/day = 11,574 events/sec avg
+  Peak (5×): ~60K events/sec
+  Per-event size: ~500 bytes (compressed)
+  Throughput: ~30 MB/sec peak
+  → 3-broker cluster sufficient (each broker handles 50 MB/sec)
+
+CLICKHOUSE
+  Aggregated daily: 1B rows × 500B = 500 GB/day
+  Compression: ~10× → 50 GB/day actual
+  5-year: ~90 TB (with TTL handling for cold tier)
+```
+
+## Deeper Dive — Common Pitfalls
+
+### Pitfall 1: Synchronous Analytics Blocking Redirect
+
+```java
+// BAD: writes click to DB before redirect
+@GetMapping("/{code}")
+public ResponseEntity<Void> redirect(...) {
+    ShortLink link = service.get(code);
+    clickService.recordSync(link.code(), userAgent, ...);   // ← 10-50ms hit
+    return ResponseEntity.status(301).location(...).build();
+}
+
+// GOOD: async fire-and-forget
+@GetMapping("/{code}")
+public ResponseEntity<Void> redirect(...) {
+    ShortLink link = service.get(code);
+    clickPublisher.publishAsync(...);   // ← <1ms (just enqueue)
+    return ResponseEntity.status(301).location(...).build();
+}
+```
+
+### Pitfall 2: Random Code Generation with Collision Check
+
+```java
+// BAD: requires DB round-trip per code
+public String generate() {
+    while (true) {
+        String code = randomString(7);
+        if (!repo.exists(code)) return code;   // ← extra DB query
+    }
+}
+
+// GOOD: Snowflake/sequence — unique by construction
+public String generate() {
+    long id = snowflake.nextId();
+    return Base62.encode(id);   // ← no DB query
+}
+```
+
+### Pitfall 3: No Cache → DB Hot Spot
+
+```
+Without cache:
+  1B redirects/day × 5ms DB query = 5M seconds of DB time
+  → Need ~60 DB instances at 100% utilization
+  → $$$$$ cost
+
+With Redis cache (95% hit):
+  50M DB queries/day instead of 1B
+  → 1-2 DB instances sufficient
+```
+
+### Pitfall 4: 301 vs 302 Redirect Choice
+
+```
+301 Moved Permanently:
+  - Browser caches → faster subsequent visits
+  - Analytics MISS the second visit (you don't see traffic)
+  - Use only for truly permanent redirects
+
+302 Found:
+  - Not cached by browser
+  - Every visit hits your service (you see analytics)
+  - Slower for end users
+
+303 See Other:
+  - Same as 302 in practice; explicitly non-cacheable
+  
+RECOMMENDATION: 302 for new URLs (to track), 301 after 30 days
+(if URL has stabilized) — or just always 302 for simplicity
+```
+
+### Pitfall 5: No Rate Limiting on Shorten
+
+```
+WITHOUT RATE LIMIT:
+  Attacker creates 1M URLs per minute
+  Fills database
+  Could be malicious URLs (phishing)
+  
+WITH RATE LIMIT:
+  Anonymous: 10/hour/IP
+  Authenticated: 1000/hour/user
+  Paid tier: 100,000/hour
+```
+
+## Deeper Dive — Scaling to 10× (10B redirects/day)
+
+### Database
+
+```
+PostgreSQL primary becomes bottleneck at ~15K writes/sec
+  → Replace with DynamoDB or sharded Postgres
+  
+DynamoDB:
+  Single-table design with code as partition key
+  Provisioned 60K WCU + 600K RCU
+  On-demand mode: pay-per-request
+  Cost: ~$50K/month
+```
+
+### Cache
+
+```
+Single Redis instance maxes at ~100K ops/sec
+  → Redis Cluster with 5-10 shards
+  → Shard by hash(code) % shards
+  Each shard handles ~60K ops/sec
+```
+
+### CDN
+
+```
+Move EVERY 301/302 to CDN
+  Cloudflare Workers: serverless function at edge
+  Workers can look up code in Workers KV
+  Code lookup at edge → <50ms globally
+  Hit rate: 99%+ for popular codes
+  Origin only handles new/unknown codes
+```
+
+### Cost at 10× Scale
+
+```
+CDN: $5K/month (Cloudflare Workers Paid + bandwidth)
+DynamoDB: $50K/month
+Redis Cluster: $5K/month
+Kafka: $10K/month
+ClickHouse: $20K/month (or BigQuery $30K/month for managed)
+Application servers: $10K/month
+
+TOTAL: ~$100K/month for 10B redirects/day
+PER REDIRECT COST: $0.000033 per redirect
+```
+
+## Deeper Dive — Real-World Examples
+
+| Service | Notable Design |
+|---|---|
+| **bit.ly** | 1B+ daily clicks; custom analytics dashboard |
+| **TinyURL** | The original (2002); simple architecture |
+| **Twitter t.co** | 280M+ users; integrates with Twitter feed; phishing detection |
+| **goo.gl** | Discontinued 2018; users moved to Firebase Dynamic Links |
+| **rebrand.ly** | Focus on custom domains for businesses |
+| **YOURLS** | Self-hosted open-source URL shortener |
+
 ## Practice
 
 1. **10× the scale.** Redesign for 10B redirects/day. What changes? (DynamoDB, sharded Redis, more CDN.)

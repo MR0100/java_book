@@ -437,6 +437,411 @@ Stateful scaling is fundamentally harder than stateless and is the main reason "
 > [!INTERVIEW]
 > A common L5 prompt: "How would you scale this service?" Strong answers (a) start by asking what's the actual bottleneck — CPU, memory, DB, downstream service?, (b) propose the right axis (horizontal if stateless, vertical if bound by single-thread state), (c) include autoscaling configuration, (d) name the downstream resources (DB pool, broker connections) that also need adjustment.
 
+## Deeper Dive — Kubernetes HPA Production Configuration
+
+### CPU-Based HPA (Simplest)
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: orders-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: orders-api
+  minReplicas: 3
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60     # avoid flapping
+      policies:
+      - type: Percent
+        value: 100                         # double pods per scaling event
+        periodSeconds: 60
+      - type: Pods
+        value: 4                            # OR add 4 pods at most per minute
+        periodSeconds: 60
+      selectPolicy: Max                    # take the more aggressive
+    scaleDown:
+      stabilizationWindowSeconds: 300    # 5 min wait before scaling down
+      policies:
+      - type: Percent
+        value: 25                         # remove at most 25% per scale-down
+        periodSeconds: 60
+```
+
+### Custom Metric HPA (Request Rate, Latency)
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: orders-api
+spec:
+  scaleTargetRef: ...
+  minReplicas: 3
+  maxReplicas: 50
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"               # 100 RPS per pod target
+  - type: Pods
+    pods:
+      metric:
+        name: http_request_duration_seconds_p99
+      target:
+        type: AverageValue
+        averageValue: "0.2"               # p99 < 200ms target
+```
+
+Requires Prometheus + prometheus-adapter to expose custom metrics to K8s.
+
+### KEDA for Async Workloads (Kafka, SQS, Redis)
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: orders-consumer
+spec:
+  scaleTargetRef:
+    name: orders-consumer
+  minReplicaCount: 1
+  maxReplicaCount: 30
+  pollingInterval: 10                    # check every 10s
+  cooldownPeriod: 300                    # wait 5min before scaling down
+  triggers:
+  - type: kafka
+    metadata:
+      bootstrapServers: kafka:9092
+      consumerGroup: orders-processor
+      topic: orders
+      lagThreshold: "100"               # scale up if lag > 100 messages per pod
+      offsetResetPolicy: latest
+```
+
+KEDA scales based on Kafka lag, SQS depth, Redis stream length, custom Prometheus queries — perfect for event-driven workloads where CPU-based HPA doesn't fit.
+
+### Vertical Pod Autoscaler (Right-Sizing)
+
+```yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: orders-api
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: orders-api
+  updatePolicy:
+    updateMode: "Auto"                  # OR "Off" for recommendations only
+  resourcePolicy:
+    containerPolicies:
+    - containerName: orders-api
+      minAllowed:
+        cpu: 100m
+        memory: 256Mi
+      maxAllowed:
+        cpu: 4000m
+        memory: 8Gi
+      controlledResources: ["cpu", "memory"]
+```
+
+VPA observes actual usage and adjusts requests/limits. Don't combine with HPA on the same metric.
+
+## Deeper Dive — Stateful Scaling Patterns
+
+### Pattern 1: Sticky Sessions (Stateful via Affinity)
+
+```yaml
+# K8s service with session affinity
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-app
+spec:
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800             # 3 hours
+  selector:
+    app: chat-app
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+**Use for**: WebSocket connections, in-memory user state, streaming uploads.
+
+**Limitation**: not truly stateless; pod removal disrupts users.
+
+### Pattern 2: External Session Store
+
+```yaml
+spring:
+  session:
+    store-type: redis
+    timeout: 3600s
+  data:
+    redis:
+      host: redis-cluster.svc.cluster.local
+      port: 6379
+```
+
+```java
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600)
+@Configuration
+public class SessionConfig {
+    @Bean
+    public LettuceConnectionFactory connectionFactory() {
+        return new LettuceConnectionFactory(
+            new RedisStandaloneConfiguration("redis", 6379));
+    }
+}
+```
+
+Pods become truly stateless; HPA works perfectly.
+
+### Pattern 3: Sharded Stateful with Consistent Routing
+
+```
+USE CASE: per-user state too large to replicate
+  - User chat sessions
+  - Per-tenant cached config
+
+PATTERN:
+  - Use StatefulSet in K8s (stable pod names: pod-0, pod-1, pod-2)
+  - Route requests by hash(user_id) % numPods to specific pod
+  - That pod owns the user's state
+  - On pod failure: state must be re-buildable from durable source
+
+K8S STATEFULSET:
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: chat-gateway
+  spec:
+    serviceName: chat-gateway
+    replicas: 4
+    selector: ...
+
+ROUTING:
+  - Use a custom LB / API Gateway
+  - Hash user_id → pick pod-N
+  - Send all requests for that user to pod-N
+```
+
+## Deeper Dive — Scaling Pitfall Catalog
+
+### Pitfall 1: HPA Ignoring Downstream Bottleneck
+
+```
+SCENARIO:
+  - Service A: scales horizontally on CPU
+  - Database: at 80% CPU
+  - HPA scales A pods → more DB connections → DB CPU 95% → cascading slowness
+
+FIX: scale CPU + monitor downstream
+  - Add DB load metric to HPA decision
+  - Use custom metric "available_db_connections" to throttle scaling
+  - Or shard the DB before adding more app pods
+```
+
+### Pitfall 2: Connection Pool Math Failure
+
+```
+SCENARIO:
+  - 50 pods × 20 connections per pool = 1000 total
+  - PostgreSQL max_connections = 100
+  - First spike → connection storm → DB rejects → cascade
+
+FIX: PgBouncer between app and PG
+  pgbouncer config:
+    pool_mode = transaction              # multiplex on transaction boundaries
+    default_pool_size = 100
+    max_client_conn = 5000
+
+  App pods: 20 connections each → PgBouncer absorbs
+  PgBouncer: 100 server connections to PostgreSQL
+```
+
+### Pitfall 3: Cold Start Latency Spikes
+
+```
+SCENARIO:
+  - Traffic spike at 9 AM
+  - HPA scales from 3 to 30 pods
+  - Each new pod: JVM startup 3s → JIT warmup 30s
+  - Users hit cold pods → p99 latency spikes
+
+FIX OPTIONS:
+  1. Pre-warm:
+     - Lower min replicas: maintain 30 always
+     - Or schedule scale-up before predictable spikes:
+       kubectl apply -f hpa-spike.yaml (at 8:55 AM)
+  2. Faster startup: GraalVM native-image or CRaC
+  3. Slow-start LB:
+     - Istio: gradually ramp up new pod's traffic
+     - AWS ALB: configure slow_start.duration_seconds
+  4. Readiness probe verification:
+     - Don't accept traffic until /actuator/health/readiness AND warmup done
+```
+
+### Pitfall 4: Vertical Scaling Hidden Limits
+
+```
+SYMPTOM: increased CPU/memory; app doesn't get faster
+CAUSES:
+  - Single-threaded bottleneck (one critical section)
+  - Garbage Collection at scale (larger heap = longer pauses)
+  - JIT code cache full at scale
+  - JVM max thread limits
+
+DIAGNOSE:
+  - Profile CPU usage; is one thread always 100%?
+  - GC log: pauses growing with heap?
+  - Code cache: hitting limit?
+
+FIX: usually horizontal is better; reach for vertical only when sharded data
+```
+
+### Pitfall 5: Autoscaling Oscillation
+
+```
+SCENARIO:
+  - Service oscillates between 5 and 10 pods every 5 minutes
+  - CPU spikes when removing pods → scale back up → CPU returns to normal → scale down → repeat
+
+FIX:
+  - Increase stabilizationWindowSeconds (avoid quick decisions)
+  - Use moving average not instantaneous
+  - Set min replicas to safe baseline (5 minimum)
+  - Use predictive scaling instead of reactive
+```
+
+## Deeper Dive — Service Mesh and Scaling
+
+### Istio for Traffic Management
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: orders-api
+spec:
+  host: orders-api
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50              # max 50% of endpoints can be ejected
+    loadBalancer:
+      simple: LEAST_REQUEST                # or ROUND_ROBIN, RANDOM
+```
+
+Istio adds connection pooling, outlier ejection, circuit breaking, traffic shifting per pod — making scaling more predictable.
+
+## Deeper Dive — Capacity Planning for Spike Events
+
+### Black Friday / Cyber Monday Math
+
+```
+INPUTS:
+  Normal day peak: 10,000 RPS
+  Expected peak multiplier: 5×
+  Target peak: 50,000 RPS
+
+CAPACITY:
+  Per-pod capacity (tested): 200 RPS at p99 < 200ms
+  Pods needed at peak: 50,000 / 200 = 250
+  Safety margin (failure tolerance): 1.3×
+  Total: 325 pods
+
+NODE CAPACITY:
+  Pod resources: 1 CPU + 1 GB
+  Node capacity: 16 CPU / 32 GB
+  Pods per node: ~16
+  Nodes needed: 325 / 16 = 21
+
+COSTS:
+  Daily: 21 × 24h × $0.85/hr = $428/day
+  Weekly: $3,000
+
+ALTERNATIVE: scale gradually
+  Start: 50 pods (10K RPS capacity)
+  Pre-warm at 9 AM: 150 pods
+  Active scale-up at 12 PM: 300 pods
+  Cost: half of always-on capacity
+```
+
+### Pre-Warming Strategy
+
+```yaml
+# CronJob to pre-warm before predictable spike
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pre-warm
+spec:
+  schedule: "55 8 * * *"               # 8:55 AM every day
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: warmup
+            image: app-warmup:latest
+            command: ["sh", "-c"]
+            args:
+            - |
+              kubectl scale deployment orders-api --replicas=30
+              # Wait for pods to be ready
+              kubectl rollout status deployment orders-api --timeout=300s
+              # Run synthetic traffic to warm JIT
+              hey -z 5m -c 10 -q 10 http://orders-api/health
+```
+
+## Deeper Dive — Cost vs Reliability Trade-Offs at Scale
+
+| Approach | Cost | RTO | Capacity Use | Notes |
+|---|---|---|---|---|
+| **Min replicas at safe baseline** | High | 0s (already there) | ~30-50% | Pay for unused capacity for safety |
+| **Aggressive autoscaling** | Low | 30-60s (cold start) | 80-90% | Risk under sudden spikes |
+| **Pre-warming + autoscaling** | Medium | 5-30s | 70-80% | Best of both worlds |
+| **Serverless (Lambda)** | Variable | <100ms (warm), 1-3s (cold) | 100% (pay-per-use) | Cold start unpredictable |
+| **Reserved capacity + autoscale** | Medium | Mixed | 60-70% | AWS Reserved Instances + autoscaling |
+| **Spot instances** | Lowest | Risk of preemption | 80-90% | Only for fault-tolerant workloads |
+
+**Decision rule of thumb**:
+- Steady-state long-running: reserved + minimal autoscaling
+- Variable but predictable: pre-warming + autoscaling
+- Bursty unpredictable: serverless or aggressive autoscaling
+- Cost-critical batch: spot + queue-driven scaling
+
 ## Practice
 
 1. **Find your bottleneck.** For a service you operate, identify the binding constraint at peak load. Is it CPU, memory, DB, downstream service, network?

@@ -501,6 +501,459 @@ Architecture trade-off analysis is not Java-specific — it's a general engineer
 > [!INTERVIEW]
 > The most common L5 architecture question: "Why did you choose X?" A weak answer is the benefits list. A strong answer is: "We chose X because of [scenarios A, B, C]. We considered Y but rejected it because of [trade-off]. The cost we accepted with X is [specific cost]. We're watching [metric Z]; if it crosses [threshold], we'll revisit." That structure — scenarios, alternatives, named trade-off, accepted cost, revisit trigger — is the architectural fluency interviewers test for.
 
+## Deeper Dive — Complete ADR Examples
+
+### ADR-001: Use PostgreSQL Instead of MongoDB for Order Service
+
+```markdown
+# ADR-001: Use PostgreSQL for Order Service Data Store
+
+## Status
+Accepted (2024-03-15)
+
+## Context
+
+Building a new Order Service handling 5K orders/sec at peak. Need:
+- ACID transactions across orders + order_items + payments
+- Complex queries: "all orders by customer in date range with status filter"
+- Reporting: daily aggregations for business analytics
+- 5+ year data retention with archival to cold storage
+
+Team is 4 engineers, mostly familiar with relational databases.
+Existing infrastructure already runs PostgreSQL for User Service.
+
+## Decision
+
+Use PostgreSQL 15 with:
+- Connection pooling via PgBouncer
+- Logical replication for read replicas
+- Partitioning by month for orders table (after first year)
+- Flyway for schema migrations
+
+## Consequences
+
+### Positive
+- Strong ACID guarantees across order placement workflow
+- Mature ecosystem (monitoring, backups, expertise)
+- SQL is universal — analysts/data team can query directly
+- Existing operational knowledge transfers
+- Spring Data JPA support out-of-the-box
+
+### Negative
+- Vertical scaling ceiling (~10TB single instance)
+- Failover involves ~30s downtime
+- Schema migrations require care under load
+- Less optimal for unstructured data (would be JSONB)
+
+### Risks Accepted
+- At 10× growth (50K orders/sec), may need to shard or migrate to CockroachDB
+- Monitoring: PostgreSQL primary CPU + connection count
+
+## Alternatives Considered
+
+### MongoDB
+- Better for unstructured data
+- Easier horizontal scaling
+- REJECTED: weaker transaction semantics; team unfamiliar; requires duplicate data for relational queries
+
+### DynamoDB
+- Managed; serverless
+- Auto-scales
+- REJECTED: limited query model requires upfront access pattern design; expensive at our write volume
+
+### CockroachDB
+- Distributed strong consistency
+- SQL compatible
+- REJECTED: operational complexity not justified at current scale
+
+## Revisit Triggers
+
+- Reaching 30K orders/sec sustained (60% of vertical scaling ceiling)
+- Need multi-region active-active
+- Schema-flexibility becomes more important than transactions
+```
+
+### ADR-002: Choose Kafka Over RabbitMQ for Event Streaming
+
+```markdown
+# ADR-002: Use Apache Kafka for Inter-Service Event Streaming
+
+## Status
+Accepted (2024-04-02)
+
+## Context
+
+Order Service publishes events consumed by:
+- Notification Service (emails, SMS, push)
+- Analytics Service (real-time dashboards)
+- Inventory Service (decrement stock)
+- Future: ML pipeline for fraud detection
+
+Volume: 100K events/sec peak; 5KB avg payload.
+Latency tolerance: ~5 seconds (eventual consistency OK).
+Durability: 7-day retention required for replay.
+
+## Decision
+
+Use Apache Kafka:
+- Self-managed via Strimzi K8s operator
+- 5-broker cluster, replication factor 3
+- Topics: orders, payments, inventory, notifications
+- Partition strategy: hash(orderId) for orders; hash(userId) for notifications
+
+## Consequences
+
+### Positive
+- High throughput (millions of msg/sec capable)
+- Built-in replay via retention
+- Strong ordering guarantees per partition
+- Decoupling producers/consumers
+- Kafka Streams for real-time aggregations
+
+### Negative
+- Operational complexity (ZooKeeper/KRaft, monitoring)
+- Higher infrastructure cost (~$5K/month vs $500/month for RabbitMQ)
+- Steeper learning curve for team
+- Topic management requires governance
+
+### Risks Accepted
+- Need to add Kafka SME or train team
+- Schema evolution requires Avro + Schema Registry
+
+## Alternatives Considered
+
+### RabbitMQ
+- Simpler operational model
+- Lower cost
+- REJECTED: ~50K msg/sec ceiling per node; no replay; weaker partitioning
+
+### AWS SQS + SNS
+- Fully managed
+- Pay-per-message
+- REJECTED: 256KB message limit; no ordering across messages; no replay beyond 14 days
+
+### Redis Streams
+- Already in stack
+- REJECTED: limited consumer groups; weaker durability
+
+## Revisit Triggers
+
+- Need for cross-region replication beyond MirrorMaker
+- Cost exceeds $15K/month
+- Schema evolution becomes painful
+```
+
+## Deeper Dive — Quality Attribute Scenarios Worked Examples
+
+### ISO 25010 Categories with Concrete Scenarios
+
+```
+PERFORMANCE EFFICIENCY
+  Scenario 1 (Time behaviour):
+    SOURCE: User on web app
+    STIMULUS: Submits checkout form
+    ENVIRONMENT: Peak Black Friday traffic (5× normal)
+    ARTIFACT: Order Service
+    RESPONSE: 95% of requests complete within 500ms
+    MEASURE: p95 latency from gateway
+
+RELIABILITY
+  Scenario 2 (Availability):
+    SOURCE: System (degraded mode)
+    STIMULUS: Database primary fails
+    ENVIRONMENT: During business hours
+    ARTIFACT: Order Service
+    RESPONSE: Failover to replica within 30s; <1% of orders affected
+    MEASURE: error rate during failover window
+
+SECURITY
+  Scenario 3 (Confidentiality):
+    SOURCE: Authenticated user
+    STIMULUS: Requests order data for another user_id
+    ENVIRONMENT: Normal operation
+    ARTIFACT: Order API
+    RESPONSE: 403 Forbidden; audit log entry created
+    MEASURE: 100% of unauthorized requests blocked
+
+MAINTAINABILITY
+  Scenario 4 (Modifiability):
+    SOURCE: Backend engineer
+    STIMULUS: Add new order status type (e.g., "PARTIALLY_REFUNDED")
+    ENVIRONMENT: Development
+    ARTIFACT: Order Service + downstream consumers
+    RESPONSE: Code change in 1 service; backwards-compatible event schema; no consumer changes required
+    MEASURE: PR review approves with no consumer ADR needed
+
+SCALABILITY
+  Scenario 5:
+    SOURCE: Marketing campaign
+    STIMULUS: 10× traffic spike for 4 hours
+    ENVIRONMENT: Pre-warmed infrastructure
+    ARTIFACT: Order pipeline
+    RESPONSE: Autoscale within 5 min; no degradation
+    MEASURE: p99 latency stays under SLO
+
+OBSERVABILITY
+  Scenario 6:
+    SOURCE: On-call engineer
+    STIMULUS: User reports "my order disappeared"
+    ENVIRONMENT: 3 AM Tuesday
+    ARTIFACT: Order Service tracing
+    RESPONSE: Engineer finds the order's complete journey within 5 min using trace_id
+    MEASURE: time-to-diagnosis < 10 min
+
+PRIVACY/COMPLIANCE
+  Scenario 7:
+    SOURCE: EU user
+    STIMULUS: Requests data deletion (GDPR)
+    ENVIRONMENT: Production
+    ARTIFACT: Order Service
+    RESPONSE: All PII anonymized within 30 days; tombstone retained for legal/audit
+    MEASURE: PII removed from primary + replicas + backups within window
+
+USABILITY (DEVELOPER EXPERIENCE)
+  Scenario 8:
+    SOURCE: New engineer
+    STIMULUS: Joins team; needs to ship a feature
+    ENVIRONMENT: Local dev environment
+    ARTIFACT: Order Service codebase
+    RESPONSE: Sets up env in <1 day; ships PR within 1 week
+    MEASURE: time-to-first-commit
+```
+
+## Deeper Dive — Fitness Functions in Practice
+
+### ArchUnit for Java Architecture Tests
+
+```java
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.lang.ArchRule;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+
+class ArchitectureTests {
+
+    JavaClasses classes = new ClassFileImporter()
+        .importPackages("com.example.orders");
+
+    @Test
+    void controllers_should_only_call_services() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..controller..")
+            .should().onlyAccessClassesThat()
+            .resideInAnyPackage("..service..", "..dto..", "java..", "org.springframework..");
+
+        rule.check(classes);
+    }
+
+    @Test
+    void repositories_should_not_be_called_from_controllers() {
+        ArchRule rule = noClasses()
+            .that().resideInAPackage("..controller..")
+            .should().dependOnClassesThat()
+            .resideInAPackage("..repository..");
+
+        rule.check(classes);
+    }
+
+    @Test
+    void services_should_be_annotated() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..service..")
+            .and().haveSimpleNameEndingWith("Service")
+            .should().beAnnotatedWith(Service.class);
+
+        rule.check(classes);
+    }
+
+    @Test
+    void no_field_injection() {
+        ArchRule rule = noFields()
+            .should().beAnnotatedWith(Autowired.class);
+
+        rule.check(classes);
+    }
+
+    @Test
+    void no_classes_in_default_package() {
+        ArchRule rule = noClasses()
+            .should().resideInDefaultPackage();
+
+        rule.check(classes);
+    }
+
+    @Test
+    void dto_classes_should_be_records() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..dto..")
+            .should().beRecords();
+
+        rule.check(classes);
+    }
+}
+```
+
+### CI Pipeline Integration
+
+```yaml
+# .github/workflows/architecture.yml
+name: Architecture Tests
+on: [pull_request]
+
+jobs:
+  arch-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+      - name: Run ArchUnit tests
+        run: ./mvnw test -Dtest='*Architecture*Test'
+      - name: Comment on PR if architecture violations
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Architecture rules violated. See test failure for details.'
+            })
+```
+
+### Performance Fitness Functions
+
+```java
+@SpringBootTest
+class PerformanceFitnessTests {
+
+    @Autowired private OrderService service;
+
+    @Test
+    void place_order_p99_under_100ms() {
+        List<Long> latencies = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            long start = System.nanoTime();
+            service.placeOrder(generateOrder());
+            latencies.add(System.nanoTime() - start);
+        }
+
+        long p99 = percentile(latencies, 99);
+        assertThat(p99).isLessThan(Duration.ofMillis(100).toNanos());
+    }
+
+    @Test
+    void heap_usage_stays_under_512mb() {
+        Runtime rt = Runtime.getRuntime();
+        for (int i = 0; i < 10_000; i++) service.placeOrder(generateOrder());
+        long usedMb = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024;
+        assertThat(usedMb).isLessThan(512);
+    }
+}
+```
+
+## Deeper Dive — Real Architecture Decisions and Their Outcomes
+
+| Decision | Year | Outcome |
+|---|---|---|
+| Twitter: monolith → microservices | 2010 | Worked initially; later consolidated some services back; "macroservices" trend |
+| Uber: H2 in-memory → MySQL → Cassandra → Spanner | 2009-2018 | Right decision for each scale level; cost of migrations was high |
+| Airbnb: Rails monolith → SOA → microservices | 2013-2016 | Right move at IPO scale but created operational complexity |
+| Etsy: PHP monolith staying monolithic | Always | Deliberate choice; supports their continuous deployment |
+| Stripe: monolith with strong boundaries | Always | Easier to maintain ACID for payments |
+| Netflix: full microservices | 2008+ | Worked because of investment in tooling (Eureka, Hystrix, Zuul) |
+| GitHub: Rails monolith → some services | 2014+ | Hybrid; main app still monolith; specific concerns extracted |
+| Shopify: Modular monolith | 2017+ | "Majestic monolith"; deliberate against microservices trend |
+
+**Insight**: monolith vs microservices is rarely "right" — context matters. Teams 5-20 engineers: monolith. 50-500: hybrid or modular monolith. 500+: usually microservices but with serious operational investment.
+
+## Deeper Dive — Anti-Pattern: "Resume-Driven Development"
+
+```
+SCENARIO:
+  Team adopts Kubernetes, Kafka, Cassandra, Kong, Istio, GraphQL, Elastic,
+  Grafana, gRPC for a service serving 100 RPS.
+  
+WHY:
+  - Engineers want to learn shiny tools
+  - Project resembles "hot 2024 stack"
+  - Adds to LinkedIn bullet points
+
+REAL OUTCOME:
+  - Operational burden: 5 people manage infrastructure full-time
+  - Cost: 10× what a simple Postgres + Rails would cost
+  - Reliability: lower (more moving parts)
+  - Hiring: hard to find Cassandra expertise; tooling debt
+  
+HOW TO PREVENT:
+  - Default to boring technology unless complexity justified
+  - Cost projections per decision (cloud bill + engineer-months)
+  - Periodic complexity audit: what could we simplify?
+  - "What problem does this solve?" must be answered with metrics
+```
+
+## Deeper Dive — When to Revisit Architecture
+
+### Triggers for Architecture Review
+
+```
+SCALE TRIGGERS:
+  - Reach 50% of current architecture's capacity ceiling
+  - Hit a SLO violation due to architectural choice
+  
+TEAM TRIGGERS:
+  - Hire/loss of key SME (knowledge transfer evaluation)
+  - Team size doubles (communication structures change)
+  
+BUSINESS TRIGGERS:
+  - Major feature requires new pattern
+  - Acquisition or IPO changes data residency / compliance
+  - Cost outgrows budget
+
+TECHNICAL TRIGGERS:
+  - New technology offers 10× improvement on key metric
+  - Existing tech reaches EOL (e.g., Java 8 deprecation)
+  - Major security CVE in current stack
+  
+OPERATIONAL TRIGGERS:
+  - >2 incidents/month related to architectural complexity
+  - PR merge time consistently >1 week
+  - Onboarding new engineers takes >1 month
+```
+
+### Architecture Health Metrics Dashboard
+
+```
+1. SLO COMPLIANCE
+   - p99 latency vs target (last 30 days)
+   - Error rate vs target
+   - Availability (mins of downtime)
+
+2. CHANGE VELOCITY
+   - Lead time: PR open → merged
+   - Deploy frequency
+   - Mean time to recovery (MTTR)
+
+3. COMPLEXITY
+   - Active services count
+   - Inter-service call graph density
+   - Lines of code per service
+   - Cyclomatic complexity trend
+
+4. COST
+   - Infrastructure spend per request
+   - Engineering time on operations vs features
+   - Cost per active user
+
+5. TECH DEBT
+   - Failing fitness functions
+   - Deprecated dependencies count
+   - TODO/FIXME density
+```
+
+Review quarterly. Use trends, not absolute values.
+
 ## Practice
 
 1. **Audit any architecture.** Take a system you know. Write down the architecture in one paragraph. List the four most consequential trade-off decisions implicit in it. Are they explicit anywhere? Are they ADR'd?

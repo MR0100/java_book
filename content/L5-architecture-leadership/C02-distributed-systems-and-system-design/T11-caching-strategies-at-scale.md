@@ -560,6 +560,418 @@ For a Spring Boot service in 2026: **Caffeine** (L1) + **Redis** (L2) is the dom
 > [!INTERVIEW]
 > A common L5 prompt: "How would you cache a heavily-read database table?" Strong answers (a) start with cache-aside + TTL, (b) layer L1 (Caffeine) + L2 (Redis) for hot keys, (c) address stampedes with refresh-ahead or single-flight, (d) name the invalidation strategy (TTL vs explicit vs CDC events).
 
+## Deeper Dive — Cache Stampede Mitigation Algorithms
+
+### Algorithm 1: Locked Recompute (Single-Flight)
+
+```java
+public class SingleFlightCache<K, V> {
+    private final Cache<K, V> cache;
+    private final ConcurrentHashMap<K, CompletableFuture<V>> inflight = new ConcurrentHashMap<>();
+    private final Function<K, V> loader;
+
+    public V get(K key) {
+        V cached = cache.getIfPresent(key);
+        if (cached != null) return cached;
+
+        // Coalesce concurrent misses
+        CompletableFuture<V> future = inflight.computeIfAbsent(key, k ->
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    V value = loader.apply(k);
+                    cache.put(k, value);
+                    return value;
+                } finally {
+                    inflight.remove(k);
+                }
+            })
+        );
+
+        try {
+            return future.get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("Cache load failed", e);
+        }
+    }
+}
+```
+
+Caffeine's `LoadingCache` does this automatically:
+
+```java
+LoadingCache<String, User> cache = Caffeine.newBuilder()
+    .maximumSize(10_000)
+    .expireAfterWrite(5, MINUTES)
+    .build(key -> userRepo.findById(key).orElseThrow());
+
+// Concurrent misses → only ONE thread loads; others wait
+User u = cache.get("user-123");
+```
+
+### Algorithm 2: Probabilistic Early Expiration
+
+```java
+public V getWithEarlyExpiry(K key) {
+    CachedEntry<V> entry = cache.getIfPresent(key);
+    if (entry == null) return loadAndCache(key);
+
+    // Compute if we should preemptively refresh
+    double remaining = (entry.expiresAt - now()) / (double) entry.ttlMs;
+    // 0.0 = expired; 1.0 = freshly cached
+    // Probability of refresh = (1 - remaining)²
+    double refreshChance = Math.pow(1 - remaining, 2);
+
+    if (Math.random() < refreshChance) {
+        // Async refresh; serve current value
+        CompletableFuture.runAsync(() -> {
+            V fresh = loader.apply(key);
+            cache.put(key, new CachedEntry<>(fresh, now() + ttlMs));
+        });
+    }
+
+    return entry.value;
+}
+```
+
+**XFetch algorithm** (Vattani 2015): probabilistic early refresh smooths the stampede.
+
+### Algorithm 3: Stale-While-Revalidate
+
+```java
+public V getSWR(K key) {
+    CachedEntry<V> entry = cache.getIfPresent(key);
+    if (entry == null) return loadAndCache(key);
+
+    boolean isStale = now() > entry.expiresAt;
+    boolean isTrulyExpired = now() > entry.staleUntil;
+
+    if (isTrulyExpired) {
+        // Past the stale-acceptance window; force refresh
+        return loadAndCache(key);
+    }
+
+    if (isStale && !entry.refreshing.getAndSet(true)) {
+        // Single refresh request; serve stale meanwhile
+        CompletableFuture.runAsync(() -> {
+            try {
+                V fresh = loader.apply(key);
+                cache.put(key, new CachedEntry<>(fresh, now() + ttlMs, now() + staleMs));
+            } finally {
+                entry.refreshing.set(false);
+            }
+        });
+    }
+
+    return entry.value;
+}
+```
+
+**Used by**: HTTP `Cache-Control: stale-while-revalidate=N` directive; Cloudflare, Vercel.
+
+### Algorithm 4: TTL with Jitter
+
+```java
+public void put(K key, V value) {
+    long jitter = ThreadLocalRandom.current().nextLong(0, baseTTLMs / 10);
+    cache.put(key, value, baseTTLMs + jitter);
+}
+```
+
+**Simplest mitigation**: prevent simultaneous expiration of related keys. Doesn't fix hot-key stampede but spreads expirations smoothly.
+
+## Deeper Dive — Spring Cache Multi-Tier Configuration
+
+```java
+@Configuration
+@EnableCaching
+public class CacheConfig {
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisCf) {
+        // L1 — Caffeine (in-process, fast)
+        CaffeineCacheManager l1 = new CaffeineCacheManager();
+        l1.setCaffeine(Caffeine.newBuilder()
+            .maximumSize(10_000)
+            .expireAfterWrite(Duration.ofSeconds(30))
+            .recordStats());
+
+        // L2 — Redis (distributed)
+        RedisCacheConfiguration redisConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(10))
+            .serializeValuesWith(SerializationPair.fromSerializer(
+                new GenericJackson2JsonRedisSerializer()));
+
+        RedisCacheManager l2 = RedisCacheManager.builder(redisCf)
+            .cacheDefaults(redisConfig)
+            .build();
+
+        // Composite L1 + L2
+        CompositeCacheManager composite = new CompositeCacheManager(l1, l2);
+        composite.setFallbackToNoOpCache(false);
+        return composite;
+    }
+
+    @Bean
+    public CacheStatisticsCollector cacheStats() {
+        return new CacheStatisticsCollector();
+    }
+}
+
+@Service
+public class UserService {
+
+    // Annotations cascade through L1 → L2 → DB
+    @Cacheable(value = "user", key = "#id")
+    public User getUser(String id) {
+        return userRepo.findById(id).orElseThrow();
+    }
+
+    @CacheEvict(value = "user", key = "#user.id")
+    public User updateUser(User user) {
+        return userRepo.save(user);
+    }
+
+    @CachePut(value = "user", key = "#result.id")
+    public User createUser(User user) {
+        return userRepo.save(user);
+    }
+}
+```
+
+### Cross-Instance L1 Coherence via Redis Pub/Sub
+
+```java
+@Component
+public class CacheCoherenceListener {
+
+    @Autowired private CaffeineCacheManager l1;
+    @Autowired private RedisTemplate<String, String> redis;
+
+    @PostConstruct
+    public void subscribe() {
+        // Listen to Redis Pub/Sub for invalidation events
+        redis.execute(new RedisCallback<Void>() {
+            @Override
+            public Void doInRedis(RedisConnection conn) {
+                conn.subscribe((message, channel) -> {
+                    String invalidationKey = new String(message.getBody());
+                    String[] parts = invalidationKey.split(":");
+                    Cache cache = l1.getCache(parts[0]);
+                    if (cache != null) cache.evict(parts[1]);
+                }, "cache-invalidation".getBytes());
+                return null;
+            }
+        });
+    }
+
+    public void invalidateAndPublish(String cacheName, String key) {
+        l1.getCache(cacheName).evict(key);
+        l2.getCache(cacheName).evict(key);
+        redis.convertAndSend("cache-invalidation", cacheName + ":" + key);
+        // All instances drop the key from their L1
+    }
+}
+```
+
+## Deeper Dive — Cache Sizing Math
+
+```
+USECASE: Product catalog cache
+  Total products: 10M
+  Avg product size: 2 KB
+  Total: 20 GB
+  
+  Hot set (Pareto 80/20): 2M products account for 80% of reads
+  Hot set size: 4 GB
+
+DECISION:
+  Cache 4 GB hot set → 80% hit rate
+  Add 4 GB more → 92% hit rate (diminishing returns)
+  Cache entire 20 GB → 100% hit rate (only worth it if memory cheap vs DB queries)
+
+REAL CALCULATION:
+  Without cache: 1000 req/s × 5ms DB query = 5 seconds of DB time per second (5 instances)
+  With 80% cache hit: 200 req/s × 5ms DB query = 1 second of DB time per second (1 instance)
+  Saved: 4 DB instances at $200/mo = $800/mo
+
+  Cache cost: 4GB Redis ElastiCache cache.t3.small = $20/mo
+
+  ROI: 40× return
+```
+
+### Latency Pyramid
+
+```
+L1 (CPU cache)                  : 1-5 ns
+L2 (Caffeine in-process)         : 50-200 ns
+L3 (Redis on same host)          : 100-500 µs
+L4 (Redis cluster)               : 1-5 ms
+L5 (Database)                    : 5-50 ms
+L6 (External API)                : 50-500 ms
+L7 (Cross-region)                : 50-200 ms
+
+DESIGN TRICK: each layer absorbs 80-95% of requests
+  90% L1 hit → 9% to L2 → 0.9% to L3 → 0.09% to DB
+  Average latency: 90% × 100ns + 9% × 1ms + 1% × 50ms ≈ 590µs
+  Without cache: 100% × 50ms = 50,000µs
+  Speedup: ~85× faster average
+```
+
+## Deeper Dive — Production Cache Monitoring
+
+### Key Metrics
+
+```yaml
+# Prometheus alerting
+- alert: CacheHitRateLow
+  expr: |
+    (rate(cache_hits_total[5m])
+     / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m])))
+    < 0.7
+  for: 10m
+  
+- alert: CacheStampedeRisk
+  expr: rate(cache_misses_total[1m]) > 1000   # spike in misses
+  for: 1m
+  
+- alert: CacheEvictionRateHigh
+  expr: rate(cache_evictions_total[5m]) > 100   # consistently evicting
+  for: 5m
+```
+
+### Spring Boot Actuator Cache Metrics
+
+```yaml
+management:
+  metrics:
+    enable.cache: true
+    export:
+      prometheus.enabled: true
+```
+
+Caffeine metrics exposed automatically:
+```
+caffeine_hit_total                  # hits per cache
+caffeine_miss_total                 # misses
+caffeine_load_total                 # loader invocations
+caffeine_load_failure_total          # loader failures
+caffeine_eviction_total              # evicted
+caffeine_estimated_size              # current size
+```
+
+## Deeper Dive — Caching Anti-Patterns
+
+### Anti-Pattern 1: Caching Mutable Data Without Invalidation
+
+```java
+// BAD: caches user profile but doesn't invalidate on update
+@Cacheable("user")
+public User getUser(String id) { ... }
+
+public User updateUser(User user) {
+    // Cache holds stale data forever
+    return userRepo.save(user);
+}
+
+// GOOD: explicit invalidation
+@CacheEvict("user")
+public User updateUser(User user) {
+    return userRepo.save(user);
+}
+```
+
+### Anti-Pattern 2: Caching Per-Request Unique Data
+
+```
+SCENARIO:
+  Cache key: hash(query_params + user_id)
+  Each request has unique parameters → cache hit rate ~0%
+  Cache just adds latency + memory cost
+
+FIX: don't cache this; or cache higher-up in the request hierarchy
+```
+
+### Anti-Pattern 3: No Cache TTL
+
+```
+SCENARIO:
+  Cache has no TTL; entries live forever
+  Over months, cache fills with stale entries
+  Hit rate drops; memory grows
+  
+FIX: set reasonable TTL based on actual data lifetime
+```
+
+### Anti-Pattern 4: Cache Sometimes Returns Null, Sometimes Doesn't
+
+```java
+// BAD: ambiguous semantics
+if (cache.get(key) == null) {
+    return loadFromDB(key);   // assume cache miss
+}
+// But what if loadFromDB returns null AND we cached null?
+
+// GOOD: distinct sentinel for "negative" cache
+if (!cache.containsKey(key)) return loadAndCache(key);
+
+V cached = cache.get(key);
+if (cached == NULL_SENTINEL) return null;   // explicit "we checked, it doesn't exist"
+return cached;
+```
+
+### Anti-Pattern 5: Synchronous Cache Population at Startup
+
+```
+SCENARIO:
+  App startup: blocks on cache warm-up
+  10K items × 5ms each = 50 seconds startup
+  K8s readiness probe fails; pod doesn't start
+
+FIX: load asynchronously after readiness; or accept cold cache + traffic ramp
+```
+
+## Deeper Dive — CDN Caching Strategies (Edge Layer)
+
+```
+CDN BENEFITS:
+  - Sub-100ms latency anywhere in world
+  - 70-95% offload from origin
+  - DDoS absorption
+
+WHAT TO CACHE:
+  Static assets (JS, CSS, images): TTL 1 year + hash in URL
+  Public API responses (e.g., product listings): TTL 5 min
+  User-specific content: NOT cacheable globally
+  
+INVALIDATION:
+  Purge API: invalidate by URL or tag
+  Cloudflare: average purge time ~100ms globally
+  
+HEADERS:
+  Cache-Control: public, max-age=300, stale-while-revalidate=600
+  Cache-Control: private, no-cache (user data)
+  ETag: "abc123" → conditional GET
+  Vary: Accept-Encoding, Authorization → segment cache by header
+```
+
+### Spring Boot HTTP Cache Configuration
+
+```java
+@RestController
+public class ProductController {
+
+    @GetMapping("/api/products")
+    public ResponseEntity<List<Product>> getProducts() {
+        List<Product> products = productService.findAll();
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES)
+                .staleWhileRevalidate(10, TimeUnit.MINUTES))
+            .eTag(computeETag(products))
+            .body(products);
+    }
+}
+```
+
 ## Practice
 
 1. **Pick patterns.** For five real operations in any system you know, pick a caching pattern (cache-aside, read-through, write-through, write-behind, refresh-ahead). Justify each.
