@@ -77,19 +77,340 @@ Java backend engineer, plus interview mastery** — a "0 to hero" master book.
 
 ## 🟢 NEXT SESSION RESUME POINT (most recent state — read this first)
 
-**Last worked: 2026-06-09 (multi-pass continuous deepening sprint, 24 passes total).**
+**Last worked: 2026-06-10 — Phase 2 (AI/LLM Integration) ✅ COMPLETE. Phase 3 next.**
 
-### Quick stats — where the course stands
+### Where we are RIGHT NOW
 
-| Module | Status | Lines (current) | Notes |
+The 56-pass deepening sprint completed (all L5 + cross-module enhancements done). Course at **244,006 lines / 554 files / ~46K L5 alone**.
+
+**Currently executing: PHASE 1 of the 9-Phase Expansion Plan** (see below).
+
+### Quick stats — current state
+
+| Module | Status | Lines | Topics deepened in sprint |
 |---|---|---:|---|
-| L0 Foundations | At depth bar | ~25k | Modern Java + algorithms expanded |
-| L1 Core Java | At depth bar | ~38k | Pitfalls +3, idioms +8, interview prep 78 Qs (100+ probes), cheatsheet +6 sections |
-| L2 Intermediate Backend | At depth bar | ~32k | Pitfalls +15, idioms +4 sections, interview prep 43 Qs, cheatsheet +5 lookups |
-| L3 Advanced JVM | At depth bar | ~30k | Pitfalls +15 senior APs, interview prep 73 Qs (15 diagnostic), cheatsheet +7 senior refs, JIT topic deepened, GC tuning deepened |
-| L4 Backend Engineering | At depth bar | ~55k | Pitfalls +15 operational, interview prep 71 Qs (8 incident scenarios), cheatsheet +7 (cloud/NoSQL/OTel/Production-1-liners), Redis/Cache invalidation/Kafka/OAuth2-JWT/Boot-3-migration/N+1 all deepened |
-| L5 Architecture & Leadership | At depth bar | ~28k | All 5 worked designs deepened (rate limiter, news feed, chat, payments, notifications), distributed locking + SLI/SLO deepened |
-| L6 Interview Mastery | At depth bar | 31,413 | Fully deepened: C02 DSA (110 worked solutions), C03 design (5 topics), C04 company tracks (10 topics), C05 resume (all 10 topics), C06 staff Q&A banks (13 banks, 554 Qs), L6 cheatsheets (19 refs) |
+| L0 Foundations | At depth bar | ~25k | Modern Java + algorithms |
+| L1 Core Java | At depth bar | ~38k | Pitfalls +3, idioms +8, interview prep 78 Qs, cheatsheet +6 |
+| L2 Intermediate Backend | At depth bar | ~32k | Pitfalls +15, idioms +4 sections, interview prep, cheatsheet |
+| L3 Advanced JVM | At depth bar | ~30k | Pitfalls +15 APs, JIT, GC tuning, GraalVM/CRaC/AOT, diagnostics |
+| L4 Backend Engineering | At depth bar | ~55k | Pitfalls +15 ops, Spring Boot 3, OAuth2/JWT, Redis, Kafka deep + Streams, cache invalidation, cheatsheets |
+| L5 Architecture & Leadership | At depth bar | ~47k | **ALL 37 topics deepened** — all worked designs + theory + patterns + operations |
+| L6 Interview Mastery | At depth bar | ~31k | DSA (110 solutions), Design (5 topics), Company tracks, Resume (10), Staff Q&A banks (554 Qs), cheatsheets |
+
+---
+
+# 📋 9-PHASE EXPANSION PLAN — The Complete Roadmap
+
+The user requested: "need to add all the things you suggested. Check existing course and tell me where and how to add."
+
+After the 56-pass deepening sprint, this is the next-level expansion plan with concrete placement decisions.
+
+## Phase Overview
+
+| Phase | Domain | Where | Effort | Status |
+|---|---|---|---|---|
+| **1** | Structural setup (INDEX, GLOSSARY, ACRONYMS, LEARNING-PATHS) | Repo root | 1-2 sessions | **🟢 IN PROGRESS** |
+| **2** | AI/LLM Java integration | NEW L4/C18 (10 topics) + NEW L5/C11 (8 topics) | 3-4 sessions | ✅ **COMPLETE** |
+| **3** | Security deep dive | NEW topics in L4/C08 (6 topics) | 2-3 sessions | Pending |
+| **4** | Real-world case studies | NEW L5 chapter (8 topics) | 3-4 sessions | Pending |
+| **5** | Mock interview library | NEW L6/C13 (15 topics) | 3-4 sessions | Pending |
+| **6** | 2026+ forward-looking | Java 25 LTS, Spring Boot 4, cost engineering, serverless, edge | 2-3 sessions | Pending |
+| **7** | Performance & observability deep | L3/L4 new topics — JMH, profiling, eBPF | 2 sessions | Pending |
+| **8** | Labs & code repos | NEW /examples directory tree | 4-5 sessions | Pending |
+| **9** | Format & quality polish | TL;DRs, cross-refs, 5-min versions | 1-2 sessions | Pending |
+
+**Total estimated effort: 22-30 focused sessions. Total new lines: ~70,000+.**
+
+---
+
+## Phase 1: Structural Setup (✅ COMPLETE)
+
+**Goal**: Build repo-level foundation files for navigation, terminology, and learning paths.
+
+### Tasks
+
+| # | Task | Status |
+|---|---|---|
+| 1.1 | Update PROGRESS.md with this 9-phase plan | ✅ Done |
+| 1.2 | Create `INDEX.md` — Master table of contents (single-page navigation) | ✅ Done — comprehensive Module → Chapter → Topic navigation with topic cluster index |
+| 1.3 | Create `GLOSSARY.md` — All terms defined alphabetically | ✅ Done — 140+ terms with topic links |
+| 1.4 | Create `ACRONYMS.md` — Quick acronym lookup (ACL, BFF, CDC, CQRS...) | ✅ Done — 250+ acronyms with expansion + meaning + topic links |
+| 1.5 | Create `LEARNING-PATHS.md` — Suggested paths (junior/mid/senior/staff/interview-prep) | ✅ Done — 6 main paths + 3 quick-win paths with week-by-week topic schedule |
+| 1.6 | Archive old 56-pass log to `PROGRESS-ARCHIVE.md` (deferred — keep PROGRESS readable for now) | Deferred to a later phase |
+
+### Phase 1 Completion Notes (2026-06-10)
+
+- All 4 navigation files created at repo root
+- INDEX.md serves as the master entry point — links to every module, chapter, and topic
+- GLOSSARY.md and ACRONYMS.md alphabetically organized with topic references
+- LEARNING-PATHS.md has 6 main paths (Junior → Mid, Mid → Senior, Senior → Staff, Staff → Principal Interview, Career Switcher, SRE-track) + 3 quick-win paths
+- Each new file cross-references the others
+- Course total post-Phase 1: ~248,000 lines (Phase 1 added ~4,000 lines across 4 files)
+
+**Next: Phase 2 — AI/LLM Java Integration** (most strategic content gap).
+
+### Acceptance criteria
+
+- `INDEX.md` lists every L0-L6 topic with one-line summary + size + status
+- `GLOSSARY.md` has 200+ terms with definition + topic reference
+- `ACRONYMS.md` has 100+ acronyms with expansion + short definition
+- `LEARNING-PATHS.md` has 5+ paths with week-by-week guidance
+- All files cross-link to existing topics
+
+---
+
+## Phase 2: AI/LLM Java Integration (Most strategic — new domain)
+
+### Where to Add (revised numbering — append after existing cross-cutting)
+
+| New Chapter | Where | Topics |
+|---|---|---|
+| **L4/C18: AI/LLM Integration** | NEW chapter at end of L4 (after C17 Resources) | 10 topics |
+| **L5/C11: AI System Architecture** | NEW chapter at end of L5 (after C10 Resources) | 8 topics |
+
+> [!NOTE]
+> Numbered after existing cross-cutting chapters to avoid renumbering existing content. INDEX.md will display them in logical position (alongside other concept chapters).
+
+### L4/C12 Topics (Implementation-focused)
+
+| T# | Topic | Lines target |
+|---|---|---:|
+| T01 | LLM API fundamentals (OpenAI/Anthropic/local) | ~700 |
+| T02 | LangChain4j framework | ~800 |
+| T03 | Spring AI framework | ~800 |
+| T04 | Prompt engineering for backend engineers | ~700 |
+| T05 | RAG (Retrieval-Augmented Generation) patterns | ~900 |
+| T06 | Vector databases (Pinecone, Weaviate, pgvector, Qdrant) | ~800 |
+| T07 | Embedding generation + storage | ~600 |
+| T08 | AI agents with tools/function calling | ~800 |
+| T09 | Streaming LLM responses (SSE, WebSocket) | ~600 |
+| T10 | AI observability + cost tracking | ~700 |
+
+### L5/C04 Topics (Architecture-focused)
+
+| T# | Topic | Lines target |
+|---|---|---:|
+| T01 | When to use LLMs vs traditional ML | ~800 |
+| T02 | AI gateway design (rate limiting, fallback, caching) | ~900 |
+| T03 | Prompt caching strategies | ~700 |
+| T04 | RAG at scale (millions of docs, fresh data) | ~900 |
+| T05 | Model fine-tuning architecture decisions | ~700 |
+| T06 | AI safety + prompt injection defense | ~800 |
+| T07 | Cost/latency optimization (smaller models, batching) | ~800 |
+| T08 | Hybrid AI/traditional architectures | ~700 |
+
+**Total: 18 new topics, ~13,500 lines**
+
+### Phase 2 Completion Notes (2026-06-10)
+
+✅ **PHASE 2 COMPLETE — All 18 topics authored, all ~400+ lines each, expert-dense.**
+
+**L4/C18 AI/LLM Integration (10/10 topics):**
+- T01 LLM API Fundamentals — OpenAI/Anthropic/Local, raw HTTP, Spring Boot client, retries, rate limits, structured output, streaming
+- T02 LangChain4j Framework — AI Services, ChatMemory, tools, RAG, Spring Boot integration
+- T03 Spring AI Framework — ChatClient, Advisors, structured output, function calling, RAG, ETL pipeline
+- T04 Prompt Engineering — templates, few-shot, CoT, ReAct, versioning, eval harnesses, injection defense
+- T05 RAG Patterns — chunking, embeddings, hybrid search, HyDE, re-ranking, citations, RAGAS
+- T06 Vector Databases — Pinecone, Weaviate, pgvector, Qdrant, HNSW, IVF, multi-tenancy
+- T07 Embedding Generation & Storage — batching, async pipelines, caching, versioning, backfill
+- T08 AI Agents with Tools — ReAct, MCP, safety rails, sandboxing, evaluation, multi-agent
+- T09 Streaming LLM Responses — SSE, WebSocket, backpressure, cancellation, progressive JSON
+- T10 AI Observability & Cost Tracking — OTel, Micrometer, Langfuse, SLOs, hallucination detection
+
+**L5/C11 AI System Architecture (8/8 topics):**
+- T01 When to Use LLMs vs Traditional ML — decision framework, hybrid patterns, anti-patterns
+- T02 AI Gateway Design — protocol translation, quotas, fallback, smart routing, caching, build vs buy
+- T03 Prompt Caching Strategies — 4 levels (provider, gateway exact, gateway semantic, application)
+- T04 RAG at Scale — sharded indexes, streaming ingestion, Lambda architecture, multi-tenancy, cost optimization
+- T05 Model Fine-Tuning Architecture — when/how (SFT, LoRA, QLoRA, DPO, distillation), infrastructure, ops
+- T06 AI Safety & Prompt Injection Defense — OWASP LLM Top 10, layered defenses, dual-LLM, red-teaming
+- T07 Cost/Latency Optimization — cascading, compression, batching, distillation, FinOps
+- T08 Hybrid AI/Traditional Architectures — 9 integration patterns, fallback strategies, observability
+
+**Total added: ~14,000+ lines across 18 new topic files + 2 chapter READMEs.**
+
+**Status correction:** Earlier READMEs marked first ~half of topics as "Done" aspirationally; this is now accurate — every topic listed has been authored.
+
+**Course total after Phase 2: ~262,000 lines (was ~248,000 post-Phase 1).**
+
+**Next: Phase 3 — Security Deep Dive** (6 new topics in L4/C08).
+
+---
+
+## Phase 3: Security Deep Dive
+
+### Where to Add
+
+**NEW topics in existing `L4/C08 Security` chapter** (currently has T01-T05). Add T06-T11.
+
+| T# | Topic | Lines target |
+|---|---|---:|
+| T06 | Supply chain security (SBOM, Sigstore, dependency scanning) | ~800 |
+| T07 | Zero-trust architecture (SPIFFE/SPIRE, service identity) | ~800 |
+| T08 | Modern auth (OAuth 2.1, FIDO2, WebAuthn, passkeys) | ~900 |
+| T09 | JVM-specific CVEs (Log4Shell, Spring4Shell patterns) | ~700 |
+| T10 | Container security (distroless, Wolfi, image signing) | ~700 |
+| T11 | Secrets management (Vault, External Secrets Operator) | ~700 |
+
+**Total: 6 new topics, ~4,600 lines**
+
+---
+
+## Phase 4: Real-World Case Studies (Stickiest content)
+
+### Where to Add
+
+**NEW chapter `L5/C05: Real-World Case Studies`** (8 topics).
+
+| T# | Topic | Lines target |
+|---|---|---:|
+| T01 | Netflix architecture end-to-end (Eureka/Hystrix/Spinnaker) | ~1,500 |
+| T02 | Shopify majestic monolith — why it works at 2.8M LOC | ~1,200 |
+| T03 | Stripe payment platform — idempotency at scale | ~1,400 |
+| T04 | Discord chat architecture — Cassandra + Elixir lessons | ~1,300 |
+| T05 | Uber Cherami/Ringpop — custom infrastructure | ~1,200 |
+| T06 | Twitter Manhattan — storage evolution | ~1,300 |
+| T07 | Airbnb migration — Rails → SOA over 6 years | ~1,200 |
+| T08 | Meta TAO/Scribe/Hydra — scale lessons | ~1,300 |
+
+**Total: 8 new topics, ~10,400 lines**
+
+---
+
+## Phase 5: Mock Interview Library (Highest student value)
+
+### Where to Add
+
+**NEW chapter `L6/C13: Mock Interview Library`** (15 verbatim mocks).
+
+| T# | Topic | Lines target |
+|---|---|---:|
+| T01 | Mock: FAANG senior backend interview (full 45 min) | ~1,200 |
+| T02 | Mock: FAANG staff system design | ~1,400 |
+| T03 | Mock: FAANG L5 behavioral (Amazon LP focus) | ~1,200 |
+| T04 | Mock: Stripe payment system design | ~1,400 |
+| T05 | Mock: Indian unicorn senior coding round (Razorpay) | ~1,200 |
+| T06 | Mock: Banking JVM-deep interview (Goldman) | ~1,300 |
+| T07 | Mock: Staff architect (Google L6) | ~1,400 |
+| T08 | Mock: Cross-functional staff (Meta E6) | ~1,300 |
+| T09 | Mock: Tech lead behavioral | ~1,100 |
+| T10 | Mock: Hiring manager round | ~1,000 |
+| T11 | Mock: Bar raiser / executive round | ~1,100 |
+| T12 | Mock: AI/ML platform engineer (new for 2026) | ~1,300 |
+| T13 | Mock: Negotiation conversation (verbatim) | ~900 |
+| T14 | Mock: 90-day plan presentation | ~900 |
+| T15 | Anti-patterns: what NOT to say (verbatim bad answers) | ~1,000 |
+
+**Total: 15 new topics, ~17,700 lines**
+
+---
+
+## Phase 6: 2026+ Forward-Looking Content
+
+### Where to Add (extending existing + new topics)
+
+| Content | Where | Action |
+|---|---|---|
+| Java 25 LTS preview (Valhalla, Babylon) | L1/C01 new T20 | Add 1 topic ~800 lines |
+| Project Valhalla deep | L3/C02 new T16 | Add 1 topic ~900 lines |
+| Spring Boot 4 / Spring 7 | L4/C01 new T26 | Add 1 topic ~800 lines |
+| GraalVM updates (Galahad) | L3/C02/T05 extension | Extend existing ~400 lines |
+| CRaC GA patterns | L3/C02/T05 extension | Extend existing ~400 lines |
+| Cost engineering / FinOps | L5/C03 new T13 | Add 1 topic ~1,000 lines |
+| JVM container right-sizing | L5/C03 new T14 | Add 1 topic ~800 lines |
+| Spot/preemptible patterns | L5/C03 new T15 | Add 1 topic ~700 lines |
+| Serverless Java (Lambda + SnapStart) | L4/C11 new topic | Add 1 topic ~900 lines |
+| Edge computing (Workers, Lambda@Edge) | L4/C11 new topic | Add 1 topic ~900 lines |
+| Multi-runtime (Dapr) | L4/C11 new topic | Add 1 topic ~700 lines |
+| WebAssembly Java status | L3/C02 new T17 | Add 1 topic ~600 lines |
+
+**Total: 10 new topics + 2 extensions, ~9,500 lines**
+
+---
+
+## Phase 7: Performance & Observability Deep
+
+### Where to Add
+
+| Content | Where | Action |
+|---|---|---|
+| JMH benchmarking tutorial step-by-step | L3/C04 new T03 | Add 1 topic ~1,000 lines |
+| Profiling deep dive (async-profiler/JFR/JMC) | L3/C04 new T04 | Add 1 topic ~1,000 lines |
+| eBPF for JVM tracing | L4/C10 new T14 | Add 1 topic ~800 lines |
+| Latency tuning workflow | L3/C02/T09 extension | Extend ~500 lines |
+| Memory optimization patterns | L3/C02/T10 extension | Extend ~400 lines |
+
+**Total: 3 new topics + 2 extensions, ~3,700 lines**
+
+---
+
+## Phase 8: Labs & Code Repositories
+
+### Where to Add
+
+**NEW directory tree `/examples/`** at repo root.
+
+```
+examples/
+├── starter-templates/
+│   ├── spring-boot-3-java-21/
+│   ├── spring-boot-3-native-image/
+│   └── spring-boot-3-virtual-threads/
+├── system-designs/
+│   ├── url-shortener/
+│   ├── rate-limiter-redis-lua/
+│   ├── distributed-lock-fenced/
+│   ├── outbox-pattern/
+│   ├── saga-orchestrator/
+│   ├── cqrs-with-axon/
+│   └── event-sourced-wallet/
+├── labs/
+│   ├── lab-01-url-shortener-in-4-hours/
+│   ├── lab-02-build-a-memory-leak/
+│   ├── lab-03-build-a-deadlock/
+│   ├── lab-04-jmh-microbenchmark/
+│   ├── lab-05-profile-with-async-profiler/
+│   ├── lab-06-distributed-tracing-from-scratch/
+│   └── lab-07-build-a-rate-limiter/
+└── k8s-manifests/
+    ├── spring-boot-3-deployment/
+    ├── istio-canary/
+    ├── istio-circuit-breaker/
+    └── observability-stack/
+```
+
+**Total: ~30 working projects, ~10,000 LOC**
+
+Each lab needs a companion tutorial topic (could go in respective module's C05 hands-on).
+
+---
+
+## Phase 9: Format & Quality Polish
+
+### Tasks
+
+| Task | Files affected |
+|---|---|
+| Add TL;DR section to topics >800 lines | ~80 topics |
+| Verify cross-references | All topic files |
+| Add "5-minute version" companion for deep dives | ~20 topics |
+| Update CONVENTIONS.md with new patterns | 1 file |
+| 2026 refresh on company tracks | L6/C04 topics |
+| Spell-check / grammar pass | All files |
+| Update generator script for new chapters | scripts/generate_skeleton.py |
+| Add accessibility hints to diagrams | All Mermaid diagrams |
+
+---
+
+## How to Resume Each Phase
+
+```
+Read PROGRESS.md → find current Phase status → continue
+```
+
+Each phase has its own "in progress" / "complete" indicator above.
+
+---
 
 ### Where to start tomorrow (3 clean options — pick one)
 
