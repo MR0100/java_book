@@ -1,0 +1,87 @@
+# =============================================================================
+# PrometheusRule — alerting on the url-shortener's golden signals
+# -----------------------------------------------------------------------------
+# Another prometheus-operator CRD (monitoring.coreos.com/v1). The operator
+# loads these PromQL alert/record rules into Prometheus. Alerts fire to
+# Alertmanager (routing to Slack/PagerDuty is configured there, not here).
+#
+# The rules below follow the GOLDEN SIGNALS (latency, traffic, errors,
+# saturation) using the metric names Micrometer exposes for Spring Boot.
+# Backing topic: L4/C10 observability.
+# =============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: url-shortener-alerts
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    # Same selector-matching caveat as the ServiceMonitor: must match the
+    # Prometheus's `ruleSelector` (kube-prometheus-stack uses `release`).
+    release: kube-prometheus-stack
+    role: alert-rules
+spec:
+  groups:
+    - name: url-shortener.rules
+      # How often Prometheus evaluates this group.
+      interval: 30s
+      rules:
+        # ---- ERRORS: 5xx ratio over total requests --------------------------
+        - alert: UrlShortenerHighErrorRate
+          # 5xx responses as a fraction of all responses, over 5 minutes.
+          # http_server_requests_seconds_count is Micrometer's request counter;
+          # `status` is the HTTP status label.
+          expr: |
+            sum(rate(http_server_requests_seconds_count{job="url-shortener",status=~"5.."}[5m]))
+              /
+            sum(rate(http_server_requests_seconds_count{job="url-shortener"}[5m]))
+              > 0.05
+          for: 5m                  # Must hold for 5m to fire (debounces blips).
+          labels:
+            severity: critical
+            service: url-shortener
+          annotations:
+            summary: "url-shortener 5xx error rate > 5% (current: {{ $value | humanizePercentage }})"
+            description: "More than 5% of requests are failing with 5xx over the last 5 minutes."
+            runbook_url: "https://runbooks.example.com/url-shortener/high-error-rate"
+        # ---- LATENCY: p95 request duration ----------------------------------
+        - alert: UrlShortenerHighLatencyP95
+          # 95th percentile latency from the Micrometer histogram buckets.
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(http_server_requests_seconds_bucket{job="url-shortener"}[5m])) by (le)
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+            service: url-shortener
+          annotations:
+            summary: "url-shortener p95 latency > 500ms (current: {{ $value }}s)"
+            description: "95th-percentile request latency has exceeded 500ms for 10 minutes."
+        # ---- SATURATION: JVM heap pressure ----------------------------------
+        - alert: UrlShortenerJvmHeapPressure
+          # Used heap as a fraction of max heap. jvm_memory_* are Micrometer's
+          # JVM gauges; area="heap" filters out non-heap pools.
+          expr: |
+            sum(jvm_memory_used_bytes{job="url-shortener",area="heap"}) by (pod)
+              /
+            sum(jvm_memory_max_bytes{job="url-shortener",area="heap"}) by (pod)
+              > 0.9
+          for: 10m
+          labels:
+            severity: warning
+            service: url-shortener
+          annotations:
+            summary: "url-shortener pod {{ $labels.pod }} heap > 90%"
+            description: "Sustained high heap usage; risk of long GC pauses or OOM. Review -XX:MaxRAMPercentage and the memory limit (L5/C03/T15)."
+        # ---- AVAILABILITY: target down --------------------------------------
+        - alert: UrlShortenerTargetDown
+          # `up` is the synthetic metric Prometheus sets per scrape target.
+          expr: up{job="url-shortener"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            service: url-shortener
+          annotations:
+            summary: "url-shortener scrape target down ({{ $labels.instance }})"
+            description: "Prometheus cannot scrape this instance — the pod may be crash-looping or the /actuator/prometheus endpoint is unreachable."

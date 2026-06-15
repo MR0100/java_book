@@ -1,0 +1,62 @@
+# =============================================================================
+# Prometheus ServiceMonitor — scrape the app's /actuator/prometheus
+# -----------------------------------------------------------------------------
+# Backing topics: L4/C10 (observability) and lab-06 (distributed tracing).
+#
+# A ServiceMonitor is a Custom Resource from the prometheus-operator (the CRD
+# group monitoring.coreos.com/v1, installed by kube-prometheus-stack). Instead
+# of editing prometheus.yml, you declare WHICH services to scrape and HOW; the
+# operator generates the scrape config. This is the current best-practice
+# replacement for prometheus.io/scrape pod annotations.
+#
+# Spring Boot exposes Prometheus metrics at /actuator/prometheus when the
+# `micrometer-registry-prometheus` dependency is present and the endpoint is in
+# management.endpoints.web.exposure.include (set in the deployment's ConfigMap).
+# =============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+    # CRITICAL: this label must match your Prometheus's `serviceMonitorSelector`.
+    # kube-prometheus-stack defaults to selecting ServiceMonitors labelled
+    # `release: <helm-release-name>` (commonly `kube-prometheus-stack` or
+    # `prometheus`). If your ServiceMonitor is ignored, this label is almost
+    # always why — check `kubectl get prometheus -A -o yaml | grep -A5 ServiceMonitorSelector`.
+    release: kube-prometheus-stack
+spec:
+  # Which Services to scrape: those matching these labels...
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: url-shortener
+      app.kubernetes.io/instance: url-shortener
+  # ...in these namespaces (omit to default to the ServiceMonitor's own ns).
+  namespaceSelector:
+    matchNames:
+      - url-shortener
+  endpoints:
+    - port: http                 # MUST match the *name* of the Service port
+                                 # (service.yaml names it `http`), not the
+                                 # number. The operator resolves it.
+      path: /actuator/prometheus  # Micrometer's Prometheus scrape endpoint.
+      scheme: http                # If you enforce STRICT mTLS in the mesh,
+                                 # Prometheus needs the Istio certs or you scrape
+                                 # via the merged sidecar metrics port (15020).
+                                 # See README "scraping inside a strict mTLS
+                                 # mesh".
+      interval: 15s               # Scrape every 15s. Balance resolution vs the
+                                 # cardinality/storage cost of your metrics.
+      scrapeTimeout: 10s
+      honorLabels: false
+      # Keep label cardinality sane: drop noisy per-URI histogram series that
+      # Micrometer can emit, which otherwise blow up Prometheus memory.
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'http_server_requests_seconds_bucket'
+          action: keep            # Example: keep the bucket series we chart...
+        - sourceLabels: [uri]
+          regex: '/actuator.*'
+          action: drop            # ...but drop self-monitoring actuator URIs.

@@ -1,0 +1,22 @@
+# Spring Data Redis connection. These defaults target a local Redis on the
+# standard port, which is what `docker run -p 6379:6379 redis` exposes.
+#
+# The integration test does NOT use these values: it starts its own throwaway
+# Redis with Testcontainers and overrides host/port via @DynamicPropertySource.
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # Fail fast if Redis is unreachable rather than hanging requests.
+      timeout: 2000ms
+
+server:
+  port: 8080
+
+# Quieten startup logs a touch; bump to DEBUG on the limiter package to watch
+# the Lua decisions if you are experimenting.
+logging:
+  level:
+    root: INFO
+    com.javamastery.examples.ratelimiter: INFO

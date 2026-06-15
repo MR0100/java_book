@@ -26,7 +26,7 @@ Alphabetical reference of terms used throughout the course. Each entry has a 1-2
 
 ## B
 
-**Backend for Frontend (BFF)**: A separate backend tailored for each frontend (mobile, web, desktop) that aggregates calls to underlying services. → [L4/C11](content/L4-backend-engineering/C11-cloud-native-patterns/)
+**Backend for Frontend (BFF)**: A separate backend tailored for each frontend (mobile, web, desktop) that aggregates calls to underlying services. → [L4/C05](content/L4-backend-engineering/C05-apis-advanced/)
 
 **Backpressure**: Mechanism by which a slow consumer signals an upstream producer to slow down, preventing buffer overflow. Critical in reactive streams. → [L5/C02/T14](content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md)
 
@@ -154,7 +154,7 @@ Alphabetical reference of terms used throughout the course. Each entry has a 1-2
 
 **Hexagonal Architecture (Ports and Adapters)**: Domain at the center; ports define interfaces; adapters implement them. Dependencies point inward. Same idea as Clean/Onion. → [L5/C01/T02](content/L5-architecture-leadership/C01-software-architecture/T02-clean-hexagonal-onion-architecture.md)
 
-**HikariCP**: Fast JDBC connection pool, default in Spring Boot. Pool sizing rule: `connections = (core_count × 2) + effective_spindle_count`. → [L4/C02](content/L4-backend-engineering/C02-persistence-and-jpa-advanced/)
+**HikariCP**: Fast JDBC connection pool, default in Spring Boot. Pool sizing rule: `connections = (core_count × 2) + effective_spindle_count`. → [L4/C02](content/L4-backend-engineering/C02-persistence-jpa-hibernate/)
 
 **Holder Idiom**: Lazy singleton pattern using nested static class. Thread-safe without `volatile`. → [L3/C03/T04](content/L3-advanced-jvm/C03-design-patterns-and-principles/T04-creational-patterns-singleton-factory-builder-prototype.md)
 
@@ -250,7 +250,7 @@ Alphabetical reference of terms used throughout the course. Each entry has a 1-2
 
 **OpenTelemetry (OTel)**: Vendor-neutral observability standard. Unified traces, metrics, logs. W3C Trace Context for propagation. → [L4/C10/T13](content/L4-backend-engineering/C10-devops-and-observability/T13-distributed-tracing-opentelemetry-jaeger-zipkin.md)
 
-**Optimistic Locking**: Concurrency control using a version column. UPDATE WHERE version = X. Throws on stale write. → [L4/C02](content/L4-backend-engineering/C02-persistence-and-jpa-advanced/)
+**Optimistic Locking**: Concurrency control using a version column. UPDATE WHERE version = X. Throws on stale write. → [L4/C02](content/L4-backend-engineering/C02-persistence-jpa-hibernate/)
 
 **Orchestration (Saga)**: Saga style with a central orchestrator that knows the workflow and calls each service in sequence. → [L5/C01/T10](content/L5-architecture-leadership/C01-software-architecture/T10-saga-pattern-distributed-transactions.md)
 

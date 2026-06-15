@@ -1,0 +1,96 @@
+# =============================================================================
+# OpenTelemetry Collector configuration (ConfigMap)
+# -----------------------------------------------------------------------------
+# Backing topics: L4/C10 (observability) + lab-06 (distributed tracing).
+#
+# The Collector is a vendor-neutral pipeline: receivers ingest telemetry,
+# processors batch/enrich it, exporters ship it to a backend. Your Spring Boot
+# app (instrumented with the OpenTelemetry Java agent or Micrometer Tracing +
+# OTLP) sends spans to this Collector over OTLP, and the Collector forwards them
+# to a tracing backend (Tempo / Jaeger).
+#
+# Running a Collector (rather than exporting straight from the app) decouples
+# the app from the backend: swap Jaeger for Tempo by editing THIS file, not
+# every service. It also centralizes batching, retry, and tail sampling.
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: otel-collector
+    app.kubernetes.io/part-of: observability-stack
+data:
+  # The Collector reads this YAML document as its config file (mounted at
+  # /etc/otelcol-contrib/config.yaml by the Deployment).
+  config.yaml: |
+    # ----- RECEIVERS: how telemetry gets IN -----
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317   # OTLP/gRPC — the default the OTel Java
+                                     # agent uses (OTEL_EXPORTER_OTLP_ENDPOINT).
+          http:
+            endpoint: 0.0.0.0:4318   # OTLP/HTTP — for SDKs/agents using HTTP.
+
+    # ----- PROCESSORS: batch, limit, enrich -----
+    processors:
+      batch:
+        # Batch spans before export — far fewer, larger requests to the backend.
+        timeout: 5s
+        send_batch_size: 512
+      memory_limiter:
+        # Backpressure so the Collector can't OOM under a span flood. Must be the
+        # FIRST processor in each pipeline. check_interval gates how often it
+        # samples memory; limits are absolute (tie to the Deployment's limits).
+        check_interval: 1s
+        limit_mib: 384
+        spike_limit_mib: 128
+      resourcedetection:
+        # Attach k8s/cloud resource attributes (cluster, node, region) so traces
+        # are queryable by infra dimensions.
+        detectors: [env, system]
+        timeout: 5s
+
+    # ----- EXPORTERS: where telemetry goes OUT -----
+    exporters:
+      # --- Traces -> Grafana Tempo (OTLP-native). SUBSTITUTE the endpoint. ---
+      otlp/tempo:
+        endpoint: tempo.observability.svc.cluster.local:4317
+        tls:
+          insecure: true            # In-cluster plaintext; enable TLS in prod.
+      # --- Alternative trace backend: Jaeger (also speaks OTLP since v1.35). ---
+      # otlp/jaeger:
+      #   endpoint: jaeger-collector.observability.svc.cluster.local:4317
+      #   tls:
+      #     insecure: true
+      # --- Debug exporter: prints to the Collector log; handy when bringing the
+      #     pipeline up. Remove or set verbosity: basic in prod. ---
+      debug:
+        verbosity: normal
+
+    # ----- EXTENSIONS: health & profiling endpoints -----
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133     # The Deployment's probes hit this.
+
+    # ----- SERVICE: wire receivers -> processors -> exporters into pipelines -----
+    service:
+      extensions: [health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, resourcedetection, batch]
+          exporters: [otlp/tempo, debug]
+        # A metrics pipeline is optional here: app metrics already flow to
+        # Prometheus via the ServiceMonitor. Enable this only if you prefer to
+        # funnel metrics through the Collector too.
+        # metrics:
+        #   receivers: [otlp]
+        #   processors: [memory_limiter, batch]
+        #   exporters: [debug]
+      telemetry:
+        logs:
+          level: info

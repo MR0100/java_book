@@ -45,5 +45,10 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 23 | Spring Session | `T23-spring-session.md` | planned |
 | 24 | Spring Testing | `T24-spring-testing.md` | planned |
 | 25 | Spring Native / GraalVM | `T25-spring-native-graalvm.md` | planned |
+| 26 | Spring Boot 4 & Spring Framework 7 | `T26-spring-boot-4-and-spring-framework-7.md` | complete |
+
+> [!NOTE]
+> T26 is a **Phase 6 (2026+ Forward-Looking)** addition, hand-maintained;
+> per-topic frontmatter `status` is the source of truth.
 
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

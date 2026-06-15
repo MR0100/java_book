@@ -1,0 +1,26 @@
+# Spring Boot externalized configuration.
+# TEACHING POINT: application.yml (or .properties) is auto-loaded from the classpath. Boot binds
+# these keys onto its auto-configured components. Anything here can be overridden by environment
+# variables, command-line args, or profile-specific files (application-<profile>.yml).
+
+spring:
+  application:
+    name: spring-boot-3-java-21
+
+server:
+  # The embedded Tomcat listens here. 8080 is the Boot default; shown explicitly for teaching.
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # TEACHING POINT: only "health" and "info" are exposed over HTTP by default. We make the
+        # exposure explicit here. Add more (e.g. "metrics", "env") deliberately — never expose
+        # everything ("*") in production without securing the actuator first.
+        include: health,info
+  endpoint:
+    health:
+      # "always" shows component details (disk space, ping, ...) on /actuator/health.
+      # In production prefer "when-authorized" so details aren't leaked to anonymous callers.
+      show-details: always

@@ -21,7 +21,7 @@ The mature view of LLMs in 2026 isn't "replace everything with AI" — it's "use
 This topic codifies the hybrid patterns: AI as classifier feeding traditional decision systems, AI as fallback when rules don't match, AI as enrichment of traditional outputs, dual-path architectures with parallel AI and classical processing, and the integration patterns that keep both halves observable, testable, and safe.
 
 > [!NOTE]
-> Prerequisites: [When to Use LLMs vs Traditional ML](T01-when-to-use-llms-vs-traditional-ml.md), [AI Gateway Design](T02-ai-gateway-design-rate-limiting-fallback-caching.md), [AI Safety](T06-ai-safety-and-prompt-injection-defense.md), [Microservices Decomposition](../C01-software-architecture/T11-microservices-decomposition.md).
+> Prerequisites: [When to Use LLMs vs Traditional ML](T01-when-to-use-llms-vs-traditional-ml.md), [AI Gateway Design](T02-ai-gateway-design-rate-limiting-fallback-caching.md), [AI Safety](T06-ai-safety-and-prompt-injection-defense.md), [Microservices Decomposition](../C01-software-architecture/T05-microservices-decomposition.md).
 
 ## Why Hybrid Wins
 

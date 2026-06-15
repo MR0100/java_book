@@ -35,7 +35,7 @@ Curated study paths through the course based on your current level, goal, and av
 - [L1/C01/T14 Records](content/L1-core-java/C01-oop/T14-record-types.md)
 - [L1/C01/T15 Sealed classes](content/L1-core-java/C01-oop/T15-sealed-classes-and-interfaces.md)
 - [L1/C02/T19 Optional](content/L1-core-java/C02-collections-and-core-apis/T19-optional.md)
-- [L2/C01](content/L2-intermediate-backend/C01-functional-java-and-modern-features/) — Streams + lambdas
+- [L2/C01](content/L2-intermediate-backend/C01-functional-and-modern-java/) — Streams + lambdas
 
 **Week 3: Collections Deep**
 - [L1/C02/T01-T08](content/L1-core-java/C02-collections-and-core-apis/) — List, Set, Map basics
@@ -60,7 +60,7 @@ Curated study paths through the course based on your current level, goal, and av
 **Week 7: Spring MVC + REST**
 - [L4/C01/T10 Spring MVC](content/L4-backend-engineering/C01-spring-framework/T10-spring-mvc-rest-controllers.md)
 - [L4/C01/T12 Exception handling](content/L4-backend-engineering/C01-spring-framework/T12-exception-handling-controlleradvice.md)
-- [L4/C01/T11 Bean validation](content/L4-backend-engineering/C01-spring-framework/T11-bean-validation-jakarta-validation.md)
+- [L4/C01/T11 Bean validation](content/L4-backend-engineering/C01-spring-framework/T11-validation-valid-bean-validation.md)
 
 **Week 8: SQL + JDBC**
 - [L2/C05/T01-T08](content/L2-intermediate-backend/C05-databases-and-sql/) — SQL deep, JDBC basics
@@ -142,10 +142,10 @@ Curated study paths through the course based on your current level, goal, and av
 
 **Week 9: Spring AOP + Transactional**
 - [L4/C01/T05 Spring AOP](content/L4-backend-engineering/C01-spring-framework/T05-spring-aop.md) — Including @Transactional self-invocation
-- [L4/C01/T06 Spring Transactions](content/L4-backend-engineering/C01-spring-framework/T06-spring-transactions.md)
+- [L4/C01/T06 Spring Transactions](content/L4-backend-engineering/C02-persistence-jpa-hibernate/T12-transactions-with-jpa.md)
 
 **Week 10: JPA Advanced**
-- [L4/C02 JPA & Hibernate advanced](content/L4-backend-engineering/C02-persistence-and-jpa-advanced/) — N+1, EntityGraph, optimistic locking
+- [L4/C02 JPA & Hibernate advanced](content/L4-backend-engineering/C02-persistence-jpa-hibernate/) — N+1, EntityGraph, optimistic locking
 
 **Week 11: NoSQL + Caching**
 - [L4/C04 NoSQL & caching](content/L4-backend-engineering/C04-nosql-and-caching/) — Redis production-grade
@@ -248,14 +248,14 @@ Study + practice these end-to-end with running code:
 ### Month 1 — Interview Foundations
 
 **Week 1: Interview System**
-- [L6/C01/T01 Leveling](content/L6-interview-mastery/C01-foundations-and-methodology/T01-engineering-levels-junior-to-lead.md)
-- [L6/C01/T02 Funnel](content/L6-interview-mastery/C01-foundations-and-methodology/T02-interview-funnel-and-stages.md)
-- [L6/C01/T03 Rubric](content/L6-interview-mastery/C01-foundations-and-methodology/T03-evaluation-rubric-signals-interviewers-look-for.md)
-- [L6/C01/T05 Communication](content/L6-interview-mastery/C01-foundations-and-methodology/T05-thinking-aloud-and-communication-mechanics.md)
-- [L6/C01/T06 Prep system](content/L6-interview-mastery/C01-foundations-and-methodology/T06-your-personal-prep-system.md)
+- [L6/C01/T01 Leveling](content/L6-interview-mastery/C01-foundations-of-interviewing/T01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.md)
+- [L6/C01/T02 Funnel](content/L6-interview-mastery/C01-foundations-of-interviewing/T02-the-interview-funnel-recruiter-screen-loop-debrief-offer.md)
+- [L6/C01/T03 Rubric](content/L6-interview-mastery/C01-foundations-of-interviewing/T03-the-interviewer-s-rubric-signals-scoring-calibration.md)
+- [L6/C01/T05 Communication](content/L6-interview-mastery/C01-foundations-of-interviewing/T05-communication-mechanics-clarify-structure-think-aloud-recover.md)
+- [L6/C01/T06 Prep system](content/L6-interview-mastery/C01-foundations-of-interviewing/T06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md)
 
 **Week 2: DSA Refresh** (allocate 2-3 hours per pattern)
-- [L6/C02 — 110 worked DSA solutions across 14 patterns](content/L6-interview-mastery/C02-dsa-patterns/)
+- [L6/C02 — 110 worked DSA solutions across 14 patterns](content/L6-interview-mastery/C02-dsa-for-interviews/)
 - Target: Comfortable with all patterns
 
 **Week 3: System Design**
@@ -268,7 +268,7 @@ Study + practice these end-to-end with running code:
 ### Month 2 — Company-Specific Tracks
 
 Pick 3-5 companies and study their tracks:
-- [L6/C04/T03 Amazon LPs](content/L6-interview-mastery/C04-behavioral-and-company-tracks/T03-amazon-leadership-principles-and-the-bar-raiser-system.md)
+- [L6/C04/T03 Amazon LPs](content/L6-interview-mastery/C04-behavioral-and-company-tracks/T03-company-track-amazon-leadership-principles.md)
 - [L6/C04/T04-T11 — Google/Meta/Apple/Netflix/Microsoft/Flipkart/Unicorns/Banking](content/L6-interview-mastery/C04-behavioral-and-company-tracks/)
 
 ### Month 3 — Q&A Banks + Resume + Negotiation
@@ -299,7 +299,7 @@ Pick 3-5 companies and study their tracks:
 
 ### Phase 3: Interview-Specific Prep (2 months)
 - [L6/C04/T01 STAR](content/L6-interview-mastery/C04-behavioral-and-company-tracks/T01-behavioral-interviews-star-car-sbi.md) — Frame your switch story
-- [L6/C02 DSA](content/L6-interview-mastery/C02-dsa-patterns/) — Especially if FAANG-style
+- [L6/C02 DSA](content/L6-interview-mastery/C02-dsa-for-interviews/) — Especially if FAANG-style
 - [L6/C06/T01-T04 Java/Concurrency/Collections/Spring Q&A banks](content/L6-interview-mastery/C06-staff-level-interview-question-banks/)
 
 ---
@@ -330,7 +330,7 @@ Pick 3-5 companies and study their tracks:
 ## 🎯 Quick-Win Paths (For Time-Constrained)
 
 ### "Interview in 4 Weeks"
-- Week 1: [L6/C01](content/L6-interview-mastery/C01-foundations-and-methodology/) + [L6/C02/T01-T07](content/L6-interview-mastery/C02-dsa-patterns/) (most-asked DSA)
+- Week 1: [L6/C01](content/L6-interview-mastery/C01-foundations-of-interviewing/) + [L6/C02/T01-T07](content/L6-interview-mastery/C02-dsa-for-interviews/) (most-asked DSA)
 - Week 2: [L6/C03/T06-T09](content/L6-interview-mastery/C03-design-interviews/) (HLD framework + 4 worked examples)
 - Week 3: [L6/C04](content/L6-interview-mastery/C04-behavioral-and-company-tracks/) (behavioral + target company)
 - Week 4: [L6/C06](content/L6-interview-mastery/C06-staff-level-interview-question-banks/) (Q&A banks for your domain)

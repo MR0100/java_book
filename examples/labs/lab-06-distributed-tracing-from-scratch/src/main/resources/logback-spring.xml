@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logback config whose pattern pulls traceId/spanId out of the MDC.
+
+  The %X{traceId} / %X{spanId} conversion words print whatever the TracingFilter
+  put into the SLF4J MDC for the current thread. The result: EVERY log line emitted
+  while handling a request is automatically tagged with the trace, with no change to
+  the logging calls in the controller/filter. The "[-]" defaults keep the columns
+  aligned for log lines emitted outside any request (e.g. startup banners).
+
+  This is exactly the trick Spring Boot's own default tracing uses; here we wire it
+  by hand so you can see there is nothing magic about it.
+-->
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [trace=%X{traceId:-────────────────────────────────} span=%X{spanId:-────────────────}] %-40logger{40} : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

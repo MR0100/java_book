@@ -94,7 +94,7 @@ Alphabetical lookup for every acronym used in the course. Each entry has the exp
 | **DNS** | Domain Name System | Hostname resolution |
 | **DPDPA** | Digital Personal Data Protection Act | India's data protection law (2023) |
 | **DRY** | Don't Repeat Yourself | Programming principle |
-| **DSA** | Data Structures and Algorithms | Interview prep topic → [L6/C02](content/L6-interview-mastery/C02-dsa-patterns/) |
+| **DSA** | Data Structures and Algorithms | Interview prep topic → [L6/C02](content/L6-interview-mastery/C02-dsa-for-interviews/) |
 | **DST** | Daylight Saving Time | Clock issue; use UTC internally |
 | **DTO** | Data Transfer Object | Flat object for layer boundary transfer → [T01](content/L5-architecture-leadership/C01-software-architecture/T01-layered-architecture.md) |
 

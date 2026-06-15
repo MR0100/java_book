@@ -21,7 +21,7 @@ Once your organization has more than one team using LLMs, every team independent
 This topic covers the architecture of a production AI gateway: capabilities, traffic patterns, multi-provider routing, semantic caching, fallback strategies, observability, the build-vs-buy decision (Portkey, Helicone, LiteLLM proxy, Kong AI Gateway).
 
 > [!NOTE]
-> Prerequisites: [LLM API Fundamentals](../../L4-backend-engineering/C18-ai-llm-integration/T01-llm-api-fundamentals.md), [API Gateway and Service Mesh](../C02-distributed-systems-and-system-design/T17-api-gateway-and-service-mesh.md), [Rate Limiting Algorithms](../C02-distributed-systems-and-system-design/T26-rate-limiting-algorithms.md), [Resilience Patterns](../C02-distributed-systems-and-system-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md).
+> Prerequisites: [LLM API Fundamentals](../../L4-backend-engineering/C18-ai-llm-integration/T01-llm-api-fundamentals.md), [API Gateway and Service Mesh](../C01-software-architecture/T07-api-gateway-and-service-mesh.md), [Rate Limiting Algorithms](../C02-distributed-systems-and-system-design/T13-rate-limiting-algorithms.md), [Resilience Patterns](../C02-distributed-systems-and-system-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md).
 
 ## What an AI Gateway Does
 

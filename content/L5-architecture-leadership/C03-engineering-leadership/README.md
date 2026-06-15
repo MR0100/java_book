@@ -33,5 +33,12 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 11 | On-call & production ownership | `T11-on-call-and-production-ownership.md` | planned |
 | 12 | Hiring & interviewing (as interviewer) | `T12-hiring-and-interviewing-as-interviewer.md` | planned |
 | 13 | Stakeholder & upward communication | `T13-stakeholder-and-upward-communication.md` | planned |
+| 14 | Cost engineering & FinOps | `T14-cost-engineering-and-finops.md` | complete |
+| 15 | JVM container right-sizing | `T15-jvm-container-right-sizing.md` | complete |
+| 16 | Spot & preemptible instance patterns | `T16-spot-and-preemptible-patterns.md` | complete |
+
+> [!NOTE]
+> T14–T16 are **Phase 6 (2026+ Forward-Looking)** additions (a cost-efficiency cluster),
+> hand-maintained; per-topic frontmatter `status` is the source of truth.
 
 [Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

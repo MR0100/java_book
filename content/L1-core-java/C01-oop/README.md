@@ -39,5 +39,10 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 17 | Java Module System (JPMS) | `T17-java-module-system-jpms.md` | planned |
 | 18 | Object cloning & Cloneable | `T18-object-cloning-and-cloneable.md` | planned |
 | 19 | Immutability & immutable class design | `T19-immutability-and-immutable-class-design.md` | planned |
+| 20 | Modern Java & the Java 25 LTS landscape | `T20-modern-java-and-the-java-25-lts-landscape.md` | complete |
+
+> [!NOTE]
+> T20 is a **Phase 6 (2026+ Forward-Looking)** addition, hand-maintained;
+> per-topic frontmatter `status` is the source of truth.
 
 [Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

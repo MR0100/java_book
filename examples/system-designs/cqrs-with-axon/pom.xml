@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      spring-boot-starter-parent gives us:
+        - a curated, conflict-free dependency BOM (we omit versions on the starters below)
+        - sensible compiler/plugin defaults (turns <java.version> into a release-21 build)
+        - the spring-boot-maven-plugin (repackage + `spring-boot:run`)
+      3.3.x is the latest Boot 3.3 line; it requires Java 17+ and is happy on 21.
+
+      NOTE ON "axon": the directory is named cqrs-with-axon for traceability, but there is
+      deliberately NO Axon Framework dependency here. CQRS is a *pattern*, not a library; this
+      example hand-rolls it with plain Spring so it runs on H2 with zero external infra. The
+      README's "How Axon Framework would do this" section maps each hand-rolled piece to its
+      Axon equivalent (aggregates, @CommandHandler/@EventHandler, event store, tracking processors).
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the repository, not a local dir -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>cqrs-with-axon</artifactId>
+    <version>1.0.0</version>
+    <name>cqrs-with-axon</name>
+    <description>Worked system-design example: Command Query Responsibility Segregation (CQRS)
+        with a hand-rolled, lightweight approach (no Axon dependency) on H2. Writes go through
+        commands; reads hit a separate denormalized read model kept up to date by an event-driven
+        projection, demonstrating eventual consistency between the two sides.</description>
+
+    <properties>
+        <!-- Targets Java 21 bytecode. Boot's compiler config turns this into a release-21 build. -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Web layer: embedded Tomcat + Spring MVC for the REST controller (POST command, GET query). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+          Persistence: Spring Data JPA (Hibernate). We map TWO independent schemas with it:
+            - the WRITE model (normalized, authoritative) and
+            - the READ model (denormalized, query-optimized).
+          The whole point of CQRS is that these two are decoupled.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+          H2 in-memory database, runtime scope. This is what lets the whole app start with
+          ZERO external infrastructure. The "event bus" is Spring's in-process
+          ApplicationEventPublisher, not Kafka/RabbitMQ -> no broker needed.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JUnit 5, AssertJ, MockMvc, Spring test slices. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Enables `mvn spring-boot:run` and builds an executable fat-jar. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

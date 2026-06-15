@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Idioms, anti-patterns, and common pitfalls for this level.
 
+## Topics
+
+- [L3 Best Practices & Pitfalls](T01-best-practices-and-pitfalls-l3.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

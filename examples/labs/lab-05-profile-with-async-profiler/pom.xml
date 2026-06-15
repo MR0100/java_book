@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      ============================================================================
+      LAB 05 - PROFILE WITH ASYNC-PROFILER / JFR
+      Backs: L3/C02/T11 "Profiling (JFR, async-profiler, VisualVM)" (hands-on lab)
+      ============================================================================
+
+      Plain Java 21 - NO Spring, NO frameworks. A profiler measures the WHOLE
+      process; the less unrelated code on the classpath, the cleaner the flame
+      graph. Everything you see in the profile of WorkloadApp is YOUR code, not a
+      DI container spinning up beans on background threads.
+
+      The only dependency is JUnit 5, in test scope. async-profiler and JFR are
+      attached at RUNTIME (an agent / a JVM flag), so there is deliberately NO
+      profiling library on the build classpath. That is the realistic model:
+      you profile a normal jar with an external tool, you do not compile the
+      profiler in.
+    -->
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-05-profile-with-async-profiler</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>lab-05-profile-with-async-profiler</name>
+    <description>Hands-on lab: find a hidden CPU hotspot with async-profiler / JFR, read it on a flame graph, and fix it. CPU vs wall-clock vs alloc profiling. Java 21, plain Java.</description>
+
+    <properties>
+        <!--
+          maven.compiler.release pins the BYTECODE level to 21. Unlike
+          source/target, `release` also restricts the visible JDK API to Java 21,
+          so you cannot accidentally call a 22+ method. A newer JDK (22..25) can
+          still compile and run this while emitting genuine Java 21 class files.
+
+          This matters for the lab: async-profiler resolves Java frames against
+          the running JVM, and JFR is a JDK feature, so the runtime JDK is what
+          counts. Anything 21+ on your PATH works.
+        -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>5.11.3</junit.version>
+        <surefire.version>3.5.2</surefire.version>
+        <compiler.plugin.version>3.13.0</compiler.plugin.version>
+        <exec.plugin.version>3.5.0</exec.plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+              JUnit 5 BOM keeps jupiter-api / jupiter-engine / platform on
+              mutually-compatible versions so we can omit <version> below.
+            -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!--
+          JUnit Jupiter (API + engine), TEST scope only. None of this is on the
+          runtime classpath of WorkloadApp, which you launch with
+          `java -cp target/classes ...`. The test proves the optimized path is
+          behaviour-preserving (identical output) and is a touch faster on a
+          tiny workload - it does NOT run a real benchmark (that would make
+          `mvn test` slow and flaky in CI).
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              Compiler plugin pinned + release 21 (via maven.compiler.release).
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+            </plugin>
+
+            <!--
+              Surefire runs the JUnit 5 tests during `mvn test`. The timing
+              sanity check uses a MODEST workload sized to finish in well under a
+              second, so CI stays fast and green. We do not set any profiling
+              flags here - profiling is something you do by hand to the launched
+              app, per the README.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+            </plugin>
+
+            <!--
+              exec-maven-plugin: convenience launcher so you do not hand-type a
+              classpath. The README mostly uses a raw `java -cp target/classes`
+              invocation, because to ATTACH a profiler you need the PID of a
+              long-running JVM, and a raw `java` process is the cleanest target.
+
+                mvn -q compile exec:java \
+                  -Dexec.mainClass=com.javamastery.examples.profiling.WorkloadApp
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec.plugin.version}</version>
+                <configuration>
+                    <mainClass>com.javamastery.examples.profiling.WorkloadApp</mainClass>
+                    <classpathScope>compile</classpathScope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

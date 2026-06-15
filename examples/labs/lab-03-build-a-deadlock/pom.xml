@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-03-build-a-deadlock</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>lab-03-build-a-deadlock</name>
+    <description>
+        Concurrency lab: deliberately build a deadlock, observe it with a thread
+        dump, then fix it with global lock ordering and tryLock+timeout.
+        Backs L3 concurrency and L6/C14/T06 Banking JVM-Deep (deadlock).
+    </description>
+
+    <properties>
+        <!-- Java 21. We use maven.compiler.release so the build is correct even
+             when run on a newer JDK (e.g. JDK 25): the compiler targets the
+             Java 21 API and bytecode level exactly. -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>5.10.2</junit.version>
+        <surefire.version>3.2.5</surefire.version>
+    </properties>
+
+    <dependencies>
+        <!-- JUnit 5 (aggregator pulls in api + engine + params). Test scope only. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <!-- Surefire runs the JUnit 5 tests. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

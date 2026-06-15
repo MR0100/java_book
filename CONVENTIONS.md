@@ -94,8 +94,8 @@ last_updated: 2026-05-28               # ISO date
   highlighting on the site depends on it.
 - Code should be complete enough to compile/run unless clearly a fragment
   (mark fragments with `// ...`).
-- Runnable examples that accompany a topic go in that module's
-  `examples/` folder and are linked from the topic.
+- Runnable examples that accompany a topic live under the repo-root
+  **[`examples/`](examples/)** tree (see §12) and are linked from the topic.
 - Terminal commands use `bash` and a `$` prompt; readers don't type the `$`.
 
 ```bash
@@ -136,7 +136,7 @@ Plus one **custom** convention the build will style specially:
 ## 6. Links
 
 - Link between docs with **relative paths including the `.md`** extension
-  (e.g. `[generics](../L2-intermediate-backend/03-generics/01-basics.md)`).
+  (e.g. `[generics](content/L1-core-java/C02-collections-and-core-apis/T11-generics-basics.md)`).
   The build rewrites these to clean web routes.
 - Link to images relatively from `assets/`.
 - Don't hard-code absolute file-system paths or full GitHub URLs for
@@ -212,3 +212,46 @@ Standard skeleton for a Concept topic (see `templates/topic-template.md`):
 - Explain **why** before **how**, especially at L3+.
 - Define jargon on first use. Assume curiosity, not prior knowledge
   (within the module's tier).
+
+---
+
+## 12. Runnable Examples (`examples/`)
+
+Companion code lives in a repo-root **`examples/`** tree, grouped by purpose:
+
+```
+examples/
+├── starter-templates/   # copy-me project skeletons
+├── system-designs/      # classic designs made runnable (url-shortener, saga, …)
+├── labs/                # guided, time-boxed hands-on exercises
+└── k8s-manifests/       # deployment & operations YAML (k8s + Istio)
+```
+
+Rules for any project added here:
+
+- **Self-contained & runnable.** A standard **Maven** project (`pom.xml`), groupId
+  `com.javamastery.examples`, **Java 21** baseline (compile to Java 21 bytecode so it
+  runs on any JDK 21+). `mvn test` is the definition of done.
+- **Zero external infra by default** — use **H2** or in-process stand-ins. If a project
+  genuinely needs infra (Redis, a broker), use **Testcontainers** so `mvn test` provisions
+  it (and keep the pure-logic tests passing without Docker).
+- **Every project has a `README.md`** that opens with a `Backs: L#/C##/T## — <topic>` line
+  linking the chapter it supports, then: what it demonstrates, prerequisites, exact run
+  commands, expected output, and "Files to read first."
+- **Labs that demonstrate failure** (OOM, deadlock, a misleading benchmark) gate the
+  destructive behavior behind a `main`/flag so the test suite stays green and never hangs.
+- The top-level [`examples/README.md`](examples/README.md) is the index mapping every
+  project back to its topic — update it when adding a project.
+
+## 13. Indexes For Expansion-Phase Additions
+
+The skeleton generator (`scripts/generate_skeleton.py`) predates the post-skeleton
+expansion phases and prints every topic as `planned`. **Do not re-run it to "fix" an
+index** — it will overwrite hand-authored chapter READMEs and drop the expansion
+chapters/topics. Instead:
+
+- When adding a topic to an existing chapter, **hand-add its row** to that chapter's
+  `README.md` (status `complete`) and add a short `> [!NOTE]` flagging it as a
+  phase addition.
+- The **per-topic frontmatter `status`** is the source of truth for completion, not the
+  generated tables.

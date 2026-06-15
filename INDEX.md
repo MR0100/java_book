@@ -41,7 +41,7 @@ Single-page navigation for the entire Java backend mastery course (L0 → L6).
 
 ### 🗄️ Databases & Persistence
 - [L2/C05 — Database basics](content/L2-intermediate-backend/C05-databases-and-sql/)
-- [L4/C02 — JPA & Hibernate advanced](content/L4-backend-engineering/C02-persistence-and-jpa-advanced/)
+- [L4/C02 — JPA & Hibernate advanced](content/L4-backend-engineering/C02-persistence-jpa-hibernate/)
 - [L4/C03 — Databases advanced (indexing, partitioning)](content/L4-backend-engineering/C03-databases-advanced/)
 - [L4/C04 — NoSQL & caching](content/L4-backend-engineering/C04-nosql-and-caching/)
 
@@ -75,8 +75,8 @@ Single-page navigation for the entire Java backend mastery course (L0 → L6).
 - [L5/C02/T15 — Reliability/SLI/SLO/SLA](content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T15-reliability-sli-slo-sla-redundancy-failover.md)
 
 ### 🎯 Interview Prep
-- [L6/C01 — Foundations & methodology](content/L6-interview-mastery/C01-foundations-and-methodology/)
-- [L6/C02 — DSA patterns + 110 worked solutions](content/L6-interview-mastery/C02-dsa-patterns/)
+- [L6/C01 — Foundations & methodology](content/L6-interview-mastery/C01-foundations-of-interviewing/)
+- [L6/C02 — DSA patterns + 110 worked solutions](content/L6-interview-mastery/C02-dsa-for-interviews/)
 - [L6/C03 — Design interviews](content/L6-interview-mastery/C03-design-interviews/)
 - [L6/C04 — Behavioral & company tracks](content/L6-interview-mastery/C04-behavioral-and-company-tracks/)
 - [L6/C05 — Resume, profile & career](content/L6-interview-mastery/C05-resume-profile-and-career/)
@@ -231,7 +231,7 @@ Single-page navigation for the entire Java backend mastery course (L0 → L6).
 **C11 — Cloud-native Patterns** (12 topics)
 
 ### Cross-cutting
-- [C12 Tools & Environment](content/L4-backend-engineering/C12-tools-and-environment/)
+- [C11 Tools & Environment](content/L4-backend-engineering/C11-tools-and-environment/)
 - [C13 Best practices](content/L4-backend-engineering/C13-best-practices/) — N+1, Spring Boot 3, 15 operational anti-patterns
 - [C14 Interview prep](content/L4-backend-engineering/C14-interview-prep/) — 71 Qs (8 incident scenarios)
 - [C15 Q&A FAQ](content/L4-backend-engineering/C15-qa-faq/)

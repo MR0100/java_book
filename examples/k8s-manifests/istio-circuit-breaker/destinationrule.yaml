@@ -1,0 +1,75 @@
+# =============================================================================
+# Istio DestinationRule — MESH-LEVEL CIRCUIT BREAKER
+# -----------------------------------------------------------------------------
+# Backing topics:
+#   - L5/C02/T14  Resilience patterns (circuit breaker, bulkhead, timeouts).
+#   - L5/C12/T01  Netflix case study (Hystrix popularized the in-process
+#                 circuit breaker; a service mesh moves the same pattern OUT of
+#                 your code and into the sidecar — no library, no redeploy).
+#
+# Two cooperating mechanisms make up the breaker:
+#   1. connectionPool  — BULKHEAD: caps concurrent connections/requests so a
+#                        slow dependency can't exhaust all your resources.
+#                        When caps are hit, Envoy fast-fails with 503 instead
+#                        of queueing forever (fail fast > fail slow).
+#   2. outlierDetection — the BREAKER itself: ejects individual backend hosts
+#                        that return errors, then probes them back in.
+#
+# API: networking.istio.io/v1 (GA, Istio 1.22+). Use v1beta1 on older meshes.
+# =============================================================================
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: url-shortener-circuit-breaker
+  namespace: url-shortener
+spec:
+  host: url-shortener        # The Service these policies protect.
+  trafficPolicy:
+    # -------------------------------------------------------------------------
+    # CONNECTION POOL (bulkhead / load shedding)
+    # -------------------------------------------------------------------------
+    connectionPool:
+      tcp:
+        maxConnections: 100        # Max TCP connections Envoy opens to all
+                                   # endpoints of this host combined. Beyond
+                                   # this, new connections wait/fail — prevents
+                                   # a connection flood to a struggling backend.
+        connectTimeout: 3s         # Give up establishing a TCP connection after
+                                   # 3s instead of hanging.
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50   # Queue depth for requests waiting on a
+                                      # connection. Small + bounded = fail fast
+                                      # under overload rather than building an
+                                      # unbounded backlog (the latency-collapse
+                                      # failure mode).
+        http2MaxRequests: 100         # Max concurrent requests (HTTP/2 streams)
+                                      # across all hosts.
+        maxRequestsPerConnection: 100 # Recycle a connection after N requests
+                                      # (mitigates connection-affinity skew; 0 =
+                                      # unlimited).
+        maxRetries: 3                 # Cap retries IN FLIGHT at once, so a retry
+                                      # storm can't amplify load on a sick
+                                      # backend (retries make outages worse).
+    # -------------------------------------------------------------------------
+    # OUTLIER DETECTION (the circuit breaker: eject unhealthy hosts)
+    # -------------------------------------------------------------------------
+    outlierDetection:
+      # A host that returns this many consecutive 5xx (gateway errors) is
+      # ejected from the load-balancing pool — Envoy stops sending it traffic.
+      consecutive5xxErrors: 5
+      # Also trip on consecutive gateway errors (502/503/504) specifically.
+      consecutiveGatewayErrors: 5
+      interval: 10s              # How often Envoy sweeps hosts for ejection.
+      baseEjectionTime: 30s      # Initial eviction duration. Each repeat
+                                 # ejection multiplies this (30s, 60s, 90s...),
+                                 # so flapping hosts stay out longer.
+      maxEjectionPercent: 50     # Never eject more than half the pool at once —
+                                 # protects against ejecting ALL hosts and taking
+                                 # the service fully down (the "open circuit that
+                                 # never closes" trap).
+      minHealthPercent: 40       # If healthy hosts drop below 40%, disable
+                                 # outlier detection (better to load-balance over
+                                 # everything than to have nothing to route to).

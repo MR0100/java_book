@@ -7,11 +7,11 @@ section: "JVM Internals & Performance"
 type: concept
 difficulty: advanced
 order: 5
-tags: [aot, ahead-of-time-compilation, graalvm-native-image, oracle-labs, substrate-vm, svm, closed-world-assumption, reachability-analysis, image-heap, build-time-initialization, runtime-initialization, initialize-at-build-time, initialize-at-run-time, reflection-config, reflect-config-json, proxy-config, jni-config, resource-config, serialization-config, graalvm-agent, hint-collection, graalvm-reachability-repository, grr, jep-484, jep-295, profile-guided-aot, pgo-aot, spring-native, spring-boot-3, quarkus, micronaut, helidon, framework-aot, startup-time, cold-start, faas, lambda-cold-start, k8s-pod-startup, cli-tool, embedded-java, appcds, app-cds, jep-310, jep-341, crac, coordinated-restore-at-checkpoint, aws-lambda-snapstart, jep-575, project-leyden, three-tier-leyden, polyglot, truffle, llvm-bitcode, jit-vs-aot, decision-matrix, image-size, throughput-vs-jvm, build-time-cost, native-image-debug, build-report]
+tags: [aot, ahead-of-time-compilation, graalvm-native-image, oracle-labs, substrate-vm, svm, closed-world-assumption, reachability-analysis, image-heap, build-time-initialization, runtime-initialization, initialize-at-build-time, initialize-at-run-time, reflection-config, reflect-config-json, proxy-config, jni-config, resource-config, serialization-config, graalvm-agent, hint-collection, graalvm-reachability-repository, grr, jep-484, jep-295, profile-guided-aot, pgo-aot, spring-native, spring-boot-3, quarkus, micronaut, helidon, framework-aot, startup-time, cold-start, faas, lambda-cold-start, k8s-pod-startup, cli-tool, embedded-java, appcds, app-cds, jep-310, jep-341, crac, coordinated-restore-at-checkpoint, aws-lambda-snapstart, jep-575, project-leyden, three-tier-leyden, polyglot, truffle, llvm-bitcode, jit-vs-aot, decision-matrix, image-size, throughput-vs-jvm, build-time-cost, native-image-debug, build-report, oracle-graalvm, graalvm-for-jdk, graalvm-21, graalvm-25, project-galahad, graalvm-galahad, gftc-license, criu, resource-api, azul-zulu, bellsoft-liberica, snapstart, fast-startup, priming, native-vs-crac]
 prerequisites: [jit-compilation-c1-c2-tiered, bytecode-basics, class-loading-and-class-loaders, jvm-architecture-and-runtime-data-areas]
 status: complete
 estimated_minutes: 135
-last_updated: 2026-06-08
+last_updated: 2026-06-15
 ---
 
 # AOT & GraalVM Native Image
@@ -800,6 +800,271 @@ jobs:
           path: target/myapp
 ```
 
+## GraalVM in 2026 — Oracle GraalVM, GraalVM for JDK, and Project Galahad
+
+The earlier sections describe native-image as a stable, mature tool — and it is. But the *packaging* and *roadmap* around GraalVM shifted a lot between 2022 and 2026, and teams adopting it today land in a noticeably different landscape than the blog posts from 2021 describe. This section is the "what's actually shipping right now, and where is it going" update. Treat the exact version numbers below as illustrative — GraalVM's cadence is fast, so always confirm against the current release notes before you pin a build.
+
+### The Mental Model Shift — GraalVM Now Tracks the JDK
+
+For years, "GraalVM" meant a *separate, parallel JDK distribution* with its own version numbers (GraalVM 19.3, 20.1, 21.3, 22.x…) that lagged the mainline OpenJDK by a release or two. Tooling, base-JDK features, and security patches arrived on GraalVM's own schedule, which was a perennial source of friction: "we want JDK 21's virtual threads *and* native-image, but the GraalVM build is still on JDK 17."
+
+That era is over. GraalVM is now released as **GraalVM for JDK N**, versioned and shipped *in lockstep with the OpenJDK feature releases* it builds on — so you get **GraalVM for JDK 21**, **GraalVM for JDK 25**, and so on, landing on (or very close to) the same day as the matching OpenJDK release. Practically: the GraalVM you download *is* a JDK N with all of N's language and library features, plus the Graal compiler and `native-image` bundled in. No more "which JDK does this GraalVM contain?" archaeology.
+
+```bash
+# 2026-style install: pick the GraalVM that matches the JDK you target.
+# (Distribution coordinates vary; confirm current ones via sdkman list.)
+sdk install java 21.0.x-graal     # GraalVM for JDK 21 (LTS)
+sdk install java 25.0.x-graal     # GraalVM for JDK 25 (LTS, if released)
+
+java -version
+# Reports the JDK version (21 / 25) — GraalVM IS that JDK plus native-image.
+
+native-image --version
+# native-image bundled in; same tool described throughout this topic.
+```
+
+> [!NOTE]
+> The **community build** is commonly distributed as **GraalVM Community Edition (CE)**, and convenient JDK-distribution channels (e.g. SDKMAN!, Liberica Native Image Kit) repackage it. The CE/Oracle split below is about *licensing and the extra optimizing features*, not about which JDK version you get.
+
+### The Licensing & Distribution Landscape (High Level)
+
+Three buckets, kept deliberately high-level — licensing terms change, so verify before you build a business plan on them:
+
+| Distribution | What it is | Extra optimizations (e.g. PGO, advanced GC) | License posture (high level) |
+|---|---|---|---|
+| **GraalVM Community Edition (CE)** | Fully open-source build (GPLv2+CE, like OpenJDK). The default for most teams. | No (PGO and some advanced features are not in CE). | Open source; free for any use. |
+| **Oracle GraalVM** | Oracle's production build, distributed under the **GraalVM Free Terms and Conditions (GFTC)**. Includes the higher-tier optimizations. | Yes — **PGO**, G1 for native image, advanced compiler optimizations. | Free under GFTC for many uses (including production); commercial support sold separately. *The old paid "GraalVM Enterprise Edition" branding has been folded into "Oracle GraalVM."* |
+| **Repackaged community builds** | Liberica NIK (BellSoft), Mandrel (Red Hat, tuned for Quarkus), etc. — CE-based, sometimes hardened/trimmed for a framework. | Generally no (CE-based). | Open source. |
+
+The single most common 2026 confusion: **"GraalVM Enterprise Edition (EE)" effectively no longer exists as a separate paid SKU** — what the PGO section earlier in this topic calls "GraalVM EE" is now delivered as **Oracle GraalVM under the GFTC**, which many teams can use in production at no license cost (support contracts are a separate purchase). If you read older docs that gate PGO behind "EE," mentally substitute "Oracle GraalVM." Always re-read the current GFTC for your specific use case; this is a moving target and *not* legal advice.
+
+> [!NOTE]
+> **Mandrel** is worth knowing by name: it's a downstream, CE-based native-image distribution maintained by Red Hat and tuned specifically for building Quarkus apps. If you build Quarkus natives in a Red Hat shop, you're likely already using Mandrel without thinking about it.
+
+### Project Galahad — Upstreaming Graal Into OpenJDK
+
+Here's the strategically important part for the next several years: **Project Galahad** is the OpenJDK effort to **contribute (upstream) GraalVM's just-in-time compiler and native-image technology into the OpenJDK code base itself**, where it will be developed alongside (and feed into) **Project Leyden** (covered earlier in this topic).
+
+Why this matters in plain terms: today, native-image and the Graal JIT live in the *separate* GraalVM project. Galahad's goal is to bring that technology *home* into mainline OpenJDK so the broader JDK ecosystem — every distribution, not just GraalVM — can build on it, and so Leyden's "AOT cache + condensers" roadmap can share the same compiler foundation.
+
+A relatable analogy: think of GraalVM today as a **high-performance aftermarket engine** sold by a specialist tuner. It's excellent, it's available now, and plenty of teams bolt it onto their car. **Project Galahad is the effort to get that engine adopted into the manufacturer's own factory line** — so future model years ship it as a first-party option, maintained on the same release train as the rest of the vehicle. You still buy the aftermarket engine *today* if you want it now; Galahad is about where the technology lives *tomorrow*.
+
+```mermaid
+flowchart LR
+  subgraph Today["Today (2026)"]
+    GV["GraalVM project<br/>(separate)<br/>Graal JIT + native-image"]
+    OJ["OpenJDK<br/>(C2 JIT, Leyden AOT cache)"]
+  end
+  subgraph Future["Galahad direction (in progress)"]
+    OJ2["OpenJDK<br/>Graal JIT + native-image<br/>upstreamed, feeds Leyden"]
+  end
+  GV -. "Project Galahad upstreams<br/>JIT + native-image" .-> OJ2
+  OJ -. "merges with" .-> OJ2
+```
+
+> [!WARNING]
+> **Maturity check, stated honestly.** Of the items in this section: GraalVM-for-JDK lockstep releasing and the CE/Oracle GraalVM distribution split are **GA and production-real today**. PGO under Oracle GraalVM is **GA**. **Project Galahad is an in-progress OpenJDK project, not a shipped product** — it does not have a guaranteed delivery JDK, and you cannot `--enable` it in a release build today. Do not put "Galahad" on a delivery roadmap; track it as direction-of-travel only.
+
+### What Changes for Teams — A Real-World Scenario
+
+> A payments team runs a Spring Boot 3 authorization service on AWS. On the JVM it cold-starts in ~2.4 s and idles at ~280 MB RSS. During Black-Friday-style scale-out, Kubernetes spins up dozens of replicas; the *aggregate* of all those 2.4 s warmups (CPU burned on class loading + JIT before any replica serves traffic) becomes a real capacity tax, and the per-pod memory limits force them to over-provision nodes.
+>
+> They move to **GraalVM for JDK 21 (Oracle GraalVM)**, build with the Spring Boot native profile, and add **PGO** (now available under the GFTC build, no EE license to negotiate). The native binary cold-starts in **~40 ms** and idles around **~55 MB RSS**. Cold start went from **2.4 s to 40 ms** — roughly a **60x** improvement — and per-pod memory dropped ~5x, so scale-out events stop being a capacity event. The cost they paid: a 4–6 minute native build in CI, a reflection-hint pass for two dynamic libraries (the tracing agent caught both), and a "you can't hot-attach a debugger to prod" operational change. For *this* workload — short-lived, bursty, memory-bound — that trade was a clear win.
+>
+> The lockstep-with-JDK point mattered here too: because GraalVM for JDK 21 *is* JDK 21, they kept their virtual-thread-based request handling unchanged. Two years earlier they'd have had to choose between virtual threads and native image, because the GraalVM build lagged the JDK. That dilemma is gone.
+
+The takeaway for teams in 2026: **GraalVM is no longer a fork-in-the-road that strands you on an old JDK**, the **PGO performance tier is reachable without an enterprise license** for many use cases, and the long-term bet (Galahad → Leyden) is that this technology becomes a *first-party* part of the JDK rather than a separate download. Adopt native-image today on its current merits; treat Galahad as reassurance that you're not betting on a dead-end branch.
+
+## CRaC — Coordinated Restore at Checkpoint (the Other Path to Fast Startup)
+
+Native-image attacks the startup problem by *never running a full JVM at all*. **CRaC — Coordinated Restore at Checkpoint** attacks it from the opposite direction: run a **completely normal JVM**, let it fully warm up (all classes loaded, all hot methods JIT-compiled to Tier 4, all GC ergonomics settled), then **freeze that entire warmed-up process to disk** and **thaw it in milliseconds** the next time you need it — skipping class loading *and* warmup entirely. The earlier "Deeper Dive — CRaC" section showed the commands; this section explains the *mechanism*, the **`Resource` API** you must wire up, **which JDKs ship it**, how **AWS Lambda SnapStart** packages the same idea, and — crucially — **how to choose between CRaC and native-image**.
+
+### The Relatable Analogy — Two Very Different Restaurants
+
+Picture two ways to open a restaurant fast tomorrow morning:
+
+- **CRaC is freezing a fully prepped kitchen mid-service and thawing it instantly tomorrow.** Tonight, with the line cooks at full tilt — stocks reduced, mise en place laid out, ovens at temperature, the head chef in rhythm — you press a magic pause button that freezes the *entire* kitchen exactly as it is. Tomorrow you un-pause and you're *already* at peak service: no prep, no warm-up, full speed from the first ticket. The catch: anything connected to the *outside world* — the gas line, the water, the phone taking orders — has to be safely shut off before you freeze and reconnected after you thaw, because you can't freeze a live gas flame or an open phone line. That "shut off / reconnect" choreography is exactly the CRaC `Resource` API.
+- **Native image is shipping a single-purpose appliance.** Instead of a general kitchen, you build a sealed countertop machine that does *one* thing — say, a bread maker. It boots in two seconds, sips power, and has no warm-up. But it can only ever make the recipes you compiled into it at the factory; you can't decide at runtime to also fry an egg. That's the closed-world assumption.
+
+Same goal (be productive instantly), opposite philosophy: **CRaC keeps the whole general-purpose kitchen and freezes it; native-image throws away the kitchen and builds a specialized appliance.**
+
+### The Mechanism — CRIU Underneath, a JVM-Aware Layer on Top
+
+On Linux, CRaC builds on **CRIU (Checkpoint/Restore In Userspace)** — a kernel-assisted facility that can serialize a running process's full memory image, open file descriptors, threads, and registers to disk, then recreate that process later. CRIU alone is blunt: it snapshots *everything*, including things that are invalid to resurrect (a TCP socket to a peer that's long gone, a file handle to a temp file that's been deleted, an absolute wall-clock timer).
+
+CRaC's contribution is the **coordination** layer — the "Coordinated" in the name. Before the JVM lets CRIU take the snapshot, it runs a **checkpoint protocol**: it notifies every registered `Resource` to *release* its OS-level handles, verifies the process is in a snapshot-safe state (it will refuse the checkpoint if, say, there are open file descriptors nobody claimed), takes the image, and on restore notifies every `Resource` to *re-acquire* fresh handles against the new reality (new time, new network, new ephemeral ports).
+
+```mermaid
+flowchart TB
+  subgraph Build["Checkpoint phase (once, during build or deploy)"]
+    Start["Start JVM normally:<br/>java -XX:CRaCCheckpointTo=/snap -jar app.jar"]
+    Warm["Drive real traffic:<br/>classes load, JIT reaches Tier 4,<br/>GC ergonomics settle"]
+    Trigger["Operator triggers:<br/>jcmd PID JDK.checkpoint"]
+    Before["beforeCheckpoint():<br/>each Resource releases<br/>files / sockets / DB pools"]
+    Snap["CRIU serializes process image<br/>(heap + JIT code + threads)<br/>to /snap"]
+    Start --> Warm --> Trigger --> Before --> Snap
+  end
+  subgraph Restore["Restore phase (every cold start)"]
+    R1["java -XX:CRaCRestoreFrom=/snap"]
+    R2["CRIU recreates process<br/>from image in ~ms"]
+    After["afterRestore():<br/>each Resource re-opens<br/>files / sockets / DB pools"]
+    Serve["Serve first request at<br/>warmed steady-state speed"]
+    R1 --> R2 --> After --> Serve
+  end
+  Snap -. "snapshot file shipped<br/>in container image / layer" .-> R1
+```
+
+### The `Resource` API — Closing and Reopening the Outside World
+
+The contract is small. Anything holding an OS resource that can't survive a freeze/thaw implements `org.crac.Resource` and registers itself with the global `Context`. The JVM calls `beforeCheckpoint` (release) on the way down and `afterRestore` (re-acquire) on the way back up.
+
+```java
+import org.crac.Context;
+import org.crac.Core;
+import org.crac.Resource;
+
+// A connection pool (or cache client, file handle, server socket...) that
+// must be torn down before the snapshot and rebuilt after restore.
+public class PooledDataSource implements Resource {
+
+    private volatile HikariDataSource pool;
+    private final HikariConfig config;
+
+    public PooledDataSource(HikariConfig config) {
+        this.config = config;
+        this.pool = new HikariDataSource(config);
+        // Register so the JVM's checkpoint coordinator calls us.
+        Core.getGlobalContext().register(this);
+    }
+
+    @Override
+    public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
+        // CALLED JUST BEFORE THE FREEZE.
+        // Drain in-flight work and close every live socket — a snapshot must
+        // not capture a TCP connection that will be dead on restore.
+        pool.close();
+        pool = null;
+    }
+
+    @Override
+    public void afterRestore(Context<? extends Resource> context) throws Exception {
+        // CALLED IMMEDIATELY AFTER THE THAW, BEFORE TRAFFIC.
+        // Re-open against current reality: DNS may have changed, the DB may
+        // have failed over, the credentials may have rotated.
+        pool = new HikariDataSource(config);
+    }
+
+    public Connection getConnection() throws SQLException {
+        return pool.getConnection();
+    }
+}
+```
+
+The reason this is a *coordination* protocol and not "the JVM magically reconnects for you": only your code knows *what* a given handle means and *how* to rebuild it correctly. The JVM cannot know that your socket was a database connection that should reconnect with retry-and-backoff, versus a one-shot upload that should simply be abandoned. CRaC gives you the two callbacks; you supply the domain knowledge.
+
+> [!IMPORTANT]
+> **Three things shift underneath a restored process, and your `afterRestore` must assume all three changed:** (1) **wall-clock time jumps** from checkpoint instant to restore instant — any cached "now," scheduled timer, or token-expiry calculation taken at checkpoint is stale; (2) **the network is brand-new** — peers, DNS, and ephemeral ports are not what they were at checkpoint; (3) **secrets may have rotated** between snapshot and restore. The safest mental rule: treat `afterRestore` like the *real* start of the program, and treat everything captured at checkpoint as merely a warm cache of code and shapes, not of live external state.
+
+> [!INTERVIEW]
+> **"What's the fundamental difference between how GraalVM native image and CRaC achieve fast startup, and what does each give up?"**
+>
+> Strong answer hits three beats. **(1) Mechanism:** native image does the work at **build time** — closed-world reachability analysis + AOT compilation into a single binary with the Substrate VM, so there's *no JVM and no warmup* at runtime; CRaC does the work at **runtime once**, by running a *full, warmed-up JVM*, then snapshotting that live process (via CRIU on Linux) and restoring it in milliseconds on later starts. **(2) What native image gives up:** runtime dynamism — reflection/proxies/JNI/resources/serialization need explicit hints (the closed-world assumption), and steady-state throughput is typically ~80–95% of the JVM unless you add PGO. **(3) What CRaC gives up:** you keep *full* JVM semantics and *full* warmed-up throughput (it's a real JVM with Tier-4 code already compiled), but you take on the **`Resource` checkpoint/restore choreography** — every file, socket, and connection pool must be closed before checkpoint and re-opened after restore — plus the operational machinery to produce and ship snapshots, and you do *not* get native-image's tiny ~50 MB memory footprint (a restored JVM still carries a full JVM's memory). Bonus points: note that **AWS Lambda SnapStart applies the CRaC idea** and that **priming** (running representative load before the snapshot) is what makes the restored process fast, not just *present*.
+
+### Which JDK Distributions Ship CRaC
+
+CRaC is **not** in every JDK — it requires a JVM built with the CRaC checkpoint/restore hooks plus the underlying CRIU support on Linux. As of 2026 the well-known shipping distributions include:
+
+| Distribution | CRaC support | Notes |
+|---|---|---|
+| **Azul Zulu (CRaC builds)** | Yes — Azul originated and drives the CRaC project. | Dedicated CRaC-enabled builds; common reference implementation. |
+| **BellSoft Liberica (CRaC builds)** | Yes. | CRaC-enabled Liberica builds for several LTS lines. |
+| **Stock OpenJDK / many vendor builds** | Generally **no** out of the box. | You need a CRaC-enabled build + Linux + CRIU; plain OpenJDK downloads usually don't include the hooks. |
+
+Two practical consequences: CRaC is **Linux-first** (CRIU is a Linux facility — local checkpointing on macOS/Windows is not the same path), and CRaC support is a property of the *specific build you download*, not of "Java N" in the abstract. Confirm the build advertises CRaC before designing around it. On the framework side, **Spring Boot 3.2+** integrates with CRaC: add the `org.crac:crac` dependency and Spring drives the checkpoint/restore lifecycle for managed components (HikariCP drains and reconnects, Tomcat stops and re-accepts) so you often don't hand-write `Resource` implementations for the common infrastructure.
+
+### AWS Lambda SnapStart — the Same Idea, Managed for You
+
+You don't have to operate CRIU yourself to benefit from snapshot-and-restore. **AWS Lambda SnapStart for Java** is the same checkpoint/restore idea, fully managed:
+
+1. When you **publish a function version**, Lambda runs your initialization once, lets it warm, and takes a **Firecracker microVM snapshot** of the initialized execution environment (the encrypted snapshot is then cached).
+2. On a **cold start**, instead of booting a fresh JVM and re-running init, Lambda **restores from the cached snapshot** — turning a multi-second Java cold start into low-hundreds-of-milliseconds (often ~100–300 ms).
+
+The make-or-break detail is **priming**. A snapshot only helps if the things you want fast are *already done* at snapshot time. So you do expensive one-time work during initialization — establish connection pools, load and parse config, touch the code paths that trigger class loading and early JIT — so they're baked into the snapshot rather than paid on every restore. AWS exposes **runtime hooks** (`beforeCheckpoint` / `afterRestore`, conceptually the same shape as CRaC's `Resource`) so you can release/re-acquire connections across the snapshot boundary and re-fetch anything time- or secret-sensitive.
+
+```java
+// AWS Lambda SnapStart: prime in init, fix up after restore.
+import org.crac.Core;
+import org.crac.Resource;
+import org.crac.Context;
+
+public class Handler implements RequestHandler<Event, String>, Resource {
+
+    // Created during INIT → captured in the snapshot ("primed").
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private DbPool pool;
+
+    public Handler() {
+        Core.getGlobalContext().register(this);
+        this.pool = DbPool.connect();          // primed into the snapshot
+        warmCriticalPaths();                   // force class load + early JIT
+    }
+
+    @Override public void beforeCheckpoint(Context<? extends Resource> c) {
+        pool.close();                          // don't snapshot live sockets
+    }
+
+    @Override public void afterRestore(Context<? extends Resource> c) {
+        pool = DbPool.connect();               // reconnect against current reality
+    }
+
+    @Override public String handleRequest(Event e, com.amazonaws.services.lambda.runtime.Context ctx) {
+        return process(e);                     // first invocation already warm
+    }
+}
+```
+
+> [!WARNING]
+> **The classic SnapStart / CRaC footgun: uniqueness baked into the snapshot.** Anything generated *once* during init — a random seed, a `UUID`, a cached timestamp, a session token — is captured in the snapshot and then **replayed identically across every restored instance**. This is the exact same hazard as native-image's build-time initialization capturing random/time/env (see the `[!IMPORTANT]` callout earlier in this topic) — and it has real security weight: an RNG seed frozen into a snapshot makes "random" values predictable across instances. Rule: generate per-instance uniqueness and re-seed `SecureRandom` in `afterRestore`, never rely on values computed before the checkpoint.
+
+### Native Image vs CRaC — the Comparison That Actually Matters
+
+Both deliver fast startup. They are *not* interchangeable; they make opposite trades. This table is the one to internalize:
+
+| Dimension | GraalVM Native Image | CRaC (Coordinated Restore at Checkpoint) |
+|---|---|---|
+| **When the heavy work happens** | **Build time** — reachability analysis + AOT compile into a binary. | **Runtime, once** — run a real JVM, warm it, then snapshot it. |
+| **Startup mechanism** | No JVM at all; native binary executes directly. | Restore a frozen, already-warmed JVM process from disk. |
+| **Cold-start latency** | ~10–100 ms. | ~10s–few-hundred ms (restore + `afterRestore` reconnect). |
+| **Peak / steady-state throughput** | ~80–95% of JVM (≈95–100% **with PGO**); no runtime JIT to improve further. | **100% of a warmed JVM** — it *is* a warmed JVM, full Tier-4 C2 code, JIT keeps optimizing. |
+| **Memory footprint** | **Lowest** (~50 MB) — minimal Substrate VM. | Full JVM footprint (~200 MB) — a real JVM heap + metaspace. |
+| **Reflection / dynamic features** | **Constrained** — closed-world; needs `reflect/proxy/jni/resource/serialization` hints (agent or framework). | **Unconstrained** — full JVM semantics; reflection, dynamic class loading, agents all work normally. |
+| **External-resource handling** | N/A at restore (there's no restore). | **Must** implement `Resource` (`beforeCheckpoint`/`afterRestore`) to release/re-acquire files, sockets, pools. |
+| **Build / pipeline cost** | High — 1–10 min native builds; must be in CI early. | Medium — need a warm-and-snapshot stage; **priming** quality determines benefit. |
+| **Platform constraints** | Cross-platform binaries (per target OS/arch). | **Linux-first** (CRIU); needs a **CRaC-enabled JDK build** (Azul Zulu, BellSoft Liberica). |
+| **Debug / observability** | Reduced — no live JVMTI/debugger attach, limited JFR. | Full JVM tooling once restored (JFR, JVMTI, `jstack`, etc.). |
+
+### Use-Cases — Which One to Reach For
+
+```
+REACH FOR NATIVE IMAGE WHEN:
+  - Memory is the binding constraint (dense K8s packing, tiny containers, IoT/edge).
+  - Process lifetime is short and throughput-ceiling doesn't matter (CLI tools, batch jobs).
+  - You want a single self-contained binary with no JDK to ship or patch.
+  - You're greenfield on Quarkus / Micronaut / Spring Boot 3 (hints come for free).
+
+REACH FOR CRaC (incl. Lambda SnapStart) WHEN:
+  - You need BOTH instant start AND full warmed-JVM throughput.
+  - Your code is reflection-heavy or does dynamic class loading (closed-world is impractical).
+  - You're already on a JVM and don't want to fight native-image hint config.
+  - You run on Linux with a CRaC-enabled JDK, or on AWS Lambda where SnapStart manages it for you.
+
+STILL JUST USE THE PLAIN JVM WHEN:
+  - The process is long-running (5+ minutes): warmup amortizes to nothing.
+  - You change dependencies constantly and don't want a native build or snapshot stage per change.
+```
+
+The honest one-liner: **native image optimizes for footprint and packaging at the cost of dynamism; CRaC optimizes for keeping full JVM behavior and peak throughput at the cost of a Linux/CRIU snapshot pipeline and `Resource` plumbing.** Pick by which cost you'd rather pay. And remember the third option always on the table: **Project Leyden** (covered earlier) is the JDK's bet that you'll eventually get much of native-image's startup *without* giving up JVM features — but it isn't there yet in 2026, so today the real choice for most teams is native-image vs CRaC.
+
 ## Practice
 
 1. **Build a native-image of "Hello World".** Install GraalVM; `native-image -jar HelloWorld.jar`. Measure startup time vs JVM-mode.
@@ -814,6 +1079,12 @@ jobs:
 10. **Quarkus vs Spring Native comparison.** Build the same RESTful microservice in both; compare binary size, startup, throughput.
 11. **Resource embedding.** Add `resource-config.json` to embed `*.properties` files; verify they're available in the native binary.
 12. **Lambda deployment.** Deploy a native-image binary to AWS Lambda's custom runtime; compare cold-start latency with JVM-mode + SnapStart.
+13. **GraalVM-for-JDK lockstep.** Install a current `*-graal` build via SDKMAN!; confirm `java -version` reports the matching JDK feature release and that `native-image --version` is bundled. Note how this differs from the old separate "GraalVM 22.x" versioning.
+14. **CE vs Oracle GraalVM / PGO availability.** Determine whether your installed GraalVM build is Community Edition or Oracle GraalVM. Try to run a `--pgo-instrument` build; observe whether PGO is available (it is in Oracle GraalVM under GFTC, not in CE). Read the current GFTC summary for your use case.
+15. **CRaC `Resource` lifecycle by hand.** On a CRaC-enabled Linux JDK (Azul Zulu or BellSoft Liberica), write a tiny app holding a `ServerSocket` and a connection pool, implement `org.crac.Resource` to close them in `beforeCheckpoint` and reopen in `afterRestore`, then checkpoint and restore. Confirm the checkpoint *fails* if you skip closing the socket.
+16. **Time/random frozen across restore.** In a CRaC (or Lambda SnapStart) app, cache `Instant.now()` and a `UUID` at init, then expose them. Snapshot, restore twice, and observe the *same* values reappear. Move the generation into `afterRestore` and re-seed `SecureRandom`; confirm uniqueness per restore.
+17. **SnapStart priming experiment.** Deploy a Java Lambda with SnapStart enabled. Measure cold start with no priming, then add priming (warm connection pool, force class load + early JIT in the constructor) and measure again. Quantify the difference.
+18. **Native image vs CRaC head-to-head.** Take one reflection-light Spring Boot 3 service. Build it (a) as a native image and (b) run it under CRaC restore. Compare cold start, steady-state throughput under load, and RSS. Map the result onto the native-image-vs-CRaC table.
 
 ## Recap
 
@@ -832,6 +1103,11 @@ You should now be able to:
 - Apply the **decision matrix**: AOT for serverless / CLI / K8s pod churn; JIT for long-running services / reflection-heavy code; CRaC for serverless that needs both JIT throughput and instant startup; AppCDS for modest startup wins on JVM-mode.
 - Use **lighter alternatives**: **AppCDS** (no closed world; modest startup gain); **CRaC** (snapshot/restore warmed JVM; instant restart; used by AWS Lambda SnapStart); **Project Leyden** (in progress for JDK 25+, combines AOT + load-time + runtime optimization).
 - Avoid the **7 common pitfalls**: silently broken reflection, long build times surprising CI, image-size bloat from heavy reflection, AOT-incompatible libraries (CGLIB-based), build-time init capturing env/random, harder debugging in production, ignoring framework support for raw native-image work.
+- Explain the **2026 GraalVM landscape**: GraalVM now ships **in lockstep with the JDK** as **GraalVM for JDK N** (e.g. GraalVM for JDK 21 / 25), ending the old "which JDK is inside this GraalVM?" lag; the **CE vs Oracle GraalVM** split (the former "Enterprise Edition" is now **Oracle GraalVM** under the **GFTC**, which brings PGO and advanced features and is free for many production uses); and downstream builds like Red Hat **Mandrel** (tuned for Quarkus).
+- Track **Project Galahad** as the OpenJDK effort to **upstream GraalVM's JIT and native-image technology into OpenJDK** (feeding Project Leyden) — direction-of-travel, **in progress and not a shipped product** in 2026, so not a roadmap item yet.
+- Explain **CRaC's mechanism** as the snapshot-and-restore path: a fully warmed JVM is frozen to disk (via **CRIU** on Linux) and restored in milliseconds, skipping class loading + warmup; coordination happens through the **`org.crac.Resource` API** (`beforeCheckpoint` releases files/sockets/pools, `afterRestore` re-acquires them); shipped by **Azul Zulu** and **BellSoft Liberica** CRaC builds (not stock OpenJDK), Linux-first, with **Spring Boot 3.2+** driving the lifecycle for common components.
+- Describe how **AWS Lambda SnapStart for Java** applies the same idea — snapshot the initialized environment at version-publish time, restore on cold start (~100–300 ms) — and why **priming** (doing expensive init + forcing class load/JIT before the snapshot) is essential, plus the **frozen-uniqueness footgun** (random seeds, UUIDs, timestamps captured in a snapshot replay identically; re-generate them in `afterRestore`).
+- Choose between **native image and CRaC** using the trade-off: **native image** = build-time AOT, no JVM at runtime, lowest memory (~50 MB), constrained dynamism (hints) — *the single-purpose appliance*; **CRaC** = a real warmed JVM frozen and thawed, full JVM semantics and 100% warmed throughput, full footprint (~200 MB), needs `Resource` plumbing and a Linux/CRIU pipeline — *the frozen, fully-prepped kitchen*.
 
 ## Next
 

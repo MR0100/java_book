@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: spring-boot-3-virtual-threads
+
+  threads:
+    virtual:
+      # =====================================================================
+      # THE ONE-LINE SWITCH.
+      #
+      # With this `true`, Spring Boot 3.2+ auto-configures Tomcat to run EVERY
+      # incoming HTTP request on its own fresh virtual thread, instead of
+      # borrowing one of ~200 shared platform (OS) threads from a bounded pool.
+      #
+      # Effect you can SEE: hit GET /api/slow and the response reports a thread
+      # name like  VirtualThread[#42]/runnable@... — proof Tomcat handed the
+      # request to a virtual thread. Flip this to `false` and the same endpoint
+      # reports a pooled platform thread like  http-nio-8080-exec-3.
+      #
+      # Why it matters: a virtual thread that blocks (sleep, JDBC, HTTP client)
+      # does NOT hold an OS thread hostage — the JVM unmounts it from its
+      # "carrier" platform thread and remounts it when the blocking call
+      # returns. So a thread-per-request server can handle tens of thousands of
+      # concurrent in-flight requests on a handful of OS threads.
+      # =====================================================================
+      enabled: true
+
+  # Pretty-print JSON so the served thread name is easy to read in a terminal.
+  jackson:
+    serialization:
+      indent-output: true

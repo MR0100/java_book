@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Cheatsheets and quick-reference material.
 
+## Topics
+
+- [L3 Cheatsheets](T01-l3-cheatsheets.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

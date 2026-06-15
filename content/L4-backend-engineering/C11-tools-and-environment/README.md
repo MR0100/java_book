@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Tooling and environment setup relevant to this level.
 
+## Topics
+
+- [Tools for Backend Engineering](T01-tools-for-backend-engineering.md)
+
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      ============================================================================
+      LAB 04 - JMH MICROBENCHMARKING
+      Backs: L3/C02/T12 "Benchmarking with JMH" (hands-on lab)
+      ============================================================================
+
+      This is the CANONICAL JMH-via-Maven setup. It is deliberately PLAIN Java
+      (no Spring): a benchmark harness wants the absolute minimum on the classpath
+      so that nothing (no DI container, no agent, no extra threads) perturbs the
+      measurement. JMH is the de-facto standard tool for measuring code that runs
+      in microseconds-to-milliseconds on the JVM, written by the same people who
+      build the HotSpot JIT.
+
+      The layout below mirrors what `mvn archetype:generate` with the
+      org.openjdk.jmh:jmh-java-benchmark-archetype produces. If you ever forget
+      the setup, regenerate it from that archetype and compare.
+    -->
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-04-jmh-microbenchmark</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>lab-04-jmh-microbenchmark</name>
+    <description>Hands-on lab: JMH microbenchmarking, the classic pitfalls (dead-code elimination, constant folding) and how to read a JMH report (Java 21, plain Java)</description>
+
+    <properties>
+        <!--
+          TEACHING POINT: maven.compiler.release pins the *bytecode* level to 21.
+          Unlike source/target, `release` also restricts the visible JDK API to
+          Java 21, so you cannot accidentally call a Java 22+ method. A newer JDK
+          (22/23/24/25) can still compile and run the project while producing
+          genuine Java 21 class files.
+        -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--
+          Pin the JMH version in one place. 1.37 is a current, stable release.
+          jmh-core and jmh-generator-annprocess MUST be the same version, or the
+          generated benchmark stubs may not match the runtime.
+        -->
+        <jmh.version>1.37</jmh.version>
+
+        <!-- The name of the executable fat-jar the shade plugin produces. -->
+        <uberjar.name>benchmarks</uberjar.name>
+
+        <junit.version>5.10.2</junit.version>
+    </properties>
+
+    <dependencies>
+        <!--
+          jmh-core: the benchmark RUNTIME. Contains Blackhole, the @State/@Benchmark
+          annotations, the Runner, the statistics engine, etc. Needed at compile
+          AND run time, so default (compile) scope.
+        -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+
+        <!--
+          jmh-generator-annprocess: the ANNOTATION PROCESSOR that, at COMPILE time,
+          scans your @Benchmark methods and GENERATES the real benchmark harness
+          classes (the *_jmhType / generated/...Benchmark classes you see appear
+          under target/generated-sources). This generated code is what defeats the
+          JIT's attempts to cheat: it forces fresh state, inserts the measurement
+          loop, and wires up Blackhole.
+
+          scope=provided: it is only needed during compilation, NOT at runtime.
+          We ALSO wire it as an explicit <annotationProcessorPath> on the compiler
+          plugin below; on JDK 23+ annotation processing is no longer discovered
+          implicitly from the classpath, so the explicit path is what actually
+          makes generation happen. Keeping the <dependency> too gives IDEs the
+          API on the compile path.
+        -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+          JUnit 5 (Jupiter) - test scope ONLY. We use it for a tiny correctness
+          test that asserts the logic the benchmarks exercise is actually right.
+          A benchmark that measures a buggy function is worthless, so we verify
+          correctness separately, FAST, without running any benchmark.
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--
+          The fat-jar is named exactly `benchmarks.jar` (no version) so the run
+          command in the README is stable: `java -jar target/benchmarks.jar`.
+        -->
+        <finalName>${uberjar.name}</finalName>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!--
+              COMPILER PLUGIN. Two jobs:
+                1. Pin bytecode to Java 21 (via maven.compiler.release).
+                2. Run the JMH annotation processor explicitly. On JDK 23+ the
+                   compiler no longer auto-discovers processors from the classpath
+                   (JDK-8306819), so we list it as an annotationProcessorPath. This
+                   is what makes the generated benchmark classes appear.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${jmh.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!--
+              SHADE PLUGIN. Builds the executable `benchmarks.jar` by merging
+              jmh-core, its transitive deps, and our compiled benchmarks into one
+              self-contained uber-jar. This is THE canonical JMH run model: you
+              package once, then run the jar from any directory.
+
+                - <mainClass> = org.openjdk.jmh.Main: the JMH CLI entry point. So
+                  `java -jar target/benchmarks.jar` launches the JMH runner, which
+                  by default runs every @Benchmark it finds. Pass a regex to run a
+                  subset, e.g. `java -jar target/benchmarks.jar Pitfalls`.
+                - The AppendingTransformer for META-INF/services merges service
+                  files from the shaded jars so JMH's SPI lookups still work.
+                - The filter that strips signature files (*.SF/*.DSA/*.RSA) from
+                  signed dependencies prevents the classic "Invalid signature file
+                  digest" SecurityException when a signed jar is repackaged.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${uberjar.name}</finalName>
+                            <!--
+                              This is a leaf module producing a runnable jar, not
+                              a library others depend on, so we don't need the
+                              rewritten "dependency-reduced-pom.xml" the shade
+                              plugin otherwise drops in the project root.
+                            -->
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.openjdk.jmh.Main</mainClass>
+                                </transformer>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!--
+                                      Shading breaks any jar that ships a
+                                      cryptographic signature, because the bytes no
+                                      longer match the signed digest. Drop those
+                                      meta files; we are not redistributing the
+                                      signed artifacts, just running benchmarks.
+                                    -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+              SUREFIRE: runs the JUnit 5 correctness test during `mvn test`. It does
+              NOT run the JMH benchmarks (those are plain @Benchmark methods, not
+              @Test methods), so `mvn test` stays fast.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

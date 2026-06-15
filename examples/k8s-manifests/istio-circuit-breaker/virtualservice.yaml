@@ -1,0 +1,53 @@
+# =============================================================================
+# Istio VirtualService — FAULT INJECTION for testing resilience (OPTIONAL)
+# -----------------------------------------------------------------------------
+# This is a CHAOS-TESTING tool, not something you run in steady-state prod.
+# Istio can synthetically inject delays and HTTP errors at the mesh layer so you
+# can verify that:
+#   - the circuit breaker in destinationrule.yaml actually trips,
+#   - your client's retries/timeouts behave (and don't retry-storm),
+#   - upstream callers degrade gracefully (fallbacks, cached responses).
+#
+# Ties to L5/C02/T14 (resilience) and the Netflix Chaos Monkey lineage
+# (L5/C12/T01): deliberately break things in a controlled way to prove the
+# system survives. Gate it behind a header so ONLY test traffic is faulted.
+#
+# API: networking.istio.io/v1 (GA). Use v1beta1 on older meshes.
+# =============================================================================
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: url-shortener-fault-injection
+  namespace: url-shortener
+spec:
+  hosts:
+    - url-shortener
+  http:
+    # -------------------------------------------------------------------------
+    # FAULTED ROUTE: only requests carrying `x-chaos: on` are degraded. This
+    # keeps real users unaffected while you run a controlled experiment.
+    # -------------------------------------------------------------------------
+    - name: chaos-testing
+      match:
+        - headers:
+            x-chaos:
+              exact: "on"
+      fault:
+        delay:
+          percentage:
+            value: 50.0      # Add latency to 50% of matched requests...
+          fixedDelay: 5s     # ...a 5s delay (should trip client timeouts).
+        abort:
+          percentage:
+            value: 20.0      # Abort 20% of matched requests...
+          httpStatus: 503    # ...with 503 (feeds outlierDetection's 5xx count).
+      route:
+        - destination:
+            host: url-shortener
+    # -------------------------------------------------------------------------
+    # NORMAL ROUTE: everything without the chaos header passes through clean.
+    # -------------------------------------------------------------------------
+    - name: passthrough
+      route:
+        - destination:
+            host: url-shortener

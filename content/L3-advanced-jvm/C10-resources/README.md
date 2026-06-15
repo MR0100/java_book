@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Books, docs, specs, and links for going deeper.
 
+## Topics
+
+- [L3 Resources](T01-l3-resources.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

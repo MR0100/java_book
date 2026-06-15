@@ -1,0 +1,142 @@
+# =============================================================================
+# OpenTelemetry Collector — Deployment + Service (+ Namespace)
+# -----------------------------------------------------------------------------
+# Backing topics: L4/C10 (observability) + lab-06 (distributed tracing).
+#
+# Runs the OTel Collector ("contrib" distro, which bundles the broadest set of
+# receivers/exporters) as a central gateway. Apps send OTLP here; it forwards to
+# the tracing backend per otel-collector-configmap.yaml. The Service gives apps
+# a stable endpoint: otel-collector.observability.svc.cluster.local:4317.
+#
+# NOTE: this is the "manual" Deployment form for teaching. In production you'd
+# typically install the OpenTelemetry Operator and use an `OpenTelemetryCollector`
+# custom resource (which generates this Deployment for you) — see the README.
+# Several documents below, separated by `---`.
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    app.kubernetes.io/part-of: observability-stack
+    # Keep the Collector OUT of the Istio mesh: it's infra, and meshing it adds
+    # mTLS/port-shifting complexity to the OTLP ingest path.
+    istio-injection: disabled
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: otel-collector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: otel-collector
+    app.kubernetes.io/component: telemetry-gateway
+    app.kubernetes.io/part-of: observability-stack
+spec:
+  replicas: 2                  # 2 for availability; the Collector is stateless,
+                              # so scale horizontally with load.
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: otel-collector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: otel-collector
+        app.kubernetes.io/component: telemetry-gateway
+        app.kubernetes.io/part-of: observability-stack
+    spec:
+      serviceAccountName: otel-collector
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true     # Same hardening discipline as the app (L4/C08/T19).
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: otel-collector
+          # Pin to a concrete version (and in prod, a digest). The contrib image
+          # carries the otlp receivers and tempo/jaeger exporters used above.
+          image: otel/opentelemetry-collector-contrib:0.110.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--config=/etc/otelcol-contrib/config.yaml"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true   # Config is read-only-mounted; the
+                                          # Collector needs no writable root.
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: otlp-grpc
+              containerPort: 4317
+              protocol: TCP
+            - name: otlp-http
+              containerPort: 4318
+              protocol: TCP
+            - name: healthcheck
+              containerPort: 13133
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              # Keep the container limit above the Collector's memory_limiter
+              # limit_mib (384) + headroom, so the limiter sheds load before the
+              # kernel OOM-kills the pod.
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /          # health_check extension serves 200 on / at :13133
+              port: healthcheck
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: healthcheck
+            periodSeconds: 10
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otelcol-contrib
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: otel-collector-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: otel-collector
+    app.kubernetes.io/part-of: observability-stack
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: otel-collector
+  ports:
+    - name: otlp-grpc        # Apps point OTEL_EXPORTER_OTLP_ENDPOINT here:
+      port: 4317             #   http://otel-collector.observability:4317
+      targetPort: otlp-grpc
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: otlp-http
+      protocol: TCP

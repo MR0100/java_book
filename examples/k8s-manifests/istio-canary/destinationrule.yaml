@@ -1,0 +1,36 @@
+# =============================================================================
+# Istio DestinationRule — defines the v1 / v2 SUBSETS for canary routing.
+# -----------------------------------------------------------------------------
+# A DestinationRule describes what happens to traffic AFTER routing decides
+# where it goes: it declares named `subsets` (here, by the pod `version` label)
+# and per-destination policies (load balancing, connection pools, TLS). The
+# companion VirtualService (virtualservice.yaml) references these subset names
+# to split traffic 90/10.
+#
+# API version note: networking.istio.io/v1 is GA in modern Istio (1.22+). If
+# you are on an older release, change to networking.istio.io/v1beta1 — the
+# schema below is identical across both.
+# =============================================================================
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+spec:
+  # `host` is the Kubernetes Service (short name resolves within the namespace;
+  # use the FQDN url-shortener.url-shortener.svc.cluster.local to be explicit).
+  host: url-shortener
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_REQUEST   # Good default for variable-latency JVM backends;
+                              # sends new requests to the least-busy pod.
+  subsets:
+    # Each subset is a logically-grouped slice of the Service's pods, selected
+    # by label. Your v1 Deployment carries `version: v1`; deploy a second
+    # Deployment with `version: v2` (same app label) to populate the v2 subset.
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2

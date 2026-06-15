@@ -595,7 +595,7 @@ If unresolved in 30 min:
 3. Open external incident comm: status.example.com
 
 ## Postmortem
-Required within 48h. Use template: [Postmortem Template](./postmortem-template.md)
+Required within 48h. Use template: [Postmortem Template](../../L5-architecture-leadership/C03-engineering-leadership/T10-incident-response-and-blameless-postmortems.md)
 ```
 
 ### 3. Git commit message convention (Conventional Commits)

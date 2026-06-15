@@ -1,0 +1,42 @@
+# =============================================================================
+# Service for url-shortener
+# -----------------------------------------------------------------------------
+# A ClusterIP Service is the stable, in-cluster virtual IP + DNS name
+# (url-shortener.url-shortener.svc.cluster.local) that load-balances across the
+# Deployment's Ready pods. Istio's VirtualService/DestinationRule (see
+# istio-canary/) route to THIS Service by host; subset selection then splits
+# traffic across the v1/v2 pod labels.
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: url-shortener-platform
+    # Istio convention; helps the mesh group telemetry by service.
+    app: url-shortener
+spec:
+  type: ClusterIP            # Internal only. Expose externally via an Istio
+                            # Gateway / Ingress, not by flipping this to
+                            # LoadBalancer.
+  selector:
+    # Selects ALL versions (v1 AND v2). Note this intentionally omits the
+    # `version` label so the Service spans both canary subsets; Istio handles
+    # the split. The selector matches the Deployment's pod labels.
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+  ports:
+    - name: http            # MUST be named for Istio protocol detection. The
+                            # `http-` / `http` prefix tells Istio this is L7
+                            # HTTP, enabling routing, retries, and metrics.
+                            # Naming it `tcp` would disable all L7 features.
+      port: 80              # Service port (what clients call).
+      targetPort: http      # Refers to the container's named port (8080).
+      protocol: TCP
+  # Optional: keep a client's connections pinned to one pod. Usually leave as
+  # the default (None) for stateless services and let Istio do smarter LB.
+  # sessionAffinity: None

@@ -77,13 +77,53 @@ Java backend engineer, plus interview mastery** — a "0 to hero" master book.
 
 ## 🟢 NEXT SESSION RESUME POINT (most recent state — read this first)
 
-**Last worked: 2026-06-10 — Phase 2 (AI/LLM Integration) ✅ COMPLETE. Phase 3 next.**
+**Last worked: 2026-06-15 — Phase 8 (Labs & Code Repos) ✅ COMPLETE + Phase 9 (Polish) core items ✅. 🎉 ALL 9 EXPANSION PHASES DONE. Remaining: optional mechanical book-wide polish (see Phase 9 note).**
 
 ### Where we are RIGHT NOW
 
-The 56-pass deepening sprint completed (all L5 + cross-module enhancements done). Course at **244,006 lines / 554 files / ~46K L5 alone**.
+🎉 **The 9-phase expansion plan is COMPLETE** (Phases 1–9). The book = the original 466-file curriculum + Phase 2 AI chapters + Phase 3–7 deepening/forward-looking topics (all deepened with analogies/scenarios) + a **Phase 8 `/examples/` tree of 21 runnable, test-verified projects** (~14k LOC Java) + Phase 9 polish (examples index, CONVENTIONS §12–13, and a full cross-reference sweep that fixed 31 pre-existing broken links).
 
-**Currently executing: PHASE 1 of the 9-Phase Expansion Plan** (see below).
+**Phase 8 result (2026-06-15):** NEW repo-root **`examples/`** tree — 17 Maven projects + 4 k8s manifest sets (210 Java files, ~14,000 LOC, 19 YAML). **Every Maven project was built and `mvn test` passed green** (Maven was available, on a JDK compiling to Java 21 bytecode); k8s YAML parse-validated. Structure: `starter-templates/` (3: java-21, native-image, virtual-threads), `system-designs/` (7: url-shortener, rate-limiter-redis-lua, distributed-lock-fenced, outbox-pattern, saga-orchestrator, cqrs, event-sourced-wallet), `labs/` (7: lab-01..07 — guided url-shortener, build-a-memory-leak, build-a-deadlock, jmh, profiling, tracing-from-scratch, rate-limiter), `k8s-manifests/` (4). Top-level [examples/README.md](examples/README.md) maps every project → backing topic. **Reviewer note:** re-run `mvn test` per project on a real JDK 21+; 2 projects (rate-limiter-redis-lua, distributed-lock-fenced) need Docker for their Testcontainers tests.
+
+**Phase 9 result (2026-06-15):** Did the concrete/safe items — examples index; CONVENTIONS.md §12 (examples conventions) + §13 (don't re-run the generator; hand-maintain expansion-phase READMEs); and a **book-wide cross-reference verification** that found + fixed **31 pre-existing broken links** (none from this session's work). DEFERRED (large, mechanical, book-wide, lower-ROI — do as a targeted follow-up if wanted): TL;DR blocks on the ~80 longest topics, "5-minute version" companions (~20), Mermaid alt-text on all diagrams, full spellcheck, the L6/C04 company-track 2026 refresh, and updating `scripts/generate_skeleton.py` to know the new chapters (risky — left as-is; READMEs are hand-maintained per §13).
+
+**Phase 7 result (2026-06-15):** Performance/observability deepening. Plan wanted JMH-tutorial + profiling-deep-dive as NEW topics in L3/C04, but L3/C02 already has **T11 Profiling** and **T12 JMH** — so those were EXTENDED in place (avoiding duplication) instead. Authored **2 new + 3 extensions**, all QA-verified (zero broken links, balanced fences, READMEs updated):
+- **NEW L4/C10/T20** — eBPF & Continuous Production Profiling (367 ln). [plan's "C10/T14" was taken]
+- **NEW L3/C02/T17** — Tail-Latency Engineering & Load Testing (465 ln; p99/p999, coordinated omission, USE/RED/Golden-Signals, k6/Gatling) — complements T13, doesn't duplicate it.
+- **EXTENDED L3/C02/T12** (JMH) 705→1126: step-by-step walkthrough + 8 microbenchmark pitfalls (DCE, constant folding, Blackhole, warmup, OSR, false sharing).
+- **EXTENDED L3/C02/T11** (Profiling) 615→960: async-profiler internals (AsyncGetCallTrace/safepoint-bias), flame-graph reading, JFR deep + event streaming.
+- **EXTENDED L3/C02/T10** (Memory leaks) 690→961: memory-optimization patterns (object layout, allocation reduction, off-heap/FFM, JOL).
+- Plan's "latency→T09 ext / memory→T10 ext" became: latency = new T17 (better as its own topic); memory = T10 ext ✓. eBPF/fast-moving facts hedged honestly.
+
+**Phase 6 result (2026-06-15):** Forward-looking content is SCATTERED across existing chapters (not a new chapter), so every plan number was stale/mis-homed and was corrected after auditing each target. Authored **10 new topics + 1 additive extension**, all `status: complete`, QA-verified (zero broken links, balanced fences, READMEs hand-updated in 5 chapters):
+- **L1/C01-oop/T20** — Modern Java & the Java 25 LTS Landscape (303 ln). [folder is `C01-oop`, not the plan's guess]
+- **L3/C02/T15** — Project Valhalla: value classes (306) · **T16** — WebAssembly & Java (361) · **T05 extended** +276 ln (→1114) with GraalVM Galahad + CRaC.
+- **L4/C01/T26** — Spring Boot 4 & Spring Framework 7 (381).
+- **L4/C10/T17** — Serverless Java/Lambda/SnapStart (385) · **T18** — Edge computing (357) · **T19** — Multi-runtime/Dapr (360). [plan said "L4/C11"=tools, wrong → placed in C10 devops]
+- **L5/C03/T14** — Cost Engineering & FinOps (337) · **T15** — JVM Container Right-Sizing (302) · **T16** — Spot & Preemptible Patterns (373). [plan's T13/T14/T15 numbers were taken → T14–T16; a cost-efficiency cluster]
+- All forward-looking/preview facts (Valhalla, Babylon, Leyden, Galahad, Spring Boot 4, WASM-on-Java, SnapStart) are explicitly hedged with maturity labels — verify version/JEP specifics before quoting. Done via parallel subagents (2 batches) at the deepened bar (analogies + real-world scenarios baked in).
+
+> [!NOTE]
+> **Additive deepening pass — 2026-06-15 (after Phase 5).** On user request ("more detailed version with relatable examples and real-world scenarios and use-cases"), all 26 topics created this session were expanded as strict supersets (nothing removed): Phase 3 (L4/C08 T17–T19), Phase 4 (L5/C12 T01–T08), Phase 5 (L6/C14 T01–T15). Added analogies, war-story scenarios, use-cases/decision-guidance, more worked code/diagrams, extra interviewer follow-ups (mocks), and expanded Variations/Practice/Recap. Combined size of these 26 files grew from ~8.9k to **~13.0k lines**. QA-verified: every file strictly longer, one H1 each, zero broken internal links, balanced fences. Done via parallel subagents (6 batches) with an ADDITIVE-ONLY spec; structural QA run directly.
+
+**Phase 5 result (2026-06-15):** New chapter **`L6/C14 — Mock Interview Library`** (plan said "C13" but that was stale — C13 is Resources, so appended as C14 per convention). 15 verbatim-style mock-interview TRANSCRIPTS (a distinct content type: dialogue + hidden rubric + inline coaching callouts + debrief scorecard + variations), ~4,909 topic lines + README, all `status: complete`, 16 unique slugs, zero broken internal links, QA-verified (structure, links, slugs, `module` field normalized to the L6 long form). Covers coding (T01,T05), system design (T02,T04,T07,T12), behavioral (T03,T08,T09), managerial (T10,T11), AI-platform (T12), negotiation (T13), 90-day plan (T14), and an anti-patterns catalog (T15). Authored via parallel subagents (4 batches) with a detailed transcript-format spec; README + QA done directly; T12 (AI) and earlier files deep-read — accurate and at-bar. Improved on stale plan: numbered C14; reframed several mocks; T13/T14 are tighter (word-dense) but complete.
+
+**Phase 4 result (2026-06-15):** New chapter **`L5/C12 — Real-World Case Studies`** (plan said "C05" but that was stale — C05 is Hands-On, C11 is the Phase 2 AI chapter, so appended as C12 per the Phase 2 convention). 8 topics authored at the L5 lead bar (~2,608 lines total + README), all `status: complete`, unique slugs, zero broken internal links, QA-verified:
+- T01 Netflix — resilience & microservices (359 ln) · T02 Stripe — idempotency/ledgers/API longevity (418) · T03 Discord — storage evolution Cassandra→ScyllaDB (300) · T04 Uber — DOMA & geo-sharding/H3/Ringpop (352) · T05 Shopify — modular monolith/Packwerk/pods (352) · T06 Airbnb — monolith→SOA strangler-fig + over-decomposition reckoning (336) · T07 Meta — memcache leases & TAO graph store (321) · T08 — cross-cutting patterns & decision framework (capstone, 170).
+- Improved on the stale plan: dropped the dated Twitter-Manhattan pick for a **synthesis capstone (T08)** that distills the recurring patterns into a forces-first decision framework; reframed Uber around DOMA/geo-sharding. Each study ties lessons back to Java/Spring + existing L5/C01–C02 and L3 topics.
+- Authored via 7 parallel subagents (one per company study) with detailed specs at the depth bar; T08 + README authored directly; every file QA'd (structure, links, slugs, Mermaid). 2 delegated files deep-read in full (Meta, Discord) — both accurate and at-bar.
+
+**Phase 3 result:** Re-audited C08 and found the plan's premise was stale — the chapter already had **T01–T16**, so 3 of the 6 originally-planned topics (supply-chain ≈T15, secrets ≈T12, zero-trust ≈T16) were already covered and dropped to avoid duplication. Authored the 3 genuinely-new ones as **T17–T19**:
+- ✅ **T17 — JVM-specific CVEs (Log4Shell, Spring4Shell, deserialization)** — 356 lines, 8 diagrams.
+- ✅ **T18 — Modern auth (OAuth 2.1, FIDO2, WebAuthn, passkeys)** — 397 lines, 10 diagrams.
+- ✅ **T19 — Container security (distroless/Wolfi, Sigstore/cosign, runtime hardening)** — ~360 lines, 8 diagrams.
+- C08 is now **19 topics**; the three deliberately form an arc (vuln → contained, verified deployment). All hand-added to the C08 README (generator not re-run).
+
+> [!WARNING]
+> Do **not** re-run `scripts/generate_skeleton.py` — it predates the Phase 2/3
+> chapter additions and would wipe the hand-maintained READMEs. Add new topic
+> rows to the chapter README by hand (as Phase 2 did). Per-topic frontmatter
+> `status` is the source of truth.
 
 ### Quick stats — current state
 
@@ -111,13 +151,13 @@ After the 56-pass deepening sprint, this is the next-level expansion plan with c
 |---|---|---|---|---|
 | **1** | Structural setup (INDEX, GLOSSARY, ACRONYMS, LEARNING-PATHS) | Repo root | 1-2 sessions | **🟢 IN PROGRESS** |
 | **2** | AI/LLM Java integration | NEW L4/C18 (10 topics) + NEW L5/C11 (8 topics) | 3-4 sessions | ✅ **COMPLETE** |
-| **3** | Security deep dive | NEW topics in L4/C08 (6 topics) | 2-3 sessions | Pending |
-| **4** | Real-world case studies | NEW L5 chapter (8 topics) | 3-4 sessions | Pending |
-| **5** | Mock interview library | NEW L6/C13 (15 topics) | 3-4 sessions | Pending |
-| **6** | 2026+ forward-looking | Java 25 LTS, Spring Boot 4, cost engineering, serverless, edge | 2-3 sessions | Pending |
-| **7** | Performance & observability deep | L3/L4 new topics — JMH, profiling, eBPF | 2 sessions | Pending |
-| **8** | Labs & code repos | NEW /examples directory tree | 4-5 sessions | Pending |
-| **9** | Format & quality polish | TL;DRs, cross-refs, 5-min versions | 1-2 sessions | Pending |
+| **3** | Security deep dive | L4/C08 T17–T19 (3 new; 3 planned ones already existed) | 2-3 sessions | ✅ **COMPLETE** |
+| **4** | Real-world case studies | L5/C12 (8 topics) — authored | 3-4 sessions | ✅ **COMPLETE** |
+| **5** | Mock interview library | L6/C14 (15 mocks) — authored | 3-4 sessions | ✅ **COMPLETE** |
+| **6** | 2026+ forward-looking | 10 new topics + 1 extension across L1/L3/L4/L5 — authored | 2-3 sessions | ✅ **COMPLETE** |
+| **7** | Performance & observability deep | 2 new (eBPF, tail-latency) + 3 extensions — done | 2 sessions | ✅ **COMPLETE** |
+| **8** | Labs & code repos | `examples/` — 21 runnable, test-verified projects | 4-5 sessions | ✅ **COMPLETE** |
+| **9** | Format & quality polish | Examples index, CONVENTIONS §12–13, cross-ref sweep (31 links fixed) | 1-2 sessions | ✅ **CORE DONE** (mechanical polish deferred) |
 
 **Total estimated effort: 22-30 focused sessions. Total new lines: ~70,000+.**
 
@@ -237,51 +277,69 @@ After the 56-pass deepening sprint, this is the next-level expansion plan with c
 
 ---
 
-## Phase 3: Security Deep Dive
+## Phase 3: Security Deep Dive (✅ COMPLETE — 3 new topics T17–T19)
 
-### Where to Add
+> [!IMPORTANT]
+> **Plan premise was stale.** `L4/C08` does NOT end at T05 — it already has
+> **T01–T16** (authored earlier, ~240–300 lines each). Re-audited 2026-06-15.
+> Several proposed Phase 3 topics are already covered and must NOT be duplicated:
+> - **T12 Secrets management** already covers Vault/dynamic secrets → proposed
+>   "Secrets management (Vault, ESO)" is redundant (could add only an ESO/K8s
+>   operator angle if wanted).
+> - **T15 Dependency & supply-chain** already covers SBOM/Sigstore/scanning →
+>   proposed "Supply chain security" is redundant.
+> - **T16 Zero-trust intro** already covers SPIFFE/SPIRE/service mesh → proposed
+>   "Zero-trust architecture" is redundant (could add a SPIFFE/SPIRE *deep dive*).
+>
+> **Genuinely-new remaining work** is therefore narrower than the original 6.
+> New topics are numbered **T17+** (chapter already ends at T16), hand-added to
+> the C08 README (the skeleton generator predates Phase 2/3 additions — do NOT
+> re-run `generate_skeleton.py`, it would wipe the hand-maintained chapters).
 
-**NEW topics in existing `L4/C08 Security` chapter** (currently has T01-T05). Add T06-T11.
+### New topics (revised, T17+)
 
-| T# | Topic | Lines target |
-|---|---|---:|
-| T06 | Supply chain security (SBOM, Sigstore, dependency scanning) | ~800 |
-| T07 | Zero-trust architecture (SPIFFE/SPIRE, service identity) | ~800 |
-| T08 | Modern auth (OAuth 2.1, FIDO2, WebAuthn, passkeys) | ~900 |
-| T09 | JVM-specific CVEs (Log4Shell, Spring4Shell patterns) | ~700 |
-| T10 | Container security (distroless, Wolfi, image signing) | ~700 |
-| T11 | Secrets management (Vault, External Secrets Operator) | ~700 |
+| T# | Topic | Status |
+|---|---|---|
+| **T17** | **JVM-specific CVEs — Log4Shell, Spring4Shell, deserialization gadget chains** | ✅ **DONE (2026-06-15)** — 356 lines, expert-dense. Shared anatomy (data→sink→code), class-loading mechanism, full Log4Shell trace (incl. local-gadget bypass of `trustURLCodebase=false`), Spring4Shell (`class.module.classLoader`→Tomcat valve→JSP webshell), deserialization (`readObject` gadget chains, ysoserial, JEP 290/415, jackson default-typing), defense-in-depth. 8 Mermaid/ASCII diagrams. |
+| **T18** | **Modern auth — OAuth 2.1, FIDO2, WebAuthn, passkeys** (extends T03) | ✅ **DONE (2026-06-15)** — ~330 lines, expert-dense. Phishing-resistance ladder, asymmetric challenge-response, FIDO2 = WebAuthn+CTAP2, registration/attestation + authentication/assertion ceremonies with `clientDataJSON`/`authenticatorData` byte layouts + signed-bytes mechanism, *why* passkeys can't be phished (RP scope + origin binding), secure-element key storage (hardware mechanism), synced vs device-bound passkeys (BE/BS flags), attestation/AAGUID, Spring Security `webAuthn` DSL + webauthn4j, composition with OAuth2.1/OIDC (amr/acr step-up), TOTP mechanism + limits. ~9 diagrams. |
+| **T19** | **Container security — distroless, Wolfi, image signing (Sigstore/cosign), runtime hardening** | ✅ **DONE (2026-06-15)** — ~360 lines, expert-dense. Container threat model, kernel isolation primitives (namespaces incl. user-ns, cgroups, capabilities, seccomp, LSM) with syscall-gauntlet diagram, real escapes (privileged/docker.sock/runc CVEs), distroless+Wolfi as attack-surface reduction (no-shell defeats T17 stage-2), Sigstore/cosign keyless signing (Fulcio+Rekor) + SLSA provenance + admission control, full `securityContext` hardening mapped to mechanism→attack-blocked (`readOnlyRootFilesystem` defeats Spring4Shell webshell), NetworkPolicy egress, Falco, gVisor/Kata. 8 diagrams. |
+| (opt) | SPIFFE/SPIRE deep dive (only if we want to go beyond T16's intro) | Optional — risk of overlap |
 
-**Total: 6 new topics, ~4,600 lines**
-
----
-
-## Phase 4: Real-World Case Studies (Stickiest content)
-
-### Where to Add
-
-**NEW chapter `L5/C05: Real-World Case Studies`** (8 topics).
-
-| T# | Topic | Lines target |
-|---|---|---:|
-| T01 | Netflix architecture end-to-end (Eureka/Hystrix/Spinnaker) | ~1,500 |
-| T02 | Shopify majestic monolith — why it works at 2.8M LOC | ~1,200 |
-| T03 | Stripe payment platform — idempotency at scale | ~1,400 |
-| T04 | Discord chat architecture — Cassandra + Elixir lessons | ~1,300 |
-| T05 | Uber Cherami/Ringpop — custom infrastructure | ~1,200 |
-| T06 | Twitter Manhattan — storage evolution | ~1,300 |
-| T07 | Airbnb migration — Rails → SOA over 6 years | ~1,200 |
-| T08 | Meta TAO/Scribe/Hydra — scale lessons | ~1,300 |
-
-**Total: 8 new topics, ~10,400 lines**
+**Revised total: ~2 more genuinely-new topics (T18, T19), ~700–900 lines each.**
+The original "6 topics" estimate assumed an empty chapter; ~half were already done.
 
 ---
 
-## Phase 5: Mock Interview Library (Highest student value)
+## Phase 4: Real-World Case Studies (✅ COMPLETE — chapter L5/C12)
 
-### Where to Add
+### Where it landed
 
-**NEW chapter `L6/C13: Mock Interview Library`** (15 verbatim mocks).
+**NEW chapter `L5/C12: Real-World Case Studies`** (8 topics). NOTE: plan originally said "C05" — STALE (C05 = Hands-On, C11 = Phase 2 AI chapter), so appended as **C12** per the Phase 2 convention. Hand-maintained README (generator not re-run).
+
+| T# | Topic (as authored) | Status |
+|---|---|---|
+| T01 | Netflix — Resilience & Microservices (Eureka, Hystrix/resilience4j, Zuul, Spinnaker, chaos, multi-region) | ✅ 359 ln |
+| T02 | Stripe — Idempotency, Ledgers & API Longevity (idempotency keys, double-entry, date-versioned APIs) | ✅ 418 ln |
+| T03 | Discord — Storage Evolution: MongoDB→Cassandra→ScyllaDB (partition key, GC tail tax, request coalescing) | ✅ 300 ln |
+| T04 | Uber — Domain-Oriented Microservices & Geo-Sharding (DOMA, H3, Ringpop/SWIM, DISCO, Schemaless) | ✅ 352 ln |
+| T05 | Shopify — The Modular Monolith (Majestic Monolith, Packwerk, pods sharding, BFCM; Spring Modulith/ArchUnit) | ✅ 352 ln |
+| T06 | Airbnb — Monolith→SOA Migration (strangler fig, dual-write, over-decomposition reckoning, unified data layer) | ✅ 336 ln |
+| T07 | Meta — Data Infra at Scale: Memcache & TAO (look-aside, leases, mcsqueal/mcrouter, TAO graph store, PC/EL) | ✅ 321 ln |
+| T08 | Cross-Cutting Patterns & a Decision Framework (capstone: pattern matrix + forces-first decision tree) | ✅ 170 ln |
+
+**Total: 8 topics, ~2,608 lines + README. QA-verified: unique slugs, zero broken internal links, balanced fences, one INTERVIEW + Practice/Recap/Next each, Mermaid labels quoted.**
+
+**Changes from the stale plan:** dropped dated Twitter-Manhattan → replaced with a synthesis capstone (T08); reframed Uber (Cherami → DOMA/geo-sharding, more current & documented); every study mapped to Java/Spring + existing L5/C01–C02 & L3 topics.
+
+---
+
+## Phase 5: Mock Interview Library (✅ COMPLETE — chapter L6/C14)
+
+### Where it landed
+
+**NEW chapter `L6/C14: Mock Interview Library`** (15 verbatim-style mock transcripts). NOTE: plan said "C13" — STALE (C13 = Resources), so appended as **C14**. Hand-maintained README (generator not re-run). Each topic = a transcript with the interviewer's hidden rubric, inline TIP/WARNING/IMPORTANT/INTERVIEW coaching, a debrief scorecard, variations, practice, recap. Authored T01–T15 (FAANG coding, FAANG staff design, Amazon LP behavioral, Stripe payment design, Indian-unicorn coding+LLD, banking JVM-deep, Google L6 architect, Meta E6 cross-functional, tech-lead behavioral, hiring-manager, bar-raiser/exec, AI/ML platform 2026, negotiation, 90-day plan, anti-patterns). ~4,909 topic lines + README. QA: 16 unique slugs, zero broken links, `module` normalized.
+
+### Original planned list (for reference)
 
 | T# | Topic | Lines target |
 |---|---|---:|
@@ -305,9 +363,16 @@ After the 56-pass deepening sprint, this is the next-level expansion plan with c
 
 ---
 
-## Phase 6: 2026+ Forward-Looking Content
+## Phase 6: 2026+ Forward-Looking Content (✅ COMPLETE)
 
-### Where to Add (extending existing + new topics)
+> [!IMPORTANT]
+> **Authored 2026-06-15.** Placement below is the ORIGINAL (stale) plan. ACTUAL placement
+> (after auditing each target chapter): L1/**C01-oop**/T20; L3/C02/**T15** Valhalla, **T16** WASM,
+> **T05** extended (GraalVM Galahad + CRaC); L4/C01/T26 Spring Boot 4; L4/**C10**/T17 serverless,
+> T18 edge, T19 Dapr (NOT C11=tools); L5/C03/**T14** FinOps, **T15** right-sizing, **T16** spot.
+> 10 new topics + 1 extension; all `status: complete`; READMEs hand-updated; preview facts hedged.
+
+### Where to Add (extending existing + new topics) — ORIGINAL PLAN (numbers were stale)
 
 | Content | Where | Action |
 |---|---|---|
@@ -328,9 +393,15 @@ After the 56-pass deepening sprint, this is the next-level expansion plan with c
 
 ---
 
-## Phase 7: Performance & Observability Deep
+## Phase 7: Performance & Observability Deep (✅ COMPLETE)
 
-### Where to Add
+> [!IMPORTANT]
+> **Authored 2026-06-15.** ACTUAL placement (corrected from the stale plan below):
+> NEW L4/C10/**T20** eBPF; NEW L3/C02/**T17** tail-latency; EXTENDED L3/C02 **T11** (profiling deep),
+> **T12** (JMH deep), **T10** (memory-optimization). The plan's separate "JMH tutorial" + "profiling
+> deep-dive" topics were folded into the existing T12/T11 to avoid duplication. 2 new + 3 extensions.
+
+### Where to Add — ORIGINAL PLAN (numbers/placement were stale)
 
 | Content | Where | Action |
 |---|---|---|
@@ -344,9 +415,15 @@ After the 56-pass deepening sprint, this is the next-level expansion plan with c
 
 ---
 
-## Phase 8: Labs & Code Repositories
+## Phase 8: Labs & Code Repositories (✅ COMPLETE)
 
-### Where to Add
+> [!IMPORTANT]
+> **Authored 2026-06-15.** Built the full `examples/` tree below: 17 Maven projects + 4 k8s
+> manifest sets, ~14k LOC, all `mvn test`-verified green; k8s YAML parse-validated. Top-level
+> [examples/README.md](examples/README.md) maps each project → backing topic. Java 21 + Maven;
+> H2/in-process by default (2 projects use Testcontainers/Docker). See the resume point above.
+
+### Planned tree (built as specified)
 
 **NEW directory tree `/examples/`** at repo root.
 
@@ -385,9 +462,18 @@ Each lab needs a companion tutorial topic (could go in respective module's C05 h
 
 ---
 
-## Phase 9: Format & Quality Polish
+## Phase 9: Format & Quality Polish (✅ CORE DONE — mechanical polish deferred)
 
-### Tasks
+> [!IMPORTANT]
+> **2026-06-15.** DONE: examples index ([examples/README.md](examples/README.md)); CONVENTIONS.md
+> §12 (examples conventions) + §13 (hand-maintain expansion READMEs, don't re-run the generator);
+> **cross-reference verification** — a book-wide sweep fixed **31 pre-existing broken links**
+> (17 `.md` + 14 directory) across INDEX/GLOSSARY/ACRONYMS/LEARNING-PATHS + the L5/C11 AI chapter.
+> DEFERRED (mechanical, book-wide): TL;DR on ~80 long topics; "5-minute version" companions (~20);
+> Mermaid alt-text; full spellcheck; L6/C04 2026 refresh; updating `generate_skeleton.py` (risky —
+> left as-is). These are safe to pick up piecemeal later.
+
+### Tasks (original)
 
 | Task | Files affected |
 |---|---|

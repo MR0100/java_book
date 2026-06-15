@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      ============================================================================
+      LAB 07 - BUILD A RATE LIMITER (in-JVM, from first principles)
+      Backs: L5/C02/T13 "Rate-Limiting Algorithms" + L6/C14/T05 mock (hands-on lab)
+      ============================================================================
+
+      This lab builds FOUR classic rate-limiting algorithms by hand, in plain
+      Java, behind one shared `RateLimiter` interface:
+
+        1. FixedWindowRateLimiter            - simplest; demonstrates the
+                                               boundary-burst FLAW.
+        2. SlidingWindowLogRateLimiter       - EXACT; stores one timestamp per
+                                               request -> O(N) memory.
+        3. SlidingWindowCounterRateLimiter   - weighted APPROXIMATION; O(1) memory;
+                                               the practical default.
+        4. TokenBucketRateLimiter            - burst up to capacity + steady refill.
+
+      It is deliberately PLAIN Java (no Spring): a rate limiter is a tiny,
+      dependency-free building block, and keeping the classpath empty makes the
+      algorithms and their concurrency stand out with zero framework noise.
+
+      TIME IS INJECTED, NOT READ FROM THE WALL CLOCK. Every limiter takes a
+      `LongSupplier nowNanos` time source. Production code passes
+      `System::nanoTime`; tests pass a `MutableClock` they advance by hand. That
+      is what lets the entire test suite run in milliseconds with NO Thread.sleep
+      and ZERO flakiness, while still exercising real boundary behaviour.
+    -->
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-07-build-a-rate-limiter</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>lab-07-build-a-rate-limiter</name>
+    <description>Hands-on lab: build fixed-window, sliding-window-log, sliding-window-counter and token-bucket rate limiters from first principles, thread-safe, with a deterministic injectable clock (Java 21, plain Java)</description>
+
+    <properties>
+        <!--
+          TEACHING POINT: maven.compiler.release pins the *bytecode* level to 21.
+          Unlike source/target, `release` also restricts the visible JDK API to
+          Java 21, so you cannot accidentally call a Java 22+ method. A newer JDK
+          (22/23/24/25) can still compile and run the project while producing
+          genuine Java 21 class files.
+        -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>5.10.2</junit.version>
+    </properties>
+
+    <dependencies>
+        <!--
+          JUnit 5 (Jupiter) - test scope ONLY. The limiters themselves have NO
+          dependencies at all; only the tests need JUnit. test scope keeps it off
+          the compile/runtime classpath of the production classes.
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Pin bytecode to Java 21 via maven.compiler.release (set above). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <!--
+              SUREFIRE runs the JUnit 5 suite during `mvn test`. The suite uses a
+              hand-advanced clock and a bounded concurrency test, so it stays FAST
+              (well under a second of actual wall-clock work).
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

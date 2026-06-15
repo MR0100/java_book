@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      TEACHING POINT: The Spring Boot parent POM.
+      Inheriting from spring-boot-starter-parent gives us, for free:
+        - A curated, mutually-compatible BOM (Bill of Materials) of dependency
+          versions, so we almost never write <version> on Spring/Jackson/JPA deps.
+        - Sensible plugin defaults (compiler, surefire, the repackage goal).
+      Pin to a concrete, stable 3.3.x release for reproducible builds.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the Maven repository, not a local path -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-01-url-shortener</artifactId>
+    <version>1.0.0</version>
+    <name>lab-01-url-shortener</name>
+    <description>Guided 4-hour lab: build a URL shortener (Spring Boot 3.3, Java 21, H2)</description>
+
+    <properties>
+        <!--
+          TEACHING POINT: maven.compiler.release pins the *bytecode* level to 21.
+          Unlike source/target, `release` also restricts the visible JDK API to
+          Java 21, so you cannot accidentally call a Java 22+ method. This lets a
+          newer JDK (e.g. 22/23/24/25) compile and run the project while still
+          producing genuine Java 21 class files. We set BOTH java.version (read by
+          the Spring Boot parent) and maven.compiler.release for belt-and-braces.
+        -->
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Web MVC + embedded Tomcat: everything to serve REST endpoints and 302 redirects. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Data JPA + Hibernate: maps our entity to a relational table. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+          Bean Validation (Jakarta Validation + Hibernate Validator). Drives the
+          @NotBlank / @Pattern checks on the request DTO and the @Valid in the
+          controller. Without this starter, @Valid is silently ignored.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+          H2: an in-memory SQL database. `runtime` scope = present when the app
+          runs/tests but NOT on the compile classpath, so you cannot accidentally
+          import an H2 class in your code. Zero external infrastructure to install.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          Test starter: JUnit 5 (Jupiter), AssertJ, Mockito, Spring Test +
+          MockMvc, JSONAssert, all version-managed by the parent. test scope only.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              The Spring Boot Maven plugin lets you `mvn spring-boot:run` and
+              repackages an executable fat-jar with `mvn package`.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

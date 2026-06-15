@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      TEACHING POINT: The Spring Boot parent POM.
+      Inheriting from spring-boot-starter-parent gives us:
+        - A curated, mutually-compatible "BOM" (Bill of Materials) of dependency
+          versions, so we almost never write <version> on Spring/Jackson/etc. deps.
+        - Sensible plugin defaults (compiler, surefire, the repackage goal).
+        - UTF-8 source encoding and the Java version wired to <java.version>.
+      Pin the parent to a concrete, stable 3.3.x release for reproducible builds.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the Maven repository, not a local path -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>spring-boot-3-java-21</artifactId>
+    <version>1.0.0</version>
+    <name>spring-boot-3-java-21</name>
+    <description>Teaching starter: a modern Spring Boot 3.3 + Java 21 baseline</description>
+
+    <properties>
+        <!--
+          TEACHING POINT: This single property drives the compiler's source/target
+          level (the parent reads java.version). Java 21 is an LTS release, so it
+          is the right floor for a long-lived "0 to hero" backend curriculum.
+        -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Web MVC + an embedded Tomcat: everything to serve REST endpoints. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Production-readiness endpoints (/actuator/health, metrics, info, ...). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--
+          Test starter: JUnit 5 (Jupiter), AssertJ, Mockito, Spring Test +
+          MockMvc, JSONAssert, all version-managed by the parent. test scope only.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              TEACHING POINT: The Boot Maven plugin's `repackage` goal turns the
+              plain JAR into an executable "fat JAR" (java -jar target/...jar) and
+              provides the `spring-boot:run` goal used during development.
+              No <version> needed: it is managed by the parent.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

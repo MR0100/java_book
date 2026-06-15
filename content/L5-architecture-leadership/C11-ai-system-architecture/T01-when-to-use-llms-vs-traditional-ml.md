@@ -21,7 +21,7 @@ The single most important architectural decision in any AI initiative is **wheth
 This topic is a senior+ decision framework for choosing between LLMs, traditional ML, rule-based systems, and pure deterministic code. It also covers hybrid architectures where each is used for what it's best at.
 
 > [!NOTE]
-> Prerequisites: [LLM API Fundamentals](../../L4-backend-engineering/C18-ai-llm-integration/T01-llm-api-fundamentals.md), [Architecture Trade-off Analysis](../C01-software-architecture/T03-architecture-tradeoff-analysis.md). Familiarity with basic ML concepts (classification, regression) helps.
+> Prerequisites: [LLM API Fundamentals](../../L4-backend-engineering/C18-ai-llm-integration/T01-llm-api-fundamentals.md), [Architecture Trade-off Analysis](../C01-software-architecture/T14-architecture-trade-off-analysis.md). Familiarity with basic ML concepts (classification, regression) helps.
 
 ## The Cost/Quality/Latency/Risk Tradeoff
 

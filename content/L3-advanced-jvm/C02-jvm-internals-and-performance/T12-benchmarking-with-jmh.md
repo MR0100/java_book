@@ -7,11 +7,11 @@ section: "JVM Internals & Performance"
 type: concept
 difficulty: advanced
 order: 12
-tags: [benchmark, jmh, java-microbenchmark-harness, aleksey-shipilev, doug-lea, openjdk-jmh, naive-benchmark, system-nanotime, jit-warmup, dead-code-elimination, dce, constant-folding, jit-devirtualization, cpu-cache-bias, gc-noise, system-noise, jmh-fork, separate-jvm-process, jmh-warmup-iterations, jmh-measurement-iterations, jmh-statistical-analysis, throughput-mode, average-time-mode, sample-time-mode, single-shot-time-mode, all-modes, benchmark-annotation, state-annotation, scope-thread, scope-benchmark, scope-group, setup-annotation, teardown-annotation, level-trial, level-iteration, level-invocation, warmup-annotation, measurement-annotation, fork-annotation, threads-annotation, param-annotation, operations-per-invocation, blackhole, bh-consume, jmh-output-format, score-error-units, confidence-interval, jmh-profilers, prof-gc, prof-stack, prof-perfasm, prof-async, jmh-async-profiler-integration, jmh-json-output, jmh-csv-output, ci-benchmark-regression, jmh-cross-hardware, jmh-limitations, microbenchmark-anti-pattern, hashmap-vs-treemap, atomicinteger-vs-longadder, profile-then-benchmark-then-compare]
+tags: [benchmark, jmh, java-microbenchmark-harness, aleksey-shipilev, doug-lea, openjdk-jmh, naive-benchmark, system-nanotime, jit-warmup, dead-code-elimination, dce, constant-folding, jit-devirtualization, cpu-cache-bias, gc-noise, system-noise, jmh-fork, separate-jvm-process, jmh-warmup-iterations, jmh-measurement-iterations, jmh-statistical-analysis, throughput-mode, average-time-mode, sample-time-mode, single-shot-time-mode, all-modes, benchmark-annotation, state-annotation, scope-thread, scope-benchmark, scope-group, setup-annotation, teardown-annotation, level-trial, level-iteration, level-invocation, warmup-annotation, measurement-annotation, fork-annotation, threads-annotation, param-annotation, operations-per-invocation, blackhole, bh-consume, jmh-output-format, score-error-units, confidence-interval, jmh-profilers, prof-gc, prof-stack, prof-perfasm, prof-async, jmh-async-profiler-integration, jmh-json-output, jmh-csv-output, ci-benchmark-regression, jmh-cross-hardware, jmh-limitations, microbenchmark-anti-pattern, hashmap-vs-treemap, atomicinteger-vs-longadder, profile-then-benchmark-then-compare, jmh-tutorial, jmh-archetype, gradle-jmh-plugin, blackhole, warmup, jmh-pitfalls, microbenchmark, loop-unrolling, on-stack-replacement, osr, false-sharing, contended-annotation, compilercontrol, dont-inline, profile-pollution, error-bar, statistically-insignificant, jmh-vs-load-testing]
 prerequisites: [profiling-jfr-async-profiler-visualvm, jit-compilation-c1-c2-tiered, garbage-collection-fundamentals, jvm-architecture-and-runtime-data-areas]
 status: complete
 estimated_minutes: 130
-last_updated: 2026-06-08
+last_updated: 2026-06-15
 ---
 
 # Benchmarking with JMH
@@ -663,6 +663,414 @@ HashMap is consistently ~3-7× faster. TreeMap's O(log n) shows in the scaling (
 
 Conclusion: pick HashMap unless you need sorted iteration.
 
+## A Step-by-Step JMH Walkthrough — From Empty Folder to First Verdict
+
+The sections above are a reference. This one is a *tutorial*: we build a working benchmark project from nothing, run it, and read the verdict, narrating every decision. Treat it as a guided lap before you race solo.
+
+### Step 1 — Scaffold the Project
+
+The fastest correct start is the official Maven archetype. It generates a `pom.xml` already wired with the annotation processor and shade plugin (the same machinery the [Setting Up JMH](#setting-up-jmh) section described — the archetype just saves you the copy-paste):
+
+```bash
+mvn archetype:generate \
+    -DinteractiveMode=false \
+    -DarchetypeGroupId=org.openjdk.jmh \
+    -DarchetypeArtifactId=jmh-java-benchmark-archetype \
+    -DarchetypeVersion=1.37 \
+    -DgroupId=com.example -DartifactId=jmh-tutorial -Dversion=1.0
+cd jmh-tutorial
+```
+
+You now have `src/main/java/com/example/MyBenchmark.java` and a runnable build. Why an archetype instead of hand-adding a dependency? Because JMH *requires* an annotation processor (`jmh-generator-annprocess`) to read your `@Benchmark` methods at compile time and generate the synthetic loop harness around each one. Forget the processor and your benchmarks compile but silently do nothing at run time — the classic "I added JMH and it found zero benchmarks" beginner trap.
+
+If you prefer Gradle, the community [`me.champeau.jmh`](https://github.com/melix/jmh-gradle-plugin) plugin wires the same pieces:
+
+```groovy
+// build.gradle
+plugins {
+    id 'java'
+    id 'me.champeau.jmh' version '0.7.2'
+}
+
+jmh {
+    fork = 3
+    warmupIterations = 5
+    iterations = 10
+}
+```
+
+Put benchmarks under `src/jmh/java` and run `./gradlew jmh`. The plugin handles the annotation processor and produces the fat JAR for you.
+
+> [!NOTE]
+> One project layout decision matters more than the build tool: keep benchmarks in a **separate source set / module** from production code. Benchmarks are throwaway measurement scaffolding; you don't want `jmh-core` on your application's runtime classpath, and you don't want benchmark code polluting your coverage reports. The archetype gives you a standalone module by default — keep it that way.
+
+### Step 2 — Write Your First `@Benchmark`
+
+We will benchmark a real, relatable question: *is `Math.floorMod(x, n)` slower than the naive `((x % n) + n) % n` idiom for safely wrapping a possibly-negative index into an array?* (Think a ring buffer or a hash that can go negative.)
+
+```java
+package com.example;
+
+import java.util.concurrent.TimeUnit;
+import org.openjdk.jmh.annotations.*;
+
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(2)
+public class WrapBenchmark {
+
+    // Inputs live in @State fields so the JIT cannot constant-fold them.
+    private int x;
+    private int n;
+
+    @Setup(Level.Trial)
+    public void setUp() {
+        x = -987_654_321;   // a value that exercises the negative branch
+        n = 1024;
+    }
+
+    @Benchmark
+    public int floorMod() {
+        return Math.floorMod(x, n);
+    }
+
+    @Benchmark
+    public int manualIdiom() {
+        return ((x % n) + n) % n;
+    }
+}
+```
+
+Notice the discipline already baked in: inputs come from fields (Step-by-step constant-folding defence, covered in detail below), and each method **returns** its result so JMH can defeat dead-code elimination for us. We have not written a single line of timing code — that is the entire point. You describe *what* to measure; JMH owns *how*.
+
+### Step 3 — Choose the `@BenchmarkMode` Deliberately
+
+The [JMH Modes](#jmh-modes) reference listed the four modes. The tutorial question is: *which one answers the question you actually have?* Each measures a fundamentally different statistic:
+
+| Mode | What it literally measures | Reports | Use when the question is… |
+|------|---------------------------|---------|----------------------------|
+| `Throughput` (default) | How many `@Benchmark` calls complete per time unit, counted over the whole iteration | ops/sec (higher = better) | "Which one does more work per second?" |
+| `AverageTime` | Total iteration time ÷ number of calls | time/op (lower = better) | "What's the average cost of one call?" |
+| `SampleTime` | Times *individual* calls and builds a distribution | p50/p90/p99/p999 percentiles | "What does the latency *tail* look like?" |
+| `SingleShotTime` | Times exactly one call, with no steady-state warmup of the measured invocation | time for one cold call | "How expensive is the *first* call — startup / cold cache?" |
+
+`Throughput` and `AverageTime` are reciprocals of the same steady-state truth and are what you reach for 90% of the time. The subtle one is `SampleTime`: because it timestamps each call individually it captures variance a single averaged number hides — two methods can share an identical average yet have wildly different p999, and for anything user-facing the tail is the story. `SingleShotTime` deliberately *skips* steady-state warmup of the measured call, which makes it the right (and only honest) tool for measuring class-loading, first-call JIT cost, or cold-cache behaviour — exactly the things the other three modes are designed to warm away.
+
+For our wrap question we want the per-call cost, so `Mode.AverageTime` is correct.
+
+### Step 4 — Understand `@Warmup`, `@Measurement`, and Especially `@Fork`
+
+```java
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(2)
+```
+
+`@Warmup` runs iterations whose results are **thrown away** — their sole job is to drive the JIT through Tier 0 (interpreter) → Tier 1/2/3 (C1) → Tier 4 (C2), so that the *measured* iterations time fully optimized code (T04). `@Measurement` runs iterations that are **recorded** and fed to the statistics engine. Five-by-one-second each is a sane default; widen warmup if the score is still drifting upward across the first measurement iterations (a tell-tale sign you're still measuring C1).
+
+`@Fork(2)` is the load-bearing annotation people most often misunderstand. A *fork* is a brand-new JVM process. Two forks means JMH runs the entire warmup+measurement cycle twice, in two freshly-launched JVMs, and pools the results. Why pay for that?
+
+```mermaid
+flowchart TB
+  subgraph F0["Fork 0 — fresh JVM"]
+    direction TB
+    P0["Clean JIT profile<br/>no prior type/branch history"]
+    M0["Measure benchmark A"]
+    P0 --> M0
+  end
+  subgraph F1["Fork 1 — fresh JVM"]
+    direction TB
+    P1["Clean JIT profile<br/>independent of Fork 0"]
+    M1["Measure benchmark A again"]
+    P1 --> M1
+  end
+  Pool["Pool results across forks<br/>(detects run-to-run JIT variance)"]
+  M0 --> Pool
+  M1 --> Pool
+```
+
+The JIT is **profile-guided**: it records which branches are taken, which types flow through a call site, how loops behave — *for this process* — and compiles accordingly. If you run benchmark A and then benchmark B in the *same* JVM, B inherits a code cache and profile shaped by A. Worse, the JIT sometimes makes a *lucky* or *unlucky* speculative decision (e.g. assuming a branch is never taken) that holds for an entire process lifetime. Run once and you might immortalize that single lucky compilation as "the result." Forking re-rolls the dice in a clean JVM each time; pooling across forks surfaces run-to-run variance as a wider error bar instead of hiding it as a confident-but-wrong score. **This is why `@Fork(0)` is a footgun and the project default is several forks.** The cost is wall-clock time; the payoff is a number you can trust.
+
+### Step 5 — Pick `@State` Scope to Match the Concurrency Story
+
+`@State` was introduced in [The Annotations in Depth](#state--where-benchmark-state-lives); the tutorial framing is *which scope tells the truth for your scenario*:
+
+- **`Scope.Thread`** — every benchmark thread gets its *own* `@State` instance. This is the honest default for single-threaded measurement and for "embarrassingly parallel, no shared state" code. Each thread hammers private data; no accidental cross-thread cache traffic creeps into the number.
+- **`Scope.Benchmark`** — *one* `@State` instance shared by all threads. This is what you want when the *contention itself* is the thing under test: a shared `AtomicLong`, a `ConcurrentHashMap`, a lock. Use it with `@Threads(N)` to measure how an implementation degrades under concurrent access.
+- **`Scope.Group`** — one instance per *group* of threads, for *asymmetric* benchmarks where different threads play different roles (producer vs consumer, reader vs writer). Pair with `@Group` / `@GroupThreads` so, say, 2 threads call `produce` and 2 call `consume` against the same shared queue.
+
+Choosing the wrong scope quietly changes the question. `Scope.Thread` on a shared-counter benchmark measures uncontended single-thread cost (useless for a contention claim); `Scope.Benchmark` on stateless code adds phantom false-sharing noise (see the pitfalls below). Scope is not a tuning knob — it is part of the *specification* of what you're measuring.
+
+### Step 6 — Run It and Read the Verdict
+
+```bash
+mvn clean package
+java -jar target/benchmarks.jar WrapBenchmark
+```
+
+Output (numbers illustrative, from a quiet laptop):
+
+```text
+Benchmark                  Mode  Cnt   Score   Error  Units
+WrapBenchmark.floorMod     avgt   10   2.13  ± 0.06   ns/op
+WrapBenchmark.manualIdiom  avgt   10   1.41  ± 0.04   ns/op
+```
+
+Read it like a sentence: *over 10 measurement iterations (5 each across 2 forks), `manualIdiom` averaged 1.41 ns/op and `floorMod` averaged 2.13 ns/op.* The manual idiom is ~1.5× faster here because `Math.floorMod` includes extra sign-handling and a method-call boundary the two raw `%` operations skip.
+
+But the **Score is only half the result — the Error is the other half, and the more important half.** The `± 0.06` and `± 0.04` are the 99.9% confidence half-widths. The intervals are roughly `[2.07, 2.19]` and `[1.37, 1.45]` — they do **not** overlap, so the difference is *statistically significant*: we can report "manualIdiom is faster" with confidence. Had the output instead read `floorMod 2.13 ± 0.9` and `manualIdiom 1.41 ± 0.9`, the intervals would overlap massively and the only honest conclusion would be **"no measurable difference — the run was too noisy to tell them apart."** A score without its error bar is not a measurement; it is a rumour. Always quote both, and never declare a winner whose error bars overlap the loser's.
+
+## Microbenchmarking Pitfalls That Silently Invalidate Results
+
+Here is the uncomfortable truth that makes JMH necessary: **a broken microbenchmark does not crash or warn you — it cheerfully prints a precise, confident, wrong number.** The danger is not noise (noise widens the error bar, which you can see); the danger is the optimizations that make the benchmark measure *something other than what you wrote*, while the error bar stays reassuringly tight. This section walks each classic trap with a before/after, and shows which JMH API neutralizes it.
+
+> [!INTERVIEW]
+> A staff-level favourite: *"You wrote a microbenchmark and method X came out 1000× faster than method Y. What's your first hypothesis?"* The expected answer is **not** "X is a better algorithm" — it's **"X was probably dead-code-eliminated or constant-folded, so I measured nothing."** A 1000× gap in a microbenchmark is almost never a real algorithmic win; it is the JIT having deleted the work. The follow-up: name the defences — return the value or `Blackhole.consume` it (DCE), read inputs from `@State` (constant folding), confirm warmup reached C2 (`-prof perfasm` / printing compilation), and check the error bars. Candidates who instantly reach for "it was optimized away" signal real benchmarking scars.
+
+### A Relatable Analogy
+
+Imagine timing how fast a narrator can read a book aloud — to estimate printing-press throughput. But this narrator has *memorized* the book and the publisher, knowing the ending is never checked, simply *skips printing the last 300 pages*. Your stopwatch reads "incredibly fast!" and you proudly conclude the press is amazing. You measured neither reading nor printing — you measured a shortcut taken precisely *because* nobody inspects the output. That is **dead-code elimination** (the unread output gets skipped) and **constant folding** (the memorized text needs no work) in one image. JMH's job is to be the strict editor who insists every page is actually printed and that the narrator is handed a *fresh, unseen* book each time — so your stopwatch times the real work.
+
+### Pitfall 1 — Dead-Code Elimination (DCE)
+
+If nothing observes a computation's result, the JIT is *entitled* to delete the computation entirely. Your loop becomes an empty loop; you time nothing.
+
+```java
+// ✗ BEFORE — the multiply is dead; the JIT removes it.
+@Benchmark
+public void broken() {
+    int sum = 0;
+    for (int i = 0; i < data.length; i++) {
+        sum += data[i] * data[i];   // 'sum' is never read after the loop
+    }
+    // sum is discarded → whole loop is provably dead → deleted
+}
+```
+
+```java
+// ✓ AFTER — return the result so JMH's generated harness consumes it.
+@Benchmark
+public int fixedByReturn() {
+    int sum = 0;
+    for (int i = 0; i < data.length; i++) {
+        sum += data[i] * data[i];
+    }
+    return sum;   // JMH stores returned values where the JIT can't prove them dead
+}
+
+// ✓ AFTER (multiple values) — Blackhole.consume each one.
+@Benchmark
+public void fixedByBlackhole(Blackhole bh) {
+    for (int i = 0; i < data.length; i++) {
+        bh.consume(data[i] * data[i]);   // each product is "observed"
+    }
+}
+```
+
+**Defence:** return the single result, or `Blackhole.consume(...)` for several. As [Black Holes](#black-holes--preventing-dead-code-elimination) explained, `Blackhole.consume` is engineered to be uninlinable and to have side effects the JIT cannot prove irrelevant, so the value must actually be produced. **Symptom to recognize:** an absurdly fast, suspiciously *zero-variance* score (e.g. `0.3 ± 0.0 ns/op` for "real work") — the hallmark of an emptied loop.
+
+### Pitfall 2 — Constant Folding
+
+If an input is a compile-time constant (or a `final` / effectively-constant value the JIT can prove), the JIT precomputes the whole expression at compile time. You then time loading a cached constant, not the operation.
+
+```java
+// ✗ BEFORE — 'x' is a constant; sqrt(2.0) is folded to a literal at compile time.
+@Benchmark
+public double broken() {
+    double x = 2.0;
+    return Math.sqrt(x);   // becomes 'return 1.4142135623730951;'
+}
+```
+
+```java
+// ✓ AFTER — read the input from a @State field the JIT must treat as unknown.
+@State(Scope.Thread)
+public static class In {
+    public double x = 2.0;   // a mutable field → not a compile-time constant
+}
+
+@Benchmark
+public double fixed(In in) {
+    return Math.sqrt(in.x);   // genuinely computes sqrt every call
+}
+```
+
+**Defence:** never feed literals into the operation under test — route every input through a non-`final` `@State` field, exactly as the tutorial's `WrapBenchmark` did. **Symptom:** the benchmark is implausibly fast *and* flat across `@Param` values that should clearly cost different amounts (because they were all folded to constants).
+
+### Pitfall 3 — Loop Unrolling and Loop Optimizations
+
+If *you* write the repetition loop inside the `@Benchmark` body, the JIT optimizes *that loop* — unrolling it, hoisting invariants out of it, even vectorizing it — none of which reflects how the operation is called one-at-a-time in production. You end up benchmarking the JIT's loop optimizer, not your code.
+
+```java
+// ✗ BEFORE — hand-rolled repeat loop; JIT unrolls/hoists/vectorizes it.
+@Benchmark
+public long broken(In in) {
+    long acc = 0;
+    for (int i = 0; i < 10_000; i++) {
+        acc += hash(in.value);   // hash(in.value) is loop-invariant → hoisted out!
+    }
+    return acc;                  // you measured 1 hash + 10_000 adds, not 10_000 hashes
+}
+```
+
+```java
+// ✓ AFTER — let JMH be the loop. One operation per @Benchmark invocation.
+@Benchmark
+public long fixed(In in) {
+    return hash(in.value);   // JMH's generated harness handles the repetition correctly
+}
+```
+
+**Defence:** put **one** operation in the `@Benchmark` method and let JMH's generated outer loop do the repeating — its loop is specifically written to resist hoisting and unrolling distortions. When you genuinely must batch (e.g. the per-call overhead would dominate a sub-nanosecond op), use a real, `Blackhole`-fed loop and declare `@OperationsPerInvocation(N)` so the score is reported per-op (see [`@OperationsPerInvocation`](#operationsperinvocation--for-batched-work)). **Symptom:** the per-op cost collapses unrealistically as you increase the internal loop count — the optimizer found more to hoist.
+
+### Pitfall 4 — Insufficient Warmup (Measuring the Interpreter or C1, Not C2)
+
+Fresh code starts interpreted (Tier 0), gets C1-compiled (Tiers 1–3), and only reaches the fully-optimizing C2 compiler (Tier 4) after enough invocations (T04). Measure too early and you time the interpreter or C1 — often 2–10× slower than the steady state your production server actually runs.
+
+```java
+// ✗ BEFORE — one short warmup iteration; very likely still C1, not C2.
+@Warmup(iterations = 1, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 5, time = 1)
+```
+
+```java
+// ✓ AFTER — enough warmup to settle into C2 before measuring.
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+```
+
+**Defence:** generous warmup, and *verify* it. Two checks: (1) watch the per-iteration scores during warmup — if they keep dropping into the measurement phase, you warmed up too little; (2) run with `-prof perfasm` (Linux x86) or add `-XX:+PrintCompilation` via `@Fork(jvmArgsAppend = "-XX:+PrintCompilation")` and confirm the hot method shows a Tier-4 compile *before* measurement begins. **Symptom:** the first measurement iteration is markedly slower than the last, and the error bar is wide because of the downward drift.
+
+### Pitfall 5 — The On-Stack Replacement (OSR) Surprise
+
+OSR is a special, *lower-quality* compilation the JVM uses to optimize a method **while it is still executing inside a long-running loop** — it swaps optimized code onto the live stack frame mid-loop. OSR-compiled code is generally *worse* than the standard compilation a method gets when it's entered fresh after warmup, because OSR can't make all the same assumptions. The trap: a hand-written benchmark loop (Pitfall 3) is exactly the long-running loop that triggers OSR, so you end up measuring OSR'd code that *no normal call path in production would ever run*.
+
+```java
+// ✗ BEFORE — the giant internal loop gets OSR-compiled mid-flight (worse code).
+@Benchmark
+public double broken(In in) {
+    double acc = 0;
+    for (int i = 0; i < 100_000_000; i++) {   // long enough to trigger OSR
+        acc += Math.log(in.x + i);
+    }
+    return acc;   // measures OSR code, not the normal post-warmup compilation
+}
+```
+
+```java
+// ✓ AFTER — no long internal loop, so the method is compiled normally on entry.
+@Benchmark
+public double fixed(In in) {
+    return Math.log(in.x);   // JMH calls this many times; it gets a clean C2 compile
+}
+```
+
+**Defence:** the same rule as Pitfall 3 — *don't write the loop yourself*. Letting JMH drive the repetition means each `@Benchmark` invocation is a normal method entry that earns a standard (non-OSR) C2 compilation, which is what production actually executes. **Symptom:** results that disagree with an equivalent benchmark that lets JMH loop, especially a benchmark that looks "too slow" given the operation.
+
+### Pitfall 6 — False Sharing Across Threads
+
+When two threads write to two *different* fields that happen to live on the **same 64-byte CPU cache line**, the cache-coherence protocol forces the whole line to ping-pong between cores on every write — even though the threads never touch the same variable. The result is contention that exists only because of *memory layout*, not logic, and it can dominate a multi-threaded benchmark's number.
+
+```java
+// ✗ BEFORE — both counters likely share one cache line → false sharing.
+@State(Scope.Benchmark)
+public static class Counters {
+    long a;   // thread 1 writes this
+    long b;   // thread 2 writes this — same cache line as 'a' → ping-pong
+}
+```
+
+```java
+// ✓ AFTER — @Contended pads each field onto its own cache line.
+@State(Scope.Benchmark)
+public static class Counters {
+    @jdk.internal.vm.annotation.Contended long a;
+    @jdk.internal.vm.annotation.Contended long b;
+}
+// Run with: -XX:-RestrictContended   (so @Contended takes effect outside the JDK)
+```
+
+**Defence:** be aware that `Scope.Benchmark` shared state can introduce false sharing the *application* wouldn't have, and pad hot independently-written fields with `@Contended` (the same mechanism `LongAdder`'s cells use internally). **Symptom:** a multi-threaded benchmark scales *negatively* (gets slower as you add threads) on logic that has no real shared dependency — a fingerprint of cache-line contention rather than algorithmic contention.
+
+### Pitfall 7 — GC Noise
+
+A garbage collection pause that lands inside a measurement iteration adds latency that has nothing to do with the operation's *steady-state* cost — but everything to do with how much it *allocates*. Ignoring it produces a misleadingly low average punctuated by invisible spikes, or run-to-run jitter you can't explain.
+
+```bash
+# ✓ Expose it: the GC profiler reports allocation rate AND normalized bytes/op.
+java -jar target/benchmarks.jar WrapBenchmark -prof gc
+```
+
+```text
+Benchmark                              Mode  Cnt    Score    Error  Units
+StringConcat.plus                      avgt   10  1234.5 ± 10.2   ns/op
+StringConcat.plus:·gc.alloc.rate.norm  avgt   10   512.0 ±  0.1   B/op   ← allocates per call
+StringConcat.builder                   avgt   10   234.1 ±  3.5   ns/op
+StringConcat.builder:·gc.alloc.rate.norm avgt 10    80.0 ±  0.1   B/op   ← far less garbage
+```
+
+**Defence:** always run allocation-sensitive comparisons with `-prof gc` and read `gc.alloc.rate.norm` (bytes allocated per operation) — it is *deterministic* and immune to GC timing luck, so it often tells a cleaner story than the raw score. Where appropriate, size the heap generously (`-Xmx`) so GC fires less during measurement, and report bytes/op alongside ns/op. **Symptom:** wide, lumpy error bars on allocation-heavy code; the average shifts when you change heap size.
+
+### Pitfall 8 — Measuring the Wrong Thing (Setup Bleed and Devirtualization)
+
+Two subtler "wrong target" traps. First, **setup bleed**: work you meant to do *once* leaks into the measured path. Second, **monomorphic devirtualization**: a call site that sees exactly *one* implementing type at benchmark time gets inlined into a direct call, whereas production — which sees several types — pays for a real virtual dispatch.
+
+```java
+// ✗ BEFORE — list rebuilt inside the timed method → measuring allocation+fill, not sort.
+@Benchmark
+public List<Integer> brokenSort() {
+    List<Integer> list = makeRandomList(10_000);   // setup work, timed by accident
+    Collections.sort(list);
+    return list;
+}
+```
+
+```java
+// ✓ AFTER — build once in @Setup; the timed path is only the operation of interest.
+@State(Scope.Thread)
+public static class Data {
+    int[] values;
+    @Setup(Level.Invocation)   // fresh per call ONLY because sort mutates in place
+    public void make() { values = randomArray(10_000); }
+}
+
+@Benchmark
+public int[] fixedSort(Data d) {
+    Arrays.sort(d.values);   // now we time the sort, not the array creation
+    return d.values;
+}
+```
+
+For devirtualization, defeat the JIT's monomorphic shortcut by feeding the benchmark a realistic *mix* of types (e.g. via `@Param` selecting different implementations), or pin compilation behaviour with `@CompilerControl`:
+
+```java
+@Benchmark
+@CompilerControl(CompilerControl.Mode.DONT_INLINE)   // force a real call boundary
+public int dispatch(In in) {
+    return in.strategy.apply(in.x);   // measured as a genuine virtual call
+}
+```
+
+**Defence:** keep one-time work in `@Setup` (mind the `@Level` — `Invocation` only when the op mutates its input, since per-call setup is costly and itself adds latency), and reach for `@CompilerControl(Mode.DONT_INLINE)` (or a polymorphic `@Param` mix) when the production call site is genuinely virtual. **Symptom:** a benchmark that's faster than physically plausible for the work described, or one whose result evaporates the moment you introduce a second implementing class.
+
+### A Real-World Cautionary Tale
+
+A team once "proved" their shiny new hashing function was **~1000× faster** than the incumbent and nearly shipped it on that basis. The benchmark looped a million times computing `hash(CONSTANT)` and discarded the result. Both pitfalls fired at once: the input was a literal, so the JIT **constant-folded** the entire computation to a single precomputed value; and the value was never used, so **dead-code elimination** deleted even that. The "new" benchmark happened to fold to a slightly cheaper constant-load pattern, hence the magic 1000×. The function had been optimized *entirely away* — they had benchmarked an empty loop against a slightly-less-empty loop. Rerun under JMH, with the input read from `@State` and the result returned, the two functions were within 4% of each other. The lesson the team posted on their wall: **"A microbenchmark result you can't explain mechanistically is a bug in the benchmark until proven otherwise."**
+
+## When JMH Is the Wrong Tool
+
+JMH is a *micro*-benchmark harness: it excels at "is operation A faster than operation B?" measured in nanoseconds-to-microseconds, in isolation, on a quiet machine. It is the wrong instrument the moment your question is about a *system* rather than an *operation*:
+
+- **"How many requests per second can my service handle before p99 latency breaches the SLO?"** — that is a **load-testing** question. Reach for Gatling, k6, JMeter, or `wrk` driving the service end-to-end over the network, with realistic concurrency, payloads, think-times, and connection pools. JMH cannot model the OS network stack, the database round-trips, the connection-pool saturation, or the GC behaviour under sustained real traffic.
+- **"Where does latency go *under load*, and how fat is the tail at saturation?"** — load tests measure the tail you actually serve; a JMH `SampleTime` microbenchmark measures the tail of one *operation* in isolation, which is a different (and usually far rosier) distribution than the tail of a whole request path under contention.
+- **"Will the system stay healthy for 48 hours?"** — soak/endurance and capacity tests catch slow leaks, fragmentation, and cache-eviction storms that a 15-second JMH run never sees.
+- **"Why is *this method* hot in production?"** — that's a **profiling** question ([T11 — Profiling](./T11-profiling-jfr-async-profiler-visualvm.md)), not a benchmarking one. Profile first to find the hot path, *then* write a JMH benchmark to compare candidate fixes for that specific method.
+
+The clean mental model: **profile to find *what* to optimize (T11) → JMH to compare *how* to optimize a specific operation → load-test to validate the *system* still meets its SLO** end-to-end. The full systematic loop — choosing the right tool per question, the USE method, regression prevention — is the subject of [T13 — Performance tuning methodology](./T13-performance-tuning-methodology.md). Using JMH to answer a whole-system throughput question is like using a micrometer to measure a football field: exquisitely precise about entirely the wrong thing.
+
 ## Practice
 
 1. **Reproduce the naive anti-pattern.** Write a `System.nanoTime()` benchmark that "measures" something obviously dead-code-eliminated. Observe nonsensical results. Convert to JMH; observe correct measurements.
@@ -677,6 +1085,15 @@ Conclusion: pick HashMap unless you need sorted iteration.
 10. **`-prof async` for flame graphs.** Run a benchmark with async-profiler integration. Identify hot self-time.
 11. **CI integration.** Save JSON output; build a small script that compares against a baseline; alert on > 10% regression.
 12. **Cross-mode comparison.** Run a benchmark with `Mode.All`. Compare throughput vs average time vs sample percentiles — same measurement, different views.
+13. **Scaffold from scratch.** Generate a project with the JMH Maven archetype (or the `me.champeau.jmh` Gradle plugin), write the `WrapBenchmark` (`Math.floorMod` vs the `((x % n) + n) % n` idiom), run it, and report whether the error bars overlap.
+14. **Make the error bar speak.** Take any stable benchmark and deliberately make it noisy (run other CPU-heavy work alongside, or set `@Fork(1)` with `@Measurement(iterations = 2)`). Watch the error widen until you can no longer declare a winner — internalize that the score is meaningless without its error bar.
+15. **DCE forensics.** Write the dead `sum += data[i]*data[i]` loop with the result discarded. Confirm the absurd near-zero, zero-variance score. Fix it once by returning the value and once with `Blackhole.consume`; verify both give the same realistic number.
+16. **Constant-folding A/B.** Benchmark `Math.sqrt(2.0)` (literal) vs `Math.sqrt(in.x)` (`@State` field). Confirm the literal version is implausibly fast and flat; the state version computes real work.
+17. **OSR / loop trap.** Write a benchmark with a 100-million-iteration internal loop, then an equivalent that lets JMH do the looping. Compare and explain the divergence in terms of hoisting/OSR.
+18. **False-sharing demo.** Build a two-thread `Scope.Benchmark` counter benchmark with two adjacent `long` fields; measure, then add `@jdk.internal.vm.annotation.Contended` (with `-XX:-RestrictContended`) and re-measure. Quantify the false-sharing penalty.
+19. **GC noise via `gc.alloc.rate.norm`.** Compare string-plus vs `StringBuilder` with `-prof gc`. Report bytes/op and explain why the normalized allocation figure is more trustworthy than the raw timing under GC jitter.
+20. **Warmup verification.** Add `@Fork(jvmArgsAppend = "-XX:+PrintCompilation")` to a benchmark and confirm the hot method reaches a Tier-4 (C2) compile *before* the measurement phase; then cut warmup to 1 short iteration and observe the score drift.
+21. **Wrong-tool reflection.** Take a "how many req/s can my REST endpoint serve?" question and sketch why JMH cannot answer it; outline the equivalent Gatling/k6 load test instead (tie back to [T13](./T13-performance-tuning-methodology.md)).
 
 ## Recap
 
@@ -698,6 +1115,11 @@ You should now be able to:
 - Recognize **JMH limitations**: microbenchmarks aren't macro benchmarks; production behavior differs; system-level questions need different tools.
 - Apply the **right workflow**: profile production first (T11), identify hot path, write JMH benchmark to compare alternatives, deploy if better, verify in prod metrics.
 - Distinguish **what JMH can answer** (microbenchmark comparisons) from **what it cannot** (whole-service performance, scaling, GC behavior in prod).
+- **Scaffold a JMH project end-to-end**: Maven archetype (or the `me.champeau.jmh` Gradle plugin) → first `@Benchmark` returning its result → deliberate `@BenchmarkMode` choice (Throughput/AverageTime/SampleTime/SingleShotTime and what each *literally* measures) → tuned `@Warmup`/`@Measurement` → and the *why* of `@Fork` (each fork is a fresh JVM with an independent profile-guided JIT, so forking isolates and re-rolls compilation luck instead of immortalizing one lucky compile).
+- Treat the **error bar as half the result**: non-overlapping 99.9% confidence intervals = a real difference; overlapping intervals = "too noisy to call a winner"; a score quoted without its error is a rumour, not a measurement.
+- Recognize and defend against the **microbenchmarking pitfalls** that print confident-but-wrong numbers: **dead-code elimination** (return / `Blackhole.consume`), **constant folding** (inputs from non-`final` `@State`, never literals), **loop unrolling / hoisting / vectorization** (let JMH be the loop; `@OperationsPerInvocation` for honest batching), **insufficient warmup** measuring interpreter/C1 not C2 (verify via score drift and `-XX:+PrintCompilation`/`-prof perfasm`), the **OSR surprise** (hand-written loops measure lower-quality on-stack-replacement code), **false sharing** (`Scope.Benchmark` adjacent fields; pad with `@Contended`), **GC noise** (`-prof gc` → trust `gc.alloc.rate.norm`), and **measuring the wrong thing** (setup bleed → `@Setup`; monomorphic devirtualization → `@Param` type mix or `@CompilerControl(DONT_INLINE)`).
+- Internalize the **diagnostic instinct**: an unexplained 1000× win is a benchmark bug (DCE/folding) until proven otherwise — *"a microbenchmark result you can't explain mechanistically is a bug in the benchmark."*
+- Know **when JMH is the wrong tool**: system-throughput, saturation-tail, and soak questions are **load-testing** problems (Gatling/k6/JMeter/`wrk`), and "why is this hot in prod" is a **profiling** problem (T11). Mental model: **profile to find *what* → JMH to compare *how* for one operation → load-test to validate the *system* SLO** (full methodology in T13).
 
 ## Next
 

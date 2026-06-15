@@ -1,0 +1,20 @@
+# Spring Data Redis connection. These defaults target a local Redis on the
+# standard port, which is what `docker run -p 6379:6379 redis:7-alpine` exposes.
+#
+# Lettuce (the default client) connects LAZILY, so the Spring context starts
+# even if Redis is down — only the FencingDemoRunner's actual calls fail, and it
+# catches that and prints a hint. The Testcontainers integration test ignores
+# these values: it starts its own throwaway Redis and overrides host/port via
+# @DynamicPropertySource.
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # Fail fast if Redis is unreachable rather than hanging the demo.
+      timeout: 2000ms
+
+logging:
+  level:
+    root: INFO
+    com.javamastery.examples.lock: INFO

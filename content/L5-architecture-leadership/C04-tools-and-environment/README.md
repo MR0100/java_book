@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Tooling and environment setup relevant to this level.
 
+## Topics
+
+- [Tools for Architecture & Leadership](T01-tools-for-architecture-and-leadership.md)
+
 [Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

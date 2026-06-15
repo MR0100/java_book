@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      spring-boot-starter-parent gives us:
+        - a curated, conflict-free dependency BOM (we omit versions on the starters below)
+        - sensible compiler/plugin defaults
+        - the spring-boot-maven-plugin (repackage + `spring-boot:run`)
+      3.3.x is the latest Boot 3.3 line; it requires Java 17+ and is happy on 21.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the repository, not a local dir -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>event-sourced-wallet</artifactId>
+    <version>1.0.0</version>
+    <name>event-sourced-wallet</name>
+    <description>Worked system-design example: an EVENT-SOURCED wallet/ledger. Balance is
+        derived by replaying an append-only event log (a fold), never stored as a mutable
+        column. Invariants (no overdraft) are enforced on the command side BEFORE the event
+        is appended. Runs on H2 with no external infrastructure.</description>
+
+    <properties>
+        <!-- Targets Java 21 bytecode. Boot's compiler config turns this into a release-21 build. -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Web layer: embedded Tomcat + Spring MVC for the REST controller. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+          Persistence: Spring Data JPA (Hibernate) over the single append-only
+          event_store table. There is NO balance table to UPDATE.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+          Bean Validation (jakarta.validation) for request DTOs: positive amounts,
+          non-blank wallet ids. Keeps trivial input checks out of the service.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+          H2 in-memory database, runtime scope. This is what lets the whole app
+          start with ZERO external infrastructure: no Postgres/MySQL, no broker.
+          The event_store table lives entirely in memory for the JVM's lifetime.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          Jackson (spring-boot-starter-json, pulled transitively by -web) is used
+          directly to serialize each domain event record into the payload JSON
+          column and to read it back on replay. No extra dependency needed.
+        -->
+
+        <!-- JUnit 5, AssertJ, MockMvc, Spring test slices. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Enables `mvn spring-boot:run` and builds an executable fat-jar. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

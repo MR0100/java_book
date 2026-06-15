@@ -36,5 +36,14 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 14 | Health checks & readiness/liveness probes | `T14-health-checks-and-readiness-liveness-probes.md` | planned |
 | 15 | Monitoring & alerting | `T15-monitoring-and-alerting.md` | planned |
 | 16 | SRE concepts (error budgets, toil) | `T16-sre-concepts-error-budgets-toil.md` | planned |
+| 17 | Serverless Java (Lambda, SnapStart, cold starts) | `T17-serverless-java-lambda-snapstart.md` | complete |
+| 18 | Edge computing with Java (Workers, Lambda@Edge) | `T18-edge-computing-java.md` | complete |
+| 19 | Multi-runtime microservices with Dapr | `T19-multi-runtime-dapr.md` | complete |
+| 20 | eBPF & continuous production profiling | `T20-ebpf-and-continuous-production-profiling.md` | complete |
+
+> [!NOTE]
+> T17–T19 are **Phase 6 (2026+ Forward-Looking)** additions; T20 is a **Phase 7
+> (Performance & Observability Deep)** addition. Hand-maintained (generator predates these);
+> per-topic frontmatter `status` is the source of truth.
 
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

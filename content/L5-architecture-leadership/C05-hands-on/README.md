@@ -20,4 +20,8 @@ Exercises plus this module's end-of-level project.
 
 **Level project.** A complete system-design document for a non-trivial product: context, requirements, high-level design, data model, scaling strategy, trade-offs, and an ADR log — with diagrams.
 
+## Topics
+
+- [Level Project: System Design Portfolio](T01-level-project-system-design-portfolio.md)
+
 [Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

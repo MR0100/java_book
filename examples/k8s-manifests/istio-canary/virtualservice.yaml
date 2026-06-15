@@ -1,0 +1,63 @@
+# =============================================================================
+# Istio VirtualService — 90/10 canary split between v1 and v2, plus
+# header-based routing for internal testers.
+# -----------------------------------------------------------------------------
+# The VirtualService is the ROUTING brain: it matches incoming requests and
+# decides which DestinationRule subset (v1 / v2) they land on. Subsets are
+# defined in destinationrule.yaml.
+#
+# PROGRESSIVE ROLLOUT: the `weight` values below are the dial you turn over
+# time. A typical canary progression is:
+#     100/0  ->  95/5  ->  90/10  ->  75/25  ->  50/50  ->  0/100
+# advancing only while v2's error rate / latency (watched in Grafana, see
+# observability-stack/) stays within SLO. Tools like Argo Rollouts or Flagger
+# automate exactly this: they patch these weights on a schedule and roll back
+# automatically if metrics regress. This file is the manual/starting state.
+# =============================================================================
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+spec:
+  hosts:
+    - url-shortener         # In-mesh callers using this host get split below.
+                            # For external traffic, also list the public host
+                            # and attach `gateways: [url-shortener-gateway]`.
+  http:
+    # -------------------------------------------------------------------------
+    # RULE 1 (matched first): header-based routing for internal testers.
+    # Requests carrying `x-canary: always` go 100% to v2 — your QA/dev team can
+    # dogfood the new version BEFORE any percentage of real users sees it. Order
+    # matters: Istio evaluates http[] top-down and takes the first match.
+    # -------------------------------------------------------------------------
+    - name: internal-testers-to-v2
+      match:
+        - headers:
+            x-canary:
+              exact: always
+      route:
+        - destination:
+            host: url-shortener
+            subset: v2
+    # -------------------------------------------------------------------------
+    # RULE 2 (default): the weighted canary split for everyone else.
+    # Weights MUST sum to 100. Start at 90/10 and advance v2 as it proves out.
+    # -------------------------------------------------------------------------
+    - name: weighted-canary
+      route:
+        - destination:
+            host: url-shortener
+            subset: v1
+          weight: 90        # Stable version takes the bulk of traffic.
+        - destination:
+            host: url-shortener
+            subset: v2
+          weight: 10        # Canary: 10% blast radius if v2 misbehaves.
+      # Resilience defaults applied to BOTH subsets (ties to istio-circuit-
+      # breaker/). Retries on transient failures + a hard timeout.
+      retries:
+        attempts: 2
+        perTryTimeout: 2s
+        retryOn: connect-failure,refused-stream,5xx
+      timeout: 10s

@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Tooling and environment setup relevant to this level.
 
+## Topics
+
+- [Tools for Advanced Java & the JVM](T01-tools-for-advanced-java-and-the-jvm.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

@@ -21,7 +21,7 @@ Prototype RAG with 1,000 documents in pgvector is straightforward. Production RA
 This topic is staff+ level: the architectural patterns for RAG at scale. We'll cover sharded vector indexes, incremental ingestion with change data capture, freshness vs cost trade-offs, hybrid search at scale, multi-tenant isolation patterns, hot/cold storage tiering, and the operational discipline (eval at scale, drift detection, capacity planning) that keeps it running.
 
 > [!NOTE]
-> Prerequisites: [RAG Patterns](../../L4-backend-engineering/C18-ai-llm-integration/T05-rag-retrieval-augmented-generation-patterns.md), [Vector Databases](../../L4-backend-engineering/C18-ai-llm-integration/T06-vector-databases-pinecone-weaviate-pgvector-qdrant.md), [Partitioning + Consistent Hashing](../C02-distributed-systems-and-system-design/T05-partitioning-and-consistent-hashing.md), [Replication Strategies](../C02-distributed-systems-and-system-design/T06-replication-strategies.md), [Caching Strategies at Scale](../C02-distributed-systems-and-system-design/T11-caching-strategies-at-scale.md).
+> Prerequisites: [RAG Patterns](../../L4-backend-engineering/C18-ai-llm-integration/T05-rag-retrieval-augmented-generation-patterns.md), [Vector Databases](../../L4-backend-engineering/C18-ai-llm-integration/T06-vector-databases-pinecone-weaviate-pgvector-qdrant.md), [Partitioning + Consistent Hashing](../C02-distributed-systems-and-system-design/T05-partitioning-and-consistent-hashing.md), [Replication Strategies](../C02-distributed-systems-and-system-design/T04-replication-strategies.md), [Caching Strategies at Scale](../C02-distributed-systems-and-system-design/T11-caching-strategies-at-scale.md).
 
 ## The Five Hard Problems at Scale
 
@@ -273,7 +273,7 @@ For massive scale where every update can't immediately re-index globally:
 
 Hot index handles fresh data. Cold index handles bulk. Nightly merge: cold ingests hot, hot resets.
 
-This is the same Lambda Architecture pattern from streaming systems (covered in [L5/C02/T19](../C02-distributed-systems-and-system-design/T19-streaming-batch-lambda-kappa.md)) applied to RAG.
+This is the same Lambda Architecture pattern from streaming systems (covered in L5/C02/T19) applied to RAG.
 
 ### Eventually Consistent Reads
 

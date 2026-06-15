@@ -1,0 +1,20 @@
+# Convenience: a local Redis for running the app by hand (NOT used by the test,
+# which starts its own Redis via Testcontainers).
+#
+#   docker compose up -d        # start Redis on localhost:6379
+#   mvn spring-boot:run         # in another shell, run the app
+#   docker compose down         # stop & remove when done
+#
+# Equivalent one-liner without compose:
+#   docker run --rm -p 6379:6379 redis:7-alpine
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    # Simple healthcheck so `docker compose up` waits until Redis answers PING.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 5

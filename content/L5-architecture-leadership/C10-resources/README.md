@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Books, docs, specs, and links for going deeper.
 
+## Topics
+
+- [L5 Resources — Books, Papers, Blogs, Talks](T01-l5-resources.md)
+
 [Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

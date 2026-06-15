@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      TEACHING POINT: The Spring Boot parent POM.
+      Inheriting from spring-boot-starter-parent gives us, for free:
+        - A curated, mutually-compatible BOM (Bill of Materials) of dependency
+          versions, so we almost never write <version> on Spring/Jackson/etc. deps.
+        - Sensible plugin defaults (compiler, surefire, the repackage goal).
+        - **The `native` profile** plus version management for the GraalVM
+          `native-maven-plugin` and the Spring Boot AOT plugin goals. This is the
+          key reason native-image works with almost no extra POM wiring below:
+          all the heavy lifting is declared in the parent and only *activated*
+          when you build with `-Pnative`.
+      Pin the parent to a concrete, stable 3.3.x release for reproducible builds.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the Maven repository, not a local path -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>spring-boot-3-native-image</artifactId>
+    <version>1.0.0</version>
+    <name>spring-boot-3-native-image</name>
+    <description>Teaching starter: Spring Boot 3.3 compiled ahead-of-time to a GraalVM native image</description>
+
+    <properties>
+        <!--
+          TEACHING POINT: This single property drives the compiler's source/target
+          level (the parent reads java.version). Java 21 is an LTS release and is
+          fully supported by the GraalVM native-image toolchain.
+
+          NOTE: native-image itself is provided by a GraalVM JDK (see README), not
+          by this property. java.version only controls bytecode level; the native
+          compiler is a separate tool you must have installed on the build machine.
+        -->
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Web MVC + an embedded Tomcat: everything to serve REST endpoints. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+          Test starter: JUnit 5 (Jupiter), AssertJ, Mockito, Spring Test +
+          MockMvc, JSONAssert, all version-managed by the parent. test scope only.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              TEACHING POINT: The Boot Maven plugin's `repackage` goal turns the
+              plain JAR into an executable "fat JAR" (java -jar target/...jar) and
+              provides the `spring-boot:run` goal used during JVM development.
+
+              It ALSO contributes the Spring AOT engine. When you build with the
+              `native` profile (below), Spring's AOT processing runs first: it
+              evaluates your @Configuration at build time, pre-computes the bean
+              definitions, and emits GraalVM "reachability metadata" (reflection,
+              resources, proxies) so native-image knows what to keep. native-image
+              does whole-program static analysis under a closed-world assumption,
+              so anything reached *only* via reflection must be declared up front —
+              that is exactly what the Spring AOT hints provide.
+              No <version> needed: it is managed by the parent.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+          TEACHING POINT: The `native` profile.
+
+          This profile is the STANDARD Spring Boot 3 native setup. The
+          spring-boot-starter-parent already DEFINES a `native` profile that wires
+          in both the GraalVM native-maven-plugin (org.graalvm.buildtools) and the
+          extra Spring AOT goals. So strictly speaking you do not have to declare
+          anything here — `mvn -Pnative native:compile` works on the parent's
+          profile alone.
+
+          We re-declare a thin `native` profile here ONLY to (a) make the moving
+          parts visible for teaching and (b) pass a couple of build-time options.
+          Maven MERGES same-id profiles from parent and child, so this augments
+          (does not replace) the parent's configuration. The plugin VERSION is
+          still inherited from the parent's <pluginManagement> — we deliberately do
+          not hard-code it, to avoid drifting from the version Spring tested.
+
+          Activate it explicitly with -Pnative (it is off by default so ordinary
+          JVM builds stay fast).
+        -->
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <!-- version intentionally omitted: managed by the parent -->
+                        <configuration>
+                            <!--
+                              The output binary name. With this set, the native
+                              build produces ./target/spring-boot-3-native-image.
+                            -->
+                            <imageName>${project.artifactId}</imageName>
+                            <!--
+                              Extra args passed straight to `native-image`.
+                              -O2 favours faster runtime over build speed; drop it
+                              for quicker (but slightly slower-running) builds.
+                              These are optional — the build works without them.
+                            -->
+                            <buildArgs>
+                                <buildArg>-O2</buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

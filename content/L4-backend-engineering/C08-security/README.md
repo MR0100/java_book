@@ -36,5 +36,14 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 14 | API security best practices | `T14-api-security-best-practices.md` | planned |
 | 15 | Dependency & supply-chain security | `T15-dependency-and-supply-chain-security.md` | planned |
 | 16 | Security architecture & zero trust (intro) | `T16-security-architecture-and-zero-trust-intro.md` | planned |
+| 17 | JVM-specific CVEs (Log4Shell, Spring4Shell, deserialization) | `T17-jvm-specific-cves-log4shell-spring4shell.md` | complete |
+| 18 | Modern auth (OAuth 2.1, FIDO2, WebAuthn, passkeys) | `T18-modern-auth-oauth21-fido2-webauthn-passkeys.md` | complete |
+| 19 | Container security (distroless, Wolfi, image signing, runtime hardening) | `T19-container-security-distroless-wolfi-image-signing.md` | complete |
+
+> [!NOTE]
+> Topics T17+ are **Phase 3 (Security Deep Dive)** additions on top of the
+> original 16-topic chapter. They are hand-maintained here (the skeleton
+> generator predates these additions); the per-topic frontmatter `status` is the
+> source of truth.
 
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

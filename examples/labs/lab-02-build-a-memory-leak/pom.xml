@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Plain Java lab — NO Spring, NO parent POM. The whole point is to keep the
+      classpath tiny so the heap dumps you capture are dominated by *your* leak,
+      not framework noise. Just JUnit 5 for the (green, non-OOM) tests.
+    -->
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>lab-02-build-a-memory-leak</artifactId>
+    <version>1.0.0</version>
+    <name>lab-02-build-a-memory-leak</name>
+    <description>Diagnostic lab: deliberately build three classic JVM memory leaks, observe them OOM, then fix them. Backs L3/C02/T10.</description>
+
+    <properties>
+        <!--
+          Compile and target Java 21. We use the javac `release` flag (set via the
+          compiler plugin below) so the bytecode is valid on a real Java 21 runtime
+          even if the JDK running Maven is newer (e.g. 25). This is the modern,
+          cross-compilation-safe way to pin a language/bytecode level.
+        -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.11.3</junit.version>
+        <surefire.version>3.5.2</surefire.version>
+        <compiler.plugin.version>3.13.0</compiler.plugin.version>
+        <exec.plugin.version>3.5.0</exec.plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+              The JUnit 5 BOM keeps the jupiter-api, jupiter-engine and platform
+              artifacts on mutually-compatible versions, so we omit <version> on the
+              individual test deps below.
+            -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!--
+          JUnit Jupiter (API + engine). test scope only — none of this is on the
+          runtime classpath of the leak demos you launch with `java -cp target/classes`.
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              Compiler plugin pinned + `release 21` (driven by maven.compiler.release).
+              `release` is stronger than source/target: it also forbids APIs that did
+              not exist in Java 21, so you cannot accidentally depend on a newer JDK.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+            </plugin>
+
+            <!--
+              Surefire runs the JUnit 5 tests during `mvn test`. The tests assert the
+              FIXED versions are bounded; they never trigger a real OOM. We give the
+              test JVM a modest, FIXED heap so behaviour is deterministic across
+              machines, and -XX:+AlwaysPreTouch is intentionally NOT set.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <argLine>-Xmx256m</argLine>
+                </configuration>
+            </plugin>
+
+            <!--
+              exec-maven-plugin: convenience launcher for the leak/fixed demos without
+              hand-typing a classpath. Examples (see README):
+                mvn -q compile exec:java -Dexec.mainClass=com.javamastery.examples.leak.UnboundedCacheLeak
+              For the *real* OOM experience you want a small, explicit heap, so the
+              README prefers a raw `java -Xmx64m -cp target/classes ...` invocation.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec.plugin.version}</version>
+                <configuration>
+                    <!-- No default mainClass: every demo has its own, pass it via -Dexec.mainClass -->
+                    <classpathScope>compile</classpathScope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

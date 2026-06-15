@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Interview questions asked at MNCs for this experience level. Use the fixed Q&A format in CONVENTIONS.md (section 9).
 
+## Topics
+
+- [Interview Prep: Senior Backend Engineer](T01-interview-prep-senior-backend.md)
+
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

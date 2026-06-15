@@ -1,0 +1,83 @@
+# =============================================================================
+# ConfigMap + supporting Namespace & ServiceAccount for url-shortener
+# -----------------------------------------------------------------------------
+# Multiple documents in one file, separated by `---`. The Namespace and
+# ServiceAccount are kept here so `deployment.yaml` (which references both)
+# applies cleanly as a bundle.
+#
+# IMPORTANT: a ConfigMap is for NON-SECRET configuration only. It is stored in
+# etcd in plaintext and is trivially readable by anyone with get-configmap RBAC.
+# Database passwords, JWT signing keys, and API tokens belong in a Secret (or,
+# better, an ExternalSecret synced from Vault / cloud secret manager). See the
+# top-level README's "secrets" note.
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: url-shortener
+  labels:
+    app.kubernetes.io/part-of: url-shortener-platform
+    # Turn on automatic Istio sidecar injection for every pod in this namespace.
+    # This is the canonical way to enroll a namespace in the mesh.
+    istio-injection: enabled
+    # Pod Security Admission (PSA) — enforce the `restricted` profile at the
+    # namespace level. This makes the kubelet REJECT any pod that violates the
+    # hardening in deployment.yaml (root, privileged, missing seccomp, etc.),
+    # so a future careless manifest can't silently ship insecure. (L4/C08/T19)
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+# Belt-and-suspenders: even though the pod sets automountServiceAccountToken:
+# false, we also disable it at the SA level so any pod using this SA defaults to
+# no token mount. (L4/C08/T19)
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: url-shortener-config
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+data:
+  # ---- Spring runtime ----
+  SPRING_PROFILES_ACTIVE: "prod,kubernetes"
+  SERVER_PORT: "8080"
+  # Graceful shutdown: stop accepting requests on SIGTERM and drain in-flight
+  # ones (pairs with terminationGracePeriodSeconds + preStop in deployment.yaml).
+  SERVER_SHUTDOWN: "graceful"
+  SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE: "30s"
+
+  # ---- Actuator: expose ONLY what the platform needs ----
+  # Probes hit health/liveness + health/readiness; Prometheus scrapes
+  # /actuator/prometheus (see observability-stack/). Do NOT expose `env`,
+  # `heapdump`, `threaddump`, or `loggers` publicly.
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus"
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  # Show readiness/liveness group details so probe failures are debuggable.
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "when_authorized"
+  # Drive Spring's readiness state from the lifecycle so it flips to OUT_OF_
+  # SERVICE during shutdown — the readiness probe then de-registers the pod.
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: "readinessState,db"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_LIVENESS_INCLUDE: "livenessState"
+  # Tag every metric with the app + version so dashboards can slice by canary.
+  MANAGEMENT_METRICS_TAGS_APPLICATION: "url-shortener"
+
+  # ---- App config (non-secret) ----
+  URLSHORTENER_BASEURL: "https://sho.rt"
+  URLSHORTENER_CACHE_TTL_SECONDS: "3600"
+  # Example: DB host/port/name are not secret; the PASSWORD is — keep it in a
+  # Secret and reference it via SPRING_DATASOURCE_PASSWORD from secretKeyRef.
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres.url-shortener.svc.cluster.local:5432/urlshortener"
+  SPRING_DATASOURCE_USERNAME: "urlshortener_app"

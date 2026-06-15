@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Interview questions asked at MNCs for this experience level. Use the fixed Q&A format in CONVENTIONS.md (section 9).
 
+## Topics
+
+- [Interview Prep: Advanced Java & JVM](T01-interview-prep-advanced-java.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

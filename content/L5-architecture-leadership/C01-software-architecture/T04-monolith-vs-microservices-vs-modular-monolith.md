@@ -614,7 +614,7 @@ A 1000 req/s service, broken down.
 - **CPU**: N independent processes; each scales independently.
 - **Database**: N databases (or N schemas), N connection pools. Cross-context queries become RPCs.
 - **Deployment**: N pipelines. Service A can release 10/day; service B once a week. Each release is small and reversible.
-- **Failure mode**: Service B crashes → service A sees timeouts and (with a circuit breaker) degrades gracefully. Independent failure if architected for it; cascading failure if not (see [T14](../C02-distributed-systems-and-service-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md)).
+- **Failure mode**: Service B crashes → service A sees timeouts and (with a circuit breaker) degrades gracefully. Independent failure if architected for it; cascading failure if not (see [T14](../C02-distributed-systems-and-system-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md)).
 
 ### Network Footprint
 

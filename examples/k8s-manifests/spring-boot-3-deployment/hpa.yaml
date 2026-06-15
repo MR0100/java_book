@@ -1,0 +1,97 @@
+# =============================================================================
+# HorizontalPodAutoscaler (autoscaling/v2)
+# -----------------------------------------------------------------------------
+# Scales the url-shortener Deployment between 2 and 10 replicas based on CPU.
+# autoscaling/v2 is the current GA API (v1 only supported a single CPU target;
+# v2 adds memory, multiple metrics, custom/external metrics, and `behavior`
+# tuning). v2beta2 is removed in modern clusters — always use v2.
+# =============================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: url-shortener        # The HPA now OWNS .spec.replicas of this
+                              # Deployment. Don't also set replicas in CI/GitOps
+                              # or the two controllers will fight.
+  minReplicas: 2              # Floor: matches the Deployment so a scale-to-zero
+                              # never happens for an always-on service.
+  maxReplicas: 10             # Ceiling: protects the cluster/budget. Size this
+                              # to your node capacity and DB connection limits —
+                              # 10 JVM pods each with a 10-conn pool = 100 DB
+                              # connections; make sure the DB can take it.
+  metrics:
+    # --- Metric 1: CPU (the classic signal) -------------------------------
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          # Percentage of the POD'S CPU *request* (250m in deployment.yaml), not
+          # of a core and not of the limit. 70% of 250m = 175m average across
+          # pods triggers scale-out. Keep below 100% so there's burst headroom.
+          averageUtilization: 70
+    # --- Metric 2: memory (optional, commented) ---------------------------
+    # JVM memory is a poor autoscaling signal: the heap fills toward MaxRAM%
+    # and stays high regardless of load, so memory-based scaling tends to
+    # latch at max. Prefer CPU or a request-rate custom metric. Shown for
+    # completeness:
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: Utilization
+    #       averageUtilization: 80
+    #
+    # --- Metric 3: CUSTOM METRIC (the better signal for web apps) ---------
+    # The most meaningful autoscaler for a request-driven service is
+    # requests-per-second per pod, exposed via the Prometheus Adapter (which
+    # serves custom.metrics.k8s.io from the Prometheus you set up in
+    # observability-stack/). Example — scale to keep ~50 rps/pod:
+    # - type: Pods
+    #   pods:
+    #     metric:
+    #       name: http_server_requests_seconds_count_rate   # from Micrometer
+    #     target:
+    #       type: AverageValue
+    #       averageValue: "50"
+    #
+    # Or an EXTERNAL metric (queue depth, etc.) via external.metrics.k8s.io:
+    # - type: External
+    #   external:
+    #     metric:
+    #       name: pubsub_subscription_num_undelivered_messages
+    #     target:
+    #       type: AverageValue
+    #       averageValue: "100"
+  # ---------------------------------------------------------------------------
+  # behavior: tame flapping (scale up fast, scale down slow). Without this the
+  # HPA can thrash, churning pods and connection pools.
+  # ---------------------------------------------------------------------------
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30   # Look back 30s; react quickly to spikes.
+      policies:
+        - type: Percent
+          value: 100                   # Allow doubling pod count...
+          periodSeconds: 30
+        - type: Pods
+          value: 4                     # ...or +4 pods, whichever is larger.
+          periodSeconds: 30
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 min of sustained low load before
+                                       # scaling in — avoids yo-yoing and the
+                                       # cold-start cost of bringing JVMs back.
+      policies:
+        - type: Percent
+          value: 50                    # Remove at most 50% of pods per minute.
+          periodSeconds: 60
+      selectPolicy: Max

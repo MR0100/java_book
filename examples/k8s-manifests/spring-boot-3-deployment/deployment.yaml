@@ -1,0 +1,289 @@
+# =============================================================================
+# Hardened Spring Boot 3 Deployment
+# -----------------------------------------------------------------------------
+# Backing topics:
+#   - L4/C08/T19  Container & Kubernetes security hardening (the securityContext
+#                 block below is a near-1:1 implementation of that topic).
+#   - L5/C03/T15  Right-sizing the JVM in containers (-XX:MaxRAMPercentage and
+#                 why container memory limits != JVM heap).
+#   - L4/C10      Observability (Actuator health probes feed k8s lifecycle).
+#
+# This manifest deploys the `url-shortener` Spring Boot service used elsewhere
+# in the book. It is deliberately over-commented: read it top-to-bottom as a
+# checklist of what "production-grade" means for a JVM workload on Kubernetes
+# 1.29+.
+# =============================================================================
+apiVersion: apps/v1           # Deployment has been GA under apps/v1 since k8s 1.9.
+kind: Deployment
+metadata:
+  name: url-shortener
+  namespace: url-shortener    # Run in a dedicated namespace (see top-level README).
+  labels:
+    # The recommended Kubernetes "app.kubernetes.io/*" label set. Tools, the
+    # Istio mesh, and Prometheus selectors all key off these.
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: url-shortener-platform
+    app.kubernetes.io/version: "1.0.0"
+    # Istio uses `app` and `version` for telemetry grouping and DestinationRule
+    # subset selection. `version: v1` is the subset the canary (istio-canary/)
+    # routes 90% of traffic to.
+    app: url-shortener
+    version: v1
+spec:
+  # Start with >=2 replicas so a single node drain / rolling update never takes
+  # the service to zero. The HPA (hpa.yaml) will scale this further under load;
+  # once an HPA owns the object, omit hard-coded values here to avoid fighting
+  # it (kubectl apply + HPA both writing `replicas` causes thrash). We keep it
+  # for the very first rollout before the HPA's metrics are available.
+  replicas: 2
+  # Pods not Ready for 10 minutes during a rollout count as a failed rollout.
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 5     # Keep 5 old ReplicaSets for rollback; default 10.
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: url-shortener
+      app.kubernetes.io/instance: url-shortener
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1             # Allow 1 extra pod above desired during rollout.
+      maxUnavailable: 0       # Never drop below desired capacity — zero-downtime.
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: url-shortener
+        app.kubernetes.io/instance: url-shortener
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: url-shortener-platform
+        app.kubernetes.io/version: "1.0.0"
+        app: url-shortener
+        version: v1
+      annotations:
+        # Istio sidecar injection is normally enabled by labelling the namespace
+        # `istio-injection=enabled`. This annotation is the per-pod override and
+        # documents the intent explicitly.
+        sidecar.istio.io/inject: "true"
+        # NOTE: We deliberately do NOT add prometheus.io/scrape annotations.
+        # Scraping is configured declaratively via a ServiceMonitor in
+        # observability-stack/ (the Prometheus-Operator pattern), which is the
+        # current best practice over annotation-based scraping.
+    spec:
+      # -----------------------------------------------------------------------
+      # SECURITY HARDENING (L4/C08/T19)
+      # -----------------------------------------------------------------------
+      # Do not mount the default ServiceAccount token. Most app pods never call
+      # the Kubernetes API; mounting the token only widens the blast radius if
+      # the pod is compromised. Set to true only for pods that genuinely talk to
+      # the API server, and then scope the SA's RBAC tightly.
+      automountServiceAccountToken: false
+      # Use a dedicated, minimally-privileged ServiceAccount rather than
+      # `default`. (Define it separately; referenced here by name.)
+      serviceAccountName: url-shortener
+      # Pod-level securityContext: applies to all containers unless overridden.
+      securityContext:
+        runAsNonRoot: true        # Kubelet refuses to start the pod if the image
+                                  # resolves to UID 0. Defense-in-depth against
+                                  # images that forgot to drop root.
+        runAsUser: 1000           # Explicit non-root UID. Your Dockerfile should
+        runAsGroup: 1000          # `USER 1000` and chown app files to 1000:1000.
+        fsGroup: 1000             # Volumes (the emptyDir below) are group-owned
+                                  # by 1000 so the non-root process can write.
+        seccompProfile:
+          # RuntimeDefault applies the container runtime's default seccomp
+          # profile, blocking ~44 dangerous syscalls. This is the single
+          # highest-value, lowest-risk hardening flag for a JVM workload.
+          type: RuntimeDefault
+      # Spread pods across zones/nodes for resilience. topologySpreadConstraints
+      # is the modern replacement for most podAntiAffinity use cases.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          # Spread across availability zones first (best for surviving an AZ
+          # outage). Requires nodes labelled with topology.kubernetes.io/zone.
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway   # Soft: don't block scheduling if
+                                              # zones are imbalanced/unavailable.
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: url-shortener
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname  # Then avoid stacking on one node.
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: url-shortener
+      # ALTERNATIVE / ADDITION: a stricter "never two replicas on one node" rule
+      # via podAntiAffinity. Prefer topologySpreadConstraints above; uncomment
+      # this only if you need a hard guarantee.
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/name: url-shortener
+      #         topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 45  # Give the JVM time to drain in-flight
+                                         # requests on SIGTERM (Spring graceful
+                                         # shutdown: server.shutdown=graceful).
+      containers:
+        - name: url-shortener
+          # -------------------------------------------------------------------
+          # IMAGE: digest-pinned, NOT a mutable tag.
+          # -------------------------------------------------------------------
+          # Pinning by @sha256 digest makes the deployment immutable and
+          # reproducible: `:latest` (or even `:1.0.0`) can be repointed at new
+          # bytes, but a digest cannot. SUBSTITUTE the digest below with the one
+          # your CI emits (`docker buildx ... --push` prints it, or
+          # `crane digest registry.example.com/url-shortener:1.0.0`).
+          image: registry.example.com/url-shortener@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          imagePullPolicy: IfNotPresent  # Safe with digests: a digest is unique,
+                                         # so a cached layer is always correct.
+          ports:
+            - name: http          # Named port; probes and the Service refer to
+              containerPort: 8080  # it by name so the number lives in one place.
+              protocol: TCP
+          # -------------------------------------------------------------------
+          # JVM RIGHT-SIZING (L5/C03/T15)
+          # -------------------------------------------------------------------
+          # The JVM is container-aware since JDK 10+ (UseContainerSupport, on by
+          # default): it reads the cgroup memory limit, NOT the node's RAM.
+          # -Xmx is NOT set. Instead -XX:MaxRAMPercentage lets the heap scale
+          # with the container limit, so the same image works at 512Mi or 4Gi.
+          # Rule of thumb: leave ~25% headroom for non-heap memory (metaspace,
+          # thread stacks, code cache, direct buffers, GC structures) — that is
+          # what OOM-kills JVMs whose -Xmx == container limit.
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -XX:MaxRAMPercentage=75.0
+                -XX:InitialRAMPercentage=50.0
+                -XX:+UseG1GC
+                -XX:+ExitOnOutOfMemoryError
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: url-shortener-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: url-shortener-config
+                  key: SERVER_PORT
+          envFrom:
+            # Pull the rest of the non-secret config in bulk. SECRETS (DB
+            # passwords, API keys) must come from a Secret/ExternalSecret, never
+            # a ConfigMap — out of scope here but noted in the README.
+            - configMapRef:
+                name: url-shortener-config
+          # -------------------------------------------------------------------
+          # RESOURCES: requests == scheduling guarantee, limits == ceiling.
+          # -------------------------------------------------------------------
+          resources:
+            requests:
+              # The scheduler reserves this; it is also the baseline the HPA
+              # measures CPU utilization against (averageUtilization is % of
+              # request). Set requests to steady-state usage.
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              # CPU limit: throttles (does not kill). Many shops omit the CPU
+              # limit to avoid latency from throttling, keeping only the request.
+              # We set one here for predictability; tune per your SLOs.
+              cpu: "1000m"
+              # Memory limit: a hard ceiling — exceed it and the kernel OOM-kills
+              # the container. MaxRAMPercentage=75 of 1024Mi ~= 768Mi heap,
+              # leaving ~256Mi for off-heap. memory request == limit (no burst)
+              # is the safest default for the JVM.
+              memory: "1024Mi"
+          # -------------------------------------------------------------------
+          # CONTAINER-LEVEL SECURITY CONTEXT (L4/C08/T19)
+          # -------------------------------------------------------------------
+          securityContext:
+            allowPrivilegeEscalation: false  # Blocks setuid binaries from gaining
+                                             # more privs than the parent process.
+            privileged: false
+            readOnlyRootFilesystem: true     # The container FS is immutable. An
+                                             # attacker who lands RCE cannot drop
+                                             # a binary or rewrite the app. This
+                                             # is why we mount writable emptyDirs
+                                             # below for the few paths that MUST
+                                             # be writable.
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL          # Drop every Linux capability. A plain HTTP service
+                               # listening on 8080 (an unprivileged port) needs
+                               # none of them. If you must bind <1024, add
+                               # NET_BIND_SERVICE back — but don't; use 8080.
+          # -------------------------------------------------------------------
+          # WRITABLE PATHS under a read-only root filesystem.
+          # -------------------------------------------------------------------
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp          # Tomcat/Jetty unpack work dirs, JVM temp
+                                       # files, and many libs assume /tmp writes.
+            - name: spring-tmp
+              mountPath: /var/tmp      # Some Spring Boot fat-jar extractions use
+                                       # /var/tmp; cheap to provide.
+          # -------------------------------------------------------------------
+          # PROBES — wired to Spring Boot Actuator (L4/C10).
+          # -------------------------------------------------------------------
+          # Spring Boot exposes split health groups on Actuator when
+          # management.endpoint.health.probes.enabled=true (auto-enabled on k8s):
+          #   /actuator/health/liveness   — is the app deadlocked / unrecoverable?
+          #   /actuator/health/readiness  — can it serve traffic right now?
+          #
+          # startupProbe guards slow JVM cold-starts: liveness/readiness are
+          # suspended until startup succeeds, so a 40s boot is never mistaken for
+          # a hang and killed.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30   # 30 * 5s = 150s max boot budget before giving
+                                   # up. Generous for a JVM + DB connection pool.
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3    # 3 failed checks => pulled from Service
+                                   # endpoints (stops receiving traffic) but NOT
+                                   # restarted. Self-heals when dependency
+                                   # recovers (e.g. DB blip).
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            # Start liveness only after startupProbe passes; the explicit delay
+            # is a belt-and-suspenders fallback if startupProbe is removed.
+            initialDelaySeconds: 0
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3    # 3 failures => container restarted. Keep
+                                   # liveness CHEAP and dependency-free; never
+                                   # let a DB outage trip liveness or you get a
+                                   # restart storm across every replica.
+            successThreshold: 1
+          # Graceful shutdown: on SIGTERM, Spring (server.shutdown=graceful)
+          # stops accepting new requests and drains. A small preStop sleep gives
+          # kube-proxy / Istio time to remove this pod from endpoints before the
+          # process exits, eliminating the "connection refused" race.
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 5"]
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi     # Bound the writable scratch space so a runaway
+                                 # temp-file leak can't fill the node.
+        - name: spring-tmp
+          emptyDir:
+            sizeLimit: 64Mi

@@ -20,4 +20,8 @@ Exercises plus this module's end-of-level project.
 
 **Level project.** A concurrent application (e.g. a multi-threaded crawler or job processor) plus a performance-tuning lab: profile, find the bottleneck, fix it, and measure the improvement.
 
+## Topics
+
+- [L3 Level Project: JVM Performance Lab](T01-level-project-jvm-performance-lab.md)
+
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

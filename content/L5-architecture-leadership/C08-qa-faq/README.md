@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Quick question to answer reference for this module.
 
+## Topics
+
+- [Staff Engineer Q&A / FAQ](T01-staff-engineer-qa.md)
+
 [Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

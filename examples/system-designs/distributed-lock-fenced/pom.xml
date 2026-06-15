@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      The Spring Boot parent POM gives us a curated, mutually-compatible set of
+      dependency versions (the Boot "BOM"), sensible plugin defaults, UTF-8 source
+      encoding, and the Java version wired to <java.version>. Pin to a concrete,
+      stable 3.3.x release for reproducible builds.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- look the parent up from the Maven repository, not a local path -->
+    </parent>
+
+    <groupId>com.javamastery.examples</groupId>
+    <artifactId>distributed-lock-fenced</artifactId>
+    <version>1.0.0</version>
+    <name>distributed-lock-fenced</name>
+    <description>Distributed lock over Redis with safe (CAS) release AND fencing tokens — Kleppmann's critique made runnable</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--
+          Pin the Testcontainers version explicitly. We import its BOM below so the
+          individual artifacts (testcontainers, junit-jupiter) inherit this version
+          and stay mutually compatible.
+        -->
+        <testcontainers.version>1.20.4</testcontainers.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+              TEACHING POINT: The Testcontainers BOM. Spring Boot's parent does NOT
+              manage Testcontainers versions for arbitrary modules, so we import the
+              Testcontainers BOM ourselves. This lets us declare the individual
+              Testcontainers dependencies below WITHOUT a <version>, and guarantees
+              testcontainers-core and junit-jupiter are the same, compatible version.
+            -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!--
+          Plain Spring Boot core (no web server). This example is a library +
+          CommandLineRunner demo, not an HTTP service. spring-boot-starter pulls in
+          the context, logging, and the @SpringBootApplication machinery.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!--
+          Spring Data Redis. Brings in the Lettuce client, StringRedisTemplate, and
+          DefaultRedisScript / RedisScript for loading and EVALSHA-executing our
+          atomic Lua release script. Auto-configures a connection from
+          spring.data.redis.* properties.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!--
+          Test starter: JUnit 5 (Jupiter), AssertJ, Mockito, Spring Test, all
+          version-managed by the Boot parent. test scope only.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          Testcontainers core: programmatically starts a throwaway Redis container
+          for the integration test, so there is NO manual "install + start Redis"
+          step. Requires a working Docker daemon on the machine running `mvn test`.
+          The integration test is Docker-GATED (skipped cleanly if Docker is
+          unavailable) so the core fencing-logic tests run anywhere.
+        -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          Testcontainers JUnit 5 integration: the @Testcontainers / @Container
+          lifecycle annotations that start/stop the container around the test class.
+        -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              The Boot Maven plugin: provides `spring-boot:run` for local dev and the
+              `repackage` goal that builds an executable fat JAR. Version managed by
+              the parent.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

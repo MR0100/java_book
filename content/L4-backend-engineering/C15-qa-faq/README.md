@@ -18,4 +18,8 @@ last_updated: 2026-06-09
 
 Quick question to answer reference for this module.
 
+## Topics
+
+- [L4 Q&A and FAQ](T01-l4-qa.md)
+
 [Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)

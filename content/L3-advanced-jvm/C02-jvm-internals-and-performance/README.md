@@ -34,5 +34,14 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 12 | Benchmarking with JMH | `T12-benchmarking-with-jmh.md` | planned |
 | 13 | Performance tuning methodology | `T13-performance-tuning-methodology.md` | planned |
 | 14 | JVM flags & ergonomics | `T14-jvm-flags-and-ergonomics.md` | planned |
+| 15 | Project Valhalla: value classes | `T15-project-valhalla-value-classes.md` | complete |
+| 16 | WebAssembly & Java | `T16-webassembly-and-java.md` | complete |
+| 17 | Tail-latency engineering & load testing | `T17-tail-latency-engineering-and-load-testing.md` | complete |
+
+> [!NOTE]
+> **Phase 6** added T15–T16 and extended T05 (GraalVM Galahad + CRaC). **Phase 7**
+> added T17 and additively extended T10 (memory-optimization patterns), T11 (async-profiler/
+> JFR/JMC deep dive + flame graphs), and T12 (step-by-step JMH + microbenchmark pitfalls).
+> Hand-maintained (generator predates these); per-topic frontmatter `status` is the source of truth.
 
 [Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
