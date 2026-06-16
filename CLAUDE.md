@@ -57,6 +57,10 @@ Do all of the following, in order:
 ## 5. Regeneration commands
 
 ```bash
+# Quickest — via the Makefile (TYPE = mixed | web | audio):
+make gen-doc TYPE=mixed                      # audio first, then web
+
+# Or directly:
 # Web book (dochub) — needs Python 3.9+
 python scripts/web/build_dochub.py          # → dochub/index.html (open in a browser)
 

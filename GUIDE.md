@@ -182,6 +182,12 @@ Read **[CLAUDE.md](CLAUDE.md)** — it's the rulebook. In short:
 ## 8. Command cheat-sheet
 
 ```bash
+# Generate docs — shortest, via the Makefile
+make gen-doc TYPE=mixed     # audio first, then web   (or: make mixed)
+make gen-doc TYPE=web       # web only                (or: make web)
+make gen-doc TYPE=audio     # audio only              (or: make audio)
+# (use TYPE=…, not --type=… — a leading -- is reserved by make)
+
 # Read
 open content/L0-foundations/                 # the Markdown book
 python scripts/web/build_dochub.py && open dochub/index.html   # the web reader
