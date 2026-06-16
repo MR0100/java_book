@@ -16,9 +16,9 @@ last_updated: 2026-06-09
 
 # Java-Specific Interview Q&A (by Level)
 
-This topic is the **distilled question bank** of Java questions interviewers reach for at each level. Junior questions probe vocabulary; mid-level probe internals; senior probe trade-offs and modern-Java fluency. Each question follows the fixed Q&A format from [CONVENTIONS §9](../../../CONVENTIONS.md). Use it as a self-quiz before any Java-heavy loop.
+This topic is the **distilled question bank** of Java questions interviewers reach for at each level. Junior questions probe vocabulary; mid-level probe internals; senior probe trade-offs and modern-Java fluency. Each question follows the fixed Q&A format from [CONVENTIONS §9](../../../templates/CONVENTIONS.md). Use it as a self-quiz before any Java-heavy loop.
 
-The exhaustive Java topic taxonomy lives across [L0–L5 Interview Prep sections](../../../CURRICULUM.md); this topic surfaces the **highest-leverage questions** specifically for L6 interview prep.
+The exhaustive Java topic taxonomy lives across [L0–L5 Interview Prep sections](../../../docs/CONTENTS.md); this topic surfaces the **highest-leverage questions** specifically for L6 interview prep.
 
 ## Junior (0-2 YOE)
 

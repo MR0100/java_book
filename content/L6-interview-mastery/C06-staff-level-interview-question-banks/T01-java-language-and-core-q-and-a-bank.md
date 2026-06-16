@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Java Language & Core — Q&A Bank (Staff Level)
 
-A high-volume question bank focused on Java language fundamentals, OOP, generics, exceptions, modern Java (8 → 21+), and the gotchas that interviewers reliably probe. **60+ questions**, grouped by sub-topic. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../CONVENTIONS.md). Use as a self-quiz before any Java-heavy loop.
+A high-volume question bank focused on Java language fundamentals, OOP, generics, exceptions, modern Java (8 → 21+), and the gotchas that interviewers reliably probe. **60+ questions**, grouped by sub-topic. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../templates/CONVENTIONS.md). Use as a self-quiz before any Java-heavy loop.
 
 ## OOP & Class Design
 

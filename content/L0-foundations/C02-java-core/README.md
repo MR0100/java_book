@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Foundations — Java Language — Core
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -40,4 +40,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 18 | var (local variable type inference) | `T18-var-local-variable-type-inference.md` | planned |
 | 19 | Comments, Javadoc & code style | `T19-comments-javadoc-and-code-style.md` | planned |
 
-[Back to L0 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L0 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

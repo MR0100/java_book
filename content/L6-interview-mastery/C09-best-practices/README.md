@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 The interviewer anti-patterns that reliably tank candidates: silence, jumping to code, ignoring edge cases, refusing hints, fake-perfect behavioral stories, over-engineering design rounds.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

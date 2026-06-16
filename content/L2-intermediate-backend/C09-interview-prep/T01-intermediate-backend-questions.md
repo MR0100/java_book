@@ -16,7 +16,7 @@ last_updated: 2026-06-05
 
 # Intermediate Backend Interview Questions
 
-The questions a junior-to-mid backend developer gets — product-company screens, mid-level rounds, and FAANG-adjacent interviews. Distilled from the INTERVIEW callouts across the L2 concept topics plus commonly-reported questions. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../CONVENTIONS.md).
+The questions a junior-to-mid backend developer gets — product-company screens, mid-level rounds, and FAANG-adjacent interviews. Distilled from the INTERVIEW callouts across the L2 concept topics plus commonly-reported questions. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../templates/CONVENTIONS.md).
 
 > [!TIP]
 > Answer out loud or write a short paragraph **before** reading the answer. At this level interviewers probe one level deeper than L0 — they want the *mechanism* ("why"), not just the definition. Every answer below ends with the deeper hook they're listening for.

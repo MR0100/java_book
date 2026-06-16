@@ -1,0 +1,2076 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rate Limiting Algorithms — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="active" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Rate Limiting Algorithms</span></div>
+        <h1>Rate Limiting Algorithms</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T13-rate-limiting-algorithms.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~70 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        <div class="example-links"><a class="example-link" href="../examples/system-designs--rate-limiter-redis-lua.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Distributed Rate Limiter — Redis + atomic Lua script</span><span class="example-link-sub">System Designs · rate-limiter-redis-lua</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a><a class="example-link" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="example-link-sub">Hands-on Labs · lab-07-build-a-rate-limiter</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a></div>
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Rate Limiting Algorithms"
+slug: rate-limiting-algorithms
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Distributed Systems &amp; System Design"
+type: concept
+difficulty: lead
+order: 13
+tags: [rate-limiting, fixed-window, sliding-window, token-bucket, leaky-bucket, gcra, bucket4j, redis-rate-limit, http-429, retry-after, x-ratelimit, cloudflare, nginx-rate-limit, spring-cloud-gateway-rate-limiter, fair-queueing, burst]
+prerequisites: [api-gateway-and-service-mesh, caching-strategies-at-scale]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="rate-limiting-algorithms">Rate Limiting Algorithms</h1>
+<p>Rate limiting is the discipline of capping how much load a system accepts per client per time window — protecting backends from abuse, ensuring fair access, and shaping bursts into manageable streams. Every public API has rate limits; every multi-tenant system needs them; every system that retries failures needs them on itself. The naive approach ("count requests in the last minute, reject if over the limit") has subtle failure modes — burst at the window boundary, no smoothing, unfair across clients with synchronized clocks — that have produced sophisticated algorithms (token bucket, leaky bucket, sliding window, GCRA) each with measurable trade-offs.</p>
+<p>The depth bar here is <strong>each algorithm's actual behavior on the boundary and the steady state</strong>. We trace fixed window (allows 2× burst at window boundary), sliding window log (memory-heavy, perfectly fair), sliding window counter (the practical default), token bucket (allows bursts up to bucket size, smooth steady-state), leaky bucket (smoothest, no burst), and the <strong>Generic Cell Rate Algorithm (GCRA)</strong> that ATM networks used before the web existed. We name the <strong>distributed</strong> rate-limiting problem — when a service has N instances and each must enforce a single global limit — and the canonical solutions (Redis Lua scripts, sliding-window counters with shared state, sentinel-based). We trace what real systems do: <strong>Cloudflare, AWS API Gateway, Kong, NGINX, Spring Cloud Gateway, Bucket4j</strong> — each with their algorithm choices and configurations. We cover the <strong>HTTP semantics</strong>: 429 Too Many Requests, the Retry-After header, the X-RateLimit-* response headers that Stripe popularized. By the end you will pick an algorithm by burst tolerance and fairness needs, implement distributed rate limiting in Spring with Redis, and refuse the most common form of rate-limiting misuse (rate-limiting the wrong dimension).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t07-api-gateway-and-service-mesh.html">API Gateway &amp; Service Mesh</a> (where rate limiting often lives), <a href="c02-t11-caching-strategies-at-scale.html">Caching</a> (rate-limit state is itself a cache).</p></div></div>
+<h2 id="where-rate-limiting-came-from-from-network-routers-to-modern-api-quotas">Where Rate Limiting Came From — From Network Routers To Modern API Quotas<a class="anchor" href="#where-rate-limiting-came-from-from-network-routers-to-modern-api-quotas" aria-hidden="true">#</a></h2>
+<p>Rate limiting has a 40-year history that spans network engineering (1980s), early internet abuse (1990s), and modern API protection (2010s). The specific algorithms (token bucket, leaky bucket, sliding window) descend from network traffic shaping in the 1980s — applied to a problem that didn't exist yet.</p>
+<h3 id="the-1980s-network-traffic-shaping">The 1980s — Network Traffic Shaping<a class="anchor" href="#the-1980s-network-traffic-shaping" aria-hidden="true">#</a></h3>
+<p>The conceptual foundation is <strong>traffic shaping in network routers</strong>. As ATM (Asynchronous Transfer Mode) networks emerged in the late 1980s, network engineers needed mechanisms to <em>smooth</em> bursty traffic into steady streams matching the network's capacity.</p>
+<p>The canonical algorithms developed for this:</p>
+<h4 id="token-bucket">Token Bucket<a class="anchor" href="#token-bucket" aria-hidden="true">#</a></h4>
+<p><strong>Token Bucket</strong> is described in early 1980s networking literature. The mechanism: tokens are added to a bucket at a constant rate; each packet consumes a token; if the bucket is empty, the packet is delayed or dropped.</p>
+<p>The bucket size determines burst tolerance — a bucket of 100 tokens allows bursts of up to 100 packets at once, but the steady-state rate is the token addition rate.</p>
+<p>Token bucket is <em>the</em> canonical traffic-shaping algorithm. It's described in RFC 2697 (1999) and earlier networking texts.</p>
+<h4 id="leaky-bucket">Leaky Bucket<a class="anchor" href="#leaky-bucket" aria-hidden="true">#</a></h4>
+<p><strong>Leaky Bucket</strong> is similar but inverted: packets enter a buffer (the bucket); the buffer leaks at a constant rate, releasing one packet per time unit. If the buffer is full, new packets are dropped.</p>
+<p>Leaky bucket is <em>more strict</em> than token bucket — it never allows bursts beyond the leak rate. Token bucket allows bursts up to the bucket size.</p>
+<p>The two algorithms are mathematically related but produce different traffic patterns. Most modern rate limiters use token bucket because it allows occasional bursts.</p>
+<h3 id="the-1990s-internet-abuse-and-early-rate-limiting">The 1990s — Internet Abuse And Early Rate Limiting<a class="anchor" href="#the-1990s-internet-abuse-and-early-rate-limiting" aria-hidden="true">#</a></h3>
+<p>The 1990s saw the first widespread <em>application-level</em> rate limiting:</p>
+<ul>
+<li><strong>Email spam protection</strong>: SMTP servers began rate-limiting per-sender to prevent spam floods.</li>
+<li><strong>Web crawler restriction</strong>: search engines respected robots.txt rate limits.</li>
+<li><strong>Brute-force authentication protection</strong>: login attempts were rate-limited per-IP.</li>
+</ul>
+<p>These were <em>ad hoc</em> — each application implemented its own rate limiting, often poorly. The algorithms used were typically simple (fixed-window counts).</p>
+<h3 id="the-2000s-dos-defense">The 2000s — DoS Defense<a class="anchor" href="#the-2000s-dos-defense" aria-hidden="true">#</a></h3>
+<p>The 2000s brought <strong>denial-of-service attacks</strong> as a major concern. The famous 2000 attacks on Yahoo, eBay, Amazon, and CNN demonstrated that internet services could be brought down by <em>coordinated</em> request floods.</p>
+<p>DoS defense required rate limiting at the network edge. Tools like:</p>
+<ul>
+<li><strong>Hardware DDoS appliances</strong>: Arbor Networks, Riverhead Networks (acquired by Cisco).</li>
+<li><strong>Cloud DDoS services</strong>: Akamai (Prolexic), CloudFlare.</li>
+</ul>
+<p>These applied rate limiting at the <em>infrastructure</em> layer, before requests reached applications.</p>
+<h3 id="the-2010s-api-rate-limiting-standardization">The 2010s — API Rate Limiting Standardization<a class="anchor" href="#the-2010s-api-rate-limiting-standardization" aria-hidden="true">#</a></h3>
+<p>The 2010s saw rate limiting become a <em>standard API feature</em>. The shift was driven by:</p>
+<ol>
+<li><strong>API platforms</strong> (Twilio, Stripe, GitHub, Twitter): all imposed rate limits.</li>
+<li><strong>Standardization</strong> of rate-limit headers (<code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>).</li>
+<li><strong>Distributed rate limiting</strong> challenges as APIs scaled.</li>
+</ol>
+<p>The GitHub API rate limit became famous: 5,000 requests/hour for authenticated users. Twitter's rate limit (180 requests/15 minutes for most endpoints) was equally well-known. Developers learned to <em>respect</em> rate limits as a normal API constraint.</p>
+<h3 id="the-modern-distributed-rate-limiting-era">The Modern Distributed Rate Limiting Era<a class="anchor" href="#the-modern-distributed-rate-limiting-era" aria-hidden="true">#</a></h3>
+<p>Modern systems implement rate limiting at scale using:</p>
+<ul>
+<li><strong>Redis-based</strong>: token buckets stored in Redis, atomic operations via Lua scripts.</li>
+<li><strong>Sliding window logs</strong>: log of recent requests, queried for window count.</li>
+<li><strong>Sliding window counters</strong>: hybrid that approximates sliding window with bucket counts.</li>
+<li><strong>Edge rate limiting</strong>: CDN-level (Cloudflare, Akamai) for early defense.</li>
+</ul>
+<p>The challenge is <em>distributed consistency</em> — rate limiters running on many machines must agree on the count. Various trade-offs between accuracy and performance are made.</p>
+<h2 id="why-rate-limiting-matters-specifically-the-senior-engineers-qa">Why Rate Limiting Matters, Specifically: The Senior Engineer's Q&amp;A<a class="anchor" href="#why-rate-limiting-matters-specifically-the-senior-engineers-qa" aria-hidden="true">#</a></h2>
+<h3 id="q1-why-is-rate-limiting-necessary">Q1: Why is rate limiting necessary?<a class="anchor" href="#q1-why-is-rate-limiting-necessary" aria-hidden="true">#</a></h3>
+<p>Three primary reasons:</p>
+<ol>
+<li><strong>Resource protection</strong>: prevent a few users from overwhelming the system.</li>
+<li><strong>Cost control</strong>: prevent abuse from running up cloud bills.</li>
+<li><strong>Fairness</strong>: ensure all users get reasonable service.</li>
+</ol>
+<p>Without rate limiting, a few users can degrade service for everyone. With it, the system degrades gracefully under load.</p>
+<h3 id="q2-when-should-i-use-token-bucket-vs-sliding-window">Q2: When should I use token bucket vs sliding window?<a class="anchor" href="#q2-when-should-i-use-token-bucket-vs-sliding-window" aria-hidden="true">#</a></h3>
+<p><strong>Token bucket</strong>:
+- Allows controlled bursts.
+- Memory-efficient (one counter per user).
+- Standard for most API rate limiting.</p>
+<p><strong>Sliding window</strong>:
+- Smoother rate limiting (no burst-window edge effects).
+- More accurate.
+- More expensive (window logs require more memory).</p>
+<p>Most APIs use token bucket for its simplicity. Sliding window is appropriate for precise rate enforcement.</p>
+<h3 id="q3-whats-the-right-rate-limit-to-set">Q3: What's the right rate limit to set?<a class="anchor" href="#q3-whats-the-right-rate-limit-to-set" aria-hidden="true">#</a></h3>
+<p>It depends on:</p>
+<ul>
+<li><strong>Server capacity</strong>: don't set higher than the server can serve.</li>
+<li><strong>Use case</strong>: API users vs anonymous users vs partners get different limits.</li>
+<li><strong>Fairness goals</strong>: how to allocate capacity across users.</li>
+</ul>
+<p>The pragmatic approach: start conservative, monitor, adjust based on actual usage.</p>
+<h3 id="q4-how-do-i-implement-distributed-rate-limiting">Q4: How do I implement distributed rate limiting?<a class="anchor" href="#q4-how-do-i-implement-distributed-rate-limiting" aria-hidden="true">#</a></h3>
+<p>Two main approaches:</p>
+<ol>
+<li><strong>Centralized state</strong>: store rate-limit counts in Redis. All instances check Redis. Atomicity via Lua scripts.</li>
+<li><strong>Distributed agreement</strong>: each instance maintains local counts, periodically syncs. Less accurate but lower-latency.</li>
+</ol>
+<p>Centralized Redis is the standard for most use cases. Distributed agreement is appropriate for ultra-low-latency needs.</p>
+<h3 id="q5-how-should-i-handle-rate-limited-requests">Q5: How should I handle rate-limited requests?<a class="anchor" href="#q5-how-should-i-handle-rate-limited-requests" aria-hidden="true">#</a></h3>
+<p>Per the HTTP standard:</p>
+<ul>
+<li><strong>429 Too Many Requests</strong> response code.</li>
+<li><strong><code>Retry-After</code> header</strong> indicating when to retry.</li>
+<li><strong>Rate-limit headers</strong> showing remaining capacity.</li>
+</ul>
+<p>The client SDK should <em>respect</em> these headers — backoff, retry after the specified time. Most modern SDKs do this automatically.</p>
+<h2 id="common-misconceptions-explained">Common Misconceptions Explained<a class="anchor" href="#common-misconceptions-explained" aria-hidden="true">#</a></h2>
+<h3 id="rate-limiting-is-just-about-throttling-abuse">"Rate limiting is just about throttling abuse."<a class="anchor" href="#rate-limiting-is-just-about-throttling-abuse" aria-hidden="true">#</a></h3>
+<p>Partial. Rate limiting protects against abuse but also against <em>honest mistakes</em> (a client in a loop, a faulty integration). Both produce overload.</p>
+<h3 id="rate-limits-should-be-per-ip">"Rate limits should be per-IP."<a class="anchor" href="#rate-limits-should-be-per-ip" aria-hidden="true">#</a></h3>
+<p>False. Per-IP can be inappropriate (NAT means many users share an IP) or insufficient (a single user with many IPs). Most APIs rate-limit per-API-key.</p>
+<h3 id="token-bucket-is-always-better-than-leaky-bucket">"Token bucket is always better than leaky bucket."<a class="anchor" href="#token-bucket-is-always-better-than-leaky-bucket" aria-hidden="true">#</a></h3>
+<p>Half true. Token bucket allows bursts; leaky bucket smooths them. The choice depends on what you want.</p>
+<h3 id="rate-limiting-should-reject-excess-requests">"Rate limiting should reject excess requests."<a class="anchor" href="#rate-limiting-should-reject-excess-requests" aria-hidden="true">#</a></h3>
+<p>Not always. Three options: reject (429), queue, or shed (silently drop). Queueing is appropriate when the client can wait; shedding is appropriate when reliability is more important than completeness.</p>
+<h3 id="distributed-rate-limiting-requires-consensus">"Distributed rate limiting requires consensus."<a class="anchor" href="#distributed-rate-limiting-requires-consensus" aria-hidden="true">#</a></h3>
+<p>False. Most distributed rate limiting uses <em>centralized state</em> (Redis with Lua), not consensus protocols. Consensus would be overkill.</p>
+<h3 id="rate-limits-eliminate-dos-attacks">"Rate limits eliminate DoS attacks."<a class="anchor" href="#rate-limits-eliminate-dos-attacks" aria-hidden="true">#</a></h3>
+<p>False. <strong>Rate limits help with abuse</strong> but don't stop true DoS attacks (which can saturate the network before reaching the rate limiter). Network-layer DDoS defense (CDN, BGP) handles those.</p>
+<h2 id="why-rate-limit">Why Rate Limit<a class="anchor" href="#why-rate-limit" aria-hidden="true">#</a></h2>
+<p>Three reasons:</p>
+<ol>
+<li><strong>Abuse protection</strong>: a misbehaving client (intentional or not) flooding a service. Cap at a sane per-client level.</li>
+<li><strong>Fairness across tenants</strong>: multi-tenant systems must prevent one tenant's bad day from harming others.</li>
+<li><strong>Backend protection</strong>: the rate limit at the edge protects the database from a stampede.</li>
+</ol>
+<div class="mermaid">flowchart LR
+  C[Clients] -->|"requests"| RL[Rate limiter]
+  RL -->|"accepted (≤ limit)"| B[Backend]
+  RL -.->|"rejected (429)"| C
+</div>
+<h2 id="the-algorithms">The Algorithms<a class="anchor" href="#the-algorithms" aria-hidden="true">#</a></h2>
+<h3 id="fixed-window">Fixed Window<a class="anchor" href="#fixed-window" aria-hidden="true">#</a></h3>
+<p>Divide time into windows (each minute, each hour). Count requests per client per window. Reject if count exceeds limit.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class FixedWindow {
+  long windowStart = System.currentTimeMillis();
+  AtomicInteger count = new AtomicInteger();
+  final int limit = 100;
+  final long windowMs = 60_000;
+
+  boolean allow() {
+    long now = System.currentTimeMillis();
+    if (now - windowStart &gt; windowMs) {
+      windowStart = now;
+      count.set(0);
+    }
+    return count.incrementAndGet() &lt;= limit;
+  }
+}
+</code></pre></div>
+<p><strong>Pros</strong>: simplest; one integer per client.</p>
+<p><strong>Cons</strong>: the <strong>boundary burst</strong> — a client can make 100 requests at 12:00:59 and 100 more at 12:01:00, hitting 200 requests in two seconds while "100 per minute" appears respected.</p>
+<div class="mermaid">flowchart LR
+  T1["12:00:00"] -.->|"99 reqs"| T59["12:00:59"]
+  T59 -->|"1 req"| T60["12:01:00 (new window)"]
+  T60 -->|"100 reqs in 1s"| T61["12:01:01"]
+  Note["200 reqs in ~2 seconds<br/>despite '100/min' limit"]
+</div>
+<h3 id="sliding-window-log">Sliding Window Log<a class="anchor" href="#sliding-window-log" aria-hidden="true">#</a></h3>
+<p>Store each request's timestamp; count requests in the last N seconds.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class SlidingLog {
+  Deque&lt;Long&gt; timestamps = new ArrayDeque&lt;&gt;();
+  final int limit = 100;
+  final long windowMs = 60_000;
+
+  synchronized boolean allow() {
+    long now = System.currentTimeMillis();
+    while (!timestamps.isEmpty() &amp;&amp; now - timestamps.peekFirst() &gt; windowMs) {
+      timestamps.pollFirst();
+    }
+    if (timestamps.size() &lt; limit) {
+      timestamps.addLast(now);
+      return true;
+    }
+    return false;
+  }
+}
+</code></pre></div>
+<p><strong>Pros</strong>: perfectly accurate.</p>
+<p><strong>Cons</strong>: memory proportional to limit (storing N timestamps per client); at 100,000 clients × 100-req limit = 10M timestamps.</p>
+<h3 id="sliding-window-counter">Sliding Window Counter<a class="anchor" href="#sliding-window-counter" aria-hidden="true">#</a></h3>
+<p>A practical hybrid: track the count for the current window AND a weighted portion of the previous window.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class SlidingCounter {
+  long currentWindow = System.currentTimeMillis() / 60_000;
+  AtomicInteger currentCount = new AtomicInteger();
+  AtomicInteger previousCount = new AtomicInteger();
+  final int limit = 100;
+
+  synchronized boolean allow() {
+    long now = System.currentTimeMillis();
+    long thisWindow = now / 60_000;
+    if (thisWindow &gt; currentWindow) {
+      previousCount.set(currentCount.get());
+      currentCount.set(0);
+      currentWindow = thisWindow;
+    }
+    double pctOfPrev = 1.0 - ((now % 60_000) / 60_000.0);
+    int effective = (int)(previousCount.get() * pctOfPrev) + currentCount.get();
+    if (effective &lt; limit) {
+      currentCount.incrementAndGet();
+      return true;
+    }
+    return false;
+  }
+}
+</code></pre></div>
+<p><strong>Pros</strong>: smooths out boundary bursts; two counters per client; standard in production rate limiters.</p>
+<p><strong>Cons</strong>: slight imprecision; assumes uniform distribution within the previous window.</p>
+<p><strong>This is the practical default</strong> — used by NGINX, Cloudflare, Kong, and most production systems.</p>
+<h3 id="token-bucket_1">Token Bucket<a class="anchor" href="#token-bucket_1" aria-hidden="true">#</a></h3>
+<p>Each client has a bucket holding up to <code>capacity</code> tokens; tokens refill at a constant rate; each request consumes one token; reject if bucket is empty.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class TokenBucket {
+  final int capacity = 100;
+  final double tokensPerSecond = 100.0 / 60;  // 100 per minute
+  double tokens;
+  long lastRefill = System.nanoTime();
+
+  synchronized boolean allow() {
+    long now = System.nanoTime();
+    tokens = Math.min(capacity, tokens + (now - lastRefill) * tokensPerSecond / 1_000_000_000);
+    lastRefill = now;
+    if (tokens &gt;= 1) {
+      tokens -= 1;
+      return true;
+    }
+    return false;
+  }
+}
+</code></pre></div>
+<p><strong>Pros</strong>: allows bursts up to <code>capacity</code>; smooth steady state at refill rate; intuitive ("save up to N tokens, spend them when you need").</p>
+<p><strong>Cons</strong>: bursts are by design — protects steady-state load, allows occasional spikes.</p>
+<p>Token bucket is <em>the</em> algorithm for APIs where occasional bursts are fine and steady-state is the constraint. <strong>AWS API Gateway, Stripe API, GitHub API</strong> all use token bucket variants.</p>
+<h3 id="leaky-bucket_1">Leaky Bucket<a class="anchor" href="#leaky-bucket_1" aria-hidden="true">#</a></h3>
+<p>Imagine a bucket with a hole that leaks at a fixed rate. Requests fill the bucket; if it overflows, reject. The leak rate is the request rate; the bucket capacity is the burst tolerance.</p>
+<p>Operationally similar to token bucket but framed as smoothing rather than allowance — useful when you want to <em>queue</em> requests to a fixed-rate downstream rather than reject.</p>
+<h3 id="gcra-generic-cell-rate-algorithm">GCRA (Generic Cell Rate Algorithm)<a class="anchor" href="#gcra-generic-cell-rate-algorithm" aria-hidden="true">#</a></h3>
+<p>Used in ATM networks (the telephony network protocol, not the bank thing). Mathematically equivalent to leaky bucket but implemented with O(1) state (the time of the next allowed cell). Cloudflare's open-source <code>gcra-go</code> implements it; widely used in Cloudflare's WAF.</p>
+<h2 id="distributed-rate-limiting">Distributed Rate Limiting<a class="anchor" href="#distributed-rate-limiting" aria-hidden="true">#</a></h2>
+<p>The hard problem: a service has 50 instances; the rate limit is "100 req/min per API key globally"; each instance can't enforce its own 100. The state must be shared.</p>
+<h3 id="redis-based-rate-limiting">Redis-Based Rate Limiting<a class="anchor" href="#redis-based-rate-limiting" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Sliding-window counter in Redis (via Lua script for atomicity)
+String script = &quot;&quot;&quot;
+  local key = KEYS[1]
+  local window = tonumber(ARGV[1])
+  local limit = tonumber(ARGV[2])
+  local now = tonumber(ARGV[3])
+  local windowStart = math.floor(now / window) * window
+  local currentKey = key .. ':' .. windowStart
+  local count = tonumber(redis.call('GET', currentKey) or '0')
+  if count &lt; limit then
+    redis.call('INCR', currentKey)
+    redis.call('EXPIRE', currentKey, window * 2)
+    return 1
+  end
+  return 0
+&quot;&quot;&quot;;
+boolean allowed = redis.eval(script, Keys.of(&quot;rl:&quot; + apiKey),
+    Args.of(&quot;60000&quot;, &quot;100&quot;, System.currentTimeMillis())) == 1L;
+</code></pre></div>
+<p>Redis Lua scripts ensure atomicity; the state is shared across all app instances; the cost is one Redis call per request.</p>
+<p>For very high throughput, <strong>batch the counter updates</strong> locally and sync to Redis periodically — at the cost of being approximate.</p>
+<h3 id="sentinel-resilience-patterns">Sentinel / Resilience Patterns<a class="anchor" href="#sentinel-resilience-patterns" aria-hidden="true">#</a></h3>
+<p><strong>Sentinel</strong> (Alibaba's flow-control library) and <strong>Resilience4j RateLimiter</strong> provide in-process rate limiting; combine with Redis-shared state for distributed enforcement.</p>
+<h2 id="http-semantics">HTTP Semantics<a class="anchor" href="#http-semantics" aria-hidden="true">#</a></h2>
+<p>When a rate limit is exceeded, the standard response is HTTP <strong>429 Too Many Requests</strong> with a <strong>Retry-After</strong> header indicating when the client may retry.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">http</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-http">HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1736353200
+</code></pre></div>
+<p><strong>X-RateLimit-* headers</strong> (Stripe popularized; not standard but widely adopted):</p>
+<ul>
+<li><code>X-RateLimit-Limit</code>: the cap.</li>
+<li><code>X-RateLimit-Remaining</code>: how many requests are left in the current window.</li>
+<li><code>X-RateLimit-Reset</code>: unix timestamp when the window resets.</li>
+</ul>
+<p>Modern clients (Stripe SDK, GitHub Octokit) read these headers to schedule retries intelligently. Returning them is good citizenship.</p>
+<h2 id="spring-cloud-gateway-rate-limiter">Spring Cloud Gateway Rate Limiter<a class="anchor" href="#spring-cloud-gateway-rate-limiter" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: orders
+        uri: lb://order-service
+        predicates: [Path=/api/v1/orders/**]
+        filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 100      # tokens per second
+            redis-rate-limiter.burstCapacity: 200      # bucket size
+            redis-rate-limiter.requestedTokens: 1
+            key-resolver: &quot;#{@userKeyResolver}&quot;
+</code></pre></div>
+<p>The built-in implementation uses Redis + Lua for token-bucket distributed rate limiting. <code>key-resolver</code> is a bean returning the rate-limit key (user ID, API key, IP).</p>
+<h2 id="bucket4j-token-bucket-for-java">Bucket4j — Token Bucket For Java<a class="anchor" href="#bucket4j-token-bucket-for-java" aria-hidden="true">#</a></h2>
+<p><a href="https://bucket4j.com/">Bucket4j</a> is the standard Java rate-limiting library, providing token bucket with multiple backends (in-memory, Hazelcast, Redis, Coherence).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Bucket bucket = Bucket.builder()
+    .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+    .build();
+
+if (bucket.tryConsume(1)) {
+  // process request
+} else {
+  // 429
+}
+</code></pre></div>
+<p>Distributed bucket via Redis:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ProxyManager&lt;String&gt; manager = Bucket4jRedis.casBased(redisClient);
+Bucket bucket = manager.getProxy(apiKey,
+    () -&gt; BucketConfiguration.builder()
+        .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+        .build());
+</code></pre></div>
+<h2 id="choosing-the-rate-limit-dimension">Choosing The Rate-Limit Dimension<a class="anchor" href="#choosing-the-rate-limit-dimension" aria-hidden="true">#</a></h2>
+<p>A rate limit applies to <em>some</em> identifier. Common choices:</p>
+<ul>
+<li><strong>Per IP</strong>: simplest; bad for clients behind NAT or proxies (all see one IP).</li>
+<li><strong>Per API key / per user</strong>: most common for authenticated APIs.</li>
+<li><strong>Per endpoint per user</strong>: different limits for different endpoints (cheap reads at 1000/min, expensive operations at 10/min).</li>
+<li><strong>Per tenant</strong>: in a multi-tenant SaaS, limits enforced at the tenant level.</li>
+<li><strong>Per IP-and-user</strong>: defense against credential-stuffing.</li>
+</ul>
+<p>Most production rate limiters layer multiple dimensions — e.g., per-IP at the edge, per-user at the application, per-endpoint nested.</p>
+<h2 id="rate-limiting-at-multiple-layers">Rate-Limiting At Multiple Layers<a class="anchor" href="#rate-limiting-at-multiple-layers" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>CDN edge (Cloudflare, CloudFront)</strong>: gross abuse defense, very high limits.</li>
+<li><strong>API gateway (Kong, Spring Cloud Gateway, AWS API Gateway)</strong>: per-API-key fine-grained.</li>
+<li><strong>Application service</strong>: per-operation business limits.</li>
+<li><strong>Database / cache</strong>: connection-level limits (don't exceed connection pool).</li>
+</ul>
+<p>Each layer protects the next. The CDN absorbs DDoS; the gateway enforces customer plans; the service enforces business rules.</p>
+<h2 id="common-failure-modes">Common Failure Modes<a class="anchor" href="#common-failure-modes" aria-hidden="true">#</a></h2>
+<h3 id="rate-limit-bypass-via-distributed-clients">Rate-Limit Bypass Via Distributed Clients<a class="anchor" href="#rate-limit-bypass-via-distributed-clients" aria-hidden="true">#</a></h3>
+<p>A client distributes its requests across 50 IPs. Per-IP limit doesn't catch them. Combine with per-user or per-API-key limits.</p>
+<h3 id="synchronous-retry-storm">Synchronous Retry Storm<a class="anchor" href="#synchronous-retry-storm" aria-hidden="true">#</a></h3>
+<p>The rate limit returns 429; clients retry immediately without backoff; the retry traffic itself exceeds the limit. Now the client is in a tight loop.</p>
+<p><strong>Fix</strong>: clients must respect <code>Retry-After</code>; exponential backoff on 429. Stripe's SDK does this by default; ad-hoc HTTP clients often don't.</p>
+<h3 id="burst-inside-the-limit">Burst Inside The Limit<a class="anchor" href="#burst-inside-the-limit" aria-hidden="true">#</a></h3>
+<p>Token bucket with capacity 100 allows 100 in one millisecond. Some downstream resources can't absorb that burst.</p>
+<p><strong>Fix</strong>: smaller burst capacity; or combine with a leaky-bucket smoothing step.</p>
+<h3 id="state-drift-across-instances">State Drift Across Instances<a class="anchor" href="#state-drift-across-instances" aria-hidden="true">#</a></h3>
+<p>Redis-based shared state goes down; instances fall back to in-memory limits; effective limit becomes N × intended.</p>
+<p><strong>Fix</strong>: monitor Redis availability; degrade to stricter local limits when Redis is unreachable.</p>
+<h3 id="hot-tenant-hot-partition">Hot Tenant Hot Partition<a class="anchor" href="#hot-tenant-hot-partition" aria-hidden="true">#</a></h3>
+<p>Rate-limit state is in Redis sharded by tenant; one tenant has 99% of traffic; one Redis shard saturates.</p>
+<p><strong>Fix</strong>: partition by composite key (tenant + endpoint), shard more, or use a CDN's distributed rate-limiting.</p>
+<h2 id="trade-off-summary">Trade-Off Summary<a class="anchor" href="#trade-off-summary" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th style="text-align: center;">Burst</th>
+<th style="text-align: center;">Memory</th>
+<th style="text-align: center;">Fairness</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fixed window</td>
+<td style="text-align: center;">High (boundary)</td>
+<td style="text-align: center;">O(1)</td>
+<td style="text-align: center;">Poor</td>
+<td>Simple, low-stakes</td>
+</tr>
+<tr>
+<td>Sliding window log</td>
+<td style="text-align: center;">None</td>
+<td style="text-align: center;">O(N)</td>
+<td style="text-align: center;">Perfect</td>
+<td>Small N, strict accuracy</td>
+</tr>
+<tr>
+<td>Sliding window counter</td>
+<td style="text-align: center;">Low</td>
+<td style="text-align: center;">O(1)</td>
+<td style="text-align: center;">Good</td>
+<td>Default for HTTP APIs</td>
+</tr>
+<tr>
+<td>Token bucket</td>
+<td style="text-align: center;">Configurable</td>
+<td style="text-align: center;">O(1)</td>
+<td style="text-align: center;">Good</td>
+<td>APIs allowing controlled bursts</td>
+</tr>
+<tr>
+<td>Leaky bucket</td>
+<td style="text-align: center;">None</td>
+<td style="text-align: center;">O(1)</td>
+<td style="text-align: center;">Good</td>
+<td>Smoothing into a fixed-rate downstream</td>
+</tr>
+<tr>
+<td>GCRA</td>
+<td style="text-align: center;">Equivalent to leaky bucket</td>
+<td style="text-align: center;">O(1)</td>
+<td style="text-align: center;">Good</td>
+<td>High-throughput edge enforcement</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A common L5 prompt: "Design a rate limiter." Strong answers (a) pick an algorithm justified by burst tolerance and fairness, (b) handle the distributed-state problem (Redis Lua, sharded sentinel), (c) return 429 with Retry-After, (d) name the layer (CDN, gateway, app) where each limit lives.</p></div></div>
+<h2 id="deeper-dive-all-five-algorithms-in-java">Deeper Dive — All Five Algorithms in Java<a class="anchor" href="#deeper-dive-all-five-algorithms-in-java" aria-hidden="true">#</a></h2>
+<h3 id="algorithm-1-fixed-window-counter">Algorithm 1: Fixed Window Counter<a class="anchor" href="#algorithm-1-fixed-window-counter" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class FixedWindowRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final AtomicLong windowStart;
+    private final AtomicInteger count;
+
+    public FixedWindowRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.windowStart = new AtomicLong(System.currentTimeMillis());
+        this.count = new AtomicInteger(0);
+    }
+
+    public boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+
+        if (windowStart.get() &lt; currentWindow) {
+            // Reset window
+            windowStart.set(currentWindow);
+            count.set(0);
+        }
+
+        if (count.incrementAndGet() &lt;= limit) {
+            return true;
+        }
+        return false;
+    }
+}
+
+// Usage
+FixedWindowRateLimiter limiter = new FixedWindowRateLimiter(100, 60_000);
+
+// PROBLEM: Boundary burst
+// At 11:59:59 — 100 requests allowed (window: 11:59:00-12:00:00)
+// At 12:00:00 — 100 more allowed (new window: 12:00:00-12:01:00)
+// Result: 200 requests in 1 second (2× the intended rate)
+</code></pre></div>
+<h3 id="algorithm-2-sliding-window-log">Algorithm 2: Sliding Window Log<a class="anchor" href="#algorithm-2-sliding-window-log" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class SlidingWindowLogRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final ConcurrentLinkedDeque&lt;Long&gt; requestTimestamps;
+
+    public SlidingWindowLogRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.requestTimestamps = new ConcurrentLinkedDeque&lt;&gt;();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long windowStart = now - windowMs;
+
+        // Remove timestamps outside window
+        while (!requestTimestamps.isEmpty() &amp;&amp; requestTimestamps.peekFirst() &lt; windowStart) {
+            requestTimestamps.pollFirst();
+        }
+
+        if (requestTimestamps.size() &lt; limit) {
+            requestTimestamps.offerLast(now);
+            return true;
+        }
+        return false;
+    }
+}
+
+// Pros: Exact - no boundary issues
+// Cons: O(N) memory per key (every request stored)
+//       At 1M req/s × 60s window = 60M entries per key
+</code></pre></div>
+<h3 id="algorithm-3-sliding-window-counter-recommended-default">Algorithm 3: Sliding Window Counter (Recommended Default)<a class="anchor" href="#algorithm-3-sliding-window-counter-recommended-default" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class SlidingWindowCounterRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private long previousWindowCount;
+    private long currentWindowCount;
+    private long currentWindowStart;
+
+    public SlidingWindowCounterRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.currentWindowStart = currentWindow();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+
+        if (currentWindow &gt; currentWindowStart) {
+            // Shift windows
+            previousWindowCount = currentWindowCount;
+            currentWindowCount = 0;
+            currentWindowStart = currentWindow;
+        }
+
+        // Calculate effective count using weighted previous window
+        long elapsedInCurrent = now - currentWindowStart;
+        double fractionOfCurrent = (double) elapsedInCurrent / windowMs;
+        double fractionOfPrevious = 1.0 - fractionOfCurrent;
+
+        double effectiveCount = currentWindowCount + 
+            previousWindowCount * fractionOfPrevious;
+
+        if (effectiveCount &lt; limit) {
+            currentWindowCount++;
+            return true;
+        }
+        return false;
+    }
+
+    private long currentWindow() {
+        long now = System.currentTimeMillis();
+        return now - (now % windowMs);
+    }
+}
+
+// Pros: O(1) memory, O(1) time
+//       Smooths boundary issue (interpolates)
+//       Default choice for HTTP APIs
+// Cons: Approximation (assumes uniform distribution in previous window)
+</code></pre></div>
+<h3 id="algorithm-4-token-bucket">Algorithm 4: Token Bucket<a class="anchor" href="#algorithm-4-token-bucket" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class TokenBucketRateLimiter {
+    private final long capacity;
+    private final long refillTokensPerInterval;
+    private final long refillIntervalMs;
+    private double tokens;
+    private long lastRefillTimestamp;
+
+    public TokenBucketRateLimiter(long capacity, long refillTokensPerInterval, long refillIntervalMs) {
+        this.capacity = capacity;
+        this.refillTokensPerInterval = refillTokensPerInterval;
+        this.refillIntervalMs = refillIntervalMs;
+        this.tokens = capacity;
+        this.lastRefillTimestamp = System.currentTimeMillis();
+    }
+
+    public synchronized boolean allowRequest(long tokensRequested) {
+        refill();
+
+        if (tokens &gt;= tokensRequested) {
+            tokens -= tokensRequested;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean allowRequest() {
+        return allowRequest(1);
+    }
+
+    private void refill() {
+        long now = System.currentTimeMillis();
+        long elapsed = now - lastRefillTimestamp;
+
+        double tokensToAdd = ((double) elapsed / refillIntervalMs) * refillTokensPerInterval;
+        tokens = Math.min(capacity, tokens + tokensToAdd);
+        lastRefillTimestamp = now;
+    }
+}
+
+// Pros: Configurable burst (capacity vs steady rate)
+//       Stripe, AWS use this
+// Cons: Slightly more complex
+</code></pre></div>
+<h3 id="algorithm-5-leaky-bucket">Algorithm 5: Leaky Bucket<a class="anchor" href="#algorithm-5-leaky-bucket" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class LeakyBucketRateLimiter {
+    private final long capacity;
+    private final long leakRatePerSecond;
+    private final BlockingQueue&lt;Request&gt; queue;
+    private final ExecutorService leaker;
+
+    public LeakyBucketRateLimiter(long capacity, long leakRatePerSecond) {
+        this.capacity = capacity;
+        this.leakRatePerSecond = leakRatePerSecond;
+        this.queue = new ArrayBlockingQueue&lt;&gt;((int) capacity);
+        this.leaker = Executors.newSingleThreadExecutor();
+        startLeaker();
+    }
+
+    public boolean allowRequest(Request request) {
+        return queue.offer(request);  // Returns false if full
+    }
+
+    private void startLeaker() {
+        leaker.submit(() -&gt; {
+            long intervalNs = TimeUnit.SECONDS.toNanos(1) / leakRatePerSecond;
+            while (!Thread.currentThread().isInterrupted()) {
+                Request req = queue.poll();
+                if (req != null) {
+                    req.process();
+                }
+                LockSupport.parkNanos(intervalNs);
+            }
+        });
+    }
+}
+
+// Pros: Smooths bursts into steady output rate
+//       Ideal for traffic shaping into a fixed-rate downstream
+// Cons: Adds latency (requests wait in queue)
+//       Not ideal for user-facing APIs
+</code></pre></div>
+<h2 id="deeper-dive-distributed-rate-limiter-redis-lua">Deeper Dive — Distributed Rate Limiter (Redis Lua)<a class="anchor" href="#deeper-dive-distributed-rate-limiter-redis-lua" aria-hidden="true">#</a></h2>
+<h3 id="sliding-window-counter-in-redis">Sliding Window Counter in Redis<a class="anchor" href="#sliding-window-counter-in-redis" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">lua</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-lua">-- KEYS[1] = bucket key
+-- ARGV[1] = max requests
+-- ARGV[2] = window in seconds
+-- ARGV[3] = current timestamp in ms
+
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local window = tonumber(ARGV[2]) * 1000
+local now = tonumber(ARGV[3])
+local currentWindowStart = math.floor(now / window) * window
+local previousWindowStart = currentWindowStart - window
+
+local currentCount = tonumber(redis.call('GET', key .. ':' .. currentWindowStart) or &quot;0&quot;)
+local previousCount = tonumber(redis.call('GET', key .. ':' .. previousWindowStart) or &quot;0&quot;)
+
+local elapsedInCurrent = now - currentWindowStart
+local fractionOfCurrent = elapsedInCurrent / window
+local fractionOfPrevious = 1.0 - fractionOfCurrent
+
+local effectiveCount = currentCount + previousCount * fractionOfPrevious
+
+if effectiveCount &lt; limit then
+    redis.call('INCR', key .. ':' .. currentWindowStart)
+    redis.call('EXPIRE', key .. ':' .. currentWindowStart, math.ceil(window * 2 / 1000))
+    return {1, limit - math.floor(effectiveCount) - 1}
+else
+    return {0, 0}
+end
+</code></pre></div>
+<h3 id="spring-boot-integration">Spring Boot Integration<a class="anchor" href="#spring-boot-integration" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class RedisRateLimiter {
+    private final StringRedisTemplate redis;
+    private final DefaultRedisScript&lt;List&gt; script;
+
+    public RedisRateLimiter(StringRedisTemplate redis) {
+        this.redis = redis;
+        this.script = new DefaultRedisScript&lt;&gt;();
+        script.setLocation(new ClassPathResource(&quot;rate-limiter.lua&quot;));
+        script.setResultType(List.class);
+    }
+
+    public RateLimitResult checkLimit(String key, int limit, long windowSeconds) {
+        Long now = System.currentTimeMillis();
+
+        List&lt;Long&gt; result = redis.execute(
+            script,
+            List.of(key),
+            String.valueOf(limit),
+            String.valueOf(windowSeconds),
+            String.valueOf(now)
+        );
+
+        boolean allowed = result.get(0) == 1L;
+        long remaining = result.get(1);
+
+        return new RateLimitResult(allowed, remaining);
+    }
+}
+
+public record RateLimitResult(boolean allowed, long remaining) {}
+</code></pre></div>
+<h2 id="deeper-dive-spring-cloud-gateway-configuration">Deeper Dive — Spring Cloud Gateway Configuration<a class="anchor" href="#deeper-dive-spring-cloud-gateway-configuration" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-route
+          uri: lb://api-service
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: &quot;#{@userKeyResolver}&quot;
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Configuration
+public class RateLimitConfig {
+
+    @Bean
+    public KeyResolver userKeyResolver() {
+        // Per-user rate limiting
+        return exchange -&gt; Mono.just(
+            exchange.getRequest().getHeaders().getFirst(&quot;X-User-Id&quot;)
+        );
+    }
+
+    @Bean
+    public KeyResolver ipKeyResolver() {
+        // Per-IP rate limiting
+        return exchange -&gt; Mono.just(
+            exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+        );
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-bucket4j-library-java-token-bucket">Deeper Dive — Bucket4j Library (Java Token Bucket)<a class="anchor" href="#deeper-dive-bucket4j-library-java-token-bucket" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class Bucket4jRateLimiter {
+    private final Map&lt;String, Bucket&gt; buckets = new ConcurrentHashMap&lt;&gt;();
+
+    public Bucket newBucket(String key, int limit, Duration window) {
+        return Bucket.builder()
+            .addLimit(Bandwidth.simple(limit, window))
+            .build();
+    }
+
+    public boolean tryConsume(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key, 
+            k -&gt; newBucket(k, limit, window));
+        return bucket.tryConsume(1);
+    }
+
+    public ConsumptionProbe tryConsumeWithProbe(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key,
+            k -&gt; newBucket(k, limit, window));
+        return bucket.tryConsumeAndReturnRemaining(1);
+    }
+}
+
+// Web filter usage
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    private final Bucket4jRateLimiter limiter;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     FilterChain chain) throws ServletException, IOException {
+        String key = extractKey(req);
+
+        ConsumptionProbe probe = limiter.tryConsumeWithProbe(key, 100, Duration.ofMinutes(1));
+
+        if (probe.isConsumed()) {
+            resp.setHeader(&quot;X-RateLimit-Remaining&quot;, String.valueOf(probe.getRemainingTokens()));
+            chain.doFilter(req, resp);
+        } else {
+            long waitMs = probe.getNanosToWaitForRefill() / 1_000_000;
+            resp.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            resp.setHeader(&quot;Retry-After&quot;, String.valueOf(waitMs / 1000));
+            resp.getWriter().write(&quot;Rate limit exceeded&quot;);
+        }
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-multi-layer-rate-limiting">Deeper Dive — Multi-Layer Rate Limiting<a class="anchor" href="#deeper-dive-multi-layer-rate-limiting" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>LAYER 1: CDN / WAF (Cloudflare, AWS WAF)
+  - Coarse: 1000 req/sec per IP
+  - Blocks volumetric DDoS
+  - At edge for low latency
+
+LAYER 2: API Gateway (Kong, AWS API Gateway, Spring Cloud Gateway)
+  - Medium: 100 req/sec per API key
+  - Enforces per-tenant quotas
+  - Returns 429 with Retry-After
+
+LAYER 3: Application
+  - Fine: 10 req/sec per user per endpoint
+  - Business logic constraints
+  - Cost controls (e.g., expensive ML calls)
+
+LAYER 4: Database
+  - Backstop: query cost limits
+  - Connection pool limits
+  - Slow query timeouts
+</code></pre></div>
+<h3 id="multi-tenant-per-endpoint-configuration">Multi-Tenant Per-Endpoint Configuration<a class="anchor" href="#multi-tenant-per-endpoint-configuration" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class TenantRateLimiter {
+
+    public RateLimit getLimit(String tenantId, String endpoint) {
+        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow();
+        TenantPlan plan = tenant.getPlan();
+
+        return switch (plan) {
+            case FREE -&gt; getFreeLimit(endpoint);
+            case STARTER -&gt; getStarterLimit(endpoint);
+            case ENTERPRISE -&gt; getEnterpriseLimit(endpoint);
+        };
+    }
+
+    private RateLimit getFreeLimit(String endpoint) {
+        return switch (endpoint) {
+            case &quot;/api/search&quot; -&gt; new RateLimit(10, Duration.ofMinutes(1));
+            case &quot;/api/ml-inference&quot; -&gt; new RateLimit(5, Duration.ofMinutes(1));
+            default -&gt; new RateLimit(100, Duration.ofMinutes(1));
+        };
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-http-semantics-for-rate-limiting">Deeper Dive — HTTP Semantics for Rate Limiting<a class="anchor" href="#deeper-dive-http-semantics-for-rate-limiting" aria-hidden="true">#</a></h2>
+<h3 id="response-headers">Response Headers<a class="anchor" href="#response-headers" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1700000060
+Retry-After: 60
+RateLimit-Policy: 100;w=60
+RateLimit-Limit: 100
+RateLimit-Remaining: 0
+RateLimit-Reset: 60
+
+{
+  &quot;error&quot;: &quot;rate_limited&quot;,
+  &quot;message&quot;: &quot;Too many requests. Try again in 60 seconds.&quot;
+}
+</code></pre></div>
+<h3 id="client-implementation">Client Implementation<a class="anchor" href="#client-implementation" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class RateLimitAwareHttpClient {
+    private final RestTemplate restTemplate;
+
+    public &lt;T&gt; T request(String url, Class&lt;T&gt; responseType) {
+        int maxRetries = 3;
+        for (int attempt = 0; attempt &lt; maxRetries; attempt++) {
+            try {
+                return restTemplate.getForObject(url, responseType);
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                String retryAfter = e.getResponseHeaders()
+                    .getFirst(HttpHeaders.RETRY_AFTER);
+
+                long waitSeconds = parseRetryAfter(retryAfter);
+                if (waitSeconds &gt; 60) {
+                    throw new RateLimitExceededException(&quot;Wait too long&quot;, e);
+                }
+
+                try {
+                    Thread.sleep(Duration.ofSeconds(waitSeconds).toMillis());
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(ie);
+                }
+            }
+        }
+        throw new RateLimitExceededException(&quot;Max retries reached&quot;);
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-common-failure-modes-and-solutions">Deeper Dive — Common Failure Modes and Solutions<a class="anchor" href="#deeper-dive-common-failure-modes-and-solutions" aria-hidden="true">#</a></h2>
+<h3 id="failure-mode-1-boundary-burst-fixed-window">Failure Mode 1: Boundary Burst (Fixed Window)<a class="anchor" href="#failure-mode-1-boundary-burst-fixed-window" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM:
+  Window: 1 minute, limit: 100 req/min
+  At 11:59:59 - 100 requests allowed
+  At 12:00:00 - new window, 100 more allowed
+  → 200 requests in 1 second
+
+SOLUTION: Use sliding window counter instead
+</code></pre></div>
+<h3 id="failure-mode-2-distributed-inconsistency">Failure Mode 2: Distributed Inconsistency<a class="anchor" href="#failure-mode-2-distributed-inconsistency" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM:
+  Multiple app instances, each enforcing 100 req/sec locally
+  Actual rate: 100 × (instances) = 1000 req/sec
+
+SOLUTION: Centralized state in Redis with Lua scripts
+</code></pre></div>
+<h3 id="failure-mode-3-memory-explosion-sliding-window-log">Failure Mode 3: Memory Explosion (Sliding Window Log)<a class="anchor" href="#failure-mode-3-memory-explosion-sliding-window-log" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM:
+  Store every request timestamp
+  Hot endpoint: 10K req/sec × 60s window = 600K entries per key
+  10K hot keys = 6B entries
+
+SOLUTION: Use sliding window counter (O(1) memory) or token bucket
+</code></pre></div>
+<h3 id="failure-mode-4-clock-skew">Failure Mode 4: Clock Skew<a class="anchor" href="#failure-mode-4-clock-skew" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM:
+  Distributed systems with different clocks
+  One node thinks &quot;now&quot; is 12:00:00
+  Another thinks 12:00:01
+  Rate limit calculations diverge
+
+SOLUTION: Use single source of time (Redis timestamps)
+          Don't trust client/local clocks
+</code></pre></div>
+<h3 id="failure-mode-5-hot-key">Failure Mode 5: Hot Key<a class="anchor" href="#failure-mode-5-hot-key" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM:
+  One API key sends 1M req/sec
+  All hashed to same Redis shard
+  Shard saturates
+
+SOLUTION: 
+  - Pre-shard hot keys (key1#shard1, key1#shard2)
+  - Local approximate limit + periodic sync
+  - Reject early at gateway
+</code></pre></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Implement each algorithm.</strong> In Java, implement fixed window, sliding-window counter, token bucket. Run a microbenchmark; compare allowed/rejected counts under a burst.</li>
+<li><strong>Show the boundary burst.</strong> Drive 100 requests at 12:00:59 and 100 at 12:01:00 against your fixed-window. Show the 200-in-2-seconds problem.</li>
+<li><strong>Bucket4j in Spring.</strong> Add Bucket4j as a Spring filter for a REST API. Test per-API-key limiting.</li>
+<li><strong>Redis distributed rate limiter.</strong> Implement a sliding-window-counter rate limiter in Redis Lua. Run across multiple JVM instances; verify the limit holds globally.</li>
+<li><strong>Spring Cloud Gateway rate limiter.</strong> Configure <code>RequestRateLimiter</code> on a real Spring Cloud Gateway route. Test under burst.</li>
+<li><strong>Layered limits.</strong> Design a system with three layers (CDN, gateway, app) each with different limits. Verify each layer enforces its own.</li>
+<li><strong>Retry-After handling.</strong> Implement a client that respects <code>Retry-After</code>. Test against a deliberately-rate-limited endpoint.</li>
+<li><strong>Per-tenant per-endpoint.</strong> Design rate limits for a multi-tenant SaaS with different limits per endpoint per tenant. Justify the algorithm and dimension choices.</li>
+<li><strong>Production trace.</strong> In any system you operate, find the rate-limit configuration. Identify the algorithm, the dimension, the limits. Decide whether they're correct.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we don't need rate limits, our customers won't abuse." Write a 200-word response on the four non-malicious causes of unintended bursts.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Apply <strong>fixed window, sliding window log, sliding window counter, token bucket, leaky bucket, GCRA</strong> algorithms with explicit burst and memory characteristics.</li>
+<li>Recognize the <strong>boundary burst</strong> problem of fixed windows and prefer sliding-window counter as the practical default.</li>
+<li>Implement <strong>distributed rate limiting</strong> with Redis Lua scripts to share state across N instances.</li>
+<li>Use <strong>Bucket4j</strong> in Spring with in-memory or Redis-backed token bucket.</li>
+<li>Configure <strong>Spring Cloud Gateway's RequestRateLimiter</strong> for distributed token bucket.</li>
+<li>Return <strong>HTTP 429</strong> with Retry-After and X-RateLimit-* response headers; respect them in clients.</li>
+<li>Pick the <strong>rate-limit dimension</strong> — IP, user, API key, tenant, endpoint, composite — by the threat model.</li>
+<li>Apply <strong>layered rate limits</strong> at CDN, gateway, application, downstream resource levels.</li>
+<li>Recognize and prevent <strong>failure modes</strong>: rate-limit bypass via distributed clients, synchronous retry storms, in-burst saturation, state drift, hot partitions.</li>
+<li>Map real systems (Cloudflare, AWS, Kong, NGINX, Stripe) to their algorithm choices and configurations.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html">Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</a> — the patterns that let a distributed system tolerate the failures that happen all the time without cascading into outage.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Rate Limiting Algorithms&quot;
+slug: rate-limiting-algorithms
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Distributed Systems &amp; System Design&quot;
+type: concept
+difficulty: lead
+order: 13
+tags: [rate-limiting, fixed-window, sliding-window, token-bucket, leaky-bucket, gcra, bucket4j, redis-rate-limit, http-429, retry-after, x-ratelimit, cloudflare, nginx-rate-limit, spring-cloud-gateway-rate-limiter, fair-queueing, burst]
+prerequisites: [api-gateway-and-service-mesh, caching-strategies-at-scale]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-08
+---
+
+# Rate Limiting Algorithms
+
+Rate limiting is the discipline of capping how much load a system accepts per client per time window — protecting backends from abuse, ensuring fair access, and shaping bursts into manageable streams. Every public API has rate limits; every multi-tenant system needs them; every system that retries failures needs them on itself. The naive approach (&quot;count requests in the last minute, reject if over the limit&quot;) has subtle failure modes — burst at the window boundary, no smoothing, unfair across clients with synchronized clocks — that have produced sophisticated algorithms (token bucket, leaky bucket, sliding window, GCRA) each with measurable trade-offs.
+
+The depth bar here is **each algorithm&#x27;s actual behavior on the boundary and the steady state**. We trace fixed window (allows 2× burst at window boundary), sliding window log (memory-heavy, perfectly fair), sliding window counter (the practical default), token bucket (allows bursts up to bucket size, smooth steady-state), leaky bucket (smoothest, no burst), and the **Generic Cell Rate Algorithm (GCRA)** that ATM networks used before the web existed. We name the **distributed** rate-limiting problem — when a service has N instances and each must enforce a single global limit — and the canonical solutions (Redis Lua scripts, sliding-window counters with shared state, sentinel-based). We trace what real systems do: **Cloudflare, AWS API Gateway, Kong, NGINX, Spring Cloud Gateway, Bucket4j** — each with their algorithm choices and configurations. We cover the **HTTP semantics**: 429 Too Many Requests, the Retry-After header, the X-RateLimit-* response headers that Stripe popularized. By the end you will pick an algorithm by burst tolerance and fairness needs, implement distributed rate limiting in Spring with Redis, and refuse the most common form of rate-limiting misuse (rate-limiting the wrong dimension).
+
+&gt; [!NOTE]
+&gt; Prerequisites: [API Gateway &amp; Service Mesh](../C01-software-architecture/T07-api-gateway-and-service-mesh.md) (where rate limiting often lives), [Caching](./T11-caching-strategies-at-scale.md) (rate-limit state is itself a cache).
+
+## Where Rate Limiting Came From — From Network Routers To Modern API Quotas
+
+Rate limiting has a 40-year history that spans network engineering (1980s), early internet abuse (1990s), and modern API protection (2010s). The specific algorithms (token bucket, leaky bucket, sliding window) descend from network traffic shaping in the 1980s — applied to a problem that didn&#x27;t exist yet.
+
+### The 1980s — Network Traffic Shaping
+
+The conceptual foundation is **traffic shaping in network routers**. As ATM (Asynchronous Transfer Mode) networks emerged in the late 1980s, network engineers needed mechanisms to *smooth* bursty traffic into steady streams matching the network&#x27;s capacity.
+
+The canonical algorithms developed for this:
+
+#### Token Bucket
+
+**Token Bucket** is described in early 1980s networking literature. The mechanism: tokens are added to a bucket at a constant rate; each packet consumes a token; if the bucket is empty, the packet is delayed or dropped.
+
+The bucket size determines burst tolerance — a bucket of 100 tokens allows bursts of up to 100 packets at once, but the steady-state rate is the token addition rate.
+
+Token bucket is *the* canonical traffic-shaping algorithm. It&#x27;s described in RFC 2697 (1999) and earlier networking texts.
+
+#### Leaky Bucket
+
+**Leaky Bucket** is similar but inverted: packets enter a buffer (the bucket); the buffer leaks at a constant rate, releasing one packet per time unit. If the buffer is full, new packets are dropped.
+
+Leaky bucket is *more strict* than token bucket — it never allows bursts beyond the leak rate. Token bucket allows bursts up to the bucket size.
+
+The two algorithms are mathematically related but produce different traffic patterns. Most modern rate limiters use token bucket because it allows occasional bursts.
+
+### The 1990s — Internet Abuse And Early Rate Limiting
+
+The 1990s saw the first widespread *application-level* rate limiting:
+
+- **Email spam protection**: SMTP servers began rate-limiting per-sender to prevent spam floods.
+- **Web crawler restriction**: search engines respected robots.txt rate limits.
+- **Brute-force authentication protection**: login attempts were rate-limited per-IP.
+
+These were *ad hoc* — each application implemented its own rate limiting, often poorly. The algorithms used were typically simple (fixed-window counts).
+
+### The 2000s — DoS Defense
+
+The 2000s brought **denial-of-service attacks** as a major concern. The famous 2000 attacks on Yahoo, eBay, Amazon, and CNN demonstrated that internet services could be brought down by *coordinated* request floods.
+
+DoS defense required rate limiting at the network edge. Tools like:
+
+- **Hardware DDoS appliances**: Arbor Networks, Riverhead Networks (acquired by Cisco).
+- **Cloud DDoS services**: Akamai (Prolexic), CloudFlare.
+
+These applied rate limiting at the *infrastructure* layer, before requests reached applications.
+
+### The 2010s — API Rate Limiting Standardization
+
+The 2010s saw rate limiting become a *standard API feature*. The shift was driven by:
+
+1. **API platforms** (Twilio, Stripe, GitHub, Twitter): all imposed rate limits.
+2. **Standardization** of rate-limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`).
+3. **Distributed rate limiting** challenges as APIs scaled.
+
+The GitHub API rate limit became famous: 5,000 requests/hour for authenticated users. Twitter&#x27;s rate limit (180 requests/15 minutes for most endpoints) was equally well-known. Developers learned to *respect* rate limits as a normal API constraint.
+
+### The Modern Distributed Rate Limiting Era
+
+Modern systems implement rate limiting at scale using:
+
+- **Redis-based**: token buckets stored in Redis, atomic operations via Lua scripts.
+- **Sliding window logs**: log of recent requests, queried for window count.
+- **Sliding window counters**: hybrid that approximates sliding window with bucket counts.
+- **Edge rate limiting**: CDN-level (Cloudflare, Akamai) for early defense.
+
+The challenge is *distributed consistency* — rate limiters running on many machines must agree on the count. Various trade-offs between accuracy and performance are made.
+
+## Why Rate Limiting Matters, Specifically: The Senior Engineer&#x27;s Q&amp;A
+
+### Q1: Why is rate limiting necessary?
+
+Three primary reasons:
+
+1. **Resource protection**: prevent a few users from overwhelming the system.
+2. **Cost control**: prevent abuse from running up cloud bills.
+3. **Fairness**: ensure all users get reasonable service.
+
+Without rate limiting, a few users can degrade service for everyone. With it, the system degrades gracefully under load.
+
+### Q2: When should I use token bucket vs sliding window?
+
+**Token bucket**:
+- Allows controlled bursts.
+- Memory-efficient (one counter per user).
+- Standard for most API rate limiting.
+
+**Sliding window**:
+- Smoother rate limiting (no burst-window edge effects).
+- More accurate.
+- More expensive (window logs require more memory).
+
+Most APIs use token bucket for its simplicity. Sliding window is appropriate for precise rate enforcement.
+
+### Q3: What&#x27;s the right rate limit to set?
+
+It depends on:
+
+- **Server capacity**: don&#x27;t set higher than the server can serve.
+- **Use case**: API users vs anonymous users vs partners get different limits.
+- **Fairness goals**: how to allocate capacity across users.
+
+The pragmatic approach: start conservative, monitor, adjust based on actual usage.
+
+### Q4: How do I implement distributed rate limiting?
+
+Two main approaches:
+
+1. **Centralized state**: store rate-limit counts in Redis. All instances check Redis. Atomicity via Lua scripts.
+2. **Distributed agreement**: each instance maintains local counts, periodically syncs. Less accurate but lower-latency.
+
+Centralized Redis is the standard for most use cases. Distributed agreement is appropriate for ultra-low-latency needs.
+
+### Q5: How should I handle rate-limited requests?
+
+Per the HTTP standard:
+
+- **429 Too Many Requests** response code.
+- **`Retry-After` header** indicating when to retry.
+- **Rate-limit headers** showing remaining capacity.
+
+The client SDK should *respect* these headers — backoff, retry after the specified time. Most modern SDKs do this automatically.
+
+## Common Misconceptions Explained
+
+### &quot;Rate limiting is just about throttling abuse.&quot;
+
+Partial. Rate limiting protects against abuse but also against *honest mistakes* (a client in a loop, a faulty integration). Both produce overload.
+
+### &quot;Rate limits should be per-IP.&quot;
+
+False. Per-IP can be inappropriate (NAT means many users share an IP) or insufficient (a single user with many IPs). Most APIs rate-limit per-API-key.
+
+### &quot;Token bucket is always better than leaky bucket.&quot;
+
+Half true. Token bucket allows bursts; leaky bucket smooths them. The choice depends on what you want.
+
+### &quot;Rate limiting should reject excess requests.&quot;
+
+Not always. Three options: reject (429), queue, or shed (silently drop). Queueing is appropriate when the client can wait; shedding is appropriate when reliability is more important than completeness.
+
+### &quot;Distributed rate limiting requires consensus.&quot;
+
+False. Most distributed rate limiting uses *centralized state* (Redis with Lua), not consensus protocols. Consensus would be overkill.
+
+### &quot;Rate limits eliminate DoS attacks.&quot;
+
+False. **Rate limits help with abuse** but don&#x27;t stop true DoS attacks (which can saturate the network before reaching the rate limiter). Network-layer DDoS defense (CDN, BGP) handles those.
+
+## Why Rate Limit
+
+Three reasons:
+
+1. **Abuse protection**: a misbehaving client (intentional or not) flooding a service. Cap at a sane per-client level.
+2. **Fairness across tenants**: multi-tenant systems must prevent one tenant&#x27;s bad day from harming others.
+3. **Backend protection**: the rate limit at the edge protects the database from a stampede.
+
+```mermaid
+flowchart LR
+  C[Clients] --&gt;|&quot;requests&quot;| RL[Rate limiter]
+  RL --&gt;|&quot;accepted (≤ limit)&quot;| B[Backend]
+  RL -.-&gt;|&quot;rejected (429)&quot;| C
+```
+
+## The Algorithms
+
+### Fixed Window
+
+Divide time into windows (each minute, each hour). Count requests per client per window. Reject if count exceeds limit.
+
+```java
+class FixedWindow {
+  long windowStart = System.currentTimeMillis();
+  AtomicInteger count = new AtomicInteger();
+  final int limit = 100;
+  final long windowMs = 60_000;
+
+  boolean allow() {
+    long now = System.currentTimeMillis();
+    if (now - windowStart &gt; windowMs) {
+      windowStart = now;
+      count.set(0);
+    }
+    return count.incrementAndGet() &lt;= limit;
+  }
+}
+```
+
+**Pros**: simplest; one integer per client.
+
+**Cons**: the **boundary burst** — a client can make 100 requests at 12:00:59 and 100 more at 12:01:00, hitting 200 requests in two seconds while &quot;100 per minute&quot; appears respected.
+
+```mermaid
+flowchart LR
+  T1[&quot;12:00:00&quot;] -.-&gt;|&quot;99 reqs&quot;| T59[&quot;12:00:59&quot;]
+  T59 --&gt;|&quot;1 req&quot;| T60[&quot;12:01:00 (new window)&quot;]
+  T60 --&gt;|&quot;100 reqs in 1s&quot;| T61[&quot;12:01:01&quot;]
+  Note[&quot;200 reqs in ~2 seconds&lt;br/&gt;despite &#x27;100/min&#x27; limit&quot;]
+```
+
+### Sliding Window Log
+
+Store each request&#x27;s timestamp; count requests in the last N seconds.
+
+```java
+class SlidingLog {
+  Deque&lt;Long&gt; timestamps = new ArrayDeque&lt;&gt;();
+  final int limit = 100;
+  final long windowMs = 60_000;
+
+  synchronized boolean allow() {
+    long now = System.currentTimeMillis();
+    while (!timestamps.isEmpty() &amp;&amp; now - timestamps.peekFirst() &gt; windowMs) {
+      timestamps.pollFirst();
+    }
+    if (timestamps.size() &lt; limit) {
+      timestamps.addLast(now);
+      return true;
+    }
+    return false;
+  }
+}
+```
+
+**Pros**: perfectly accurate.
+
+**Cons**: memory proportional to limit (storing N timestamps per client); at 100,000 clients × 100-req limit = 10M timestamps.
+
+### Sliding Window Counter
+
+A practical hybrid: track the count for the current window AND a weighted portion of the previous window.
+
+```java
+class SlidingCounter {
+  long currentWindow = System.currentTimeMillis() / 60_000;
+  AtomicInteger currentCount = new AtomicInteger();
+  AtomicInteger previousCount = new AtomicInteger();
+  final int limit = 100;
+
+  synchronized boolean allow() {
+    long now = System.currentTimeMillis();
+    long thisWindow = now / 60_000;
+    if (thisWindow &gt; currentWindow) {
+      previousCount.set(currentCount.get());
+      currentCount.set(0);
+      currentWindow = thisWindow;
+    }
+    double pctOfPrev = 1.0 - ((now % 60_000) / 60_000.0);
+    int effective = (int)(previousCount.get() * pctOfPrev) + currentCount.get();
+    if (effective &lt; limit) {
+      currentCount.incrementAndGet();
+      return true;
+    }
+    return false;
+  }
+}
+```
+
+**Pros**: smooths out boundary bursts; two counters per client; standard in production rate limiters.
+
+**Cons**: slight imprecision; assumes uniform distribution within the previous window.
+
+**This is the practical default** — used by NGINX, Cloudflare, Kong, and most production systems.
+
+### Token Bucket
+
+Each client has a bucket holding up to `capacity` tokens; tokens refill at a constant rate; each request consumes one token; reject if bucket is empty.
+
+```java
+class TokenBucket {
+  final int capacity = 100;
+  final double tokensPerSecond = 100.0 / 60;  // 100 per minute
+  double tokens;
+  long lastRefill = System.nanoTime();
+
+  synchronized boolean allow() {
+    long now = System.nanoTime();
+    tokens = Math.min(capacity, tokens + (now - lastRefill) * tokensPerSecond / 1_000_000_000);
+    lastRefill = now;
+    if (tokens &gt;= 1) {
+      tokens -= 1;
+      return true;
+    }
+    return false;
+  }
+}
+```
+
+**Pros**: allows bursts up to `capacity`; smooth steady state at refill rate; intuitive (&quot;save up to N tokens, spend them when you need&quot;).
+
+**Cons**: bursts are by design — protects steady-state load, allows occasional spikes.
+
+Token bucket is *the* algorithm for APIs where occasional bursts are fine and steady-state is the constraint. **AWS API Gateway, Stripe API, GitHub API** all use token bucket variants.
+
+### Leaky Bucket
+
+Imagine a bucket with a hole that leaks at a fixed rate. Requests fill the bucket; if it overflows, reject. The leak rate is the request rate; the bucket capacity is the burst tolerance.
+
+Operationally similar to token bucket but framed as smoothing rather than allowance — useful when you want to *queue* requests to a fixed-rate downstream rather than reject.
+
+### GCRA (Generic Cell Rate Algorithm)
+
+Used in ATM networks (the telephony network protocol, not the bank thing). Mathematically equivalent to leaky bucket but implemented with O(1) state (the time of the next allowed cell). Cloudflare&#x27;s open-source `gcra-go` implements it; widely used in Cloudflare&#x27;s WAF.
+
+## Distributed Rate Limiting
+
+The hard problem: a service has 50 instances; the rate limit is &quot;100 req/min per API key globally&quot;; each instance can&#x27;t enforce its own 100. The state must be shared.
+
+### Redis-Based Rate Limiting
+
+```java
+// Sliding-window counter in Redis (via Lua script for atomicity)
+String script = &quot;&quot;&quot;
+  local key = KEYS[1]
+  local window = tonumber(ARGV[1])
+  local limit = tonumber(ARGV[2])
+  local now = tonumber(ARGV[3])
+  local windowStart = math.floor(now / window) * window
+  local currentKey = key .. &#x27;:&#x27; .. windowStart
+  local count = tonumber(redis.call(&#x27;GET&#x27;, currentKey) or &#x27;0&#x27;)
+  if count &lt; limit then
+    redis.call(&#x27;INCR&#x27;, currentKey)
+    redis.call(&#x27;EXPIRE&#x27;, currentKey, window * 2)
+    return 1
+  end
+  return 0
+&quot;&quot;&quot;;
+boolean allowed = redis.eval(script, Keys.of(&quot;rl:&quot; + apiKey),
+    Args.of(&quot;60000&quot;, &quot;100&quot;, System.currentTimeMillis())) == 1L;
+```
+
+Redis Lua scripts ensure atomicity; the state is shared across all app instances; the cost is one Redis call per request.
+
+For very high throughput, **batch the counter updates** locally and sync to Redis periodically — at the cost of being approximate.
+
+### Sentinel / Resilience Patterns
+
+**Sentinel** (Alibaba&#x27;s flow-control library) and **Resilience4j RateLimiter** provide in-process rate limiting; combine with Redis-shared state for distributed enforcement.
+
+## HTTP Semantics
+
+When a rate limit is exceeded, the standard response is HTTP **429 Too Many Requests** with a **Retry-After** header indicating when the client may retry.
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1736353200
+```
+
+**X-RateLimit-* headers** (Stripe popularized; not standard but widely adopted):
+
+- `X-RateLimit-Limit`: the cap.
+- `X-RateLimit-Remaining`: how many requests are left in the current window.
+- `X-RateLimit-Reset`: unix timestamp when the window resets.
+
+Modern clients (Stripe SDK, GitHub Octokit) read these headers to schedule retries intelligently. Returning them is good citizenship.
+
+## Spring Cloud Gateway Rate Limiter
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: orders
+        uri: lb://order-service
+        predicates: [Path=/api/v1/orders/**]
+        filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 100      # tokens per second
+            redis-rate-limiter.burstCapacity: 200      # bucket size
+            redis-rate-limiter.requestedTokens: 1
+            key-resolver: &quot;#{@userKeyResolver}&quot;
+```
+
+The built-in implementation uses Redis + Lua for token-bucket distributed rate limiting. `key-resolver` is a bean returning the rate-limit key (user ID, API key, IP).
+
+## Bucket4j — Token Bucket For Java
+
+[Bucket4j](https://bucket4j.com/) is the standard Java rate-limiting library, providing token bucket with multiple backends (in-memory, Hazelcast, Redis, Coherence).
+
+```java
+Bucket bucket = Bucket.builder()
+    .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+    .build();
+
+if (bucket.tryConsume(1)) {
+  // process request
+} else {
+  // 429
+}
+```
+
+Distributed bucket via Redis:
+
+```java
+ProxyManager&lt;String&gt; manager = Bucket4jRedis.casBased(redisClient);
+Bucket bucket = manager.getProxy(apiKey,
+    () -&gt; BucketConfiguration.builder()
+        .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+        .build());
+```
+
+## Choosing The Rate-Limit Dimension
+
+A rate limit applies to *some* identifier. Common choices:
+
+- **Per IP**: simplest; bad for clients behind NAT or proxies (all see one IP).
+- **Per API key / per user**: most common for authenticated APIs.
+- **Per endpoint per user**: different limits for different endpoints (cheap reads at 1000/min, expensive operations at 10/min).
+- **Per tenant**: in a multi-tenant SaaS, limits enforced at the tenant level.
+- **Per IP-and-user**: defense against credential-stuffing.
+
+Most production rate limiters layer multiple dimensions — e.g., per-IP at the edge, per-user at the application, per-endpoint nested.
+
+## Rate-Limiting At Multiple Layers
+
+- **CDN edge (Cloudflare, CloudFront)**: gross abuse defense, very high limits.
+- **API gateway (Kong, Spring Cloud Gateway, AWS API Gateway)**: per-API-key fine-grained.
+- **Application service**: per-operation business limits.
+- **Database / cache**: connection-level limits (don&#x27;t exceed connection pool).
+
+Each layer protects the next. The CDN absorbs DDoS; the gateway enforces customer plans; the service enforces business rules.
+
+## Common Failure Modes
+
+### Rate-Limit Bypass Via Distributed Clients
+
+A client distributes its requests across 50 IPs. Per-IP limit doesn&#x27;t catch them. Combine with per-user or per-API-key limits.
+
+### Synchronous Retry Storm
+
+The rate limit returns 429; clients retry immediately without backoff; the retry traffic itself exceeds the limit. Now the client is in a tight loop.
+
+**Fix**: clients must respect `Retry-After`; exponential backoff on 429. Stripe&#x27;s SDK does this by default; ad-hoc HTTP clients often don&#x27;t.
+
+### Burst Inside The Limit
+
+Token bucket with capacity 100 allows 100 in one millisecond. Some downstream resources can&#x27;t absorb that burst.
+
+**Fix**: smaller burst capacity; or combine with a leaky-bucket smoothing step.
+
+### State Drift Across Instances
+
+Redis-based shared state goes down; instances fall back to in-memory limits; effective limit becomes N × intended.
+
+**Fix**: monitor Redis availability; degrade to stricter local limits when Redis is unreachable.
+
+### Hot Tenant Hot Partition
+
+Rate-limit state is in Redis sharded by tenant; one tenant has 99% of traffic; one Redis shard saturates.
+
+**Fix**: partition by composite key (tenant + endpoint), shard more, or use a CDN&#x27;s distributed rate-limiting.
+
+## Trade-Off Summary
+
+| Algorithm | Burst | Memory | Fairness | When to use |
+|-----------|:-----:|:------:|:--------:|-------------|
+| Fixed window | High (boundary) | O(1) | Poor | Simple, low-stakes |
+| Sliding window log | None | O(N) | Perfect | Small N, strict accuracy |
+| Sliding window counter | Low | O(1) | Good | Default for HTTP APIs |
+| Token bucket | Configurable | O(1) | Good | APIs allowing controlled bursts |
+| Leaky bucket | None | O(1) | Good | Smoothing into a fixed-rate downstream |
+| GCRA | Equivalent to leaky bucket | O(1) | Good | High-throughput edge enforcement |
+
+&gt; [!INTERVIEW]
+&gt; A common L5 prompt: &quot;Design a rate limiter.&quot; Strong answers (a) pick an algorithm justified by burst tolerance and fairness, (b) handle the distributed-state problem (Redis Lua, sharded sentinel), (c) return 429 with Retry-After, (d) name the layer (CDN, gateway, app) where each limit lives.
+
+## Deeper Dive — All Five Algorithms in Java
+
+### Algorithm 1: Fixed Window Counter
+
+```java
+public class FixedWindowRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final AtomicLong windowStart;
+    private final AtomicInteger count;
+
+    public FixedWindowRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.windowStart = new AtomicLong(System.currentTimeMillis());
+        this.count = new AtomicInteger(0);
+    }
+
+    public boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+        
+        if (windowStart.get() &lt; currentWindow) {
+            // Reset window
+            windowStart.set(currentWindow);
+            count.set(0);
+        }
+        
+        if (count.incrementAndGet() &lt;= limit) {
+            return true;
+        }
+        return false;
+    }
+}
+
+// Usage
+FixedWindowRateLimiter limiter = new FixedWindowRateLimiter(100, 60_000);
+
+// PROBLEM: Boundary burst
+// At 11:59:59 — 100 requests allowed (window: 11:59:00-12:00:00)
+// At 12:00:00 — 100 more allowed (new window: 12:00:00-12:01:00)
+// Result: 200 requests in 1 second (2× the intended rate)
+```
+
+### Algorithm 2: Sliding Window Log
+
+```java
+public class SlidingWindowLogRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private final ConcurrentLinkedDeque&lt;Long&gt; requestTimestamps;
+
+    public SlidingWindowLogRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.requestTimestamps = new ConcurrentLinkedDeque&lt;&gt;();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long windowStart = now - windowMs;
+        
+        // Remove timestamps outside window
+        while (!requestTimestamps.isEmpty() &amp;&amp; requestTimestamps.peekFirst() &lt; windowStart) {
+            requestTimestamps.pollFirst();
+        }
+        
+        if (requestTimestamps.size() &lt; limit) {
+            requestTimestamps.offerLast(now);
+            return true;
+        }
+        return false;
+    }
+}
+
+// Pros: Exact - no boundary issues
+// Cons: O(N) memory per key (every request stored)
+//       At 1M req/s × 60s window = 60M entries per key
+```
+
+### Algorithm 3: Sliding Window Counter (Recommended Default)
+
+```java
+public class SlidingWindowCounterRateLimiter {
+    private final int limit;
+    private final long windowMs;
+    private long previousWindowCount;
+    private long currentWindowCount;
+    private long currentWindowStart;
+
+    public SlidingWindowCounterRateLimiter(int limit, long windowMs) {
+        this.limit = limit;
+        this.windowMs = windowMs;
+        this.currentWindowStart = currentWindow();
+    }
+
+    public synchronized boolean allowRequest() {
+        long now = System.currentTimeMillis();
+        long currentWindow = now - (now % windowMs);
+        
+        if (currentWindow &gt; currentWindowStart) {
+            // Shift windows
+            previousWindowCount = currentWindowCount;
+            currentWindowCount = 0;
+            currentWindowStart = currentWindow;
+        }
+        
+        // Calculate effective count using weighted previous window
+        long elapsedInCurrent = now - currentWindowStart;
+        double fractionOfCurrent = (double) elapsedInCurrent / windowMs;
+        double fractionOfPrevious = 1.0 - fractionOfCurrent;
+        
+        double effectiveCount = currentWindowCount + 
+            previousWindowCount * fractionOfPrevious;
+        
+        if (effectiveCount &lt; limit) {
+            currentWindowCount++;
+            return true;
+        }
+        return false;
+    }
+
+    private long currentWindow() {
+        long now = System.currentTimeMillis();
+        return now - (now % windowMs);
+    }
+}
+
+// Pros: O(1) memory, O(1) time
+//       Smooths boundary issue (interpolates)
+//       Default choice for HTTP APIs
+// Cons: Approximation (assumes uniform distribution in previous window)
+```
+
+### Algorithm 4: Token Bucket
+
+```java
+public class TokenBucketRateLimiter {
+    private final long capacity;
+    private final long refillTokensPerInterval;
+    private final long refillIntervalMs;
+    private double tokens;
+    private long lastRefillTimestamp;
+
+    public TokenBucketRateLimiter(long capacity, long refillTokensPerInterval, long refillIntervalMs) {
+        this.capacity = capacity;
+        this.refillTokensPerInterval = refillTokensPerInterval;
+        this.refillIntervalMs = refillIntervalMs;
+        this.tokens = capacity;
+        this.lastRefillTimestamp = System.currentTimeMillis();
+    }
+
+    public synchronized boolean allowRequest(long tokensRequested) {
+        refill();
+        
+        if (tokens &gt;= tokensRequested) {
+            tokens -= tokensRequested;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean allowRequest() {
+        return allowRequest(1);
+    }
+
+    private void refill() {
+        long now = System.currentTimeMillis();
+        long elapsed = now - lastRefillTimestamp;
+        
+        double tokensToAdd = ((double) elapsed / refillIntervalMs) * refillTokensPerInterval;
+        tokens = Math.min(capacity, tokens + tokensToAdd);
+        lastRefillTimestamp = now;
+    }
+}
+
+// Pros: Configurable burst (capacity vs steady rate)
+//       Stripe, AWS use this
+// Cons: Slightly more complex
+```
+
+### Algorithm 5: Leaky Bucket
+
+```java
+public class LeakyBucketRateLimiter {
+    private final long capacity;
+    private final long leakRatePerSecond;
+    private final BlockingQueue&lt;Request&gt; queue;
+    private final ExecutorService leaker;
+
+    public LeakyBucketRateLimiter(long capacity, long leakRatePerSecond) {
+        this.capacity = capacity;
+        this.leakRatePerSecond = leakRatePerSecond;
+        this.queue = new ArrayBlockingQueue&lt;&gt;((int) capacity);
+        this.leaker = Executors.newSingleThreadExecutor();
+        startLeaker();
+    }
+
+    public boolean allowRequest(Request request) {
+        return queue.offer(request);  // Returns false if full
+    }
+
+    private void startLeaker() {
+        leaker.submit(() -&gt; {
+            long intervalNs = TimeUnit.SECONDS.toNanos(1) / leakRatePerSecond;
+            while (!Thread.currentThread().isInterrupted()) {
+                Request req = queue.poll();
+                if (req != null) {
+                    req.process();
+                }
+                LockSupport.parkNanos(intervalNs);
+            }
+        });
+    }
+}
+
+// Pros: Smooths bursts into steady output rate
+//       Ideal for traffic shaping into a fixed-rate downstream
+// Cons: Adds latency (requests wait in queue)
+//       Not ideal for user-facing APIs
+```
+
+## Deeper Dive — Distributed Rate Limiter (Redis Lua)
+
+### Sliding Window Counter in Redis
+
+```lua
+-- KEYS[1] = bucket key
+-- ARGV[1] = max requests
+-- ARGV[2] = window in seconds
+-- ARGV[3] = current timestamp in ms
+
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local window = tonumber(ARGV[2]) * 1000
+local now = tonumber(ARGV[3])
+local currentWindowStart = math.floor(now / window) * window
+local previousWindowStart = currentWindowStart - window
+
+local currentCount = tonumber(redis.call(&#x27;GET&#x27;, key .. &#x27;:&#x27; .. currentWindowStart) or &quot;0&quot;)
+local previousCount = tonumber(redis.call(&#x27;GET&#x27;, key .. &#x27;:&#x27; .. previousWindowStart) or &quot;0&quot;)
+
+local elapsedInCurrent = now - currentWindowStart
+local fractionOfCurrent = elapsedInCurrent / window
+local fractionOfPrevious = 1.0 - fractionOfCurrent
+
+local effectiveCount = currentCount + previousCount * fractionOfPrevious
+
+if effectiveCount &lt; limit then
+    redis.call(&#x27;INCR&#x27;, key .. &#x27;:&#x27; .. currentWindowStart)
+    redis.call(&#x27;EXPIRE&#x27;, key .. &#x27;:&#x27; .. currentWindowStart, math.ceil(window * 2 / 1000))
+    return {1, limit - math.floor(effectiveCount) - 1}
+else
+    return {0, 0}
+end
+```
+
+### Spring Boot Integration
+
+```java
+@Service
+public class RedisRateLimiter {
+    private final StringRedisTemplate redis;
+    private final DefaultRedisScript&lt;List&gt; script;
+
+    public RedisRateLimiter(StringRedisTemplate redis) {
+        this.redis = redis;
+        this.script = new DefaultRedisScript&lt;&gt;();
+        script.setLocation(new ClassPathResource(&quot;rate-limiter.lua&quot;));
+        script.setResultType(List.class);
+    }
+
+    public RateLimitResult checkLimit(String key, int limit, long windowSeconds) {
+        Long now = System.currentTimeMillis();
+        
+        List&lt;Long&gt; result = redis.execute(
+            script,
+            List.of(key),
+            String.valueOf(limit),
+            String.valueOf(windowSeconds),
+            String.valueOf(now)
+        );
+        
+        boolean allowed = result.get(0) == 1L;
+        long remaining = result.get(1);
+        
+        return new RateLimitResult(allowed, remaining);
+    }
+}
+
+public record RateLimitResult(boolean allowed, long remaining) {}
+```
+
+## Deeper Dive — Spring Cloud Gateway Configuration
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-route
+          uri: lb://api-service
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: &quot;#{@userKeyResolver}&quot;
+```
+
+```java
+@Configuration
+public class RateLimitConfig {
+    
+    @Bean
+    public KeyResolver userKeyResolver() {
+        // Per-user rate limiting
+        return exchange -&gt; Mono.just(
+            exchange.getRequest().getHeaders().getFirst(&quot;X-User-Id&quot;)
+        );
+    }
+    
+    @Bean
+    public KeyResolver ipKeyResolver() {
+        // Per-IP rate limiting
+        return exchange -&gt; Mono.just(
+            exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+        );
+    }
+}
+```
+
+## Deeper Dive — Bucket4j Library (Java Token Bucket)
+
+```java
+@Service
+public class Bucket4jRateLimiter {
+    private final Map&lt;String, Bucket&gt; buckets = new ConcurrentHashMap&lt;&gt;();
+
+    public Bucket newBucket(String key, int limit, Duration window) {
+        return Bucket.builder()
+            .addLimit(Bandwidth.simple(limit, window))
+            .build();
+    }
+
+    public boolean tryConsume(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key, 
+            k -&gt; newBucket(k, limit, window));
+        return bucket.tryConsume(1);
+    }
+
+    public ConsumptionProbe tryConsumeWithProbe(String key, int limit, Duration window) {
+        Bucket bucket = buckets.computeIfAbsent(key,
+            k -&gt; newBucket(k, limit, window));
+        return bucket.tryConsumeAndReturnRemaining(1);
+    }
+}
+
+// Web filter usage
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    private final Bucket4jRateLimiter limiter;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     FilterChain chain) throws ServletException, IOException {
+        String key = extractKey(req);
+        
+        ConsumptionProbe probe = limiter.tryConsumeWithProbe(key, 100, Duration.ofMinutes(1));
+        
+        if (probe.isConsumed()) {
+            resp.setHeader(&quot;X-RateLimit-Remaining&quot;, String.valueOf(probe.getRemainingTokens()));
+            chain.doFilter(req, resp);
+        } else {
+            long waitMs = probe.getNanosToWaitForRefill() / 1_000_000;
+            resp.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            resp.setHeader(&quot;Retry-After&quot;, String.valueOf(waitMs / 1000));
+            resp.getWriter().write(&quot;Rate limit exceeded&quot;);
+        }
+    }
+}
+```
+
+## Deeper Dive — Multi-Layer Rate Limiting
+
+```
+LAYER 1: CDN / WAF (Cloudflare, AWS WAF)
+  - Coarse: 1000 req/sec per IP
+  - Blocks volumetric DDoS
+  - At edge for low latency
+
+LAYER 2: API Gateway (Kong, AWS API Gateway, Spring Cloud Gateway)
+  - Medium: 100 req/sec per API key
+  - Enforces per-tenant quotas
+  - Returns 429 with Retry-After
+
+LAYER 3: Application
+  - Fine: 10 req/sec per user per endpoint
+  - Business logic constraints
+  - Cost controls (e.g., expensive ML calls)
+
+LAYER 4: Database
+  - Backstop: query cost limits
+  - Connection pool limits
+  - Slow query timeouts
+```
+
+### Multi-Tenant Per-Endpoint Configuration
+
+```java
+@Service
+public class TenantRateLimiter {
+    
+    public RateLimit getLimit(String tenantId, String endpoint) {
+        Tenant tenant = tenantRepo.findById(tenantId).orElseThrow();
+        TenantPlan plan = tenant.getPlan();
+        
+        return switch (plan) {
+            case FREE -&gt; getFreeLimit(endpoint);
+            case STARTER -&gt; getStarterLimit(endpoint);
+            case ENTERPRISE -&gt; getEnterpriseLimit(endpoint);
+        };
+    }
+    
+    private RateLimit getFreeLimit(String endpoint) {
+        return switch (endpoint) {
+            case &quot;/api/search&quot; -&gt; new RateLimit(10, Duration.ofMinutes(1));
+            case &quot;/api/ml-inference&quot; -&gt; new RateLimit(5, Duration.ofMinutes(1));
+            default -&gt; new RateLimit(100, Duration.ofMinutes(1));
+        };
+    }
+}
+```
+
+## Deeper Dive — HTTP Semantics for Rate Limiting
+
+### Response Headers
+
+```
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1700000060
+Retry-After: 60
+RateLimit-Policy: 100;w=60
+RateLimit-Limit: 100
+RateLimit-Remaining: 0
+RateLimit-Reset: 60
+
+{
+  &quot;error&quot;: &quot;rate_limited&quot;,
+  &quot;message&quot;: &quot;Too many requests. Try again in 60 seconds.&quot;
+}
+```
+
+### Client Implementation
+
+```java
+@Component
+public class RateLimitAwareHttpClient {
+    private final RestTemplate restTemplate;
+
+    public &lt;T&gt; T request(String url, Class&lt;T&gt; responseType) {
+        int maxRetries = 3;
+        for (int attempt = 0; attempt &lt; maxRetries; attempt++) {
+            try {
+                return restTemplate.getForObject(url, responseType);
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                String retryAfter = e.getResponseHeaders()
+                    .getFirst(HttpHeaders.RETRY_AFTER);
+                
+                long waitSeconds = parseRetryAfter(retryAfter);
+                if (waitSeconds &gt; 60) {
+                    throw new RateLimitExceededException(&quot;Wait too long&quot;, e);
+                }
+                
+                try {
+                    Thread.sleep(Duration.ofSeconds(waitSeconds).toMillis());
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(ie);
+                }
+            }
+        }
+        throw new RateLimitExceededException(&quot;Max retries reached&quot;);
+    }
+}
+```
+
+## Deeper Dive — Common Failure Modes and Solutions
+
+### Failure Mode 1: Boundary Burst (Fixed Window)
+
+```
+PROBLEM:
+  Window: 1 minute, limit: 100 req/min
+  At 11:59:59 - 100 requests allowed
+  At 12:00:00 - new window, 100 more allowed
+  → 200 requests in 1 second
+
+SOLUTION: Use sliding window counter instead
+```
+
+### Failure Mode 2: Distributed Inconsistency
+
+```
+PROBLEM:
+  Multiple app instances, each enforcing 100 req/sec locally
+  Actual rate: 100 × (instances) = 1000 req/sec
+
+SOLUTION: Centralized state in Redis with Lua scripts
+```
+
+### Failure Mode 3: Memory Explosion (Sliding Window Log)
+
+```
+PROBLEM:
+  Store every request timestamp
+  Hot endpoint: 10K req/sec × 60s window = 600K entries per key
+  10K hot keys = 6B entries
+
+SOLUTION: Use sliding window counter (O(1) memory) or token bucket
+```
+
+### Failure Mode 4: Clock Skew
+
+```
+PROBLEM:
+  Distributed systems with different clocks
+  One node thinks &quot;now&quot; is 12:00:00
+  Another thinks 12:00:01
+  Rate limit calculations diverge
+
+SOLUTION: Use single source of time (Redis timestamps)
+          Don&#x27;t trust client/local clocks
+```
+
+### Failure Mode 5: Hot Key
+
+```
+PROBLEM:
+  One API key sends 1M req/sec
+  All hashed to same Redis shard
+  Shard saturates
+
+SOLUTION: 
+  - Pre-shard hot keys (key1#shard1, key1#shard2)
+  - Local approximate limit + periodic sync
+  - Reject early at gateway
+```
+
+## Practice
+
+1. **Implement each algorithm.** In Java, implement fixed window, sliding-window counter, token bucket. Run a microbenchmark; compare allowed/rejected counts under a burst.
+2. **Show the boundary burst.** Drive 100 requests at 12:00:59 and 100 at 12:01:00 against your fixed-window. Show the 200-in-2-seconds problem.
+3. **Bucket4j in Spring.** Add Bucket4j as a Spring filter for a REST API. Test per-API-key limiting.
+4. **Redis distributed rate limiter.** Implement a sliding-window-counter rate limiter in Redis Lua. Run across multiple JVM instances; verify the limit holds globally.
+5. **Spring Cloud Gateway rate limiter.** Configure `RequestRateLimiter` on a real Spring Cloud Gateway route. Test under burst.
+6. **Layered limits.** Design a system with three layers (CDN, gateway, app) each with different limits. Verify each layer enforces its own.
+7. **Retry-After handling.** Implement a client that respects `Retry-After`. Test against a deliberately-rate-limited endpoint.
+8. **Per-tenant per-endpoint.** Design rate limits for a multi-tenant SaaS with different limits per endpoint per tenant. Justify the algorithm and dimension choices.
+9. **Production trace.** In any system you operate, find the rate-limit configuration. Identify the algorithm, the dimension, the limits. Decide whether they&#x27;re correct.
+10. **The skeptic conversation.** A senior engineer says &quot;we don&#x27;t need rate limits, our customers won&#x27;t abuse.&quot; Write a 200-word response on the four non-malicious causes of unintended bursts.
+
+## Recap
+
+You should now be able to:
+
+- Apply **fixed window, sliding window log, sliding window counter, token bucket, leaky bucket, GCRA** algorithms with explicit burst and memory characteristics.
+- Recognize the **boundary burst** problem of fixed windows and prefer sliding-window counter as the practical default.
+- Implement **distributed rate limiting** with Redis Lua scripts to share state across N instances.
+- Use **Bucket4j** in Spring with in-memory or Redis-backed token bucket.
+- Configure **Spring Cloud Gateway&#x27;s RequestRateLimiter** for distributed token bucket.
+- Return **HTTP 429** with Retry-After and X-RateLimit-* response headers; respect them in clients.
+- Pick the **rate-limit dimension** — IP, user, API key, tenant, endpoint, composite — by the threat model.
+- Apply **layered rate limits** at CDN, gateway, application, downstream resource levels.
+- Recognize and prevent **failure modes**: rate-limit bypass via distributed clients, synchronous retry storms, in-burst saturation, state drift, hot partitions.
+- Map real systems (Cloudflare, AWS, Kong, NGINX, Stripe) to their algorithm choices and configurations.
+
+## Next
+
+Continue to [Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)](./T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md) — the patterns that let a distributed system tolerate the failures that happen all the time without cascading into outage.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><div class="lbl">← Previous</div><div class="ttl">T12-scaling-horizontal-vertical-autoscaling-statelessness</div><div class="sub">Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</div></a><a class="next" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><div class="lbl">Next →</div><div class="ttl">T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure</div><div class="sub">Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#where-rate-limiting-came-from-from-network-routers-to-modern-api-quotas" data-toc-link>Where Rate Limiting Came From — From Network Routers To Modern API Quotas</a></li><li class="lvl-3"><a href="#the-1980s-network-traffic-shaping" data-toc-link>The 1980s — Network Traffic Shaping</a></li><li class="lvl-3"><a href="#the-1990s-internet-abuse-and-early-rate-limiting" data-toc-link>The 1990s — Internet Abuse And Early Rate Limiting</a></li><li class="lvl-3"><a href="#the-2000s-dos-defense" data-toc-link>The 2000s — DoS Defense</a></li><li class="lvl-3"><a href="#the-2010s-api-rate-limiting-standardization" data-toc-link>The 2010s — API Rate Limiting Standardization</a></li><li class="lvl-3"><a href="#the-modern-distributed-rate-limiting-era" data-toc-link>The Modern Distributed Rate Limiting Era</a></li><li class="lvl-2"><a href="#why-rate-limiting-matters-specifically-the-senior-engineers-qa" data-toc-link>Why Rate Limiting Matters, Specifically: The Senior Engineer&#x27;s Q&amp;amp;A</a></li><li class="lvl-3"><a href="#q1-why-is-rate-limiting-necessary" data-toc-link>Q1: Why is rate limiting necessary?</a></li><li class="lvl-3"><a href="#q2-when-should-i-use-token-bucket-vs-sliding-window" data-toc-link>Q2: When should I use token bucket vs sliding window?</a></li><li class="lvl-3"><a href="#q3-whats-the-right-rate-limit-to-set" data-toc-link>Q3: What&#x27;s the right rate limit to set?</a></li><li class="lvl-3"><a href="#q4-how-do-i-implement-distributed-rate-limiting" data-toc-link>Q4: How do I implement distributed rate limiting?</a></li><li class="lvl-3"><a href="#q5-how-should-i-handle-rate-limited-requests" data-toc-link>Q5: How should I handle rate-limited requests?</a></li><li class="lvl-2"><a href="#common-misconceptions-explained" data-toc-link>Common Misconceptions Explained</a></li><li class="lvl-3"><a href="#rate-limiting-is-just-about-throttling-abuse" data-toc-link>&quot;Rate limiting is just about throttling abuse.&quot;</a></li><li class="lvl-3"><a href="#rate-limits-should-be-per-ip" data-toc-link>&quot;Rate limits should be per-IP.&quot;</a></li><li class="lvl-3"><a href="#token-bucket-is-always-better-than-leaky-bucket" data-toc-link>&quot;Token bucket is always better than leaky bucket.&quot;</a></li><li class="lvl-3"><a href="#rate-limiting-should-reject-excess-requests" data-toc-link>&quot;Rate limiting should reject excess requests.&quot;</a></li><li class="lvl-3"><a href="#distributed-rate-limiting-requires-consensus" data-toc-link>&quot;Distributed rate limiting requires consensus.&quot;</a></li><li class="lvl-3"><a href="#rate-limits-eliminate-dos-attacks" data-toc-link>&quot;Rate limits eliminate DoS attacks.&quot;</a></li><li class="lvl-2"><a href="#why-rate-limit" data-toc-link>Why Rate Limit</a></li><li class="lvl-2"><a href="#the-algorithms" data-toc-link>The Algorithms</a></li><li class="lvl-3"><a href="#fixed-window" data-toc-link>Fixed Window</a></li><li class="lvl-3"><a href="#sliding-window-log" data-toc-link>Sliding Window Log</a></li><li class="lvl-3"><a href="#sliding-window-counter" data-toc-link>Sliding Window Counter</a></li><li class="lvl-3"><a href="#token-bucket_1" data-toc-link>Token Bucket</a></li><li class="lvl-3"><a href="#leaky-bucket_1" data-toc-link>Leaky Bucket</a></li><li class="lvl-3"><a href="#gcra-generic-cell-rate-algorithm" data-toc-link>GCRA (Generic Cell Rate Algorithm)</a></li><li class="lvl-2"><a href="#distributed-rate-limiting" data-toc-link>Distributed Rate Limiting</a></li><li class="lvl-3"><a href="#redis-based-rate-limiting" data-toc-link>Redis-Based Rate Limiting</a></li><li class="lvl-3"><a href="#sentinel-resilience-patterns" data-toc-link>Sentinel / Resilience Patterns</a></li><li class="lvl-2"><a href="#http-semantics" data-toc-link>HTTP Semantics</a></li><li class="lvl-2"><a href="#spring-cloud-gateway-rate-limiter" data-toc-link>Spring Cloud Gateway Rate Limiter</a></li><li class="lvl-2"><a href="#bucket4j-token-bucket-for-java" data-toc-link>Bucket4j — Token Bucket For Java</a></li><li class="lvl-2"><a href="#choosing-the-rate-limit-dimension" data-toc-link>Choosing The Rate-Limit Dimension</a></li><li class="lvl-2"><a href="#rate-limiting-at-multiple-layers" data-toc-link>Rate-Limiting At Multiple Layers</a></li><li class="lvl-2"><a href="#common-failure-modes" data-toc-link>Common Failure Modes</a></li><li class="lvl-3"><a href="#rate-limit-bypass-via-distributed-clients" data-toc-link>Rate-Limit Bypass Via Distributed Clients</a></li><li class="lvl-3"><a href="#synchronous-retry-storm" data-toc-link>Synchronous Retry Storm</a></li><li class="lvl-3"><a href="#burst-inside-the-limit" data-toc-link>Burst Inside The Limit</a></li><li class="lvl-3"><a href="#state-drift-across-instances" data-toc-link>State Drift Across Instances</a></li><li class="lvl-3"><a href="#hot-tenant-hot-partition" data-toc-link>Hot Tenant Hot Partition</a></li><li class="lvl-2"><a href="#trade-off-summary" data-toc-link>Trade-Off Summary</a></li><li class="lvl-2"><a href="#deeper-dive-all-five-algorithms-in-java" data-toc-link>Deeper Dive — All Five Algorithms in Java</a></li><li class="lvl-3"><a href="#algorithm-1-fixed-window-counter" data-toc-link>Algorithm 1: Fixed Window Counter</a></li><li class="lvl-3"><a href="#algorithm-2-sliding-window-log" data-toc-link>Algorithm 2: Sliding Window Log</a></li><li class="lvl-3"><a href="#algorithm-3-sliding-window-counter-recommended-default" data-toc-link>Algorithm 3: Sliding Window Counter (Recommended Default)</a></li><li class="lvl-3"><a href="#algorithm-4-token-bucket" data-toc-link>Algorithm 4: Token Bucket</a></li><li class="lvl-3"><a href="#algorithm-5-leaky-bucket" data-toc-link>Algorithm 5: Leaky Bucket</a></li><li class="lvl-2"><a href="#deeper-dive-distributed-rate-limiter-redis-lua" data-toc-link>Deeper Dive — Distributed Rate Limiter (Redis Lua)</a></li><li class="lvl-3"><a href="#sliding-window-counter-in-redis" data-toc-link>Sliding Window Counter in Redis</a></li><li class="lvl-3"><a href="#spring-boot-integration" data-toc-link>Spring Boot Integration</a></li><li class="lvl-2"><a href="#deeper-dive-spring-cloud-gateway-configuration" data-toc-link>Deeper Dive — Spring Cloud Gateway Configuration</a></li><li class="lvl-2"><a href="#deeper-dive-bucket4j-library-java-token-bucket" data-toc-link>Deeper Dive — Bucket4j Library (Java Token Bucket)</a></li><li class="lvl-2"><a href="#deeper-dive-multi-layer-rate-limiting" data-toc-link>Deeper Dive — Multi-Layer Rate Limiting</a></li><li class="lvl-3"><a href="#multi-tenant-per-endpoint-configuration" data-toc-link>Multi-Tenant Per-Endpoint Configuration</a></li><li class="lvl-2"><a href="#deeper-dive-http-semantics-for-rate-limiting" data-toc-link>Deeper Dive — HTTP Semantics for Rate Limiting</a></li><li class="lvl-3"><a href="#response-headers" data-toc-link>Response Headers</a></li><li class="lvl-3"><a href="#client-implementation" data-toc-link>Client Implementation</a></li><li class="lvl-2"><a href="#deeper-dive-common-failure-modes-and-solutions" data-toc-link>Deeper Dive — Common Failure Modes and Solutions</a></li><li class="lvl-3"><a href="#failure-mode-1-boundary-burst-fixed-window" data-toc-link>Failure Mode 1: Boundary Burst (Fixed Window)</a></li><li class="lvl-3"><a href="#failure-mode-2-distributed-inconsistency" data-toc-link>Failure Mode 2: Distributed Inconsistency</a></li><li class="lvl-3"><a href="#failure-mode-3-memory-explosion-sliding-window-log" data-toc-link>Failure Mode 3: Memory Explosion (Sliding Window Log)</a></li><li class="lvl-3"><a href="#failure-mode-4-clock-skew" data-toc-link>Failure Mode 4: Clock Skew</a></li><li class="lvl-3"><a href="#failure-mode-5-hot-key" data-toc-link>Failure Mode 5: Hot Key</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Backend Engineering — NoSQL & Caching
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -33,4 +33,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 11 | Cache invalidation & TTLs | `T11-cache-invalidation-and-ttls.md` | planned |
 | 12 | CDN caching | `T12-cdn-caching.md` | planned |
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -22,7 +22,7 @@ they target.
 > [!NOTE]
 > Each question follows a fixed structure so it can be rendered as a
 > flashcard on the website. See section 9 of
-> [CONVENTIONS.md](../../../CONVENTIONS.md).
+> [CONVENTIONS.md](../../../templates/CONVENTIONS.md).
 
 ### Q: REPLACE — the question?
 

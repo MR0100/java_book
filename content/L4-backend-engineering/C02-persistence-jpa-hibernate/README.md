@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Backend Engineering — Persistence — JPA / Hibernate / ORM
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -37,4 +37,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 15 | Projections & DTO mapping | `T15-projections-and-dto-mapping.md` | planned |
 | 16 | Auditing | `T16-auditing.md` | planned |
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

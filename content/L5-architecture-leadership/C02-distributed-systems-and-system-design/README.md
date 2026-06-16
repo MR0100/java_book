@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Architecture & Engineering Leadership — Distributed Systems & System Design
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -44,4 +44,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 22 | Worked design: notification system | `T22-worked-design-notification-system.md` | planned |
 | 23 | Worked design: ride-hailing / food delivery | `T23-worked-design-ride-hailing-food-delivery.md` | planned |
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

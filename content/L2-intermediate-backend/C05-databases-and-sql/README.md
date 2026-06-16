@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Intermediate Java & Backend Foundations — Databases & SQL
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -30,4 +30,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 08 | Stored procedures, views, triggers | `T08-stored-procedures-views-triggers.md` | planned |
 | 09 | JDBC & connection pooling (HikariCP) | `T09-jdbc-and-connection-pooling-hikaricp.md` | planned |
 
-[Back to L2 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L2 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

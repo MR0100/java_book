@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Class Loading &amp; Class Loaders — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="active" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Class Loading &amp; Class Loaders</span></div>
+        <h1>Class Loading &amp; Class Loaders</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T02-class-loading-and-class-loaders.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~135 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Class Loading &amp; Class Loaders"
+slug: class-loading-and-class-loaders
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 2
+tags: [class-loading, class-loader, classloader-hierarchy, bootstrap-classloader, platform-classloader, application-classloader, system-classloader, extension-classloader-renamed, three-phase-lifecycle, loading-phase, linking-phase, verification, bytecode-verifier, preparation, default-values, resolution, symbolic-reference, direct-reference, lazy-resolution, initialization-phase, clinit, class-init-lock, init-thread-safety, init-triggers, instance-creation-trigger, static-access-trigger, class-forname, static-final-constant-no-init, parent-first-delegation, child-first-delegation, class-identity, defining-classloader, initiating-classloader, custom-classloader, find-class, define-class, url-classloader, tomcat-webapp-classloader, osgi-bundle-classloader, spring-devtools, class-loader-leak, metaspace-oom, threadlocal-leak, jdbc-driver-leak, logging-framework-leak, static-field-leak, jcmd-vm-classloaders, gc-class-histogram-classloader, jpms, module-system, module-info-java, requires, exports, named-module, unnamed-module, automatic-module, cds, app-cds, class-data-sharing, jep-310, jep-341, shared-archive-file, tccl, thread-context-classloader, hot-reload, hot-swap]
+prerequisites: [jvm-architecture-and-runtime-data-areas, thread-safety-patterns, virtual-threads-project-loom, source-to-bytecode-to-jvm-to-machine-code]
+status: complete
+estimated_minutes: 135
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="class-loading-class-loaders">Class Loading &amp; Class Loaders</h1>
+<p>T01 placed class metadata in the <strong>method area</strong> (Metaspace since JDK 8). This topic covers how it <em>gets</em> there: the <strong>class loading subsystem</strong> is the JVM's gateway between the file system (or JAR, or network, or memory) and the runtime. Every <code>Class&lt;?&gt;</code> object in a Java program — every <code>String.class</code>, every user-defined class, every dynamically-generated proxy — was loaded by a <strong>ClassLoader</strong>, and that ClassLoader determines the class's <em>identity</em> (a class is <code>(name, defining ClassLoader)</code>, not just <code>name</code>), its <em>accessibility</em> (parent-first delegation prevents user code from spoofing <code>java.lang.String</code>), and its <em>lifetime</em> (a class can only be unloaded when its ClassLoader becomes unreachable — the source of <em>the</em> dominant production cause of Metaspace OOMs in app servers).</p>
+<p>The depth-bar requirement isn't "ClassLoader.loadClass loads a class." At the <strong>lifecycle</strong> layer, every class moves through <strong>three phases</strong> — <strong>Loading</strong> (find and read the .class bytes; create the Klass structure in Metaspace + the <code>Class&lt;?&gt;</code> mirror on the heap), <strong>Linking</strong> (Verification of bytecode well-formedness + Preparation of static field slots with default values + Resolution of symbolic references), and <strong>Initialization</strong> (run <code>&lt;clinit&gt;</code> — static initializer block + static field assignments — under a per-class init lock that guarantees exactly-once initialization across all threads). At the <strong>hierarchy</strong> layer, the JVM ships a three-level <strong>ClassLoader chain</strong> — <strong>Bootstrap</strong> (C++-implemented, loads java.base), <strong>Platform</strong> (JDK 9+, the renamed Extension, loads JDK platform modules), <strong>Application</strong> (the system loader, loads <code>-cp</code> classes) — connected by a <strong>parent-first delegation</strong> algorithm that prevents class-spoofing attacks but is sometimes inverted by app servers (Tomcat's WebappClassLoader does <em>child-first</em>) for plugin isolation. At the <strong>identity</strong> layer, a class is uniquely identified by <strong>(name, defining ClassLoader)</strong> — the same <code>Logger.class</code> loaded by two different loaders produces two <em>different</em> <code>Class&lt;?&gt;</code> instances that cannot be assigned to each other, the root cause of <code>ClassCastException: X cannot be cast to X</code> in app servers. At the <strong>leak</strong> layer, a ClassLoader (and all its loaded classes) can only be GC'd when <em>no</em> references to it or its classes or instances remain — and a single <code>ThreadLocal</code> retained in a long-lived thread (typically a thread-pool worker) holding a webapp class is enough to retain the entire webapp's ClassLoader through 100s of redeploys, exhausting Metaspace.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t01-jvm-architecture-and-runtime-data-areas.html">JVM architecture &amp; runtime data areas</a> (L3/C02/T01) — Metaspace is where class metadata lives; <a href="c01-t17-thread-safety-patterns.html">Thread-safety patterns</a> (L3/C01/T17) — ThreadLocal leaks are the canonical CL leak cause; <a href="c01-t14-virtual-threads-project-loom.html">Virtual threads</a> (L3/C01/T14) — <code>&lt;clinit&gt;</code> is one of the remaining pinning sources; <a href="../l0/c01-t04-source-to-bytecode-to-jvm-to-machine-code.html">Source to bytecode</a> (L0/C01/T04) — .class file structure.</p></div></div>
+<h2 id="the-three-phase-class-lifecycle">The Three-Phase Class Lifecycle<a class="anchor" href="#the-three-phase-class-lifecycle" aria-hidden="true">#</a></h2>
+<p>Every class moves through three phases before it can be used:</p>
+<div class="mermaid">flowchart LR
+  Load["1. LOADING<br/>read .class bytes<br/>→ Klass in Metaspace<br/>→ Class&lt;?&gt; on heap"]
+  Link["2. LINKING<br/>(a) Verify<br/>(b) Prepare<br/>(c) Resolve"]
+  Init["3. INITIALIZATION<br/>run &lt;clinit&gt;<br/>(per-class init lock)"]
+  Load --> Link --> Init
+  Use["class is now usable"]
+  Init --> Use
+</div>
+<p>The phases happen in order, but they're not all eager:</p>
+<ul>
+<li><strong>Loading</strong> is lazy — a class is loaded the first time it's referenced.</li>
+<li><strong>Linking</strong> has eager and lazy parts (verify is eager; resolve is mostly lazy).</li>
+<li><strong>Initialization</strong> is <em>exactly</em> lazy — happens at the <em>first active use</em> (defined precisely below).</li>
+</ul>
+<h3 id="phase-1-loading">Phase 1 — Loading<a class="anchor" href="#phase-1-loading" aria-hidden="true">#</a></h3>
+<p>The ClassLoader's <code>loadClass(String name)</code> is the entry point. The work:</p>
+<ol>
+<li>Locate the <code>.class</code> bytes (file system, JAR, URL, in-memory generation).</li>
+<li>Read the bytes; verify the magic number (<code>0xCAFEBABE</code>) and version.</li>
+<li>Parse the constant pool, methods, fields, attributes.</li>
+<li>Build the internal <strong>Klass</strong> structure (HotSpot's C++ data structure for "loaded class") in Metaspace.</li>
+<li>Build the <strong><code>java.lang.Class&lt;?&gt;</code></strong> mirror object on the heap (this is what <code>String.class</code> is — the heap reflection of the Klass).</li>
+<li>Return the <code>Class&lt;?&gt;</code> to the caller.</li>
+</ol>
+<p>The result: a Class instance the JVM knows about, but whose static state is still uninitialized.</p>
+<h3 id="phase-2-linking">Phase 2 — Linking<a class="anchor" href="#phase-2-linking" aria-hidden="true">#</a></h3>
+<p>Three sub-phases:</p>
+<h4 id="verification">Verification<a class="anchor" href="#verification" aria-hidden="true">#</a></h4>
+<p>Confirms the .class file is well-formed bytecode that won't break JVM invariants:</p>
+<ul>
+<li>Magic number and version are valid.</li>
+<li>Constant pool entries are well-typed and consistent.</li>
+<li>Each method's bytecode obeys the <em>operand stack discipline</em> (stack depth correct at every instruction; types match).</li>
+<li>Final classes aren't extended; final methods aren't overridden.</li>
+<li>Access modifiers are respected.</li>
+<li>The class hierarchy is well-formed.</li>
+</ul>
+<p>Without verification, <em>malicious</em> bytecode could violate JVM invariants — overflow the operand stack, cast int to reference, access private fields. Verification is the gatekeeper.</p>
+<p><code>-Xverify:none</code> disables verification — <em>never</em> do this in production. Faster class loading, but loses security; only used for trusted, performance-critical scenarios (and even then, dubious).</p>
+<h4 id="preparation">Preparation<a class="anchor" href="#preparation" aria-hidden="true">#</a></h4>
+<p>Allocate memory for <strong>static fields</strong> of the class; initialize them to <em>default values</em> (zero for primitives, null for references, false for booleans):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static int counter;          // prepared to 0
+static String name;           // prepared to null
+static boolean enabled;       // prepared to false
+</code></pre></div>
+<p><strong>Static final compile-time constants</strong> are technically prepared with their final values <em>during preparation</em> (not during initialization), enabling them to be accessible without triggering class init (more below):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static final int MAX = 100;          // value 100 set during preparation, not &lt;clinit&gt;
+</code></pre></div>
+<h4 id="resolution">Resolution<a class="anchor" href="#resolution" aria-hidden="true">#</a></h4>
+<p>Replace <strong>symbolic references</strong> with <strong>direct references</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Symbolic reference (in .class file constant pool):
+  CONSTANT_Methodref → &quot;java/util/HashMap.put:(LObject;LObject;)LObject;&quot;
+
+Resolved direct reference:
+  pointer to HashMap.put's vtable entry in HashMap's Klass
+</code></pre></div>
+<p>Resolution is <em>lazy by default</em> in HotSpot — happens the first time the reference is used, not eagerly during linking. This enables loading classes that reference other classes not present at load time (graceful failure on actual use, not on load).</p>
+<h3 id="phase-3-initialization">Phase 3 — Initialization<a class="anchor" href="#phase-3-initialization" aria-hidden="true">#</a></h3>
+<p>Run <code>&lt;clinit&gt;</code> — the special method synthesized by <code>javac</code> containing:</p>
+<ul>
+<li>Static initializer blocks (<code>static { ... }</code>).</li>
+<li>Static field assignments with non-constant values.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Config {
+    static int x = computeX();              // assignment in &lt;clinit&gt;
+    static {                                 // explicit static block in &lt;clinit&gt;
+        loadConfig();
+    }
+    static final int MAX = 100;              // NOT in &lt;clinit&gt; — prepared with value
+}
+</code></pre></div>
+<p><code>javac</code> emits <code>&lt;clinit&gt;</code> containing the runtime initialization steps in source order.</p>
+<h4 id="the-init-lock-exactly-once-initialization">The init lock — exactly-once initialization<a class="anchor" href="#the-init-lock-exactly-once-initialization" aria-hidden="true">#</a></h4>
+<p>The JVM guarantees <code>&lt;clinit&gt;</code> runs <strong>exactly once</strong> per class per ClassLoader, even under concurrent thread access. Each Class has an internal <strong>init lock</strong>:</p>
+<ol>
+<li>Thread A first accesses Config → triggers init → acquires Config's init lock → runs <code>&lt;clinit&gt;</code>.</li>
+<li>Thread B accesses Config during init → tries to acquire init lock → <strong>blocks</strong> until A finishes.</li>
+<li>Both threads observe a fully-initialized Config.</li>
+</ol>
+<p>This is <em>the</em> reason singleton initialization via the <strong>holder class idiom</strong> (T12 — DCL alternative) works correctly:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Singleton {
+    private static class Holder { static final Singleton INSTANCE = new Singleton(); }
+    public static Singleton getInstance() { return Holder.INSTANCE; }
+}
+</code></pre></div>
+<p>Holder's <code>&lt;clinit&gt;</code> runs exactly once when <code>Holder.INSTANCE</code> is first accessed; the init lock provides the synchronization for free.</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong><code>&lt;clinit&gt;</code> pins virtual threads</strong> even on JDK 24+ (T14). A VT inside a <code>&lt;clinit&gt;</code> block cannot unmount because the init lock is held; the carrier stays bound through whatever the init does. For warm classes — config loaders, framework bootstrap — initialize at JVM startup rather than first-request on hot paths to avoid pinning latencies on the request itself.</p></div></div>
+<h3 id="when-initialization-is-triggered">When Initialization Is Triggered<a class="anchor" href="#when-initialization-is-triggered" aria-hidden="true">#</a></h3>
+<p>The JLS specifies <strong>active use</strong> as the trigger — exactly these actions cause initialization (per JLS §12.4.1):</p>
+<ol>
+<li><strong>Instance creation</strong>: <code>new Config()</code>.</li>
+<li><strong>Static field write or read</strong> (except for compile-time constants).</li>
+<li><strong>Static method invocation</strong>.</li>
+<li><strong>Reflective <code>Class.forName(name)</code></strong> (the 1-arg form, or <code>forName(name, true, loader)</code>).</li>
+<li><strong>Subclass initialization</strong> — initializing a subclass first initializes the parent.</li>
+<li><strong>Class is the main class</strong> of an application — <code>main()</code> invocation triggers it.</li>
+<li><strong>Method handles</strong> linked to the class.</li>
+</ol>
+<p>What does <strong>not</strong> trigger initialization:</p>
+<ul>
+<li>Accessing a <strong>static final compile-time constant</strong>: <code>Math.PI</code> reads the value without initializing <code>Math</code> (the value was prepared).</li>
+<li><code>Class.forName(name, false, loader)</code> — explicit "don't initialize" form.</li>
+<li>Loading by name without using (<code>ClassLoader.loadClass</code>).</li>
+<li>Reflective <code>Class&lt;?&gt;.getMethods()</code> or similar (loads but doesn't init).</li>
+<li>Declaring a field of the class type: <code>Config c;</code> doesn't init Config.</li>
+</ul>
+<p>The distinction is <em>the</em> most commonly missed detail in class loading interview questions.</p>
+<h2 id="the-classloader-hierarchy">The ClassLoader Hierarchy<a class="anchor" href="#the-classloader-hierarchy" aria-hidden="true">#</a></h2>
+<p>The JDK ships three built-in ClassLoaders organized in a hierarchy:</p>
+<div class="mermaid">flowchart TB
+  B["Bootstrap ClassLoader<br/>(C++-implemented)<br/>loads java.base module<br/>(getClassLoader() returns null)"]
+  P["Platform ClassLoader<br/>(was Extension pre-JDK 9)<br/>loads JDK platform modules<br/>java.sql, java.xml, etc."]
+  A["Application ClassLoader<br/>(System ClassLoader)<br/>loads classes from -cp/classpath"]
+  C["Custom ClassLoaders<br/>(per-webapp, per-bundle,<br/>per-plugin, etc.)"]
+  B --> P
+  P --> A
+  A --> C
+  Arrow["parent ↑"]
+</div>
+<h3 id="bootstrap-classloader">Bootstrap ClassLoader<a class="anchor" href="#bootstrap-classloader" aria-hidden="true">#</a></h3>
+<p>The most-fundamental ClassLoader, implemented in <strong>C++</strong> as part of the JVM itself (not Java). Loads classes from the <strong>java.base module</strong> (and historically from <code>rt.jar</code>): <code>java.lang.Object</code>, <code>java.lang.String</code>, every core Java class.</p>
+<p>Because it's not a Java object, <code>Object.class.getClassLoader()</code> returns <code>null</code>. This is the sentinel for "loaded by Bootstrap."</p>
+<h3 id="platform-classloader">Platform ClassLoader<a class="anchor" href="#platform-classloader" aria-hidden="true">#</a></h3>
+<p>Introduced (and renamed from Extension) in JDK 9. Loads the <strong>JDK platform modules</strong> that aren't in java.base: <code>java.sql</code>, <code>java.xml</code>, <code>java.scripting</code>, etc.</p>
+<p>Accessible via <code>ClassLoader.getPlatformClassLoader()</code> since JDK 9. Pre-JDK 9 this was the "Extension ClassLoader" loading <code>$JAVA_HOME/lib/ext/*.jar</code>. The JDK 9 modularization renamed it and shifted its responsibilities.</p>
+<h3 id="application-classloader-system-classloader">Application ClassLoader (System ClassLoader)<a class="anchor" href="#application-classloader-system-classloader" aria-hidden="true">#</a></h3>
+<p>Loads classes from the <strong>classpath</strong> (<code>-cp</code>, <code>-classpath</code>, or <code>CLASSPATH</code> env var) and the <strong>module path</strong> (<code>--module-path</code>). This is the loader that loads <em>your</em> application code by default.</p>
+<p>Accessible via <code>ClassLoader.getSystemClassLoader()</code> or <code>Thread.currentThread().getContextClassLoader()</code> (in normal scenarios).</p>
+<h3 id="custom-classloaders">Custom ClassLoaders<a class="anchor" href="#custom-classloaders" aria-hidden="true">#</a></h3>
+<p>User code can extend <code>ClassLoader</code> to create custom loaders. The standard subclasses:</p>
+<ul>
+<li><strong><code>URLClassLoader</code></strong> — loads from a list of URLs (file: or http: or jar:).</li>
+<li><strong>Web app loaders</strong> — Tomcat's <code>WebappClassLoader</code>, Jetty's <code>WebAppClassLoader</code>.</li>
+<li><strong>OSGi bundle loaders</strong> — one per OSGi bundle for isolation.</li>
+<li><strong>JDK ServiceLoader internal loaders</strong> — for SPI resolution.</li>
+<li><strong>Spring DevTools loader</strong> — for hot-reload.</li>
+<li><strong>Bytecode generation loaders</strong> — used by Hibernate, Spring proxies, CGLIB.</li>
+</ul>
+<h2 id="parent-first-delegation">Parent-First Delegation<a class="anchor" href="#parent-first-delegation" aria-hidden="true">#</a></h2>
+<p>The standard <code>ClassLoader.loadClass(name)</code> algorithm:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public Class&lt;?&gt; loadClass(String name) throws ClassNotFoundException {
+    // 1. Check cache
+    Class&lt;?&gt; loaded = findLoadedClass(name);
+    if (loaded != null) return loaded;
+
+    try {
+        // 2. Delegate to parent
+        if (parent != null) return parent.loadClass(name);
+        else return findBootstrapClass(name);
+    } catch (ClassNotFoundException e) {
+        // 3. Parent couldn't find it; try locally
+        return findClass(name);
+    }
+}
+</code></pre></div>
+<p>The algorithm: <strong>always try the parent first, then yourself</strong>. The chain bottoms out at Bootstrap; if nobody can find the class, <code>ClassNotFoundException</code> propagates.</p>
+<h3 id="why-parent-first">Why parent-first?<a class="anchor" href="#why-parent-first" aria-hidden="true">#</a></h3>
+<p>Two reasons:</p>
+<ol>
+<li><strong>Class-spoofing prevention.</strong> If a user-supplied class called <code>java.lang.String</code> were loaded by the Application ClassLoader, code expecting the real <code>java.lang.String</code> would be confused — security disaster. Delegating to Bootstrap first guarantees the real <code>java.lang.String</code> always wins.</li>
+<li><strong>Class sharing.</strong> Classes loaded by parent loaders are <em>shared</em> across all child loaders. If three webapps in the same Tomcat all use the JDK's <code>HashMap</code>, only <em>one</em> HashMap class lives in Metaspace — loaded by Bootstrap, visible to all.</li>
+</ol>
+<div class="mermaid">sequenceDiagram
+  participant App as Custom Loader
+  participant SyS as Application Loader
+  participant Plat as Platform Loader
+  participant Boot as Bootstrap Loader
+  App->>SyS: loadClass("java.lang.String")
+  SyS->>Plat: delegate
+  Plat->>Boot: delegate
+  Boot->>Boot: find it
+  Boot-->>Plat: return Class
+  Plat-->>SyS: return Class
+  SyS-->>App: return Class
+  Note over App,Boot: parent-first ensures the real String is found,<br/>even if a user provided one with same name
+</div>
+<h2 id="class-identity-name-classloader">Class Identity — <code>(name, ClassLoader)</code><a class="anchor" href="#class-identity-name-classloader" aria-hidden="true">#</a></h2>
+<p>Two <code>Class&lt;?&gt;</code> instances are equal <strong>if and only if</strong> their <strong>defining ClassLoader</strong> is the same. The same <code>.class</code> file loaded by two different loaders produces two <strong>distinct</strong> <code>Class&lt;?&gt;</code> instances:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ClassLoader cl1 = new URLClassLoader(jarUrls);
+ClassLoader cl2 = new URLClassLoader(jarUrls);
+
+Class&lt;?&gt; c1 = cl1.loadClass(&quot;com.x.Foo&quot;);
+Class&lt;?&gt; c2 = cl2.loadClass(&quot;com.x.Foo&quot;);
+
+c1 == c2;                  // false — different defining loaders → different classes
+c1.getName().equals(c2.getName());   // true — same name
+
+Foo foo = (Foo)(Object) c2.getDeclaredConstructor().newInstance();
+// ✗ ClassCastException: com.x.Foo cannot be cast to com.x.Foo
+// (the static-type Foo was loaded by ClassLoader X; the instance is class loaded by Y)
+</code></pre></div>
+<p>The <code>ClassCastException: com.x.Foo cannot be cast to com.x.Foo</code> is <em>the</em> class-loader-identity error, beloved of confused app-server developers.</p>
+<p><strong>Defining loader</strong> vs <strong>initiating loader</strong>:</p>
+<ul>
+<li><strong>Defining loader</strong>: the loader that actually called <code>defineClass(bytes)</code> and is recorded as the class's owner.</li>
+<li><strong>Initiating loader</strong>: the loader whose <code>loadClass</code> was called externally.</li>
+</ul>
+<p>In parent-first delegation, the <em>initiating</em> loader is the child (you called it), but the <em>defining</em> loader is the parent (it actually defined the class). The class identity is by <em>defining</em>, not <em>initiating</em>.</p>
+<h2 id="web-app-osgi-pattern-child-first-delegation">Web App / OSGi Pattern — Child-First Delegation<a class="anchor" href="#web-app-osgi-pattern-child-first-delegation" aria-hidden="true">#</a></h2>
+<p>Tomcat's <code>WebappClassLoader</code> (and OSGi bundle loaders) deliberately <strong>invert</strong> the standard delegation: try locally first, fall back to parent. The reason: enable per-webapp library versioning.</p>
+<div class="mermaid">flowchart TB
+  B["Bootstrap"]
+  P["Platform"]
+  Common["Common (Tomcat itself)<br/>loads Tomcat classes + shared libs"]
+  W1["WebappClassLoader (app1)<br/>loads app1's WEB-INF/classes + lib<br/>CHILD-FIRST delegation"]
+  W2["WebappClassLoader (app2)"]
+  B --> P --> Common --> W1
+  Common --> W2
+  Note["app1 wants its own Spring 6;<br/>app2 wants its own Spring 5;<br/>Tomcat itself uses something else.<br/>Each isolated via per-loader delegation."]
+</div>
+<p>The child-first algorithm:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public Class&lt;?&gt; loadClass(String name) throws ClassNotFoundException {
+    Class&lt;?&gt; loaded = findLoadedClass(name);
+    if (loaded != null) return loaded;
+
+    // CHILD-FIRST: try local first
+    try {
+        return findClass(name);
+    } catch (ClassNotFoundException e) {
+        return parent.loadClass(name);
+    }
+}
+</code></pre></div>
+<p>Exception: <code>java.*</code> and <code>javax.*</code> classes are still delegated to parent (security — webapps can't replace core classes).</p>
+<h3 id="the-class-loader-identity-bug-in-practice">The class-loader-identity bug in practice<a class="anchor" href="#the-class-loader-identity-bug-in-practice" aria-hidden="true">#</a></h3>
+<p>Tomcat scenario: a JDBC driver is loaded in WEB-INF/lib (webapp loader). The driver registers itself with <code>java.sql.DriverManager</code>. <code>DriverManager</code> is loaded by Bootstrap. The registration stores a reference from <code>DriverManager</code> (Bootstrap) to the driver class (Webapp loader). Even after the webapp is undeployed, <code>DriverManager</code> still holds the reference — <em>retaining the entire webapp ClassLoader and all its classes in Metaspace</em>.</p>
+<p>This is the canonical class-loader-leak pattern; fix is to deregister the driver on webapp shutdown (<code>ServletContextListener.contextDestroyed()</code>).</p>
+<h2 id="class-loader-leaks-metaspace-oom">Class Loader Leaks → Metaspace OOM<a class="anchor" href="#class-loader-leaks-metaspace-oom" aria-hidden="true">#</a></h2>
+<p>A ClassLoader (and all classes it loaded) can be unloaded <strong>only when</strong> all of these hold:</p>
+<ol>
+<li>The ClassLoader instance itself is unreachable from GC roots.</li>
+<li>All <code>Class&lt;?&gt;</code> instances loaded by it are unreachable.</li>
+<li>All <em>instances</em> of those classes are unreachable.</li>
+</ol>
+<p>If <em>any</em> reference survives — to the loader, to a class, to an instance — <em>the entire ClassLoader stays alive</em>, and its classes stay in Metaspace forever. Repeat over 100s of webapp redeploys and you exhaust Metaspace → <code>OutOfMemoryError: Metaspace</code>.</p>
+<h3 id="the-five-canonical-leak-causes">The Five Canonical Leak Causes<a class="anchor" href="#the-five-canonical-leak-causes" aria-hidden="true">#</a></h3>
+<ol>
+<li>
+<p><strong>ThreadLocal retained in thread-pool workers.</strong>
+   A long-lived thread pool's <code>Thread</code> object holds a <code>ThreadLocalMap</code>. If a <code>ThreadLocal</code> value references a webapp class, the entry retains the webapp ClassLoader.
+   <em>Fix</em>: clear ThreadLocals on webapp shutdown; or use <code>ScopedValue</code> (T14) which auto-clears.</p>
+</li>
+<li>
+<p><strong>JDBC driver registration (above).</strong>
+   <code>DriverManager</code> holds driver class references.
+   <em>Fix</em>: deregister via <code>DriverManager.deregisterDriver(driver)</code> on shutdown.</p>
+</li>
+<li>
+<p><strong>java.util.logging Logger retention.</strong>
+   <code>java.util.logging</code> keeps logger references that retain webapp classes.
+   <em>Fix</em>: log4j2 / Logback don't have this issue; or explicitly remove loggers on shutdown.</p>
+</li>
+<li>
+<p><strong>Static fields in parent-loaded classes referring to webapp classes.</strong>
+   A library loaded by the Common loader caches a webapp's class in a static field.
+   <em>Fix</em>: use weak references; clear on shutdown.</p>
+</li>
+<li>
+<p><strong>JNI/native code retaining JVM globals.</strong>
+   Native code's global refs (<code>NewGlobalRef</code>) hold classes.
+   <em>Fix</em>: pair every <code>NewGlobalRef</code> with <code>DeleteGlobalRef</code> in unload.</p>
+</li>
+</ol>
+<h3 id="diagnosing-class-loader-leaks">Diagnosing class loader leaks<a class="anchor" href="#diagnosing-class-loader-leaks" aria-hidden="true">#</a></h3>
+<h4 id="jcmd-pid-vmclassloaders"><code>jcmd &lt;pid&gt; VM.classloaders</code><a class="anchor" href="#jcmd-pid-vmclassloaders" aria-hidden="true">#</a></h4>
+<p>Lists all live ClassLoaders, their parents, and the number of classes each has loaded. Increasing counts after redeploy → leak.</p>
+<h4 id="jcmd-pid-gcclass_histogram-head-20"><code>jcmd &lt;pid&gt; GC.class_histogram | head -20</code><a class="anchor" href="#jcmd-pid-gcclass_histogram-head-20" aria-hidden="true">#</a></h4>
+<p>Shows top classes by instance count. After redeploying a webapp, look for the <em>same</em> class (e.g., <code>com.myapp.UserService</code>) appearing multiple times — one entry per stale loader.</p>
+<h4 id="heap-dump-analysis-eclipse-mat-jdk-mission-control">Heap dump analysis (Eclipse MAT, JDK Mission Control)<a class="anchor" href="#heap-dump-analysis-eclipse-mat-jdk-mission-control" aria-hidden="true">#</a></h4>
+<p>Find ClassLoader instances; for each, check its "retained heap" — what would be freed if the loader were collected. The largest retained-heap loaders are the leakers. MAT's <em>Leak Suspects Report</em> automates this for the common patterns.</p>
+<h4 id="nmt-native-memory-tracking">NMT (Native Memory Tracking)<a class="anchor" href="#nmt-native-memory-tracking" aria-hidden="true">#</a></h4>
+<p>Enables <code>-XX:NativeMemoryTracking=summary</code>. Then <code>jcmd VM.native_memory</code> shows Metaspace growth over baselines.</p>
+<h2 id="jpms-java-platform-module-system">JPMS — Java Platform Module System<a class="anchor" href="#jpms-java-platform-module-system" aria-hidden="true">#</a></h2>
+<p>JDK 9 introduced <strong>modules</strong> as a unit of code organization above packages, with explicit dependencies and exports:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// module-info.java
+module com.example.app {
+    requires java.sql;                       // depend on java.sql
+    requires com.example.lib;
+    exports com.example.app.api;             // expose this package
+    // non-exported packages are encapsulated
+}
+</code></pre></div>
+<p>JPMS gives:</p>
+<ul>
+<li><strong>Strong encapsulation</strong>: non-exported packages cannot be accessed from outside the module — even via reflection (mostly; <code>--add-opens</code> overrides for legacy code).</li>
+<li><strong>Explicit dependencies</strong>: missing <code>requires</code> produces compile-time and load-time errors.</li>
+<li><strong>Reliable configuration</strong>: module graph is validated at startup; cycles forbidden; missing modules detected early.</li>
+</ul>
+<h3 id="modules-and-classloaders">Modules and ClassLoaders<a class="anchor" href="#modules-and-classloaders" aria-hidden="true">#</a></h3>
+<p>The JDK modules are split between Bootstrap and Platform loaders:</p>
+<ul>
+<li><strong>Bootstrap</strong>: java.base.</li>
+<li><strong>Platform</strong>: most other java.<em> and jdk.</em> modules.</li>
+</ul>
+<p>User modules can be loaded by:</p>
+<ul>
+<li><strong>Application loader</strong> — modules on <code>--module-path</code>.</li>
+<li><strong>Custom layered loaders</strong> — for advanced JPMS use cases.</li>
+</ul>
+<h3 id="named-vs-unnamed-modules">Named vs unnamed modules<a class="anchor" href="#named-vs-unnamed-modules" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Named module</strong>: declared via <code>module-info.java</code>; participates in the module graph.</li>
+<li><strong>Unnamed module</strong>: classes on the classpath (<code>-cp</code>); all classpath classes belong to the "unnamed module" of their ClassLoader.</li>
+<li><strong>Automatic module</strong>: a JAR on the module path without <code>module-info.java</code>; gets a synthesized module name.</li>
+</ul>
+<p>The migration story: most JDK-9-or-later code still has classpath-based parts (the "unnamed module") interoperating with modular parts. JPMS is opt-in; the JDK itself is fully modularized but applications can still use traditional classpath only.</p>
+<h2 id="runtime-class-loading">Runtime Class Loading<a class="anchor" href="#runtime-class-loading" aria-hidden="true">#</a></h2>
+<p>Apart from the JVM's automatic loading on first reference, code can load classes at runtime:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Triggers initialization (default)
+Class&lt;?&gt; c = Class.forName(&quot;com.x.Foo&quot;);
+
+// Explicit: don't initialize; use a specific ClassLoader
+Class&lt;?&gt; c = Class.forName(&quot;com.x.Foo&quot;, false, classLoader);
+
+// Load without initializing; explicit ClassLoader
+Class&lt;?&gt; c = classLoader.loadClass(&quot;com.x.Foo&quot;);
+</code></pre></div>
+<p>Use cases:</p>
+<ul>
+<li><strong>JDBC drivers (legacy)</strong>: <code>Class.forName("com.mysql.cj.jdbc.Driver")</code> triggers static block that registers with <code>DriverManager</code>. Pre-Java-6 pattern; superseded by <code>ServiceLoader</code> since JDBC 4 (just put the driver JAR on the classpath).</li>
+<li><strong>Plugins</strong>: load a plugin's main class via reflection.</li>
+<li><strong>Bytecode generation</strong>: dynamically generate classes (CGLIB, javassist, ByteBuddy) and define them via <code>ClassLoader.defineClass(bytes)</code>.</li>
+<li><strong>Hot reload</strong>: load updated <code>.class</code> files at runtime.</li>
+</ul>
+<h2 id="cds-class-data-sharing">CDS — Class Data Sharing<a class="anchor" href="#cds-class-data-sharing" aria-hidden="true">#</a></h2>
+<p><strong>AppCDS</strong> (Application Class Data Sharing, JEP 310 / JEP 341, JDK 10–12) pre-computes a shared memory image of loaded classes that the JVM can <code>mmap</code> at startup, skipping the cost of re-loading + verifying every class on every JVM start.</p>
+<p>Workflow:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># 1. Record which classes are loaded
+java -XX:ArchiveClassesAtExit=app.jsa -cp myapp.jar com.x.Main
+
+# 2. Use the archive on subsequent runs
+java -XX:SharedArchiveFile=app.jsa -cp myapp.jar com.x.Main      # faster startup
+</code></pre></div>
+<p>Reduces startup time by 30–60% for typical Spring Boot apps. The JVM itself has a default CDS archive (<code>-XX:+UseSharedSpaces</code>, default since JDK 12) covering core JDK classes.</p>
+<p>For serverless / Lambda / CLI scenarios where startup time matters, AppCDS is the easy win. For long-running servers, the savings are amortized over uptime and matter less.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="calling-classforname-in-a-hot-loop">Calling <code>Class.forName(...)</code> in a hot loop<a class="anchor" href="#calling-classforname-in-a-hot-loop" aria-hidden="true">#</a></h3>
+<p>Even after init, <code>forName</code> performs ClassLoader resolution — small but real overhead. Cache the resolved <code>Class&lt;?&gt;</code>.</p>
+<h3 id="disabling-verification">Disabling verification<a class="anchor" href="#disabling-verification" aria-hidden="true">#</a></h3>
+<p><code>-Xverify:none</code> is a security regression. Don't.</p>
+<h3 id="relying-on-classpath-order-for-behavior">Relying on classpath order for behavior<a class="anchor" href="#relying-on-classpath-order-for-behavior" aria-hidden="true">#</a></h3>
+<p>If two JARs both contain <code>com.x.Foo</code>, behavior depends on classpath order. Mavenize properly; use the module system; never rely on duplicated classes.</p>
+<h3 id="casting-across-classloaders">Casting across ClassLoaders<a class="anchor" href="#casting-across-classloaders" aria-hidden="true">#</a></h3>
+<p>If you receive an object from another ClassLoader's class, casting to your loader's class throws <code>ClassCastException</code>. Use reflection or interface-based access through a shared parent loader.</p>
+<h3 id="letting-threadlocals-retain-webapp-classes">Letting ThreadLocals retain webapp classes<a class="anchor" href="#letting-threadlocals-retain-webapp-classes" aria-hidden="true">#</a></h3>
+<p>The #1 ClassLoader leak source. Clear on shutdown via <code>ServletContextListener</code>, or use ScopedValue (T14).</p>
+<h3 id="initializing-classes-lazily-in-hot-request-paths">Initializing classes lazily in hot request paths<a class="anchor" href="#initializing-classes-lazily-in-hot-request-paths" aria-hidden="true">#</a></h3>
+<p>A class loaded at first request adds startup latency to the <em>unlucky</em> request. For warm classes, force initialization at app startup (<code>Class.forName("...")</code> in a startup hook).</p>
+<h3 id="mixing-module-path-and-classpath-inconsistently">Mixing module path and classpath inconsistently<a class="anchor" href="#mixing-module-path-and-classpath-inconsistently" aria-hidden="true">#</a></h3>
+<p>A class can appear in both; behavior is subtle. Prefer one or the other for new code.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>List all ClassLoaders.</strong> Write a program that walks from <code>getClass().getClassLoader()</code> up via <code>getParent()</code> to Bootstrap (null). Print each loader's class.</li>
+<li><strong>Trigger init explicitly.</strong> Define a class with a static block that prints. Verify which actions trigger init: <code>new</code>, static field read/write, static method, <code>Class.forName(name, true, loader)</code>, <code>Class.forName(name, false, loader)</code>.</li>
+<li><strong>Static final constant trick.</strong> Define <code>static final int X = 100;</code>. From another class, read <code>Cls.X</code>. Verify <code>&lt;clinit&gt;</code> did NOT run. Change to <code>static final int X = computeIt();</code> — verify it now runs.</li>
+<li><strong>Holder class singleton.</strong> Implement Singleton via the holder-class idiom; race threads through getInstance(); verify exactly-one construction.</li>
+<li><strong>Custom ClassLoader from bytes.</strong> Write a ClassLoader that loads a class from in-memory bytes. Use it to load a dynamically-generated class via <code>defineClass</code>.</li>
+<li><strong>Class identity via different loaders.</strong> Load the same class via two URLClassLoaders; verify the resulting Class instances are not equal; demonstrate the ClassCastException.</li>
+<li><strong>Tomcat-style child-first delegation.</strong> Implement a ChildFirstClassLoader. Demonstrate that it loads a local version of a class even if the parent has one.</li>
+<li><strong>Class loader leak reproduction.</strong> In a "webapp simulator," register a ThreadLocal containing a webapp object on a thread-pool worker. Discard the webapp ClassLoader. Verify (via heap dump) the loader is retained. Add explicit cleanup; verify it's collected.</li>
+<li><strong>JPMS basics.</strong> Create a small modular project with two modules; demonstrate requires/exports and how a non-exported package is inaccessible.</li>
+<li><strong>AppCDS.</strong> Run a Spring Boot app twice — once recording AppCDS, once using it. Measure startup time difference.</li>
+<li><strong><code>jcmd VM.classloaders</code>.</strong> On a running Java app, print classloaders; identify the hierarchy.</li>
+<li><strong>Diagnose Metaspace OOM.</strong> Reproduce a class loader leak (loop loading + discarding URLClassLoaders); set <code>-XX:MaxMetaspaceSize=64m</code>; observe OOM; capture heap dump; trace the retention chain.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Walk through the <strong>three class-lifecycle phases</strong>: <strong>Loading</strong> (read .class bytes → Klass in Metaspace + Class mirror on heap), <strong>Linking</strong> (Verification + Preparation + Resolution), <strong>Initialization</strong> (run <code>&lt;clinit&gt;</code> under per-class init lock).</li>
+<li>State the <strong>active-use triggers</strong> for initialization (new, static read/write, static method, forName with init, subclass init, main, method handles) and the <strong>non-triggers</strong> (static final constants, forName(false), loadClass, type declaration).</li>
+<li>Recognize the <strong>init lock</strong> as the JVM's exactly-once guarantee for <code>&lt;clinit&gt;</code> — and the <em>one remaining VT pinning source</em> on JDK 24+ (T14).</li>
+<li>Recite the <strong>three-level ClassLoader hierarchy</strong> (Bootstrap C++ → Platform → Application), the JDK 9 rename from Extension to Platform, and the <strong>parent-first delegation</strong> algorithm (cache → parent → local).</li>
+<li>Explain <strong>why parent-first</strong>: class-spoofing prevention + class sharing across child loaders.</li>
+<li>State the <strong>class identity rule</strong>: a Class is identified by <code>(name, defining ClassLoader)</code>. The same .class loaded by two loaders produces two distinct Class instances; cross-cast throws <code>ClassCastException: X cannot be cast to X</code>.</li>
+<li>Distinguish <strong>defining loader</strong> (called defineClass) from <strong>initiating loader</strong> (called loadClass externally) — identity is by defining.</li>
+<li>Use <strong>custom ClassLoaders</strong>: extend ClassLoader, override findClass; URLClassLoader for URL-based loading; web app loaders for per-webapp isolation; bytecode generators for runtime class generation.</li>
+<li>Understand <strong>child-first delegation</strong> in Tomcat WebappClassLoader (and OSGi bundles) for plugin isolation; recognize that <code>java.*</code> and <code>javax.*</code> are still parent-delegated.</li>
+<li>Identify the <strong>five canonical CL leak causes</strong>: ThreadLocal in pool threads, JDBC driver registration, java.util.logging, static fields in parent-loaded classes referring to child-loaded ones, JNI global refs. Recognize that <em>any</em> surviving reference retains the entire loader → Metaspace OOM.</li>
+<li>Diagnose CL leaks via <strong><code>jcmd VM.classloaders</code></strong>, <strong><code>GC.class_histogram</code></strong>, and heap-dump analysis (Eclipse MAT, JMC).</li>
+<li>Understand <strong>JPMS</strong> basics: module-info.java; requires/exports; strong encapsulation; named vs unnamed vs automatic modules; how JDK modules split between Bootstrap and Platform loaders.</li>
+<li>Use <strong>runtime loading</strong>: <code>Class.forName(name)</code> (initializes); <code>Class.forName(name, false, loader)</code> (doesn't); <code>ClassLoader.loadClass(name)</code> (no init); the legacy JDBC-driver-registration pattern.</li>
+<li>Apply <strong>AppCDS</strong> for startup-sensitive workloads: record on first run; mmap on subsequent runs; 30–60% startup reduction.</li>
+<li>Avoid the <strong>seven common pitfalls</strong>: forName in hot loops, disabled verification, classpath-order dependence, cross-loader casts, ThreadLocal-retained classes, lazy class init in hot paths, inconsistent module-path/classpath mixing.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t03-bytecode-basics.html">Bytecode basics</a> — the actual <em>instructions</em> the JVM executes. We'll dissect the .class file structure (magic number, constant pool, access flags, fields, methods, attributes), the bytecode instruction families (load/store, arithmetic, branches, invocation, object creation), the operand stack semantics, <code>javap -v</code> output reading, the four <code>invoke*</code> instructions (invokevirtual / invokestatic / invokespecial / invokeinterface / invokedynamic), and how <code>synchronized</code> lowers to <code>monitorenter</code>/<code>monitorexit</code> plus exception-table-emitted release.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Class Loading &amp; Class Loaders&quot;
+slug: class-loading-and-class-loaders
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 2
+tags: [class-loading, class-loader, classloader-hierarchy, bootstrap-classloader, platform-classloader, application-classloader, system-classloader, extension-classloader-renamed, three-phase-lifecycle, loading-phase, linking-phase, verification, bytecode-verifier, preparation, default-values, resolution, symbolic-reference, direct-reference, lazy-resolution, initialization-phase, clinit, class-init-lock, init-thread-safety, init-triggers, instance-creation-trigger, static-access-trigger, class-forname, static-final-constant-no-init, parent-first-delegation, child-first-delegation, class-identity, defining-classloader, initiating-classloader, custom-classloader, find-class, define-class, url-classloader, tomcat-webapp-classloader, osgi-bundle-classloader, spring-devtools, class-loader-leak, metaspace-oom, threadlocal-leak, jdbc-driver-leak, logging-framework-leak, static-field-leak, jcmd-vm-classloaders, gc-class-histogram-classloader, jpms, module-system, module-info-java, requires, exports, named-module, unnamed-module, automatic-module, cds, app-cds, class-data-sharing, jep-310, jep-341, shared-archive-file, tccl, thread-context-classloader, hot-reload, hot-swap]
+prerequisites: [jvm-architecture-and-runtime-data-areas, thread-safety-patterns, virtual-threads-project-loom, source-to-bytecode-to-jvm-to-machine-code]
+status: complete
+estimated_minutes: 135
+last_updated: 2026-06-08
+---
+
+# Class Loading &amp; Class Loaders
+
+T01 placed class metadata in the **method area** (Metaspace since JDK 8). This topic covers how it *gets* there: the **class loading subsystem** is the JVM&#x27;s gateway between the file system (or JAR, or network, or memory) and the runtime. Every `Class&lt;?&gt;` object in a Java program — every `String.class`, every user-defined class, every dynamically-generated proxy — was loaded by a **ClassLoader**, and that ClassLoader determines the class&#x27;s *identity* (a class is `(name, defining ClassLoader)`, not just `name`), its *accessibility* (parent-first delegation prevents user code from spoofing `java.lang.String`), and its *lifetime* (a class can only be unloaded when its ClassLoader becomes unreachable — the source of *the* dominant production cause of Metaspace OOMs in app servers).
+
+The depth-bar requirement isn&#x27;t &quot;ClassLoader.loadClass loads a class.&quot; At the **lifecycle** layer, every class moves through **three phases** — **Loading** (find and read the .class bytes; create the Klass structure in Metaspace + the `Class&lt;?&gt;` mirror on the heap), **Linking** (Verification of bytecode well-formedness + Preparation of static field slots with default values + Resolution of symbolic references), and **Initialization** (run `&lt;clinit&gt;` — static initializer block + static field assignments — under a per-class init lock that guarantees exactly-once initialization across all threads). At the **hierarchy** layer, the JVM ships a three-level **ClassLoader chain** — **Bootstrap** (C++-implemented, loads java.base), **Platform** (JDK 9+, the renamed Extension, loads JDK platform modules), **Application** (the system loader, loads `-cp` classes) — connected by a **parent-first delegation** algorithm that prevents class-spoofing attacks but is sometimes inverted by app servers (Tomcat&#x27;s WebappClassLoader does *child-first*) for plugin isolation. At the **identity** layer, a class is uniquely identified by **(name, defining ClassLoader)** — the same `Logger.class` loaded by two different loaders produces two *different* `Class&lt;?&gt;` instances that cannot be assigned to each other, the root cause of `ClassCastException: X cannot be cast to X` in app servers. At the **leak** layer, a ClassLoader (and all its loaded classes) can only be GC&#x27;d when *no* references to it or its classes or instances remain — and a single `ThreadLocal` retained in a long-lived thread (typically a thread-pool worker) holding a webapp class is enough to retain the entire webapp&#x27;s ClassLoader through 100s of redeploys, exhausting Metaspace.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [JVM architecture &amp; runtime data areas](./T01-jvm-architecture-and-runtime-data-areas.md) (L3/C02/T01) — Metaspace is where class metadata lives; [Thread-safety patterns](../C01-concurrency/T17-thread-safety-patterns.md) (L3/C01/T17) — ThreadLocal leaks are the canonical CL leak cause; [Virtual threads](../C01-concurrency/T14-virtual-threads-project-loom.md) (L3/C01/T14) — `&lt;clinit&gt;` is one of the remaining pinning sources; [Source to bytecode](../../L0-foundations/C01-cs-foundations/T04-source-to-bytecode-to-jvm-to-machine-code.md) (L0/C01/T04) — .class file structure.
+
+## The Three-Phase Class Lifecycle
+
+Every class moves through three phases before it can be used:
+
+```mermaid
+flowchart LR
+  Load[&quot;1. LOADING&lt;br/&gt;read .class bytes&lt;br/&gt;→ Klass in Metaspace&lt;br/&gt;→ Class&amp;lt;?&amp;gt; on heap&quot;]
+  Link[&quot;2. LINKING&lt;br/&gt;(a) Verify&lt;br/&gt;(b) Prepare&lt;br/&gt;(c) Resolve&quot;]
+  Init[&quot;3. INITIALIZATION&lt;br/&gt;run &amp;lt;clinit&amp;gt;&lt;br/&gt;(per-class init lock)&quot;]
+  Load --&gt; Link --&gt; Init
+  Use[&quot;class is now usable&quot;]
+  Init --&gt; Use
+```
+
+The phases happen in order, but they&#x27;re not all eager:
+
+- **Loading** is lazy — a class is loaded the first time it&#x27;s referenced.
+- **Linking** has eager and lazy parts (verify is eager; resolve is mostly lazy).
+- **Initialization** is *exactly* lazy — happens at the *first active use* (defined precisely below).
+
+### Phase 1 — Loading
+
+The ClassLoader&#x27;s `loadClass(String name)` is the entry point. The work:
+
+1. Locate the `.class` bytes (file system, JAR, URL, in-memory generation).
+2. Read the bytes; verify the magic number (`0xCAFEBABE`) and version.
+3. Parse the constant pool, methods, fields, attributes.
+4. Build the internal **Klass** structure (HotSpot&#x27;s C++ data structure for &quot;loaded class&quot;) in Metaspace.
+5. Build the **`java.lang.Class&lt;?&gt;`** mirror object on the heap (this is what `String.class` is — the heap reflection of the Klass).
+6. Return the `Class&lt;?&gt;` to the caller.
+
+The result: a Class instance the JVM knows about, but whose static state is still uninitialized.
+
+### Phase 2 — Linking
+
+Three sub-phases:
+
+#### Verification
+
+Confirms the .class file is well-formed bytecode that won&#x27;t break JVM invariants:
+
+- Magic number and version are valid.
+- Constant pool entries are well-typed and consistent.
+- Each method&#x27;s bytecode obeys the *operand stack discipline* (stack depth correct at every instruction; types match).
+- Final classes aren&#x27;t extended; final methods aren&#x27;t overridden.
+- Access modifiers are respected.
+- The class hierarchy is well-formed.
+
+Without verification, *malicious* bytecode could violate JVM invariants — overflow the operand stack, cast int to reference, access private fields. Verification is the gatekeeper.
+
+`-Xverify:none` disables verification — *never* do this in production. Faster class loading, but loses security; only used for trusted, performance-critical scenarios (and even then, dubious).
+
+#### Preparation
+
+Allocate memory for **static fields** of the class; initialize them to *default values* (zero for primitives, null for references, false for booleans):
+
+```java
+static int counter;          // prepared to 0
+static String name;           // prepared to null
+static boolean enabled;       // prepared to false
+```
+
+**Static final compile-time constants** are technically prepared with their final values *during preparation* (not during initialization), enabling them to be accessible without triggering class init (more below):
+
+```java
+static final int MAX = 100;          // value 100 set during preparation, not &lt;clinit&gt;
+```
+
+#### Resolution
+
+Replace **symbolic references** with **direct references**:
+
+```text
+Symbolic reference (in .class file constant pool):
+  CONSTANT_Methodref → &quot;java/util/HashMap.put:(LObject;LObject;)LObject;&quot;
+
+Resolved direct reference:
+  pointer to HashMap.put&#x27;s vtable entry in HashMap&#x27;s Klass
+```
+
+Resolution is *lazy by default* in HotSpot — happens the first time the reference is used, not eagerly during linking. This enables loading classes that reference other classes not present at load time (graceful failure on actual use, not on load).
+
+### Phase 3 — Initialization
+
+Run `&lt;clinit&gt;` — the special method synthesized by `javac` containing:
+
+- Static initializer blocks (`static { ... }`).
+- Static field assignments with non-constant values.
+
+```java
+class Config {
+    static int x = computeX();              // assignment in &lt;clinit&gt;
+    static {                                 // explicit static block in &lt;clinit&gt;
+        loadConfig();
+    }
+    static final int MAX = 100;              // NOT in &lt;clinit&gt; — prepared with value
+}
+```
+
+`javac` emits `&lt;clinit&gt;` containing the runtime initialization steps in source order.
+
+#### The init lock — exactly-once initialization
+
+The JVM guarantees `&lt;clinit&gt;` runs **exactly once** per class per ClassLoader, even under concurrent thread access. Each Class has an internal **init lock**:
+
+1. Thread A first accesses Config → triggers init → acquires Config&#x27;s init lock → runs `&lt;clinit&gt;`.
+2. Thread B accesses Config during init → tries to acquire init lock → **blocks** until A finishes.
+3. Both threads observe a fully-initialized Config.
+
+This is *the* reason singleton initialization via the **holder class idiom** (T12 — DCL alternative) works correctly:
+
+```java
+public class Singleton {
+    private static class Holder { static final Singleton INSTANCE = new Singleton(); }
+    public static Singleton getInstance() { return Holder.INSTANCE; }
+}
+```
+
+Holder&#x27;s `&lt;clinit&gt;` runs exactly once when `Holder.INSTANCE` is first accessed; the init lock provides the synchronization for free.
+
+&gt; [!IMPORTANT]
+&gt; **`&lt;clinit&gt;` pins virtual threads** even on JDK 24+ (T14). A VT inside a `&lt;clinit&gt;` block cannot unmount because the init lock is held; the carrier stays bound through whatever the init does. For warm classes — config loaders, framework bootstrap — initialize at JVM startup rather than first-request on hot paths to avoid pinning latencies on the request itself.
+
+### When Initialization Is Triggered
+
+The JLS specifies **active use** as the trigger — exactly these actions cause initialization (per JLS §12.4.1):
+
+1. **Instance creation**: `new Config()`.
+2. **Static field write or read** (except for compile-time constants).
+3. **Static method invocation**.
+4. **Reflective `Class.forName(name)`** (the 1-arg form, or `forName(name, true, loader)`).
+5. **Subclass initialization** — initializing a subclass first initializes the parent.
+6. **Class is the main class** of an application — `main()` invocation triggers it.
+7. **Method handles** linked to the class.
+
+What does **not** trigger initialization:
+
+- Accessing a **static final compile-time constant**: `Math.PI` reads the value without initializing `Math` (the value was prepared).
+- `Class.forName(name, false, loader)` — explicit &quot;don&#x27;t initialize&quot; form.
+- Loading by name without using (`ClassLoader.loadClass`).
+- Reflective `Class&lt;?&gt;.getMethods()` or similar (loads but doesn&#x27;t init).
+- Declaring a field of the class type: `Config c;` doesn&#x27;t init Config.
+
+The distinction is *the* most commonly missed detail in class loading interview questions.
+
+## The ClassLoader Hierarchy
+
+The JDK ships three built-in ClassLoaders organized in a hierarchy:
+
+```mermaid
+flowchart TB
+  B[&quot;Bootstrap ClassLoader&lt;br/&gt;(C++-implemented)&lt;br/&gt;loads java.base module&lt;br/&gt;(getClassLoader() returns null)&quot;]
+  P[&quot;Platform ClassLoader&lt;br/&gt;(was Extension pre-JDK 9)&lt;br/&gt;loads JDK platform modules&lt;br/&gt;java.sql, java.xml, etc.&quot;]
+  A[&quot;Application ClassLoader&lt;br/&gt;(System ClassLoader)&lt;br/&gt;loads classes from -cp/classpath&quot;]
+  C[&quot;Custom ClassLoaders&lt;br/&gt;(per-webapp, per-bundle,&lt;br/&gt;per-plugin, etc.)&quot;]
+  B --&gt; P
+  P --&gt; A
+  A --&gt; C
+  Arrow[&quot;parent ↑&quot;]
+```
+
+### Bootstrap ClassLoader
+
+The most-fundamental ClassLoader, implemented in **C++** as part of the JVM itself (not Java). Loads classes from the **java.base module** (and historically from `rt.jar`): `java.lang.Object`, `java.lang.String`, every core Java class.
+
+Because it&#x27;s not a Java object, `Object.class.getClassLoader()` returns `null`. This is the sentinel for &quot;loaded by Bootstrap.&quot;
+
+### Platform ClassLoader
+
+Introduced (and renamed from Extension) in JDK 9. Loads the **JDK platform modules** that aren&#x27;t in java.base: `java.sql`, `java.xml`, `java.scripting`, etc.
+
+Accessible via `ClassLoader.getPlatformClassLoader()` since JDK 9. Pre-JDK 9 this was the &quot;Extension ClassLoader&quot; loading `$JAVA_HOME/lib/ext/*.jar`. The JDK 9 modularization renamed it and shifted its responsibilities.
+
+### Application ClassLoader (System ClassLoader)
+
+Loads classes from the **classpath** (`-cp`, `-classpath`, or `CLASSPATH` env var) and the **module path** (`--module-path`). This is the loader that loads *your* application code by default.
+
+Accessible via `ClassLoader.getSystemClassLoader()` or `Thread.currentThread().getContextClassLoader()` (in normal scenarios).
+
+### Custom ClassLoaders
+
+User code can extend `ClassLoader` to create custom loaders. The standard subclasses:
+
+- **`URLClassLoader`** — loads from a list of URLs (file: or http: or jar:).
+- **Web app loaders** — Tomcat&#x27;s `WebappClassLoader`, Jetty&#x27;s `WebAppClassLoader`.
+- **OSGi bundle loaders** — one per OSGi bundle for isolation.
+- **JDK ServiceLoader internal loaders** — for SPI resolution.
+- **Spring DevTools loader** — for hot-reload.
+- **Bytecode generation loaders** — used by Hibernate, Spring proxies, CGLIB.
+
+## Parent-First Delegation
+
+The standard `ClassLoader.loadClass(name)` algorithm:
+
+```java
+public Class&lt;?&gt; loadClass(String name) throws ClassNotFoundException {
+    // 1. Check cache
+    Class&lt;?&gt; loaded = findLoadedClass(name);
+    if (loaded != null) return loaded;
+
+    try {
+        // 2. Delegate to parent
+        if (parent != null) return parent.loadClass(name);
+        else return findBootstrapClass(name);
+    } catch (ClassNotFoundException e) {
+        // 3. Parent couldn&#x27;t find it; try locally
+        return findClass(name);
+    }
+}
+```
+
+The algorithm: **always try the parent first, then yourself**. The chain bottoms out at Bootstrap; if nobody can find the class, `ClassNotFoundException` propagates.
+
+### Why parent-first?
+
+Two reasons:
+
+1. **Class-spoofing prevention.** If a user-supplied class called `java.lang.String` were loaded by the Application ClassLoader, code expecting the real `java.lang.String` would be confused — security disaster. Delegating to Bootstrap first guarantees the real `java.lang.String` always wins.
+2. **Class sharing.** Classes loaded by parent loaders are *shared* across all child loaders. If three webapps in the same Tomcat all use the JDK&#x27;s `HashMap`, only *one* HashMap class lives in Metaspace — loaded by Bootstrap, visible to all.
+
+```mermaid
+sequenceDiagram
+  participant App as Custom Loader
+  participant SyS as Application Loader
+  participant Plat as Platform Loader
+  participant Boot as Bootstrap Loader
+  App-&gt;&gt;SyS: loadClass(&quot;java.lang.String&quot;)
+  SyS-&gt;&gt;Plat: delegate
+  Plat-&gt;&gt;Boot: delegate
+  Boot-&gt;&gt;Boot: find it
+  Boot--&gt;&gt;Plat: return Class
+  Plat--&gt;&gt;SyS: return Class
+  SyS--&gt;&gt;App: return Class
+  Note over App,Boot: parent-first ensures the real String is found,&lt;br/&gt;even if a user provided one with same name
+```
+
+## Class Identity — `(name, ClassLoader)`
+
+Two `Class&lt;?&gt;` instances are equal **if and only if** their **defining ClassLoader** is the same. The same `.class` file loaded by two different loaders produces two **distinct** `Class&lt;?&gt;` instances:
+
+```java
+ClassLoader cl1 = new URLClassLoader(jarUrls);
+ClassLoader cl2 = new URLClassLoader(jarUrls);
+
+Class&lt;?&gt; c1 = cl1.loadClass(&quot;com.x.Foo&quot;);
+Class&lt;?&gt; c2 = cl2.loadClass(&quot;com.x.Foo&quot;);
+
+c1 == c2;                  // false — different defining loaders → different classes
+c1.getName().equals(c2.getName());   // true — same name
+
+Foo foo = (Foo)(Object) c2.getDeclaredConstructor().newInstance();
+// ✗ ClassCastException: com.x.Foo cannot be cast to com.x.Foo
+// (the static-type Foo was loaded by ClassLoader X; the instance is class loaded by Y)
+```
+
+The `ClassCastException: com.x.Foo cannot be cast to com.x.Foo` is *the* class-loader-identity error, beloved of confused app-server developers.
+
+**Defining loader** vs **initiating loader**:
+
+- **Defining loader**: the loader that actually called `defineClass(bytes)` and is recorded as the class&#x27;s owner.
+- **Initiating loader**: the loader whose `loadClass` was called externally.
+
+In parent-first delegation, the *initiating* loader is the child (you called it), but the *defining* loader is the parent (it actually defined the class). The class identity is by *defining*, not *initiating*.
+
+## Web App / OSGi Pattern — Child-First Delegation
+
+Tomcat&#x27;s `WebappClassLoader` (and OSGi bundle loaders) deliberately **invert** the standard delegation: try locally first, fall back to parent. The reason: enable per-webapp library versioning.
+
+```mermaid
+flowchart TB
+  B[&quot;Bootstrap&quot;]
+  P[&quot;Platform&quot;]
+  Common[&quot;Common (Tomcat itself)&lt;br/&gt;loads Tomcat classes + shared libs&quot;]
+  W1[&quot;WebappClassLoader (app1)&lt;br/&gt;loads app1&#x27;s WEB-INF/classes + lib&lt;br/&gt;CHILD-FIRST delegation&quot;]
+  W2[&quot;WebappClassLoader (app2)&quot;]
+  B --&gt; P --&gt; Common --&gt; W1
+  Common --&gt; W2
+  Note[&quot;app1 wants its own Spring 6;&lt;br/&gt;app2 wants its own Spring 5;&lt;br/&gt;Tomcat itself uses something else.&lt;br/&gt;Each isolated via per-loader delegation.&quot;]
+```
+
+The child-first algorithm:
+
+```java
+public Class&lt;?&gt; loadClass(String name) throws ClassNotFoundException {
+    Class&lt;?&gt; loaded = findLoadedClass(name);
+    if (loaded != null) return loaded;
+
+    // CHILD-FIRST: try local first
+    try {
+        return findClass(name);
+    } catch (ClassNotFoundException e) {
+        return parent.loadClass(name);
+    }
+}
+```
+
+Exception: `java.*` and `javax.*` classes are still delegated to parent (security — webapps can&#x27;t replace core classes).
+
+### The class-loader-identity bug in practice
+
+Tomcat scenario: a JDBC driver is loaded in WEB-INF/lib (webapp loader). The driver registers itself with `java.sql.DriverManager`. `DriverManager` is loaded by Bootstrap. The registration stores a reference from `DriverManager` (Bootstrap) to the driver class (Webapp loader). Even after the webapp is undeployed, `DriverManager` still holds the reference — *retaining the entire webapp ClassLoader and all its classes in Metaspace*.
+
+This is the canonical class-loader-leak pattern; fix is to deregister the driver on webapp shutdown (`ServletContextListener.contextDestroyed()`).
+
+## Class Loader Leaks → Metaspace OOM
+
+A ClassLoader (and all classes it loaded) can be unloaded **only when** all of these hold:
+
+1. The ClassLoader instance itself is unreachable from GC roots.
+2. All `Class&lt;?&gt;` instances loaded by it are unreachable.
+3. All *instances* of those classes are unreachable.
+
+If *any* reference survives — to the loader, to a class, to an instance — *the entire ClassLoader stays alive*, and its classes stay in Metaspace forever. Repeat over 100s of webapp redeploys and you exhaust Metaspace → `OutOfMemoryError: Metaspace`.
+
+### The Five Canonical Leak Causes
+
+1. **ThreadLocal retained in thread-pool workers.**
+   A long-lived thread pool&#x27;s `Thread` object holds a `ThreadLocalMap`. If a `ThreadLocal` value references a webapp class, the entry retains the webapp ClassLoader.
+   *Fix*: clear ThreadLocals on webapp shutdown; or use `ScopedValue` (T14) which auto-clears.
+
+2. **JDBC driver registration (above).**
+   `DriverManager` holds driver class references.
+   *Fix*: deregister via `DriverManager.deregisterDriver(driver)` on shutdown.
+
+3. **java.util.logging Logger retention.**
+   `java.util.logging` keeps logger references that retain webapp classes.
+   *Fix*: log4j2 / Logback don&#x27;t have this issue; or explicitly remove loggers on shutdown.
+
+4. **Static fields in parent-loaded classes referring to webapp classes.**
+   A library loaded by the Common loader caches a webapp&#x27;s class in a static field.
+   *Fix*: use weak references; clear on shutdown.
+
+5. **JNI/native code retaining JVM globals.**
+   Native code&#x27;s global refs (`NewGlobalRef`) hold classes.
+   *Fix*: pair every `NewGlobalRef` with `DeleteGlobalRef` in unload.
+
+### Diagnosing class loader leaks
+
+#### `jcmd &lt;pid&gt; VM.classloaders`
+
+Lists all live ClassLoaders, their parents, and the number of classes each has loaded. Increasing counts after redeploy → leak.
+
+#### `jcmd &lt;pid&gt; GC.class_histogram | head -20`
+
+Shows top classes by instance count. After redeploying a webapp, look for the *same* class (e.g., `com.myapp.UserService`) appearing multiple times — one entry per stale loader.
+
+#### Heap dump analysis (Eclipse MAT, JDK Mission Control)
+
+Find ClassLoader instances; for each, check its &quot;retained heap&quot; — what would be freed if the loader were collected. The largest retained-heap loaders are the leakers. MAT&#x27;s *Leak Suspects Report* automates this for the common patterns.
+
+#### NMT (Native Memory Tracking)
+
+Enables `-XX:NativeMemoryTracking=summary`. Then `jcmd VM.native_memory` shows Metaspace growth over baselines.
+
+## JPMS — Java Platform Module System
+
+JDK 9 introduced **modules** as a unit of code organization above packages, with explicit dependencies and exports:
+
+```java
+// module-info.java
+module com.example.app {
+    requires java.sql;                       // depend on java.sql
+    requires com.example.lib;
+    exports com.example.app.api;             // expose this package
+    // non-exported packages are encapsulated
+}
+```
+
+JPMS gives:
+
+- **Strong encapsulation**: non-exported packages cannot be accessed from outside the module — even via reflection (mostly; `--add-opens` overrides for legacy code).
+- **Explicit dependencies**: missing `requires` produces compile-time and load-time errors.
+- **Reliable configuration**: module graph is validated at startup; cycles forbidden; missing modules detected early.
+
+### Modules and ClassLoaders
+
+The JDK modules are split between Bootstrap and Platform loaders:
+
+- **Bootstrap**: java.base.
+- **Platform**: most other java.* and jdk.* modules.
+
+User modules can be loaded by:
+
+- **Application loader** — modules on `--module-path`.
+- **Custom layered loaders** — for advanced JPMS use cases.
+
+### Named vs unnamed modules
+
+- **Named module**: declared via `module-info.java`; participates in the module graph.
+- **Unnamed module**: classes on the classpath (`-cp`); all classpath classes belong to the &quot;unnamed module&quot; of their ClassLoader.
+- **Automatic module**: a JAR on the module path without `module-info.java`; gets a synthesized module name.
+
+The migration story: most JDK-9-or-later code still has classpath-based parts (the &quot;unnamed module&quot;) interoperating with modular parts. JPMS is opt-in; the JDK itself is fully modularized but applications can still use traditional classpath only.
+
+## Runtime Class Loading
+
+Apart from the JVM&#x27;s automatic loading on first reference, code can load classes at runtime:
+
+```java
+// Triggers initialization (default)
+Class&lt;?&gt; c = Class.forName(&quot;com.x.Foo&quot;);
+
+// Explicit: don&#x27;t initialize; use a specific ClassLoader
+Class&lt;?&gt; c = Class.forName(&quot;com.x.Foo&quot;, false, classLoader);
+
+// Load without initializing; explicit ClassLoader
+Class&lt;?&gt; c = classLoader.loadClass(&quot;com.x.Foo&quot;);
+```
+
+Use cases:
+
+- **JDBC drivers (legacy)**: `Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;)` triggers static block that registers with `DriverManager`. Pre-Java-6 pattern; superseded by `ServiceLoader` since JDBC 4 (just put the driver JAR on the classpath).
+- **Plugins**: load a plugin&#x27;s main class via reflection.
+- **Bytecode generation**: dynamically generate classes (CGLIB, javassist, ByteBuddy) and define them via `ClassLoader.defineClass(bytes)`.
+- **Hot reload**: load updated `.class` files at runtime.
+
+## CDS — Class Data Sharing
+
+**AppCDS** (Application Class Data Sharing, JEP 310 / JEP 341, JDK 10–12) pre-computes a shared memory image of loaded classes that the JVM can `mmap` at startup, skipping the cost of re-loading + verifying every class on every JVM start.
+
+Workflow:
+
+```bash
+# 1. Record which classes are loaded
+java -XX:ArchiveClassesAtExit=app.jsa -cp myapp.jar com.x.Main
+
+# 2. Use the archive on subsequent runs
+java -XX:SharedArchiveFile=app.jsa -cp myapp.jar com.x.Main      # faster startup
+```
+
+Reduces startup time by 30–60% for typical Spring Boot apps. The JVM itself has a default CDS archive (`-XX:+UseSharedSpaces`, default since JDK 12) covering core JDK classes.
+
+For serverless / Lambda / CLI scenarios where startup time matters, AppCDS is the easy win. For long-running servers, the savings are amortized over uptime and matter less.
+
+## Common Mistakes
+
+### Calling `Class.forName(...)` in a hot loop
+
+Even after init, `forName` performs ClassLoader resolution — small but real overhead. Cache the resolved `Class&lt;?&gt;`.
+
+### Disabling verification
+
+`-Xverify:none` is a security regression. Don&#x27;t.
+
+### Relying on classpath order for behavior
+
+If two JARs both contain `com.x.Foo`, behavior depends on classpath order. Mavenize properly; use the module system; never rely on duplicated classes.
+
+### Casting across ClassLoaders
+
+If you receive an object from another ClassLoader&#x27;s class, casting to your loader&#x27;s class throws `ClassCastException`. Use reflection or interface-based access through a shared parent loader.
+
+### Letting ThreadLocals retain webapp classes
+
+The #1 ClassLoader leak source. Clear on shutdown via `ServletContextListener`, or use ScopedValue (T14).
+
+### Initializing classes lazily in hot request paths
+
+A class loaded at first request adds startup latency to the *unlucky* request. For warm classes, force initialization at app startup (`Class.forName(&quot;...&quot;)` in a startup hook).
+
+### Mixing module path and classpath inconsistently
+
+A class can appear in both; behavior is subtle. Prefer one or the other for new code.
+
+## Practice
+
+1. **List all ClassLoaders.** Write a program that walks from `getClass().getClassLoader()` up via `getParent()` to Bootstrap (null). Print each loader&#x27;s class.
+2. **Trigger init explicitly.** Define a class with a static block that prints. Verify which actions trigger init: `new`, static field read/write, static method, `Class.forName(name, true, loader)`, `Class.forName(name, false, loader)`.
+3. **Static final constant trick.** Define `static final int X = 100;`. From another class, read `Cls.X`. Verify `&lt;clinit&gt;` did NOT run. Change to `static final int X = computeIt();` — verify it now runs.
+4. **Holder class singleton.** Implement Singleton via the holder-class idiom; race threads through getInstance(); verify exactly-one construction.
+5. **Custom ClassLoader from bytes.** Write a ClassLoader that loads a class from in-memory bytes. Use it to load a dynamically-generated class via `defineClass`.
+6. **Class identity via different loaders.** Load the same class via two URLClassLoaders; verify the resulting Class instances are not equal; demonstrate the ClassCastException.
+7. **Tomcat-style child-first delegation.** Implement a ChildFirstClassLoader. Demonstrate that it loads a local version of a class even if the parent has one.
+8. **Class loader leak reproduction.** In a &quot;webapp simulator,&quot; register a ThreadLocal containing a webapp object on a thread-pool worker. Discard the webapp ClassLoader. Verify (via heap dump) the loader is retained. Add explicit cleanup; verify it&#x27;s collected.
+9. **JPMS basics.** Create a small modular project with two modules; demonstrate requires/exports and how a non-exported package is inaccessible.
+10. **AppCDS.** Run a Spring Boot app twice — once recording AppCDS, once using it. Measure startup time difference.
+11. **`jcmd VM.classloaders`.** On a running Java app, print classloaders; identify the hierarchy.
+12. **Diagnose Metaspace OOM.** Reproduce a class loader leak (loop loading + discarding URLClassLoaders); set `-XX:MaxMetaspaceSize=64m`; observe OOM; capture heap dump; trace the retention chain.
+
+## Recap
+
+You should now be able to:
+
+- Walk through the **three class-lifecycle phases**: **Loading** (read .class bytes → Klass in Metaspace + Class mirror on heap), **Linking** (Verification + Preparation + Resolution), **Initialization** (run `&lt;clinit&gt;` under per-class init lock).
+- State the **active-use triggers** for initialization (new, static read/write, static method, forName with init, subclass init, main, method handles) and the **non-triggers** (static final constants, forName(false), loadClass, type declaration).
+- Recognize the **init lock** as the JVM&#x27;s exactly-once guarantee for `&lt;clinit&gt;` — and the *one remaining VT pinning source* on JDK 24+ (T14).
+- Recite the **three-level ClassLoader hierarchy** (Bootstrap C++ → Platform → Application), the JDK 9 rename from Extension to Platform, and the **parent-first delegation** algorithm (cache → parent → local).
+- Explain **why parent-first**: class-spoofing prevention + class sharing across child loaders.
+- State the **class identity rule**: a Class is identified by `(name, defining ClassLoader)`. The same .class loaded by two loaders produces two distinct Class instances; cross-cast throws `ClassCastException: X cannot be cast to X`.
+- Distinguish **defining loader** (called defineClass) from **initiating loader** (called loadClass externally) — identity is by defining.
+- Use **custom ClassLoaders**: extend ClassLoader, override findClass; URLClassLoader for URL-based loading; web app loaders for per-webapp isolation; bytecode generators for runtime class generation.
+- Understand **child-first delegation** in Tomcat WebappClassLoader (and OSGi bundles) for plugin isolation; recognize that `java.*` and `javax.*` are still parent-delegated.
+- Identify the **five canonical CL leak causes**: ThreadLocal in pool threads, JDBC driver registration, java.util.logging, static fields in parent-loaded classes referring to child-loaded ones, JNI global refs. Recognize that *any* surviving reference retains the entire loader → Metaspace OOM.
+- Diagnose CL leaks via **`jcmd VM.classloaders`**, **`GC.class_histogram`**, and heap-dump analysis (Eclipse MAT, JMC).
+- Understand **JPMS** basics: module-info.java; requires/exports; strong encapsulation; named vs unnamed vs automatic modules; how JDK modules split between Bootstrap and Platform loaders.
+- Use **runtime loading**: `Class.forName(name)` (initializes); `Class.forName(name, false, loader)` (doesn&#x27;t); `ClassLoader.loadClass(name)` (no init); the legacy JDBC-driver-registration pattern.
+- Apply **AppCDS** for startup-sensitive workloads: record on first run; mmap on subsequent runs; 30–60% startup reduction.
+- Avoid the **seven common pitfalls**: forName in hot loops, disabled verification, classpath-order dependence, cross-loader casts, ThreadLocal-retained classes, lazy class init in hot paths, inconsistent module-path/classpath mixing.
+
+## Next
+
+Continue to [Bytecode basics](./T03-bytecode-basics.md) — the actual *instructions* the JVM executes. We&#x27;ll dissect the .class file structure (magic number, constant pool, access flags, fields, methods, attributes), the bytecode instruction families (load/store, arithmetic, branches, invocation, object creation), the operand stack semantics, `javap -v` output reading, the four `invoke*` instructions (invokevirtual / invokestatic / invokespecial / invokeinterface / invokedynamic), and how `synchronized` lowers to `monitorenter`/`monitorexit` plus exception-table-emitted release.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><div class="lbl">← Previous</div><div class="ttl">T01-jvm-architecture-and-runtime-data-areas</div><div class="sub">JVM Architecture &amp; Runtime Data Areas</div></a><a class="next" href="../l3/c02-t03-bytecode-basics.html"><div class="lbl">Next →</div><div class="ttl">T03-bytecode-basics</div><div class="sub">Bytecode Basics</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-three-phase-class-lifecycle" data-toc-link>The Three-Phase Class Lifecycle</a></li><li class="lvl-3"><a href="#phase-1-loading" data-toc-link>Phase 1 — Loading</a></li><li class="lvl-3"><a href="#phase-2-linking" data-toc-link>Phase 2 — Linking</a></li><li class="lvl-3"><a href="#phase-3-initialization" data-toc-link>Phase 3 — Initialization</a></li><li class="lvl-3"><a href="#when-initialization-is-triggered" data-toc-link>When Initialization Is Triggered</a></li><li class="lvl-2"><a href="#the-classloader-hierarchy" data-toc-link>The ClassLoader Hierarchy</a></li><li class="lvl-3"><a href="#bootstrap-classloader" data-toc-link>Bootstrap ClassLoader</a></li><li class="lvl-3"><a href="#platform-classloader" data-toc-link>Platform ClassLoader</a></li><li class="lvl-3"><a href="#application-classloader-system-classloader" data-toc-link>Application ClassLoader (System ClassLoader)</a></li><li class="lvl-3"><a href="#custom-classloaders" data-toc-link>Custom ClassLoaders</a></li><li class="lvl-2"><a href="#parent-first-delegation" data-toc-link>Parent-First Delegation</a></li><li class="lvl-3"><a href="#why-parent-first" data-toc-link>Why parent-first?</a></li><li class="lvl-2"><a href="#class-identity-name-classloader" data-toc-link>Class Identity — (name, ClassLoader)</a></li><li class="lvl-2"><a href="#web-app-osgi-pattern-child-first-delegation" data-toc-link>Web App / OSGi Pattern — Child-First Delegation</a></li><li class="lvl-3"><a href="#the-class-loader-identity-bug-in-practice" data-toc-link>The class-loader-identity bug in practice</a></li><li class="lvl-2"><a href="#class-loader-leaks-metaspace-oom" data-toc-link>Class Loader Leaks → Metaspace OOM</a></li><li class="lvl-3"><a href="#the-five-canonical-leak-causes" data-toc-link>The Five Canonical Leak Causes</a></li><li class="lvl-3"><a href="#diagnosing-class-loader-leaks" data-toc-link>Diagnosing class loader leaks</a></li><li class="lvl-2"><a href="#jpms-java-platform-module-system" data-toc-link>JPMS — Java Platform Module System</a></li><li class="lvl-3"><a href="#modules-and-classloaders" data-toc-link>Modules and ClassLoaders</a></li><li class="lvl-3"><a href="#named-vs-unnamed-modules" data-toc-link>Named vs unnamed modules</a></li><li class="lvl-2"><a href="#runtime-class-loading" data-toc-link>Runtime Class Loading</a></li><li class="lvl-2"><a href="#cds-class-data-sharing" data-toc-link>CDS — Class Data Sharing</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#calling-classforname-in-a-hot-loop" data-toc-link>Calling Class.forName(...) in a hot loop</a></li><li class="lvl-3"><a href="#disabling-verification" data-toc-link>Disabling verification</a></li><li class="lvl-3"><a href="#relying-on-classpath-order-for-behavior" data-toc-link>Relying on classpath order for behavior</a></li><li class="lvl-3"><a href="#casting-across-classloaders" data-toc-link>Casting across ClassLoaders</a></li><li class="lvl-3"><a href="#letting-threadlocals-retain-webapp-classes" data-toc-link>Letting ThreadLocals retain webapp classes</a></li><li class="lvl-3"><a href="#initializing-classes-lazily-in-hot-request-paths" data-toc-link>Initializing classes lazily in hot request paths</a></li><li class="lvl-3"><a href="#mixing-module-path-and-classpath-inconsistently" data-toc-link>Mixing module path and classpath inconsistently</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

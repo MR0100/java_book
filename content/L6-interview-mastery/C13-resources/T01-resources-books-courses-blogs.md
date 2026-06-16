@@ -180,7 +180,7 @@ The single highest-ROI external resources for FAANGM Java prep:
 
 ## Next
 
-You've completed the **L6 — Interview Mastery** module. The entire course is now complete. Return to the [master curriculum](../../../CURRICULUM.md) to review any module, or to the [L6 README](../README.md) to revisit specific topics.
+You've completed the **L6 — Interview Mastery** module. The entire course is now complete. Return to the [master curriculum](../../../docs/CONTENTS.md) to review any module, or to the [L6 README](../README.md) to revisit specific topics.
 
 If you're prepping for an actual loop, the recommended sequence is:
 

@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Distributed Rate Limiter — Redis + atomic Lua script — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="active" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>Distributed Rate Limiter — Redis + atomic Lua script</span></div>
+        <h1>Distributed Rate Limiter — Redis + atomic Lua script</h1>
+        <div><span class="source-path">examples/system-designs/rate-limiter-redis-lua</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><blockquote>
+<p><strong>Backs: L5/C02/T13 Rate-Limiting Algorithms + L6/C14/T05 mock (rate limiter)</strong></p>
+</blockquote>
+<p>A small, runnable Spring Boot 3.3 / Java 21 service that rate-limits requests
+<strong>per client</strong> using a <strong>sliding-window-counter</strong> algorithm whose entire
+read-decide-write decision runs as <strong>one atomic Lua script inside Redis</strong>. That
+atomicity is the whole lesson: it is what makes the limiter correct when several
+application nodes share one Redis.</p>
+<hr>
+<h2 id="why-this-design">Why this design<a class="anchor" href="#why-this-design" aria-hidden="true">#</a></h2>
+<h3 id="the-algorithm-sliding-window-counter">The algorithm: sliding-window counter<a class="anchor" href="#the-algorithm-sliding-window-counter" aria-hidden="true">#</a></h3>
+<p>There are several classic rate-limiting algorithms (see L5/C02/T13):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Memory</th>
+<th>Burst behaviour</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fixed window</strong></td>
+<td>O(1)</td>
+<td>Allows 2x bursts at the boundary</td>
+<td>simplest, but flawed</td>
+</tr>
+<tr>
+<td><strong>Sliding window log</strong></td>
+<td>O(N) per client (one timestamp per request)</td>
+<td>exact</td>
+<td>accurate but memory-heavy</td>
+</tr>
+<tr>
+<td><strong>Token bucket</strong></td>
+<td>O(1)</td>
+<td>allows controlled bursts up to bucket size</td>
+<td>great for "burst then steady"</td>
+</tr>
+<tr>
+<td><strong>Sliding window counter</strong></td>
+<td>O(1)</td>
+<td>smooths the boundary burst</td>
+<td>the sweet spot — used here</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The fixed-window boundary-burst problem.</strong> A fixed window ("max N per calendar
+minute") lets a client send N requests at <code>11:00:59.9</code> and another N at
+<code>11:01:00.0</code> — <strong>2N requests in a fraction of a second</strong> — without ever
+exceeding N <em>within</em> a single calendar minute. The limit is technically honored
+but the protection is defeated.</p>
+<p><strong>The sliding-window-counter fix.</strong> Keep two fixed-window counters — the
+<em>current</em> window and the <em>previous</em> one — and weight the previous window by how
+much of it still overlaps the trailing window:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>elapsed     = seconds into the current window           (0 .. window)
+prev_weight = (window - elapsed) / window               (1.0 -&gt; 0.0)
+estimated   = floor(prev_count * prev_weight) + curr_count
+admit if estimated + 1 &lt;= limit
+</code></pre></div>
+<p>Right after a boundary the previous window still counts almost fully, decaying
+to zero by the end of the current window — so a burst straddling the boundary is
+still counted against the limit. It is an O(1) approximation (it assumes the
+previous window's traffic was evenly spread) and is exactly what production
+limiters such as Cloudflare's use.</p>
+<h3 id="why-a-lua-script-atomicity-and-the-lost-update-race">Why a Lua script — atomicity, and the lost-update race<a class="anchor" href="#why-a-lua-script-atomicity-and-the-lost-update-race" aria-hidden="true">#</a></h3>
+<p>A rate-limit decision is a <strong>read-modify-write</strong>: read the count, decide, write
+the new count. If those are three separate Redis commands issued from Java, two
+app nodes (or two threads) can interleave:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>limit = 100, current count = 99
+
+Node A: GET count        -&gt; 99
+Node B: GET count        -&gt; 99        (A hasn't written yet)
+Node A: 99 &lt; 100 -&gt; allow, write 100
+Node B: 99 &lt; 100 -&gt; allow, write 100  (should have been 101 -&gt; DENY)
+</code></pre></div>
+<p>Both requests are admitted; the true total is 101. This is the classic
+<strong>lost-update / check-then-act race</strong>, and under real concurrency it lets clients
+silently blow past the limit. <code>INCR</code> alone fixes the <em>counter</em> but not the
+windowing/expiry logic, and "INCR then decrement-if-over" is itself another race.</p>
+<p><strong>Redis runs each Lua script atomically</strong> — the script executes as a single unit
+on Redis's single command-processing thread, and no other command from any
+client runs in the middle of it. So <code>read -&gt; decide -&gt; write</code> is indivisible.
+Because Redis is the single shared source of truth, this holds <strong>across nodes</strong>:
+every app instance ships the same script to the same Redis, and Redis serializes
+them. That is what makes it a correct <em>distributed</em> limiter. The
+<code>concurrentRequestsNeverExceedTheLimit</code> test proves it by hammering the limiter
+from 32 threads and asserting exactly <code>limit</code> are admitted.</p>
+<h3 id="per-client-keying">Per-client keying<a class="anchor" href="#per-client-keying" aria-hidden="true">#</a></h3>
+<p>The limit is enforced <strong>per client</strong>, keyed by the <code>X-Client-Id</code> header (in a
+real system: an authenticated user id, API key, or source IP). Keys are
+namespaced as <code>ratelimit:{clientId}:&lt;window-index&gt;</code>. The <code>{clientId}</code> hash tag
+keeps all of one client's per-window keys on the same Redis Cluster slot, which
+<code>EVAL</code> requires (every <code>KEYS</code> entry must live on one node).</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Java 21</strong> (LTS)</li>
+<li><strong>Maven 3.9+</strong></li>
+<li><strong>Docker</strong> — required both for <code>mvn test</code> (Testcontainers starts a throwaway
+  Redis) and, optionally, for running a local Redis by hand.</li>
+</ul>
+<hr>
+<h2 id="run-it">Run it<a class="anchor" href="#run-it" aria-hidden="true">#</a></h2>
+<h3 id="1-tests-uses-testcontainers-needs-docker-no-manual-redis">1. Tests (uses Testcontainers — needs Docker, no manual Redis)<a class="anchor" href="#1-tests-uses-testcontainers-needs-docker-no-manual-redis" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn test
+</code></pre></div>
+<p>Testcontainers pulls <code>redis:7-alpine</code>, starts an ephemeral container, points
+Spring Data Redis at its mapped port via <code>@DynamicPropertySource</code>, runs the
+suite, and tears the container down. <strong>No manual Redis setup.</strong></p>
+<p>Expected output (abridged):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>[INFO] --- surefire ... ---
+[INFO] Running com.javamastery.examples.ratelimiter.RateLimiterServiceIntegrationTest
+... Creating container for image: redis:7-alpine
+... Container redis:7-alpine started
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+</code></pre></div>
+<h3 id="2-run-the-app-manually-watch-429s">2. Run the app manually + watch 429s<a class="anchor" href="#2-run-the-app-manually-watch-429s" aria-hidden="true">#</a></h3>
+<p>Start a local Redis (either form):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">docker run --rm -p 6379:6379 redis:7-alpine
+# or:  docker compose up -d
+</code></pre></div>
+<p>Run the app in another shell:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn spring-boot:run
+</code></pre></div>
+<p>The demo endpoint allows <strong>5 requests per 10 seconds per client</strong>. Fire a loop
+and watch the first 5 succeed (200) and the rest get throttled (429):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">for i in $(seq 1 8); do
+  curl -s -o /dev/null -w &quot;%{http_code} &quot; -H &quot;X-Client-Id: alice&quot; http://localhost:8080/api/limited
+done
+echo
+</code></pre></div>
+<p>Expected:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>200 200 200 200 200 429 429 429
+</code></pre></div>
+<p>Inspect the headers on a throttled response (note <code>Retry-After</code>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">curl -i -H &quot;X-Client-Id: alice&quot; http://localhost:8080/api/limited
+</code></pre></div>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>HTTP/1.1 429
+X-RateLimit-Limit: 5
+X-RateLimit-Remaining: 0
+Retry-After: 7
+Content-Type: application/json
+{&quot;error&quot;:&quot;rate_limit_exceeded&quot;,&quot;clientId&quot;:&quot;alice&quot;,&quot;retryAfterSeconds&quot;:7}
+</code></pre></div>
+<p>A <em>different</em> client is unaffected (per-client isolation):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">curl -s -o /dev/null -w &quot;%{http_code}\n&quot; -H &quot;X-Client-Id: bob&quot; http://localhost:8080/api/limited
+# 200
+</code></pre></div>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong><code>src/main/resources/scripts/rate_limit.lua</code></strong> — the heart of the example.
+   Heavily commented: the atomicity argument, the lost-update race, and the
+   sliding-window math all live here.</li>
+<li><strong><code>RateLimiterService.java</code></strong> — the thin Java bridge that ships the decision
+   to Redis (<code>StringRedisTemplate.execute(script, keys, args...)</code>).</li>
+<li><strong><code>RateLimiterConfig.java</code></strong> — loads the <code>.lua</code> file as a <code>DefaultRedisScript</code>
+   (EVALSHA caching).</li>
+<li><strong><code>LimitedController.java</code></strong> — applies the limiter per <code>X-Client-Id</code> and
+   returns 429 + <code>Retry-After</code>.</li>
+<li><strong><code>RateLimiterServiceIntegrationTest.java</code></strong> — the Testcontainers test,
+   including the concurrency/race proof.</li>
+</ol>
+<hr>
+<h2 id="scaling-notes">Scaling notes<a class="anchor" href="#scaling-notes" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Single Redis = single source of truth, but also a SPOF and a hotspot.</strong> All
+  nodes funnel their decisions through one Redis. For HA, run Redis with
+  replicas + Sentinel, or Redis Cluster. Note that Lua scripts run only on the
+  primary; replicas receive the <em>effects</em>, so a failover is safe but in-flight
+  scripts are not replicated mid-execution.</li>
+<li><strong>Redis Cluster sharding.</strong> With the <code>{clientId}</code> hash tag, each client's keys
+  hash to one slot, so the load spreads across shards by client. A single very
+  hot client still hits one shard — for those, consider a local
+  in-process pre-filter (admit obviously-OK requests locally, only consult Redis
+  near the limit) or sharded sub-keys.</li>
+<li><strong>Reduce round-trips.</strong> This example does one Redis round-trip per request. At
+  very high QPS you can batch, or use a <em>local token bucket that is periodically
+  reconciled with Redis</em> (eventual-consistency trade-off: brief over-admission
+  during the reconcile interval).</li>
+<li><strong>Clock skew.</strong> The script takes <code>now</code> from the caller so it stays a pure,
+  replication-safe function of its inputs. Keep app clocks NTP-synced; modest
+  skew only nudges the sliding weight slightly and never breaks atomicity.</li>
+<li><strong>Memory.</strong> O(1) per client per active window (at most two integer keys), and
+  keys self-expire after <code>2 * window</code> seconds — no background cleanup needed.</li>
+<li><strong>Tuning the algorithm.</strong> Swap to <strong>token bucket</strong> if you want to <em>allow</em>
+  controlled bursts (e.g. a UI that fires several calls on page load) rather than
+  smoothing them; the same atomic-Lua pattern applies — only the script body
+  changes.</li>
+</ul>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>
+
+## Source files
+
+*7 key file(s) from `examples/system-designs/rate-limiter-redis-lua/`. Truncated files are marked; see the repo for the full source.*
+
+
+### `pom.xml`
+
+```xml
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!--
+      The Spring Boot parent POM gives us a curated, mutually-compatible set of
+      dependency versions (the Boot &quot;BOM&quot;), sensible plugin defaults, UTF-8 source
+      encoding, and the Java version wired to &lt;java.version&gt;. Pin to a concrete,
+      stable 3.3.x release for reproducible builds.
+    --&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.3.5&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- look the parent up from the Maven repository, not a local path --&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;rate-limiter-redis-lua&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;rate-limiter-redis-lua&lt;/name&gt;
+    &lt;description&gt;Distributed rate limiter: Redis + atomic Lua script (sliding-window counter)&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;21&lt;/java.version&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;!--
+          Pin the Testcontainers version explicitly. We import its BOM below so the
+          individual artifacts (testcontainers, junit-jupiter) inherit this version
+          and stay mutually compatible.
+        --&gt;
+        &lt;testcontainers.version&gt;1.20.4&lt;/testcontainers.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;!--
+              TEACHING POINT: The Testcontainers BOM. Spring Boot's parent does NOT
+              manage Testcontainers versions for arbitrary modules, so we import the
+              Testcontainers BOM ourselves. This lets us declare the individual
+              Testcontainers dependencies below WITHOUT a &lt;version&gt;, and guarantees
+              testcontainers-core and junit-jupiter are the same, compatible version.
+            --&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+                &lt;artifactId&gt;testcontainers-bom&lt;/artifactId&gt;
+                &lt;version&gt;${testcontainers.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Web MVC + embedded Tomcat: serves the /api/limited REST endpoint. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          Spring Data Redis. Brings in the Lettuce client and StringRedisTemplate,
+          plus DefaultRedisScript / RedisScript for loading and EVALSHA-executing
+          our atomic Lua script. Auto-configures a connection from
+          spring.data.redis.* properties.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          Test starter: JUnit 5 (Jupiter), AssertJ, Mockito, Spring Test + MockMvc,
+          all version-managed by the Boot parent. test scope only.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          Testcontainers core: programmatically starts a throwaway Redis container
+          for the integration test, so there is NO manual &quot;install + start Redis&quot;
+          step. Requires a working Docker daemon on the machine running `mvn test`.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+            &lt;artifactId&gt;testcontainers&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          Testcontainers JUnit 5 integration: the @Testcontainers / @Container
+          lifecycle annotations that start/stop the container around the test class.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.testcontainers&lt;/groupId&gt;
+            &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;!--
+              The Boot Maven plugin: provides `spring-boot:run` for local dev and the
+              `repackage` goal that builds an executable fat JAR. Version managed by
+              the parent.
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&amp;lt;/project&amp;gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesratelimiterlimitedcontrollerjava"><code>src/main/java/com/javamastery/examples/ratelimiter/LimitedController.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesratelimiterlimitedcontrollerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+/**
+ * Demonstrates applying the {@link RateLimiterService} per client.
+ *
+ * &lt;p&gt;Each request is keyed by the {@code X-Client-Id} header. In a real system
+ * the key might be an authenticated user id, an API key, or the source IP — the
+ * point is that the limit is enforced PER client, not globally.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class LimitedController {
+
+    /**
+     * Demo policy: at most {@value #LIMIT} requests per {@value #WINDOW_SECONDS}
+     * seconds, per client. Small numbers make the throttling easy to see by hand
+     * with a curl loop.
+     */
+    private static final int LIMIT = 5;
+    private static final int WINDOW_SECONDS = 10;
+
+    private final RateLimiterService rateLimiter;
+
+    public LimitedController(RateLimiterService rateLimiter) {
+        this.rateLimiter = rateLimiter;
+    }
+
+    /**
+     * A rate-limited endpoint.
+     *
+     * &lt;p&gt;On success returns 200 with the remaining quota. When the client exceeds
+     * its budget it returns {@code 429 Too Many Requests} with a standard
+     * {@code Retry-After} header (seconds) so well-behaved clients can back off.
+     *
+     * &lt;p&gt;We also surface {@code X-RateLimit-Limit} and
+     * {@code X-RateLimit-Remaining} informational headers on every response, which
+     * is the de-facto convention clients look for.
+     */
+    @GetMapping(&quot;/limited&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; limited(
+            @RequestHeader(value = &quot;X-Client-Id&quot;, defaultValue = &quot;anonymous&quot;) String clientId) {
+
+        RateLimitResult result = rateLimiter.tryAcquire(clientId, LIMIT, WINDOW_SECONDS);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(&quot;X-RateLimit-Limit&quot;, String.valueOf(LIMIT));
+        headers.add(&quot;X-RateLimit-Remaining&quot;, String.valueOf(result.remaining()));
+
+        if (!result.allowed()) {
+            // RFC 7231 Retry-After (delta-seconds form). Clients/proxies honor it.
+            headers.add(HttpHeaders.RETRY_AFTER, String.valueOf(result.retryAfterSeconds()));
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .headers(headers)
+                    .body(Map.of(
+                            &quot;error&quot;, &quot;rate_limit_exceeded&quot;,
+                            &quot;clientId&quot;, clientId,
+                            &quot;retryAfterSeconds&quot;, result.retryAfterSeconds()));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(Map.of(
+                        &quot;message&quot;, &quot;ok&quot;,
+                        &quot;clientId&quot;, clientId,
+                        &quot;remaining&quot;, result.remaining()));
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesratelimiterratelimitresultjava"><code>src/main/java/com/javamastery/examples/ratelimiter/RateLimitResult.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesratelimiterratelimitresultjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+/**
+ * The outcome of a single {@link RateLimiterService#tryAcquire} call.
+ *
+ * &lt;p&gt;A {@code record} is the idiomatic Java 21 carrier for an immutable value
+ * object: it generates the canonical constructor, accessors, {@code equals},
+ * {@code hashCode} and {@code toString} for us.
+ *
+ * @param allowed           whether the request was admitted under the limit
+ * @param remaining         requests still available in the current sliding window
+ *                          (always {@code &gt;= 0})
+ * @param retryAfterSeconds when {@code !allowed}, how many seconds the client
+ *                          should wait before retrying; {@code 0} when allowed.
+ *                          This maps directly onto the HTTP {@code Retry-After}
+ *                          header sent with a 429 response.
+ * @param estimated         the weighted sliding-window count after this decision,
+ *                          exposed mainly for observability / debugging.
+ */
+public record RateLimitResult(
+        boolean allowed,
+        long remaining,
+        long retryAfterSeconds,
+        long estimated
+) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesratelimiterratelimiterapplicationjava"><code>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterApplication.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterapplicationjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Application entry point.
+ *
+ * &lt;p&gt;{@code @SpringBootApplication} bundles {@code @Configuration},
+ * {@code @EnableAutoConfiguration} and {@code @ComponentScan}. Auto-configuration
+ * wires a Redis {@code ConnectionFactory} (Lettuce) and a {@code RedisTemplate}
+ * from the {@code spring.data.redis.*} properties in {@code application.yml}.
+ */
+@SpringBootApplication
+public class RateLimiterApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RateLimiterApplication.class, args);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesratelimiterratelimiterconfigjava"><code>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterConfig.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterconfigjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
+
+import java.util.List;
+
+/**
+ * Loads the atomic rate-limit Lua script once at startup and exposes it as a
+ * Spring bean.
+ */
+@Configuration
+public class RateLimiterConfig {
+
+    /**
+     * Builds the {@link RedisScript} for {@code rate_limit.lua}.
+     *
+     * &lt;p&gt;TEACHING POINT: {@link DefaultRedisScript} reads the {@code .lua} text
+     * from the classpath and computes its SHA-1 digest. At call time Spring Data
+     * Redis first tries {@code EVALSHA &lt;sha&gt;}; only if Redis reports the script
+     * is not cached (a {@code NOSCRIPT} error) does it fall back to a full
+     * {@code EVAL &lt;body&gt;} (which also caches it). So the script body travels over
+     * the wire once per Redis node, not once per request — cheap and atomic.
+     *
+     * &lt;p&gt;The generic type is {@code List} because the Lua script returns a Redis
+     * multi-bulk reply (an array). Spring Data Redis maps a Lua array reply to a
+     * Java {@link List}; each numeric element comes back as a {@link Long}
+     * (Redis/Lua integer semantics — note Lua truncates any non-integer numbers
+     * when returning to Redis, which is why the script uses {@code math.floor}).
+     */
+    @Bean
+    public RedisScript&lt;List&gt; rateLimitScript() {
+        DefaultRedisScript&lt;List&gt; script = new DefaultRedisScript&lt;&gt;();
+        script.setScriptSource(
+                new ResourceScriptSource(new ClassPathResource(&quot;scripts/rate_limit.lua&quot;)));
+        // The Lua script returns a 4-element array; tell Spring the reply type.
+        script.setResultType(List.class);
+        return script;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesratelimiterratelimiterservicejava"><code>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Distributed rate limiter backed by Redis and an atomic Lua script.
+ *
+ * &lt;p&gt;All the interesting logic lives in {@code scripts/rate_limit.lua}; this
+ * class is a thin, well-typed bridge that ships the decision to Redis. Every
+ * application instance calls the SAME Redis, and Redis serializes the scripts,
+ * which is what makes the limit correct across many nodes (no lost-update race —
+ * see the long comment block in the Lua file).
+ */
+@Service
+public class RateLimiterService {
+
+    private final StringRedisTemplate redis;
+    private final RedisScript&lt;List&gt; rateLimitScript;
+
+    public RateLimiterService(StringRedisTemplate redis, RedisScript&lt;List&gt; rateLimitScript) {
+        this.redis = redis;
+        this.rateLimitScript = rateLimitScript;
+    }
+
+    /**
+     * Attempts to admit one request for {@code key} under a sliding window of
+     * {@code limit} requests per {@code windowSeconds}.
+     *
+     * &lt;p&gt;This is a single atomic round-trip to Redis: the read-decide-write
+     * happens entirely inside the Lua script, so concurrent callers (threads or
+     * separate nodes) can never both observe the same pre-increment count.
+     *
+     * @param key           logical client identity, e.g. an API key or user id;
+     *                      we namespace it under {@code ratelimit:}
+     * @param limit         maximum requests allowed per window ({@code &gt; 0})
+     * @param windowSeconds sliding window length in seconds ({@code &gt; 0})
+     * @return a {@link RateLimitResult} describing the decision
+     */
+    public RateLimitResult tryAcquire(String key, int limit, int windowSeconds) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException(&quot;key must not be null/blank&quot;);
+        }
+        if (limit &lt;= 0) {
+            throw new IllegalArgumentException(&quot;limit must be &gt; 0&quot;);
+        }
+        if (windowSeconds &lt;= 0) {
+            throw new IllegalArgumentException(&quot;windowSeconds must be &gt; 0&quot;);
+        }
+
+        // Hash-tag the client id with {curly braces} so that, on a Redis Cluster,
+        // every physical per-window key the script derives (base:index) hashes to
+        // the SAME slot/node. EVAL/EVALSHA requires all KEYS to live on one node.
+        String base = &quot;ratelimit:{&quot; + key + &quot;}&quot;;
+
+        // Pass the wall-clock time in as an argument so the script is a pure
+        // function of its inputs (deterministic; safe under all replication
+        // modes). Lua receives ARGV as strings, hence String.valueOf.
+        long nowMillis = System.currentTimeMillis();
+
+        @SuppressWarnings(&quot;unchecked&quot;)
+        List&lt;Long&gt; reply = (List&lt;Long&gt;) redis.execute(
+                rateLimitScript,
+                List.of(base),                       // KEYS[1]
+                String.valueOf(limit),               // ARGV[1]
+                String.valueOf(windowSeconds),       // ARGV[2]
+                String.valueOf(nowMillis));          // ARGV[3]
+
+        // Defensive: a correctly executed script always returns 4 elements.
+        if (reply == null || reply.size() &lt; 4) {
+            throw new IllegalStateException(&quot;Unexpected Lua reply: &quot; + reply);
+        }
+
+        boolean allowed = reply.get(0) != null &amp;&amp; reply.get(0) == 1L;
+        long remaining = reply.get(1) == null ? 0L : reply.get(1);
+        long retryAfter = reply.get(2) == null ? 0L : reply.get(2);
+        long estimated = reply.get(3) == null ? 0L : reply.get(3);
+
+        return new RateLimitResult(allowed, remaining, retryAfter, estimated);
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesratelimiterratelimiterserviceintegrationtestjava"><code>src/test/java/com/javamastery/examples/ratelimiter/RateLimiterServiceIntegrationTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesratelimiterratelimiterserviceintegrationtestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.ratelimiter;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Integration test that runs against a REAL Redis started by Testcontainers.
+ *
+ * &lt;p&gt;TEACHING POINT: Why a real Redis instead of a mock? The entire correctness
+ * argument of this example is that &lt;em&gt;Redis&lt;/em&gt; executes the Lua script
+ * atomically. Mocking Redis would test our Java glue but not the property that
+ * matters. Testcontainers spins up an ephemeral {@code redis:7-alpine} container,
+ * so there is no manual setup — only a running Docker daemon is required.
+ */
+@SpringBootTest
+@Testcontainers
+class RateLimiterServiceIntegrationTest {
+
+    /**
+     * {@code @Container} + {@code @Testcontainers} start this container before the
+     * tests and stop it after. {@code static} so a single Redis is shared by the
+     * whole class (faster than one-per-method).
+     */
+    @Container
+    static final GenericContainer&lt;?&gt; REDIS =
+            new GenericContainer&lt;&gt;(DockerImageName.parse(&quot;redis:7-alpine&quot;))
+                    .withExposedPorts(6379);
+
+    /**
+     * Point Spring Data Redis at the container's mapped host/port. Testcontainers
+     * publishes the container's 6379 on a random free host port; we read it back
+     * here. Registered before the Spring context is built.
+     */
+    @DynamicPropertySource
+    static void redisProps(DynamicPropertyRegistry registry) {
+        registry.add(&quot;spring.data.redis.host&quot;, REDIS::getHost);
+        registry.add(&quot;spring.data.redis.port&quot;, () -&gt; REDIS.getMappedPort(6379));
+    }
+
+    @Autowired
+    RateLimiterService rateLimiter;
+
+    /**
+     * Sequentially fire 2*N requests for one client and assert EXACTLY the first
+     * N are admitted and the remaining N are rejected with a positive Retry-After.
+     */
+    @Test
+    void allowsExactlyLimitWithinWindowThenRejectsTheRest() {
+        String client = &quot;client-&quot; + UUID.randomUUID();
+        int limit = 5;
+        int windowSeconds = 60; // long window so the test never crosses a boundary
+
+        int allowed = 0;
+        int rejected = 0;
+        for (int i = 0; i &lt; limit * 2; i++) {
+            RateLimitResult r = rateLimiter.tryAcquire(client, limit, windowSeconds);
+            if (r.allowed()) {
+                allowed++;
+            } else {
+                rejected++;
+                assertThat(r.retryAfterSeconds())
+                        .as(&quot;rejected requests must tell the client when to retry&quot;)
+                        .isPositive();
+                assertThat(r.remaining()).isZero();
+            }
+        }
+
+        assertThat(allowed).as(&quot;exactly the limit is admitted&quot;).isEqualTo(limit);
+        assertThat(rejected).as(&quot;everything beyond the limit is rejected&quot;).isEqualTo(limit);
+    }
+
+    /**
+     * The decrementing-headroom contract: the first admitted request reports
+     * remaining == limit-1, and headroom strictly decreases to 0.
+     */
+    @Test
+    void remainingCountsDownToZero() {
+        String client = &quot;client-&quot; + UUID.randomUUID();
+        int limit = 5;
+
+        long prev = Long.MAX_VALUE;
+        for (int i = 0; i &lt; limit; i++) {
+            RateLimitResult r = rateLimiter.tryAcquire(client, limit, 60);
+            assertThat(r.allowed()).isTrue();
+            assertThat(r.remaining()).isLessThan(prev);
+            prev = r.remaining();
+        }
+        assertThat(prev).as(&quot;last admitted request leaves zero headroom&quot;).isZero();
+    }
+
+    /**
+     * The window REFILLS: after a short window elapses, a previously-throttled
+     * client is admitted again.
+     *
+     * &lt;p&gt;We use a 1-second window and exhaust it, confirm the next call is
+     * rejected, then wait past the window boundary and confirm we are admitted
+     * again. (The sliding-window weighting means we wait a little over 2 windows
+     * to be sure the previous-window contribution has fully decayed.)
+     */
+    @Test
+    void windowRefillsAfterItElapses() throws InterruptedException {
+        String client = &quot;client-&quot; + UUID.randomUUID();
+        int limit = 3;
+        int windowSeconds = 1;
+
+        // Exhaust the budget.
+        for (int i = 0; i &lt; limit; i++) {
+            assertThat(rateLimiter.tryAcquire(client, limit, windowSeconds).allowed()).isTrue();
+        }
+        // Now throttled.
+        assertThat(rateLimiter.tryAcquire(client, limit, windowSeconds).allowed()).isFalse();
+
+        // Wait out the window (plus margin for the sliding decay) and retry.
+        Thread.sleep((windowSeconds * 2 + 1) * 1000L);
+
+        assertThat(rateLimiter.tryAcquire(client, limit, windowSeconds).allowed())
+                .as(&quot;window should have refilled&quot;)
+                .isTrue();
+    }
+
+    /**
+     * Per-client isolation: one client hitting its limit must not affect another.
+     */
+    @Test
+    void limitsAreIsolatedPerClient() {
+        String a = &quot;client-&quot; + UUID.randomUUID();
+        String b = &quot;client-&quot; + UUID.randomUUID();
+        int limit = 3;
+
+        // Exhaust client A.
+        for (int i = 0; i &lt; limit; i++) {
+            assertThat(rateLimiter.tryAcquire(a, limit, 60).allowed()).isTrue();
+        }
+        assertThat(rateLimiter.tryAcquire(a, limit, 60).allowed()).isFalse();
+
+        // Client B still has its full budget.
+        for (int i = 0; i &lt; limit; i++) {
+            assertThat(rateLimiter.tryAcquire(b, limit, 60).allowed()).isTrue();
+        }
+    }
+
+    /**
+     * THE RACE TEST: hammer the limiter from many threads at once and assert the
+     * limit is NOT breached. This is precisely the scenario that a naive
+     * GET-then-INCR (or two app nodes) would get wrong via a lost update. Because
+     * the decision runs as one atomic Lua script, the number admitted is exactly
+     * the limit even under heavy contention.
+     */
+    @Test
+    void concurrentRequestsNeverExceedTheLimit() throws InterruptedException {
+        String client = &quot;client-&quot; + UUID.randomUUID();
+        int limit = 50;
+        int windowSeconds = 60;
+        int threads = 32;
+        int requestsPerThread = 20; // 640 attempts &gt;&gt; 50 limit
+
+        ExecutorService pool = Executors.newFixedThreadPool(threads);
+        CountDownLatch start = new CountDownLatch(1);
+        CountDownLatch done = new CountDownLatch(threads);
+        AtomicInteger allowed = new AtomicInteger();
+        // Track distinct success &quot;remaining&quot; values to ensure no double-grant.
+        var seenRemaining = ConcurrentHashMap.&lt;Long&gt;newKeySet();
+
+        for (int t = 0; t &lt; threads; t++) {
+            pool.submit(() -&gt; {
+                try {
+                    start.await(); // line every thread up so they fire together
+                    for (int i = 0; i &lt; requestsPerThread; i++) {
+                        RateLimitResult r = rateLimiter.tryAcquire(client, limit, windowSeconds);
+                        if (r.allowed()) {
+                            allowed.incrementAndGet();
+                            seenRemaining.add(r.remaining());
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    done.countDown();
+                }
+            });
+        }
+
+        start.countDown();
+        assertThat(done.await(30, TimeUnit.SECONDS)).as(&quot;all threads finished&quot;).isTrue();
+        pool.shutdownNow();
+
+        assertThat(allowed.get())
+                .as(&quot;atomic Lua script must admit EXACTLY the limit, never more, under contention&quot;)
+                .isEqualTo(limit);
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># Distributed Rate Limiter — Redis + atomic Lua script
+
+&gt; **Backs: L5/C02/T13 Rate-Limiting Algorithms + L6/C14/T05 mock (rate limiter)**
+
+A small, runnable Spring Boot 3.3 / Java 21 service that rate-limits requests
+**per client** using a **sliding-window-counter** algorithm whose entire
+read-decide-write decision runs as **one atomic Lua script inside Redis**. That
+atomicity is the whole lesson: it is what makes the limiter correct when several
+application nodes share one Redis.
+
+---
+
+## Why this design
+
+### The algorithm: sliding-window counter
+
+There are several classic rate-limiting algorithms (see L5/C02/T13):
+
+| Algorithm | Memory | Burst behaviour | Note |
+|---|---|---|---|
+| **Fixed window** | O(1) | Allows 2x bursts at the boundary | simplest, but flawed |
+| **Sliding window log** | O(N) per client (one timestamp per request) | exact | accurate but memory-heavy |
+| **Token bucket** | O(1) | allows controlled bursts up to bucket size | great for &quot;burst then steady&quot; |
+| **Sliding window counter** | O(1) | smooths the boundary burst | the sweet spot — used here |
+
+**The fixed-window boundary-burst problem.** A fixed window (&quot;max N per calendar
+minute&quot;) lets a client send N requests at `11:00:59.9` and another N at
+`11:01:00.0` — **2N requests in a fraction of a second** — without ever
+exceeding N *within* a single calendar minute. The limit is technically honored
+but the protection is defeated.
+
+**The sliding-window-counter fix.** Keep two fixed-window counters — the
+*current* window and the *previous* one — and weight the previous window by how
+much of it still overlaps the trailing window:
+
+```
+elapsed     = seconds into the current window           (0 .. window)
+prev_weight = (window - elapsed) / window               (1.0 -&gt; 0.0)
+estimated   = floor(prev_count * prev_weight) + curr_count
+admit if estimated + 1 &lt;= limit
+```
+
+Right after a boundary the previous window still counts almost fully, decaying
+to zero by the end of the current window — so a burst straddling the boundary is
+still counted against the limit. It is an O(1) approximation (it assumes the
+previous window&#x27;s traffic was evenly spread) and is exactly what production
+limiters such as Cloudflare&#x27;s use.
+
+### Why a Lua script — atomicity, and the lost-update race
+
+A rate-limit decision is a **read-modify-write**: read the count, decide, write
+the new count. If those are three separate Redis commands issued from Java, two
+app nodes (or two threads) can interleave:
+
+```
+limit = 100, current count = 99
+
+Node A: GET count        -&gt; 99
+Node B: GET count        -&gt; 99        (A hasn&#x27;t written yet)
+Node A: 99 &lt; 100 -&gt; allow, write 100
+Node B: 99 &lt; 100 -&gt; allow, write 100  (should have been 101 -&gt; DENY)
+```
+
+Both requests are admitted; the true total is 101. This is the classic
+**lost-update / check-then-act race**, and under real concurrency it lets clients
+silently blow past the limit. `INCR` alone fixes the *counter* but not the
+windowing/expiry logic, and &quot;INCR then decrement-if-over&quot; is itself another race.
+
+**Redis runs each Lua script atomically** — the script executes as a single unit
+on Redis&#x27;s single command-processing thread, and no other command from any
+client runs in the middle of it. So `read -&gt; decide -&gt; write` is indivisible.
+Because Redis is the single shared source of truth, this holds **across nodes**:
+every app instance ships the same script to the same Redis, and Redis serializes
+them. That is what makes it a correct *distributed* limiter. The
+`concurrentRequestsNeverExceedTheLimit` test proves it by hammering the limiter
+from 32 threads and asserting exactly `limit` are admitted.
+
+### Per-client keying
+
+The limit is enforced **per client**, keyed by the `X-Client-Id` header (in a
+real system: an authenticated user id, API key, or source IP). Keys are
+namespaced as `ratelimit:{clientId}:&lt;window-index&gt;`. The `{clientId}` hash tag
+keeps all of one client&#x27;s per-window keys on the same Redis Cluster slot, which
+`EVAL` requires (every `KEYS` entry must live on one node).
+
+---
+
+## Prerequisites
+
+- **Java 21** (LTS)
+- **Maven 3.9+**
+- **Docker** — required both for `mvn test` (Testcontainers starts a throwaway
+  Redis) and, optionally, for running a local Redis by hand.
+
+---
+
+## Run it
+
+### 1. Tests (uses Testcontainers — needs Docker, no manual Redis)
+
+```bash
+mvn test
+```
+
+Testcontainers pulls `redis:7-alpine`, starts an ephemeral container, points
+Spring Data Redis at its mapped port via `@DynamicPropertySource`, runs the
+suite, and tears the container down. **No manual Redis setup.**
+
+Expected output (abridged):
+
+```
+[INFO] --- surefire ... ---
+[INFO] Running com.javamastery.examples.ratelimiter.RateLimiterServiceIntegrationTest
+... Creating container for image: redis:7-alpine
+... Container redis:7-alpine started
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+### 2. Run the app manually + watch 429s
+
+Start a local Redis (either form):
+
+```bash
+docker run --rm -p 6379:6379 redis:7-alpine
+# or:  docker compose up -d
+```
+
+Run the app in another shell:
+
+```bash
+mvn spring-boot:run
+```
+
+The demo endpoint allows **5 requests per 10 seconds per client**. Fire a loop
+and watch the first 5 succeed (200) and the rest get throttled (429):
+
+```bash
+for i in $(seq 1 8); do
+  curl -s -o /dev/null -w &quot;%{http_code} &quot; -H &quot;X-Client-Id: alice&quot; http://localhost:8080/api/limited
+done
+echo
+```
+
+Expected:
+
+```
+200 200 200 200 200 429 429 429
+```
+
+Inspect the headers on a throttled response (note `Retry-After`):
+
+```bash
+curl -i -H &quot;X-Client-Id: alice&quot; http://localhost:8080/api/limited
+```
+
+```
+HTTP/1.1 429
+X-RateLimit-Limit: 5
+X-RateLimit-Remaining: 0
+Retry-After: 7
+Content-Type: application/json
+{&quot;error&quot;:&quot;rate_limit_exceeded&quot;,&quot;clientId&quot;:&quot;alice&quot;,&quot;retryAfterSeconds&quot;:7}
+```
+
+A *different* client is unaffected (per-client isolation):
+
+```bash
+curl -s -o /dev/null -w &quot;%{http_code}\n&quot; -H &quot;X-Client-Id: bob&quot; http://localhost:8080/api/limited
+# 200
+```
+
+---
+
+## Files to read first
+
+1. **`src/main/resources/scripts/rate_limit.lua`** — the heart of the example.
+   Heavily commented: the atomicity argument, the lost-update race, and the
+   sliding-window math all live here.
+2. **`RateLimiterService.java`** — the thin Java bridge that ships the decision
+   to Redis (`StringRedisTemplate.execute(script, keys, args...)`).
+3. **`RateLimiterConfig.java`** — loads the `.lua` file as a `DefaultRedisScript`
+   (EVALSHA caching).
+4. **`LimitedController.java`** — applies the limiter per `X-Client-Id` and
+   returns 429 + `Retry-After`.
+5. **`RateLimiterServiceIntegrationTest.java`** — the Testcontainers test,
+   including the concurrency/race proof.
+
+---
+
+## Scaling notes
+
+- **Single Redis = single source of truth, but also a SPOF and a hotspot.** All
+  nodes funnel their decisions through one Redis. For HA, run Redis with
+  replicas + Sentinel, or Redis Cluster. Note that Lua scripts run only on the
+  primary; replicas receive the *effects*, so a failover is safe but in-flight
+  scripts are not replicated mid-execution.
+- **Redis Cluster sharding.** With the `{clientId}` hash tag, each client&#x27;s keys
+  hash to one slot, so the load spreads across shards by client. A single very
+  hot client still hits one shard — for those, consider a local
+  in-process pre-filter (admit obviously-OK requests locally, only consult Redis
+  near the limit) or sharded sub-keys.
+- **Reduce round-trips.** This example does one Redis round-trip per request. At
+  very high QPS you can batch, or use a *local token bucket that is periodically
+  reconciled with Redis* (eventual-consistency trade-off: brief over-admission
+  during the reconcile interval).
+- **Clock skew.** The script takes `now` from the caller so it stays a pure,
+  replication-safe function of its inputs. Keep app clocks NTP-synced; modest
+  skew only nudges the sliding weight slightly and never breaks atomicity.
+- **Memory.** O(1) per client per active window (at most two integer keys), and
+  keys self-expire after `2 * window` seconds — no background cleanup needed.
+- **Tuning the algorithm.** Swap to **token bucket** if you want to *allow*
+  controlled bursts (e.g. a UI that fires several calls on page load) rather than
+  smoothing them; the same atomic-Lua pattern applies — only the script body
+  changes.
+```
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/system-designs--outbox-pattern.html"><div class="lbl">← Previous</div><div class="ttl">outbox-pattern</div><div class="sub">Transactional Outbox — reliable event publication without distributed transactions</div></a><a class="next" href="../examples/system-designs--saga-orchestrator.html"><div class="lbl">Next →</div><div class="ttl">saga-orchestrator</div><div class="sub">Saga Orchestrator (orchestration-based, with compensation)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-this-design" data-toc-link>Why this design</a></li><li class="lvl-3"><a href="#the-algorithm-sliding-window-counter" data-toc-link>The algorithm: sliding-window counter</a></li><li class="lvl-3"><a href="#why-a-lua-script-atomicity-and-the-lost-update-race" data-toc-link>Why a Lua script — atomicity, and the lost-update race</a></li><li class="lvl-3"><a href="#per-client-keying" data-toc-link>Per-client keying</a></li><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#run-it" data-toc-link>Run it</a></li><li class="lvl-3"><a href="#1-tests-uses-testcontainers-needs-docker-no-manual-redis" data-toc-link>1. Tests (uses Testcontainers — needs Docker, no manual Redis)</a></li><li class="lvl-3"><a href="#2-run-the-app-manually-watch-429s" data-toc-link>2. Run the app manually + watch 429s</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-2"><a href="#scaling-notes" data-toc-link>Scaling notes</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesratelimiterlimitedcontrollerjava" data-toc-link>src/main/java/com/javamastery/examples/ratelimiter/LimitedController.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesratelimiterratelimitresultjava" data-toc-link>src/main/java/com/javamastery/examples/ratelimiter/RateLimitResult.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterapplicationjava" data-toc-link>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterApplication.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterconfigjava" data-toc-link>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterConfig.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesratelimiterratelimiterservicejava" data-toc-link>src/main/java/com/javamastery/examples/ratelimiter/RateLimiterService.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesratelimiterratelimiterserviceintegrationtestjava" data-toc-link>src/test/java/com/javamastery/examples/ratelimiter/RateLimiterServiceIntegrationTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

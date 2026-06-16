@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Consolidated Java interview Q&A pulled from each L0–L5 module's Interview Prep section, grouped by experience level.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

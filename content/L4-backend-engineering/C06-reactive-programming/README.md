@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Backend Engineering — Reactive Programming
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -28,4 +28,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 06 | R2DBC (reactive database access) | `T06-r2dbc-reactive-database-access.md` | planned |
 | 07 | Reactive vs virtual threads (trade-offs) | `T07-reactive-vs-virtual-threads-trade-offs.md` | planned |
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

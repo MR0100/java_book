@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Load &amp; performance testing (JMeter, Gatling) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link active" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🏗</span><span>Ch. 6 · L4 — Backend Engineering</span></div><div class="chapter-path">content/L4-backend-engineering/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l4/overview.html" data-q="l4 — backend engineering content/l4-backend-engineering/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · spring framework content/l4-backend-engineering/c01-spring-framework/readme.md content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><summary><span class="caret">▶</span><span>C01 · Spring Framework</span></summary><ul class="pages"><li data-q="backend engineering — spring framework &amp; ecosystem content/l4-backend-engineering/c01-spring-framework/readme.md"><a class="" href="../l4/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="spring core: ioc container &amp; beans content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md"><a class="" href="../l4/c01-t01-spring-core-ioc-container-and-beans.html"><span>Spring Core: IoC Container &amp; Beans</span><span class="kind-pill "></span></a></li><li data-q="dependency injection (constructor / field / setter) content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md"><a class="" href="../l4/c01-t02-dependency-injection-constructor-field-setter.html"><span>Dependency Injection (constructor / field / setter)</span><span class="kind-pill "></span></a></li><li data-q="bean scopes &amp; lifecycle content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md"><a class="" href="../l4/c01-t03-bean-scopes-and-lifecycle.html"><span>Bean Scopes &amp; Lifecycle</span><span class="kind-pill "></span></a></li><li data-q="spring configuration (java / annotation / xml) content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md"><a class="" href="../l4/c01-t04-spring-configuration-java-annotation-xml.html"><span>Spring Configuration (Java / Annotation / XML)</span><span class="kind-pill "></span></a></li><li data-q="spring aop content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md"><a class="" href="../l4/c01-t05-spring-aop.html"><span>Spring AOP</span><span class="kind-pill "></span></a></li><li data-q="spring expression language (spel) content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md"><a class="" href="../l4/c01-t06-spring-expression-language-spel.html"><span>Spring Expression Language (SpEL)</span><span class="kind-pill "></span></a></li><li data-q="spring boot auto-configuration &amp; starters content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md"><a class="" href="../l4/c01-t07-spring-boot-auto-configuration-and-starters.html"><span>Spring Boot Auto-Configuration &amp; Starters</span><span class="kind-pill "></span></a></li><li data-q="spring boot properties &amp; profiles content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md"><a class="" href="../l4/c01-t08-spring-boot-properties-and-profiles.html"><span>Spring Boot Properties &amp; Profiles</span><span class="kind-pill "></span></a></li><li data-q="spring boot actuator content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md"><a class="" href="../l4/c01-t09-spring-boot-actuator.html"><span>Spring Boot Actuator</span><span class="kind-pill "></span></a></li><li data-q="spring mvc (rest controllers) content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md"><a class="" href="../l4/c01-t10-spring-mvc-rest-controllers.html"><span>Spring MVC (REST Controllers)</span><span class="kind-pill "></span></a></li><li data-q="validation (@valid, bean validation) content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md"><a class="" href="../l4/c01-t11-validation-valid-bean-validation.html"><span>Validation (@Valid, Bean Validation)</span><span class="kind-pill "></span></a></li><li data-q="exception handling (@controlleradvice) content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md"><a class="" href="../l4/c01-t12-exception-handling-controlleradvice.html"><span>Exception Handling (@ControllerAdvice)</span><span class="kind-pill "></span></a></li><li data-q="spring data content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md"><a class="" href="../l4/c01-t13-spring-data.html"><span>Spring Data</span><span class="kind-pill "></span></a></li><li data-q="spring security (authentication &amp; authorization) content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md"><a class="" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><span>Spring Security (authentication &amp; authorization)</span><span class="kind-pill "></span></a></li><li data-q="oauth2 / openid connect / jwt with spring security content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md"><a class="" href="../l4/c01-t15-oauth2-openid-connect-jwt-with-spring-security.html"><span>OAuth2 / OpenID Connect / JWT with Spring Security</span><span class="kind-pill "></span></a></li><li data-q="method-level security content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md"><a class="" href="../l4/c01-t16-method-level-security.html"><span>Method-Level Security</span><span class="kind-pill "></span></a></li><li data-q="spring webflux (reactive) content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md"><a class="" href="../l4/c01-t17-spring-webflux-reactive.html"><span>Spring WebFlux (reactive)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud (config, gateway, eureka, openfeign) content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md"><a class="" href="../l4/c01-t18-spring-cloud-config-gateway-eureka-openfeign.html"><span>Spring Cloud (Config, Gateway, Eureka, OpenFeign)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud resilience (resilience4j) content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md"><a class="" href="../l4/c01-t19-spring-cloud-resilience-resilience4j.html"><span>Spring Cloud Resilience (Resilience4j)</span><span class="kind-pill "></span></a></li><li data-q="spring batch content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md"><a class="" href="../l4/c01-t20-spring-batch.html"><span>Spring Batch</span><span class="kind-pill "></span></a></li><li data-q="spring integration content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md"><a class="" href="../l4/c01-t21-spring-integration.html"><span>Spring Integration</span><span class="kind-pill "></span></a></li><li data-q="spring for kafka / amqp content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md"><a class="" href="../l4/c01-t22-spring-for-kafka-amqp.html"><span>Spring for Kafka / AMQP</span><span class="kind-pill "></span></a></li><li data-q="spring session content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md"><a class="" href="../l4/c01-t23-spring-session.html"><span>Spring Session</span><span class="kind-pill "></span></a></li><li data-q="spring testing content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md"><a class="" href="../l4/c01-t24-spring-testing.html"><span>Spring Testing</span><span class="kind-pill "></span></a></li><li data-q="spring native / graalvm content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md"><a class="" href="../l4/c01-t25-spring-native-graalvm.html"><span>Spring Native / GraalVM</span><span class="kind-pill "></span></a></li><li data-q="spring boot 4 &amp; spring framework 7 content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><a class="" href="../l4/c01-t26-spring-boot-4-and-spring-framework-7.html"><span>Spring Boot 4 &amp; Spring Framework 7</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · persistence jpa hibernate content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><summary><span class="caret">▶</span><span>C02 · Persistence JPA Hibernate</span></summary><ul class="pages"><li data-q="backend engineering — persistence — jpa / hibernate / orm content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md"><a class="" href="../l4/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="orm concepts &amp; the impedance mismatch content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md"><a class="" href="../l4/c02-t01-orm-concepts-and-the-impedance-mismatch.html"><span>ORM concepts &amp; the impedance mismatch</span><span class="kind-pill "></span></a></li><li data-q="jpa fundamentals (entities, entitymanager) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md"><a class="" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><span>JPA fundamentals (entities, EntityManager)</span><span class="kind-pill "></span></a></li><li data-q="entity mappings &amp; relationships (@onetomany, etc.) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md"><a class="" href="../l4/c02-t03-entity-mappings-and-relationships-onetomany-etc.html"><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span><span class="kind-pill "></span></a></li><li data-q="hibernate architecture content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md"><a class="" href="../l4/c02-t04-hibernate-architecture.html"><span>Hibernate architecture</span><span class="kind-pill "></span></a></li><li data-q="persistence context &amp; entity lifecycle content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md"><a class="" href="../l4/c02-t05-persistence-context-and-entity-lifecycle.html"><span>Persistence context &amp; entity lifecycle</span><span class="kind-pill "></span></a></li><li data-q="lazy vs eager loading content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md"><a class="" href="../l4/c02-t06-lazy-vs-eager-loading.html"><span>Lazy vs eager loading</span><span class="kind-pill "></span></a></li><li data-q="the n+1 problem &amp; fixes content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md"><a class="" href="../l4/c02-t07-the-n-plus-1-problem-and-fixes.html"><span>The N+1 problem &amp; fixes</span><span class="kind-pill "></span></a></li><li data-q="jpql &amp; criteria api content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md"><a class="" href="../l4/c02-t08-jpql-and-criteria-api.html"><span>JPQL &amp; Criteria API</span><span class="kind-pill "></span></a></li><li data-q="querydsl content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md"><a class="" href="../l4/c02-t09-querydsl.html"><span>QueryDSL</span><span class="kind-pill "></span></a></li><li data-q="native queries content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md"><a class="" href="../l4/c02-t10-native-queries.html"><span>Native queries</span><span class="kind-pill "></span></a></li><li data-q="caching (first/second level) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md"><a class="" href="../l4/c02-t11-caching-first-second-level.html"><span>Caching (first/second level)</span><span class="kind-pill "></span></a></li><li data-q="transactions with jpa content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md"><a class="" href="../l4/c02-t12-transactions-with-jpa.html"><span>Transactions with JPA</span><span class="kind-pill "></span></a></li><li data-q="optimistic vs pessimistic locking content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md"><a class="" href="../l4/c02-t13-optimistic-vs-pessimistic-locking.html"><span>Optimistic vs pessimistic locking</span><span class="kind-pill "></span></a></li><li data-q="spring data jpa repositories content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md"><a class="" href="../l4/c02-t14-spring-data-jpa-repositories.html"><span>Spring Data JPA repositories</span><span class="kind-pill "></span></a></li><li data-q="projections &amp; dto mapping content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md"><a class="" href="../l4/c02-t15-projections-and-dto-mapping.html"><span>Projections &amp; DTO mapping</span><span class="kind-pill "></span></a></li><li data-q="auditing content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><a class="" href="../l4/c02-t16-auditing.html"><span>Auditing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · databases advanced content/l4-backend-engineering/c03-databases-advanced/readme.md content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><summary><span class="caret">▶</span><span>C03 · Databases Advanced</span></summary><ul class="pages"><li data-q="backend engineering — databases — advanced content/l4-backend-engineering/c03-databases-advanced/readme.md"><a class="" href="../l4/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="indexing &amp; index types content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md"><a class="" href="../l4/c03-t01-indexing-and-index-types.html"><span>Indexing &amp; index types</span><span class="kind-pill "></span></a></li><li data-q="query optimization &amp; execution plans content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md"><a class="" href="../l4/c03-t02-query-optimization-and-execution-plans.html"><span>Query optimization &amp; execution plans</span><span class="kind-pill "></span></a></li><li data-q="database migrations (flyway, liquibase) content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md"><a class="" href="../l4/c03-t03-database-migrations-flyway-liquibase.html"><span>Database migrations (Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="replication &amp; read replicas content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md"><a class="" href="../l4/c03-t04-replication-and-read-replicas.html"><span>Replication &amp; read replicas</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; sharding content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md"><a class="" href="../l4/c03-t05-partitioning-and-sharding.html"><span>Partitioning &amp; sharding</span><span class="kind-pill "></span></a></li><li data-q="change data capture (debezium) content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><a class="" href="../l4/c03-t06-change-data-capture-debezium.html"><span>Change Data Capture (Debezium)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · nosql and caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><summary><span class="caret">▶</span><span>C04 · Nosql And Caching</span></summary><ul class="pages"><li data-q="backend engineering — nosql &amp; caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md"><a class="" href="../l4/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use nosql vs sql content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md"><a class="" href="../l4/c04-t01-when-to-use-nosql-vs-sql.html"><span>When to use NoSQL vs SQL</span><span class="kind-pill "></span></a></li><li data-q="document stores (mongodb) content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md"><a class="" href="../l4/c04-t02-document-stores-mongodb.html"><span>Document stores (MongoDB)</span><span class="kind-pill "></span></a></li><li data-q="key-value stores (redis) content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md"><a class="" href="../l4/c04-t03-key-value-stores-redis.html"><span>Key-value stores (Redis)</span><span class="kind-pill "></span></a></li><li data-q="wide-column stores (cassandra) content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md"><a class="" href="../l4/c04-t04-wide-column-stores-cassandra.html"><span>Wide-column stores (Cassandra)</span><span class="kind-pill "></span></a></li><li data-q="search engines (elasticsearch / opensearch) content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md"><a class="" href="../l4/c04-t05-search-engines-elasticsearch-opensearch.html"><span>Search engines (Elasticsearch / OpenSearch)</span><span class="kind-pill "></span></a></li><li data-q="graph databases (intro) content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md"><a class="" href="../l4/c04-t06-graph-databases-intro.html"><span>Graph databases (intro)</span><span class="kind-pill "></span></a></li><li data-q="spring data for nosql content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md"><a class="" href="../l4/c04-t07-spring-data-for-nosql.html"><span>Spring Data for NoSQL</span><span class="kind-pill "></span></a></li><li data-q="caching concepts (cache-aside, write-through, write-behind) content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md"><a class="" href="../l4/c04-t08-caching-concepts-cache-aside-write-through-write-behind.html"><span>Caching concepts (cache-aside, write-through, write-behind)</span><span class="kind-pill "></span></a></li><li data-q="local caching (caffeine) content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md"><a class="" href="../l4/c04-t09-local-caching-caffeine.html"><span>Local caching (Caffeine)</span><span class="kind-pill "></span></a></li><li data-q="distributed caching (redis) content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md"><a class="" href="../l4/c04-t10-distributed-caching-redis.html"><span>Distributed caching (Redis)</span><span class="kind-pill "></span></a></li><li data-q="cache invalidation &amp; ttls content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md"><a class="" href="../l4/c04-t11-cache-invalidation-and-ttls.html"><span>Cache invalidation &amp; TTLs</span><span class="kind-pill "></span></a></li><li data-q="cdn caching content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><a class="" href="../l4/c04-t12-cdn-caching.html"><span>CDN caching</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · apis advanced content/l4-backend-engineering/c05-apis-advanced/readme.md content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><summary><span class="caret">▶</span><span>C05 · APIs Advanced</span></summary><ul class="pages"><li data-q="backend engineering — apis — advanced content/l4-backend-engineering/c05-apis-advanced/readme.md"><a class="" href="../l4/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http/2 &amp; http/3 content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md"><a class="" href="../l4/c05-t01-http-2-and-http-3.html"><span>HTTP/2 &amp; HTTP/3</span><span class="kind-pill "></span></a></li><li data-q="richardson maturity model &amp; hateoas content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md"><a class="" href="../l4/c05-t02-richardson-maturity-model-and-hateoas.html"><span>Richardson Maturity Model &amp; HATEOAS</span><span class="kind-pill "></span></a></li><li data-q="idempotency in apis content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md"><a class="" href="../l4/c05-t03-idempotency-in-apis.html"><span>Idempotency in APIs</span><span class="kind-pill "></span></a></li><li data-q="openapi / swagger documentation content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md"><a class="" href="../l4/c05-t04-openapi-swagger-documentation.html"><span>OpenAPI / Swagger documentation</span><span class="kind-pill "></span></a></li><li data-q="graphql content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md"><a class="" href="../l4/c05-t05-graphql.html"><span>GraphQL</span><span class="kind-pill "></span></a></li><li data-q="grpc &amp; protocol buffers content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md"><a class="" href="../l4/c05-t06-grpc-and-protocol-buffers.html"><span>gRPC &amp; Protocol Buffers</span><span class="kind-pill "></span></a></li><li data-q="websockets content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md"><a class="" href="../l4/c05-t07-websockets.html"><span>WebSockets</span><span class="kind-pill "></span></a></li><li data-q="server-sent events (sse) content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md"><a class="" href="../l4/c05-t08-server-sent-events-sse.html"><span>Server-Sent Events (SSE)</span><span class="kind-pill "></span></a></li><li data-q="webhooks content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md"><a class="" href="../l4/c05-t09-webhooks.html"><span>Webhooks</span><span class="kind-pill "></span></a></li><li data-q="rate limiting &amp; throttling content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md"><a class="" href="../l4/c05-t10-rate-limiting-and-throttling.html"><span>Rate limiting &amp; throttling</span><span class="kind-pill "></span></a></li><li data-q="bff (backend for frontend) content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><a class="" href="../l4/c05-t11-bff-backend-for-frontend.html"><span>BFF (Backend for Frontend)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><summary><span class="caret">▶</span><span>C06 · Reactive Programming</span></summary><ul class="pages"><li data-q="backend engineering — reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md"><a class="" href="../l4/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="reactive principles &amp; the reactive streams spec content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md"><a class="" href="../l4/c06-t01-reactive-principles-and-the-reactive-streams-spec.html"><span>Reactive principles &amp; the Reactive Streams spec</span><span class="kind-pill "></span></a></li><li data-q="project reactor (mono / flux) content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md"><a class="" href="../l4/c06-t02-project-reactor-mono-flux.html"><span>Project Reactor (Mono / Flux)</span><span class="kind-pill "></span></a></li><li data-q="rxjava (alternative) content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md"><a class="" href="../l4/c06-t03-rxjava-alternative.html"><span>RxJava (alternative)</span><span class="kind-pill "></span></a></li><li data-q="backpressure content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md"><a class="" href="../l4/c06-t04-backpressure.html"><span>Backpressure</span><span class="kind-pill "></span></a></li><li data-q="spring webflux content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md"><a class="" href="../l4/c06-t05-spring-webflux.html"><span>Spring WebFlux</span><span class="kind-pill "></span></a></li><li data-q="r2dbc (reactive database access) content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md"><a class="" href="../l4/c06-t06-r2dbc-reactive-database-access.html"><span>R2DBC (reactive database access)</span><span class="kind-pill "></span></a></li><li data-q="reactive vs virtual threads (trade-offs) content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><a class="" href="../l4/c06-t07-reactive-vs-virtual-threads-trade-offs.html"><span>Reactive vs virtual threads (trade-offs)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · messaging and streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><summary><span class="caret">▶</span><span>C07 · Messaging And Streaming</span></summary><ul class="pages"><li data-q="backend engineering — messaging &amp; event streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md"><a class="" href="../l4/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="messaging concepts (queues, topics, pub/sub) content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md"><a class="" href="../l4/c07-t01-messaging-concepts-queues-topics-pub-sub.html"><span>Messaging concepts (queues, topics, pub/sub)</span><span class="kind-pill "></span></a></li><li data-q="jms &amp; activemq content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md"><a class="" href="../l4/c07-t02-jms-and-activemq.html"><span>JMS &amp; ActiveMQ</span><span class="kind-pill "></span></a></li><li data-q="rabbitmq (amqp) content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md"><a class="" href="../l4/c07-t03-rabbitmq-amqp.html"><span>RabbitMQ (AMQP)</span><span class="kind-pill "></span></a></li><li data-q="apache kafka fundamentals content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md"><a class="" href="../l4/c07-t04-apache-kafka-fundamentals.html"><span>Apache Kafka fundamentals</span><span class="kind-pill "></span></a></li><li data-q="kafka deep (partitions, consumer groups, offsets) content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md"><a class="" href="../l4/c07-t05-kafka-deep-partitions-consumer-groups-offsets.html"><span>Kafka deep (partitions, consumer groups, offsets)</span><span class="kind-pill "></span></a></li><li data-q="kafka streams content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md"><a class="" href="../l4/c07-t06-kafka-streams.html"><span>Kafka Streams</span><span class="kind-pill "></span></a></li><li data-q="event-driven architecture content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md"><a class="" href="../l4/c07-t07-event-driven-architecture.html"><span>Event-driven architecture</span><span class="kind-pill "></span></a></li><li data-q="async processing patterns content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md"><a class="" href="../l4/c07-t08-async-processing-patterns.html"><span>Async processing patterns</span><span class="kind-pill "></span></a></li><li data-q="outbox pattern &amp; exactly-once content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md"><a class="" href="../l4/c07-t09-outbox-pattern-and-exactly-once.html"><span>Outbox pattern &amp; exactly-once</span><span class="kind-pill "></span></a></li><li data-q="dead-letter queues &amp; retries content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md"><a class="" href="../l4/c07-t10-dead-letter-queues-and-retries.html"><span>Dead-letter queues &amp; retries</span><span class="kind-pill "></span></a></li><li data-q="stream processing (flink, intro) content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><a class="" href="../l4/c07-t11-stream-processing-flink-intro.html"><span>Stream processing (Flink, intro)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · security content/l4-backend-engineering/c08-security/readme.md content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md content/l4-backend-engineering/c08-security/t06-owasp-top-10.md content/l4-backend-engineering/c08-security/t07-sql-injection.md content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md content/l4-backend-engineering/c08-security/t11-tls-in-practice.md content/l4-backend-engineering/c08-security/t12-secrets-management.md content/l4-backend-engineering/c08-security/t13-security-headers.md content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><summary><span class="caret">▶</span><span>C08 · Security</span></summary><ul class="pages"><li data-q="backend engineering — security content/l4-backend-engineering/c08-security/readme.md"><a class="" href="../l4/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="authentication vs authorization content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md"><a class="" href="../l4/c08-t01-authentication-vs-authorization.html"><span>Authentication vs authorization</span><span class="kind-pill "></span></a></li><li data-q="sessions vs tokens content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md"><a class="" href="../l4/c08-t02-sessions-vs-tokens.html"><span>Sessions vs tokens</span><span class="kind-pill "></span></a></li><li data-q="oauth2 &amp; openid connect content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md"><a class="" href="../l4/c08-t03-oauth2-and-openid-connect.html"><span>OAuth2 &amp; OpenID Connect</span><span class="kind-pill "></span></a></li><li data-q="jwt (structure, validation, pitfalls) content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md"><a class="" href="../l4/c08-t04-jwt-structure-validation-pitfalls.html"><span>JWT (structure, validation, pitfalls)</span><span class="kind-pill "></span></a></li><li data-q="password storage (bcrypt, argon2) content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md"><a class="" href="../l4/c08-t05-password-storage-bcrypt-argon2.html"><span>Password storage (bcrypt, Argon2)</span><span class="kind-pill "></span></a></li><li data-q="owasp top 10 content/l4-backend-engineering/c08-security/t06-owasp-top-10.md"><a class="" href="../l4/c08-t06-owasp-top-10.html"><span>OWASP Top 10</span><span class="kind-pill "></span></a></li><li data-q="sql injection content/l4-backend-engineering/c08-security/t07-sql-injection.md"><a class="" href="../l4/c08-t07-sql-injection.html"><span>SQL injection</span><span class="kind-pill "></span></a></li><li data-q="xss &amp; csrf content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md"><a class="" href="../l4/c08-t08-xss-and-csrf.html"><span>XSS &amp; CSRF</span><span class="kind-pill "></span></a></li><li data-q="cors &amp; cross-origin requests content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md"><a class="" href="../l4/c08-t09-cors-and-cross-origin-requests.html"><span>CORS &amp; cross-origin requests</span><span class="kind-pill "></span></a></li><li data-q="encryption (symmetric/asymmetric, hashing) content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md"><a class="" href="../l4/c08-t10-encryption-symmetric-asymmetric-hashing.html"><span>Encryption (symmetric/asymmetric, hashing)</span><span class="kind-pill "></span></a></li><li data-q="tls in practice content/l4-backend-engineering/c08-security/t11-tls-in-practice.md"><a class="" href="../l4/c08-t11-tls-in-practice.html"><span>TLS in practice</span><span class="kind-pill "></span></a></li><li data-q="secrets management content/l4-backend-engineering/c08-security/t12-secrets-management.md"><a class="" href="../l4/c08-t12-secrets-management.html"><span>Secrets management</span><span class="kind-pill "></span></a></li><li data-q="security headers content/l4-backend-engineering/c08-security/t13-security-headers.md"><a class="" href="../l4/c08-t13-security-headers.html"><span>Security headers</span><span class="kind-pill "></span></a></li><li data-q="api security best practices content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md"><a class="" href="../l4/c08-t14-api-security-best-practices.html"><span>API security best practices</span><span class="kind-pill "></span></a></li><li data-q="dependency &amp; supply-chain security content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md"><a class="" href="../l4/c08-t15-dependency-and-supply-chain-security.html"><span>Dependency &amp; supply-chain security</span><span class="kind-pill "></span></a></li><li data-q="security architecture &amp; zero trust (intro) content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md"><a class="" href="../l4/c08-t16-security-architecture-and-zero-trust-intro.html"><span>Security architecture &amp; zero trust (intro)</span><span class="kind-pill "></span></a></li><li data-q="jvm-specific cves: log4shell, spring4shell &amp; the anatomy of java vulnerabilities content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md"><a class="" href="../l4/c08-t17-jvm-specific-cves-log4shell-spring4shell.html"><span>JVM-Specific CVEs: Log4Shell, Spring4Shell &amp; the Anatomy of Java Vulnerabilities</span><span class="kind-pill "></span></a></li><li data-q="modern authentication: oauth 2.1, fido2, webauthn &amp; passkeys content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md"><a class="" href="../l4/c08-t18-modern-auth-oauth21-fido2-webauthn-passkeys.html"><span>Modern Authentication: OAuth 2.1, FIDO2, WebAuthn &amp; Passkeys</span><span class="kind-pill "></span></a></li><li data-q="container security: distroless, wolfi, image signing &amp; runtime hardening content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><a class="" href="../l4/c08-t19-container-security-distroless-wolfi-image-signing.html"><span>Container Security: Distroless, Wolfi, Image Signing &amp; Runtime Hardening</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c09 · testing advanced content/l4-backend-engineering/c09-testing-advanced/readme.md content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><summary><span class="caret">▶</span><span>C09 · Testing Advanced</span></summary><ul class="pages"><li data-q="backend engineering — testing — advanced content/l4-backend-engineering/c09-testing-advanced/readme.md"><a class="" href="../l4/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="integration testing content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md"><a class="" href="../l4/c09-t01-integration-testing.html"><span>Integration testing</span><span class="kind-pill "></span></a></li><li data-q="spring boot test slices content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md"><a class="" href="../l4/c09-t02-spring-boot-test-slices.html"><span>Spring Boot test slices</span><span class="kind-pill "></span></a></li><li data-q="testcontainers content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md"><a class="" href="../l4/c09-t03-testcontainers.html"><span>Testcontainers</span><span class="kind-pill "></span></a></li><li data-q="behavior-driven development (bdd, cucumber) content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md"><a class="" href="../l4/c09-t04-behavior-driven-development-bdd-cucumber.html"><span>Behavior-Driven Development (BDD, Cucumber)</span><span class="kind-pill "></span></a></li><li data-q="contract testing (spring cloud contract, pact) content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md"><a class="" href="../l4/c09-t05-contract-testing-spring-cloud-contract-pact.html"><span>Contract testing (Spring Cloud Contract, Pact)</span><span class="kind-pill "></span></a></li><li data-q="mutation testing (pit) content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md"><a class="" href="../l4/c09-t06-mutation-testing-pit.html"><span>Mutation testing (PIT)</span><span class="kind-pill "></span></a></li><li data-q="load &amp; performance testing (jmeter, gatling) content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md"><a class="active" href="../l4/c09-t07-load-and-performance-testing-jmeter-gatling.html"><span>Load &amp; performance testing (JMeter, Gatling)</span><span class="kind-pill "></span></a></li><li data-q="the test pyramid &amp; testing strategy content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><a class="" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><span>The test pyramid &amp; testing strategy</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · devops and observability content/l4-backend-engineering/c10-devops-and-observability/readme.md content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><summary><span class="caret">▶</span><span>C10 · Devops And Observability</span></summary><ul class="pages"><li data-q="backend engineering — devops, cloud &amp; observability content/l4-backend-engineering/c10-devops-and-observability/readme.md"><a class="" href="../l4/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="docker &amp; containerization for java content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md"><a class="" href="../l4/c10-t01-docker-and-containerization-for-java.html"><span>Docker &amp; containerization for Java</span><span class="kind-pill "></span></a></li><li data-q="dockerfile best practices for java apps content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md"><a class="" href="../l4/c10-t02-dockerfile-best-practices-for-java-apps.html"><span>Dockerfile best practices for Java apps</span><span class="kind-pill "></span></a></li><li data-q="kubernetes basics content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md"><a class="" href="../l4/c10-t03-kubernetes-basics.html"><span>Kubernetes basics</span><span class="kind-pill "></span></a></li><li data-q="ci/cd concepts content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md"><a class="" href="../l4/c10-t04-ci-cd-concepts.html"><span>CI/CD concepts</span><span class="kind-pill "></span></a></li><li data-q="ci/cd tools (github actions, jenkins, gitlab ci) content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md"><a class="" href="../l4/c10-t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.html"><span>CI/CD tools (GitHub Actions, Jenkins, GitLab CI)</span><span class="kind-pill "></span></a></li><li data-q="deployment strategies (blue-green, canary, rolling) content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md"><a class="" href="../l4/c10-t06-deployment-strategies-blue-green-canary-rolling.html"><span>Deployment strategies (blue-green, canary, rolling)</span><span class="kind-pill "></span></a></li><li data-q="cloud basics for java devs (aws/gcp/azure) content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md"><a class="" href="../l4/c10-t07-cloud-basics-for-java-devs-aws-gcp-azure.html"><span>Cloud basics for Java devs (AWS/GCP/Azure)</span><span class="kind-pill "></span></a></li><li data-q="infrastructure as code (terraform, intro) content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md"><a class="" href="../l4/c10-t08-infrastructure-as-code-terraform-intro.html"><span>Infrastructure as Code (Terraform, intro)</span><span class="kind-pill "></span></a></li><li data-q="configuration and secrets management content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md"><a class="" href="../l4/c10-t09-configuration-and-secrets-management.html"><span>Configuration and secrets management</span><span class="kind-pill "></span></a></li><li data-q="feature flags content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md"><a class="" href="../l4/c10-t10-feature-flags.html"><span>Feature flags</span><span class="kind-pill "></span></a></li><li data-q="logging (slf4j, logback, log4j2, elk) content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md"><a class="" href="../l4/c10-t11-logging-slf4j-logback-log4j2-elk.html"><span>Logging (SLF4J, Logback, Log4j2, ELK)</span><span class="kind-pill "></span></a></li><li data-q="metrics (micrometer, prometheus, grafana) content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md"><a class="" href="../l4/c10-t12-metrics-micrometer-prometheus-grafana.html"><span>Metrics (Micrometer, Prometheus, Grafana)</span><span class="kind-pill "></span></a></li><li data-q="distributed tracing (opentelemetry, jaeger, zipkin) content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md"><a class="" href="../l4/c10-t13-distributed-tracing-opentelemetry-jaeger-zipkin.html"><span>Distributed tracing (OpenTelemetry, Jaeger, Zipkin)</span><span class="kind-pill "></span></a></li><li data-q="health checks and readiness/liveness probes content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md"><a class="" href="../l4/c10-t14-health-checks-and-readiness-liveness-probes.html"><span>Health checks and readiness/liveness probes</span><span class="kind-pill "></span></a></li><li data-q="monitoring and alerting content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md"><a class="" href="../l4/c10-t15-monitoring-and-alerting.html"><span>Monitoring and alerting</span><span class="kind-pill "></span></a></li><li data-q="sre concepts (error budgets, toil) content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md"><a class="" href="../l4/c10-t16-sre-concepts-error-budgets-toil.html"><span>SRE concepts (error budgets, toil)</span><span class="kind-pill "></span></a></li><li data-q="serverless java: aws lambda, snapstart &amp; cold starts content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md"><a class="" href="../l4/c10-t17-serverless-java-lambda-snapstart.html"><span>Serverless Java: AWS Lambda, SnapStart &amp; Cold Starts</span><span class="kind-pill "></span></a></li><li data-q="edge computing with java: workers, lambda@edge &amp; the network edge content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md"><a class="" href="../l4/c10-t18-edge-computing-java.html"><span>Edge Computing with Java: Workers, Lambda@Edge &amp; the Network Edge</span><span class="kind-pill "></span></a></li><li data-q="multi-runtime microservices with dapr content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md"><a class="" href="../l4/c10-t19-multi-runtime-dapr.html"><span>Multi-Runtime Microservices with Dapr</span><span class="kind-pill "></span></a></li><li data-q="ebpf &amp; continuous production profiling content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><a class="" href="../l4/c10-t20-ebpf-and-continuous-production-profiling.html"><span>eBPF &amp; Continuous Production Profiling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · tools and environment content/l4-backend-engineering/c11-tools-and-environment/readme.md content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><summary><span class="caret">▶</span><span>C11 · Tools And Environment</span></summary><ul class="pages"><li data-q="backend engineering — tools &amp; environment content/l4-backend-engineering/c11-tools-and-environment/readme.md"><a class="" href="../l4/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for backend engineering content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><a class="" href="../l4/c11-t01-tools-for-backend-engineering.html"><span>Tools for Backend Engineering</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · hands on content/l4-backend-engineering/c12-hands-on/readme.md content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><summary><span class="caret">▶</span><span>C12 · Hands On</span></summary><ul class="pages"><li data-q="backend engineering — hands-on content/l4-backend-engineering/c12-hands-on/readme.md"><a class="" href="../l4/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 level project: production-grade rest service content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><a class="" href="../l4/c12-t01-level-project-production-grade-rest-service.html"><span>L4 Level Project: Production-Grade REST Service</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · best practices content/l4-backend-engineering/c13-best-practices/readme.md content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><summary><span class="caret">▶</span><span>C13 · Best Practices</span></summary><ul class="pages"><li data-q="backend engineering — best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/readme.md"><a class="" href="../l4/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><a class="" href="../l4/c13-t01-best-practices-and-pitfalls-l4.html"><span>L4 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · interview prep content/l4-backend-engineering/c14-interview-prep/readme.md content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><summary><span class="caret">▶</span><span>C14 · Interview Prep</span></summary><ul class="pages"><li data-q="backend engineering — interview prep content/l4-backend-engineering/c14-interview-prep/readme.md"><a class="" href="../l4/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: senior backend engineer content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><a class="" href="../l4/c14-t01-interview-prep-senior-backend.html"><span>Interview Prep: Senior Backend Engineer</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c15 · qa faq content/l4-backend-engineering/c15-qa-faq/readme.md content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><summary><span class="caret">▶</span><span>C15 · QA FAQ</span></summary><ul class="pages"><li data-q="backend engineering — q&amp;a / faq content/l4-backend-engineering/c15-qa-faq/readme.md"><a class="" href="../l4/c15-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 q&amp;a and faq content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><a class="" href="../l4/c15-t01-l4-qa.html"><span>L4 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c16 · cheatsheets content/l4-backend-engineering/c16-cheatsheets/readme.md content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><summary><span class="caret">▶</span><span>C16 · Cheatsheets</span></summary><ul class="pages"><li data-q="backend engineering — cheatsheets &amp; reference content/l4-backend-engineering/c16-cheatsheets/readme.md"><a class="" href="../l4/c16-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 cheatsheets content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><a class="" href="../l4/c16-t01-l4-cheatsheets.html"><span>L4 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c17 · resources content/l4-backend-engineering/c17-resources/readme.md content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><summary><span class="caret">▶</span><span>C17 · Resources</span></summary><ul class="pages"><li data-q="backend engineering — resources content/l4-backend-engineering/c17-resources/readme.md"><a class="" href="../l4/c17-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 resources content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><a class="" href="../l4/c17-t01-l4-resources.html"><span>L4 Resources</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c18 · ai llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><summary><span class="caret">▶</span><span>C18 · Ai Llm Integration</span></summary><ul class="pages"><li data-q="ai/llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md"><a class="" href="../l4/c18-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="llm api fundamentals — openai, anthropic, local models content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md"><a class="" href="../l4/c18-t01-llm-api-fundamentals.html"><span>LLM API Fundamentals — OpenAI, Anthropic, Local Models</span><span class="kind-pill "></span></a></li><li data-q="langchain4j framework — java&#x27;s leading llm framework content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md"><a class="" href="../l4/c18-t02-langchain4j-framework.html"><span>LangChain4j Framework — Java&#x27;s Leading LLM Framework</span><span class="kind-pill "></span></a></li><li data-q="spring ai framework — spring&#x27;s official llm abstraction content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md"><a class="" href="../l4/c18-t03-spring-ai-framework.html"><span>Spring AI Framework — Spring&#x27;s Official LLM Abstraction</span><span class="kind-pill "></span></a></li><li data-q="prompt engineering for backend engineers — practical patterns content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md"><a class="" href="../l4/c18-t04-prompt-engineering-for-backend-engineers.html"><span>Prompt Engineering for Backend Engineers — Practical Patterns</span><span class="kind-pill "></span></a></li><li data-q="rag patterns — retrieval-augmented generation content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md"><a class="" href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html"><span>RAG Patterns — Retrieval-Augmented Generation</span><span class="kind-pill "></span></a></li><li data-q="vector databases — pinecone, weaviate, pgvector, qdrant content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md"><a class="" href="../l4/c18-t06-vector-databases-pinecone-weaviate-pgvector-qdrant.html"><span>Vector Databases — Pinecone, Weaviate, pgvector, Qdrant</span><span class="kind-pill "></span></a></li><li data-q="embedding generation &amp; storage — production pipelines content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md"><a class="" href="../l4/c18-t07-embedding-generation-and-storage.html"><span>Embedding Generation &amp; Storage — Production Pipelines</span><span class="kind-pill "></span></a></li><li data-q="ai agents with tools / function calling — multi-step workflows content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md"><a class="" href="../l4/c18-t08-ai-agents-with-tools-function-calling.html"><span>AI Agents with Tools / Function Calling — Multi-Step Workflows</span><span class="kind-pill "></span></a></li><li data-q="streaming llm responses — sse and websocket content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md"><a class="" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><span>Streaming LLM Responses — SSE and WebSocket</span><span class="kind-pill "></span></a></li><li data-q="ai observability &amp; cost tracking — opentelemetry, token accounting content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><a class="" href="../l4/c18-t10-ai-observability-and-cost-tracking.html"><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l4/index.html">L4 — Backend Engineering</a><span class="sep">/</span><span>Load &amp; performance testing (JMeter, Gatling)</span></div>
+        <h1>Load &amp; performance testing (JMeter, Gatling)</h1>
+        <div><span class="source-path">content/L4-backend-engineering/C09-testing-advanced/T07-load-and-performance-testing-jmeter-gatling.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~50 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Load &amp; performance testing (JMeter, Gatling)"
+slug: load-and-performance-testing-jmeter-gatling
+level: L4
+module: "Backend Engineering"
+section: "Testing — Advanced"
+type: concept
+difficulty: senior
+order: 7
+tags: [load-testing, performance-testing, jmeter, gatling, k6, stress-testing, soak-test, spike-test, throughput, latency, percentile, slo, capacity-planning, async-http, profiling]
+prerequisites: []
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="load-performance-testing-jmeter-gatling">Load &amp; performance testing (JMeter, Gatling)</h1>
+<p>Functional tests answer "does it work?". Load and performance tests answer "does it work at the scale and speed users actually demand?" — questions that no unit test will surface and that production will eventually answer in painful ways if you don't. The dominant tools for the JVM ecosystem are Apache JMeter (1998, GUI-driven, still ubiquitous), Gatling (2012, Scala/Java DSL, async-IO, code-as-config), and k6 (2017, Go-based, JavaScript scripting, increasingly popular). Senior engineers know how to design realistic load scenarios, what metrics to capture, how to interpret percentile distributions, and how to translate results into capacity-planning decisions.</p>
+<p>This topic covers test types (load, stress, soak, spike), JMeter's plan structure, Gatling's DSL, k6 briefly, metrics (RPS, latency percentiles, error rate), the testing environment trap (load testing the wrong env), and how performance tests integrate into CI without slowing every build.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: basic HTTP and Spring Boot familiarity.</p></div></div>
+<h2 id="categories-of-performance-tests">Categories Of Performance Tests<a class="anchor" href="#categories-of-performance-tests" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Goal</th>
+<th>Duration</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Load</strong></td>
+<td>Verify perf at expected load</td>
+<td>10-60 min</td>
+<td>Steady RPS at target</td>
+</tr>
+<tr>
+<td><strong>Stress</strong></td>
+<td>Find breaking point</td>
+<td>30-60 min</td>
+<td>Ramp up until failure</td>
+</tr>
+<tr>
+<td><strong>Soak</strong></td>
+<td>Detect memory leaks, resource exhaustion</td>
+<td>4-24 hours</td>
+<td>Steady load over time</td>
+</tr>
+<tr>
+<td><strong>Spike</strong></td>
+<td>Test response to sudden surge</td>
+<td>5-30 min</td>
+<td>0 → high → 0</td>
+</tr>
+<tr>
+<td><strong>Smoke</strong></td>
+<td>Quick perf sanity</td>
+<td>1-5 min</td>
+<td>Light load</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each answers a different question. Mature teams run all.</p>
+<div class="mermaid">flowchart LR
+  Smoke["Smoke<br/>~1 min<br/>does it work?"]
+  Load["Load<br/>~30 min<br/>perf at target?"]
+  Stress["Stress<br/>~60 min<br/>where does it break?"]
+  Soak["Soak<br/>~24h<br/>does it leak?"]
+  Spike["Spike<br/>~5 min<br/>can it absorb surges?"]
+</div>
+<h2 id="key-metrics">Key Metrics<a class="anchor" href="#key-metrics" aria-hidden="true">#</a></h2>
+<p>For each test, capture:</p>
+<ul>
+<li><strong>Throughput</strong> (RPS, TPS): requests/sec sustained.</li>
+<li><strong>Latency percentiles</strong>: p50, p95, p99, p99.9 (always percentiles, never average).</li>
+<li><strong>Error rate</strong>: % of requests failing (5xx, timeouts).</li>
+<li><strong>Concurrency</strong>: simultaneous users / connections.</li>
+<li><strong>System metrics</strong>: CPU, memory, GC, DB connections, queue depth.</li>
+</ul>
+<p>Coupling load test results with system metrics shows <em>why</em> perf is what it is.</p>
+<h2 id="jmeter">JMeter<a class="anchor" href="#jmeter" aria-hidden="true">#</a></h2>
+<p>Apache JMeter is the OSS veteran. GUI for plan design, headless for CI runs.</p>
+<h3 id="plan-structure">Plan Structure<a class="anchor" href="#plan-structure" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Test Plan
+└── Thread Group (users, ramp-up, loops)
+    ├── HTTP Request Defaults (host, port)
+    ├── HTTP Header Manager (auth, content-type)
+    ├── HTTP Request 1: GET /api/users
+    ├── HTTP Request 2: POST /api/orders
+    ├── Listeners (Aggregate Report, Summary)
+    └── Assertions (status 200, response time &lt; 500ms)
+</code></pre></div>
+<p>A <em>Thread Group</em> simulates N concurrent users.</p>
+<h3 id="sample-jmx-headless-xml">Sample JMX (Headless XML)<a class="anchor" href="#sample-jmx-headless-xml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;jmeterTestPlan&gt;
+  &lt;hashTree&gt;
+    &lt;TestPlan testname=&quot;Checkout Load&quot;&gt;
+      &lt;hashTree&gt;
+        &lt;ThreadGroup&gt;
+          &lt;stringProp name=&quot;ThreadGroup.num_threads&quot;&gt;100&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;ThreadGroup.ramp_time&quot;&gt;30&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;ThreadGroup.duration&quot;&gt;600&lt;/stringProp&gt;
+        &lt;/ThreadGroup&gt;
+        &lt;HTTPSamplerProxy&gt;
+          &lt;stringProp name=&quot;HTTPSampler.path&quot;&gt;/api/checkout&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;HTTPSampler.method&quot;&gt;POST&lt;/stringProp&gt;
+        &lt;/HTTPSamplerProxy&gt;
+      &lt;/hashTree&gt;
+    &lt;/TestPlan&gt;
+  &lt;/hashTree&gt;
+&lt;/jmeterTestPlan&gt;
+</code></pre></div>
+<h3 id="headless-run">Headless Run<a class="anchor" href="#headless-run" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jmeter -n -t checkout.jmx -l results.jtl -e -o report-html/
+</code></pre></div>
+<p><code>-n</code> non-GUI, <code>-t</code> plan, <code>-l</code> results CSV, <code>-e -o</code> generate HTML report.</p>
+<h2 id="gatling">Gatling<a class="anchor" href="#gatling" aria-hidden="true">#</a></h2>
+<p>Gatling (2012, started by Stéphane Landelle) is Scala/Java-based, async IO, lower overhead than JMeter. Code-as-config approach: tests are version-controlled Java/Kotlin/Scala.</p>
+<h3 id="java-dsl">Java DSL<a class="anchor" href="#java-dsl" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.*;
+
+public class CheckoutSimulation extends Simulation {
+
+    HttpProtocolBuilder httpProtocol = http
+        .baseUrl(&quot;https://api.example.com&quot;)
+        .acceptHeader(&quot;application/json&quot;)
+        .userAgentHeader(&quot;Gatling/Test&quot;);
+
+    ScenarioBuilder scn = scenario(&quot;Checkout&quot;)
+        .exec(http(&quot;Login&quot;)
+            .post(&quot;/api/login&quot;)
+            .body(StringBody(&quot;&quot;&quot;
+                {&quot;username&quot;: &quot;test&quot;, &quot;password&quot;: &quot;test&quot;}
+                &quot;&quot;&quot;))
+            .check(status().is(200))
+            .check(jsonPath(&quot;$.token&quot;).saveAs(&quot;token&quot;)))
+        .exec(http(&quot;Add to cart&quot;)
+            .post(&quot;/api/cart&quot;)
+            .header(&quot;Authorization&quot;, &quot;Bearer #{token}&quot;)
+            .body(StringBody(&quot;&quot;&quot;
+                {&quot;sku&quot;: &quot;ABC-123&quot;, &quot;qty&quot;: 1}
+                &quot;&quot;&quot;))
+            .check(status().is(200)))
+        .exec(http(&quot;Checkout&quot;)
+            .post(&quot;/api/checkout&quot;)
+            .header(&quot;Authorization&quot;, &quot;Bearer #{token}&quot;)
+            .check(status().is(200))
+            .check(responseTimeInMillis().lt(500)));
+
+    {
+        setUp(
+            scn.injectOpen(
+                rampUsersPerSec(1).to(100).during(60),
+                constantUsersPerSec(100).during(600),
+                rampUsersPerSec(100).to(0).during(60)
+            )
+        ).protocols(httpProtocol)
+         .assertions(
+            global().responseTime().percentile3().lt(500),
+            global().successfulRequests().percent().gt(99.0)
+         );
+    }
+}
+</code></pre></div>
+<p>This:
+- Ramps 0 → 100 RPS over 1 minute.
+- Holds 100 RPS for 10 minutes.
+- Ramps 100 → 0 over 1 minute.
+- Asserts p95 &lt; 500ms and success &gt; 99%.</p>
+<h3 id="maven-plugin">Maven Plugin<a class="anchor" href="#maven-plugin" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;plugin&gt;
+  &lt;groupId&gt;io.gatling&lt;/groupId&gt;
+  &lt;artifactId&gt;gatling-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;4.10.2&lt;/version&gt;
+&lt;/plugin&gt;
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn gatling:test -Dgatling.simulationClass=CheckoutSimulation
+</code></pre></div>
+<p>Output: HTML report with charts (throughput, latency, errors over time).</p>
+<h3 id="why-gatling-often-wins">Why Gatling Often Wins<a class="anchor" href="#why-gatling-often-wins" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Async IO</strong>: handles 10k+ concurrent virtual users on a single JVM.</li>
+<li><strong>Code-as-config</strong>: PR review, refactoring, DRY.</li>
+<li><strong>Better reports</strong>: time-series graphs.</li>
+<li><strong>DSL is expressive</strong>: scenarios feel like specs.</li>
+</ul>
+<p>JMeter's strength: maturity, GUI for non-coders, huge plugin ecosystem.</p>
+<h2 id="k6-a-word">k6 — A Word<a class="anchor" href="#k6-a-word" aria-hidden="true">#</a></h2>
+<p>k6 (2017, Grafana Labs) is Go-based, JavaScript scripting:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">javascript</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-javascript">import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  vus: 100,
+  duration: '10m',
+  thresholds: {
+    http_req_duration: ['p(95)&lt;500'],
+    http_req_failed: ['rate&lt;0.01'],
+  },
+};
+
+export default function () {
+  const res = http.post('https://api.example.com/api/checkout',
+    JSON.stringify({sku: 'ABC-123'}),
+    {headers: {'Content-Type': 'application/json'}}
+  );
+  check(res, {'status is 200': r =&gt; r.status === 200});
+}
+</code></pre></div>
+<p>Very low per-VU overhead. Cloud companion (k6 Cloud / Grafana Cloud k6) for distributed load. Increasingly popular alongside Gatling.</p>
+<h2 id="the-environment-trap">The Environment Trap<a class="anchor" href="#the-environment-trap" aria-hidden="true">#</a></h2>
+<p>Load testing the wrong environment produces garbage results. Common mistakes:</p>
+<ul>
+<li>Testing against staging with 1/10th the prod resources.</li>
+<li>Testing without the prod-equivalent DB size.</li>
+<li>Testing with localhost caching that prod doesn't have.</li>
+<li>Testing without realistic data (1k rows instead of 1M).</li>
+<li>Testing without the CDN/load balancer in front.</li>
+</ul>
+<p>The senior practice: <strong>performance-equivalent environment</strong> for load tests. Typically a dedicated "perf" env scaled to prod.</p>
+<h2 id="test-data-considerations">Test Data Considerations<a class="anchor" href="#test-data-considerations" aria-hidden="true">#</a></h2>
+<p>Test data should mirror prod scale:
+- Same row counts (1M+ where prod has 1M).
+- Same key distributions (some hot, some cold).
+- Same content size (long descriptions, not "Lorem ipsum").</p>
+<p>Use prod snapshots (anonymized) where legal, synthetic data otherwise.</p>
+<h2 id="distributed-load-generation">Distributed Load Generation<a class="anchor" href="#distributed-load-generation" aria-hidden="true">#</a></h2>
+<p>One test machine can saturate. For higher load:</p>
+<ul>
+<li><strong>JMeter</strong>: distributed mode with master + slaves.</li>
+<li><strong>Gatling FrontLine</strong> / Gatling Enterprise: distributed runs.</li>
+<li><strong>k6 Cloud</strong>: managed.</li>
+<li><strong>AWS Distributed Load Testing</strong>: CloudFormation template.</li>
+</ul>
+<h2 id="interpreting-results">Interpreting Results<a class="anchor" href="#interpreting-results" aria-hidden="true">#</a></h2>
+<p>A latency histogram:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>p50:   45ms
+p95:  120ms
+p99:  480ms
+p99.9: 2100ms
+max:  5200ms
+</code></pre></div>
+<p>What this tells you:
+- Most users see fast responses.
+- 1% see &gt; 480ms.
+- 0.1% see &gt; 2s (probably a GC pause or thread starvation).
+- Max 5.2s — at scale, that affects real users.</p>
+<p>If the SLO is "p99 &lt; 500ms", you're just within budget. Watch closely.</p>
+<p>The <strong>average</strong> is meaningless: <code>(45*0.5 + 120*0.4 + 480*0.09 + 2100*0.009 + 5200*0.001) ≈ 130ms</code>. Sounds great. But 1% of users have 500ms+ — that's your problem.</p>
+<h2 id="correlating-with-system-metrics">Correlating With System Metrics<a class="anchor" href="#correlating-with-system-metrics" aria-hidden="true">#</a></h2>
+<p>During the load test, capture:
+- CPU on app, DB.
+- JVM heap, GC pause time.
+- Thread count, blocked threads.
+- DB connection pool usage.
+- DB slow queries.
+- Network throughput.</p>
+<p>If p99 latency rises with CPU at 95%: CPU-bound. Scale horizontally.
+If p99 rises with stable CPU but high DB latency: DB is the bottleneck.
+If GC pauses correlate with latency spikes: tune GC or heap.</p>
+<h2 id="ci-integration">CI Integration<a class="anchor" href="#ci-integration" aria-hidden="true">#</a></h2>
+<p>Performance tests are slow. Don't run on every PR. Patterns:</p>
+<ul>
+<li><strong>Smoke</strong> on every PR: 1-minute light load. Catches catastrophic regressions.</li>
+<li><strong>Full load</strong> nightly or weekly.</li>
+<li><strong>Manual trigger</strong> for big changes.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">- name: Performance smoke
+  run: mvn gatling:test -Dgatling.simulationClass=SmokeSimulation
+</code></pre></div>
+<p>Set thresholds; fail build if exceeded.</p>
+<h2 id="profiling-after-load-test">Profiling After Load Test<a class="anchor" href="#profiling-after-load-test" aria-hidden="true">#</a></h2>
+<p>Load tests show <em>that</em> perf is bad. Profilers show <em>why</em>.</p>
+<p>Tools:
+- <strong>async-profiler</strong>: low-overhead JVM profiler.
+- <strong>JFR (Java Flight Recorder)</strong>: built-in.
+- <strong>JProfiler / YourKit</strong>: commercial, rich UIs.
+- <strong>Flame graphs</strong>: visualize hot paths.</p>
+<p>Run profiler during load test → identify hot methods → optimize.</p>
+<h2 id="anti-patterns">Anti-Patterns<a class="anchor" href="#anti-patterns" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Testing localhost.</strong> No real network, no real load.</p><p>[!WARNING]
+<strong>Average instead of percentiles.</strong> Hides tail latency.</p>
+<p>[!WARNING]
+<strong>Single user load test.</strong> Concurrency reveals issues averages can't.</p>
+<p>[!WARNING]
+<strong>No warm-up.</strong> JIT compilation needs time. First 30s of results are misleading.</p>
+<p>[!WARNING]
+<strong>No baseline.</strong> Without prior data, you can't tell if perf regressed.</p>
+<p>[!WARNING]
+<strong>Testing the wrong env.</strong> Results don't generalize.</p>
+<p>[!WARNING]
+<strong>No system metrics during load.</strong> Only see symptoms, not causes.</p>
+<p>[!WARNING]
+<strong>Synthetic data 1000x smaller than prod.</strong> Cache hits artificially high.</p>
+<p>[!WARNING]
+<strong>Spike tests without ramp-down.</strong> Cleanup matters.</p></div></div>
+<h2 id="common-misconceptions">Common Misconceptions<a class="anchor" href="#common-misconceptions" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>"Load test = stress test."</strong> Different goals.</p><p>[!WARNING]
+<strong>"More users = more load."</strong> Closed model. Open model (target RPS) is more accurate.</p>
+<p>[!WARNING]
+<strong>"JMeter is dead."</strong> Still widely used.</p>
+<p>[!WARNING]
+<strong>"Gatling is only for Scala teams."</strong> Java DSL since v3.7.</p>
+<p>[!WARNING]
+<strong>"100% throughput is the goal."</strong> Goal is meeting SLOs at expected load with headroom.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Smoke test</strong>: 1-min Gatling test against a Spring Boot endpoint.</li>
+<li><strong>Ramp test</strong>: ramp 0 → 100 RPS over 5 min; observe at what RPS errors start.</li>
+<li><strong>Soak test</strong>: 4 hours at moderate load. Watch heap for leaks.</li>
+<li><strong>Spike test</strong>: sudden 10x surge.</li>
+<li><strong>Distributed run</strong>: Gatling on two boxes.</li>
+<li><strong>JMeter</strong>: convert one Gatling scenario to JMeter for comparison.</li>
+<li><strong>Percentile interpretation</strong>: capture p50/p95/p99/p99.9; explain to a PM.</li>
+<li><strong>Profiler</strong>: run async-profiler during load test; identify hot method.</li>
+<li><strong>CI smoke</strong>: configure 1-min smoke in PR pipeline.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Distinguish load, stress, soak, spike, smoke tests.</li>
+<li>Write Gatling scenarios in Java DSL.</li>
+<li>Use JMeter for ad-hoc or legacy needs.</li>
+<li>Interpret percentile latency distributions.</li>
+<li>Correlate load test results with system metrics.</li>
+<li>Avoid environment and data anti-patterns.</li>
+<li>Profile after load test to find root causes.</li>
+<li>Integrate perf tests into CI sensibly.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c09-t08-the-test-pyramid-and-testing-strategy.html">The test pyramid &amp; testing strategy</a> — synthesizing every testing tool in this chapter into a coherent strategy.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Load &amp; performance testing (JMeter, Gatling)&quot;
+slug: load-and-performance-testing-jmeter-gatling
+level: L4
+module: &quot;Backend Engineering&quot;
+section: &quot;Testing — Advanced&quot;
+type: concept
+difficulty: senior
+order: 7
+tags: [load-testing, performance-testing, jmeter, gatling, k6, stress-testing, soak-test, spike-test, throughput, latency, percentile, slo, capacity-planning, async-http, profiling]
+prerequisites: []
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-08
+---
+
+# Load &amp; performance testing (JMeter, Gatling)
+
+Functional tests answer &quot;does it work?&quot;. Load and performance tests answer &quot;does it work at the scale and speed users actually demand?&quot; — questions that no unit test will surface and that production will eventually answer in painful ways if you don&#x27;t. The dominant tools for the JVM ecosystem are Apache JMeter (1998, GUI-driven, still ubiquitous), Gatling (2012, Scala/Java DSL, async-IO, code-as-config), and k6 (2017, Go-based, JavaScript scripting, increasingly popular). Senior engineers know how to design realistic load scenarios, what metrics to capture, how to interpret percentile distributions, and how to translate results into capacity-planning decisions.
+
+This topic covers test types (load, stress, soak, spike), JMeter&#x27;s plan structure, Gatling&#x27;s DSL, k6 briefly, metrics (RPS, latency percentiles, error rate), the testing environment trap (load testing the wrong env), and how performance tests integrate into CI without slowing every build.
+
+&gt; [!NOTE]
+&gt; Prerequisites: basic HTTP and Spring Boot familiarity.
+
+## Categories Of Performance Tests
+
+| Type | Goal | Duration | Pattern |
+|------|------|----------|---------|
+| **Load** | Verify perf at expected load | 10-60 min | Steady RPS at target |
+| **Stress** | Find breaking point | 30-60 min | Ramp up until failure |
+| **Soak** | Detect memory leaks, resource exhaustion | 4-24 hours | Steady load over time |
+| **Spike** | Test response to sudden surge | 5-30 min | 0 → high → 0 |
+| **Smoke** | Quick perf sanity | 1-5 min | Light load |
+
+Each answers a different question. Mature teams run all.
+
+```mermaid
+flowchart LR
+  Smoke[&quot;Smoke&lt;br/&gt;~1 min&lt;br/&gt;does it work?&quot;]
+  Load[&quot;Load&lt;br/&gt;~30 min&lt;br/&gt;perf at target?&quot;]
+  Stress[&quot;Stress&lt;br/&gt;~60 min&lt;br/&gt;where does it break?&quot;]
+  Soak[&quot;Soak&lt;br/&gt;~24h&lt;br/&gt;does it leak?&quot;]
+  Spike[&quot;Spike&lt;br/&gt;~5 min&lt;br/&gt;can it absorb surges?&quot;]
+```
+
+## Key Metrics
+
+For each test, capture:
+
+- **Throughput** (RPS, TPS): requests/sec sustained.
+- **Latency percentiles**: p50, p95, p99, p99.9 (always percentiles, never average).
+- **Error rate**: % of requests failing (5xx, timeouts).
+- **Concurrency**: simultaneous users / connections.
+- **System metrics**: CPU, memory, GC, DB connections, queue depth.
+
+Coupling load test results with system metrics shows *why* perf is what it is.
+
+## JMeter
+
+Apache JMeter is the OSS veteran. GUI for plan design, headless for CI runs.
+
+### Plan Structure
+
+```
+Test Plan
+└── Thread Group (users, ramp-up, loops)
+    ├── HTTP Request Defaults (host, port)
+    ├── HTTP Header Manager (auth, content-type)
+    ├── HTTP Request 1: GET /api/users
+    ├── HTTP Request 2: POST /api/orders
+    ├── Listeners (Aggregate Report, Summary)
+    └── Assertions (status 200, response time &lt; 500ms)
+```
+
+A *Thread Group* simulates N concurrent users.
+
+### Sample JMX (Headless XML)
+
+```xml
+&lt;jmeterTestPlan&gt;
+  &lt;hashTree&gt;
+    &lt;TestPlan testname=&quot;Checkout Load&quot;&gt;
+      &lt;hashTree&gt;
+        &lt;ThreadGroup&gt;
+          &lt;stringProp name=&quot;ThreadGroup.num_threads&quot;&gt;100&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;ThreadGroup.ramp_time&quot;&gt;30&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;ThreadGroup.duration&quot;&gt;600&lt;/stringProp&gt;
+        &lt;/ThreadGroup&gt;
+        &lt;HTTPSamplerProxy&gt;
+          &lt;stringProp name=&quot;HTTPSampler.path&quot;&gt;/api/checkout&lt;/stringProp&gt;
+          &lt;stringProp name=&quot;HTTPSampler.method&quot;&gt;POST&lt;/stringProp&gt;
+        &lt;/HTTPSamplerProxy&gt;
+      &lt;/hashTree&gt;
+    &lt;/TestPlan&gt;
+  &lt;/hashTree&gt;
+&lt;/jmeterTestPlan&gt;
+```
+
+### Headless Run
+
+```bash
+jmeter -n -t checkout.jmx -l results.jtl -e -o report-html/
+```
+
+`-n` non-GUI, `-t` plan, `-l` results CSV, `-e -o` generate HTML report.
+
+## Gatling
+
+Gatling (2012, started by Stéphane Landelle) is Scala/Java-based, async IO, lower overhead than JMeter. Code-as-config approach: tests are version-controlled Java/Kotlin/Scala.
+
+### Java DSL
+
+```java
+import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.*;
+
+public class CheckoutSimulation extends Simulation {
+
+    HttpProtocolBuilder httpProtocol = http
+        .baseUrl(&quot;https://api.example.com&quot;)
+        .acceptHeader(&quot;application/json&quot;)
+        .userAgentHeader(&quot;Gatling/Test&quot;);
+
+    ScenarioBuilder scn = scenario(&quot;Checkout&quot;)
+        .exec(http(&quot;Login&quot;)
+            .post(&quot;/api/login&quot;)
+            .body(StringBody(&quot;&quot;&quot;
+                {&quot;username&quot;: &quot;test&quot;, &quot;password&quot;: &quot;test&quot;}
+                &quot;&quot;&quot;))
+            .check(status().is(200))
+            .check(jsonPath(&quot;$.token&quot;).saveAs(&quot;token&quot;)))
+        .exec(http(&quot;Add to cart&quot;)
+            .post(&quot;/api/cart&quot;)
+            .header(&quot;Authorization&quot;, &quot;Bearer #{token}&quot;)
+            .body(StringBody(&quot;&quot;&quot;
+                {&quot;sku&quot;: &quot;ABC-123&quot;, &quot;qty&quot;: 1}
+                &quot;&quot;&quot;))
+            .check(status().is(200)))
+        .exec(http(&quot;Checkout&quot;)
+            .post(&quot;/api/checkout&quot;)
+            .header(&quot;Authorization&quot;, &quot;Bearer #{token}&quot;)
+            .check(status().is(200))
+            .check(responseTimeInMillis().lt(500)));
+
+    {
+        setUp(
+            scn.injectOpen(
+                rampUsersPerSec(1).to(100).during(60),
+                constantUsersPerSec(100).during(600),
+                rampUsersPerSec(100).to(0).during(60)
+            )
+        ).protocols(httpProtocol)
+         .assertions(
+            global().responseTime().percentile3().lt(500),
+            global().successfulRequests().percent().gt(99.0)
+         );
+    }
+}
+```
+
+This:
+- Ramps 0 → 100 RPS over 1 minute.
+- Holds 100 RPS for 10 minutes.
+- Ramps 100 → 0 over 1 minute.
+- Asserts p95 &lt; 500ms and success &gt; 99%.
+
+### Maven Plugin
+
+```xml
+&lt;plugin&gt;
+  &lt;groupId&gt;io.gatling&lt;/groupId&gt;
+  &lt;artifactId&gt;gatling-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;4.10.2&lt;/version&gt;
+&lt;/plugin&gt;
+```
+
+```bash
+mvn gatling:test -Dgatling.simulationClass=CheckoutSimulation
+```
+
+Output: HTML report with charts (throughput, latency, errors over time).
+
+### Why Gatling Often Wins
+
+- **Async IO**: handles 10k+ concurrent virtual users on a single JVM.
+- **Code-as-config**: PR review, refactoring, DRY.
+- **Better reports**: time-series graphs.
+- **DSL is expressive**: scenarios feel like specs.
+
+JMeter&#x27;s strength: maturity, GUI for non-coders, huge plugin ecosystem.
+
+## k6 — A Word
+
+k6 (2017, Grafana Labs) is Go-based, JavaScript scripting:
+
+```javascript
+import http from &#x27;k6/http&#x27;;
+import { check } from &#x27;k6&#x27;;
+
+export const options = {
+  vus: 100,
+  duration: &#x27;10m&#x27;,
+  thresholds: {
+    http_req_duration: [&#x27;p(95)&lt;500&#x27;],
+    http_req_failed: [&#x27;rate&lt;0.01&#x27;],
+  },
+};
+
+export default function () {
+  const res = http.post(&#x27;https://api.example.com/api/checkout&#x27;,
+    JSON.stringify({sku: &#x27;ABC-123&#x27;}),
+    {headers: {&#x27;Content-Type&#x27;: &#x27;application/json&#x27;}}
+  );
+  check(res, {&#x27;status is 200&#x27;: r =&gt; r.status === 200});
+}
+```
+
+Very low per-VU overhead. Cloud companion (k6 Cloud / Grafana Cloud k6) for distributed load. Increasingly popular alongside Gatling.
+
+## The Environment Trap
+
+Load testing the wrong environment produces garbage results. Common mistakes:
+
+- Testing against staging with 1/10th the prod resources.
+- Testing without the prod-equivalent DB size.
+- Testing with localhost caching that prod doesn&#x27;t have.
+- Testing without realistic data (1k rows instead of 1M).
+- Testing without the CDN/load balancer in front.
+
+The senior practice: **performance-equivalent environment** for load tests. Typically a dedicated &quot;perf&quot; env scaled to prod.
+
+## Test Data Considerations
+
+Test data should mirror prod scale:
+- Same row counts (1M+ where prod has 1M).
+- Same key distributions (some hot, some cold).
+- Same content size (long descriptions, not &quot;Lorem ipsum&quot;).
+
+Use prod snapshots (anonymized) where legal, synthetic data otherwise.
+
+## Distributed Load Generation
+
+One test machine can saturate. For higher load:
+
+- **JMeter**: distributed mode with master + slaves.
+- **Gatling FrontLine** / Gatling Enterprise: distributed runs.
+- **k6 Cloud**: managed.
+- **AWS Distributed Load Testing**: CloudFormation template.
+
+## Interpreting Results
+
+A latency histogram:
+
+```
+p50:   45ms
+p95:  120ms
+p99:  480ms
+p99.9: 2100ms
+max:  5200ms
+```
+
+What this tells you:
+- Most users see fast responses.
+- 1% see &gt; 480ms.
+- 0.1% see &gt; 2s (probably a GC pause or thread starvation).
+- Max 5.2s — at scale, that affects real users.
+
+If the SLO is &quot;p99 &lt; 500ms&quot;, you&#x27;re just within budget. Watch closely.
+
+The **average** is meaningless: `(45*0.5 + 120*0.4 + 480*0.09 + 2100*0.009 + 5200*0.001) ≈ 130ms`. Sounds great. But 1% of users have 500ms+ — that&#x27;s your problem.
+
+## Correlating With System Metrics
+
+During the load test, capture:
+- CPU on app, DB.
+- JVM heap, GC pause time.
+- Thread count, blocked threads.
+- DB connection pool usage.
+- DB slow queries.
+- Network throughput.
+
+If p99 latency rises with CPU at 95%: CPU-bound. Scale horizontally.
+If p99 rises with stable CPU but high DB latency: DB is the bottleneck.
+If GC pauses correlate with latency spikes: tune GC or heap.
+
+## CI Integration
+
+Performance tests are slow. Don&#x27;t run on every PR. Patterns:
+
+- **Smoke** on every PR: 1-minute light load. Catches catastrophic regressions.
+- **Full load** nightly or weekly.
+- **Manual trigger** for big changes.
+
+```yaml
+- name: Performance smoke
+  run: mvn gatling:test -Dgatling.simulationClass=SmokeSimulation
+```
+
+Set thresholds; fail build if exceeded.
+
+## Profiling After Load Test
+
+Load tests show *that* perf is bad. Profilers show *why*.
+
+Tools:
+- **async-profiler**: low-overhead JVM profiler.
+- **JFR (Java Flight Recorder)**: built-in.
+- **JProfiler / YourKit**: commercial, rich UIs.
+- **Flame graphs**: visualize hot paths.
+
+Run profiler during load test → identify hot methods → optimize.
+
+## Anti-Patterns
+
+&gt; [!WARNING]
+&gt; **Testing localhost.** No real network, no real load.
+
+&gt; [!WARNING]
+&gt; **Average instead of percentiles.** Hides tail latency.
+
+&gt; [!WARNING]
+&gt; **Single user load test.** Concurrency reveals issues averages can&#x27;t.
+
+&gt; [!WARNING]
+&gt; **No warm-up.** JIT compilation needs time. First 30s of results are misleading.
+
+&gt; [!WARNING]
+&gt; **No baseline.** Without prior data, you can&#x27;t tell if perf regressed.
+
+&gt; [!WARNING]
+&gt; **Testing the wrong env.** Results don&#x27;t generalize.
+
+&gt; [!WARNING]
+&gt; **No system metrics during load.** Only see symptoms, not causes.
+
+&gt; [!WARNING]
+&gt; **Synthetic data 1000x smaller than prod.** Cache hits artificially high.
+
+&gt; [!WARNING]
+&gt; **Spike tests without ramp-down.** Cleanup matters.
+
+## Common Misconceptions
+
+&gt; [!WARNING]
+&gt; **&quot;Load test = stress test.&quot;** Different goals.
+
+&gt; [!WARNING]
+&gt; **&quot;More users = more load.&quot;** Closed model. Open model (target RPS) is more accurate.
+
+&gt; [!WARNING]
+&gt; **&quot;JMeter is dead.&quot;** Still widely used.
+
+&gt; [!WARNING]
+&gt; **&quot;Gatling is only for Scala teams.&quot;** Java DSL since v3.7.
+
+&gt; [!WARNING]
+&gt; **&quot;100% throughput is the goal.&quot;** Goal is meeting SLOs at expected load with headroom.
+
+## Practice
+
+1. **Smoke test**: 1-min Gatling test against a Spring Boot endpoint.
+2. **Ramp test**: ramp 0 → 100 RPS over 5 min; observe at what RPS errors start.
+3. **Soak test**: 4 hours at moderate load. Watch heap for leaks.
+4. **Spike test**: sudden 10x surge.
+5. **Distributed run**: Gatling on two boxes.
+6. **JMeter**: convert one Gatling scenario to JMeter for comparison.
+7. **Percentile interpretation**: capture p50/p95/p99/p99.9; explain to a PM.
+8. **Profiler**: run async-profiler during load test; identify hot method.
+9. **CI smoke**: configure 1-min smoke in PR pipeline.
+
+## Recap
+
+You should now be able to:
+
+- Distinguish load, stress, soak, spike, smoke tests.
+- Write Gatling scenarios in Java DSL.
+- Use JMeter for ad-hoc or legacy needs.
+- Interpret percentile latency distributions.
+- Correlate load test results with system metrics.
+- Avoid environment and data anti-patterns.
+- Profile after load test to find root causes.
+- Integrate perf tests into CI sensibly.
+
+## Next
+
+Continue to [The test pyramid &amp; testing strategy](./T08-the-test-pyramid-and-testing-strategy.md) — synthesizing every testing tool in this chapter into a coherent strategy.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l4/c09-t06-mutation-testing-pit.html"><div class="lbl">← Previous</div><div class="ttl">T06-mutation-testing-pit</div><div class="sub">Mutation testing (PIT)</div></a><a class="next" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><div class="lbl">Next →</div><div class="ttl">T08-the-test-pyramid-and-testing-strategy</div><div class="sub">The test pyramid &amp; testing strategy</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#categories-of-performance-tests" data-toc-link>Categories Of Performance Tests</a></li><li class="lvl-2"><a href="#key-metrics" data-toc-link>Key Metrics</a></li><li class="lvl-2"><a href="#jmeter" data-toc-link>JMeter</a></li><li class="lvl-3"><a href="#plan-structure" data-toc-link>Plan Structure</a></li><li class="lvl-3"><a href="#sample-jmx-headless-xml" data-toc-link>Sample JMX (Headless XML)</a></li><li class="lvl-3"><a href="#headless-run" data-toc-link>Headless Run</a></li><li class="lvl-2"><a href="#gatling" data-toc-link>Gatling</a></li><li class="lvl-3"><a href="#java-dsl" data-toc-link>Java DSL</a></li><li class="lvl-3"><a href="#maven-plugin" data-toc-link>Maven Plugin</a></li><li class="lvl-3"><a href="#why-gatling-often-wins" data-toc-link>Why Gatling Often Wins</a></li><li class="lvl-2"><a href="#k6-a-word" data-toc-link>k6 — A Word</a></li><li class="lvl-2"><a href="#the-environment-trap" data-toc-link>The Environment Trap</a></li><li class="lvl-2"><a href="#test-data-considerations" data-toc-link>Test Data Considerations</a></li><li class="lvl-2"><a href="#distributed-load-generation" data-toc-link>Distributed Load Generation</a></li><li class="lvl-2"><a href="#interpreting-results" data-toc-link>Interpreting Results</a></li><li class="lvl-2"><a href="#correlating-with-system-metrics" data-toc-link>Correlating With System Metrics</a></li><li class="lvl-2"><a href="#ci-integration" data-toc-link>CI Integration</a></li><li class="lvl-2"><a href="#profiling-after-load-test" data-toc-link>Profiling After Load Test</a></li><li class="lvl-2"><a href="#anti-patterns" data-toc-link>Anti-Patterns</a></li><li class="lvl-2"><a href="#common-misconceptions" data-toc-link>Common Misconceptions</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

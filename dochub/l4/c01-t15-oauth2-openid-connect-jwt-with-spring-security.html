@@ -1,0 +1,1745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OAuth2 / OpenID Connect / JWT with Spring Security — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link active" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🏗</span><span>Ch. 6 · L4 — Backend Engineering</span></div><div class="chapter-path">content/L4-backend-engineering/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l4/overview.html" data-q="l4 — backend engineering content/l4-backend-engineering/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · spring framework content/l4-backend-engineering/c01-spring-framework/readme.md content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><summary><span class="caret">▶</span><span>C01 · Spring Framework</span></summary><ul class="pages"><li data-q="backend engineering — spring framework &amp; ecosystem content/l4-backend-engineering/c01-spring-framework/readme.md"><a class="" href="../l4/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="spring core: ioc container &amp; beans content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md"><a class="" href="../l4/c01-t01-spring-core-ioc-container-and-beans.html"><span>Spring Core: IoC Container &amp; Beans</span><span class="kind-pill "></span></a></li><li data-q="dependency injection (constructor / field / setter) content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md"><a class="" href="../l4/c01-t02-dependency-injection-constructor-field-setter.html"><span>Dependency Injection (constructor / field / setter)</span><span class="kind-pill "></span></a></li><li data-q="bean scopes &amp; lifecycle content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md"><a class="" href="../l4/c01-t03-bean-scopes-and-lifecycle.html"><span>Bean Scopes &amp; Lifecycle</span><span class="kind-pill "></span></a></li><li data-q="spring configuration (java / annotation / xml) content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md"><a class="" href="../l4/c01-t04-spring-configuration-java-annotation-xml.html"><span>Spring Configuration (Java / Annotation / XML)</span><span class="kind-pill "></span></a></li><li data-q="spring aop content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md"><a class="" href="../l4/c01-t05-spring-aop.html"><span>Spring AOP</span><span class="kind-pill "></span></a></li><li data-q="spring expression language (spel) content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md"><a class="" href="../l4/c01-t06-spring-expression-language-spel.html"><span>Spring Expression Language (SpEL)</span><span class="kind-pill "></span></a></li><li data-q="spring boot auto-configuration &amp; starters content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md"><a class="" href="../l4/c01-t07-spring-boot-auto-configuration-and-starters.html"><span>Spring Boot Auto-Configuration &amp; Starters</span><span class="kind-pill "></span></a></li><li data-q="spring boot properties &amp; profiles content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md"><a class="" href="../l4/c01-t08-spring-boot-properties-and-profiles.html"><span>Spring Boot Properties &amp; Profiles</span><span class="kind-pill "></span></a></li><li data-q="spring boot actuator content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md"><a class="" href="../l4/c01-t09-spring-boot-actuator.html"><span>Spring Boot Actuator</span><span class="kind-pill "></span></a></li><li data-q="spring mvc (rest controllers) content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md"><a class="" href="../l4/c01-t10-spring-mvc-rest-controllers.html"><span>Spring MVC (REST Controllers)</span><span class="kind-pill "></span></a></li><li data-q="validation (@valid, bean validation) content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md"><a class="" href="../l4/c01-t11-validation-valid-bean-validation.html"><span>Validation (@Valid, Bean Validation)</span><span class="kind-pill "></span></a></li><li data-q="exception handling (@controlleradvice) content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md"><a class="" href="../l4/c01-t12-exception-handling-controlleradvice.html"><span>Exception Handling (@ControllerAdvice)</span><span class="kind-pill "></span></a></li><li data-q="spring data content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md"><a class="" href="../l4/c01-t13-spring-data.html"><span>Spring Data</span><span class="kind-pill "></span></a></li><li data-q="spring security (authentication &amp; authorization) content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md"><a class="" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><span>Spring Security (authentication &amp; authorization)</span><span class="kind-pill "></span></a></li><li data-q="oauth2 / openid connect / jwt with spring security content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md"><a class="active" href="../l4/c01-t15-oauth2-openid-connect-jwt-with-spring-security.html"><span>OAuth2 / OpenID Connect / JWT with Spring Security</span><span class="kind-pill "></span></a></li><li data-q="method-level security content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md"><a class="" href="../l4/c01-t16-method-level-security.html"><span>Method-Level Security</span><span class="kind-pill "></span></a></li><li data-q="spring webflux (reactive) content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md"><a class="" href="../l4/c01-t17-spring-webflux-reactive.html"><span>Spring WebFlux (reactive)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud (config, gateway, eureka, openfeign) content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md"><a class="" href="../l4/c01-t18-spring-cloud-config-gateway-eureka-openfeign.html"><span>Spring Cloud (Config, Gateway, Eureka, OpenFeign)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud resilience (resilience4j) content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md"><a class="" href="../l4/c01-t19-spring-cloud-resilience-resilience4j.html"><span>Spring Cloud Resilience (Resilience4j)</span><span class="kind-pill "></span></a></li><li data-q="spring batch content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md"><a class="" href="../l4/c01-t20-spring-batch.html"><span>Spring Batch</span><span class="kind-pill "></span></a></li><li data-q="spring integration content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md"><a class="" href="../l4/c01-t21-spring-integration.html"><span>Spring Integration</span><span class="kind-pill "></span></a></li><li data-q="spring for kafka / amqp content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md"><a class="" href="../l4/c01-t22-spring-for-kafka-amqp.html"><span>Spring for Kafka / AMQP</span><span class="kind-pill "></span></a></li><li data-q="spring session content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md"><a class="" href="../l4/c01-t23-spring-session.html"><span>Spring Session</span><span class="kind-pill "></span></a></li><li data-q="spring testing content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md"><a class="" href="../l4/c01-t24-spring-testing.html"><span>Spring Testing</span><span class="kind-pill "></span></a></li><li data-q="spring native / graalvm content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md"><a class="" href="../l4/c01-t25-spring-native-graalvm.html"><span>Spring Native / GraalVM</span><span class="kind-pill "></span></a></li><li data-q="spring boot 4 &amp; spring framework 7 content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><a class="" href="../l4/c01-t26-spring-boot-4-and-spring-framework-7.html"><span>Spring Boot 4 &amp; Spring Framework 7</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · persistence jpa hibernate content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><summary><span class="caret">▶</span><span>C02 · Persistence JPA Hibernate</span></summary><ul class="pages"><li data-q="backend engineering — persistence — jpa / hibernate / orm content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md"><a class="" href="../l4/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="orm concepts &amp; the impedance mismatch content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md"><a class="" href="../l4/c02-t01-orm-concepts-and-the-impedance-mismatch.html"><span>ORM concepts &amp; the impedance mismatch</span><span class="kind-pill "></span></a></li><li data-q="jpa fundamentals (entities, entitymanager) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md"><a class="" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><span>JPA fundamentals (entities, EntityManager)</span><span class="kind-pill "></span></a></li><li data-q="entity mappings &amp; relationships (@onetomany, etc.) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md"><a class="" href="../l4/c02-t03-entity-mappings-and-relationships-onetomany-etc.html"><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span><span class="kind-pill "></span></a></li><li data-q="hibernate architecture content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md"><a class="" href="../l4/c02-t04-hibernate-architecture.html"><span>Hibernate architecture</span><span class="kind-pill "></span></a></li><li data-q="persistence context &amp; entity lifecycle content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md"><a class="" href="../l4/c02-t05-persistence-context-and-entity-lifecycle.html"><span>Persistence context &amp; entity lifecycle</span><span class="kind-pill "></span></a></li><li data-q="lazy vs eager loading content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md"><a class="" href="../l4/c02-t06-lazy-vs-eager-loading.html"><span>Lazy vs eager loading</span><span class="kind-pill "></span></a></li><li data-q="the n+1 problem &amp; fixes content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md"><a class="" href="../l4/c02-t07-the-n-plus-1-problem-and-fixes.html"><span>The N+1 problem &amp; fixes</span><span class="kind-pill "></span></a></li><li data-q="jpql &amp; criteria api content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md"><a class="" href="../l4/c02-t08-jpql-and-criteria-api.html"><span>JPQL &amp; Criteria API</span><span class="kind-pill "></span></a></li><li data-q="querydsl content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md"><a class="" href="../l4/c02-t09-querydsl.html"><span>QueryDSL</span><span class="kind-pill "></span></a></li><li data-q="native queries content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md"><a class="" href="../l4/c02-t10-native-queries.html"><span>Native queries</span><span class="kind-pill "></span></a></li><li data-q="caching (first/second level) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md"><a class="" href="../l4/c02-t11-caching-first-second-level.html"><span>Caching (first/second level)</span><span class="kind-pill "></span></a></li><li data-q="transactions with jpa content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md"><a class="" href="../l4/c02-t12-transactions-with-jpa.html"><span>Transactions with JPA</span><span class="kind-pill "></span></a></li><li data-q="optimistic vs pessimistic locking content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md"><a class="" href="../l4/c02-t13-optimistic-vs-pessimistic-locking.html"><span>Optimistic vs pessimistic locking</span><span class="kind-pill "></span></a></li><li data-q="spring data jpa repositories content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md"><a class="" href="../l4/c02-t14-spring-data-jpa-repositories.html"><span>Spring Data JPA repositories</span><span class="kind-pill "></span></a></li><li data-q="projections &amp; dto mapping content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md"><a class="" href="../l4/c02-t15-projections-and-dto-mapping.html"><span>Projections &amp; DTO mapping</span><span class="kind-pill "></span></a></li><li data-q="auditing content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><a class="" href="../l4/c02-t16-auditing.html"><span>Auditing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · databases advanced content/l4-backend-engineering/c03-databases-advanced/readme.md content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><summary><span class="caret">▶</span><span>C03 · Databases Advanced</span></summary><ul class="pages"><li data-q="backend engineering — databases — advanced content/l4-backend-engineering/c03-databases-advanced/readme.md"><a class="" href="../l4/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="indexing &amp; index types content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md"><a class="" href="../l4/c03-t01-indexing-and-index-types.html"><span>Indexing &amp; index types</span><span class="kind-pill "></span></a></li><li data-q="query optimization &amp; execution plans content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md"><a class="" href="../l4/c03-t02-query-optimization-and-execution-plans.html"><span>Query optimization &amp; execution plans</span><span class="kind-pill "></span></a></li><li data-q="database migrations (flyway, liquibase) content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md"><a class="" href="../l4/c03-t03-database-migrations-flyway-liquibase.html"><span>Database migrations (Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="replication &amp; read replicas content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md"><a class="" href="../l4/c03-t04-replication-and-read-replicas.html"><span>Replication &amp; read replicas</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; sharding content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md"><a class="" href="../l4/c03-t05-partitioning-and-sharding.html"><span>Partitioning &amp; sharding</span><span class="kind-pill "></span></a></li><li data-q="change data capture (debezium) content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><a class="" href="../l4/c03-t06-change-data-capture-debezium.html"><span>Change Data Capture (Debezium)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · nosql and caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><summary><span class="caret">▶</span><span>C04 · Nosql And Caching</span></summary><ul class="pages"><li data-q="backend engineering — nosql &amp; caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md"><a class="" href="../l4/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use nosql vs sql content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md"><a class="" href="../l4/c04-t01-when-to-use-nosql-vs-sql.html"><span>When to use NoSQL vs SQL</span><span class="kind-pill "></span></a></li><li data-q="document stores (mongodb) content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md"><a class="" href="../l4/c04-t02-document-stores-mongodb.html"><span>Document stores (MongoDB)</span><span class="kind-pill "></span></a></li><li data-q="key-value stores (redis) content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md"><a class="" href="../l4/c04-t03-key-value-stores-redis.html"><span>Key-value stores (Redis)</span><span class="kind-pill "></span></a></li><li data-q="wide-column stores (cassandra) content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md"><a class="" href="../l4/c04-t04-wide-column-stores-cassandra.html"><span>Wide-column stores (Cassandra)</span><span class="kind-pill "></span></a></li><li data-q="search engines (elasticsearch / opensearch) content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md"><a class="" href="../l4/c04-t05-search-engines-elasticsearch-opensearch.html"><span>Search engines (Elasticsearch / OpenSearch)</span><span class="kind-pill "></span></a></li><li data-q="graph databases (intro) content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md"><a class="" href="../l4/c04-t06-graph-databases-intro.html"><span>Graph databases (intro)</span><span class="kind-pill "></span></a></li><li data-q="spring data for nosql content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md"><a class="" href="../l4/c04-t07-spring-data-for-nosql.html"><span>Spring Data for NoSQL</span><span class="kind-pill "></span></a></li><li data-q="caching concepts (cache-aside, write-through, write-behind) content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md"><a class="" href="../l4/c04-t08-caching-concepts-cache-aside-write-through-write-behind.html"><span>Caching concepts (cache-aside, write-through, write-behind)</span><span class="kind-pill "></span></a></li><li data-q="local caching (caffeine) content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md"><a class="" href="../l4/c04-t09-local-caching-caffeine.html"><span>Local caching (Caffeine)</span><span class="kind-pill "></span></a></li><li data-q="distributed caching (redis) content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md"><a class="" href="../l4/c04-t10-distributed-caching-redis.html"><span>Distributed caching (Redis)</span><span class="kind-pill "></span></a></li><li data-q="cache invalidation &amp; ttls content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md"><a class="" href="../l4/c04-t11-cache-invalidation-and-ttls.html"><span>Cache invalidation &amp; TTLs</span><span class="kind-pill "></span></a></li><li data-q="cdn caching content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><a class="" href="../l4/c04-t12-cdn-caching.html"><span>CDN caching</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · apis advanced content/l4-backend-engineering/c05-apis-advanced/readme.md content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><summary><span class="caret">▶</span><span>C05 · APIs Advanced</span></summary><ul class="pages"><li data-q="backend engineering — apis — advanced content/l4-backend-engineering/c05-apis-advanced/readme.md"><a class="" href="../l4/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http/2 &amp; http/3 content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md"><a class="" href="../l4/c05-t01-http-2-and-http-3.html"><span>HTTP/2 &amp; HTTP/3</span><span class="kind-pill "></span></a></li><li data-q="richardson maturity model &amp; hateoas content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md"><a class="" href="../l4/c05-t02-richardson-maturity-model-and-hateoas.html"><span>Richardson Maturity Model &amp; HATEOAS</span><span class="kind-pill "></span></a></li><li data-q="idempotency in apis content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md"><a class="" href="../l4/c05-t03-idempotency-in-apis.html"><span>Idempotency in APIs</span><span class="kind-pill "></span></a></li><li data-q="openapi / swagger documentation content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md"><a class="" href="../l4/c05-t04-openapi-swagger-documentation.html"><span>OpenAPI / Swagger documentation</span><span class="kind-pill "></span></a></li><li data-q="graphql content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md"><a class="" href="../l4/c05-t05-graphql.html"><span>GraphQL</span><span class="kind-pill "></span></a></li><li data-q="grpc &amp; protocol buffers content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md"><a class="" href="../l4/c05-t06-grpc-and-protocol-buffers.html"><span>gRPC &amp; Protocol Buffers</span><span class="kind-pill "></span></a></li><li data-q="websockets content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md"><a class="" href="../l4/c05-t07-websockets.html"><span>WebSockets</span><span class="kind-pill "></span></a></li><li data-q="server-sent events (sse) content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md"><a class="" href="../l4/c05-t08-server-sent-events-sse.html"><span>Server-Sent Events (SSE)</span><span class="kind-pill "></span></a></li><li data-q="webhooks content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md"><a class="" href="../l4/c05-t09-webhooks.html"><span>Webhooks</span><span class="kind-pill "></span></a></li><li data-q="rate limiting &amp; throttling content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md"><a class="" href="../l4/c05-t10-rate-limiting-and-throttling.html"><span>Rate limiting &amp; throttling</span><span class="kind-pill "></span></a></li><li data-q="bff (backend for frontend) content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><a class="" href="../l4/c05-t11-bff-backend-for-frontend.html"><span>BFF (Backend for Frontend)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><summary><span class="caret">▶</span><span>C06 · Reactive Programming</span></summary><ul class="pages"><li data-q="backend engineering — reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md"><a class="" href="../l4/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="reactive principles &amp; the reactive streams spec content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md"><a class="" href="../l4/c06-t01-reactive-principles-and-the-reactive-streams-spec.html"><span>Reactive principles &amp; the Reactive Streams spec</span><span class="kind-pill "></span></a></li><li data-q="project reactor (mono / flux) content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md"><a class="" href="../l4/c06-t02-project-reactor-mono-flux.html"><span>Project Reactor (Mono / Flux)</span><span class="kind-pill "></span></a></li><li data-q="rxjava (alternative) content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md"><a class="" href="../l4/c06-t03-rxjava-alternative.html"><span>RxJava (alternative)</span><span class="kind-pill "></span></a></li><li data-q="backpressure content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md"><a class="" href="../l4/c06-t04-backpressure.html"><span>Backpressure</span><span class="kind-pill "></span></a></li><li data-q="spring webflux content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md"><a class="" href="../l4/c06-t05-spring-webflux.html"><span>Spring WebFlux</span><span class="kind-pill "></span></a></li><li data-q="r2dbc (reactive database access) content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md"><a class="" href="../l4/c06-t06-r2dbc-reactive-database-access.html"><span>R2DBC (reactive database access)</span><span class="kind-pill "></span></a></li><li data-q="reactive vs virtual threads (trade-offs) content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><a class="" href="../l4/c06-t07-reactive-vs-virtual-threads-trade-offs.html"><span>Reactive vs virtual threads (trade-offs)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · messaging and streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><summary><span class="caret">▶</span><span>C07 · Messaging And Streaming</span></summary><ul class="pages"><li data-q="backend engineering — messaging &amp; event streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md"><a class="" href="../l4/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="messaging concepts (queues, topics, pub/sub) content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md"><a class="" href="../l4/c07-t01-messaging-concepts-queues-topics-pub-sub.html"><span>Messaging concepts (queues, topics, pub/sub)</span><span class="kind-pill "></span></a></li><li data-q="jms &amp; activemq content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md"><a class="" href="../l4/c07-t02-jms-and-activemq.html"><span>JMS &amp; ActiveMQ</span><span class="kind-pill "></span></a></li><li data-q="rabbitmq (amqp) content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md"><a class="" href="../l4/c07-t03-rabbitmq-amqp.html"><span>RabbitMQ (AMQP)</span><span class="kind-pill "></span></a></li><li data-q="apache kafka fundamentals content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md"><a class="" href="../l4/c07-t04-apache-kafka-fundamentals.html"><span>Apache Kafka fundamentals</span><span class="kind-pill "></span></a></li><li data-q="kafka deep (partitions, consumer groups, offsets) content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md"><a class="" href="../l4/c07-t05-kafka-deep-partitions-consumer-groups-offsets.html"><span>Kafka deep (partitions, consumer groups, offsets)</span><span class="kind-pill "></span></a></li><li data-q="kafka streams content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md"><a class="" href="../l4/c07-t06-kafka-streams.html"><span>Kafka Streams</span><span class="kind-pill "></span></a></li><li data-q="event-driven architecture content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md"><a class="" href="../l4/c07-t07-event-driven-architecture.html"><span>Event-driven architecture</span><span class="kind-pill "></span></a></li><li data-q="async processing patterns content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md"><a class="" href="../l4/c07-t08-async-processing-patterns.html"><span>Async processing patterns</span><span class="kind-pill "></span></a></li><li data-q="outbox pattern &amp; exactly-once content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md"><a class="" href="../l4/c07-t09-outbox-pattern-and-exactly-once.html"><span>Outbox pattern &amp; exactly-once</span><span class="kind-pill "></span></a></li><li data-q="dead-letter queues &amp; retries content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md"><a class="" href="../l4/c07-t10-dead-letter-queues-and-retries.html"><span>Dead-letter queues &amp; retries</span><span class="kind-pill "></span></a></li><li data-q="stream processing (flink, intro) content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><a class="" href="../l4/c07-t11-stream-processing-flink-intro.html"><span>Stream processing (Flink, intro)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · security content/l4-backend-engineering/c08-security/readme.md content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md content/l4-backend-engineering/c08-security/t06-owasp-top-10.md content/l4-backend-engineering/c08-security/t07-sql-injection.md content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md content/l4-backend-engineering/c08-security/t11-tls-in-practice.md content/l4-backend-engineering/c08-security/t12-secrets-management.md content/l4-backend-engineering/c08-security/t13-security-headers.md content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><summary><span class="caret">▶</span><span>C08 · Security</span></summary><ul class="pages"><li data-q="backend engineering — security content/l4-backend-engineering/c08-security/readme.md"><a class="" href="../l4/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="authentication vs authorization content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md"><a class="" href="../l4/c08-t01-authentication-vs-authorization.html"><span>Authentication vs authorization</span><span class="kind-pill "></span></a></li><li data-q="sessions vs tokens content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md"><a class="" href="../l4/c08-t02-sessions-vs-tokens.html"><span>Sessions vs tokens</span><span class="kind-pill "></span></a></li><li data-q="oauth2 &amp; openid connect content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md"><a class="" href="../l4/c08-t03-oauth2-and-openid-connect.html"><span>OAuth2 &amp; OpenID Connect</span><span class="kind-pill "></span></a></li><li data-q="jwt (structure, validation, pitfalls) content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md"><a class="" href="../l4/c08-t04-jwt-structure-validation-pitfalls.html"><span>JWT (structure, validation, pitfalls)</span><span class="kind-pill "></span></a></li><li data-q="password storage (bcrypt, argon2) content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md"><a class="" href="../l4/c08-t05-password-storage-bcrypt-argon2.html"><span>Password storage (bcrypt, Argon2)</span><span class="kind-pill "></span></a></li><li data-q="owasp top 10 content/l4-backend-engineering/c08-security/t06-owasp-top-10.md"><a class="" href="../l4/c08-t06-owasp-top-10.html"><span>OWASP Top 10</span><span class="kind-pill "></span></a></li><li data-q="sql injection content/l4-backend-engineering/c08-security/t07-sql-injection.md"><a class="" href="../l4/c08-t07-sql-injection.html"><span>SQL injection</span><span class="kind-pill "></span></a></li><li data-q="xss &amp; csrf content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md"><a class="" href="../l4/c08-t08-xss-and-csrf.html"><span>XSS &amp; CSRF</span><span class="kind-pill "></span></a></li><li data-q="cors &amp; cross-origin requests content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md"><a class="" href="../l4/c08-t09-cors-and-cross-origin-requests.html"><span>CORS &amp; cross-origin requests</span><span class="kind-pill "></span></a></li><li data-q="encryption (symmetric/asymmetric, hashing) content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md"><a class="" href="../l4/c08-t10-encryption-symmetric-asymmetric-hashing.html"><span>Encryption (symmetric/asymmetric, hashing)</span><span class="kind-pill "></span></a></li><li data-q="tls in practice content/l4-backend-engineering/c08-security/t11-tls-in-practice.md"><a class="" href="../l4/c08-t11-tls-in-practice.html"><span>TLS in practice</span><span class="kind-pill "></span></a></li><li data-q="secrets management content/l4-backend-engineering/c08-security/t12-secrets-management.md"><a class="" href="../l4/c08-t12-secrets-management.html"><span>Secrets management</span><span class="kind-pill "></span></a></li><li data-q="security headers content/l4-backend-engineering/c08-security/t13-security-headers.md"><a class="" href="../l4/c08-t13-security-headers.html"><span>Security headers</span><span class="kind-pill "></span></a></li><li data-q="api security best practices content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md"><a class="" href="../l4/c08-t14-api-security-best-practices.html"><span>API security best practices</span><span class="kind-pill "></span></a></li><li data-q="dependency &amp; supply-chain security content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md"><a class="" href="../l4/c08-t15-dependency-and-supply-chain-security.html"><span>Dependency &amp; supply-chain security</span><span class="kind-pill "></span></a></li><li data-q="security architecture &amp; zero trust (intro) content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md"><a class="" href="../l4/c08-t16-security-architecture-and-zero-trust-intro.html"><span>Security architecture &amp; zero trust (intro)</span><span class="kind-pill "></span></a></li><li data-q="jvm-specific cves: log4shell, spring4shell &amp; the anatomy of java vulnerabilities content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md"><a class="" href="../l4/c08-t17-jvm-specific-cves-log4shell-spring4shell.html"><span>JVM-Specific CVEs: Log4Shell, Spring4Shell &amp; the Anatomy of Java Vulnerabilities</span><span class="kind-pill "></span></a></li><li data-q="modern authentication: oauth 2.1, fido2, webauthn &amp; passkeys content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md"><a class="" href="../l4/c08-t18-modern-auth-oauth21-fido2-webauthn-passkeys.html"><span>Modern Authentication: OAuth 2.1, FIDO2, WebAuthn &amp; Passkeys</span><span class="kind-pill "></span></a></li><li data-q="container security: distroless, wolfi, image signing &amp; runtime hardening content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><a class="" href="../l4/c08-t19-container-security-distroless-wolfi-image-signing.html"><span>Container Security: Distroless, Wolfi, Image Signing &amp; Runtime Hardening</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · testing advanced content/l4-backend-engineering/c09-testing-advanced/readme.md content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><summary><span class="caret">▶</span><span>C09 · Testing Advanced</span></summary><ul class="pages"><li data-q="backend engineering — testing — advanced content/l4-backend-engineering/c09-testing-advanced/readme.md"><a class="" href="../l4/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="integration testing content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md"><a class="" href="../l4/c09-t01-integration-testing.html"><span>Integration testing</span><span class="kind-pill "></span></a></li><li data-q="spring boot test slices content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md"><a class="" href="../l4/c09-t02-spring-boot-test-slices.html"><span>Spring Boot test slices</span><span class="kind-pill "></span></a></li><li data-q="testcontainers content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md"><a class="" href="../l4/c09-t03-testcontainers.html"><span>Testcontainers</span><span class="kind-pill "></span></a></li><li data-q="behavior-driven development (bdd, cucumber) content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md"><a class="" href="../l4/c09-t04-behavior-driven-development-bdd-cucumber.html"><span>Behavior-Driven Development (BDD, Cucumber)</span><span class="kind-pill "></span></a></li><li data-q="contract testing (spring cloud contract, pact) content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md"><a class="" href="../l4/c09-t05-contract-testing-spring-cloud-contract-pact.html"><span>Contract testing (Spring Cloud Contract, Pact)</span><span class="kind-pill "></span></a></li><li data-q="mutation testing (pit) content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md"><a class="" href="../l4/c09-t06-mutation-testing-pit.html"><span>Mutation testing (PIT)</span><span class="kind-pill "></span></a></li><li data-q="load &amp; performance testing (jmeter, gatling) content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md"><a class="" href="../l4/c09-t07-load-and-performance-testing-jmeter-gatling.html"><span>Load &amp; performance testing (JMeter, Gatling)</span><span class="kind-pill "></span></a></li><li data-q="the test pyramid &amp; testing strategy content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><a class="" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><span>The test pyramid &amp; testing strategy</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · devops and observability content/l4-backend-engineering/c10-devops-and-observability/readme.md content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><summary><span class="caret">▶</span><span>C10 · Devops And Observability</span></summary><ul class="pages"><li data-q="backend engineering — devops, cloud &amp; observability content/l4-backend-engineering/c10-devops-and-observability/readme.md"><a class="" href="../l4/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="docker &amp; containerization for java content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md"><a class="" href="../l4/c10-t01-docker-and-containerization-for-java.html"><span>Docker &amp; containerization for Java</span><span class="kind-pill "></span></a></li><li data-q="dockerfile best practices for java apps content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md"><a class="" href="../l4/c10-t02-dockerfile-best-practices-for-java-apps.html"><span>Dockerfile best practices for Java apps</span><span class="kind-pill "></span></a></li><li data-q="kubernetes basics content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md"><a class="" href="../l4/c10-t03-kubernetes-basics.html"><span>Kubernetes basics</span><span class="kind-pill "></span></a></li><li data-q="ci/cd concepts content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md"><a class="" href="../l4/c10-t04-ci-cd-concepts.html"><span>CI/CD concepts</span><span class="kind-pill "></span></a></li><li data-q="ci/cd tools (github actions, jenkins, gitlab ci) content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md"><a class="" href="../l4/c10-t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.html"><span>CI/CD tools (GitHub Actions, Jenkins, GitLab CI)</span><span class="kind-pill "></span></a></li><li data-q="deployment strategies (blue-green, canary, rolling) content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md"><a class="" href="../l4/c10-t06-deployment-strategies-blue-green-canary-rolling.html"><span>Deployment strategies (blue-green, canary, rolling)</span><span class="kind-pill "></span></a></li><li data-q="cloud basics for java devs (aws/gcp/azure) content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md"><a class="" href="../l4/c10-t07-cloud-basics-for-java-devs-aws-gcp-azure.html"><span>Cloud basics for Java devs (AWS/GCP/Azure)</span><span class="kind-pill "></span></a></li><li data-q="infrastructure as code (terraform, intro) content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md"><a class="" href="../l4/c10-t08-infrastructure-as-code-terraform-intro.html"><span>Infrastructure as Code (Terraform, intro)</span><span class="kind-pill "></span></a></li><li data-q="configuration and secrets management content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md"><a class="" href="../l4/c10-t09-configuration-and-secrets-management.html"><span>Configuration and secrets management</span><span class="kind-pill "></span></a></li><li data-q="feature flags content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md"><a class="" href="../l4/c10-t10-feature-flags.html"><span>Feature flags</span><span class="kind-pill "></span></a></li><li data-q="logging (slf4j, logback, log4j2, elk) content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md"><a class="" href="../l4/c10-t11-logging-slf4j-logback-log4j2-elk.html"><span>Logging (SLF4J, Logback, Log4j2, ELK)</span><span class="kind-pill "></span></a></li><li data-q="metrics (micrometer, prometheus, grafana) content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md"><a class="" href="../l4/c10-t12-metrics-micrometer-prometheus-grafana.html"><span>Metrics (Micrometer, Prometheus, Grafana)</span><span class="kind-pill "></span></a></li><li data-q="distributed tracing (opentelemetry, jaeger, zipkin) content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md"><a class="" href="../l4/c10-t13-distributed-tracing-opentelemetry-jaeger-zipkin.html"><span>Distributed tracing (OpenTelemetry, Jaeger, Zipkin)</span><span class="kind-pill "></span></a></li><li data-q="health checks and readiness/liveness probes content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md"><a class="" href="../l4/c10-t14-health-checks-and-readiness-liveness-probes.html"><span>Health checks and readiness/liveness probes</span><span class="kind-pill "></span></a></li><li data-q="monitoring and alerting content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md"><a class="" href="../l4/c10-t15-monitoring-and-alerting.html"><span>Monitoring and alerting</span><span class="kind-pill "></span></a></li><li data-q="sre concepts (error budgets, toil) content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md"><a class="" href="../l4/c10-t16-sre-concepts-error-budgets-toil.html"><span>SRE concepts (error budgets, toil)</span><span class="kind-pill "></span></a></li><li data-q="serverless java: aws lambda, snapstart &amp; cold starts content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md"><a class="" href="../l4/c10-t17-serverless-java-lambda-snapstart.html"><span>Serverless Java: AWS Lambda, SnapStart &amp; Cold Starts</span><span class="kind-pill "></span></a></li><li data-q="edge computing with java: workers, lambda@edge &amp; the network edge content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md"><a class="" href="../l4/c10-t18-edge-computing-java.html"><span>Edge Computing with Java: Workers, Lambda@Edge &amp; the Network Edge</span><span class="kind-pill "></span></a></li><li data-q="multi-runtime microservices with dapr content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md"><a class="" href="../l4/c10-t19-multi-runtime-dapr.html"><span>Multi-Runtime Microservices with Dapr</span><span class="kind-pill "></span></a></li><li data-q="ebpf &amp; continuous production profiling content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><a class="" href="../l4/c10-t20-ebpf-and-continuous-production-profiling.html"><span>eBPF &amp; Continuous Production Profiling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · tools and environment content/l4-backend-engineering/c11-tools-and-environment/readme.md content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><summary><span class="caret">▶</span><span>C11 · Tools And Environment</span></summary><ul class="pages"><li data-q="backend engineering — tools &amp; environment content/l4-backend-engineering/c11-tools-and-environment/readme.md"><a class="" href="../l4/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for backend engineering content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><a class="" href="../l4/c11-t01-tools-for-backend-engineering.html"><span>Tools for Backend Engineering</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · hands on content/l4-backend-engineering/c12-hands-on/readme.md content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><summary><span class="caret">▶</span><span>C12 · Hands On</span></summary><ul class="pages"><li data-q="backend engineering — hands-on content/l4-backend-engineering/c12-hands-on/readme.md"><a class="" href="../l4/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 level project: production-grade rest service content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><a class="" href="../l4/c12-t01-level-project-production-grade-rest-service.html"><span>L4 Level Project: Production-Grade REST Service</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · best practices content/l4-backend-engineering/c13-best-practices/readme.md content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><summary><span class="caret">▶</span><span>C13 · Best Practices</span></summary><ul class="pages"><li data-q="backend engineering — best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/readme.md"><a class="" href="../l4/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><a class="" href="../l4/c13-t01-best-practices-and-pitfalls-l4.html"><span>L4 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · interview prep content/l4-backend-engineering/c14-interview-prep/readme.md content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><summary><span class="caret">▶</span><span>C14 · Interview Prep</span></summary><ul class="pages"><li data-q="backend engineering — interview prep content/l4-backend-engineering/c14-interview-prep/readme.md"><a class="" href="../l4/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: senior backend engineer content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><a class="" href="../l4/c14-t01-interview-prep-senior-backend.html"><span>Interview Prep: Senior Backend Engineer</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c15 · qa faq content/l4-backend-engineering/c15-qa-faq/readme.md content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><summary><span class="caret">▶</span><span>C15 · QA FAQ</span></summary><ul class="pages"><li data-q="backend engineering — q&amp;a / faq content/l4-backend-engineering/c15-qa-faq/readme.md"><a class="" href="../l4/c15-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 q&amp;a and faq content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><a class="" href="../l4/c15-t01-l4-qa.html"><span>L4 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c16 · cheatsheets content/l4-backend-engineering/c16-cheatsheets/readme.md content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><summary><span class="caret">▶</span><span>C16 · Cheatsheets</span></summary><ul class="pages"><li data-q="backend engineering — cheatsheets &amp; reference content/l4-backend-engineering/c16-cheatsheets/readme.md"><a class="" href="../l4/c16-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 cheatsheets content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><a class="" href="../l4/c16-t01-l4-cheatsheets.html"><span>L4 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c17 · resources content/l4-backend-engineering/c17-resources/readme.md content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><summary><span class="caret">▶</span><span>C17 · Resources</span></summary><ul class="pages"><li data-q="backend engineering — resources content/l4-backend-engineering/c17-resources/readme.md"><a class="" href="../l4/c17-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 resources content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><a class="" href="../l4/c17-t01-l4-resources.html"><span>L4 Resources</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c18 · ai llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><summary><span class="caret">▶</span><span>C18 · Ai Llm Integration</span></summary><ul class="pages"><li data-q="ai/llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md"><a class="" href="../l4/c18-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="llm api fundamentals — openai, anthropic, local models content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md"><a class="" href="../l4/c18-t01-llm-api-fundamentals.html"><span>LLM API Fundamentals — OpenAI, Anthropic, Local Models</span><span class="kind-pill "></span></a></li><li data-q="langchain4j framework — java&#x27;s leading llm framework content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md"><a class="" href="../l4/c18-t02-langchain4j-framework.html"><span>LangChain4j Framework — Java&#x27;s Leading LLM Framework</span><span class="kind-pill "></span></a></li><li data-q="spring ai framework — spring&#x27;s official llm abstraction content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md"><a class="" href="../l4/c18-t03-spring-ai-framework.html"><span>Spring AI Framework — Spring&#x27;s Official LLM Abstraction</span><span class="kind-pill "></span></a></li><li data-q="prompt engineering for backend engineers — practical patterns content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md"><a class="" href="../l4/c18-t04-prompt-engineering-for-backend-engineers.html"><span>Prompt Engineering for Backend Engineers — Practical Patterns</span><span class="kind-pill "></span></a></li><li data-q="rag patterns — retrieval-augmented generation content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md"><a class="" href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html"><span>RAG Patterns — Retrieval-Augmented Generation</span><span class="kind-pill "></span></a></li><li data-q="vector databases — pinecone, weaviate, pgvector, qdrant content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md"><a class="" href="../l4/c18-t06-vector-databases-pinecone-weaviate-pgvector-qdrant.html"><span>Vector Databases — Pinecone, Weaviate, pgvector, Qdrant</span><span class="kind-pill "></span></a></li><li data-q="embedding generation &amp; storage — production pipelines content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md"><a class="" href="../l4/c18-t07-embedding-generation-and-storage.html"><span>Embedding Generation &amp; Storage — Production Pipelines</span><span class="kind-pill "></span></a></li><li data-q="ai agents with tools / function calling — multi-step workflows content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md"><a class="" href="../l4/c18-t08-ai-agents-with-tools-function-calling.html"><span>AI Agents with Tools / Function Calling — Multi-Step Workflows</span><span class="kind-pill "></span></a></li><li data-q="streaming llm responses — sse and websocket content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md"><a class="" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><span>Streaming LLM Responses — SSE and WebSocket</span><span class="kind-pill "></span></a></li><li data-q="ai observability &amp; cost tracking — opentelemetry, token accounting content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><a class="" href="../l4/c18-t10-ai-observability-and-cost-tracking.html"><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l4/index.html">L4 — Backend Engineering</a><span class="sep">/</span><span>OAuth2 / OpenID Connect / JWT with Spring Security</span></div>
+        <h1>OAuth2 / OpenID Connect / JWT with Spring Security</h1>
+        <div><span class="source-path">content/L4-backend-engineering/C01-spring-framework/T15-oauth2-openid-connect-jwt-with-spring-security.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~95 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        <div class="example-links"><a class="example-link" href="../examples/starter-templates--spring-boot-3-java-21.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Spring Boot 3 + Java 21 — Starter Template</span><span class="example-link-sub">Starter Templates · spring-boot-3-java-21</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a></div>
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "OAuth2 / OpenID Connect / JWT with Spring Security"
+slug: oauth2-openid-connect-jwt-with-spring-security
+level: L4
+module: "Backend Engineering"
+section: "Spring Framework &amp; Ecosystem"
+type: concept
+difficulty: senior
+order: 15
+tags: [oauth2, oidc, openid-connect, jwt, json-web-token, jws, jwe, jwk, jwks, jwks-uri, authorization-code-flow, pkce, code-challenge, code-verifier, client-credentials, refresh-token, implicit-grant-deprecated, password-grant-deprecated, device-code-flow, resource-server, authorization-server, opaque-token, introspection-endpoint, bearer-token, access-token, id-token, refresh-token-rotation, scopes, audience, claims, kid, alg, rs256, hs256, es256, eddsa, public-key, jwt-decoder, nimbus-jwt-decoder, signature-validation, issuer-validation, audience-validation, expiration-validation, jwk-source, jwk-cache, key-rotation, oauth2-client, registered-clients, oauth2-login, spring-authorization-server, authorization-code-grant, token-endpoint, jwt-authentication-token, oauth2-authentication-token, granted-authorities-converter, custom-jwt-converter]
+prerequisites: [spring-security-authentication-and-authorization, spring-mvc-rest-controllers]
+status: complete
+estimated_minutes: 95
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="oauth2-openid-connect-jwt-with-spring-security">OAuth2 / OpenID Connect / JWT with Spring Security</h1>
+<p>Modern backend services almost never store passwords. Authentication is <em>delegated</em> — to Google / Microsoft / Okta / Auth0 / your own SSO IdP — using the <strong>OAuth2</strong> authorization protocol, with <strong>OpenID Connect (OIDC)</strong> layered on top for <em>authentication</em> (OAuth2 alone is "delegated access"; OIDC adds "delegated identity"). The token format that carries the identity from issuer to your service is almost always <strong>JWT (JSON Web Token)</strong> — a self-contained, signed, base64-encoded credential your service can validate without a network call to the issuer (cache the public key, verify the signature, read the claims, done).</p>
+<p>If T14 was the <em>infrastructure</em> of Spring Security (the filter chain, the manager, the context), T15 is the <em>protocol</em> — the precise OAuth2 / OIDC flows, the JWT structure and validation rules, Spring's three OAuth2 modules (<strong>Resource Server</strong>, <strong>Client</strong>, <strong>Authorization Server</strong>), and the operational reality of token lifetime, key rotation, audience validation, scope-based authorization, and the CVE catalog of common JWT mistakes (CVE-2022-21449 ECDSA bypass, JWT <code>alg=none</code>, key confusion, replay).</p>
+<p>The depth-bar this topic clears: at the <strong>language layer</strong>, OAuth2 vocabulary (grant type, scope, client, resource server, authorization server, refresh token, PKCE, audience, opaque token, introspection), JWT structure (header / payload / signature), OIDC's ID-token claims, and Spring Security 6's three OAuth2 modules with their configuration DSL. At the <strong>memory layer</strong>, the JWT validation pipeline — header parsing, signature verification with RSA/ECDSA/EdDSA (CPU cost: ~50–200 µs per token for RS256), JWK cache (key fetched once, cached for hours, refreshed on rotation), claims validation (issuer / audience / expiration). At the <strong>architecture layer</strong> — the heart — the <strong>authorization code + PKCE flow</strong> end-to-end (the only flow you should be using for browser/mobile clients in 2026), <strong>client-credentials</strong> for service-to-service, <strong>how Spring Security 6 wires each module</strong>, the <strong>JWT validator pipeline</strong> (signature + iss + aud + exp + custom claims + scope-to-authorities mapping), and the <strong>pitfalls</strong> that have caused real breaches.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t14-spring-security-authentication-and-authorization.html">Spring Security (T14)</a> — the filter chain and <code>SecurityContext</code>. HTTP request/response (L2/C04/T01). Public-key cryptography basics — what a signature verifies, what a key fingerprint is.</p></div></div>
+<h2 id="the-vocabulary">The Vocabulary<a class="anchor" href="#the-vocabulary" aria-hidden="true">#</a></h2>
+<p>OAuth2 (RFC 6749, 2012) defines four parties:</p>
+<ul>
+<li><strong>Resource Owner</strong> — the user.</li>
+<li><strong>Client</strong> — the application requesting access on the user's behalf (your front-end, mobile app, or backend service).</li>
+<li><strong>Resource Server</strong> — the API holding the user's data (your backend).</li>
+<li><strong>Authorization Server</strong> — the system that authenticates the user and issues tokens (Google, Okta, your own).</li>
+</ul>
+<div class="mermaid">flowchart LR
+  U["Resource Owner (user)"]
+  C["Client (app)"]
+  AS["Authorization Server (issuer)"]
+  RS["Resource Server (your API)"]
+  U -->|"login"| AS
+  C -->|"redirect for auth"| AS
+  AS -->|"access token"| C
+  C -->|"call API with Bearer token"| RS
+  RS -->|"validate token"| RS
+</div>
+<p>The currency exchanged:</p>
+<ul>
+<li><strong>Access token</strong> — opaque to the client; presented to the resource server; short-lived (5–60 min); confers permission.</li>
+<li><strong>Refresh token</strong> — long-lived (hours to days); used to obtain new access tokens without re-prompting the user.</li>
+<li><strong>ID token</strong> (OIDC only) — a JWT containing the user's identity claims; <em>consumed by the client</em>, not the resource server.</li>
+</ul>
+<p>A <strong>scope</strong> is a string the client requests (<code>openid</code>, <code>profile</code>, <code>email</code>, <code>read:orders</code>, <code>write:orders</code>) that the user consents to. The authorization server embeds the granted scopes in the token; the resource server enforces them on each request.</p>
+<div class="mermaid">flowchart LR
+  AT["Access Token (Bearer)"]
+  RT["Refresh Token"]
+  IT["ID Token (OIDC)"]
+  AT -->|"for"| RS["API requests"]
+  RT -->|"for"| Renew["renew access token"]
+  IT -->|"for"| Client["client knows who logged in"]
+</div>
+<h2 id="the-authorization-code-flow-with-pkce">The Authorization Code Flow with PKCE<a class="anchor" href="#the-authorization-code-flow-with-pkce" aria-hidden="true">#</a></h2>
+<p>In 2026 there is exactly one OAuth2 flow you should be using for end-user authentication: <strong>Authorization Code with PKCE</strong> (RFC 7636). The historical alternatives:</p>
+<ul>
+<li><strong>Implicit grant</strong> — deprecated (RFC 8252, 6749 errata). Returns access tokens in URL fragments → leak risk.</li>
+<li><strong>Resource Owner Password Credentials</strong> — deprecated (RFC 8252). The client sees the user's password — defeats the point.</li>
+<li><strong>Authorization Code</strong> (without PKCE) — needs a client secret. Fine for confidential clients (server-side) but useless for public clients (mobile, SPA) that cannot keep a secret.</li>
+<li><strong>Authorization Code with PKCE</strong> — works for both. The current best practice.</li>
+</ul>
+<h3 id="the-flow">The Flow<a class="anchor" href="#the-flow" aria-hidden="true">#</a></h3>
+<div class="mermaid">sequenceDiagram
+  participant User
+  participant App as Client (SPA / mobile / backend)
+  participant AS as Authorization Server
+  participant RS as Resource Server
+  App->>App: 1. generate code_verifier (random ~43-char string)
+  App->>App: 2. code_challenge = SHA256(code_verifier) base64url
+  App->>AS: 3. /authorize?response_type=code&client_id=...&code_challenge=...&code_challenge_method=S256&scope=openid profile email&redirect_uri=...&state=...
+  AS->>User: 4. login + consent UI
+  User-->>AS: 5. credentials + consent
+  AS-->>App: 6. redirect to redirect_uri?code=AUTH_CODE&state=...
+  App->>AS: 7. POST /token: code=AUTH_CODE&code_verifier=...&grant_type=authorization_code&client_id=...&redirect_uri=...
+  AS->>AS: 8. verify SHA256(code_verifier) == stored code_challenge
+  AS-->>App: 9. {access_token, refresh_token, id_token, expires_in}
+  App->>RS: 10. GET /api/... Authorization: Bearer ACCESS_TOKEN
+  RS->>RS: 11. validate token (signature, iss, aud, exp, scope)
+  RS-->>App: 12. response
+</div>
+<p>Why PKCE? The <code>code</code> parameter in step 6 travels through the browser's URL bar / system intent. An attacker who intercepts it (a malicious app on the device, browser history) cannot exchange it for a token without the matching <code>code_verifier</code>, which never left the client app. PKCE binds the code to the originating client without requiring a secret.</p>
+<p>The <code>state</code> parameter in step 3/6 prevents CSRF on the redirect.</p>
+<h2 id="jwt-structure-and-validation">JWT — Structure and Validation<a class="anchor" href="#jwt-structure-and-validation" aria-hidden="true">#</a></h2>
+<p>A JWT is <strong>three base64url segments joined by dots</strong>:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>eyJhbGciOiJSUzI1NiIsImtpZCI6ImtpZC0xMjMifQ.eyJzdWIiOiJ1c2VyXzQyIiwiaXNzIjoiaHR0cHM6Ly9pc3N1ZXIuZXhhbXBsZS5jb20iLCJhdWQiOiJvcmRlcnMtc2VydmljZSIsImlhdCI6MTcxNzc3MDAwMCwiZXhwIjoxNzE3NzczNjAwLCJzY29wZSI6InJlYWQ6b3JkZXJzIHdyaXRlOm9yZGVycyJ9.SIGNATURE_BYTES
+</code></pre></div>
+<p>Decoded:</p>
+<p><strong>Header</strong> (algorithm + key id):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-json">{ &quot;alg&quot;: &quot;RS256&quot;, &quot;kid&quot;: &quot;kid-123&quot; }
+</code></pre></div>
+<p><strong>Payload</strong> (claims):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-json">{
+  &quot;sub&quot;: &quot;user_42&quot;,
+  &quot;iss&quot;: &quot;https://issuer.example.com&quot;,
+  &quot;aud&quot;: &quot;orders-service&quot;,
+  &quot;iat&quot;: 1717770000,
+  &quot;exp&quot;: 1717773600,
+  &quot;scope&quot;: &quot;read:orders write:orders&quot;
+}
+</code></pre></div>
+<p><strong>Signature</strong> — the cryptographic signature of <code>base64url(header) + "." + base64url(payload)</code> using the algorithm and the issuer's private key.</p>
+<div class="mermaid">flowchart LR
+  H["header: {alg, kid}"]
+  P["payload: {sub, iss, aud, iat, exp, scope, ...}"]
+  S["signature: sign(header.payload, private-key)"]
+  JWT["JWT = base64url(H) . base64url(P) . base64url(S)"]
+  H --> JWT
+  P --> JWT
+  S --> JWT
+</div>
+<h3 id="standard-claims-rfc-7519">Standard Claims (RFC 7519)<a class="anchor" href="#standard-claims-rfc-7519" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>iss</code></td>
+<td>Issuer — the authorization server's URL</td>
+</tr>
+<tr>
+<td><code>sub</code></td>
+<td>Subject — the user (or client) id</td>
+</tr>
+<tr>
+<td><code>aud</code></td>
+<td>Audience — the resource server(s) the token is for</td>
+</tr>
+<tr>
+<td><code>exp</code></td>
+<td>Expiration time (Unix seconds)</td>
+</tr>
+<tr>
+<td><code>nbf</code></td>
+<td>Not before — earliest valid time</td>
+</tr>
+<tr>
+<td><code>iat</code></td>
+<td>Issued at</td>
+</tr>
+<tr>
+<td><code>jti</code></td>
+<td>JWT ID — unique per token, useful for revocation</td>
+</tr>
+</tbody>
+</table></div>
+<p>OIDC adds: <code>nonce</code> (prevents replay), <code>auth_time</code> (when the user authenticated), <code>acr</code> (auth context class), and user-info claims (<code>email</code>, <code>name</code>, <code>picture</code>, …).</p>
+<h3 id="validating-a-jwt">Validating a JWT<a class="anchor" href="#validating-a-jwt" aria-hidden="true">#</a></h3>
+<p>The minimum checks a resource server must perform:</p>
+<ol>
+<li><strong>Signature</strong> — verify with the issuer's public key.</li>
+<li><strong><code>iss</code></strong> — exactly matches the expected issuer URL.</li>
+<li><strong><code>aud</code></strong> — includes your service's identifier.</li>
+<li><strong><code>exp</code></strong> — not expired (with a small clock-skew tolerance, ~60 s).</li>
+<li><strong><code>nbf</code></strong> — if present, time is past it.</li>
+<li><strong><code>alg</code></strong> — matches the algorithm you accept. <strong>Never accept <code>alg=none</code>.</strong> <strong>Never accept a symmetric algorithm (<code>HS256</code>) if you expect asymmetric (<code>RS256</code>).</strong></li>
+<li><strong>Optional</strong>: <code>jti</code> against a revocation list; custom claims like <code>scope</code>, <code>tenant</code>.</li>
+</ol>
+<p>The <code>kid</code> (key id) in the header tells you <em>which</em> of the issuer's keys to use. Issuers expose their public keys at a <strong>JWKS endpoint</strong> (<code>https://issuer.example.com/.well-known/jwks.json</code>), an JSON array of JWKs (JSON Web Keys). Spring's <code>NimbusJwtDecoder</code> fetches and caches the JWKS, picks the key matching the <code>kid</code>, and verifies.</p>
+<div class="mermaid">flowchart TB
+  Tok["JWT received in Authorization: Bearer ..."]
+  Hdr["parse header: {alg=RS256, kid=kid-123}"]
+  Fetch["fetch JWKS from jwks_uri (cached)"]
+  Pick["pick JWK where kid=kid-123"]
+  Key["extract public key (RSA exponent + modulus)"]
+  Verify["verify signature with public key + alg"]
+  Claims["read payload claims"]
+  Iss["iss == expected?"]
+  Aud["aud contains us?"]
+  Exp["exp > now (with skew)?"]
+  Scope["map scope claim → GrantedAuthority list"]
+  AuthTok["produce JwtAuthenticationToken"]
+  Tok --> Hdr --> Fetch --> Pick --> Key --> Verify --> Claims --> Iss --> Aud --> Exp --> Scope --> AuthTok
+</div>
+<h2 id="spring-security-as-a-resource-server">Spring Security as a Resource Server<a class="anchor" href="#spring-security-as-a-resource-server" aria-hidden="true">#</a></h2>
+<p>The most common Spring Security OAuth2 role for backend services. Add the starter:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-oauth2-resource-server&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre></div>
+<p>Configure:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://issuer.example.com
+          # or: jwk-set-uri: https://issuer.example.com/.well-known/jwks.json
+          # or: public-key-location: classpath:public.pem
+</code></pre></div>
+<p><code>issuer-uri</code> is preferred — Spring fetches the OIDC discovery document at <code>{issuer}/.well-known/openid-configuration</code>, which contains the <code>jwks_uri</code>, supported algorithms, etc. Auto-configured.</p>
+<p>The minimal <code>SecurityFilterChain</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public SecurityFilterChain api(HttpSecurity http) throws Exception {
+    return http
+        .securityMatcher(&quot;/api/**&quot;)
+        .authorizeHttpRequests(auth -&gt; auth.anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()))
+        .sessionManagement(s -&gt; s.sessionCreationPolicy(STATELESS))
+        .csrf(CsrfConfigurer::disable)
+        .build();
+}
+</code></pre></div>
+<p>With these ~10 lines, every request to <code>/api/**</code> must carry a valid JWT bearer token issued by your IdP.</p>
+<h3 id="mapping-scopes-roles-to-authorities">Mapping Scopes / Roles to Authorities<a class="anchor" href="#mapping-scopes-roles-to-authorities" aria-hidden="true">#</a></h3>
+<p>The default <code>JwtAuthenticationConverter</code> maps the <code>scope</code> (or <code>scp</code>) claim into <code>GrantedAuthority</code> instances with the <code>SCOPE_</code> prefix:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>scope: &quot;read:orders write:orders&quot;
+→ authorities: [&quot;SCOPE_read:orders&quot;, &quot;SCOPE_write:orders&quot;]
+</code></pre></div>
+<p>Authorize:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">.authorizeHttpRequests(auth -&gt; auth
+    .requestMatchers(GET, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_read:orders&quot;)
+    .requestMatchers(POST, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_write:orders&quot;)
+    .anyRequest().authenticated()
+)
+</code></pre></div>
+<p>For roles instead of scopes (or in addition), customize the converter:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public JwtAuthenticationConverter jwtConverter() {
+    JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
+    scopes.setAuthorityPrefix(&quot;SCOPE_&quot;);
+    scopes.setAuthoritiesClaimName(&quot;scope&quot;);
+
+    JwtAuthenticationConverter c = new JwtAuthenticationConverter();
+    c.setJwtGrantedAuthoritiesConverter(jwt -&gt; {
+        Collection&lt;GrantedAuthority&gt; auth = new ArrayList&lt;&gt;(scopes.convert(jwt));
+        // also include realm_access.roles (Keycloak style)
+        Object realmAccess = jwt.getClaims().get(&quot;realm_access&quot;);
+        if (realmAccess instanceof Map&lt;?, ?&gt; ra &amp;&amp; ra.get(&quot;roles&quot;) instanceof List&lt;?&gt; roles) {
+            roles.forEach(r -&gt; auth.add(new SimpleGrantedAuthority(&quot;ROLE_&quot; + r)));
+        }
+        return auth;
+    });
+    return c;
+}
+</code></pre></div>
+<p>Wire to the resource-server config:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">.oauth2ResourceServer(o -&gt; o.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtConverter())));
+</code></pre></div>
+<h3 id="reading-the-jwt-in-a-controller">Reading the JWT in a Controller<a class="anchor" href="#reading-the-jwt-in-a-controller" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@RestController
+public class OrderController {
+
+    @GetMapping(&quot;/api/orders&quot;)
+    public List&lt;Order&gt; list(@AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return orderService.findByUser(userId);
+    }
+}
+</code></pre></div>
+<p><code>@AuthenticationPrincipal</code> resolves to the <code>Jwt</code> (the parsed token). The <code>JwtAuthenticationToken</code> wraps it as the <code>SecurityContext</code>'s <code>Authentication</code>.</p>
+<h3 id="opaque-tokens-introspection">Opaque Tokens — Introspection<a class="anchor" href="#opaque-tokens-introspection" aria-hidden="true">#</a></h3>
+<p>Some IdPs issue <em>opaque</em> tokens (random strings, not JWT). Validation requires calling the IdP's introspection endpoint:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://issuer/oauth2/introspect
+          client-id: my-resource-server
+          client-secret: ${INTROSPECT_SECRET}
+</code></pre></div>
+<p>Spring calls <code>POST /oauth2/introspect</code> with the token; the IdP returns <code>{ "active": true, "sub": "...", "scope": "...", ... }</code>. Higher network cost than JWT (one HTTP call per request); use a cache (<code>CaffeineOpaqueTokenIntrospector</code> wrap) in production.</p>
+<p>JWT vs opaque trade-off: JWT is faster and self-contained but cannot be revoked mid-life (need to wait for expiry, or maintain a revocation list). Opaque is per-request but revocable instantly. Choose based on your security/perf needs.</p>
+<h2 id="spring-security-as-an-oauth2-client">Spring Security as an OAuth2 Client<a class="anchor" href="#spring-security-as-an-oauth2-client" aria-hidden="true">#</a></h2>
+<p>For server-side apps that <em>log users in</em> via an external IdP (Google, Okta, etc.):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-oauth2-client&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre></div>
+<p>Configure:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,profile,email
+            redirect-uri: &quot;{baseUrl}/login/oauth2/code/{registrationId}&quot;
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+</code></pre></div>
+<p><code>SecurityFilterChain</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public SecurityFilterChain web(HttpSecurity http) throws Exception {
+    return http
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(&quot;/&quot;, &quot;/login&quot;).permitAll()
+            .anyRequest().authenticated())
+        .oauth2Login(Customizer.withDefaults())
+        .build();
+}
+</code></pre></div>
+<p>Spring wires the entire OAuth2 dance — when an unauthenticated user hits a protected URL, they're redirected to <code>/oauth2/authorization/google</code>, which redirects to Google, comes back to <code>/login/oauth2/code/google</code>, exchanges code for tokens, stores the <code>OAuth2AuthenticationToken</code> in the session, and continues to the original URL.</p>
+<h3 id="calling-other-services-with-the-users-token">Calling Other Services with the User's Token<a class="anchor" href="#calling-other-services-with-the-users-token" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public RestClient restClient(OAuth2AuthorizedClientManager mgr) {
+    return RestClient.builder()
+        .requestInterceptor((req, body, exec) -&gt; {
+            OAuth2AuthorizeRequest auth = OAuth2AuthorizeRequest
+                .withClientRegistrationId(&quot;google&quot;)
+                .principal(SecurityContextHolder.getContext().getAuthentication())
+                .build();
+            OAuth2AuthorizedClient client = mgr.authorize(auth);
+            req.getHeaders().setBearerAuth(client.getAccessToken().getTokenValue());
+            return exec.execute(req, body);
+        })
+        .build();
+}
+</code></pre></div>
+<p>Spring obtains a token, refreshes if needed, and attaches it as <code>Authorization: Bearer ...</code> to outgoing requests.</p>
+<h3 id="service-to-service-client-credentials">Service-to-Service: Client Credentials<a class="anchor" href="#service-to-service-client-credentials" aria-hidden="true">#</a></h3>
+<p>For backend-to-backend calls (no user involved):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          inventory-service:
+            authorization-grant-type: client_credentials
+            client-id: ${INV_CLIENT_ID}
+            client-secret: ${INV_CLIENT_SECRET}
+            scope: read:inventory
+        provider:
+          inventory-service:
+            token-uri: https://issuer/oauth2/token
+</code></pre></div>
+<p>The client gets its own access token (no user); use it to call the other service. Spring caches the token until expiry and refreshes automatically.</p>
+<h2 id="spring-authorization-server">Spring Authorization Server<a class="anchor" href="#spring-authorization-server" aria-hidden="true">#</a></h2>
+<p>If you need to <em>be</em> an authorization server (issue tokens to your own clients), Spring Authorization Server (separate project, GA 2022) is the path. Self-hosts an OAuth2 + OIDC IdP.</p>
+<p>Coverage of running your own IdP is deep enough for its own topic — typically you use a third-party (Keycloak, Auth0, Okta) instead of running your own.</p>
+<h2 id="jwt-pitfalls-the-cve-catalog">JWT Pitfalls — The CVE Catalog<a class="anchor" href="#jwt-pitfalls-the-cve-catalog" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong><code>alg=none</code> acceptance.</strong> Some libraries default to accepting the unsigned <code>alg=none</code> JWT. An attacker can forge any token. Spring's <code>NimbusJwtDecoder</code> rejects <code>alg=none</code> by default — verify your configuration matches.</p><p>[!WARNING]
+<strong><code>HS256</code> vs <code>RS256</code> key confusion.</strong> If your verifier accepts both <code>HS256</code> and <code>RS256</code>, an attacker can take the issuer's <em>public</em> RSA key, sign a token with HMAC-SHA256 using the public-key bytes as the secret, and the verifier (using the public key as if it were the HMAC secret) accepts it. <strong>Pin the algorithm.</strong> Spring 6: <code>JwtDecoderBuilder.jwsAlgorithm(SignatureAlgorithm.RS256)</code>.</p>
+<p>[!WARNING]
+<strong>CVE-2022-21449 — ECDSA signature bypass.</strong> Pre-fix JDKs accepted ECDSA signatures with <code>r=0, s=0</code>. If your IdP uses ES256/ES384/ES512, <strong>update your JDK</strong> to a fixed version.</p>
+<p>[!WARNING]
+<strong>Missing <code>aud</code> validation.</strong> A token issued for another service is accepted by yours. Validate <code>aud</code>.</p>
+<p>[!WARNING]
+<strong>Missing <code>iss</code> validation.</strong> Spring's <code>issuer-uri</code> configuration adds it automatically. If you wire the decoder manually, add an <code>IssuerValidator</code>.</p>
+<p>[!WARNING]
+<strong>Trusting <code>kid</code> blindly.</strong> A token with <code>kid=../../malicious.pem</code> once worked against naive implementations that loaded the key from a path. Use Spring's JWKS-based key resolution, which only accepts keys present in the JWKS.</p>
+<p>[!WARNING]
+<strong>Reusing access tokens across services.</strong> Each token should be <code>aud</code>-bound to a specific resource server. A token for the orders service should not be valid for the payments service. Configure <code>aud</code> claims at the IdP.</p>
+<p>[!WARNING]
+<strong>Long-lived access tokens.</strong> A 24-hour access token gives an attacker who steals one 24 hours of access. Use short access tokens (5–15 min) + refresh tokens.</p>
+<p>[!WARNING]
+<strong>Storing tokens in <code>localStorage</code>.</strong> Browser JavaScript can read it; XSS = total compromise. Use HttpOnly cookies (with <code>SameSite=Lax</code> or <code>Strict</code>) for browser apps. For mobile, secure native storage (Keychain / Keystore).</p>
+<p>[!WARNING]
+<strong>Allowing <code>nbf</code> and <code>exp</code> past clock skew.</strong> Default tolerance is 60 s; do not extend without thought.</p></div></div>
+<h2 id="oidc-id-token-dont-use-for-api-authorization">OIDC ID Token — Don't Use For API Authorization<a class="anchor" href="#oidc-id-token-dont-use-for-api-authorization" aria-hidden="true">#</a></h2>
+<p>The ID token (OIDC) carries the user's identity to the <em>client</em>. It is <strong>not</strong> for resource-server authorization.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-json">{
+  &quot;iss&quot;: &quot;https://accounts.google.com&quot;,
+  &quot;sub&quot;: &quot;user_42&quot;,
+  &quot;aud&quot;: &quot;your-client-id&quot;,   // ← your CLIENT, not your resource server
+  &quot;exp&quot;: ...,
+  &quot;iat&quot;: ...,
+  &quot;nonce&quot;: &quot;random&quot;,
+  &quot;email&quot;: &quot;alice@example.com&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;name&quot;: &quot;Alice Example&quot;
+}
+</code></pre></div>
+<p>Two confusion points:</p>
+<ul>
+<li>The <code>aud</code> is your <em>client</em>, not your API. A resource server validating an ID token (and accepting <code>aud=client-id</code>) is misconfigured.</li>
+<li>The lifetime is usually short (5–15 min); the ID token is consumed once at login. Long-lived sessions use <em>cookies</em> or refresh tokens, not the ID token.</li>
+</ul>
+<p>Use the access token for API calls; use the ID token at login for who-just-logged-in. Different jobs.</p>
+<h2 id="worked-example-end-to-end">Worked Example — End-to-End<a class="anchor" href="#worked-example-end-to-end" aria-hidden="true">#</a></h2>
+<p>A SPA (React) talking to a Spring resource server, via Auth0.</p>
+<ol>
+<li><strong>Front-end</strong> initiates Authorization Code + PKCE with Auth0; receives <code>access_token</code> (JWT, aud=<code>orders-api</code>) and <code>id_token</code> (aud=<code>spa-client-id</code>).</li>
+<li>SPA stores tokens in memory (not localStorage). Calls <code>GET /api/orders</code> with <code>Authorization: Bearer ACCESS_TOKEN</code>.</li>
+<li>Spring's resource-server config — <code>issuer-uri: https://your-tenant.auth0.com/</code> — auto-fetches JWKS, decodes the JWT, validates signature + iss + aud + exp.</li>
+<li><code>JwtAuthenticationConverter</code> reads <code>scope: "read:orders write:orders"</code> claim → authorities <code>SCOPE_read:orders</code>, <code>SCOPE_write:orders</code>.</li>
+<li><code>authorizeHttpRequests</code> rule <code>requestMatchers(GET, "/api/orders/**").hasAuthority("SCOPE_read:orders")</code> passes.</li>
+<li>Controller method runs.</li>
+</ol>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public SecurityFilterChain api(HttpSecurity http) throws Exception {
+    return http
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(GET, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_read:orders&quot;)
+            .requestMatchers(POST, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_write:orders&quot;)
+            .anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtConverter())))
+        .sessionManagement(s -&gt; s.sessionCreationPolicy(STATELESS))
+        .csrf(CsrfConfigurer::disable)
+        .cors(Customizer.withDefaults())
+        .build();
+}
+
+@Bean
+public JwtAuthenticationConverter jwtConverter() {
+    JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
+    scopes.setAuthorityPrefix(&quot;SCOPE_&quot;);
+    JwtAuthenticationConverter c = new JwtAuthenticationConverter();
+    c.setJwtGrantedAuthoritiesConverter(scopes);
+    return c;
+}
+
+@Bean
+public CorsConfigurationSource corsConfig() {
+    CorsConfiguration cors = new CorsConfiguration();
+    cors.setAllowedOrigins(List.of(&quot;https://app.example.com&quot;));
+    cors.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));
+    cors.setAllowedHeaders(List.of(&quot;Authorization&quot;, &quot;Content-Type&quot;));
+    cors.setMaxAge(3600L);
+    UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
+    src.registerCorsConfiguration(&quot;/api/**&quot;, cors);
+    return src;
+}
+</code></pre></div>
+<p>Yaml:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://your-tenant.auth0.com/
+          audiences: orders-api
+</code></pre></div>
+<p>That is the whole resource-server config. Auth0 / Keycloak / Okta / your own IdP — same shape.</p>
+<h2 id="common-pitfalls">Common Pitfalls<a class="anchor" href="#common-pitfalls" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Configuring <code>jwk-set-uri</code> directly when <code>issuer-uri</code> would do.</strong> <code>issuer-uri</code> reads the OIDC discovery document and configures issuer + jwks_uri together. Using <code>jwk-set-uri</code> alone skips issuer validation.</p><p>[!WARNING]
+<strong>Missing <code>audiences</code> config.</strong> Without it, Spring does not validate <code>aud</code>. Tokens for other services are accepted. Add <code>spring.security.oauth2.resourceserver.jwt.audiences</code>.</p>
+<p>[!WARNING]
+<strong>Default <code>JwtAuthenticationConverter</code> prefix <code>SCOPE_</code>.</strong> If your authorization rules use <code>hasRole</code>/<code>hasAuthority</code> with different prefixes, configure the converter to match. Inconsistency causes silent 403s.</p>
+<p>[!WARNING]
+<strong>CORS not enabled for the OAuth2 endpoints.</strong> Your SPA's <code>OPTIONS /api/orders</code> preflight has no <code>Authorization</code>; Spring Security rejects it. Make sure <code>permitAll()</code> matches CORS preflights — or use <code>cors(Customizer.withDefaults())</code> which short-circuits preflights.</p>
+<p>[!WARNING]
+<strong>Storing tokens in browser localStorage.</strong> XSS reads them all. Use HttpOnly cookies; sacrifice a bit of cross-origin convenience for the security.</p>
+<p>[!WARNING]
+<strong>Skipping refresh-token rotation.</strong> Spring's default does not rotate refresh tokens on use; an exfiltrated refresh token works until expiry. Enable rotation at the IdP (Okta / Auth0 support it).</p>
+<p>[!WARNING]
+<strong>Long token TTL "for convenience."</strong> 24-hour access tokens are too long. Make access tokens short (5–15 min), refresh tokens shorter than you expected (24 h, not 30 d).</p></div></div>
+<h2 id="deeper-dive-all-five-oauth2-grant-types">Deeper Dive — All Five OAuth2 Grant Types<a class="anchor" href="#deeper-dive-all-five-oauth2-grant-types" aria-hidden="true">#</a></h2>
+<h3 id="1-authorization-code-pkce-the-modern-default">1. Authorization Code + PKCE (the modern default)<a class="anchor" href="#1-authorization-code-pkce-the-modern-default" aria-hidden="true">#</a></h3>
+<p><strong>When</strong>: SPAs, mobile apps, server-side web apps. Any client that can keep a redirect URI registered.</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>User clicks &quot;Login&quot; → app redirects to:
+  /authorize?response_type=code
+            &amp;client_id=abc
+            &amp;redirect_uri=https://app/callback
+            &amp;scope=openid+profile+orders.read
+            &amp;state=xyz123                       ← CSRF protection
+            &amp;code_challenge=BASE64URL(SHA256(verifier))
+            &amp;code_challenge_method=S256
+
+User logs in at IdP → IdP redirects back:
+  https://app/callback?code=AUTH_CODE&amp;state=xyz123
+
+App exchanges code for tokens (server-to-server):
+  POST /token
+  grant_type=authorization_code
+  &amp;code=AUTH_CODE
+  &amp;redirect_uri=https://app/callback
+  &amp;client_id=abc
+  &amp;code_verifier=ORIGINAL_VERIFIER   ← proves it was the same client that started
+
+Response:
+  { &quot;access_token&quot;: &quot;eyJ...&quot;, &quot;refresh_token&quot;: &quot;abc...&quot;, &quot;id_token&quot;: &quot;eyJ...&quot; }
+</code></pre></div>
+<p><strong>PKCE rationale</strong>: prevents authorization-code interception in mobile/SPA. Even if attacker steals the code from the redirect, they can't exchange it without the original <code>code_verifier</code>.</p>
+<h3 id="2-client-credentials-machine-to-machine">2. Client Credentials (machine-to-machine)<a class="anchor" href="#2-client-credentials-machine-to-machine" aria-hidden="true">#</a></h3>
+<p><strong>When</strong>: backend service calling another backend service. No user context.</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>POST /token
+grant_type=client_credentials
+&amp;client_id=svc-payment
+&amp;client_secret=SECRET
+&amp;scope=payments.write
+
+→ { &quot;access_token&quot;: &quot;eyJ...&quot; }
+</code></pre></div>
+<p>Spring OAuth2 Client config:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          payment-api:
+            client-id: svc-payment
+            client-secret: ${PAYMENT_SECRET}
+            authorization-grant-type: client_credentials
+            scope: payments.write
+        provider:
+          payment-api:
+            token-uri: https://auth.example.com/oauth/token
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Inject the OAuth2 client
+@Service
+public class PaymentClient {
+    private final WebClient webClient;
+
+    public PaymentClient(WebClient.Builder builder,
+                         OAuth2AuthorizedClientManager manager) {
+        var oauth2Filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(manager);
+        oauth2Filter.setDefaultClientRegistrationId(&quot;payment-api&quot;);
+        this.webClient = builder.filter(oauth2Filter).build();
+    }
+
+    public Payment charge(Charge charge) {
+        return webClient.post().uri(&quot;/api/charges&quot;).bodyValue(charge)
+                        .retrieve().bodyToMono(Payment.class).block();
+    }
+}
+</code></pre></div>
+<h3 id="3-resource-owner-password-credentials-deprecated-dont-use">3. Resource Owner Password Credentials (DEPRECATED — don't use)<a class="anchor" href="#3-resource-owner-password-credentials-deprecated-dont-use" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>POST /token
+grant_type=password
+&amp;username=alice
+&amp;password=hunter2
+&amp;client_id=app
+</code></pre></div>
+<p><strong>Why deprecated</strong> (OAuth 2.1 will remove it): the client app sees the user's password. Defeats the whole point of OAuth (delegation without sharing credentials). Only justifiable for legacy first-party apps with no migration path.</p>
+<h3 id="4-implicit-flow-deprecated-dont-use">4. Implicit Flow (DEPRECATED — don't use)<a class="anchor" href="#4-implicit-flow-deprecated-dont-use" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>/authorize?response_type=token&amp;...
+→ redirect with #access_token=eyJ... in URL fragment
+</code></pre></div>
+<p><strong>Why deprecated</strong>: tokens in URL → leak via referrer headers, browser history, server logs. Use Authorization Code + PKCE instead (works for SPAs too).</p>
+<h3 id="5-device-code-flow-tvs-cli-tools-iot">5. Device Code Flow (TVs, CLI tools, IoT)<a class="anchor" href="#5-device-code-flow-tvs-cli-tools-iot" aria-hidden="true">#</a></h3>
+<p><strong>When</strong>: device has no browser or is hard to type on.</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Step 1: Device requests:
+  POST /device/authorize?client_id=tv-app
+  → { &quot;device_code&quot;: &quot;xyz&quot;, &quot;user_code&quot;: &quot;ABCD-EFGH&quot;,
+      &quot;verification_uri&quot;: &quot;https://example.com/device&quot;,
+      &quot;expires_in&quot;: 600, &quot;interval&quot;: 5 }
+
+Step 2: Device shows user_code on screen (&quot;Visit example.com/device, enter ABCD-EFGH&quot;)
+
+Step 3: User goes to verification_uri on phone/laptop, enters user_code, approves.
+
+Step 4: Device polls every 5s:
+  POST /token
+  grant_type=urn:ietf:params:oauth:grant-type:device_code
+  &amp;device_code=xyz
+  &amp;client_id=tv-app
+  → 400 authorization_pending  (until user approves)
+  → 200 { &quot;access_token&quot;: &quot;eyJ...&quot;, &quot;refresh_token&quot;: &quot;abc...&quot; }
+</code></pre></div>
+<p>Used by Netflix on TVs, GitHub CLI, kubectl OIDC plugin, AWS CLI SSO.</p>
+<h2 id="deeper-dive-jwt-validation-step-by-step">Deeper Dive — JWT Validation Step-by-Step<a class="anchor" href="#deeper-dive-jwt-validation-step-by-step" aria-hidden="true">#</a></h2>
+<p>When a request arrives with <code>Authorization: Bearer eyJhbGc...</code>:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>1. PARSE
+   - Split on '.'  → header.payload.signature (3 parts)
+   - Base64-decode header + payload to JSON
+   - If structure wrong → 401 &quot;Malformed token&quot;
+
+2. HEADER VALIDATION
+   - alg ∈ allowed set? (e.g., {RS256, ES256}; NEVER {none, HS256-when-RS256-expected})
+   - kid (key ID) present? → use to find correct key
+
+3. SIGNATURE VERIFICATION
+   - Fetch JWKS from /.well-known/jwks.json (cached, with refresh on kid miss)
+   - Find key by kid; algo must match
+   - Compute hash(header.payload) with key; compare to signature
+   - If mismatch → 401 &quot;Invalid signature&quot;
+
+4. CLAIM VALIDATION
+   - exp &gt; now? (else &quot;Token expired&quot;)
+   - nbf &lt;= now? (not-before; else &quot;Token not yet valid&quot;)
+   - iss == expected_issuer? (else &quot;Wrong issuer&quot;)
+   - aud contains expected_audience? (else &quot;Wrong audience&quot;)
+   - iat &lt;= now? (sanity check)
+
+5. AUTHORIZATION
+   - Extract scope / roles / authorities from claims
+   - Map to Spring Authority objects
+   - Build SecurityContext with Authentication
+
+6. (Optional) Check denylist
+   - For known-revoked JTIs (Redis set lookup)
+   - Adds ~1ms; trades stateless purity for revocation capability
+</code></pre></div>
+<p><strong>Spring Security 6 does all this automatically</strong> given:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring.security.oauth2.resourceserver:
+  jwt:
+    issuer-uri: https://auth.example.com/realms/myapp
+    audiences: my-api
+</code></pre></div>
+<p>Plus:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">http.oauth2ResourceServer(rs -&gt; rs.jwt(jwt -&gt; jwt
+    .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+</code></pre></div>
+<h2 id="deeper-dive-jwks-key-rotation-strategy">Deeper Dive — JWKS Key Rotation Strategy<a class="anchor" href="#deeper-dive-jwks-key-rotation-strategy" aria-hidden="true">#</a></h2>
+<p>The IdP rotates its signing key periodically (typically weekly):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Time T:
+  Active key: kid=&quot;key-2024-W23-001&quot; (used to sign new tokens)
+  Previous key: kid=&quot;key-2024-W22-001&quot; (still valid for verification — last 7 days of tokens)
+
+JWKS endpoint returns BOTH:
+  { &quot;keys&quot;: [
+      { &quot;kid&quot;: &quot;key-2024-W23-001&quot;, &quot;kty&quot;: &quot;RSA&quot;, &quot;n&quot;: &quot;...&quot;, &quot;e&quot;: &quot;AQAB&quot; },
+      { &quot;kid&quot;: &quot;key-2024-W22-001&quot;, &quot;kty&quot;: &quot;RSA&quot;, &quot;n&quot;: &quot;...&quot;, &quot;e&quot;: &quot;AQAB&quot; }
+    ]
+  }
+
+Time T+1 week:
+  New active: kid=&quot;key-2024-W24-001&quot;
+  Previous: kid=&quot;key-2024-W23-001&quot;
+  Old removed: kid=&quot;key-2024-W22-001&quot; (its tokens expired by now)
+</code></pre></div>
+<p>Spring Security caches JWKS (default 5 min). On unknown <code>kid</code>, it refreshes from JWKS endpoint. So new keys are picked up automatically; old keys remain valid until their tokens naturally expire.</p>
+<p><strong>Critical</strong>: never use HS256 (symmetric) for multi-service architectures — every service needs the same secret = wider compromise blast radius. Use RS256 / ES256 (asymmetric) so only the IdP has the private key.</p>
+<h2 id="deeper-dive-refresh-token-rotation-reuse-detection">Deeper Dive — Refresh Token Rotation (Reuse Detection)<a class="anchor" href="#deeper-dive-refresh-token-rotation-reuse-detection" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class RefreshTokenService {
+    @Transactional
+    public TokenPair refresh(String refreshToken) {
+        RefreshTokenRecord record = repo.findById(refreshToken)
+            .orElseThrow(() -&gt; new InvalidTokenException());
+
+        if (record.used()) {
+            // CRITICAL: refresh token reused → session compromised
+            // Revoke entire family of refresh tokens (all from the user's current session)
+            repo.revokeFamilyByUserId(record.userId(), record.sessionId());
+            // Log + alert security team
+            log.warn(&quot;Refresh token reuse detected: user={} session={}&quot;,
+                     record.userId(), record.sessionId());
+            throw new SecurityException(&quot;Token reuse detected; please re-login&quot;);
+        }
+
+        // Mark old as used + issue new pair
+        record.markUsed();
+        String newRefresh = repo.save(new RefreshTokenRecord(
+            UUID.randomUUID().toString(),
+            record.userId(),
+            record.sessionId(),
+            Instant.now().plus(7, DAYS)
+        )).id();
+
+        String newAccess = accessTokenService.create(
+            record.userId(),
+            Duration.ofMinutes(15)
+        );
+
+        return new TokenPair(newAccess, newRefresh);
+    }
+}
+</code></pre></div>
+<p><strong>Attack scenario</strong> this defeats:
+1. Attacker steals refresh token (XSS, network).
+2. Either attacker or legitimate user uses it first → issues new pair, old marked used.
+3. The other party uses it (the now-used one) → triggers reuse detection.
+4. All session tokens revoked → user must re-authenticate.</p>
+<p><strong>Window of attack</strong>: from theft to next legitimate refresh (typically minutes-to-hours instead of days).</p>
+<h2 id="deeper-dive-common-jwt-vulnerabilities-cve-catalog">Deeper Dive — Common JWT Vulnerabilities (CVE Catalog)<a class="anchor" href="#deeper-dive-common-jwt-vulnerabilities-cve-catalog" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Vulnerability</th>
+<th>Mechanism</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>alg=none</strong></td>
+<td>Token with <code>"alg":"none"</code> and no signature accepted</td>
+<td>Whitelist allowed algorithms; reject <code>none</code></td>
+</tr>
+<tr>
+<td><strong>alg substitution</strong></td>
+<td>Send <code>alg=HS256</code> when server expects <code>alg=RS256</code>; HMAC the public key as the secret</td>
+<td>Configure decoder for ONE expected algorithm</td>
+</tr>
+<tr>
+<td><strong>Key confusion</strong></td>
+<td>Public key used as HMAC secret</td>
+<td>Server should only accept matching algorithm per key type</td>
+</tr>
+<tr>
+<td><strong>Weak HS256 secret</strong></td>
+<td>Brute-force 256-bit symmetric key offline</td>
+<td>Use 256+ bit random secret; better: asymmetric RS256/ES256</td>
+</tr>
+<tr>
+<td><strong>JKU/X5U injection</strong></td>
+<td>Token specifies attacker-controlled <code>jku</code> for JWKS URL</td>
+<td>Server must hard-code or whitelist JWKS URL</td>
+</tr>
+<tr>
+<td><strong>Replay attack</strong></td>
+<td>Old captured token reused</td>
+<td>Short TTL (15 min); JTI denylist for sensitive operations</td>
+</tr>
+<tr>
+<td><strong>Storage in localStorage</strong></td>
+<td>XSS reads token</td>
+<td>HttpOnly cookies; SameSite=Strict</td>
+</tr>
+<tr>
+<td><strong>Logged in URL</strong></td>
+<td>Token in query param logged by server/CDN</td>
+<td>Always header <code>Authorization: Bearer ...</code></td>
+</tr>
+<tr>
+<td><strong>Long TTL access token</strong></td>
+<td>Stolen token valid for days</td>
+<td>5-15 min access; refresh for new ones</td>
+</tr>
+<tr>
+<td><strong>No audience check</strong></td>
+<td>Token for service A accepted by service B</td>
+<td>Validate <code>aud</code> claim</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deeper-dive-oauth2-vs-oidc-vs-saml">Deeper Dive — OAuth2 vs OIDC vs SAML<a class="anchor" href="#deeper-dive-oauth2-vs-oidc-vs-saml" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>OAuth 2.0</th>
+<th>OpenID Connect</th>
+<th>SAML 2.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Authorization</td>
+<td>Authentication + Authorization</td>
+<td>Authentication + SSO</td>
+</tr>
+<tr>
+<td><strong>Year</strong></td>
+<td>2012</td>
+<td>2014</td>
+<td>2005</td>
+</tr>
+<tr>
+<td><strong>Format</strong></td>
+<td>JSON / opaque</td>
+<td>JWT (id_token) + JSON</td>
+<td>XML / SAML assertions</td>
+</tr>
+<tr>
+<td><strong>Transport</strong></td>
+<td>HTTP/REST</td>
+<td>HTTP/REST</td>
+<td>HTTP POST/Redirect/SOAP</td>
+</tr>
+<tr>
+<td><strong>Token</strong></td>
+<td>access_token (opaque or JWT)</td>
+<td>id_token (JWT) + access_token</td>
+<td>SAML Assertion (XML)</td>
+</tr>
+<tr>
+<td><strong>Use case</strong></td>
+<td>Delegated API access</td>
+<td>Web/mobile login + delegated access</td>
+<td>Enterprise SSO, B2B federation</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Medium</td>
+<td>Medium-high</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Modern relevance</strong></td>
+<td>Standard for APIs</td>
+<td>Standard for login</td>
+<td>Mostly legacy enterprise</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>When to use which</strong>:
+- <strong>Building a public API</strong>: OAuth 2.0 + JWT
+- <strong>User login for web/mobile app</strong>: OIDC (OAuth 2.0 + id_token)
+- <strong>Enterprise federation with legacy systems</strong>: SAML
+- <strong>Multi-tenant SaaS where customers bring their own IdP</strong>: support both OIDC + SAML</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li>Set up Auth0 (free tier) or run Keycloak in Docker. Register a client. Build a Spring resource server validating its tokens.</li>
+<li>Use <code>curl</code> to obtain a token via client-credentials and call your API. Inspect the JWT on <code>jwt.io</code> to see its claims.</li>
+<li>Customize <code>JwtAuthenticationConverter</code> to extract Keycloak-style <code>realm_access.roles</code> claims into Spring authorities with <code>ROLE_</code> prefix.</li>
+<li>Build a React SPA using <code>oidc-client-ts</code> or <code>@auth0/auth0-react</code>. Authorization code + PKCE. Call your Spring resource server.</li>
+<li>Build a backend client using <code>OAuth2AuthorizedClientManager</code>. Configure the inventory-service registration with client-credentials. Call another service.</li>
+<li>Add CORS configuration. Verify preflights succeed and the SPA can call the API.</li>
+<li>Try a JWT with an expired <code>exp</code>. Verify the response is 401 with a clear error.</li>
+<li>Try a JWT signed by a different IdP. Verify rejection (issuer mismatch).</li>
+<li>Set up Spring Authorization Server in a separate module and have your services use it as the IdP. Issue and validate tokens.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Explain OAuth2's four roles (resource owner, client, resource server, authorization server) and the difference between access tokens, refresh tokens, and ID tokens.</li>
+<li>Walk the Authorization Code + PKCE flow end-to-end, including why PKCE exists.</li>
+<li>Read a JWT's three parts, decode standard claims (<code>iss</code>, <code>sub</code>, <code>aud</code>, <code>exp</code>, <code>nbf</code>, <code>iat</code>, <code>jti</code>), and articulate validation requirements.</li>
+<li>Configure Spring Security as a Resource Server with <code>issuer-uri</code>, JWT decoding, JWKS caching, audience validation, and a custom <code>JwtAuthenticationConverter</code> for scopes/roles.</li>
+<li>Configure Spring Security as an OAuth2 Client for browser login (<code>oauth2Login</code>) and service-to-service (<code>client_credentials</code>), and attach tokens to outgoing <code>RestClient</code> requests.</li>
+<li>Choose JWT vs opaque tokens (introspection) based on speed and revocation needs.</li>
+<li>Map JWT scopes/roles into Spring authorities using <code>JwtGrantedAuthoritiesConverter</code>.</li>
+<li>Use <code>@AuthenticationPrincipal Jwt</code> to read claims in controllers.</li>
+<li>Avoid the CVE-catalog pitfalls: <code>alg=none</code>, key confusion, missing <code>aud</code>/<code>iss</code>, long-lived tokens, localStorage storage.</li>
+<li>Explain when Spring Authorization Server is appropriate vs using a third-party IdP.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t16-method-level-security.html">Method-Level Security</a> for the deep treatment of <code>@EnableMethodSecurity</code>, <code>@PreAuthorize</code> / <code>@PostAuthorize</code> / <code>@Secured</code> / <code>@RolesAllowed</code>, SpEL-based authorization (T06), <code>MethodSecurityExpressionRoot</code>, and how to integrate domain-level permission checks via <code>PermissionEvaluator</code>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;OAuth2 / OpenID Connect / JWT with Spring Security&quot;
+slug: oauth2-openid-connect-jwt-with-spring-security
+level: L4
+module: &quot;Backend Engineering&quot;
+section: &quot;Spring Framework &amp; Ecosystem&quot;
+type: concept
+difficulty: senior
+order: 15
+tags: [oauth2, oidc, openid-connect, jwt, json-web-token, jws, jwe, jwk, jwks, jwks-uri, authorization-code-flow, pkce, code-challenge, code-verifier, client-credentials, refresh-token, implicit-grant-deprecated, password-grant-deprecated, device-code-flow, resource-server, authorization-server, opaque-token, introspection-endpoint, bearer-token, access-token, id-token, refresh-token-rotation, scopes, audience, claims, kid, alg, rs256, hs256, es256, eddsa, public-key, jwt-decoder, nimbus-jwt-decoder, signature-validation, issuer-validation, audience-validation, expiration-validation, jwk-source, jwk-cache, key-rotation, oauth2-client, registered-clients, oauth2-login, spring-authorization-server, authorization-code-grant, token-endpoint, jwt-authentication-token, oauth2-authentication-token, granted-authorities-converter, custom-jwt-converter]
+prerequisites: [spring-security-authentication-and-authorization, spring-mvc-rest-controllers]
+status: complete
+estimated_minutes: 95
+last_updated: 2026-06-08
+---
+
+# OAuth2 / OpenID Connect / JWT with Spring Security
+
+Modern backend services almost never store passwords. Authentication is *delegated* — to Google / Microsoft / Okta / Auth0 / your own SSO IdP — using the **OAuth2** authorization protocol, with **OpenID Connect (OIDC)** layered on top for *authentication* (OAuth2 alone is &quot;delegated access&quot;; OIDC adds &quot;delegated identity&quot;). The token format that carries the identity from issuer to your service is almost always **JWT (JSON Web Token)** — a self-contained, signed, base64-encoded credential your service can validate without a network call to the issuer (cache the public key, verify the signature, read the claims, done).
+
+If T14 was the *infrastructure* of Spring Security (the filter chain, the manager, the context), T15 is the *protocol* — the precise OAuth2 / OIDC flows, the JWT structure and validation rules, Spring&#x27;s three OAuth2 modules (**Resource Server**, **Client**, **Authorization Server**), and the operational reality of token lifetime, key rotation, audience validation, scope-based authorization, and the CVE catalog of common JWT mistakes (CVE-2022-21449 ECDSA bypass, JWT `alg=none`, key confusion, replay).
+
+The depth-bar this topic clears: at the **language layer**, OAuth2 vocabulary (grant type, scope, client, resource server, authorization server, refresh token, PKCE, audience, opaque token, introspection), JWT structure (header / payload / signature), OIDC&#x27;s ID-token claims, and Spring Security 6&#x27;s three OAuth2 modules with their configuration DSL. At the **memory layer**, the JWT validation pipeline — header parsing, signature verification with RSA/ECDSA/EdDSA (CPU cost: ~50–200 µs per token for RS256), JWK cache (key fetched once, cached for hours, refreshed on rotation), claims validation (issuer / audience / expiration). At the **architecture layer** — the heart — the **authorization code + PKCE flow** end-to-end (the only flow you should be using for browser/mobile clients in 2026), **client-credentials** for service-to-service, **how Spring Security 6 wires each module**, the **JWT validator pipeline** (signature + iss + aud + exp + custom claims + scope-to-authorities mapping), and the **pitfalls** that have caused real breaches.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Spring Security (T14)](./T14-spring-security-authentication-and-authorization.md) — the filter chain and `SecurityContext`. HTTP request/response (L2/C04/T01). Public-key cryptography basics — what a signature verifies, what a key fingerprint is.
+
+## The Vocabulary
+
+OAuth2 (RFC 6749, 2012) defines four parties:
+
+- **Resource Owner** — the user.
+- **Client** — the application requesting access on the user&#x27;s behalf (your front-end, mobile app, or backend service).
+- **Resource Server** — the API holding the user&#x27;s data (your backend).
+- **Authorization Server** — the system that authenticates the user and issues tokens (Google, Okta, your own).
+
+```mermaid
+flowchart LR
+  U[&quot;Resource Owner (user)&quot;]
+  C[&quot;Client (app)&quot;]
+  AS[&quot;Authorization Server (issuer)&quot;]
+  RS[&quot;Resource Server (your API)&quot;]
+  U --&gt;|&quot;login&quot;| AS
+  C --&gt;|&quot;redirect for auth&quot;| AS
+  AS --&gt;|&quot;access token&quot;| C
+  C --&gt;|&quot;call API with Bearer token&quot;| RS
+  RS --&gt;|&quot;validate token&quot;| RS
+```
+
+The currency exchanged:
+
+- **Access token** — opaque to the client; presented to the resource server; short-lived (5–60 min); confers permission.
+- **Refresh token** — long-lived (hours to days); used to obtain new access tokens without re-prompting the user.
+- **ID token** (OIDC only) — a JWT containing the user&#x27;s identity claims; *consumed by the client*, not the resource server.
+
+A **scope** is a string the client requests (`openid`, `profile`, `email`, `read:orders`, `write:orders`) that the user consents to. The authorization server embeds the granted scopes in the token; the resource server enforces them on each request.
+
+```mermaid
+flowchart LR
+  AT[&quot;Access Token (Bearer)&quot;]
+  RT[&quot;Refresh Token&quot;]
+  IT[&quot;ID Token (OIDC)&quot;]
+  AT --&gt;|&quot;for&quot;| RS[&quot;API requests&quot;]
+  RT --&gt;|&quot;for&quot;| Renew[&quot;renew access token&quot;]
+  IT --&gt;|&quot;for&quot;| Client[&quot;client knows who logged in&quot;]
+```
+
+## The Authorization Code Flow with PKCE
+
+In 2026 there is exactly one OAuth2 flow you should be using for end-user authentication: **Authorization Code with PKCE** (RFC 7636). The historical alternatives:
+
+- **Implicit grant** — deprecated (RFC 8252, 6749 errata). Returns access tokens in URL fragments → leak risk.
+- **Resource Owner Password Credentials** — deprecated (RFC 8252). The client sees the user&#x27;s password — defeats the point.
+- **Authorization Code** (without PKCE) — needs a client secret. Fine for confidential clients (server-side) but useless for public clients (mobile, SPA) that cannot keep a secret.
+- **Authorization Code with PKCE** — works for both. The current best practice.
+
+### The Flow
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant App as Client (SPA / mobile / backend)
+  participant AS as Authorization Server
+  participant RS as Resource Server
+  App-&gt;&gt;App: 1. generate code_verifier (random ~43-char string)
+  App-&gt;&gt;App: 2. code_challenge = SHA256(code_verifier) base64url
+  App-&gt;&gt;AS: 3. /authorize?response_type=code&amp;client_id=...&amp;code_challenge=...&amp;code_challenge_method=S256&amp;scope=openid profile email&amp;redirect_uri=...&amp;state=...
+  AS-&gt;&gt;User: 4. login + consent UI
+  User--&gt;&gt;AS: 5. credentials + consent
+  AS--&gt;&gt;App: 6. redirect to redirect_uri?code=AUTH_CODE&amp;state=...
+  App-&gt;&gt;AS: 7. POST /token: code=AUTH_CODE&amp;code_verifier=...&amp;grant_type=authorization_code&amp;client_id=...&amp;redirect_uri=...
+  AS-&gt;&gt;AS: 8. verify SHA256(code_verifier) == stored code_challenge
+  AS--&gt;&gt;App: 9. {access_token, refresh_token, id_token, expires_in}
+  App-&gt;&gt;RS: 10. GET /api/... Authorization: Bearer ACCESS_TOKEN
+  RS-&gt;&gt;RS: 11. validate token (signature, iss, aud, exp, scope)
+  RS--&gt;&gt;App: 12. response
+```
+
+Why PKCE? The `code` parameter in step 6 travels through the browser&#x27;s URL bar / system intent. An attacker who intercepts it (a malicious app on the device, browser history) cannot exchange it for a token without the matching `code_verifier`, which never left the client app. PKCE binds the code to the originating client without requiring a secret.
+
+The `state` parameter in step 3/6 prevents CSRF on the redirect.
+
+## JWT — Structure and Validation
+
+A JWT is **three base64url segments joined by dots**:
+
+```
+eyJhbGciOiJSUzI1NiIsImtpZCI6ImtpZC0xMjMifQ.eyJzdWIiOiJ1c2VyXzQyIiwiaXNzIjoiaHR0cHM6Ly9pc3N1ZXIuZXhhbXBsZS5jb20iLCJhdWQiOiJvcmRlcnMtc2VydmljZSIsImlhdCI6MTcxNzc3MDAwMCwiZXhwIjoxNzE3NzczNjAwLCJzY29wZSI6InJlYWQ6b3JkZXJzIHdyaXRlOm9yZGVycyJ9.SIGNATURE_BYTES
+```
+
+Decoded:
+
+**Header** (algorithm + key id):
+
+```json
+{ &quot;alg&quot;: &quot;RS256&quot;, &quot;kid&quot;: &quot;kid-123&quot; }
+```
+
+**Payload** (claims):
+
+```json
+{
+  &quot;sub&quot;: &quot;user_42&quot;,
+  &quot;iss&quot;: &quot;https://issuer.example.com&quot;,
+  &quot;aud&quot;: &quot;orders-service&quot;,
+  &quot;iat&quot;: 1717770000,
+  &quot;exp&quot;: 1717773600,
+  &quot;scope&quot;: &quot;read:orders write:orders&quot;
+}
+```
+
+**Signature** — the cryptographic signature of `base64url(header) + &quot;.&quot; + base64url(payload)` using the algorithm and the issuer&#x27;s private key.
+
+```mermaid
+flowchart LR
+  H[&quot;header: {alg, kid}&quot;]
+  P[&quot;payload: {sub, iss, aud, iat, exp, scope, ...}&quot;]
+  S[&quot;signature: sign(header.payload, private-key)&quot;]
+  JWT[&quot;JWT = base64url(H) . base64url(P) . base64url(S)&quot;]
+  H --&gt; JWT
+  P --&gt; JWT
+  S --&gt; JWT
+```
+
+### Standard Claims (RFC 7519)
+
+| Claim | Meaning |
+|-------|---------|
+| `iss` | Issuer — the authorization server&#x27;s URL |
+| `sub` | Subject — the user (or client) id |
+| `aud` | Audience — the resource server(s) the token is for |
+| `exp` | Expiration time (Unix seconds) |
+| `nbf` | Not before — earliest valid time |
+| `iat` | Issued at |
+| `jti` | JWT ID — unique per token, useful for revocation |
+
+OIDC adds: `nonce` (prevents replay), `auth_time` (when the user authenticated), `acr` (auth context class), and user-info claims (`email`, `name`, `picture`, …).
+
+### Validating a JWT
+
+The minimum checks a resource server must perform:
+
+1. **Signature** — verify with the issuer&#x27;s public key.
+2. **`iss`** — exactly matches the expected issuer URL.
+3. **`aud`** — includes your service&#x27;s identifier.
+4. **`exp`** — not expired (with a small clock-skew tolerance, ~60 s).
+5. **`nbf`** — if present, time is past it.
+6. **`alg`** — matches the algorithm you accept. **Never accept `alg=none`.** **Never accept a symmetric algorithm (`HS256`) if you expect asymmetric (`RS256`).**
+7. **Optional**: `jti` against a revocation list; custom claims like `scope`, `tenant`.
+
+The `kid` (key id) in the header tells you *which* of the issuer&#x27;s keys to use. Issuers expose their public keys at a **JWKS endpoint** (`https://issuer.example.com/.well-known/jwks.json`), an JSON array of JWKs (JSON Web Keys). Spring&#x27;s `NimbusJwtDecoder` fetches and caches the JWKS, picks the key matching the `kid`, and verifies.
+
+```mermaid
+flowchart TB
+  Tok[&quot;JWT received in Authorization: Bearer ...&quot;]
+  Hdr[&quot;parse header: {alg=RS256, kid=kid-123}&quot;]
+  Fetch[&quot;fetch JWKS from jwks_uri (cached)&quot;]
+  Pick[&quot;pick JWK where kid=kid-123&quot;]
+  Key[&quot;extract public key (RSA exponent + modulus)&quot;]
+  Verify[&quot;verify signature with public key + alg&quot;]
+  Claims[&quot;read payload claims&quot;]
+  Iss[&quot;iss == expected?&quot;]
+  Aud[&quot;aud contains us?&quot;]
+  Exp[&quot;exp &gt; now (with skew)?&quot;]
+  Scope[&quot;map scope claim → GrantedAuthority list&quot;]
+  AuthTok[&quot;produce JwtAuthenticationToken&quot;]
+  Tok --&gt; Hdr --&gt; Fetch --&gt; Pick --&gt; Key --&gt; Verify --&gt; Claims --&gt; Iss --&gt; Aud --&gt; Exp --&gt; Scope --&gt; AuthTok
+```
+
+## Spring Security as a Resource Server
+
+The most common Spring Security OAuth2 role for backend services. Add the starter:
+
+```xml
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-oauth2-resource-server&lt;/artifactId&gt;
+&lt;/dependency&gt;
+```
+
+Configure:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://issuer.example.com
+          # or: jwk-set-uri: https://issuer.example.com/.well-known/jwks.json
+          # or: public-key-location: classpath:public.pem
+```
+
+`issuer-uri` is preferred — Spring fetches the OIDC discovery document at `{issuer}/.well-known/openid-configuration`, which contains the `jwks_uri`, supported algorithms, etc. Auto-configured.
+
+The minimal `SecurityFilterChain`:
+
+```java
+@Bean
+public SecurityFilterChain api(HttpSecurity http) throws Exception {
+    return http
+        .securityMatcher(&quot;/api/**&quot;)
+        .authorizeHttpRequests(auth -&gt; auth.anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()))
+        .sessionManagement(s -&gt; s.sessionCreationPolicy(STATELESS))
+        .csrf(CsrfConfigurer::disable)
+        .build();
+}
+```
+
+With these ~10 lines, every request to `/api/**` must carry a valid JWT bearer token issued by your IdP.
+
+### Mapping Scopes / Roles to Authorities
+
+The default `JwtAuthenticationConverter` maps the `scope` (or `scp`) claim into `GrantedAuthority` instances with the `SCOPE_` prefix:
+
+```
+scope: &quot;read:orders write:orders&quot;
+→ authorities: [&quot;SCOPE_read:orders&quot;, &quot;SCOPE_write:orders&quot;]
+```
+
+Authorize:
+
+```java
+.authorizeHttpRequests(auth -&gt; auth
+    .requestMatchers(GET, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_read:orders&quot;)
+    .requestMatchers(POST, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_write:orders&quot;)
+    .anyRequest().authenticated()
+)
+```
+
+For roles instead of scopes (or in addition), customize the converter:
+
+```java
+@Bean
+public JwtAuthenticationConverter jwtConverter() {
+    JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
+    scopes.setAuthorityPrefix(&quot;SCOPE_&quot;);
+    scopes.setAuthoritiesClaimName(&quot;scope&quot;);
+
+    JwtAuthenticationConverter c = new JwtAuthenticationConverter();
+    c.setJwtGrantedAuthoritiesConverter(jwt -&gt; {
+        Collection&lt;GrantedAuthority&gt; auth = new ArrayList&lt;&gt;(scopes.convert(jwt));
+        // also include realm_access.roles (Keycloak style)
+        Object realmAccess = jwt.getClaims().get(&quot;realm_access&quot;);
+        if (realmAccess instanceof Map&lt;?, ?&gt; ra &amp;&amp; ra.get(&quot;roles&quot;) instanceof List&lt;?&gt; roles) {
+            roles.forEach(r -&gt; auth.add(new SimpleGrantedAuthority(&quot;ROLE_&quot; + r)));
+        }
+        return auth;
+    });
+    return c;
+}
+```
+
+Wire to the resource-server config:
+
+```java
+.oauth2ResourceServer(o -&gt; o.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtConverter())));
+```
+
+### Reading the JWT in a Controller
+
+```java
+@RestController
+public class OrderController {
+
+    @GetMapping(&quot;/api/orders&quot;)
+    public List&lt;Order&gt; list(@AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return orderService.findByUser(userId);
+    }
+}
+```
+
+`@AuthenticationPrincipal` resolves to the `Jwt` (the parsed token). The `JwtAuthenticationToken` wraps it as the `SecurityContext`&#x27;s `Authentication`.
+
+### Opaque Tokens — Introspection
+
+Some IdPs issue *opaque* tokens (random strings, not JWT). Validation requires calling the IdP&#x27;s introspection endpoint:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: https://issuer/oauth2/introspect
+          client-id: my-resource-server
+          client-secret: ${INTROSPECT_SECRET}
+```
+
+Spring calls `POST /oauth2/introspect` with the token; the IdP returns `{ &quot;active&quot;: true, &quot;sub&quot;: &quot;...&quot;, &quot;scope&quot;: &quot;...&quot;, ... }`. Higher network cost than JWT (one HTTP call per request); use a cache (`CaffeineOpaqueTokenIntrospector` wrap) in production.
+
+JWT vs opaque trade-off: JWT is faster and self-contained but cannot be revoked mid-life (need to wait for expiry, or maintain a revocation list). Opaque is per-request but revocable instantly. Choose based on your security/perf needs.
+
+## Spring Security as an OAuth2 Client
+
+For server-side apps that *log users in* via an external IdP (Google, Okta, etc.):
+
+```xml
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-oauth2-client&lt;/artifactId&gt;
+&lt;/dependency&gt;
+```
+
+Configure:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,profile,email
+            redirect-uri: &quot;{baseUrl}/login/oauth2/code/{registrationId}&quot;
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+```
+
+`SecurityFilterChain`:
+
+```java
+@Bean
+public SecurityFilterChain web(HttpSecurity http) throws Exception {
+    return http
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(&quot;/&quot;, &quot;/login&quot;).permitAll()
+            .anyRequest().authenticated())
+        .oauth2Login(Customizer.withDefaults())
+        .build();
+}
+```
+
+Spring wires the entire OAuth2 dance — when an unauthenticated user hits a protected URL, they&#x27;re redirected to `/oauth2/authorization/google`, which redirects to Google, comes back to `/login/oauth2/code/google`, exchanges code for tokens, stores the `OAuth2AuthenticationToken` in the session, and continues to the original URL.
+
+### Calling Other Services with the User&#x27;s Token
+
+```java
+@Bean
+public RestClient restClient(OAuth2AuthorizedClientManager mgr) {
+    return RestClient.builder()
+        .requestInterceptor((req, body, exec) -&gt; {
+            OAuth2AuthorizeRequest auth = OAuth2AuthorizeRequest
+                .withClientRegistrationId(&quot;google&quot;)
+                .principal(SecurityContextHolder.getContext().getAuthentication())
+                .build();
+            OAuth2AuthorizedClient client = mgr.authorize(auth);
+            req.getHeaders().setBearerAuth(client.getAccessToken().getTokenValue());
+            return exec.execute(req, body);
+        })
+        .build();
+}
+```
+
+Spring obtains a token, refreshes if needed, and attaches it as `Authorization: Bearer ...` to outgoing requests.
+
+### Service-to-Service: Client Credentials
+
+For backend-to-backend calls (no user involved):
+
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          inventory-service:
+            authorization-grant-type: client_credentials
+            client-id: ${INV_CLIENT_ID}
+            client-secret: ${INV_CLIENT_SECRET}
+            scope: read:inventory
+        provider:
+          inventory-service:
+            token-uri: https://issuer/oauth2/token
+```
+
+The client gets its own access token (no user); use it to call the other service. Spring caches the token until expiry and refreshes automatically.
+
+## Spring Authorization Server
+
+If you need to *be* an authorization server (issue tokens to your own clients), Spring Authorization Server (separate project, GA 2022) is the path. Self-hosts an OAuth2 + OIDC IdP.
+
+Coverage of running your own IdP is deep enough for its own topic — typically you use a third-party (Keycloak, Auth0, Okta) instead of running your own.
+
+## JWT Pitfalls — The CVE Catalog
+
+&gt; [!WARNING]
+&gt; **`alg=none` acceptance.** Some libraries default to accepting the unsigned `alg=none` JWT. An attacker can forge any token. Spring&#x27;s `NimbusJwtDecoder` rejects `alg=none` by default — verify your configuration matches.
+
+&gt; [!WARNING]
+&gt; **`HS256` vs `RS256` key confusion.** If your verifier accepts both `HS256` and `RS256`, an attacker can take the issuer&#x27;s *public* RSA key, sign a token with HMAC-SHA256 using the public-key bytes as the secret, and the verifier (using the public key as if it were the HMAC secret) accepts it. **Pin the algorithm.** Spring 6: `JwtDecoderBuilder.jwsAlgorithm(SignatureAlgorithm.RS256)`.
+
+&gt; [!WARNING]
+&gt; **CVE-2022-21449 — ECDSA signature bypass.** Pre-fix JDKs accepted ECDSA signatures with `r=0, s=0`. If your IdP uses ES256/ES384/ES512, **update your JDK** to a fixed version.
+
+&gt; [!WARNING]
+&gt; **Missing `aud` validation.** A token issued for another service is accepted by yours. Validate `aud`.
+
+&gt; [!WARNING]
+&gt; **Missing `iss` validation.** Spring&#x27;s `issuer-uri` configuration adds it automatically. If you wire the decoder manually, add an `IssuerValidator`.
+
+&gt; [!WARNING]
+&gt; **Trusting `kid` blindly.** A token with `kid=../../malicious.pem` once worked against naive implementations that loaded the key from a path. Use Spring&#x27;s JWKS-based key resolution, which only accepts keys present in the JWKS.
+
+&gt; [!WARNING]
+&gt; **Reusing access tokens across services.** Each token should be `aud`-bound to a specific resource server. A token for the orders service should not be valid for the payments service. Configure `aud` claims at the IdP.
+
+&gt; [!WARNING]
+&gt; **Long-lived access tokens.** A 24-hour access token gives an attacker who steals one 24 hours of access. Use short access tokens (5–15 min) + refresh tokens.
+
+&gt; [!WARNING]
+&gt; **Storing tokens in `localStorage`.** Browser JavaScript can read it; XSS = total compromise. Use HttpOnly cookies (with `SameSite=Lax` or `Strict`) for browser apps. For mobile, secure native storage (Keychain / Keystore).
+
+&gt; [!WARNING]
+&gt; **Allowing `nbf` and `exp` past clock skew.** Default tolerance is 60 s; do not extend without thought.
+
+## OIDC ID Token — Don&#x27;t Use For API Authorization
+
+The ID token (OIDC) carries the user&#x27;s identity to the *client*. It is **not** for resource-server authorization.
+
+```json
+{
+  &quot;iss&quot;: &quot;https://accounts.google.com&quot;,
+  &quot;sub&quot;: &quot;user_42&quot;,
+  &quot;aud&quot;: &quot;your-client-id&quot;,   // ← your CLIENT, not your resource server
+  &quot;exp&quot;: ...,
+  &quot;iat&quot;: ...,
+  &quot;nonce&quot;: &quot;random&quot;,
+  &quot;email&quot;: &quot;alice@example.com&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;name&quot;: &quot;Alice Example&quot;
+}
+```
+
+Two confusion points:
+
+- The `aud` is your *client*, not your API. A resource server validating an ID token (and accepting `aud=client-id`) is misconfigured.
+- The lifetime is usually short (5–15 min); the ID token is consumed once at login. Long-lived sessions use *cookies* or refresh tokens, not the ID token.
+
+Use the access token for API calls; use the ID token at login for who-just-logged-in. Different jobs.
+
+## Worked Example — End-to-End
+
+A SPA (React) talking to a Spring resource server, via Auth0.
+
+1. **Front-end** initiates Authorization Code + PKCE with Auth0; receives `access_token` (JWT, aud=`orders-api`) and `id_token` (aud=`spa-client-id`).
+2. SPA stores tokens in memory (not localStorage). Calls `GET /api/orders` with `Authorization: Bearer ACCESS_TOKEN`.
+3. Spring&#x27;s resource-server config — `issuer-uri: https://your-tenant.auth0.com/` — auto-fetches JWKS, decodes the JWT, validates signature + iss + aud + exp.
+4. `JwtAuthenticationConverter` reads `scope: &quot;read:orders write:orders&quot;` claim → authorities `SCOPE_read:orders`, `SCOPE_write:orders`.
+5. `authorizeHttpRequests` rule `requestMatchers(GET, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_read:orders&quot;)` passes.
+6. Controller method runs.
+
+```java
+@Bean
+public SecurityFilterChain api(HttpSecurity http) throws Exception {
+    return http
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(GET, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_read:orders&quot;)
+            .requestMatchers(POST, &quot;/api/orders/**&quot;).hasAuthority(&quot;SCOPE_write:orders&quot;)
+            .anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(jwtConverter())))
+        .sessionManagement(s -&gt; s.sessionCreationPolicy(STATELESS))
+        .csrf(CsrfConfigurer::disable)
+        .cors(Customizer.withDefaults())
+        .build();
+}
+
+@Bean
+public JwtAuthenticationConverter jwtConverter() {
+    JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
+    scopes.setAuthorityPrefix(&quot;SCOPE_&quot;);
+    JwtAuthenticationConverter c = new JwtAuthenticationConverter();
+    c.setJwtGrantedAuthoritiesConverter(scopes);
+    return c;
+}
+
+@Bean
+public CorsConfigurationSource corsConfig() {
+    CorsConfiguration cors = new CorsConfiguration();
+    cors.setAllowedOrigins(List.of(&quot;https://app.example.com&quot;));
+    cors.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));
+    cors.setAllowedHeaders(List.of(&quot;Authorization&quot;, &quot;Content-Type&quot;));
+    cors.setMaxAge(3600L);
+    UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
+    src.registerCorsConfiguration(&quot;/api/**&quot;, cors);
+    return src;
+}
+```
+
+Yaml:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://your-tenant.auth0.com/
+          audiences: orders-api
+```
+
+That is the whole resource-server config. Auth0 / Keycloak / Okta / your own IdP — same shape.
+
+## Common Pitfalls
+
+&gt; [!WARNING]
+&gt; **Configuring `jwk-set-uri` directly when `issuer-uri` would do.** `issuer-uri` reads the OIDC discovery document and configures issuer + jwks_uri together. Using `jwk-set-uri` alone skips issuer validation.
+
+&gt; [!WARNING]
+&gt; **Missing `audiences` config.** Without it, Spring does not validate `aud`. Tokens for other services are accepted. Add `spring.security.oauth2.resourceserver.jwt.audiences`.
+
+&gt; [!WARNING]
+&gt; **Default `JwtAuthenticationConverter` prefix `SCOPE_`.** If your authorization rules use `hasRole`/`hasAuthority` with different prefixes, configure the converter to match. Inconsistency causes silent 403s.
+
+&gt; [!WARNING]
+&gt; **CORS not enabled for the OAuth2 endpoints.** Your SPA&#x27;s `OPTIONS /api/orders` preflight has no `Authorization`; Spring Security rejects it. Make sure `permitAll()` matches CORS preflights — or use `cors(Customizer.withDefaults())` which short-circuits preflights.
+
+&gt; [!WARNING]
+&gt; **Storing tokens in browser localStorage.** XSS reads them all. Use HttpOnly cookies; sacrifice a bit of cross-origin convenience for the security.
+
+&gt; [!WARNING]
+&gt; **Skipping refresh-token rotation.** Spring&#x27;s default does not rotate refresh tokens on use; an exfiltrated refresh token works until expiry. Enable rotation at the IdP (Okta / Auth0 support it).
+
+&gt; [!WARNING]
+&gt; **Long token TTL &quot;for convenience.&quot;** 24-hour access tokens are too long. Make access tokens short (5–15 min), refresh tokens shorter than you expected (24 h, not 30 d).
+
+## Deeper Dive — All Five OAuth2 Grant Types
+
+### 1. Authorization Code + PKCE (the modern default)
+
+**When**: SPAs, mobile apps, server-side web apps. Any client that can keep a redirect URI registered.
+
+```
+User clicks &quot;Login&quot; → app redirects to:
+  /authorize?response_type=code
+            &amp;client_id=abc
+            &amp;redirect_uri=https://app/callback
+            &amp;scope=openid+profile+orders.read
+            &amp;state=xyz123                       ← CSRF protection
+            &amp;code_challenge=BASE64URL(SHA256(verifier))
+            &amp;code_challenge_method=S256
+
+User logs in at IdP → IdP redirects back:
+  https://app/callback?code=AUTH_CODE&amp;state=xyz123
+
+App exchanges code for tokens (server-to-server):
+  POST /token
+  grant_type=authorization_code
+  &amp;code=AUTH_CODE
+  &amp;redirect_uri=https://app/callback
+  &amp;client_id=abc
+  &amp;code_verifier=ORIGINAL_VERIFIER   ← proves it was the same client that started
+
+Response:
+  { &quot;access_token&quot;: &quot;eyJ...&quot;, &quot;refresh_token&quot;: &quot;abc...&quot;, &quot;id_token&quot;: &quot;eyJ...&quot; }
+```
+
+**PKCE rationale**: prevents authorization-code interception in mobile/SPA. Even if attacker steals the code from the redirect, they can&#x27;t exchange it without the original `code_verifier`.
+
+### 2. Client Credentials (machine-to-machine)
+
+**When**: backend service calling another backend service. No user context.
+
+```
+POST /token
+grant_type=client_credentials
+&amp;client_id=svc-payment
+&amp;client_secret=SECRET
+&amp;scope=payments.write
+
+→ { &quot;access_token&quot;: &quot;eyJ...&quot; }
+```
+
+Spring OAuth2 Client config:
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          payment-api:
+            client-id: svc-payment
+            client-secret: ${PAYMENT_SECRET}
+            authorization-grant-type: client_credentials
+            scope: payments.write
+        provider:
+          payment-api:
+            token-uri: https://auth.example.com/oauth/token
+```
+
+```java
+// Inject the OAuth2 client
+@Service
+public class PaymentClient {
+    private final WebClient webClient;
+
+    public PaymentClient(WebClient.Builder builder,
+                         OAuth2AuthorizedClientManager manager) {
+        var oauth2Filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(manager);
+        oauth2Filter.setDefaultClientRegistrationId(&quot;payment-api&quot;);
+        this.webClient = builder.filter(oauth2Filter).build();
+    }
+
+    public Payment charge(Charge charge) {
+        return webClient.post().uri(&quot;/api/charges&quot;).bodyValue(charge)
+                        .retrieve().bodyToMono(Payment.class).block();
+    }
+}
+```
+
+### 3. Resource Owner Password Credentials (DEPRECATED — don&#x27;t use)
+
+```
+POST /token
+grant_type=password
+&amp;username=alice
+&amp;password=hunter2
+&amp;client_id=app
+```
+
+**Why deprecated** (OAuth 2.1 will remove it): the client app sees the user&#x27;s password. Defeats the whole point of OAuth (delegation without sharing credentials). Only justifiable for legacy first-party apps with no migration path.
+
+### 4. Implicit Flow (DEPRECATED — don&#x27;t use)
+
+```
+/authorize?response_type=token&amp;...
+→ redirect with #access_token=eyJ... in URL fragment
+```
+
+**Why deprecated**: tokens in URL → leak via referrer headers, browser history, server logs. Use Authorization Code + PKCE instead (works for SPAs too).
+
+### 5. Device Code Flow (TVs, CLI tools, IoT)
+
+**When**: device has no browser or is hard to type on.
+
+```
+Step 1: Device requests:
+  POST /device/authorize?client_id=tv-app
+  → { &quot;device_code&quot;: &quot;xyz&quot;, &quot;user_code&quot;: &quot;ABCD-EFGH&quot;,
+      &quot;verification_uri&quot;: &quot;https://example.com/device&quot;,
+      &quot;expires_in&quot;: 600, &quot;interval&quot;: 5 }
+
+Step 2: Device shows user_code on screen (&quot;Visit example.com/device, enter ABCD-EFGH&quot;)
+
+Step 3: User goes to verification_uri on phone/laptop, enters user_code, approves.
+
+Step 4: Device polls every 5s:
+  POST /token
+  grant_type=urn:ietf:params:oauth:grant-type:device_code
+  &amp;device_code=xyz
+  &amp;client_id=tv-app
+  → 400 authorization_pending  (until user approves)
+  → 200 { &quot;access_token&quot;: &quot;eyJ...&quot;, &quot;refresh_token&quot;: &quot;abc...&quot; }
+```
+
+Used by Netflix on TVs, GitHub CLI, kubectl OIDC plugin, AWS CLI SSO.
+
+## Deeper Dive — JWT Validation Step-by-Step
+
+When a request arrives with `Authorization: Bearer eyJhbGc...`:
+
+```
+1. PARSE
+   - Split on &#x27;.&#x27;  → header.payload.signature (3 parts)
+   - Base64-decode header + payload to JSON
+   - If structure wrong → 401 &quot;Malformed token&quot;
+
+2. HEADER VALIDATION
+   - alg ∈ allowed set? (e.g., {RS256, ES256}; NEVER {none, HS256-when-RS256-expected})
+   - kid (key ID) present? → use to find correct key
+
+3. SIGNATURE VERIFICATION
+   - Fetch JWKS from /.well-known/jwks.json (cached, with refresh on kid miss)
+   - Find key by kid; algo must match
+   - Compute hash(header.payload) with key; compare to signature
+   - If mismatch → 401 &quot;Invalid signature&quot;
+
+4. CLAIM VALIDATION
+   - exp &gt; now? (else &quot;Token expired&quot;)
+   - nbf &lt;= now? (not-before; else &quot;Token not yet valid&quot;)
+   - iss == expected_issuer? (else &quot;Wrong issuer&quot;)
+   - aud contains expected_audience? (else &quot;Wrong audience&quot;)
+   - iat &lt;= now? (sanity check)
+
+5. AUTHORIZATION
+   - Extract scope / roles / authorities from claims
+   - Map to Spring Authority objects
+   - Build SecurityContext with Authentication
+
+6. (Optional) Check denylist
+   - For known-revoked JTIs (Redis set lookup)
+   - Adds ~1ms; trades stateless purity for revocation capability
+```
+
+**Spring Security 6 does all this automatically** given:
+```yaml
+spring.security.oauth2.resourceserver:
+  jwt:
+    issuer-uri: https://auth.example.com/realms/myapp
+    audiences: my-api
+```
+
+Plus:
+```java
+http.oauth2ResourceServer(rs -&gt; rs.jwt(jwt -&gt; jwt
+    .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+```
+
+## Deeper Dive — JWKS Key Rotation Strategy
+
+The IdP rotates its signing key periodically (typically weekly):
+
+```
+Time T:
+  Active key: kid=&quot;key-2024-W23-001&quot; (used to sign new tokens)
+  Previous key: kid=&quot;key-2024-W22-001&quot; (still valid for verification — last 7 days of tokens)
+
+JWKS endpoint returns BOTH:
+  { &quot;keys&quot;: [
+      { &quot;kid&quot;: &quot;key-2024-W23-001&quot;, &quot;kty&quot;: &quot;RSA&quot;, &quot;n&quot;: &quot;...&quot;, &quot;e&quot;: &quot;AQAB&quot; },
+      { &quot;kid&quot;: &quot;key-2024-W22-001&quot;, &quot;kty&quot;: &quot;RSA&quot;, &quot;n&quot;: &quot;...&quot;, &quot;e&quot;: &quot;AQAB&quot; }
+    ]
+  }
+
+Time T+1 week:
+  New active: kid=&quot;key-2024-W24-001&quot;
+  Previous: kid=&quot;key-2024-W23-001&quot;
+  Old removed: kid=&quot;key-2024-W22-001&quot; (its tokens expired by now)
+```
+
+Spring Security caches JWKS (default 5 min). On unknown `kid`, it refreshes from JWKS endpoint. So new keys are picked up automatically; old keys remain valid until their tokens naturally expire.
+
+**Critical**: never use HS256 (symmetric) for multi-service architectures — every service needs the same secret = wider compromise blast radius. Use RS256 / ES256 (asymmetric) so only the IdP has the private key.
+
+## Deeper Dive — Refresh Token Rotation (Reuse Detection)
+
+```java
+@Service
+public class RefreshTokenService {
+    @Transactional
+    public TokenPair refresh(String refreshToken) {
+        RefreshTokenRecord record = repo.findById(refreshToken)
+            .orElseThrow(() -&gt; new InvalidTokenException());
+
+        if (record.used()) {
+            // CRITICAL: refresh token reused → session compromised
+            // Revoke entire family of refresh tokens (all from the user&#x27;s current session)
+            repo.revokeFamilyByUserId(record.userId(), record.sessionId());
+            // Log + alert security team
+            log.warn(&quot;Refresh token reuse detected: user={} session={}&quot;,
+                     record.userId(), record.sessionId());
+            throw new SecurityException(&quot;Token reuse detected; please re-login&quot;);
+        }
+
+        // Mark old as used + issue new pair
+        record.markUsed();
+        String newRefresh = repo.save(new RefreshTokenRecord(
+            UUID.randomUUID().toString(),
+            record.userId(),
+            record.sessionId(),
+            Instant.now().plus(7, DAYS)
+        )).id();
+
+        String newAccess = accessTokenService.create(
+            record.userId(),
+            Duration.ofMinutes(15)
+        );
+
+        return new TokenPair(newAccess, newRefresh);
+    }
+}
+```
+
+**Attack scenario** this defeats:
+1. Attacker steals refresh token (XSS, network).
+2. Either attacker or legitimate user uses it first → issues new pair, old marked used.
+3. The other party uses it (the now-used one) → triggers reuse detection.
+4. All session tokens revoked → user must re-authenticate.
+
+**Window of attack**: from theft to next legitimate refresh (typically minutes-to-hours instead of days).
+
+## Deeper Dive — Common JWT Vulnerabilities (CVE Catalog)
+
+| Vulnerability | Mechanism | Mitigation |
+|---|---|---|
+| **alg=none** | Token with `&quot;alg&quot;:&quot;none&quot;` and no signature accepted | Whitelist allowed algorithms; reject `none` |
+| **alg substitution** | Send `alg=HS256` when server expects `alg=RS256`; HMAC the public key as the secret | Configure decoder for ONE expected algorithm |
+| **Key confusion** | Public key used as HMAC secret | Server should only accept matching algorithm per key type |
+| **Weak HS256 secret** | Brute-force 256-bit symmetric key offline | Use 256+ bit random secret; better: asymmetric RS256/ES256 |
+| **JKU/X5U injection** | Token specifies attacker-controlled `jku` for JWKS URL | Server must hard-code or whitelist JWKS URL |
+| **Replay attack** | Old captured token reused | Short TTL (15 min); JTI denylist for sensitive operations |
+| **Storage in localStorage** | XSS reads token | HttpOnly cookies; SameSite=Strict |
+| **Logged in URL** | Token in query param logged by server/CDN | Always header `Authorization: Bearer ...` |
+| **Long TTL access token** | Stolen token valid for days | 5-15 min access; refresh for new ones |
+| **No audience check** | Token for service A accepted by service B | Validate `aud` claim |
+
+## Deeper Dive — OAuth2 vs OIDC vs SAML
+
+| Aspect | OAuth 2.0 | OpenID Connect | SAML 2.0 |
+|---|---|---|---|
+| **Purpose** | Authorization | Authentication + Authorization | Authentication + SSO |
+| **Year** | 2012 | 2014 | 2005 |
+| **Format** | JSON / opaque | JWT (id_token) + JSON | XML / SAML assertions |
+| **Transport** | HTTP/REST | HTTP/REST | HTTP POST/Redirect/SOAP |
+| **Token** | access_token (opaque or JWT) | id_token (JWT) + access_token | SAML Assertion (XML) |
+| **Use case** | Delegated API access | Web/mobile login + delegated access | Enterprise SSO, B2B federation |
+| **Complexity** | Medium | Medium-high | High |
+| **Modern relevance** | Standard for APIs | Standard for login | Mostly legacy enterprise |
+
+**When to use which**:
+- **Building a public API**: OAuth 2.0 + JWT
+- **User login for web/mobile app**: OIDC (OAuth 2.0 + id_token)
+- **Enterprise federation with legacy systems**: SAML
+- **Multi-tenant SaaS where customers bring their own IdP**: support both OIDC + SAML
+
+## Practice
+
+1. Set up Auth0 (free tier) or run Keycloak in Docker. Register a client. Build a Spring resource server validating its tokens.
+2. Use `curl` to obtain a token via client-credentials and call your API. Inspect the JWT on `jwt.io` to see its claims.
+3. Customize `JwtAuthenticationConverter` to extract Keycloak-style `realm_access.roles` claims into Spring authorities with `ROLE_` prefix.
+4. Build a React SPA using `oidc-client-ts` or `@auth0/auth0-react`. Authorization code + PKCE. Call your Spring resource server.
+5. Build a backend client using `OAuth2AuthorizedClientManager`. Configure the inventory-service registration with client-credentials. Call another service.
+6. Add CORS configuration. Verify preflights succeed and the SPA can call the API.
+7. Try a JWT with an expired `exp`. Verify the response is 401 with a clear error.
+8. Try a JWT signed by a different IdP. Verify rejection (issuer mismatch).
+9. Set up Spring Authorization Server in a separate module and have your services use it as the IdP. Issue and validate tokens.
+
+## Recap
+
+You should now be able to:
+
+- Explain OAuth2&#x27;s four roles (resource owner, client, resource server, authorization server) and the difference between access tokens, refresh tokens, and ID tokens.
+- Walk the Authorization Code + PKCE flow end-to-end, including why PKCE exists.
+- Read a JWT&#x27;s three parts, decode standard claims (`iss`, `sub`, `aud`, `exp`, `nbf`, `iat`, `jti`), and articulate validation requirements.
+- Configure Spring Security as a Resource Server with `issuer-uri`, JWT decoding, JWKS caching, audience validation, and a custom `JwtAuthenticationConverter` for scopes/roles.
+- Configure Spring Security as an OAuth2 Client for browser login (`oauth2Login`) and service-to-service (`client_credentials`), and attach tokens to outgoing `RestClient` requests.
+- Choose JWT vs opaque tokens (introspection) based on speed and revocation needs.
+- Map JWT scopes/roles into Spring authorities using `JwtGrantedAuthoritiesConverter`.
+- Use `@AuthenticationPrincipal Jwt` to read claims in controllers.
+- Avoid the CVE-catalog pitfalls: `alg=none`, key confusion, missing `aud`/`iss`, long-lived tokens, localStorage storage.
+- Explain when Spring Authorization Server is appropriate vs using a third-party IdP.
+
+## Next
+
+Continue to [Method-Level Security](./T16-method-level-security.md) for the deep treatment of `@EnableMethodSecurity`, `@PreAuthorize` / `@PostAuthorize` / `@Secured` / `@RolesAllowed`, SpEL-based authorization (T06), `MethodSecurityExpressionRoot`, and how to integrate domain-level permission checks via `PermissionEvaluator`.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><div class="lbl">← Previous</div><div class="ttl">T14-spring-security-authentication-and-authorization</div><div class="sub">Spring Security (authentication &amp; authorization)</div></a><a class="next" href="../l4/c01-t16-method-level-security.html"><div class="lbl">Next →</div><div class="ttl">T16-method-level-security</div><div class="sub">Method-Level Security</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-vocabulary" data-toc-link>The Vocabulary</a></li><li class="lvl-2"><a href="#the-authorization-code-flow-with-pkce" data-toc-link>The Authorization Code Flow with PKCE</a></li><li class="lvl-3"><a href="#the-flow" data-toc-link>The Flow</a></li><li class="lvl-2"><a href="#jwt-structure-and-validation" data-toc-link>JWT — Structure and Validation</a></li><li class="lvl-3"><a href="#standard-claims-rfc-7519" data-toc-link>Standard Claims (RFC 7519)</a></li><li class="lvl-3"><a href="#validating-a-jwt" data-toc-link>Validating a JWT</a></li><li class="lvl-2"><a href="#spring-security-as-a-resource-server" data-toc-link>Spring Security as a Resource Server</a></li><li class="lvl-3"><a href="#mapping-scopes-roles-to-authorities" data-toc-link>Mapping Scopes / Roles to Authorities</a></li><li class="lvl-3"><a href="#reading-the-jwt-in-a-controller" data-toc-link>Reading the JWT in a Controller</a></li><li class="lvl-3"><a href="#opaque-tokens-introspection" data-toc-link>Opaque Tokens — Introspection</a></li><li class="lvl-2"><a href="#spring-security-as-an-oauth2-client" data-toc-link>Spring Security as an OAuth2 Client</a></li><li class="lvl-3"><a href="#calling-other-services-with-the-users-token" data-toc-link>Calling Other Services with the User&#x27;s Token</a></li><li class="lvl-3"><a href="#service-to-service-client-credentials" data-toc-link>Service-to-Service: Client Credentials</a></li><li class="lvl-2"><a href="#spring-authorization-server" data-toc-link>Spring Authorization Server</a></li><li class="lvl-2"><a href="#jwt-pitfalls-the-cve-catalog" data-toc-link>JWT Pitfalls — The CVE Catalog</a></li><li class="lvl-2"><a href="#oidc-id-token-dont-use-for-api-authorization" data-toc-link>OIDC ID Token — Don&#x27;t Use For API Authorization</a></li><li class="lvl-2"><a href="#worked-example-end-to-end" data-toc-link>Worked Example — End-to-End</a></li><li class="lvl-2"><a href="#common-pitfalls" data-toc-link>Common Pitfalls</a></li><li class="lvl-2"><a href="#deeper-dive-all-five-oauth2-grant-types" data-toc-link>Deeper Dive — All Five OAuth2 Grant Types</a></li><li class="lvl-3"><a href="#1-authorization-code-pkce-the-modern-default" data-toc-link>1. Authorization Code + PKCE (the modern default)</a></li><li class="lvl-3"><a href="#2-client-credentials-machine-to-machine" data-toc-link>2. Client Credentials (machine-to-machine)</a></li><li class="lvl-3"><a href="#3-resource-owner-password-credentials-deprecated-dont-use" data-toc-link>3. Resource Owner Password Credentials (DEPRECATED — don&#x27;t use)</a></li><li class="lvl-3"><a href="#4-implicit-flow-deprecated-dont-use" data-toc-link>4. Implicit Flow (DEPRECATED — don&#x27;t use)</a></li><li class="lvl-3"><a href="#5-device-code-flow-tvs-cli-tools-iot" data-toc-link>5. Device Code Flow (TVs, CLI tools, IoT)</a></li><li class="lvl-2"><a href="#deeper-dive-jwt-validation-step-by-step" data-toc-link>Deeper Dive — JWT Validation Step-by-Step</a></li><li class="lvl-2"><a href="#deeper-dive-jwks-key-rotation-strategy" data-toc-link>Deeper Dive — JWKS Key Rotation Strategy</a></li><li class="lvl-2"><a href="#deeper-dive-refresh-token-rotation-reuse-detection" data-toc-link>Deeper Dive — Refresh Token Rotation (Reuse Detection)</a></li><li class="lvl-2"><a href="#deeper-dive-common-jwt-vulnerabilities-cve-catalog" data-toc-link>Deeper Dive — Common JWT Vulnerabilities (CVE Catalog)</a></li><li class="lvl-2"><a href="#deeper-dive-oauth2-vs-oidc-vs-saml" data-toc-link>Deeper Dive — OAuth2 vs OIDC vs SAML</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

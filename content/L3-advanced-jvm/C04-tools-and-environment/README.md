@@ -22,4 +22,4 @@ Tooling and environment setup relevant to this level.
 
 - [Tools for Advanced Java & the JVM](T01-tools-for-advanced-java-and-the-jvm.md)
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

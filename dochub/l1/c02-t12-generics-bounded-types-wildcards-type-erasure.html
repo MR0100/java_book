@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Generics — bounded types, wildcards, type erasure — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link active" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧬</span><span>Ch. 3 · L1 — Core Java &amp; OOP</span></div><div class="chapter-path">content/L1-core-java/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l1/overview.html" data-q="l1 — core java &amp; oop content/l1-core-java/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · oop content/l1-core-java/c01-oop/readme.md content/l1-core-java/c01-oop/t01-classes-and-objects.md content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md content/l1-core-java/c01-oop/t04-inheritance-and-super.md content/l1-core-java/c01-oop/t05-method-overriding.md content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md content/l1-core-java/c01-oop/t14-record-types.md content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md content/l1-core-java/c01-oop/t16-packages-and-imports.md content/l1-core-java/c01-oop/t17-java-module-system-jpms.md content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md content/l1-core-java/c01-oop/t20-modern-java-and-the-java-25-lts-landscape.md"><summary><span class="caret">▶</span><span>C01 · OOP</span></summary><ul class="pages"><li data-q="core java &amp; oop — object-oriented programming content/l1-core-java/c01-oop/readme.md"><a class="" href="../l1/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="classes &amp; objects content/l1-core-java/c01-oop/t01-classes-and-objects.md"><a class="" href="../l1/c01-t01-classes-and-objects.html"><span>Classes &amp; Objects</span><span class="kind-pill "></span></a></li><li data-q="fields, methods, constructors, this content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md"><a class="" href="../l1/c01-t02-fields-methods-constructors-this.html"><span>Fields, methods, constructors, this</span><span class="kind-pill "></span></a></li><li data-q="encapsulation &amp; access modifiers content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md"><a class="" href="../l1/c01-t03-encapsulation-and-access-modifiers.html"><span>Encapsulation &amp; access modifiers</span><span class="kind-pill "></span></a></li><li data-q="inheritance &amp; super content/l1-core-java/c01-oop/t04-inheritance-and-super.md"><a class="" href="../l1/c01-t04-inheritance-and-super.html"><span>Inheritance &amp; super</span><span class="kind-pill "></span></a></li><li data-q="method overriding content/l1-core-java/c01-oop/t05-method-overriding.md"><a class="" href="../l1/c01-t05-method-overriding.html"><span>Method overriding</span><span class="kind-pill "></span></a></li><li data-q="polymorphism (compile-time vs runtime) content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md"><a class="" href="../l1/c01-t06-polymorphism-compile-time-vs-runtime.html"><span>Polymorphism (compile-time vs runtime)</span><span class="kind-pill "></span></a></li><li data-q="abstraction &amp; abstract classes content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md"><a class="" href="../l1/c01-t07-abstraction-and-abstract-classes.html"><span>Abstraction &amp; abstract classes</span><span class="kind-pill "></span></a></li><li data-q="interfaces (default, static, private methods) content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md"><a class="" href="../l1/c01-t08-interfaces-default-static-private-methods.html"><span>Interfaces (default, static, private methods)</span><span class="kind-pill "></span></a></li><li data-q="object class &amp; its methods content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md"><a class="" href="../l1/c01-t09-object-class-and-its-methods.html"><span>Object class &amp; its methods</span><span class="kind-pill "></span></a></li><li data-q="equals, hashcode, tostring contracts content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md"><a class="" href="../l1/c01-t10-equals-hashcode-tostring-contracts.html"><span>equals, hashCode, toString contracts</span><span class="kind-pill "></span></a></li><li data-q="static members, blocks &amp; nested classes content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md"><a class="" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><span>static members, blocks &amp; nested classes</span><span class="kind-pill "></span></a></li><li data-q="inner, local &amp; anonymous classes content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md"><a class="" href="../l1/c01-t12-inner-local-and-anonymous-classes.html"><span>Inner, local &amp; anonymous classes</span><span class="kind-pill "></span></a></li><li data-q="enum types (with fields/methods) content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md"><a class="" href="../l1/c01-t13-enum-types-with-fields-methods.html"><span>enum types (with fields/methods)</span><span class="kind-pill "></span></a></li><li data-q="record types content/l1-core-java/c01-oop/t14-record-types.md"><a class="" href="../l1/c01-t14-record-types.html"><span>record types</span><span class="kind-pill "></span></a></li><li data-q="sealed classes &amp; interfaces content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md"><a class="" href="../l1/c01-t15-sealed-classes-and-interfaces.html"><span>Sealed classes &amp; interfaces</span><span class="kind-pill "></span></a></li><li data-q="packages &amp; imports content/l1-core-java/c01-oop/t16-packages-and-imports.md"><a class="" href="../l1/c01-t16-packages-and-imports.html"><span>Packages &amp; imports</span><span class="kind-pill "></span></a></li><li data-q="java module system (jpms) content/l1-core-java/c01-oop/t17-java-module-system-jpms.md"><a class="" href="../l1/c01-t17-java-module-system-jpms.html"><span>Java Module System (JPMS)</span><span class="kind-pill "></span></a></li><li data-q="object cloning &amp; cloneable content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md"><a class="" href="../l1/c01-t18-object-cloning-and-cloneable.html"><span>Object cloning &amp; Cloneable</span><span class="kind-pill "></span></a></li><li data-q="immutability &amp; immutable class design content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><a class="" href="../l1/c01-t19-immutability-and-immutable-class-design.html"><span>Immutability &amp; immutable class design</span><span class="kind-pill "></span></a></li><li data-q="modern java &amp; the java 25 lts landscape content/l1-core-java/c01-oop/t20-modern-java-and-the-java-25-lts-landscape.md"><a class="" href="../l1/c01-t20-modern-java-and-the-java-25-lts-landscape.html"><span>Modern Java &amp; the Java 25 LTS Landscape</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · collections and core apis content/l1-core-java/c02-collections-and-core-apis/readme.md content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md content/l1-core-java/c02-collections-and-core-apis/t19-optional.md content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><summary><span class="caret">▶</span><span>C02 · Collections And Core APIs</span></summary><ul class="pages"><li data-q="core java &amp; oop — collections &amp; core apis content/l1-core-java/c02-collections-and-core-apis/readme.md"><a class="" href="../l1/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="collections framework overview content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md"><a class="" href="../l1/c02-t01-collections-framework-overview.html"><span>Collections framework overview</span><span class="kind-pill "></span></a></li><li data-q="list (arraylist, linkedlist) content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md"><a class="" href="../l1/c02-t02-list-arraylist-linkedlist.html"><span>List (ArrayList, LinkedList)</span><span class="kind-pill "></span></a></li><li data-q="set (hashset, linkedhashset, treeset) content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md"><a class="" href="../l1/c02-t03-set-hashset-linkedhashset-treeset.html"><span>Set (HashSet, LinkedHashSet, TreeSet)</span><span class="kind-pill "></span></a></li><li data-q="map (hashmap, linkedhashmap, treemap) content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md"><a class="" href="../l1/c02-t04-map-hashmap-linkedhashmap-treemap.html"><span>Map (HashMap, LinkedHashMap, TreeMap)</span><span class="kind-pill "></span></a></li><li data-q="queue, deque, priorityqueue, stack content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md"><a class="" href="../l1/c02-t05-queue-deque-priorityqueue-stack.html"><span>Queue, Deque, PriorityQueue, Stack</span><span class="kind-pill "></span></a></li><li data-q="iterators &amp; iterable content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md"><a class="" href="../l1/c02-t06-iterators-and-iterable.html"><span>Iterators &amp; Iterable</span><span class="kind-pill "></span></a></li><li data-q="comparable vs comparator content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md"><a class="" href="../l1/c02-t07-comparable-vs-comparator.html"><span>Comparable vs Comparator</span><span class="kind-pill "></span></a></li><li data-q="collection performance characteristics (big-o) content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md"><a class="" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><span>Collection Performance Characteristics (Big-O)</span><span class="kind-pill "></span></a></li><li data-q="exceptions: try/catch/finally, checked vs unchecked content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md"><a class="" href="../l1/c02-t09-exceptions-try-catch-finally-checked-vs-unchecked.html"><span>Exceptions: try/catch/finally, checked vs unchecked</span><span class="kind-pill "></span></a></li><li data-q="custom exceptions &amp; try-with-resources content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md"><a class="" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><span>Custom exceptions &amp; try-with-resources</span><span class="kind-pill "></span></a></li><li data-q="generics — basics content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md"><a class="" href="../l1/c02-t11-generics-basics.html"><span>Generics — basics</span><span class="kind-pill "></span></a></li><li data-q="generics — bounded types, wildcards, type erasure content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md"><a class="active" href="../l1/c02-t12-generics-bounded-types-wildcards-type-erasure.html"><span>Generics — bounded types, wildcards, type erasure</span><span class="kind-pill "></span></a></li><li data-q="i/o streams (byte &amp; character) content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md"><a class="" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><span>I/O streams (byte &amp; character)</span><span class="kind-pill "></span></a></li><li data-q="nio.2 (path, files, channels) content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md"><a class="" href="../l1/c02-t14-nio-2-path-files-channels.html"><span>NIO.2 (Path, Files, channels)</span><span class="kind-pill "></span></a></li><li data-q="date/time api (java.time) content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md"><a class="" href="../l1/c02-t15-date-time-api-java-time.html"><span>Date/Time API (java.time)</span><span class="kind-pill "></span></a></li><li data-q="regular expressions content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md"><a class="" href="../l1/c02-t16-regular-expressions.html"><span>Regular expressions</span><span class="kind-pill "></span></a></li><li data-q="reflection content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md"><a class="" href="../l1/c02-t17-reflection.html"><span>Reflection</span><span class="kind-pill "></span></a></li><li data-q="annotations (using &amp; writing meta-annotations) content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md"><a class="" href="../l1/c02-t18-annotations-using-and-writing-meta-annotations.html"><span>Annotations (using &amp; writing meta-annotations)</span><span class="kind-pill "></span></a></li><li data-q="optional content/l1-core-java/c02-collections-and-core-apis/t19-optional.md"><a class="" href="../l1/c02-t19-optional.html"><span>Optional</span><span class="kind-pill "></span></a></li><li data-q="math, bigdecimal / biginteger, random content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md"><a class="" href="../l1/c02-t20-math-bigdecimal-biginteger-random.html"><span>Math, BigDecimal / BigInteger, Random</span><span class="kind-pill "></span></a></li><li data-q="serialization &amp; deserialization content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md"><a class="" href="../l1/c02-t21-serialization-and-deserialization.html"><span>Serialization &amp; deserialization</span><span class="kind-pill "></span></a></li><li data-q="networking (socket, httpclient) content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md"><a class="" href="../l1/c02-t22-networking-socket-httpclient.html"><span>Networking (Socket, HttpClient)</span><span class="kind-pill "></span></a></li><li data-q="internationalization (i18n) &amp; formatting content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><a class="" href="../l1/c02-t23-internationalization-i18n-and-formatting.html"><span>Internationalization (i18n) &amp; formatting</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md content/l1-core-java/c03-testing-fundamentals/t02-assertions-assertj-hamcrest.md content/l1-core-java/c03-testing-fundamentals/t03-mocking-with-mockito.md content/l1-core-java/c03-testing-fundamentals/t04-test-doubles-stub-mock-spy-fake.md content/l1-core-java/c03-testing-fundamentals/t05-testng-alternative.md content/l1-core-java/c03-testing-fundamentals/t06-test-driven-development-tdd.md content/l1-core-java/c03-testing-fundamentals/t07-test-coverage-jacoco.md"><summary><span class="caret">▶</span><span>C03 · Testing Fundamentals</span></summary><ul class="pages"><li data-q="core java &amp; oop — testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md"><a class="" href="../l1/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="unit testing with junit 5 content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><a class="" href="../l1/c03-t01-unit-testing-with-junit-5.html"><span>Unit testing with JUnit 5</span><span class="kind-pill "></span></a></li><li data-q="assertions (assertj, hamcrest) content/l1-core-java/c03-testing-fundamentals/t02-assertions-assertj-hamcrest.md"><a class="" href="../l1/c03-t02-assertions-assertj-hamcrest.html"><span>Assertions (AssertJ, Hamcrest)</span><span class="kind-pill "></span></a></li><li data-q="mocking with mockito content/l1-core-java/c03-testing-fundamentals/t03-mocking-with-mockito.md"><a class="" href="../l1/c03-t03-mocking-with-mockito.html"><span>Mocking with Mockito</span><span class="kind-pill "></span></a></li><li data-q="test doubles (stub, mock, spy, fake) content/l1-core-java/c03-testing-fundamentals/t04-test-doubles-stub-mock-spy-fake.md"><a class="" href="../l1/c03-t04-test-doubles-stub-mock-spy-fake.html"><span>Test doubles (stub, mock, spy, fake)</span><span class="kind-pill "></span></a></li><li data-q="testng (alternative) content/l1-core-java/c03-testing-fundamentals/t05-testng-alternative.md"><a class="" href="../l1/c03-t05-testng-alternative.html"><span>TestNG (alternative)</span><span class="kind-pill "></span></a></li><li data-q="test-driven development (tdd) content/l1-core-java/c03-testing-fundamentals/t06-test-driven-development-tdd.md"><a class="" href="../l1/c03-t06-test-driven-development-tdd.html"><span>Test-Driven Development (TDD)</span><span class="kind-pill "></span></a></li><li data-q="test coverage (jacoco) content/l1-core-java/c03-testing-fundamentals/t07-test-coverage-jacoco.md"><a class="" href="../l1/c03-t07-test-coverage-jacoco.html"><span>Test coverage (JaCoCo)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l1-core-java/c04-tools-and-environment/readme.md content/l1-core-java/c04-tools-and-environment/t01-build-dependencies-and-project-tooling.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="core java &amp; oop — tools &amp; environment content/l1-core-java/c04-tools-and-environment/readme.md"><a class="" href="../l1/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="build, dependencies &amp; project tooling content/l1-core-java/c04-tools-and-environment/t01-build-dependencies-and-project-tooling.md"><a class="" href="../l1/c04-t01-build-dependencies-and-project-tooling.html"><span>Build, Dependencies &amp; Project Tooling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l1-core-java/c05-hands-on/readme.md content/l1-core-java/c05-hands-on/t01-exercises.md content/l1-core-java/c05-hands-on/t02-project-library-management-system.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="core java &amp; oop — hands-on content/l1-core-java/c05-hands-on/readme.md"><a class="" href="../l1/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="exercises content/l1-core-java/c05-hands-on/t01-exercises.md"><a class="" href="../l1/c05-t01-exercises.html"><span>Exercises</span><span class="kind-pill "></span></a></li><li data-q="level project — library management system content/l1-core-java/c05-hands-on/t02-project-library-management-system.md"><a class="" href="../l1/c05-t02-project-library-management-system.html"><span>Level Project — Library Management System</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l1-core-java/c06-best-practices/readme.md content/l1-core-java/c06-best-practices/t01-l1-idioms.md content/l1-core-java/c06-best-practices/t02-l1-pitfalls-catalogue.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="core java &amp; oop — best practices &amp; pitfalls content/l1-core-java/c06-best-practices/readme.md"><a class="" href="../l1/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 idioms content/l1-core-java/c06-best-practices/t01-l1-idioms.md"><a class="" href="../l1/c06-t01-l1-idioms.html"><span>L1 Idioms</span><span class="kind-pill "></span></a></li><li data-q="l1 pitfalls catalogue content/l1-core-java/c06-best-practices/t02-l1-pitfalls-catalogue.md"><a class="" href="../l1/c06-t02-l1-pitfalls-catalogue.html"><span>L1 Pitfalls Catalogue</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l1-core-java/c07-interview-prep/readme.md content/l1-core-java/c07-interview-prep/t01-core-java-and-oop-questions.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="core java &amp; oop — interview prep content/l1-core-java/c07-interview-prep/readme.md"><a class="" href="../l1/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="core java &amp; oop interview questions content/l1-core-java/c07-interview-prep/t01-core-java-and-oop-questions.md"><a class="" href="../l1/c07-t01-core-java-and-oop-questions.html"><span>Core Java &amp; OOP Interview Questions</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l1-core-java/c08-qa-faq/readme.md content/l1-core-java/c08-qa-faq/t01-faq.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="core java &amp; oop — q&amp;a / faq content/l1-core-java/c08-qa-faq/readme.md"><a class="" href="../l1/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 faq content/l1-core-java/c08-qa-faq/t01-faq.md"><a class="" href="../l1/c08-t01-faq.html"><span>L1 FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l1-core-java/c09-cheatsheets/readme.md content/l1-core-java/c09-cheatsheets/t01-l1-cheatsheet.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="core java &amp; oop — cheatsheets &amp; reference content/l1-core-java/c09-cheatsheets/readme.md"><a class="" href="../l1/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 cheatsheet content/l1-core-java/c09-cheatsheets/t01-l1-cheatsheet.md"><a class="" href="../l1/c09-t01-l1-cheatsheet.html"><span>L1 Cheatsheet</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l1-core-java/c10-resources/readme.md content/l1-core-java/c10-resources/t01-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="core java &amp; oop — resources content/l1-core-java/c10-resources/readme.md"><a class="" href="../l1/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 resources content/l1-core-java/c10-resources/t01-resources.md"><a class="" href="../l1/c10-t01-resources.html"><span>L1 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l1/index.html">L1 — Core Java &amp; OOP</a><span class="sep">/</span><span>Generics — bounded types, wildcards, type erasure</span></div>
+        <h1>Generics — bounded types, wildcards, type erasure</h1>
+        <div><span class="source-path">content/L1-core-java/C02-collections-and-core-apis/T12-generics-bounded-types-wildcards-type-erasure.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~65 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Generics — bounded types, wildcards, type erasure"
+slug: generics-bounded-types-wildcards-type-erasure
+level: L1
+module: "Core Java &amp; OOP"
+section: "Collections &amp; Core APIs"
+type: concept
+difficulty: intermediate
+order: 12
+tags: [generics, bounded-types, wildcards, pecs, invariance, covariance, contravariance, type-erasure, bridge-methods, heap-pollution, safevarargs, variance]
+prerequisites: [generics-basics, comparable-vs-comparator, collections-framework-overview, polymorphism-compile-time-vs-runtime, inheritance-and-super]
+status: complete
+estimated_minutes: 65
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="generics-bounded-types-wildcards-type-erasure">Generics — bounded types, wildcards, type erasure</h1>
+<p><a href="c02-t11-generics-basics.html">T11</a> introduced <code>&lt;T&gt;</code> and the type erasure beneath it; this topic turns generics from "typed collections" into a tool for designing <strong>flexible, type-safe APIs</strong>. Three ideas do the work. <strong>Bounded type parameters</strong> (<code>&lt;T extends Number&gt;</code>) let a generic require that its type argument has certain capabilities — so you can actually <em>call methods</em> on a <code>T</code> instead of treating it as an opaque <code>Object</code>. <strong>Variance</strong> answers the question that surprises everyone: a <code>List&lt;String&gt;</code> is <strong>not</strong> a <code>List&lt;Object&gt;</code>, even though <code>String</code> is an <code>Object</code> — generics are <em>invariant</em>, for a reason that protects type safety. And <strong>wildcards</strong> (<code>? extends T</code>, <code>? super T</code>) restore the flexibility invariance takes away, governed by the <strong>PECS</strong> rule — <em>Producer Extends, Consumer Super</em> — the single most useful mnemonic in Java generics.</p>
+<p>The depth bar is <strong>why invariance is correct and how erasure keeps overriding working</strong>. Invariance is not arbitrary: if <code>List&lt;String&gt;</code> <em>were</em> a <code>List&lt;Object&gt;</code>, you could alias it, <code>add</code> an <code>Integer</code> through the alias, and corrupt the original — so the compiler forbids the assignment. Arrays, by contrast, <em>are</em> covariant (a <code>String[]</code> is an <code>Object[]</code>), and they pay for it with a <strong>runtime</strong> <code>ArrayStoreException</code> and a per-store type check; generics learned from that mistake and close the hole at <strong>compile time</strong> with zero runtime cost. And erasure (<a href="c02-t11-generics-basics.html">T11</a>) has a subtle consequence: when a class implements <code>Comparable&lt;MyType&gt;</code>, its <code>compareTo(MyType)</code> doesn't match the erased interface method <code>compareTo(Object)</code> — so the compiler synthesizes a <strong>bridge method</strong>, an invisible <code>compareTo(Object)</code> that casts and forwards, preserving polymorphism through erasure. By the end you will bound type parameters, explain invariance and the array-covariance hole, apply PECS to design flexible signatures, read a bridge method in <code>javap</code>, and contrast Java's <em>use-site</em> wildcards with the <em>declaration-site</em> variance of C#, Kotlin, and Scala.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t11-generics-basics.html">Generics basics</a> (<code>L1/C02/T11</code>) — type parameters and erasure, which this builds on directly; <a href="c02-t07-comparable-vs-comparator.html">Comparable/Comparator</a> (<code>L1/C02/T07</code>) — <code>Comparable&lt;T&gt;</code> is the canonical bounded/bridge-method example; <a href="c01-t06-polymorphism-compile-time-vs-runtime.html">Polymorphism</a> (<code>L1/C01/T06</code>) — bridge methods preserve runtime dispatch through erasure; <a href="c01-t04-inheritance-and-super.html">Inheritance</a> (<code>L1/C01/T04</code>) — the subtype relationships variance is about. Forward: <a href="c02-t13-i-o-streams-byte-and-character.html">T13</a> (I/O streams) — the first core-API topic, where the language facilities give way to the libraries.</p></div></div>
+<h2 id="bounded-type-parameters">Bounded Type Parameters<a class="anchor" href="#bounded-type-parameters" aria-hidden="true">#</a></h2>
+<p>An unbounded <code>&lt;T&gt;</code> erases to <code>Object</code> (<a href="c02-t11-generics-basics.html">T11</a>), so you can only call <code>Object</code> methods on a <code>T</code>. A <strong>bound</strong> restricts <code>T</code> to a type (or its subtypes), unlocking that type's methods:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public static &lt;T extends Number&gt; double sum(List&lt;T&gt; list) {   // T must be a Number or subtype
+    double total = 0;
+    for (T n : list) total += n.doubleValue();                // legal — T is at least a Number
+    return total;
+}
+</code></pre></div>
+<p><code>&lt;T extends Number&gt;</code> is an <strong>upper bound</strong>: the argument must be <code>Number</code> or below. Note <code>extends</code> is used for both classes <em>and</em> interfaces (even where you'd normally write <code>implements</code>). A parameter can have <strong>multiple bounds</strong> with <code>&amp;</code> — <code>&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;</code> — requiring <code>T</code> to satisfy all of them; if one bound is a <strong>class</strong>, it must come <strong>first</strong>, before any interface bounds (at most one class bound is allowed). Bounds can even be <strong>recursive</strong> — <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> ("<code>T</code> is comparable to itself"), exactly the signature <code>Collections.max</code> uses.</p>
+<div class="mermaid">flowchart LR
+  Unb["unbounded &lt;T&gt; → erases to Object → only Object methods"]
+  Bnd["&lt;T extends Number&gt; → erases to Number → call doubleValue(), intValue()…"]
+  Multi["&lt;T extends Number &amp; Comparable&lt;T&gt;&gt; → all bounds; CLASS bound first, then interfaces"]
+  Unb -.->|"a bound unlocks the type's API"| Bnd
+</div>
+<h2 id="the-invariance-problem-why-liststring-is-not-a-listobject">The Invariance Problem — Why <code>List&lt;String&gt;</code> Is Not a <code>List&lt;Object&gt;</code><a class="anchor" href="#the-invariance-problem-why-liststring-is-not-a-listobject" aria-hidden="true">#</a></h2>
+<p>A <code>String</code> is an <code>Object</code>, so intuition says a <code>List&lt;String&gt;</code> should be usable as a <code>List&lt;Object&gt;</code>. <strong>It cannot</strong> — and the compiler is right to forbid it:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+List&lt;Object&gt; objects = strings;   // COMPILE ERROR — generics are INVARIANT
+</code></pre></div>
+<p>Why? Imagine it were allowed. Then through the <code>objects</code> alias you could insert a non-<code>String</code>, corrupting <code>strings</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;Object&gt; objects = strings;   // (hypothetically allowed)
+objects.add(42);                  // an Integer goes into what is really a List&lt;String&gt;
+String s = strings.get(0);        // ClassCastException — the list is now poisoned
+</code></pre></div>
+<p>To prevent exactly this, generics are <strong>invariant</strong>: <code>List&lt;String&gt;</code> and <code>List&lt;Object&gt;</code> are <em>unrelated</em> types regardless of the relationship between <code>String</code> and <code>Object</code>. The error appears at the assignment, at <strong>compile time</strong>, before any corruption can happen.</p>
+<div class="mermaid">flowchart TB
+  Inv["generics are INVARIANT: List&lt;String&gt; is NOT a List&lt;Object&gt;"]
+  Inv --> Why["if it were: objects.add(42) through the alias → corrupts the String list"]
+  Why --> Safe["so the compiler rejects List&lt;Object&gt; o = stringList — at COMPILE time, no corruption possible"]
+</div>
+<h3 id="the-array-covariance-hole">The Array-Covariance Hole<a class="anchor" href="#the-array-covariance-hole" aria-hidden="true">#</a></h3>
+<p>This is where Java's history bites. <strong>Arrays are covariant</strong> — a <code>String[]</code> <em>is</em> an <code>Object[]</code> — a decision from Java 1.0, before generics existed. That covariance creates exactly the hole invariance closes, but it is caught only at <strong>runtime</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Object[] objects = new String[3];   // ALLOWED — arrays are covariant
+objects[0] = 42;                     // compiles fine… but throws ArrayStoreException at RUNTIME
+</code></pre></div>
+<p>Because an array knows its component type and <strong>checks every store</strong>, the illegal write is caught — but at runtime, with a per-store cost, and only when the bad line executes. Generics learned the lesson: be <strong>invariant and compile-time-checked</strong> instead of <strong>covariant and runtime-checked</strong>. The contrast is the cleanest illustration of the difference between reified arrays (which carry their type and check at runtime) and erased generics (which check at compile time and carry nothing — <a href="c02-t11-generics-basics.html">T11</a>).</p>
+<div class="mermaid">flowchart TB
+  Arr["arrays: COVARIANT — String[] IS an Object[]"]
+  Arr --> AHole["objects[0] = 42 compiles → ArrayStoreException at RUNTIME (per-store check)"]
+  Gen["generics: INVARIANT — List&lt;String&gt; is NOT a List&lt;Object&gt;"]
+  Gen --> GSafe["objects.add(42) → COMPILE error (no runtime check needed)"]
+  AHole -.->|"generics fixed the 1.0 array mistake"| GSafe
+</div>
+<h2 id="wildcards-restoring-flexibility">Wildcards — Restoring Flexibility<a class="anchor" href="#wildcards-restoring-flexibility" aria-hidden="true">#</a></h2>
+<p>Invariance is safe but rigid: a method written for <code>List&lt;Number&gt;</code> would reject a <code>List&lt;Integer&gt;</code>, which is annoying. <strong>Wildcards</strong> add controlled variance back. There are three:</p>
+<ul>
+<li><strong><code>List&lt;?&gt;</code></strong> — unbounded; "a list of <em>some</em> unknown type." You can read elements as <code>Object</code> and call type-independent methods (<code>size</code>, <code>clear</code>), but you <strong>cannot add</strong> anything except <code>null</code> (you don't know the element type).</li>
+<li><strong><code>List&lt;? extends Number&gt;</code></strong> — upper-bounded, <strong>covariant</strong>; "a list of <code>Number</code> or some subtype." A <code>List&lt;Integer&gt;</code> <em>is</em> a <code>List&lt;? extends Number&gt;</code>. You can <strong>read</strong> elements as <code>Number</code>, but <strong>cannot add</strong> (you don't know if it's a <code>List&lt;Integer&gt;</code> or a <code>List&lt;Double&gt;</code>).</li>
+<li><strong><code>List&lt;? super Integer&gt;</code></strong> — lower-bounded, <strong>contravariant</strong>; "a list of <code>Integer</code> or some supertype." A <code>List&lt;Number&gt;</code> <em>is</em> a <code>List&lt;? super Integer&gt;</code>. You can <strong>add</strong> <code>Integer</code>s, but can only <strong>read</strong> elements as <code>Object</code>.</li>
+</ul>
+<div class="mermaid">flowchart TB
+  W1["List&lt;?&gt; — unknown type: read as Object, add only null"]
+  W2["List&lt;? extends Number&gt; — COVARIANT (producer): READ as Number, cannot add"]
+  W3["List&lt;? super Integer&gt; — CONTRAVARIANT (consumer): ADD Integers, read as Object"]
+</div>
+<h2 id="pecs-producer-extends-consumer-super">PECS — Producer Extends, Consumer Super<a class="anchor" href="#pecs-producer-extends-consumer-super" aria-hidden="true">#</a></h2>
+<p>When do you use which wildcard? Josh Bloch's mnemonic <strong>PECS — Producer Extends, Consumer Super</strong> — answers it. If a parameter <strong>produces</strong> values you read out, use <code>? extends T</code>. If it <strong>consumes</strong> values you write in, use <code>? super T</code>. If it does both, use an exact <code>T</code> (no wildcard). The textbook example is <code>Collections.copy</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+    for (int i = 0; i &lt; src.size(); i++)
+        dest.set(i, src.get(i));     // src PRODUCES T's (read) → extends; dest CONSUMES T's (write) → super
+}
+</code></pre></div>
+<p><code>src</code> is the <strong>producer</strong> — you <code>get</code> <code>T</code>s from it — so <code>? extends T</code> (you can read, and it accepts any subtype list). <code>dest</code> is the <strong>consumer</strong> — you <code>set</code> <code>T</code>s into it — so <code>? super T</code> (you can write, and it accepts any supertype list). This single signature accepts <code>copy(List&lt;Number&gt;, List&lt;Integer&gt;)</code>, <code>copy(List&lt;Object&gt;, List&lt;String&gt;)</code>, and more — the flexibility invariance alone could not give. (The older name for the same rule is the <strong>get/put principle</strong>: <em>get → extends, put → super</em>.) You see PECS throughout the JDK: <code>Collections.max(Collection&lt;? extends T&gt;)</code>, <code>Comparator&lt;? super T&gt;</code> parameters, and the <code>Stream</code> API.</p>
+<div class="mermaid">flowchart LR
+  Copy["copy(dest, src)"]
+  Copy --> Src["src = PRODUCER (we get T's) → List&lt;? extends T&gt;"]
+  Copy --> Dest["dest = CONSUMER (we put T's) → List&lt;? super T&gt;"]
+  Src --> Pecs["PECS: Producer Extends, Consumer Super (both → exact T)"]
+  Dest --> Pecs
+</div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>You cannot <code>add</code> to a <code>List&lt;? extends T&gt;</code></strong> (except <code>null</code>). It is a <em>producer</em> — the compiler can't know its exact element type, so no specific value is provably safe to insert. If you need to add, the parameter is a <em>consumer</em> and wants <code>? super T</code>. Getting PECS backwards is the most common wildcard error.</p></div></div>
+<div class="mermaid">flowchart TB
+  Ext["List&lt;? extends T&gt; (producer)"] --> EG["GET: yes, as T  |  PUT: no (only null)"]
+  Sup["List&lt;? super T&gt; (consumer)"] --> SG["GET: only as Object  |  PUT: yes, T and subtypes"]
+  Exact["List&lt;T&gt; (both)"] --> XG["GET: as T  |  PUT: T — full read/write"]
+</div>
+<h2 id="memory-bounded-erasure-and-bridge-methods">Memory — Bounded Erasure and Bridge Methods<a class="anchor" href="#memory-bounded-erasure-and-bridge-methods" aria-hidden="true">#</a></h2>
+<p>Two erasure consequences from <a href="c02-t11-generics-basics.html">T11</a> deepen here. First, a <strong>bounded</strong> type parameter erases to its <strong>bound</strong>, not to <code>Object</code>: <code>&lt;T extends Number&gt;</code> erases <code>T</code> to <code>Number</code>, so the synthetic casts the compiler inserts are <code>checkcast Number</code>, and calling <code>n.doubleValue()</code> needs <strong>no cast</strong> because <code>T</code> is already <code>Number</code> at the bytecode level. Multiple bounds erase to the <strong>leftmost</strong> bound — another reason the class bound (if any) must come first.</p>
+<div class="mermaid">flowchart LR
+  Unb["unbounded &lt;T&gt; → erases to Object → must checkcast to call anything beyond Object"]
+  Bnd["&lt;T extends Number&gt; → erases to Number → n.doubleValue() with NO cast (leaner bytecode)"]
+  Multi["&lt;T extends A &amp; B&gt; → erases to A (the LEFTMOST bound)"]
+  Unb -.->|"a tighter bound = fewer synthetic casts"| Bnd
+</div>
+<p>Second, the <strong>bridge method</strong> — erasure's subtlest artifact. Consider implementing <code>Comparable</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class MyInt implements Comparable&lt;MyInt&gt; {
+    private final int v;
+    public int compareTo(MyInt o) { return Integer.compare(v, o.v); }   // the real, specific method
+}
+</code></pre></div>
+<p><code>Comparable&lt;T&gt;</code> declares <code>compareTo(T)</code>, which <strong>erases to <code>compareTo(Object)</code></strong>. But <code>MyInt</code> only has <code>compareTo(MyInt)</code> — so the erased interface method <code>compareTo(Object)</code> appears <em>unimplemented</em>, which would break polymorphic calls through a <code>Comparable</code> reference. To fix this, the compiler <strong>synthesizes a bridge method</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// compiler-generated, invisible in source — flagged ACC_BRIDGE | ACC_SYNTHETIC:
+public int compareTo(Object o) { return compareTo((MyInt) o); }   // cast + forward to the real method
+</code></pre></div>
+<p><code>javap -p MyInt</code> shows <em>two</em> <code>compareTo</code> methods: yours and the synthetic bridge. The bridge is how erasure preserves overriding (<a href="c01-t06-polymorphism-compile-time-vs-runtime.html">T06</a>/<a href="c02-t07-comparable-vs-comparator.html">T07</a>): a call to the erased <code>compareTo(Object)</code> lands on the bridge, which casts and dispatches to your <code>compareTo(MyInt)</code>. Any time a generic supertype is overridden with a more specific type, a bridge appears.</p>
+<div class="mermaid">flowchart TB
+  Iface["Comparable&lt;MyInt&gt; declares compareTo(MyInt) → ERASES to compareTo(Object)"]
+  Real["MyInt has compareTo(MyInt) — the real method"]
+  Iface --> Mismatch["erased compareTo(Object) ≠ compareTo(MyInt) — would break polymorphism"]
+  Mismatch --> Bridge["compiler synthesizes BRIDGE compareTo(Object){ return compareTo((MyInt)o); } (ACC_BRIDGE)"]
+  Bridge --> Poly["polymorphic call to compareTo(Object) → bridge → casts → real compareTo(MyInt)"]
+</div>
+<h2 id="architecture-cheaper-casts-bridge-indirection-and-what-erasure-forbids">Architecture — Cheaper Casts, Bridge Indirection, and What Erasure Forbids<a class="anchor" href="#architecture-cheaper-casts-bridge-indirection-and-what-erasure-forbids" aria-hidden="true">#</a></h2>
+<p>Several runtime consequences follow from bounded erasure and bridges. <strong>Bounds can reduce casts</strong>: because <code>&lt;T extends Number&gt;</code> erases to <code>Number</code>, calling <code>Number</code> methods on a <code>T</code> needs <em>no</em> synthetic cast, whereas an unbounded <code>T</code> (erased to <code>Object</code>) would need a cast to do anything beyond <code>Object</code>'s methods — so a tighter bound is not just safer, it can emit leaner bytecode. <strong>Bridge methods add one indirection</strong>: a polymorphic generic call hits the bridge, which does a <code>checkcast</code> and forwards — an extra tiny method call. But the bridge is monomorphic and trivial, so the JIT virtually always <strong>inlines</strong> it (<a href="c01-t05-method-overriding.html">T05</a>/<a href="c01-t06-polymorphism-compile-time-vs-runtime.html">T06</a>), making the indirection free in hot code.</p>
+<p>Erasure also <strong>forbids three things</strong> that catch people out:</p>
+<ul>
+<li><strong>You cannot catch a generic exception type.</strong> <code>catch (MyException&lt;String&gt; e)</code> is illegal, and a generic class <strong>cannot</strong> extend <code>Throwable</code> at all. A <code>catch</code> needs a <strong>reifiable</strong> type — one fully known at runtime — but erasure makes <code>MyException&lt;String&gt;</code> and <code>MyException&lt;Integer&gt;</code> indistinguishable, so the JVM could not decide which clause matches.</li>
+<li><strong>Wildcard capture</strong> is the compiler's trick for handling <code>?</code>. When you pass a <code>List&lt;?&gt;</code> to a method, the compiler "captures" the unknown type as a fresh synthetic variable (<code>CAP#1</code>); a private generic helper with a real <code>&lt;T&gt;</code> parameter can then operate on it. This is why the idiomatic way to mutate a <code>List&lt;?&gt;</code> is to delegate to a <code>private static &lt;T&gt; void helper(List&lt;T&gt;)</code>.</li>
+<li><strong>Generic varargs cause heap pollution.</strong> A method like <code>void m(List&lt;String&gt;... lists)</code> creates an <code>Object[]</code> of a generic type at the call site, which can be aliased and made to hold the wrong parameterization — "heap pollution," and the compiler warns. If the method is genuinely safe (it only reads the varargs, never stores into the array), annotate it <strong><code>@SafeVarargs</code></strong> to assert that and silence the warning (as <code>List.of</code> and <code>Arrays.asList</code> do).</li>
+</ul>
+<div class="mermaid">flowchart TB
+  Er["erasure consequences at runtime"]
+  Er --> Catch["✗ catch (MyEx&lt;T&gt; e) / class MyEx&lt;T&gt; extends Throwable — needs a reifiable type"]
+  Er --> Cap["wildcard CAPTURE: List&lt;?&gt; → fresh CAP#1 → delegate to a private &lt;T&gt; helper"]
+  Er --> Pol["generic varargs → Object[] → heap pollution → assert safety with @SafeVarargs"]
+</div>
+<h2 id="cross-language-perspective-use-site-vs-declaration-site-variance">Cross-Language Perspective — Use-Site vs Declaration-Site Variance<a class="anchor" href="#cross-language-perspective-use-site-vs-declaration-site-variance" aria-hidden="true">#</a></h2>
+<p>Every language with generics must answer "is a <code>List&lt;Cat&gt;</code> a <code>List&lt;Animal&gt;</code>?", and the deep design split is <strong>where you declare the variance</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Variance style</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td><strong>use-site</strong></td>
+<td>wildcards <code>? extends</code> / <code>? super</code> at each method parameter</td>
+</tr>
+<tr>
+<td><strong>C#</strong></td>
+<td><strong>declaration-site</strong></td>
+<td><code>out T</code> (covariant) / <code>in T</code> (contravariant) on the interface</td>
+</tr>
+<tr>
+<td><strong>Kotlin</strong></td>
+<td><strong>both</strong></td>
+<td><code>out</code>/<code>in</code> on the declaration + use-site projections</td>
+</tr>
+<tr>
+<td><strong>Scala</strong></td>
+<td><strong>declaration-site</strong></td>
+<td><code>+T</code> / <code>-T</code> / <code>T</code> on the type</td>
+</tr>
+<tr>
+<td><strong>C++</strong></td>
+<td>invariant + duck-typed</td>
+<td>templates; bounds via <code>concepts</code> (C++20)</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>inferred</td>
+<td>trait bounds <code>&lt;T: Ord&gt;</code>; variance inferred by the compiler</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Java uses use-site variance</strong>: the variance lives at each <em>use</em> — every method that wants flexibility writes <code>? extends</code>/<code>? super</code> in its signature. This is maximally flexible (the same <code>List&lt;T&gt;</code> is read covariantly in one method and written contravariantly in another) but <strong>verbose</strong> — the wildcards repeat across every signature, and beginners find PECS hard. <strong>C#, Kotlin, and Scala use declaration-site variance</strong>: you mark a type parameter variant <strong>once</strong>, on the type itself — C#'s <code>IEnumerable&lt;out T&gt;</code> says "<code>IEnumerable</code> is covariant in <code>T</code>" forever, so an <code>IEnumerable&lt;Cat&gt;</code> is automatically an <code>IEnumerable&lt;Animal&gt;</code> with no per-use wildcard. That is cleaner and easier to learn, but less flexible (the variance is fixed at declaration, and in C# applies only to interfaces and delegates). <strong>Kotlin offers both</strong> — declaration-site <code>out</code>/<code>in</code> plus Java-style use-site projections — the most complete design. <strong>C++</strong> templates are invariant and structurally typed (a template just fails to compile if an operation isn't supported; <code>concepts</code> add named bounds in C++20), and <strong>Rust</strong> uses trait bounds like Java's <code>extends</code> while <em>inferring</em> variance from how a type uses its parameters. Java chose use-site wildcards because they could be <strong>retrofitted</strong> onto the already-shipped invariant generics without changing a single existing type declaration — the same migration-pragmatism that drove erasure (<a href="c02-t11-generics-basics.html">T11</a>).</p>
+<div class="mermaid">flowchart LR
+  Use["USE-SITE (Java): ? extends / ? super at every use — flexible, verbose, retrofit-friendly"]
+  Decl["DECLARATION-SITE (C#, Kotlin, Scala): out/in once on the type — concise, fixed"]
+  Use -.->|"Kotlin offers BOTH"| Decl
+</div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Assuming <code>List&lt;String&gt;</code> is a <code>List&lt;Object&gt;</code>.</strong> Generics are invariant; the assignment is a compile error. Use <code>List&lt;? extends Object&gt;</code> (i.e. <code>List&lt;?&gt;</code>) if you only need to read.</p><p>[!WARNING]
+<strong>Getting PECS backwards.</strong> <code>? extends T</code> for a parameter you write to (you then can't <code>add</code>), or <code>? super T</code> for one you read from (you then only get <code>Object</code>). Producer → extends, consumer → super.</p>
+<p>[!WARNING]
+<strong>Using raw types to silence wildcard errors.</strong> Switching <code>List&lt;? extends Number&gt;</code> to a raw <code>List</code> to make an <code>add</code> compile reintroduces the unsafety generics exist to prevent (<a href="c02-t11-generics-basics.html">T11</a>). Fix the variance instead.</p>
+<p>[!WARNING]
+<strong>Wrong multiple-bound order.</strong> A class bound must precede interface bounds: <code>&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;</code> is legal, <code>&lt;T extends Comparable&lt;T&gt; &amp; Number&gt;</code> is not (and there can be at most one class bound).</p>
+<p>[!WARNING]
+<strong>Trying to catch a generic exception or extend <code>Throwable</code> generically.</strong> <code>catch (MyEx&lt;String&gt; e)</code> and <code>class MyEx&lt;T&gt; extends Exception</code> are both illegal — a catchable/throwable type must be reifiable, which erasure prevents.</p>
+<p>[!WARNING]
+<strong>Generic varargs without thinking about heap pollution.</strong> Annotate a genuinely safe generic varargs method with <code>@SafeVarargs</code>; never add it to one that actually stores into the varargs array — that's asserting a falsehood.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>Common interview questions for this topic:
+1. <strong>What is a bounded type parameter?</strong> <code>&lt;T extends X&gt;</code> restricts <code>T</code> to <code>X</code> or a subtype, letting you call <code>X</code>'s methods on <code>T</code>; it erases to <code>X</code>.
+2. <strong>Why is <code>List&lt;String&gt;</code> not a <code>List&lt;Object&gt;</code>?</strong> Invariance — allowing it would let you insert a non-<code>String</code> through the alias and corrupt the list.
+3. <strong>How do arrays differ from generics on variance?</strong> Arrays are covariant and catch the resulting hole at runtime (<code>ArrayStoreException</code>); generics are invariant and catch it at compile time.
+4. <strong>What are the three wildcards?</strong> <code>?</code> (unbounded), <code>? extends T</code> (covariant producer), <code>? super T</code> (contravariant consumer).
+5. <strong>What is PECS?</strong> Producer Extends, Consumer Super — <code>? extends T</code> for parameters you read from, <code>? super T</code> for parameters you write to.
+6. <strong>Can you add to a <code>List&lt;? extends Number&gt;</code>?</strong> No (except <code>null</code>) — the exact element type is unknown.
+7. <strong>Can you add to a <code>List&lt;? super Integer&gt;</code>?</strong> Yes, <code>Integer</code>s — but you can only read elements as <code>Object</code>.
+8. <strong>What does a bounded type parameter erase to?</strong> Its bound (the leftmost, for multiple bounds), not <code>Object</code> — so calling the bound's methods needs no cast.
+9. <strong>What is a bridge method?</strong> A synthetic <code>ACC_BRIDGE</code> method the compiler generates to preserve polymorphism through erasure — e.g. <code>compareTo(Object)</code> forwarding to <code>compareTo(MyType)</code>.
+10. <strong>Why can't you catch a generic exception type?</strong> A <code>catch</code> needs a reifiable type; erasure makes <code>MyEx&lt;A&gt;</code> and <code>MyEx&lt;B&gt;</code> indistinguishable at runtime.
+11. <strong>What is heap pollution / <code>@SafeVarargs</code>?</strong> A parameterized variable referring to an object of a different parameterization (often via generic varargs); <code>@SafeVarargs</code> asserts a varargs method doesn't cause it.
+12. <strong>Use-site vs declaration-site variance?</strong> Java declares variance at each use (wildcards — flexible, verbose); C#/Kotlin/Scala declare it once on the type (<code>out</code>/<code>in</code> — concise, fixed).
+13. <strong>Multiple-bound ordering rule?</strong> At most one class bound, and it must come first, before interface bounds.</p></div></div>
+<ol>
+<li>
+<p><strong>Bounded parameter.</strong> Write <code>&lt;T extends Comparable&lt;T&gt;&gt; T max(List&lt;T&gt; list)</code>; call it on a <code>List&lt;Integer&gt;</code> and a <code>List&lt;String&gt;</code>. Explain the recursive bound.</p>
+</li>
+<li>
+<p><strong>Multiple bounds.</strong> Write a method bounded by <code>&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;</code>; use both the <code>Number</code> and <code>Comparable</code> capabilities of <code>T</code>.</p>
+</li>
+<li>
+<p><strong>Invariance.</strong> Try <code>List&lt;Object&gt; o = stringList;</code>; observe the compile error; explain the corruption it prevents.</p>
+</li>
+<li>
+<p><strong>Array-covariance hole.</strong> Write <code>Object[] a = new String[2]; a[0] = 42;</code>; observe the <code>ArrayStoreException</code> at runtime; contrast with the compile-time rejection generics give.</p>
+</li>
+<li>
+<p><strong>PECS copy.</strong> Implement <code>copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)</code>; confirm it accepts <code>copy(numberList, integerList)</code> and explain which is producer and which is consumer.</p>
+</li>
+<li>
+<p><strong><code>? extends</code> is read-only.</strong> Try to <code>add</code> to a <code>List&lt;? extends Number&gt;</code> parameter; observe the compile error; confirm you can still read elements as <code>Number</code> and add <code>null</code>.</p>
+</li>
+<li>
+<p><strong><code>? super</code> is write-restricted.</strong> From a <code>List&lt;? super Integer&gt;</code>, <code>add</code> an <code>Integer</code> (works) and try to assign an element to <code>Integer</code> (fails — only <code>Object</code>); explain.</p>
+</li>
+<li>
+<p><strong>Unbounded <code>?</code>.</strong> Write <code>printAll(List&lt;?&gt; list)</code>; confirm it accepts any <code>List</code> but cannot <code>add</code> (except <code>null</code>).</p>
+</li>
+<li>
+<p><strong>Bridge method.</strong> Implement <code>Comparable&lt;MyType&gt;</code>; run <code>javap -p</code> and find the synthetic <code>compareTo(Object)</code> bridge; explain its role.</p>
+</li>
+<li>
+<p><strong>Can't catch generic.</strong> Try <code>catch (MyEx&lt;String&gt; e)</code> and <code>class MyEx&lt;T&gt; extends Exception</code>; observe both compile errors and explain why erasure forbids them.</p>
+</li>
+<li>
+<p><strong>Wildcard capture.</strong> Write a <code>swap(List&lt;?&gt; list, int i, int j)</code> that delegates to a <code>private static &lt;T&gt; void swapHelper(List&lt;T&gt; list, int i, int j)</code>; explain the capture.</p>
+</li>
+<li>
+<p><strong><code>@SafeVarargs</code>.</strong> Write a safe generic varargs method (only reads its varargs); observe the heap-pollution warning; add <code>@SafeVarargs</code> and confirm it's gone.</p>
+</li>
+<li>
+<p><strong>Bounded erasure in bytecode.</strong> Compile a <code>&lt;T extends Number&gt;</code> method; <code>javap -c</code> it and confirm the erased signature uses <code>Number</code> (and <code>doubleValue</code> is called without a cast).</p>
+</li>
+<li>
+<p><strong>Use-site vs declaration-site.</strong> Express the same covariance in Java (<code>List&lt;? extends T&gt;</code>) and conceptually in C#/Kotlin (<code>out T</code>); discuss the verbosity/flexibility trade-off.</p>
+</li>
+<li>
+<p><strong>End-to-end explain-it-back.</strong> For <code>Collections.copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)</code> and a class implementing <code>Comparable&lt;MyType&gt;</code>: (a) why <code>src</code> is <code>? extends T</code> and <code>dest</code> is <code>? super T</code>; (b) what you can and cannot do with each; (c) what bridge method the compiler generates for the <code>Comparable</code> class and why; (d) how a polymorphic <code>compareTo</code> call reaches the real method; (e) why none of this carries runtime type information. Twelve sentences max.</p>
+</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<p><strong>Language layer.</strong></p>
+<ul>
+<li>Bound type parameters (<code>&lt;T extends X&gt;</code>, multiple bounds with the class first, recursive bounds) to call the bound's methods on <code>T</code>.</li>
+<li>Explain invariance — why <code>List&lt;String&gt;</code> is not a <code>List&lt;Object&gt;</code> — and contrast it with covariant arrays and their runtime <code>ArrayStoreException</code>.</li>
+<li>Use the three wildcards and apply <strong>PECS</strong> (Producer Extends, Consumer Super) to design flexible, type-safe signatures.</li>
+</ul>
+<p><strong>Memory layer.</strong></p>
+<ul>
+<li>Explain that a bounded type parameter erases to its bound (leftmost for multiple bounds), reducing the casts the compiler must insert.</li>
+<li>Describe bridge methods: synthetic <code>ACC_BRIDGE</code> methods the compiler generates so an erased override (<code>compareTo(Object)</code>) forwards to the real specific method, preserving polymorphism.</li>
+</ul>
+<p><strong>Architecture layer.</strong></p>
+<ul>
+<li>Explain that bounds can emit leaner bytecode (fewer casts) and that bridge-method indirection is normally inlined away by the JIT.</li>
+<li>State what erasure forbids — catching/extending a generic <code>Throwable</code>, distinguishing parameterizations at runtime — and explain wildcard capture and <code>@SafeVarargs</code> heap-pollution.</li>
+<li>Contrast Java's use-site wildcard variance with the declaration-site variance of C#, Kotlin, and Scala, and tie Java's choice to retrofit/migration pragmatism.</li>
+</ul>
+<p>This <strong>completes the generics pair</strong> (<a href="c02-t11-generics-basics.html">T11</a> basics + T12 advanced) and the chapter's <strong>language-facilities run</strong> (exceptions T09–T10, generics T11–T12). Everything from here is the <strong>core API libraries</strong> — and the chapter opens that arc with the one every program uses to move data across boundaries: input and output.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t13-i-o-streams-byte-and-character.html">I/O streams (byte &amp; character)</a> — the first of the core-API topics, and a shift from <em>language facilities</em> to <em>libraries</em>. We leave type systems behind and turn to moving bytes and characters across boundaries — files, sockets, pipes. T13 opens the two parallel hierarchies: <code>InputStream</code>/<code>OutputStream</code> for raw <strong>bytes</strong> and <code>Reader</code>/<code>Writer</code> for <strong>characters</strong>, why the split exists (the charset-decoding boundary — the same encoding concerns from L0), the <strong>decorator pattern</strong> that composes them (<code>BufferedReader</code> wrapping a <code>FileReader</code> wrapping bytes — the wrapping you met in <a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>'s reverse-order close), why <strong>buffering</strong> matters (the memory-hierarchy lesson from <a href="c02-t08-collection-performance-characteristics-big-o.html">T08</a>, now at the syscall and disk level), and the <code>try</code>-with-resources discipline (<a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>) that every stream demands.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Generics — bounded types, wildcards, type erasure&quot;
+slug: generics-bounded-types-wildcards-type-erasure
+level: L1
+module: &quot;Core Java &amp; OOP&quot;
+section: &quot;Collections &amp; Core APIs&quot;
+type: concept
+difficulty: intermediate
+order: 12
+tags: [generics, bounded-types, wildcards, pecs, invariance, covariance, contravariance, type-erasure, bridge-methods, heap-pollution, safevarargs, variance]
+prerequisites: [generics-basics, comparable-vs-comparator, collections-framework-overview, polymorphism-compile-time-vs-runtime, inheritance-and-super]
+status: complete
+estimated_minutes: 65
+last_updated: 2026-06-04
+---
+
+# Generics — bounded types, wildcards, type erasure
+
+[T11](./T11-generics-basics.md) introduced `&lt;T&gt;` and the type erasure beneath it; this topic turns generics from &quot;typed collections&quot; into a tool for designing **flexible, type-safe APIs**. Three ideas do the work. **Bounded type parameters** (`&lt;T extends Number&gt;`) let a generic require that its type argument has certain capabilities — so you can actually *call methods* on a `T` instead of treating it as an opaque `Object`. **Variance** answers the question that surprises everyone: a `List&lt;String&gt;` is **not** a `List&lt;Object&gt;`, even though `String` is an `Object` — generics are *invariant*, for a reason that protects type safety. And **wildcards** (`? extends T`, `? super T`) restore the flexibility invariance takes away, governed by the **PECS** rule — *Producer Extends, Consumer Super* — the single most useful mnemonic in Java generics.
+
+The depth bar is **why invariance is correct and how erasure keeps overriding working**. Invariance is not arbitrary: if `List&lt;String&gt;` *were* a `List&lt;Object&gt;`, you could alias it, `add` an `Integer` through the alias, and corrupt the original — so the compiler forbids the assignment. Arrays, by contrast, *are* covariant (a `String[]` is an `Object[]`), and they pay for it with a **runtime** `ArrayStoreException` and a per-store type check; generics learned from that mistake and close the hole at **compile time** with zero runtime cost. And erasure ([T11](./T11-generics-basics.md)) has a subtle consequence: when a class implements `Comparable&lt;MyType&gt;`, its `compareTo(MyType)` doesn&#x27;t match the erased interface method `compareTo(Object)` — so the compiler synthesizes a **bridge method**, an invisible `compareTo(Object)` that casts and forwards, preserving polymorphism through erasure. By the end you will bound type parameters, explain invariance and the array-covariance hole, apply PECS to design flexible signatures, read a bridge method in `javap`, and contrast Java&#x27;s *use-site* wildcards with the *declaration-site* variance of C#, Kotlin, and Scala.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Generics basics](./T11-generics-basics.md) (`L1/C02/T11`) — type parameters and erasure, which this builds on directly; [Comparable/Comparator](./T07-comparable-vs-comparator.md) (`L1/C02/T07`) — `Comparable&lt;T&gt;` is the canonical bounded/bridge-method example; [Polymorphism](../C01-oop/T06-polymorphism-compile-time-vs-runtime.md) (`L1/C01/T06`) — bridge methods preserve runtime dispatch through erasure; [Inheritance](../C01-oop/T04-inheritance-and-super.md) (`L1/C01/T04`) — the subtype relationships variance is about. Forward: [T13](./T13-i-o-streams-byte-and-character.md) (I/O streams) — the first core-API topic, where the language facilities give way to the libraries.
+
+## Bounded Type Parameters
+
+An unbounded `&lt;T&gt;` erases to `Object` ([T11](./T11-generics-basics.md)), so you can only call `Object` methods on a `T`. A **bound** restricts `T` to a type (or its subtypes), unlocking that type&#x27;s methods:
+
+```java
+public static &lt;T extends Number&gt; double sum(List&lt;T&gt; list) {   // T must be a Number or subtype
+    double total = 0;
+    for (T n : list) total += n.doubleValue();                // legal — T is at least a Number
+    return total;
+}
+```
+
+`&lt;T extends Number&gt;` is an **upper bound**: the argument must be `Number` or below. Note `extends` is used for both classes *and* interfaces (even where you&#x27;d normally write `implements`). A parameter can have **multiple bounds** with `&amp;` — `&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;` — requiring `T` to satisfy all of them; if one bound is a **class**, it must come **first**, before any interface bounds (at most one class bound is allowed). Bounds can even be **recursive** — `&lt;T extends Comparable&lt;T&gt;&gt;` (&quot;`T` is comparable to itself&quot;), exactly the signature `Collections.max` uses.
+
+```mermaid
+flowchart LR
+  Unb[&quot;unbounded &amp;lt;T&amp;gt; → erases to Object → only Object methods&quot;]
+  Bnd[&quot;&amp;lt;T extends Number&amp;gt; → erases to Number → call doubleValue(), intValue()…&quot;]
+  Multi[&quot;&amp;lt;T extends Number &amp;amp; Comparable&amp;lt;T&amp;gt;&amp;gt; → all bounds; CLASS bound first, then interfaces&quot;]
+  Unb -.-&gt;|&quot;a bound unlocks the type&#x27;s API&quot;| Bnd
+```
+
+## The Invariance Problem — Why `List&lt;String&gt;` Is Not a `List&lt;Object&gt;`
+
+A `String` is an `Object`, so intuition says a `List&lt;String&gt;` should be usable as a `List&lt;Object&gt;`. **It cannot** — and the compiler is right to forbid it:
+
+```java
+List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+List&lt;Object&gt; objects = strings;   // COMPILE ERROR — generics are INVARIANT
+```
+
+Why? Imagine it were allowed. Then through the `objects` alias you could insert a non-`String`, corrupting `strings`:
+
+```java
+List&lt;Object&gt; objects = strings;   // (hypothetically allowed)
+objects.add(42);                  // an Integer goes into what is really a List&lt;String&gt;
+String s = strings.get(0);        // ClassCastException — the list is now poisoned
+```
+
+To prevent exactly this, generics are **invariant**: `List&lt;String&gt;` and `List&lt;Object&gt;` are *unrelated* types regardless of the relationship between `String` and `Object`. The error appears at the assignment, at **compile time**, before any corruption can happen.
+
+```mermaid
+flowchart TB
+  Inv[&quot;generics are INVARIANT: List&amp;lt;String&amp;gt; is NOT a List&amp;lt;Object&amp;gt;&quot;]
+  Inv --&gt; Why[&quot;if it were: objects.add(42) through the alias → corrupts the String list&quot;]
+  Why --&gt; Safe[&quot;so the compiler rejects List&amp;lt;Object&amp;gt; o = stringList — at COMPILE time, no corruption possible&quot;]
+```
+
+### The Array-Covariance Hole
+
+This is where Java&#x27;s history bites. **Arrays are covariant** — a `String[]` *is* an `Object[]` — a decision from Java 1.0, before generics existed. That covariance creates exactly the hole invariance closes, but it is caught only at **runtime**:
+
+```java
+Object[] objects = new String[3];   // ALLOWED — arrays are covariant
+objects[0] = 42;                     // compiles fine… but throws ArrayStoreException at RUNTIME
+```
+
+Because an array knows its component type and **checks every store**, the illegal write is caught — but at runtime, with a per-store cost, and only when the bad line executes. Generics learned the lesson: be **invariant and compile-time-checked** instead of **covariant and runtime-checked**. The contrast is the cleanest illustration of the difference between reified arrays (which carry their type and check at runtime) and erased generics (which check at compile time and carry nothing — [T11](./T11-generics-basics.md)).
+
+```mermaid
+flowchart TB
+  Arr[&quot;arrays: COVARIANT — String[] IS an Object[]&quot;]
+  Arr --&gt; AHole[&quot;objects[0] = 42 compiles → ArrayStoreException at RUNTIME (per-store check)&quot;]
+  Gen[&quot;generics: INVARIANT — List&amp;lt;String&amp;gt; is NOT a List&amp;lt;Object&amp;gt;&quot;]
+  Gen --&gt; GSafe[&quot;objects.add(42) → COMPILE error (no runtime check needed)&quot;]
+  AHole -.-&gt;|&quot;generics fixed the 1.0 array mistake&quot;| GSafe
+```
+
+## Wildcards — Restoring Flexibility
+
+Invariance is safe but rigid: a method written for `List&lt;Number&gt;` would reject a `List&lt;Integer&gt;`, which is annoying. **Wildcards** add controlled variance back. There are three:
+
+- **`List&lt;?&gt;`** — unbounded; &quot;a list of *some* unknown type.&quot; You can read elements as `Object` and call type-independent methods (`size`, `clear`), but you **cannot add** anything except `null` (you don&#x27;t know the element type).
+- **`List&lt;? extends Number&gt;`** — upper-bounded, **covariant**; &quot;a list of `Number` or some subtype.&quot; A `List&lt;Integer&gt;` *is* a `List&lt;? extends Number&gt;`. You can **read** elements as `Number`, but **cannot add** (you don&#x27;t know if it&#x27;s a `List&lt;Integer&gt;` or a `List&lt;Double&gt;`).
+- **`List&lt;? super Integer&gt;`** — lower-bounded, **contravariant**; &quot;a list of `Integer` or some supertype.&quot; A `List&lt;Number&gt;` *is* a `List&lt;? super Integer&gt;`. You can **add** `Integer`s, but can only **read** elements as `Object`.
+
+```mermaid
+flowchart TB
+  W1[&quot;List&amp;lt;?&amp;gt; — unknown type: read as Object, add only null&quot;]
+  W2[&quot;List&amp;lt;? extends Number&amp;gt; — COVARIANT (producer): READ as Number, cannot add&quot;]
+  W3[&quot;List&amp;lt;? super Integer&amp;gt; — CONTRAVARIANT (consumer): ADD Integers, read as Object&quot;]
+```
+
+## PECS — Producer Extends, Consumer Super
+
+When do you use which wildcard? Josh Bloch&#x27;s mnemonic **PECS — Producer Extends, Consumer Super** — answers it. If a parameter **produces** values you read out, use `? extends T`. If it **consumes** values you write in, use `? super T`. If it does both, use an exact `T` (no wildcard). The textbook example is `Collections.copy`:
+
+```java
+public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+    for (int i = 0; i &lt; src.size(); i++)
+        dest.set(i, src.get(i));     // src PRODUCES T&#x27;s (read) → extends; dest CONSUMES T&#x27;s (write) → super
+}
+```
+
+`src` is the **producer** — you `get` `T`s from it — so `? extends T` (you can read, and it accepts any subtype list). `dest` is the **consumer** — you `set` `T`s into it — so `? super T` (you can write, and it accepts any supertype list). This single signature accepts `copy(List&lt;Number&gt;, List&lt;Integer&gt;)`, `copy(List&lt;Object&gt;, List&lt;String&gt;)`, and more — the flexibility invariance alone could not give. (The older name for the same rule is the **get/put principle**: *get → extends, put → super*.) You see PECS throughout the JDK: `Collections.max(Collection&lt;? extends T&gt;)`, `Comparator&lt;? super T&gt;` parameters, and the `Stream` API.
+
+```mermaid
+flowchart LR
+  Copy[&quot;copy(dest, src)&quot;]
+  Copy --&gt; Src[&quot;src = PRODUCER (we get T&#x27;s) → List&amp;lt;? extends T&amp;gt;&quot;]
+  Copy --&gt; Dest[&quot;dest = CONSUMER (we put T&#x27;s) → List&amp;lt;? super T&amp;gt;&quot;]
+  Src --&gt; Pecs[&quot;PECS: Producer Extends, Consumer Super (both → exact T)&quot;]
+  Dest --&gt; Pecs
+```
+
+&gt; [!WARNING]
+&gt; **You cannot `add` to a `List&lt;? extends T&gt;`** (except `null`). It is a *producer* — the compiler can&#x27;t know its exact element type, so no specific value is provably safe to insert. If you need to add, the parameter is a *consumer* and wants `? super T`. Getting PECS backwards is the most common wildcard error.
+
+```mermaid
+flowchart TB
+  Ext[&quot;List&amp;lt;? extends T&amp;gt; (producer)&quot;] --&gt; EG[&quot;GET: yes, as T  |  PUT: no (only null)&quot;]
+  Sup[&quot;List&amp;lt;? super T&amp;gt; (consumer)&quot;] --&gt; SG[&quot;GET: only as Object  |  PUT: yes, T and subtypes&quot;]
+  Exact[&quot;List&amp;lt;T&amp;gt; (both)&quot;] --&gt; XG[&quot;GET: as T  |  PUT: T — full read/write&quot;]
+```
+
+## Memory — Bounded Erasure and Bridge Methods
+
+Two erasure consequences from [T11](./T11-generics-basics.md) deepen here. First, a **bounded** type parameter erases to its **bound**, not to `Object`: `&lt;T extends Number&gt;` erases `T` to `Number`, so the synthetic casts the compiler inserts are `checkcast Number`, and calling `n.doubleValue()` needs **no cast** because `T` is already `Number` at the bytecode level. Multiple bounds erase to the **leftmost** bound — another reason the class bound (if any) must come first.
+
+```mermaid
+flowchart LR
+  Unb[&quot;unbounded &amp;lt;T&amp;gt; → erases to Object → must checkcast to call anything beyond Object&quot;]
+  Bnd[&quot;&amp;lt;T extends Number&amp;gt; → erases to Number → n.doubleValue() with NO cast (leaner bytecode)&quot;]
+  Multi[&quot;&amp;lt;T extends A &amp;amp; B&amp;gt; → erases to A (the LEFTMOST bound)&quot;]
+  Unb -.-&gt;|&quot;a tighter bound = fewer synthetic casts&quot;| Bnd
+```
+
+Second, the **bridge method** — erasure&#x27;s subtlest artifact. Consider implementing `Comparable`:
+
+```java
+class MyInt implements Comparable&lt;MyInt&gt; {
+    private final int v;
+    public int compareTo(MyInt o) { return Integer.compare(v, o.v); }   // the real, specific method
+}
+```
+
+`Comparable&lt;T&gt;` declares `compareTo(T)`, which **erases to `compareTo(Object)`**. But `MyInt` only has `compareTo(MyInt)` — so the erased interface method `compareTo(Object)` appears *unimplemented*, which would break polymorphic calls through a `Comparable` reference. To fix this, the compiler **synthesizes a bridge method**:
+
+```java
+// compiler-generated, invisible in source — flagged ACC_BRIDGE | ACC_SYNTHETIC:
+public int compareTo(Object o) { return compareTo((MyInt) o); }   // cast + forward to the real method
+```
+
+`javap -p MyInt` shows *two* `compareTo` methods: yours and the synthetic bridge. The bridge is how erasure preserves overriding ([T06](../C01-oop/T06-polymorphism-compile-time-vs-runtime.md)/[T07](./T07-comparable-vs-comparator.md)): a call to the erased `compareTo(Object)` lands on the bridge, which casts and dispatches to your `compareTo(MyInt)`. Any time a generic supertype is overridden with a more specific type, a bridge appears.
+
+```mermaid
+flowchart TB
+  Iface[&quot;Comparable&amp;lt;MyInt&amp;gt; declares compareTo(MyInt) → ERASES to compareTo(Object)&quot;]
+  Real[&quot;MyInt has compareTo(MyInt) — the real method&quot;]
+  Iface --&gt; Mismatch[&quot;erased compareTo(Object) ≠ compareTo(MyInt) — would break polymorphism&quot;]
+  Mismatch --&gt; Bridge[&quot;compiler synthesizes BRIDGE compareTo(Object){ return compareTo((MyInt)o); } (ACC_BRIDGE)&quot;]
+  Bridge --&gt; Poly[&quot;polymorphic call to compareTo(Object) → bridge → casts → real compareTo(MyInt)&quot;]
+```
+
+## Architecture — Cheaper Casts, Bridge Indirection, and What Erasure Forbids
+
+Several runtime consequences follow from bounded erasure and bridges. **Bounds can reduce casts**: because `&lt;T extends Number&gt;` erases to `Number`, calling `Number` methods on a `T` needs *no* synthetic cast, whereas an unbounded `T` (erased to `Object`) would need a cast to do anything beyond `Object`&#x27;s methods — so a tighter bound is not just safer, it can emit leaner bytecode. **Bridge methods add one indirection**: a polymorphic generic call hits the bridge, which does a `checkcast` and forwards — an extra tiny method call. But the bridge is monomorphic and trivial, so the JIT virtually always **inlines** it ([T05](../C01-oop/T05-method-overriding.md)/[T06](../C01-oop/T06-polymorphism-compile-time-vs-runtime.md)), making the indirection free in hot code.
+
+Erasure also **forbids three things** that catch people out:
+
+- **You cannot catch a generic exception type.** `catch (MyException&lt;String&gt; e)` is illegal, and a generic class **cannot** extend `Throwable` at all. A `catch` needs a **reifiable** type — one fully known at runtime — but erasure makes `MyException&lt;String&gt;` and `MyException&lt;Integer&gt;` indistinguishable, so the JVM could not decide which clause matches.
+- **Wildcard capture** is the compiler&#x27;s trick for handling `?`. When you pass a `List&lt;?&gt;` to a method, the compiler &quot;captures&quot; the unknown type as a fresh synthetic variable (`CAP#1`); a private generic helper with a real `&lt;T&gt;` parameter can then operate on it. This is why the idiomatic way to mutate a `List&lt;?&gt;` is to delegate to a `private static &lt;T&gt; void helper(List&lt;T&gt;)`.
+- **Generic varargs cause heap pollution.** A method like `void m(List&lt;String&gt;... lists)` creates an `Object[]` of a generic type at the call site, which can be aliased and made to hold the wrong parameterization — &quot;heap pollution,&quot; and the compiler warns. If the method is genuinely safe (it only reads the varargs, never stores into the array), annotate it **`@SafeVarargs`** to assert that and silence the warning (as `List.of` and `Arrays.asList` do).
+
+```mermaid
+flowchart TB
+  Er[&quot;erasure consequences at runtime&quot;]
+  Er --&gt; Catch[&quot;✗ catch (MyEx&amp;lt;T&amp;gt; e) / class MyEx&amp;lt;T&amp;gt; extends Throwable — needs a reifiable type&quot;]
+  Er --&gt; Cap[&quot;wildcard CAPTURE: List&amp;lt;?&amp;gt; → fresh CAP#1 → delegate to a private &amp;lt;T&amp;gt; helper&quot;]
+  Er --&gt; Pol[&quot;generic varargs → Object[] → heap pollution → assert safety with @SafeVarargs&quot;]
+```
+
+## Cross-Language Perspective — Use-Site vs Declaration-Site Variance
+
+Every language with generics must answer &quot;is a `List&lt;Cat&gt;` a `List&lt;Animal&gt;`?&quot;, and the deep design split is **where you declare the variance**:
+
+| Language | Variance style | How |
+|---|---|---|
+| **Java** | **use-site** | wildcards `? extends` / `? super` at each method parameter |
+| **C#** | **declaration-site** | `out T` (covariant) / `in T` (contravariant) on the interface |
+| **Kotlin** | **both** | `out`/`in` on the declaration + use-site projections |
+| **Scala** | **declaration-site** | `+T` / `-T` / `T` on the type |
+| **C++** | invariant + duck-typed | templates; bounds via `concepts` (C++20) |
+| **Rust** | inferred | trait bounds `&lt;T: Ord&gt;`; variance inferred by the compiler |
+
+**Java uses use-site variance**: the variance lives at each *use* — every method that wants flexibility writes `? extends`/`? super` in its signature. This is maximally flexible (the same `List&lt;T&gt;` is read covariantly in one method and written contravariantly in another) but **verbose** — the wildcards repeat across every signature, and beginners find PECS hard. **C#, Kotlin, and Scala use declaration-site variance**: you mark a type parameter variant **once**, on the type itself — C#&#x27;s `IEnumerable&lt;out T&gt;` says &quot;`IEnumerable` is covariant in `T`&quot; forever, so an `IEnumerable&lt;Cat&gt;` is automatically an `IEnumerable&lt;Animal&gt;` with no per-use wildcard. That is cleaner and easier to learn, but less flexible (the variance is fixed at declaration, and in C# applies only to interfaces and delegates). **Kotlin offers both** — declaration-site `out`/`in` plus Java-style use-site projections — the most complete design. **C++** templates are invariant and structurally typed (a template just fails to compile if an operation isn&#x27;t supported; `concepts` add named bounds in C++20), and **Rust** uses trait bounds like Java&#x27;s `extends` while *inferring* variance from how a type uses its parameters. Java chose use-site wildcards because they could be **retrofitted** onto the already-shipped invariant generics without changing a single existing type declaration — the same migration-pragmatism that drove erasure ([T11](./T11-generics-basics.md)).
+
+```mermaid
+flowchart LR
+  Use[&quot;USE-SITE (Java): ? extends / ? super at every use — flexible, verbose, retrofit-friendly&quot;]
+  Decl[&quot;DECLARATION-SITE (C#, Kotlin, Scala): out/in once on the type — concise, fixed&quot;]
+  Use -.-&gt;|&quot;Kotlin offers BOTH&quot;| Decl
+```
+
+## Common Mistakes
+
+&gt; [!WARNING]
+&gt; **Assuming `List&lt;String&gt;` is a `List&lt;Object&gt;`.** Generics are invariant; the assignment is a compile error. Use `List&lt;? extends Object&gt;` (i.e. `List&lt;?&gt;`) if you only need to read.
+
+&gt; [!WARNING]
+&gt; **Getting PECS backwards.** `? extends T` for a parameter you write to (you then can&#x27;t `add`), or `? super T` for one you read from (you then only get `Object`). Producer → extends, consumer → super.
+
+&gt; [!WARNING]
+&gt; **Using raw types to silence wildcard errors.** Switching `List&lt;? extends Number&gt;` to a raw `List` to make an `add` compile reintroduces the unsafety generics exist to prevent ([T11](./T11-generics-basics.md)). Fix the variance instead.
+
+&gt; [!WARNING]
+&gt; **Wrong multiple-bound order.** A class bound must precede interface bounds: `&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;` is legal, `&lt;T extends Comparable&lt;T&gt; &amp; Number&gt;` is not (and there can be at most one class bound).
+
+&gt; [!WARNING]
+&gt; **Trying to catch a generic exception or extend `Throwable` generically.** `catch (MyEx&lt;String&gt; e)` and `class MyEx&lt;T&gt; extends Exception` are both illegal — a catchable/throwable type must be reifiable, which erasure prevents.
+
+&gt; [!WARNING]
+&gt; **Generic varargs without thinking about heap pollution.** Annotate a genuinely safe generic varargs method with `@SafeVarargs`; never add it to one that actually stores into the varargs array — that&#x27;s asserting a falsehood.
+
+## Practice
+
+&gt; [!INTERVIEW]
+&gt; Common interview questions for this topic:
+&gt; 1. **What is a bounded type parameter?** `&lt;T extends X&gt;` restricts `T` to `X` or a subtype, letting you call `X`&#x27;s methods on `T`; it erases to `X`.
+&gt; 2. **Why is `List&lt;String&gt;` not a `List&lt;Object&gt;`?** Invariance — allowing it would let you insert a non-`String` through the alias and corrupt the list.
+&gt; 3. **How do arrays differ from generics on variance?** Arrays are covariant and catch the resulting hole at runtime (`ArrayStoreException`); generics are invariant and catch it at compile time.
+&gt; 4. **What are the three wildcards?** `?` (unbounded), `? extends T` (covariant producer), `? super T` (contravariant consumer).
+&gt; 5. **What is PECS?** Producer Extends, Consumer Super — `? extends T` for parameters you read from, `? super T` for parameters you write to.
+&gt; 6. **Can you add to a `List&lt;? extends Number&gt;`?** No (except `null`) — the exact element type is unknown.
+&gt; 7. **Can you add to a `List&lt;? super Integer&gt;`?** Yes, `Integer`s — but you can only read elements as `Object`.
+&gt; 8. **What does a bounded type parameter erase to?** Its bound (the leftmost, for multiple bounds), not `Object` — so calling the bound&#x27;s methods needs no cast.
+&gt; 9. **What is a bridge method?** A synthetic `ACC_BRIDGE` method the compiler generates to preserve polymorphism through erasure — e.g. `compareTo(Object)` forwarding to `compareTo(MyType)`.
+&gt; 10. **Why can&#x27;t you catch a generic exception type?** A `catch` needs a reifiable type; erasure makes `MyEx&lt;A&gt;` and `MyEx&lt;B&gt;` indistinguishable at runtime.
+&gt; 11. **What is heap pollution / `@SafeVarargs`?** A parameterized variable referring to an object of a different parameterization (often via generic varargs); `@SafeVarargs` asserts a varargs method doesn&#x27;t cause it.
+&gt; 12. **Use-site vs declaration-site variance?** Java declares variance at each use (wildcards — flexible, verbose); C#/Kotlin/Scala declare it once on the type (`out`/`in` — concise, fixed).
+&gt; 13. **Multiple-bound ordering rule?** At most one class bound, and it must come first, before interface bounds.
+
+1. **Bounded parameter.** Write `&lt;T extends Comparable&lt;T&gt;&gt; T max(List&lt;T&gt; list)`; call it on a `List&lt;Integer&gt;` and a `List&lt;String&gt;`. Explain the recursive bound.
+
+2. **Multiple bounds.** Write a method bounded by `&lt;T extends Number &amp; Comparable&lt;T&gt;&gt;`; use both the `Number` and `Comparable` capabilities of `T`.
+
+3. **Invariance.** Try `List&lt;Object&gt; o = stringList;`; observe the compile error; explain the corruption it prevents.
+
+4. **Array-covariance hole.** Write `Object[] a = new String[2]; a[0] = 42;`; observe the `ArrayStoreException` at runtime; contrast with the compile-time rejection generics give.
+
+5. **PECS copy.** Implement `copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)`; confirm it accepts `copy(numberList, integerList)` and explain which is producer and which is consumer.
+
+6. **`? extends` is read-only.** Try to `add` to a `List&lt;? extends Number&gt;` parameter; observe the compile error; confirm you can still read elements as `Number` and add `null`.
+
+7. **`? super` is write-restricted.** From a `List&lt;? super Integer&gt;`, `add` an `Integer` (works) and try to assign an element to `Integer` (fails — only `Object`); explain.
+
+8. **Unbounded `?`.** Write `printAll(List&lt;?&gt; list)`; confirm it accepts any `List` but cannot `add` (except `null`).
+
+9. **Bridge method.** Implement `Comparable&lt;MyType&gt;`; run `javap -p` and find the synthetic `compareTo(Object)` bridge; explain its role.
+
+10. **Can&#x27;t catch generic.** Try `catch (MyEx&lt;String&gt; e)` and `class MyEx&lt;T&gt; extends Exception`; observe both compile errors and explain why erasure forbids them.
+
+11. **Wildcard capture.** Write a `swap(List&lt;?&gt; list, int i, int j)` that delegates to a `private static &lt;T&gt; void swapHelper(List&lt;T&gt; list, int i, int j)`; explain the capture.
+
+12. **`@SafeVarargs`.** Write a safe generic varargs method (only reads its varargs); observe the heap-pollution warning; add `@SafeVarargs` and confirm it&#x27;s gone.
+
+13. **Bounded erasure in bytecode.** Compile a `&lt;T extends Number&gt;` method; `javap -c` it and confirm the erased signature uses `Number` (and `doubleValue` is called without a cast).
+
+14. **Use-site vs declaration-site.** Express the same covariance in Java (`List&lt;? extends T&gt;`) and conceptually in C#/Kotlin (`out T`); discuss the verbosity/flexibility trade-off.
+
+15. **End-to-end explain-it-back.** For `Collections.copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)` and a class implementing `Comparable&lt;MyType&gt;`: (a) why `src` is `? extends T` and `dest` is `? super T`; (b) what you can and cannot do with each; (c) what bridge method the compiler generates for the `Comparable` class and why; (d) how a polymorphic `compareTo` call reaches the real method; (e) why none of this carries runtime type information. Twelve sentences max.
+
+## Recap
+
+You should now be able to:
+
+**Language layer.**
+
+- Bound type parameters (`&lt;T extends X&gt;`, multiple bounds with the class first, recursive bounds) to call the bound&#x27;s methods on `T`.
+- Explain invariance — why `List&lt;String&gt;` is not a `List&lt;Object&gt;` — and contrast it with covariant arrays and their runtime `ArrayStoreException`.
+- Use the three wildcards and apply **PECS** (Producer Extends, Consumer Super) to design flexible, type-safe signatures.
+
+**Memory layer.**
+
+- Explain that a bounded type parameter erases to its bound (leftmost for multiple bounds), reducing the casts the compiler must insert.
+- Describe bridge methods: synthetic `ACC_BRIDGE` methods the compiler generates so an erased override (`compareTo(Object)`) forwards to the real specific method, preserving polymorphism.
+
+**Architecture layer.**
+
+- Explain that bounds can emit leaner bytecode (fewer casts) and that bridge-method indirection is normally inlined away by the JIT.
+- State what erasure forbids — catching/extending a generic `Throwable`, distinguishing parameterizations at runtime — and explain wildcard capture and `@SafeVarargs` heap-pollution.
+- Contrast Java&#x27;s use-site wildcard variance with the declaration-site variance of C#, Kotlin, and Scala, and tie Java&#x27;s choice to retrofit/migration pragmatism.
+
+This **completes the generics pair** ([T11](./T11-generics-basics.md) basics + T12 advanced) and the chapter&#x27;s **language-facilities run** (exceptions T09–T10, generics T11–T12). Everything from here is the **core API libraries** — and the chapter opens that arc with the one every program uses to move data across boundaries: input and output.
+
+## Next
+
+Continue to [I/O streams (byte &amp; character)](./T13-i-o-streams-byte-and-character.md) — the first of the core-API topics, and a shift from *language facilities* to *libraries*. We leave type systems behind and turn to moving bytes and characters across boundaries — files, sockets, pipes. T13 opens the two parallel hierarchies: `InputStream`/`OutputStream` for raw **bytes** and `Reader`/`Writer` for **characters**, why the split exists (the charset-decoding boundary — the same encoding concerns from L0), the **decorator pattern** that composes them (`BufferedReader` wrapping a `FileReader` wrapping bytes — the wrapping you met in [T10](./T10-custom-exceptions-and-try-with-resources.md)&#x27;s reverse-order close), why **buffering** matters (the memory-hierarchy lesson from [T08](./T08-collection-performance-characteristics-big-o.md), now at the syscall and disk level), and the `try`-with-resources discipline ([T10](./T10-custom-exceptions-and-try-with-resources.md)) that every stream demands.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l1/c02-t11-generics-basics.html"><div class="lbl">← Previous</div><div class="ttl">T11-generics-basics</div><div class="sub">Generics — basics</div></a><a class="next" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><div class="lbl">Next →</div><div class="ttl">T13-i-o-streams-byte-and-character</div><div class="sub">I/O streams (byte &amp; character)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#bounded-type-parameters" data-toc-link>Bounded Type Parameters</a></li><li class="lvl-2"><a href="#the-invariance-problem-why-liststring-is-not-a-listobject" data-toc-link>The Invariance Problem — Why List&amp;lt;String&amp;gt; Is Not a List&amp;lt;Object&amp;gt;</a></li><li class="lvl-3"><a href="#the-array-covariance-hole" data-toc-link>The Array-Covariance Hole</a></li><li class="lvl-2"><a href="#wildcards-restoring-flexibility" data-toc-link>Wildcards — Restoring Flexibility</a></li><li class="lvl-2"><a href="#pecs-producer-extends-consumer-super" data-toc-link>PECS — Producer Extends, Consumer Super</a></li><li class="lvl-2"><a href="#memory-bounded-erasure-and-bridge-methods" data-toc-link>Memory — Bounded Erasure and Bridge Methods</a></li><li class="lvl-2"><a href="#architecture-cheaper-casts-bridge-indirection-and-what-erasure-forbids" data-toc-link>Architecture — Cheaper Casts, Bridge Indirection, and What Erasure Forbids</a></li><li class="lvl-2"><a href="#cross-language-perspective-use-site-vs-declaration-site-variance" data-toc-link>Cross-Language Perspective — Use-Site vs Declaration-Site Variance</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

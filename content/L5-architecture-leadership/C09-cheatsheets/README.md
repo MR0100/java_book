@@ -22,4 +22,4 @@ Cheatsheets and quick-reference material.
 
 - [L5 Cheatsheets & Quick Reference](T01-l5-cheatsheets.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

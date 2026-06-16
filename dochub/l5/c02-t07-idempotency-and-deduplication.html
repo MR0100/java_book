@@ -1,0 +1,1960 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Idempotency &amp; Deduplication — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="active" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Idempotency &amp; Deduplication</span></div>
+        <h1>Idempotency &amp; Deduplication</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T07-idempotency-and-deduplication.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~70 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Idempotency &amp; Deduplication"
+slug: idempotency-and-deduplication
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Distributed Systems &amp; System Design"
+type: concept
+difficulty: lead
+order: 7
+tags: [idempotency, deduplication, idempotency-key, at-least-once, exactly-once, stripe, request-id, dedup-store, outbox-pattern, transactional-outbox, debezium, kafka-exactly-once, fenced-token, monotonic-id, redis-setnx, postgres-unique-constraint, semantic-idempotency, http-method-semantics]
+prerequisites: [service-communication-sync-vs-async, replication-strategies, distributed-transactions-2pc-saga]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="idempotency-deduplication">Idempotency &amp; Deduplication</h1>
+<p>In a distributed system, <strong>every request will be retried</strong> — by clients on timeouts, by message brokers on consumer ack failures, by load balancers on transient errors, by the operator's mid-incident rerun of a job. The retries are not bugs; they are the only way to recover from the partial failures distributed systems naturally produce. But every retry must satisfy one rule: <strong>processing the same operation twice must produce the same effect as processing it once</strong>. This property is <strong>idempotency</strong>, and a system that doesn't have it cannot survive its own retries — every retry adds an unwanted side effect (a duplicate charge, a duplicate email, a duplicate row, a duplicate decrement). Without idempotency, a distributed system is hostage to the rare cases where retries happen to be free; with it, retries become the <em>primary</em> fault-tolerance mechanism.</p>
+<p>The depth bar here is <strong>how to make operations idempotent in practice</strong>, the mechanisms at each layer (HTTP idempotency, idempotency keys, transactional outbox, deduplication stores), and the well-known production incidents caused by missing idempotency. We trace Stripe's <code>Idempotency-Key</code> header pattern, the most famous and most-copied idempotency mechanism in payments, and explain the storage and lifetime questions it raises. We cover <strong>semantic idempotency</strong> (the underlying operation is idempotent — <code>set x = 5</code> is, <code>x = x + 1</code> is not) versus <strong>mechanical idempotency</strong> (the operation is non-idempotent but the system <em>dedupes</em> it via a tracking mechanism). We name the canonical patterns: <strong>idempotency key + dedup store</strong> for HTTP, <strong>transactional outbox + consumer dedup</strong> for Kafka events, <strong>fencing tokens</strong> for leader-bound writes, <strong>monotonic identifiers</strong> for write ordering. We trace Kafka's "exactly-once" semantics — which is at-least-once delivery + idempotent producer + transactional consumer — and the operational realities. We cover failure modes: the dedup-store TTL that's too short, the idempotency key reused for different operations, the case where the underlying business operation can't be idempotent and the system has to live with the consequences. By the end you will design idempotent endpoints, debug duplicate-side-effect incidents, and refuse the "we'll just retry" answer that has no idempotency story.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t06-service-communication-sync-vs-async.html">Service Communication</a>, <a href="c02-t04-replication-strategies.html">Replication</a>, <a href="c02-t06-distributed-transactions-2pc-saga.html">Distributed Transactions</a>. Idempotency is the engineering that lets at-least-once delivery be safe; without it, at-least-once is at-most-multiple.</p></div></div>
+<h2 id="where-idempotency-came-from-mathematics-networking-and-stripes-2015-productization">Where Idempotency Came From — Mathematics, Networking, And Stripe's 2015 Productization<a class="anchor" href="#where-idempotency-came-from-mathematics-networking-and-stripes-2015-productization" aria-hidden="true">#</a></h2>
+<p>The word <strong>idempotent</strong> comes from mathematics: a function f is <em>idempotent</em> if f(f(x)) = f(x). Applying the function twice yields the same result as applying it once. The term was introduced by <strong>Benjamin Peirce</strong> in his 1870 paper <a href="https://en.wikipedia.org/wiki/Linear_Associative_Algebra"><em>Linear Associative Algebra</em></a>, describing matrix multiplication. The concept is purely mathematical; the engineering application would come a century later.</p>
+<h3 id="the-networking-application-1970s1980s">The Networking Application (1970s–1980s)<a class="anchor" href="#the-networking-application-1970s1980s" aria-hidden="true">#</a></h3>
+<p>The networking application of idempotency emerged with the development of <strong>reliable network protocols</strong>. TCP (Transmission Control Protocol, RFC 793, 1981) and the earlier ARPANET protocols had to handle a fundamental problem: <strong>messages could be duplicated, reordered, or lost</strong>. The protocols needed semantics that worked despite all three.</p>
+<p>The specific TCP mechanism: <strong>sequence numbers</strong>. Each byte in the stream has a sequence number; receivers can detect duplicates (same sequence number seen twice) and reorder out-of-order packets. The TCP layer absorbs the duplication; the application receives each byte exactly once.</p>
+<p>This was <em>one form</em> of idempotency: the <em>transport layer</em> deduplicates messages so the application doesn't have to. But it only worked <em>within</em> a single TCP connection. Across connections, across processes, across system reboots — the application had to handle duplication itself.</p>
+<h3 id="the-http-method-definitions-19961999">The HTTP Method Definitions (1996–1999)<a class="anchor" href="#the-http-method-definitions-19961999" aria-hidden="true">#</a></h3>
+<p>The HTTP/1.1 RFC (RFC 2068, 1996, updated RFC 2616, 1999) formally defined which HTTP methods were <em>idempotent</em>:</p>
+<ul>
+<li><strong>GET, HEAD, PUT, DELETE, OPTIONS</strong>: idempotent. A client can retry these safely.</li>
+<li><strong>POST</strong>: NOT idempotent. Two POSTs may create two resources.</li>
+</ul>
+<p>This was a <em>design decision</em>, not a mathematical fact. The HTTP spec authors recognized that <em>some operations could be retried safely</em> and named those operations explicitly. For <em>unsafe</em> operations (POST), the retry was the client's responsibility.</p>
+<p>The HTTP spec also introduced the concept of <strong>safe methods</strong> — methods that don't modify state. GET and HEAD are safe; POST, PUT, DELETE are not.</p>
+<p>These distinctions remain foundational. When a developer writes a GET endpoint, they're committing to idempotent semantics; when they write a POST, they're not. The HTTP method choice has semantic implications.</p>
+<h3 id="the-mid-2000s-web-service-era">The Mid-2000s Web Service Era<a class="anchor" href="#the-mid-2000s-web-service-era" aria-hidden="true">#</a></h3>
+<p>By the mid-2000s, web services were proliferating, and the idempotency problem was emerging in distributed application contexts. Specific scenarios:</p>
+<ul>
+<li><strong>Payment processing</strong>: a network timeout left the client uncertain whether the payment succeeded. A retry might charge twice.</li>
+<li><strong>Order placement</strong>: a duplicate order from retry would create two database records.</li>
+<li><strong>API integrations</strong>: cross-service calls had no built-in deduplication.</li>
+</ul>
+<p>Different teams solved this <em>ad hoc</em> — request IDs, sequence numbers, database constraints. The pattern wasn't standardized; each company invented their own approach.</p>
+<h3 id="stripes-idempotency-key-2015">Stripe's Idempotency Key (2015)<a class="anchor" href="#stripes-idempotency-key-2015" aria-hidden="true">#</a></h3>
+<p>The breakthrough was <strong>Stripe's 2015 introduction of the <code>Idempotency-Key</code> header</strong>. Stripe — the payments-as-a-service company founded by Patrick and John Collison in 2010 — had been growing rapidly and encountering customer issues with retry semantics. Customers who experienced a network blip during a charge would retry; sometimes the original charge had succeeded, and the retry charged a second time.</p>
+<p>The solution: <strong>let the client generate a unique key per operation</strong>. Stripe stores the key with the operation result; if the same key arrives again, return the stored result without re-executing. The retry sees the original result; no duplicate operation.</p>
+<p>The Stripe API documentation made this <strong>explicit and prominent</strong> — every POST endpoint accepted <code>Idempotency-Key</code>, every example in the documentation used it, the SDK auto-generated keys. By 2018, this pattern was <strong>the standard for safe POST operations</strong> across the payments industry.</p>
+<h3 id="who-patrick-and-john-collison-are">Who Patrick And John Collison Are<a class="anchor" href="#who-patrick-and-john-collison-are" aria-hidden="true">#</a></h3>
+<p>The <strong>Collison brothers</strong> (Patrick born 1988, John born 1990) are Irish entrepreneurs who founded <strong>Auctomatic</strong> (a payment/auction tool) while still teenagers, sold it for $5M, and then founded <strong>Stripe</strong> in 2010. By 2024, Stripe is valued at ~$70B and processes a significant fraction of internet commerce. The company is famous in engineering circles for its developer-friendly API design — Stripe's API documentation is widely held as the gold standard for clarity.</p>
+<p>The Idempotency-Key pattern was <em>one of many</em> Stripe-introduced conventions that became industry standards. The pattern's success was as much about <em>clear documentation</em> as about technical novelty.</p>
+<h3 id="the-2017-standardization">The 2017+ Standardization<a class="anchor" href="#the-2017-standardization" aria-hidden="true">#</a></h3>
+<p>After Stripe popularized the pattern:</p>
+<ul>
+<li><strong>The IETF drafted standards</strong> for idempotency keys in HTTP (work-in-progress as of 2024).</li>
+<li><strong>AWS introduced idempotency tokens</strong> across their APIs.</li>
+<li><strong>Major fintech and payments companies</strong> (Square, PayPal, Adyen, Plaid) all adopted Stripe-style idempotency keys.</li>
+<li><strong>Resilience4j, Spring Retry, and other Java libraries</strong> added idempotency-key support.</li>
+</ul>
+<p>By 2024, "idempotency keys" are a <em>standard</em> pattern in API design, expected on any POST endpoint that modifies critical state.</p>
+<h3 id="the-kafka-exactly-once-semantics-2017">The Kafka Exactly-Once Semantics (2017)<a class="anchor" href="#the-kafka-exactly-once-semantics-2017" aria-hidden="true">#</a></h3>
+<p>In parallel with the API-level standardization, <strong>Apache Kafka introduced "Exactly-Once Semantics" (EOS)</strong> in version 0.11 (June 2017), specifically <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-98+-+Exactly+Once+Delivery+and+Transactional+Messaging"><em>KIP-98: Exactly Once Delivery and Transactional Messaging</em></a>. EOS achieved exactly-once <em>within Kafka</em> — events published once would be delivered once, regardless of failures.</p>
+<p>The mechanism: producer IDs and sequence numbers, similar to TCP but at the message level. Kafka tracks per-producer sequence; duplicates are detected and discarded.</p>
+<p>The important caveat: <strong>exactly-once is within Kafka</strong>. End-to-end exactly-once (from producer through external system) still requires application-level idempotency. KIP-98 doesn't eliminate the application's responsibility.</p>
+<h3 id="why-idempotency-now-pervades-distributed-systems">Why Idempotency Now Pervades Distributed Systems<a class="anchor" href="#why-idempotency-now-pervades-distributed-systems" aria-hidden="true">#</a></h3>
+<p>By 2024, every senior engineer encounters idempotency <em>constantly</em>:</p>
+<ul>
+<li>API design: every POST has an idempotency mechanism.</li>
+<li>Message processing: every Kafka consumer must be idempotent.</li>
+<li>Workflow engines: Temporal, Camunda all enforce idempotency.</li>
+<li>Database operations: upserts with deterministic keys.</li>
+</ul>
+<p>The pattern has become <em>infrastructure</em> — not something engineers implement from scratch, but something they verify they're using correctly.</p>
+<h2 id="why-idempotency-specifically-the-senior-engineers-qa">Why Idempotency, Specifically: The Senior Engineer's Q&amp;A<a class="anchor" href="#why-idempotency-specifically-the-senior-engineers-qa" aria-hidden="true">#</a></h2>
+<h3 id="q1-why-is-idempotency-mandatory-in-distributed-systems">Q1: Why is idempotency mandatory in distributed systems?<a class="anchor" href="#q1-why-is-idempotency-mandatory-in-distributed-systems" aria-hidden="true">#</a></h3>
+<p>Because <strong>retries are inevitable</strong>. Networks fail, processes crash, timeouts trigger retries. Without idempotency, every retry might cause duplicate effects. With idempotency, retries are safe.</p>
+<p>The math: in a system with N services, the probability of <em>some</em> failure occurring during a request is roughly 1 - (1 - p)^N where p is the per-service failure probability. For p = 0.01 and N = 10, this is ~10%. Without idempotency, ~10% of requests have potential for duplicate side effects.</p>
+<p>The senior judgment: <strong>assume retries; design for them</strong>.</p>
+<h3 id="q2-how-does-idempotency-relate-to-at-least-once-delivery">Q2: How does idempotency relate to at-least-once delivery?<a class="anchor" href="#q2-how-does-idempotency-relate-to-at-least-once-delivery" aria-hidden="true">#</a></h3>
+<p>They're complementary:</p>
+<ul>
+<li><strong>At-least-once delivery</strong> ensures messages aren't lost. Duplicates are possible.</li>
+<li><strong>Idempotent processing</strong> ensures duplicates don't cause harm.</li>
+</ul>
+<p>Together: at-least-once + idempotent = "effectively exactly-once." This is the standard pattern for Kafka consumers, message-driven architectures, and reliable APIs.</p>
+<p>Without idempotency, at-least-once delivery is at-least-once-and-sometimes-twice — typically broken.</p>
+<h3 id="q3-whats-the-right-scope-for-idempotency">Q3: What's the right scope for idempotency?<a class="anchor" href="#q3-whats-the-right-scope-for-idempotency" aria-hidden="true">#</a></h3>
+<p>Three scopes:</p>
+<ol>
+<li><strong>Method-level</strong>: <code>setUserName(id, name)</code> is idempotent — calling twice with the same arguments leaves the state the same.</li>
+<li><strong>Operation-level</strong>: <code>transferMoney(from, to, amount, idempotencyKey)</code> is idempotent <em>for the same key</em> — the first call processes, subsequent calls with the same key return the original result.</li>
+<li><strong>Workflow-level</strong>: an entire multi-step saga is idempotent — re-executing the saga from scratch produces the same final state.</li>
+</ol>
+<p>The scope you choose affects implementation. Method-level is built into the operation; operation-level needs explicit keys; workflow-level needs durable saga state.</p>
+<h3 id="q4-whats-the-canonical-implementation-of-operation-level-idempotency">Q4: What's the canonical implementation of operation-level idempotency?<a class="anchor" href="#q4-whats-the-canonical-implementation-of-operation-level-idempotency" aria-hidden="true">#</a></h3>
+<p>The Stripe pattern:</p>
+<ol>
+<li>Client generates a unique UUID (the idempotency key).</li>
+<li>Client sends the request with <code>Idempotency-Key: &lt;uuid&gt;</code> header.</li>
+<li>Server checks a key-value store for the key.</li>
+<li>If found, return the stored response (don't re-execute).</li>
+<li>If not found, execute the operation, store the result keyed by the UUID, return the result.</li>
+<li>TTL on the stored key (typically 24 hours to a week).</li>
+</ol>
+<p>The implementation is conceptually simple but has subtle requirements:
+- The check-and-execute must be atomic (race condition between concurrent requests with the same key).
+- The stored result must be complete (status code, headers, body).
+- The TTL must be longer than client retry windows.</p>
+<h3 id="q5-when-does-idempotency-fail-to-help">Q5: When does idempotency fail to help?<a class="anchor" href="#q5-when-does-idempotency-fail-to-help" aria-hidden="true">#</a></h3>
+<p>Three failure modes:</p>
+<ol>
+<li><strong>Time-bound operations</strong>: "process this transaction" may not be safely retryable if the transaction has time-sensitive validity.</li>
+<li><strong>External side effects</strong>: if the operation sends an email or makes a phone call, the side effect is non-idempotent regardless of the database state.</li>
+<li><strong>Race conditions in the idempotency mechanism</strong>: if two concurrent requests with the same key arrive simultaneously, both may check the store, both find no entry, both execute, both store results.</li>
+</ol>
+<p>Mitigations: distinguish "safe to retry" from "any retry"; use database locks or compare-and-swap for race protection; design external side effects to be deduplicated at the side-effect layer.</p>
+<h3 id="q6-how-does-this-relate-to-message-broker-delivery-semantics">Q6: How does this relate to message broker delivery semantics?<a class="anchor" href="#q6-how-does-this-relate-to-message-broker-delivery-semantics" aria-hidden="true">#</a></h3>
+<p>Three brokers, three approaches:</p>
+<ul>
+<li><strong>Kafka with EOS</strong> (KIP-98): exactly-once within Kafka. Producers send with sequence numbers; brokers deduplicate.</li>
+<li><strong>RabbitMQ</strong>: at-least-once with consumer acknowledgments. Idempotent consumer needed for duplicate-safe processing.</li>
+<li><strong>AWS SQS Standard</strong>: at-least-once with possible duplicates. Idempotent consumer mandatory.</li>
+</ul>
+<p>In all cases, application-level idempotency is needed for end-to-end exactly-once processing. The broker's delivery guarantee is <em>necessary but not sufficient</em>.</p>
+<h2 id="common-misconceptions-explained">Common Misconceptions Explained<a class="anchor" href="#common-misconceptions-explained" aria-hidden="true">#</a></h2>
+<h3 id="idempotency-means-the-operation-is-safe-to-retry">"Idempotency means the operation is safe to retry."<a class="anchor" href="#idempotency-means-the-operation-is-safe-to-retry" aria-hidden="true">#</a></h3>
+<p>Mostly true, with caveats. Idempotency means the <em>result</em> is the same regardless of how many times the operation is retried. The <em>operation</em> may still have rate limits, expiry, or other constraints that make repeated execution wasteful.</p>
+<h3 id="get-requests-are-inherently-idempotent">"GET requests are inherently idempotent."<a class="anchor" href="#get-requests-are-inherently-idempotent" aria-hidden="true">#</a></h3>
+<p>True, by HTTP spec. But the <em>application logic</em> must respect this. A GET that side-effectfully creates a log entry is technically violating the HTTP contract.</p>
+<h3 id="idempotency-keys-solve-all-distributed-system-retry-problems">"Idempotency keys solve all distributed-system retry problems."<a class="anchor" href="#idempotency-keys-solve-all-distributed-system-retry-problems" aria-hidden="true">#</a></h3>
+<p>False. Idempotency keys handle <em>one type</em> of duplicate (same operation, retried). They don't handle <em>different</em> operations that have the same effect (a duplicate order placed with different keys).</p>
+<h3 id="kafkas-exactly-once-means-i-dont-need-idempotent-consumers">"Kafka's exactly-once means I don't need idempotent consumers."<a class="anchor" href="#kafkas-exactly-once-means-i-dont-need-idempotent-consumers" aria-hidden="true">#</a></h3>
+<p>False. Kafka EOS is <em>within Kafka</em>. Consumers writing to external systems must still be idempotent.</p>
+<h3 id="idempotency-is-just-deduplication">"Idempotency is just deduplication."<a class="anchor" href="#idempotency-is-just-deduplication" aria-hidden="true">#</a></h3>
+<p>Half true. Idempotency <em>includes</em> deduplication but is broader. A truly idempotent operation works correctly regardless of retries; deduplication is one mechanism for achieving it.</p>
+<h3 id="idempotency-comes-for-free-with-put-and-delete">"Idempotency comes for free with PUT and DELETE."<a class="anchor" href="#idempotency-comes-for-free-with-put-and-delete" aria-hidden="true">#</a></h3>
+<p>False. The HTTP spec <em>defines</em> PUT and DELETE as idempotent semantically, but the implementation must enforce it. A PUT that has side effects in addition to the resource update may not be idempotent.</p>
+<h2 id="the-retry-reality">The Retry Reality<a class="anchor" href="#the-retry-reality" aria-hidden="true">#</a></h2>
+<p>Three facts about distributed systems make retries mandatory:</p>
+<ol>
+<li><strong>Timeouts don't tell you whether the operation succeeded.</strong> A client times out at 30 s, but the server might have completed the operation, the response just got lost.</li>
+<li><strong>Message brokers retry on ack failures.</strong> Kafka, RabbitMQ, SQS all redeliver if the consumer doesn't ack in time.</li>
+<li><strong>Operators rerun jobs.</strong> A failed batch job is reinvoked. A "let me try that again" support action.</li>
+</ol>
+<div class="mermaid">flowchart TB
+  R[Retries happen]
+  R --> R1["Client timeouts<br/>(unknown outcome)"]
+  R --> R2["Broker redelivery<br/>(consumer didn't ack)"]
+  R --> R3["Operator reruns<br/>(stuck job)"]
+  R --> R4["Saga retries<br/>(compensation drift)"]
+  Idemp[Idempotency = safety net]
+  R -.-> Idemp
+</div>
+<p>If retries are inevitable, <strong>either every operation is idempotent, or the system corrupts data</strong>. There is no middle ground.</p>
+<h2 id="semantic-vs-mechanical-idempotency">Semantic Vs Mechanical Idempotency<a class="anchor" href="#semantic-vs-mechanical-idempotency" aria-hidden="true">#</a></h2>
+<p>Two distinct ways an operation becomes idempotent.</p>
+<h3 id="semantic-idempotency">Semantic Idempotency<a class="anchor" href="#semantic-idempotency" aria-hidden="true">#</a></h3>
+<p>The operation's <em>meaning</em> is naturally idempotent. <code>set x = 5</code> produces the same result whether run once or ten times. <code>DELETE /resource/42</code> produces the same result. <code>UPDATE orders SET status = 'SHIPPED' WHERE id = 42 AND status = 'PAID'</code> is conditionally idempotent (it's only effective once; subsequent runs are no-ops).</p>
+<p>Semantic idempotency is the cleanest answer. Design operations so the natural semantics are idempotent:</p>
+<ul>
+<li>Use <code>set X = value</code> instead of <code>X = X + delta</code> where possible.</li>
+<li>Use conditional updates (<code>WHERE status = 'expected'</code>) that no-op after the first success.</li>
+<li>Use HTTP <code>PUT</code> (idempotent) instead of <code>POST</code> (not) where the operation creates with a client-chosen ID.</li>
+</ul>
+<h3 id="mechanical-idempotency">Mechanical Idempotency<a class="anchor" href="#mechanical-idempotency" aria-hidden="true">#</a></h3>
+<p>The operation is <em>not</em> semantically idempotent, but the system <strong>tracks</strong> which operation has been performed and refuses to repeat it. A charge is <code>x = x + delta</code>; the dedup mechanism records "charge attempt with key K already processed."</p>
+<p>Mechanical idempotency is more general but operationally heavier — it requires a deduplication store and rules for its lifecycle.</p>
+<h2 id="the-idempotency-key-pattern-stripe-style">The Idempotency Key Pattern (Stripe-Style)<a class="anchor" href="#the-idempotency-key-pattern-stripe-style" aria-hidden="true">#</a></h2>
+<p>The canonical mechanical-idempotency mechanism. Every request carries an <code>Idempotency-Key</code> header (typically a UUID, generated by the client and identical across retries). The server stores the key + the result of the first request; subsequent requests with the same key return the stored result without re-executing.</p>
+<div class="mermaid">sequenceDiagram
+  participant C as Client
+  participant S as Server
+  participant D as DB
+  participant Dedup as Dedup store
+
+  C->>S: POST /charges<br/>Idempotency-Key: abc-123
+  S->>Dedup: check abc-123
+  Dedup-->>S: not seen
+  S->>D: write charge
+  D-->>S: ok
+  S->>Dedup: store(abc-123, result)
+  S-->>C: 201 Created (result)
+
+  Note over C: timeout, client retries
+
+  C->>S: POST /charges<br/>Idempotency-Key: abc-123
+  S->>Dedup: check abc-123
+  Dedup-->>S: result
+  S-->>C: 201 Created (cached result)
+</div>
+<p>Stripe's <a href="https://stripe.com/docs/api/idempotent_requests">Idempotency</a> is the canonical implementation. Two retries with the same key return the same response without performing the charge twice — even if those retries cross days or use different network paths.</p>
+<h3 id="implementation-details">Implementation Details<a class="anchor" href="#implementation-details" aria-hidden="true">#</a></h3>
+<p>The dedup store has several non-trivial concerns:</p>
+<ol>
+<li><strong>Storage</strong>: a Redis instance with TTL (typically 24 hours), a Postgres table with a unique constraint on key, or DynamoDB with TTL.</li>
+<li><strong>TTL</strong>: too short and a legitimate retry sees the key expired and re-executes; too long and the store grows unbounded. Stripe's TTL is 24 hours — generous for client retries, bounded enough for storage.</li>
+<li><strong>Concurrency</strong>: two concurrent requests with the same key must not both execute. Use a database unique constraint or <code>SETNX</code> in Redis to serialize.</li>
+<li><strong>Storing the response</strong>: the dedup store records the <em>entire</em> response so retries get the original outcome. Tens to hundreds of bytes per entry.</li>
+<li><strong>Schema evolution</strong>: the dedup store outlives application versions; stored responses must remain decodable.</li>
+</ol>
+<h3 id="a-java-implementation">A Java Implementation<a class="anchor" href="#a-java-implementation" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@RestController
+class ChargeController {
+  private final ChargeService service;
+  private final IdempotencyStore store;
+
+  @PostMapping(&quot;/charges&quot;)
+  public ChargeResponse charge(@RequestHeader(&quot;Idempotency-Key&quot;) String key,
+                                @RequestBody ChargeRequest req) {
+    return store.exec(key, () -&gt; service.charge(req));
+  }
+}
+
+@Component
+class IdempotencyStore {
+  private final JdbcTemplate jdbc;
+  private final ObjectMapper json;
+
+  public &lt;T&gt; T exec(String key, Supplier&lt;T&gt; op) {
+    Optional&lt;String&gt; cached = jdbc.queryForObject(
+        &quot;SELECT response FROM idempotency_keys WHERE key = ? AND expires_at &gt; NOW()&quot;,
+        new Object[]{key}, String.class);
+    if (cached.isPresent()) {
+      return deserialize(cached.get());
+    }
+    T result = op.get();
+    String body = serialize(result);
+    try {
+      jdbc.update(&quot;INSERT INTO idempotency_keys(key, response, expires_at) VALUES (?, ?, NOW() + INTERVAL '24 hours')&quot;,
+          key, body);
+    } catch (DuplicateKeyException e) {
+      // concurrent retry inserted first; fetch its result
+      return deserialize(jdbc.queryForObject(&quot;SELECT response FROM idempotency_keys WHERE key = ?&quot;,
+          new Object[]{key}, String.class));
+    }
+    return result;
+  }
+}
+</code></pre></div>
+<p>A real production-grade implementation handles partial failures (the request completed but the store couldn't record it) and inspects the request body to detect when the same key is reused for a <em>different</em> operation (a strong signal of a client bug).</p>
+<h2 id="idempotency-for-consumers-kafka-and-friends">Idempotency For Consumers — Kafka And Friends<a class="anchor" href="#idempotency-for-consumers-kafka-and-friends" aria-hidden="true">#</a></h2>
+<p>For message-based systems (Kafka, RabbitMQ, SQS), idempotency lives in the <strong>consumer</strong>. The pattern: each message has a unique identifier; the consumer records identifiers it has processed; duplicates are detected and skipped.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@KafkaListener(topics = &quot;orders&quot;)
+public void on(ConsumerRecord&lt;String, OrderEvent&gt; record) {
+  String eventId = record.value().eventId();
+  if (dedupStore.exists(eventId)) {
+    return;          // already processed
+  }
+  try {
+    process(record.value());
+    dedupStore.markProcessed(eventId);
+  } catch (Exception e) {
+    // don't mark processed; will retry on next delivery
+    throw e;
+  }
+}
+</code></pre></div>
+<p>The dedup store can be:</p>
+<ul>
+<li><strong>A database table</strong> with a unique constraint on <code>event_id</code>.</li>
+<li><strong>Redis</strong> with <code>SETNX</code> and TTL.</li>
+<li><strong>The application's own state</strong> if the operation produces a state that's naturally checkable (a row insertion with a unique key).</li>
+</ul>
+<p>The TTL is governed by the maximum redelivery window. Kafka can redeliver weeks-old messages if a consumer fully restarts. Keep dedup entries for at least the message retention period.</p>
+<h3 id="naturally-idempotent-consumers">Naturally-Idempotent Consumers<a class="anchor" href="#naturally-idempotent-consumers" aria-hidden="true">#</a></h3>
+<p>Sometimes the operation itself is naturally idempotent and no dedup store is needed:</p>
+<ul>
+<li><code>UPDATE accounts SET balance = 100 WHERE customer_id = 7</code> is idempotent.</li>
+<li><code>INSERT ... ON CONFLICT DO NOTHING</code> is idempotent.</li>
+<li><code>PUT</code> to an object store with a fixed key is idempotent.</li>
+</ul>
+<p>For these, the consumer can process duplicates safely without explicit tracking.</p>
+<h2 id="kafka-exactly-once-a-closer-look">Kafka "Exactly-Once" — A Closer Look<a class="anchor" href="#kafka-exactly-once-a-closer-look" aria-hidden="true">#</a></h2>
+<p>Kafka markets "exactly-once semantics" (EOS). What it actually provides:</p>
+<ol>
+<li><strong>Idempotent producer</strong>: each producer has a unique ID; the broker dedupes by (producer ID, sequence number). A producer retry produces the same effect as one publish.</li>
+<li><strong>Transactional producer</strong>: a producer can group writes across topics and partitions into a transaction; consumers configured with <code>isolation.level = read_committed</code> see all or nothing.</li>
+<li><strong>Exactly-once stream processing</strong>: Kafka Streams ties producer transactions to consumer offset commits, so a "read-process-write" loop is exactly-once.</li>
+</ol>
+<p>This is <em>exactly-once within Kafka</em> — events flowing Kafka → Kafka. <strong>External side effects (database writes, HTTP calls, emails) are not transactional with Kafka</strong>, and exactly-once doesn't extend there. The standard answer for cross-boundary exactly-once is <em>at-least-once + idempotent consumer</em>.</p>
+<h2 id="the-transactional-outbox-atomic-database-and-message-publish">The Transactional Outbox — Atomic Database And Message Publish<a class="anchor" href="#the-transactional-outbox-atomic-database-and-message-publish" aria-hidden="true">#</a></h2>
+<p>A classic distributed-systems problem: a service must write to its database <em>and</em> publish a Kafka event. Both must succeed or both must fail. They cannot be transactionally tied (the database and Kafka are separate systems).</p>
+<p>The transactional outbox solves it:</p>
+<div class="mermaid">flowchart LR
+  App[Application]
+  App -->|"write order + outbox<br/>in ONE transaction"| DB[(PostgreSQL)]
+  DB -->|"WAL"| CDC[Debezium]
+  CDC -->|"publish"| Kafka[(Kafka)]
+  Kafka -->|"consume"| Consumer[Consumer]
+</div>
+<ol>
+<li>Application writes the order <em>and</em> a row in the <code>outbox</code> table in the same DB transaction. The DB guarantees both commit together.</li>
+<li>Debezium (or a similar CDC tool, or a custom poller) tails the database's WAL or polls the outbox table.</li>
+<li>It publishes outbox rows to Kafka.</li>
+<li>Consumers read from Kafka with idempotency.</li>
+</ol>
+<p>The transactional outbox is <strong>the standard pattern for guaranteed event publication from a Spring service to Kafka</strong>. Spring Modulith and ChrisRichardson's eventuate-tram library provide implementations.</p>
+<h2 id="fencing-tokens-idempotency-for-leader-bound-writes">Fencing Tokens — Idempotency For Leader-Bound Writes<a class="anchor" href="#fencing-tokens-idempotency-for-leader-bound-writes" aria-hidden="true">#</a></h2>
+<p>A subtle problem: a client thinks it holds a distributed lock; the lock has expired but the client doesn't know; it does work; the new lock holder also does work. Concurrent execution.</p>
+<p><strong>Fencing tokens</strong> (Martin Kleppmann's <em>Designing Data-Intensive Applications</em>) add a monotonically-increasing token to every lock acquisition. Every write under the lock carries the token. The storage layer rejects writes with stale tokens.</p>
+<div class="mermaid">sequenceDiagram
+  participant C1 as Client 1
+  participant L as Lock Service
+  participant S as Storage
+  C1->>L: acquire lock
+  L-->>C1: lock acquired, token=33
+  Note over C1: pause (long GC, network delay)
+  participant C2 as Client 2
+  L->>C1: lock expired
+  C2->>L: acquire lock
+  L-->>C2: lock acquired, token=34
+  C2->>S: write data (token=34)
+  S-->>C2: ok
+  Note over C1: resumes, still thinks it holds lock
+  C1->>S: write data (token=33)
+  S-->>C1: REJECTED (token < 34)
+</div>
+<p>The storage layer's check makes the second write fail safely. Fencing tokens require the storage layer to participate; this is one reason consensus-based stores (etcd, ZooKeeper) are recommended for distributed locking.</p>
+<h2 id="when-idempotency-is-impossible">When Idempotency Is Impossible<a class="anchor" href="#when-idempotency-is-impossible" aria-hidden="true">#</a></h2>
+<p>Some operations genuinely can't be made idempotent:</p>
+<ul>
+<li><strong>Send an email</strong>. Once dispatched, you cannot undo it. A retry sends a second email.</li>
+<li><strong>Dispatch a physical truck</strong>. Telling FedEx to pick up twice produces two pickups.</li>
+<li><strong>Call an external API without idempotency</strong>. If Stripe didn't have idempotency keys, your retries would create duplicate charges.</li>
+</ul>
+<p>For these:</p>
+<ol>
+<li><strong>Put them last in the saga.</strong> All the reversible work has committed first; the irreversible step happens once.</li>
+<li><strong>Pre-condition checks.</strong> Send the email only after checking "did we already send for this order?" — a manual dedup at the application level.</li>
+<li><strong>Accept the duplicate</strong>. Sometimes the cost of double emails is less than the cost of building dedup. Be deliberate.</li>
+</ol>
+<h2 id="production-incidents-tied-to-missing-idempotency">Production Incidents Tied To Missing Idempotency<a class="anchor" href="#production-incidents-tied-to-missing-idempotency" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Stripe-style duplicate charges</strong>: any payment service without idempotency keys has had a duplicate-charge incident. The class of incident is so common that idempotency keys are now a regulatory expectation.</li>
+<li><strong>Slack 2018 outage</strong> (<a href="c01-t06-service-communication-sync-vs-async.html">C01/T06</a>): non-idempotent Kafka consumer multiplied load on retries.</li>
+<li><strong>Various NPM publish duplicates</strong>: the registry's pre-2017 design allowed duplicate publishes from retries.</li>
+<li><strong>Many email-sending bugs</strong>: retries that double-send marketing or transactional emails.</li>
+</ul>
+<p>The pattern: a system that didn't think about retries explicitly will discover idempotency was needed only after a customer complains.</p>
+<h2 id="cross-language-notes">Cross-Language Notes<a class="anchor" href="#cross-language-notes" aria-hidden="true">#</a></h2>
+<p>Idempotency is a discipline, not a library. Each ecosystem has helpers:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java / Spring</strong></td>
+<td>Custom interceptors, Spring Retry, Resilience4j, Redis for dedup</td>
+</tr>
+<tr>
+<td><strong>C# / .NET</strong></td>
+<td>MediatR pipelines for dedup, Polly for retries, Redis dedup</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td>Hand-rolled middleware, Redis dedup</td>
+</tr>
+<tr>
+<td><strong>Node.js</strong></td>
+<td>Express middleware, Redis dedup</td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>FastAPI middleware, Redis dedup</td>
+</tr>
+</tbody>
+</table></div>
+<p>The pattern is universal; the implementation is a few hundred lines plus storage.</p>
+<h2 id="trade-off-summary">Trade-Off Summary<a class="anchor" href="#trade-off-summary" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP POST</td>
+<td>Idempotency-Key header + dedup store</td>
+</tr>
+<tr>
+<td>Kafka consumer</td>
+<td>Event ID + dedup table</td>
+</tr>
+<tr>
+<td>Database upsert</td>
+<td><code>ON CONFLICT DO NOTHING</code> or <code>MERGE</code></td>
+</tr>
+<tr>
+<td>Cross-DB + broker</td>
+<td>Transactional outbox + Debezium</td>
+</tr>
+<tr>
+<td>Leader-bound write</td>
+<td>Fencing token + storage rejection</td>
+</tr>
+<tr>
+<td>Irreversible step</td>
+<td>Put last; accept rarely-duplicated risk</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A common L5 prompt: "How do you make a payment API idempotent?" Strong answers (a) name the Idempotency-Key header pattern, (b) describe the dedup store and its TTL, (c) handle concurrent retries via DB unique constraint, (d) name the storage / response cache details. Mentioning the transactional outbox unprompted shows depth.</p></div></div>
+<h2 id="deeper-dive-spring-boot-idempotency-middleware-implementation">Deeper Dive — Spring Boot Idempotency Middleware Implementation<a class="anchor" href="#deeper-dive-spring-boot-idempotency-middleware-implementation" aria-hidden="true">#</a></h2>
+<h3 id="idempotency-interceptor-with-redis-backing">Idempotency Interceptor with Redis Backing<a class="anchor" href="#idempotency-interceptor-with-redis-backing" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+    private final RedisTemplate&lt;String, String&gt; redis;
+    private final ObjectMapper json;
+
+    private static final Duration TTL = Duration.ofHours(72);
+
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        // Only enforce on mutating methods
+        String method = req.getMethod();
+        if (!Set.of(&quot;POST&quot;, &quot;PUT&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;).contains(method)) return true;
+
+        String key = req.getHeader(&quot;Idempotency-Key&quot;);
+        if (key == null) {
+            // No key → reject mutating requests (strict mode)
+            resp.setStatus(400);
+            resp.getWriter().write(&quot;Idempotency-Key header required&quot;);
+            return false;
+        }
+
+        // Validate key format
+        try { UUID.fromString(key); }
+        catch (IllegalArgumentException e) {
+            resp.setStatus(400);
+            resp.getWriter().write(&quot;Idempotency-Key must be UUID&quot;);
+            return false;
+        }
+
+        // Cache key combines method + path + idempotency key
+        String cacheKey = &quot;idem:&quot; + method + &quot;:&quot; + req.getRequestURI() + &quot;:&quot; + key;
+
+        // Compute hash of request body for change detection
+        byte[] body = StreamUtils.copyToByteArray(req.getInputStream());
+        String requestHash = DigestUtils.sha256Hex(body);
+
+        // Atomic: SET NX with hash + expiry
+        String existing = redis.opsForValue().get(cacheKey);
+
+        if (existing != null) {
+            // Replay: check hash matches
+            IdempotencyRecord record = json.readValue(existing, IdempotencyRecord.class);
+
+            if (!record.requestHash().equals(requestHash)) {
+                resp.setStatus(422);
+                resp.getWriter().write(&quot;Idempotency-Key reused with different body&quot;);
+                return false;
+            }
+
+            if (record.status().equals(&quot;COMPLETED&quot;)) {
+                // Return cached response
+                resp.setStatus(record.statusCode());
+                record.headers().forEach(resp::setHeader);
+                resp.getWriter().write(record.responseBody());
+                return false;
+            }
+            if (record.status().equals(&quot;PROCESSING&quot;)) {
+                resp.setStatus(409);
+                resp.getWriter().write(&quot;Request in progress&quot;);
+                return false;
+            }
+        }
+
+        // Mark as PROCESSING; wrap request to capture body + response
+        IdempotencyRecord processing = new IdempotencyRecord(
+            key, requestHash, &quot;PROCESSING&quot;, null, null, null, Instant.now()
+        );
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(processing), TTL);
+
+        // Store in request attribute for post-handler use
+        req.setAttribute(&quot;idem_cache_key&quot;, cacheKey);
+        req.setAttribute(&quot;idem_request_hash&quot;, requestHash);
+
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest req, HttpServletResponse resp,
+                                  Object handler, Exception ex) throws Exception {
+        String cacheKey = (String) req.getAttribute(&quot;idem_cache_key&quot;);
+        String requestHash = (String) req.getAttribute(&quot;idem_request_hash&quot;);
+        if (cacheKey == null) return;
+
+        // Cache the response for future retries
+        String responseBody = captureResponseBody(resp);   // requires response wrapping
+        Map&lt;String, String&gt; responseHeaders = captureHeaders(resp);
+
+        IdempotencyRecord completed = new IdempotencyRecord(
+            UUID.fromString(req.getHeader(&quot;Idempotency-Key&quot;)).toString(),
+            requestHash,
+            ex == null &amp;&amp; resp.getStatus() &lt; 500 ? &quot;COMPLETED&quot; : &quot;FAILED&quot;,
+            resp.getStatus(),
+            responseHeaders,
+            responseBody,
+            Instant.now()
+        );
+
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(completed), TTL);
+    }
+}
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Autowired private IdempotencyInterceptor interceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(interceptor)
+            .addPathPatterns(&quot;/api/**&quot;)
+            .excludePathPatterns(&quot;/api/health&quot;, &quot;/api/metrics&quot;);
+    }
+}
+
+public record IdempotencyRecord(
+    String key,
+    String requestHash,
+    String status,             // PROCESSING / COMPLETED / FAILED
+    Integer statusCode,
+    Map&lt;String, String&gt; headers,
+    String responseBody,
+    Instant createdAt
+) {}
+</code></pre></div>
+<h3 id="database-backed-idempotency-stronger-durability">Database-Backed Idempotency (Stronger Durability)<a class="anchor" href="#database-backed-idempotency-stronger-durability" aria-hidden="true">#</a></h3>
+<p>For payment APIs where Redis loss is unacceptable:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">CREATE TABLE idempotency_keys (
+    key UUID PRIMARY KEY,
+    request_hash CHAR(64) NOT NULL,
+    request_method TEXT NOT NULL,
+    request_path TEXT NOT NULL,
+    response_status INTEGER,
+    response_headers JSONB,
+    response_body TEXT,
+    status TEXT NOT NULL,                          -- PROCESSING / COMPLETED / FAILED
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL                -- typically created_at + 72h
+);
+
+CREATE INDEX idx_idem_expires ON idempotency_keys(expires_at);
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+@Transactional
+public class IdempotencyService {
+
+    public Optional&lt;IdempotencyRecord&gt; reserveOrGet(String key, String requestHash,
+                                                      String method, String path) {
+        // Try INSERT ON CONFLICT for atomic claim
+        int rows = jdbc.update(&quot;&quot;&quot;
+            INSERT INTO idempotency_keys (key, request_hash, request_method,
+                                         request_path, status, expires_at)
+            VALUES (?, ?, ?, ?, 'PROCESSING', NOW() + INTERVAL '72 hours')
+            ON CONFLICT (key) DO NOTHING
+            &quot;&quot;&quot;,
+            UUID.fromString(key), requestHash, method, path);
+
+        if (rows == 1) {
+            return Optional.empty();   // we got the lock; proceed with request
+        }
+
+        // Key existed; return current state
+        return repo.findById(UUID.fromString(key));
+    }
+
+    public void recordCompletion(String key, int status,
+                                  Map&lt;String, String&gt; headers, String body) {
+        jdbc.update(&quot;&quot;&quot;
+            UPDATE idempotency_keys
+            SET response_status = ?, response_headers = ?::jsonb,
+                response_body = ?, status = 'COMPLETED'
+            WHERE key = ?
+            &quot;&quot;&quot;,
+            status, json.writeValueAsString(headers), body, UUID.fromString(key));
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-kafka-consumer-idempotency-pattern">Deeper Dive — Kafka Consumer Idempotency Pattern<a class="anchor" href="#deeper-dive-kafka-consumer-idempotency-pattern" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class IdempotentKafkaConsumer {
+
+    @Autowired private DedupRepo dedupRepo;
+    @Autowired private OrderService orderService;
+
+    @KafkaListener(topics = &quot;orders&quot;, groupId = &quot;order-processor&quot;)
+    @Transactional
+    public void consume(ConsumerRecord&lt;String, Order&gt; record,
+                        Acknowledgment ack) {
+        // Extract dedup key from message header or compute from content
+        UUID dedupKey = extractDedupKey(record);
+
+        // Try to record this message as processed
+        boolean isNew = dedupRepo.tryInsert(dedupKey, Instant.now());
+
+        if (!isNew) {
+            log.info(&quot;Duplicate message {} skipped&quot;, dedupKey);
+            ack.acknowledge();
+            return;
+        }
+
+        try {
+            // Process — same DB transaction as dedup insert
+            orderService.processOrder(record.value());
+            ack.acknowledge();
+        } catch (Exception e) {
+            // DB transaction rolls back BOTH the dedup insert AND business state
+            // Message will be re-delivered; will retry
+            throw e;
+        }
+    }
+}
+
+@Repository
+public class DedupRepo {
+    @Autowired private JdbcTemplate jdbc;
+
+    public boolean tryInsert(UUID key, Instant timestamp) {
+        try {
+            int rows = jdbc.update(
+                &quot;INSERT INTO message_dedup (msg_id, processed_at) VALUES (?, ?)&quot;,
+                key, Timestamp.from(timestamp));
+            return rows == 1;
+        } catch (DuplicateKeyException e) {
+            return false;   // already processed
+        }
+    }
+}
+</code></pre></div>
+<h3 id="dedup-table-cleanup">Dedup Table Cleanup<a class="anchor" href="#dedup-table-cleanup" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">-- Periodically clean old dedup records
+DELETE FROM message_dedup
+WHERE processed_at &lt; NOW() - INTERVAL '7 days';
+
+-- Or use partition pruning for large-scale dedup
+CREATE TABLE message_dedup_2024_06 PARTITION OF message_dedup
+FOR VALUES FROM ('2024-06-01') TO ('2024-07-01');
+
+-- Drop old partitions monthly
+DROP TABLE message_dedup_2024_03;
+</code></pre></div>
+<h2 id="deeper-dive-common-idempotency-bugs">Deeper Dive — Common Idempotency Bugs<a class="anchor" href="#deeper-dive-common-idempotency-bugs" aria-hidden="true">#</a></h2>
+<h3 id="bug-1-idempotency-key-without-body-check">Bug 1: Idempotency Key Without Body Check<a class="anchor" href="#bug-1-idempotency-key-without-body-check" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// BAD: same key, different body → returns CACHED response anyway
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    return cache.get(key).orElseGet(() -&gt; {
+        Response r = doCharge(req);
+        cache.put(key, r);
+        return r;
+    });
+}
+
+// Attack scenario:
+// 1. Client sends ChargeRequest($100) with key &quot;abc&quot;
+// 2. Cache stores the result
+// 3. Client mistakenly sends ChargeRequest($1000) with SAME key &quot;abc&quot;
+// 4. Server returns cached &quot;charged $100&quot; response BUT $1000 was the actual intent
+//    → Silent loss; user gets wrong charge confirmation
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// GOOD: hash the body; reject on mismatch
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    String bodyHash = sha256(json.write(req));
+
+    Optional&lt;CachedResponse&gt; cached = cache.get(key);
+    if (cached.isPresent()) {
+        if (!cached.get().bodyHash().equals(bodyHash)) {
+            throw new IdempotencyKeyConflictException();
+        }
+        return cached.get().response();
+    }
+
+    Response r = doCharge(req);
+    cache.put(key, new CachedResponse(bodyHash, r));
+    return r;
+}
+</code></pre></div>
+<h3 id="bug-2-race-between-concurrent-requests-with-same-key">Bug 2: Race Between Concurrent Requests with Same Key<a class="anchor" href="#bug-2-race-between-concurrent-requests-with-same-key" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// BAD: both requests check cache, both proceed, both execute
+if (cache.get(key).isPresent()) return cache.get(key);
+Response r = doCharge(req);   // ← TWO concurrent calls execute
+cache.put(key, r);
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// GOOD: atomic insert + state machine
+boolean isFirstRequest = cache.insertIfAbsent(key, &quot;PROCESSING&quot;);
+if (!isFirstRequest) {
+    // Another request is processing or completed
+    waitForResult(key);   // or return 409 / 202 &quot;Accepted, processing&quot;
+}
+
+try {
+    Response r = doCharge(req);
+    cache.update(key, &quot;COMPLETED&quot;, r);
+    return r;
+} catch (Exception e) {
+    cache.update(key, &quot;FAILED&quot;, null);
+    throw e;
+}
+</code></pre></div>
+<h3 id="bug-3-idempotency-without-considering-downstream-calls">Bug 3: Idempotency Without Considering Downstream Calls<a class="anchor" href="#bug-3-idempotency-without-considering-downstream-calls" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// BAD: server-side dedup but downstream calls happen multiple times
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+    paymentClient.charge(order.id());          // ← What if THIS retries?
+    inventoryClient.reserve(order.id());        // ← Or THIS?
+    notificationClient.send(order.id());        // ← Or THIS?
+    return order;
+}
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// GOOD: each downstream call has its own idempotency
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+
+    // Each call uses order_id as idempotency key
+    paymentClient.charge(order.id(), order.id().toString());
+    inventoryClient.reserve(order.id(), order.id().toString());
+    notificationClient.send(order.id(), order.id().toString());
+
+    return order;
+}
+</code></pre></div>
+<h3 id="bug-4-ttl-too-short">Bug 4: TTL Too Short<a class="anchor" href="#bug-4-ttl-too-short" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Idempotency TTL: 1 hour
+Customer service uses webhook retries with 24-hour backoff
+After 1 hour, webhook fires → idempotency cache empty → DUPLICATE charge
+
+LESSON: TTL must exceed maximum retry window of all sources
+RECOMMENDATION: 72-168 hours for payment-critical operations
+</code></pre></div>
+<h2 id="deeper-dive-idempotency-for-different-operation-types">Deeper Dive — Idempotency for Different Operation Types<a class="anchor" href="#deeper-dive-idempotency-for-different-operation-types" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>INSERT (CREATE):
+  Strategy: Unique constraint on natural key + idempotency key
+    INSERT INTO orders (..., idempotency_key)
+    VALUES (...)
+    ON CONFLICT (idempotency_key) DO UPDATE
+    SET retry_count = retry_count + 1
+    RETURNING ...
+
+  Or: separate idempotency table that maps key → resource ID
+    INSERT INTO idempotency (key, resource_id) ON CONFLICT DO NOTHING
+
+UPDATE:
+  Strategy 1: Naturally idempotent via SET
+    UPDATE users SET email = 'new@example.com' WHERE id = ?
+    → Multiple retries produce same end state
+
+  Strategy 2: Version check (optimistic locking)
+    UPDATE users SET email = ?, version = ? + 1
+    WHERE id = ? AND version = ?
+    → Stale retries fail safely
+
+DELETE:
+  Strategy: Naturally idempotent
+    DELETE FROM users WHERE id = ?
+    → Repeating gives same result (id no longer exists)
+
+  Or: Soft delete with idempotency
+    UPDATE users SET deleted_at = NOW()
+    WHERE id = ? AND deleted_at IS NULL
+
+EVENT EMISSION:
+  Strategy: Outbox pattern
+    INSERT INTO outbox (event_id, payload) ON CONFLICT DO NOTHING
+    → Idempotent at DB layer
+    → Relay handles at-least-once Kafka delivery
+    → Consumers must dedup
+
+INCREMENT/DECREMENT:
+  Strategy: Idempotency key + recorded operation
+    INSERT INTO operations (key, account_id, delta)
+    VALUES (?, ?, ?) ON CONFLICT DO NOTHING
+    UPDATE balances SET amount = (SELECT SUM(delta) FROM operations WHERE account_id = ?)
+    WHERE id = ?
+    → Sum-based; replays don't double-count
+
+SEND EMAIL / SMS:
+  Strategy: Track sends by idempotency key
+    INSERT INTO email_sends (key, recipient, sent_at)
+    VALUES (?, ?, NOW()) ON CONFLICT (key) DO NOTHING
+    → If row inserted, fire the send
+    → If conflict, the send already happened
+</code></pre></div>
+<h2 id="deeper-dive-when-idempotency-is-genuinely-hard">Deeper Dive — When Idempotency Is Genuinely Hard<a class="anchor" href="#deeper-dive-when-idempotency-is-genuinely-hard" aria-hidden="true">#</a></h2>
+<h3 id="the-email-send-problem">The Email Send Problem<a class="anchor" href="#the-email-send-problem" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SEND EMAIL CALLS THIRD-PARTY API
+  SES.send(...) → returns message_id
+  Network failure → did SES receive it?
+
+  OPTION A: dedupTable + retry-on-success
+    Before SES call: INSERT INTO email_sends (key, status='PENDING')
+    Call SES
+    On success: UPDATE status='SENT', message_id=...
+    On failure: DELETE the row → can retry
+    On timeout: leave as PENDING; reconciliation job
+
+    Risk: 5% double-send on uncertain timeout
+
+  OPTION B: Use provider's idempotency
+    AWS SES supports Idempotency-Key header (recently added)
+    Stripe also supports
+
+  REAL-WORLD: most teams accept rare double-send rather than complexity
+</code></pre></div>
+<h3 id="the-money-send-problem">The Money-Send Problem<a class="anchor" href="#the-money-send-problem" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>WIRE TRANSFER VIA EXTERNAL BANK
+  Bank API: no idempotency support
+  Retry → DOUBLE TRANSFER
+
+  WHAT BANKS ACTUALLY DO:
+    Reconcile via wire confirmation file (daily batch)
+    Detect duplicates via amount + recipient + memo
+    Manual intervention for ambiguous cases
+
+  ARCHITECTURE: explicit RECONCILIATION step
+    Wire request → record intent → submit to bank
+    Daily: compare intent ledger vs bank confirmation file
+    Mismatch → on-call alert + manual resolution
+</code></pre></div>
+<h3 id="the-push-notification-problem">The Push Notification Problem<a class="anchor" href="#the-push-notification-problem" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>FCM/APN: cannot guarantee delivery exactly once
+  Retry → DOUBLE PUSH
+
+  MITIGATION:
+    1. Server-side dedup window: only attempt send if not sent in last 10s
+    2. Client-side dedup: notification_id in payload; ignore duplicates
+    3. Accept rare duplicates as acceptable UX cost
+</code></pre></div>
+<h2 id="deeper-dive-production-idempotency-architecture-decision">Deeper Dive — Production Idempotency Architecture Decision<a class="anchor" href="#deeper-dive-production-idempotency-architecture-decision" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>DECISION TREE:
+
+Is the operation a simple CRUD?
+├── Yes
+│   ├── CREATE → unique constraint or idempotency table
+│   ├── UPDATE → naturally idempotent if SET-based, or optimistic lock
+│   └── DELETE → naturally idempotent
+│
+└── No (complex business logic)
+    ├── Single-DB? → Idempotency table + transaction
+    ├── Cross-service? → Saga + outbox + per-step idempotency
+    └── Cross-DB without distributed tx?
+        ├── 2PC available? → JTA/Atomikos (rare modern use)
+        └── No → idempotency-key + reconciliation
+
+Cross-system call (external API)?
+├── External API supports idempotency? → use their key
+├── External API doesn't? 
+│   ├── Acceptable to rare-duplicate? → accept it
+│   ├── Critical (money)? → reconciliation pattern
+│   └── Notification? → server-side rate limit + client dedup
+
+Storage layer?
+├── Single source of truth (Postgres)? → Easy
+├── Multi-region replicated? → CDC + idempotent consumer
+└── Cache layer? → Invalidate on write success only
+</code></pre></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Audit an API.</strong> For five POST endpoints in any system you know, identify which are idempotent and which aren't. For the non-idempotent ones, propose a fix.</li>
+<li><strong>Idempotency-key middleware.</strong> Implement a Spring middleware (<code>HandlerInterceptor</code>) that enforces idempotency via a Redis dedup store with 24-hour TTL.</li>
+<li><strong>Kafka consumer dedup.</strong> Take a non-idempotent Kafka consumer. Add a dedup mechanism. Force-replay 100 messages; verify zero duplicate side effects.</li>
+<li><strong>Transactional outbox.</strong> Implement the outbox pattern in a Spring + Postgres + Kafka stack. Force a Kafka outage; restore; verify all outbox rows are eventually published.</li>
+<li><strong>Fencing-token storage.</strong> Design a storage table that enforces fencing tokens. Each write includes a token; the table rejects writes with stale tokens.</li>
+<li><strong>The irreversible-step exercise.</strong> For a saga that includes "send invoice email," design how to handle the irreversible step without causing duplicate sends on retry.</li>
+<li><strong>Dedup-store TTL.</strong> For your team's idempotency mechanism, decide the right TTL. Justify in terms of maximum client retry window.</li>
+<li><strong>Find a missing-idempotency bug.</strong> In any open-source service, find an endpoint without idempotency. Propose the fix.</li>
+<li><strong>The compare-and-set pattern.</strong> Replace a <code>x = x + 1</code> operation with a compare-and-set (<code>UPDATE x = old + 1 WHERE x = old</code>). Verify it's safe under concurrent retries.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we don't need idempotency; we'll just be careful not to retry." Write a 200-word response listing the four sources of retries this engineer cannot control.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Articulate why <strong>every operation in a distributed system will be retried</strong> and the four sources of retries: client timeouts, broker redelivery, operator reruns, saga retries.</li>
+<li>Distinguish <strong>semantic idempotency</strong> (operation naturally produces the same result on retry) from <strong>mechanical idempotency</strong> (system tracks and dedupes).</li>
+<li>Implement the <strong>Stripe-style Idempotency-Key pattern</strong> with a dedup store, concurrent-retry handling, and TTL.</li>
+<li>Implement <strong>Kafka consumer dedup</strong> via event IDs + a database unique constraint or Redis SETNX.</li>
+<li>Distinguish <strong>Kafka's "exactly-once" semantics</strong> (within Kafka only) from end-to-end exactly-once (which requires application-level idempotency).</li>
+<li>Apply the <strong>transactional outbox pattern</strong> to atomically write to a database and publish to Kafka.</li>
+<li>Use <strong>fencing tokens</strong> for safe distributed locking.</li>
+<li>Handle <strong>irreversible operations</strong> by placing them last in sagas and accepting the rare-double-execution risk.</li>
+<li>Cite <strong>real incidents</strong> caused by missing idempotency and recognize the production class of bugs they represent.</li>
+<li>Apply the idempotency discipline to <strong>every cross-service operation</strong> as a default, not as an afterthought.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t08-distributed-locking.html">Distributed Locking</a> — when multiple processes need mutual exclusion across machines, the patterns and pitfalls of distributed locks (Redis Redlock, etcd, ZooKeeper, fencing tokens) and the common failure modes.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Idempotency &amp; Deduplication&quot;
+slug: idempotency-and-deduplication
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Distributed Systems &amp; System Design&quot;
+type: concept
+difficulty: lead
+order: 7
+tags: [idempotency, deduplication, idempotency-key, at-least-once, exactly-once, stripe, request-id, dedup-store, outbox-pattern, transactional-outbox, debezium, kafka-exactly-once, fenced-token, monotonic-id, redis-setnx, postgres-unique-constraint, semantic-idempotency, http-method-semantics]
+prerequisites: [service-communication-sync-vs-async, replication-strategies, distributed-transactions-2pc-saga]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-08
+---
+
+# Idempotency &amp; Deduplication
+
+In a distributed system, **every request will be retried** — by clients on timeouts, by message brokers on consumer ack failures, by load balancers on transient errors, by the operator&#x27;s mid-incident rerun of a job. The retries are not bugs; they are the only way to recover from the partial failures distributed systems naturally produce. But every retry must satisfy one rule: **processing the same operation twice must produce the same effect as processing it once**. This property is **idempotency**, and a system that doesn&#x27;t have it cannot survive its own retries — every retry adds an unwanted side effect (a duplicate charge, a duplicate email, a duplicate row, a duplicate decrement). Without idempotency, a distributed system is hostage to the rare cases where retries happen to be free; with it, retries become the *primary* fault-tolerance mechanism.
+
+The depth bar here is **how to make operations idempotent in practice**, the mechanisms at each layer (HTTP idempotency, idempotency keys, transactional outbox, deduplication stores), and the well-known production incidents caused by missing idempotency. We trace Stripe&#x27;s `Idempotency-Key` header pattern, the most famous and most-copied idempotency mechanism in payments, and explain the storage and lifetime questions it raises. We cover **semantic idempotency** (the underlying operation is idempotent — `set x = 5` is, `x = x + 1` is not) versus **mechanical idempotency** (the operation is non-idempotent but the system *dedupes* it via a tracking mechanism). We name the canonical patterns: **idempotency key + dedup store** for HTTP, **transactional outbox + consumer dedup** for Kafka events, **fencing tokens** for leader-bound writes, **monotonic identifiers** for write ordering. We trace Kafka&#x27;s &quot;exactly-once&quot; semantics — which is at-least-once delivery + idempotent producer + transactional consumer — and the operational realities. We cover failure modes: the dedup-store TTL that&#x27;s too short, the idempotency key reused for different operations, the case where the underlying business operation can&#x27;t be idempotent and the system has to live with the consequences. By the end you will design idempotent endpoints, debug duplicate-side-effect incidents, and refuse the &quot;we&#x27;ll just retry&quot; answer that has no idempotency story.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Service Communication](../C01-software-architecture/T06-service-communication-sync-vs-async.md), [Replication](./T04-replication-strategies.md), [Distributed Transactions](./T06-distributed-transactions-2pc-saga.md). Idempotency is the engineering that lets at-least-once delivery be safe; without it, at-least-once is at-most-multiple.
+
+## Where Idempotency Came From — Mathematics, Networking, And Stripe&#x27;s 2015 Productization
+
+The word **idempotent** comes from mathematics: a function f is *idempotent* if f(f(x)) = f(x). Applying the function twice yields the same result as applying it once. The term was introduced by **Benjamin Peirce** in his 1870 paper [*Linear Associative Algebra*](https://en.wikipedia.org/wiki/Linear_Associative_Algebra), describing matrix multiplication. The concept is purely mathematical; the engineering application would come a century later.
+
+### The Networking Application (1970s–1980s)
+
+The networking application of idempotency emerged with the development of **reliable network protocols**. TCP (Transmission Control Protocol, RFC 793, 1981) and the earlier ARPANET protocols had to handle a fundamental problem: **messages could be duplicated, reordered, or lost**. The protocols needed semantics that worked despite all three.
+
+The specific TCP mechanism: **sequence numbers**. Each byte in the stream has a sequence number; receivers can detect duplicates (same sequence number seen twice) and reorder out-of-order packets. The TCP layer absorbs the duplication; the application receives each byte exactly once.
+
+This was *one form* of idempotency: the *transport layer* deduplicates messages so the application doesn&#x27;t have to. But it only worked *within* a single TCP connection. Across connections, across processes, across system reboots — the application had to handle duplication itself.
+
+### The HTTP Method Definitions (1996–1999)
+
+The HTTP/1.1 RFC (RFC 2068, 1996, updated RFC 2616, 1999) formally defined which HTTP methods were *idempotent*:
+
+- **GET, HEAD, PUT, DELETE, OPTIONS**: idempotent. A client can retry these safely.
+- **POST**: NOT idempotent. Two POSTs may create two resources.
+
+This was a *design decision*, not a mathematical fact. The HTTP spec authors recognized that *some operations could be retried safely* and named those operations explicitly. For *unsafe* operations (POST), the retry was the client&#x27;s responsibility.
+
+The HTTP spec also introduced the concept of **safe methods** — methods that don&#x27;t modify state. GET and HEAD are safe; POST, PUT, DELETE are not.
+
+These distinctions remain foundational. When a developer writes a GET endpoint, they&#x27;re committing to idempotent semantics; when they write a POST, they&#x27;re not. The HTTP method choice has semantic implications.
+
+### The Mid-2000s Web Service Era
+
+By the mid-2000s, web services were proliferating, and the idempotency problem was emerging in distributed application contexts. Specific scenarios:
+
+- **Payment processing**: a network timeout left the client uncertain whether the payment succeeded. A retry might charge twice.
+- **Order placement**: a duplicate order from retry would create two database records.
+- **API integrations**: cross-service calls had no built-in deduplication.
+
+Different teams solved this *ad hoc* — request IDs, sequence numbers, database constraints. The pattern wasn&#x27;t standardized; each company invented their own approach.
+
+### Stripe&#x27;s Idempotency Key (2015)
+
+The breakthrough was **Stripe&#x27;s 2015 introduction of the `Idempotency-Key` header**. Stripe — the payments-as-a-service company founded by Patrick and John Collison in 2010 — had been growing rapidly and encountering customer issues with retry semantics. Customers who experienced a network blip during a charge would retry; sometimes the original charge had succeeded, and the retry charged a second time.
+
+The solution: **let the client generate a unique key per operation**. Stripe stores the key with the operation result; if the same key arrives again, return the stored result without re-executing. The retry sees the original result; no duplicate operation.
+
+The Stripe API documentation made this **explicit and prominent** — every POST endpoint accepted `Idempotency-Key`, every example in the documentation used it, the SDK auto-generated keys. By 2018, this pattern was **the standard for safe POST operations** across the payments industry.
+
+### Who Patrick And John Collison Are
+
+The **Collison brothers** (Patrick born 1988, John born 1990) are Irish entrepreneurs who founded **Auctomatic** (a payment/auction tool) while still teenagers, sold it for $5M, and then founded **Stripe** in 2010. By 2024, Stripe is valued at ~$70B and processes a significant fraction of internet commerce. The company is famous in engineering circles for its developer-friendly API design — Stripe&#x27;s API documentation is widely held as the gold standard for clarity.
+
+The Idempotency-Key pattern was *one of many* Stripe-introduced conventions that became industry standards. The pattern&#x27;s success was as much about *clear documentation* as about technical novelty.
+
+### The 2017+ Standardization
+
+After Stripe popularized the pattern:
+
+- **The IETF drafted standards** for idempotency keys in HTTP (work-in-progress as of 2024).
+- **AWS introduced idempotency tokens** across their APIs.
+- **Major fintech and payments companies** (Square, PayPal, Adyen, Plaid) all adopted Stripe-style idempotency keys.
+- **Resilience4j, Spring Retry, and other Java libraries** added idempotency-key support.
+
+By 2024, &quot;idempotency keys&quot; are a *standard* pattern in API design, expected on any POST endpoint that modifies critical state.
+
+### The Kafka Exactly-Once Semantics (2017)
+
+In parallel with the API-level standardization, **Apache Kafka introduced &quot;Exactly-Once Semantics&quot; (EOS)** in version 0.11 (June 2017), specifically [*KIP-98: Exactly Once Delivery and Transactional Messaging*](https://cwiki.apache.org/confluence/display/KAFKA/KIP-98+-+Exactly+Once+Delivery+and+Transactional+Messaging). EOS achieved exactly-once *within Kafka* — events published once would be delivered once, regardless of failures.
+
+The mechanism: producer IDs and sequence numbers, similar to TCP but at the message level. Kafka tracks per-producer sequence; duplicates are detected and discarded.
+
+The important caveat: **exactly-once is within Kafka**. End-to-end exactly-once (from producer through external system) still requires application-level idempotency. KIP-98 doesn&#x27;t eliminate the application&#x27;s responsibility.
+
+### Why Idempotency Now Pervades Distributed Systems
+
+By 2024, every senior engineer encounters idempotency *constantly*:
+
+- API design: every POST has an idempotency mechanism.
+- Message processing: every Kafka consumer must be idempotent.
+- Workflow engines: Temporal, Camunda all enforce idempotency.
+- Database operations: upserts with deterministic keys.
+
+The pattern has become *infrastructure* — not something engineers implement from scratch, but something they verify they&#x27;re using correctly.
+
+## Why Idempotency, Specifically: The Senior Engineer&#x27;s Q&amp;A
+
+### Q1: Why is idempotency mandatory in distributed systems?
+
+Because **retries are inevitable**. Networks fail, processes crash, timeouts trigger retries. Without idempotency, every retry might cause duplicate effects. With idempotency, retries are safe.
+
+The math: in a system with N services, the probability of *some* failure occurring during a request is roughly 1 - (1 - p)^N where p is the per-service failure probability. For p = 0.01 and N = 10, this is ~10%. Without idempotency, ~10% of requests have potential for duplicate side effects.
+
+The senior judgment: **assume retries; design for them**.
+
+### Q2: How does idempotency relate to at-least-once delivery?
+
+They&#x27;re complementary:
+
+- **At-least-once delivery** ensures messages aren&#x27;t lost. Duplicates are possible.
+- **Idempotent processing** ensures duplicates don&#x27;t cause harm.
+
+Together: at-least-once + idempotent = &quot;effectively exactly-once.&quot; This is the standard pattern for Kafka consumers, message-driven architectures, and reliable APIs.
+
+Without idempotency, at-least-once delivery is at-least-once-and-sometimes-twice — typically broken.
+
+### Q3: What&#x27;s the right scope for idempotency?
+
+Three scopes:
+
+1. **Method-level**: `setUserName(id, name)` is idempotent — calling twice with the same arguments leaves the state the same.
+2. **Operation-level**: `transferMoney(from, to, amount, idempotencyKey)` is idempotent *for the same key* — the first call processes, subsequent calls with the same key return the original result.
+3. **Workflow-level**: an entire multi-step saga is idempotent — re-executing the saga from scratch produces the same final state.
+
+The scope you choose affects implementation. Method-level is built into the operation; operation-level needs explicit keys; workflow-level needs durable saga state.
+
+### Q4: What&#x27;s the canonical implementation of operation-level idempotency?
+
+The Stripe pattern:
+
+1. Client generates a unique UUID (the idempotency key).
+2. Client sends the request with `Idempotency-Key: &lt;uuid&gt;` header.
+3. Server checks a key-value store for the key.
+4. If found, return the stored response (don&#x27;t re-execute).
+5. If not found, execute the operation, store the result keyed by the UUID, return the result.
+6. TTL on the stored key (typically 24 hours to a week).
+
+The implementation is conceptually simple but has subtle requirements:
+- The check-and-execute must be atomic (race condition between concurrent requests with the same key).
+- The stored result must be complete (status code, headers, body).
+- The TTL must be longer than client retry windows.
+
+### Q5: When does idempotency fail to help?
+
+Three failure modes:
+
+1. **Time-bound operations**: &quot;process this transaction&quot; may not be safely retryable if the transaction has time-sensitive validity.
+2. **External side effects**: if the operation sends an email or makes a phone call, the side effect is non-idempotent regardless of the database state.
+3. **Race conditions in the idempotency mechanism**: if two concurrent requests with the same key arrive simultaneously, both may check the store, both find no entry, both execute, both store results.
+
+Mitigations: distinguish &quot;safe to retry&quot; from &quot;any retry&quot;; use database locks or compare-and-swap for race protection; design external side effects to be deduplicated at the side-effect layer.
+
+### Q6: How does this relate to message broker delivery semantics?
+
+Three brokers, three approaches:
+
+- **Kafka with EOS** (KIP-98): exactly-once within Kafka. Producers send with sequence numbers; brokers deduplicate.
+- **RabbitMQ**: at-least-once with consumer acknowledgments. Idempotent consumer needed for duplicate-safe processing.
+- **AWS SQS Standard**: at-least-once with possible duplicates. Idempotent consumer mandatory.
+
+In all cases, application-level idempotency is needed for end-to-end exactly-once processing. The broker&#x27;s delivery guarantee is *necessary but not sufficient*.
+
+## Common Misconceptions Explained
+
+### &quot;Idempotency means the operation is safe to retry.&quot;
+
+Mostly true, with caveats. Idempotency means the *result* is the same regardless of how many times the operation is retried. The *operation* may still have rate limits, expiry, or other constraints that make repeated execution wasteful.
+
+### &quot;GET requests are inherently idempotent.&quot;
+
+True, by HTTP spec. But the *application logic* must respect this. A GET that side-effectfully creates a log entry is technically violating the HTTP contract.
+
+### &quot;Idempotency keys solve all distributed-system retry problems.&quot;
+
+False. Idempotency keys handle *one type* of duplicate (same operation, retried). They don&#x27;t handle *different* operations that have the same effect (a duplicate order placed with different keys).
+
+### &quot;Kafka&#x27;s exactly-once means I don&#x27;t need idempotent consumers.&quot;
+
+False. Kafka EOS is *within Kafka*. Consumers writing to external systems must still be idempotent.
+
+### &quot;Idempotency is just deduplication.&quot;
+
+Half true. Idempotency *includes* deduplication but is broader. A truly idempotent operation works correctly regardless of retries; deduplication is one mechanism for achieving it.
+
+### &quot;Idempotency comes for free with PUT and DELETE.&quot;
+
+False. The HTTP spec *defines* PUT and DELETE as idempotent semantically, but the implementation must enforce it. A PUT that has side effects in addition to the resource update may not be idempotent.
+
+## The Retry Reality
+
+Three facts about distributed systems make retries mandatory:
+
+1. **Timeouts don&#x27;t tell you whether the operation succeeded.** A client times out at 30 s, but the server might have completed the operation, the response just got lost.
+2. **Message brokers retry on ack failures.** Kafka, RabbitMQ, SQS all redeliver if the consumer doesn&#x27;t ack in time.
+3. **Operators rerun jobs.** A failed batch job is reinvoked. A &quot;let me try that again&quot; support action.
+
+```mermaid
+flowchart TB
+  R[Retries happen]
+  R --&gt; R1[&quot;Client timeouts&lt;br/&gt;(unknown outcome)&quot;]
+  R --&gt; R2[&quot;Broker redelivery&lt;br/&gt;(consumer didn&#x27;t ack)&quot;]
+  R --&gt; R3[&quot;Operator reruns&lt;br/&gt;(stuck job)&quot;]
+  R --&gt; R4[&quot;Saga retries&lt;br/&gt;(compensation drift)&quot;]
+  Idemp[Idempotency = safety net]
+  R -.-&gt; Idemp
+```
+
+If retries are inevitable, **either every operation is idempotent, or the system corrupts data**. There is no middle ground.
+
+## Semantic Vs Mechanical Idempotency
+
+Two distinct ways an operation becomes idempotent.
+
+### Semantic Idempotency
+
+The operation&#x27;s *meaning* is naturally idempotent. `set x = 5` produces the same result whether run once or ten times. `DELETE /resource/42` produces the same result. `UPDATE orders SET status = &#x27;SHIPPED&#x27; WHERE id = 42 AND status = &#x27;PAID&#x27;` is conditionally idempotent (it&#x27;s only effective once; subsequent runs are no-ops).
+
+Semantic idempotency is the cleanest answer. Design operations so the natural semantics are idempotent:
+
+- Use `set X = value` instead of `X = X + delta` where possible.
+- Use conditional updates (`WHERE status = &#x27;expected&#x27;`) that no-op after the first success.
+- Use HTTP `PUT` (idempotent) instead of `POST` (not) where the operation creates with a client-chosen ID.
+
+### Mechanical Idempotency
+
+The operation is *not* semantically idempotent, but the system **tracks** which operation has been performed and refuses to repeat it. A charge is `x = x + delta`; the dedup mechanism records &quot;charge attempt with key K already processed.&quot;
+
+Mechanical idempotency is more general but operationally heavier — it requires a deduplication store and rules for its lifecycle.
+
+## The Idempotency Key Pattern (Stripe-Style)
+
+The canonical mechanical-idempotency mechanism. Every request carries an `Idempotency-Key` header (typically a UUID, generated by the client and identical across retries). The server stores the key + the result of the first request; subsequent requests with the same key return the stored result without re-executing.
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant S as Server
+  participant D as DB
+  participant Dedup as Dedup store
+
+  C-&gt;&gt;S: POST /charges&lt;br/&gt;Idempotency-Key: abc-123
+  S-&gt;&gt;Dedup: check abc-123
+  Dedup--&gt;&gt;S: not seen
+  S-&gt;&gt;D: write charge
+  D--&gt;&gt;S: ok
+  S-&gt;&gt;Dedup: store(abc-123, result)
+  S--&gt;&gt;C: 201 Created (result)
+  
+  Note over C: timeout, client retries
+  
+  C-&gt;&gt;S: POST /charges&lt;br/&gt;Idempotency-Key: abc-123
+  S-&gt;&gt;Dedup: check abc-123
+  Dedup--&gt;&gt;S: result
+  S--&gt;&gt;C: 201 Created (cached result)
+```
+
+Stripe&#x27;s [Idempotency](https://stripe.com/docs/api/idempotent_requests) is the canonical implementation. Two retries with the same key return the same response without performing the charge twice — even if those retries cross days or use different network paths.
+
+### Implementation Details
+
+The dedup store has several non-trivial concerns:
+
+1. **Storage**: a Redis instance with TTL (typically 24 hours), a Postgres table with a unique constraint on key, or DynamoDB with TTL.
+2. **TTL**: too short and a legitimate retry sees the key expired and re-executes; too long and the store grows unbounded. Stripe&#x27;s TTL is 24 hours — generous for client retries, bounded enough for storage.
+3. **Concurrency**: two concurrent requests with the same key must not both execute. Use a database unique constraint or `SETNX` in Redis to serialize.
+4. **Storing the response**: the dedup store records the *entire* response so retries get the original outcome. Tens to hundreds of bytes per entry.
+5. **Schema evolution**: the dedup store outlives application versions; stored responses must remain decodable.
+
+### A Java Implementation
+
+```java
+@RestController
+class ChargeController {
+  private final ChargeService service;
+  private final IdempotencyStore store;
+
+  @PostMapping(&quot;/charges&quot;)
+  public ChargeResponse charge(@RequestHeader(&quot;Idempotency-Key&quot;) String key,
+                                @RequestBody ChargeRequest req) {
+    return store.exec(key, () -&gt; service.charge(req));
+  }
+}
+
+@Component
+class IdempotencyStore {
+  private final JdbcTemplate jdbc;
+  private final ObjectMapper json;
+
+  public &lt;T&gt; T exec(String key, Supplier&lt;T&gt; op) {
+    Optional&lt;String&gt; cached = jdbc.queryForObject(
+        &quot;SELECT response FROM idempotency_keys WHERE key = ? AND expires_at &gt; NOW()&quot;,
+        new Object[]{key}, String.class);
+    if (cached.isPresent()) {
+      return deserialize(cached.get());
+    }
+    T result = op.get();
+    String body = serialize(result);
+    try {
+      jdbc.update(&quot;INSERT INTO idempotency_keys(key, response, expires_at) VALUES (?, ?, NOW() + INTERVAL &#x27;24 hours&#x27;)&quot;,
+          key, body);
+    } catch (DuplicateKeyException e) {
+      // concurrent retry inserted first; fetch its result
+      return deserialize(jdbc.queryForObject(&quot;SELECT response FROM idempotency_keys WHERE key = ?&quot;,
+          new Object[]{key}, String.class));
+    }
+    return result;
+  }
+}
+```
+
+A real production-grade implementation handles partial failures (the request completed but the store couldn&#x27;t record it) and inspects the request body to detect when the same key is reused for a *different* operation (a strong signal of a client bug).
+
+## Idempotency For Consumers — Kafka And Friends
+
+For message-based systems (Kafka, RabbitMQ, SQS), idempotency lives in the **consumer**. The pattern: each message has a unique identifier; the consumer records identifiers it has processed; duplicates are detected and skipped.
+
+```java
+@KafkaListener(topics = &quot;orders&quot;)
+public void on(ConsumerRecord&lt;String, OrderEvent&gt; record) {
+  String eventId = record.value().eventId();
+  if (dedupStore.exists(eventId)) {
+    return;          // already processed
+  }
+  try {
+    process(record.value());
+    dedupStore.markProcessed(eventId);
+  } catch (Exception e) {
+    // don&#x27;t mark processed; will retry on next delivery
+    throw e;
+  }
+}
+```
+
+The dedup store can be:
+
+- **A database table** with a unique constraint on `event_id`.
+- **Redis** with `SETNX` and TTL.
+- **The application&#x27;s own state** if the operation produces a state that&#x27;s naturally checkable (a row insertion with a unique key).
+
+The TTL is governed by the maximum redelivery window. Kafka can redeliver weeks-old messages if a consumer fully restarts. Keep dedup entries for at least the message retention period.
+
+### Naturally-Idempotent Consumers
+
+Sometimes the operation itself is naturally idempotent and no dedup store is needed:
+
+- `UPDATE accounts SET balance = 100 WHERE customer_id = 7` is idempotent.
+- `INSERT ... ON CONFLICT DO NOTHING` is idempotent.
+- `PUT` to an object store with a fixed key is idempotent.
+
+For these, the consumer can process duplicates safely without explicit tracking.
+
+## Kafka &quot;Exactly-Once&quot; — A Closer Look
+
+Kafka markets &quot;exactly-once semantics&quot; (EOS). What it actually provides:
+
+1. **Idempotent producer**: each producer has a unique ID; the broker dedupes by (producer ID, sequence number). A producer retry produces the same effect as one publish.
+2. **Transactional producer**: a producer can group writes across topics and partitions into a transaction; consumers configured with `isolation.level = read_committed` see all or nothing.
+3. **Exactly-once stream processing**: Kafka Streams ties producer transactions to consumer offset commits, so a &quot;read-process-write&quot; loop is exactly-once.
+
+This is *exactly-once within Kafka* — events flowing Kafka → Kafka. **External side effects (database writes, HTTP calls, emails) are not transactional with Kafka**, and exactly-once doesn&#x27;t extend there. The standard answer for cross-boundary exactly-once is *at-least-once + idempotent consumer*.
+
+## The Transactional Outbox — Atomic Database And Message Publish
+
+A classic distributed-systems problem: a service must write to its database *and* publish a Kafka event. Both must succeed or both must fail. They cannot be transactionally tied (the database and Kafka are separate systems).
+
+The transactional outbox solves it:
+
+```mermaid
+flowchart LR
+  App[Application]
+  App --&gt;|&quot;write order + outbox&lt;br/&gt;in ONE transaction&quot;| DB[(PostgreSQL)]
+  DB --&gt;|&quot;WAL&quot;| CDC[Debezium]
+  CDC --&gt;|&quot;publish&quot;| Kafka[(Kafka)]
+  Kafka --&gt;|&quot;consume&quot;| Consumer[Consumer]
+```
+
+1. Application writes the order *and* a row in the `outbox` table in the same DB transaction. The DB guarantees both commit together.
+2. Debezium (or a similar CDC tool, or a custom poller) tails the database&#x27;s WAL or polls the outbox table.
+3. It publishes outbox rows to Kafka.
+4. Consumers read from Kafka with idempotency.
+
+The transactional outbox is **the standard pattern for guaranteed event publication from a Spring service to Kafka**. Spring Modulith and ChrisRichardson&#x27;s eventuate-tram library provide implementations.
+
+## Fencing Tokens — Idempotency For Leader-Bound Writes
+
+A subtle problem: a client thinks it holds a distributed lock; the lock has expired but the client doesn&#x27;t know; it does work; the new lock holder also does work. Concurrent execution.
+
+**Fencing tokens** (Martin Kleppmann&#x27;s *Designing Data-Intensive Applications*) add a monotonically-increasing token to every lock acquisition. Every write under the lock carries the token. The storage layer rejects writes with stale tokens.
+
+```mermaid
+sequenceDiagram
+  participant C1 as Client 1
+  participant L as Lock Service
+  participant S as Storage
+  C1-&gt;&gt;L: acquire lock
+  L--&gt;&gt;C1: lock acquired, token=33
+  Note over C1: pause (long GC, network delay)
+  participant C2 as Client 2
+  L-&gt;&gt;C1: lock expired
+  C2-&gt;&gt;L: acquire lock
+  L--&gt;&gt;C2: lock acquired, token=34
+  C2-&gt;&gt;S: write data (token=34)
+  S--&gt;&gt;C2: ok
+  Note over C1: resumes, still thinks it holds lock
+  C1-&gt;&gt;S: write data (token=33)
+  S--&gt;&gt;C1: REJECTED (token &lt; 34)
+```
+
+The storage layer&#x27;s check makes the second write fail safely. Fencing tokens require the storage layer to participate; this is one reason consensus-based stores (etcd, ZooKeeper) are recommended for distributed locking.
+
+## When Idempotency Is Impossible
+
+Some operations genuinely can&#x27;t be made idempotent:
+
+- **Send an email**. Once dispatched, you cannot undo it. A retry sends a second email.
+- **Dispatch a physical truck**. Telling FedEx to pick up twice produces two pickups.
+- **Call an external API without idempotency**. If Stripe didn&#x27;t have idempotency keys, your retries would create duplicate charges.
+
+For these:
+
+1. **Put them last in the saga.** All the reversible work has committed first; the irreversible step happens once.
+2. **Pre-condition checks.** Send the email only after checking &quot;did we already send for this order?&quot; — a manual dedup at the application level.
+3. **Accept the duplicate**. Sometimes the cost of double emails is less than the cost of building dedup. Be deliberate.
+
+## Production Incidents Tied To Missing Idempotency
+
+- **Stripe-style duplicate charges**: any payment service without idempotency keys has had a duplicate-charge incident. The class of incident is so common that idempotency keys are now a regulatory expectation.
+- **Slack 2018 outage** ([C01/T06](../C01-software-architecture/T06-service-communication-sync-vs-async.md)): non-idempotent Kafka consumer multiplied load on retries.
+- **Various NPM publish duplicates**: the registry&#x27;s pre-2017 design allowed duplicate publishes from retries.
+- **Many email-sending bugs**: retries that double-send marketing or transactional emails.
+
+The pattern: a system that didn&#x27;t think about retries explicitly will discover idempotency was needed only after a customer complains.
+
+## Cross-Language Notes
+
+Idempotency is a discipline, not a library. Each ecosystem has helpers:
+
+| Ecosystem | Tools |
+|-----------|-------|
+| **Java / Spring** | Custom interceptors, Spring Retry, Resilience4j, Redis for dedup |
+| **C# / .NET** | MediatR pipelines for dedup, Polly for retries, Redis dedup |
+| **Go** | Hand-rolled middleware, Redis dedup |
+| **Node.js** | Express middleware, Redis dedup |
+| **Python** | FastAPI middleware, Redis dedup |
+
+The pattern is universal; the implementation is a few hundred lines plus storage.
+
+## Trade-Off Summary
+
+| Concern | Pattern |
+|---------|---------|
+| HTTP POST | Idempotency-Key header + dedup store |
+| Kafka consumer | Event ID + dedup table |
+| Database upsert | `ON CONFLICT DO NOTHING` or `MERGE` |
+| Cross-DB + broker | Transactional outbox + Debezium |
+| Leader-bound write | Fencing token + storage rejection |
+| Irreversible step | Put last; accept rarely-duplicated risk |
+
+&gt; [!INTERVIEW]
+&gt; A common L5 prompt: &quot;How do you make a payment API idempotent?&quot; Strong answers (a) name the Idempotency-Key header pattern, (b) describe the dedup store and its TTL, (c) handle concurrent retries via DB unique constraint, (d) name the storage / response cache details. Mentioning the transactional outbox unprompted shows depth.
+
+## Deeper Dive — Spring Boot Idempotency Middleware Implementation
+
+### Idempotency Interceptor with Redis Backing
+
+```java
+@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+    private final RedisTemplate&lt;String, String&gt; redis;
+    private final ObjectMapper json;
+
+    private static final Duration TTL = Duration.ofHours(72);
+
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        // Only enforce on mutating methods
+        String method = req.getMethod();
+        if (!Set.of(&quot;POST&quot;, &quot;PUT&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;).contains(method)) return true;
+
+        String key = req.getHeader(&quot;Idempotency-Key&quot;);
+        if (key == null) {
+            // No key → reject mutating requests (strict mode)
+            resp.setStatus(400);
+            resp.getWriter().write(&quot;Idempotency-Key header required&quot;);
+            return false;
+        }
+
+        // Validate key format
+        try { UUID.fromString(key); }
+        catch (IllegalArgumentException e) {
+            resp.setStatus(400);
+            resp.getWriter().write(&quot;Idempotency-Key must be UUID&quot;);
+            return false;
+        }
+
+        // Cache key combines method + path + idempotency key
+        String cacheKey = &quot;idem:&quot; + method + &quot;:&quot; + req.getRequestURI() + &quot;:&quot; + key;
+
+        // Compute hash of request body for change detection
+        byte[] body = StreamUtils.copyToByteArray(req.getInputStream());
+        String requestHash = DigestUtils.sha256Hex(body);
+
+        // Atomic: SET NX with hash + expiry
+        String existing = redis.opsForValue().get(cacheKey);
+
+        if (existing != null) {
+            // Replay: check hash matches
+            IdempotencyRecord record = json.readValue(existing, IdempotencyRecord.class);
+
+            if (!record.requestHash().equals(requestHash)) {
+                resp.setStatus(422);
+                resp.getWriter().write(&quot;Idempotency-Key reused with different body&quot;);
+                return false;
+            }
+
+            if (record.status().equals(&quot;COMPLETED&quot;)) {
+                // Return cached response
+                resp.setStatus(record.statusCode());
+                record.headers().forEach(resp::setHeader);
+                resp.getWriter().write(record.responseBody());
+                return false;
+            }
+            if (record.status().equals(&quot;PROCESSING&quot;)) {
+                resp.setStatus(409);
+                resp.getWriter().write(&quot;Request in progress&quot;);
+                return false;
+            }
+        }
+
+        // Mark as PROCESSING; wrap request to capture body + response
+        IdempotencyRecord processing = new IdempotencyRecord(
+            key, requestHash, &quot;PROCESSING&quot;, null, null, null, Instant.now()
+        );
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(processing), TTL);
+
+        // Store in request attribute for post-handler use
+        req.setAttribute(&quot;idem_cache_key&quot;, cacheKey);
+        req.setAttribute(&quot;idem_request_hash&quot;, requestHash);
+
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest req, HttpServletResponse resp,
+                                  Object handler, Exception ex) throws Exception {
+        String cacheKey = (String) req.getAttribute(&quot;idem_cache_key&quot;);
+        String requestHash = (String) req.getAttribute(&quot;idem_request_hash&quot;);
+        if (cacheKey == null) return;
+
+        // Cache the response for future retries
+        String responseBody = captureResponseBody(resp);   // requires response wrapping
+        Map&lt;String, String&gt; responseHeaders = captureHeaders(resp);
+
+        IdempotencyRecord completed = new IdempotencyRecord(
+            UUID.fromString(req.getHeader(&quot;Idempotency-Key&quot;)).toString(),
+            requestHash,
+            ex == null &amp;&amp; resp.getStatus() &lt; 500 ? &quot;COMPLETED&quot; : &quot;FAILED&quot;,
+            resp.getStatus(),
+            responseHeaders,
+            responseBody,
+            Instant.now()
+        );
+
+        redis.opsForValue().set(cacheKey, json.writeValueAsString(completed), TTL);
+    }
+}
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Autowired private IdempotencyInterceptor interceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(interceptor)
+            .addPathPatterns(&quot;/api/**&quot;)
+            .excludePathPatterns(&quot;/api/health&quot;, &quot;/api/metrics&quot;);
+    }
+}
+
+public record IdempotencyRecord(
+    String key,
+    String requestHash,
+    String status,             // PROCESSING / COMPLETED / FAILED
+    Integer statusCode,
+    Map&lt;String, String&gt; headers,
+    String responseBody,
+    Instant createdAt
+) {}
+```
+
+### Database-Backed Idempotency (Stronger Durability)
+
+For payment APIs where Redis loss is unacceptable:
+
+```sql
+CREATE TABLE idempotency_keys (
+    key UUID PRIMARY KEY,
+    request_hash CHAR(64) NOT NULL,
+    request_method TEXT NOT NULL,
+    request_path TEXT NOT NULL,
+    response_status INTEGER,
+    response_headers JSONB,
+    response_body TEXT,
+    status TEXT NOT NULL,                          -- PROCESSING / COMPLETED / FAILED
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL                -- typically created_at + 72h
+);
+
+CREATE INDEX idx_idem_expires ON idempotency_keys(expires_at);
+```
+
+```java
+@Service
+@Transactional
+public class IdempotencyService {
+
+    public Optional&lt;IdempotencyRecord&gt; reserveOrGet(String key, String requestHash,
+                                                      String method, String path) {
+        // Try INSERT ON CONFLICT for atomic claim
+        int rows = jdbc.update(&quot;&quot;&quot;
+            INSERT INTO idempotency_keys (key, request_hash, request_method,
+                                         request_path, status, expires_at)
+            VALUES (?, ?, ?, ?, &#x27;PROCESSING&#x27;, NOW() + INTERVAL &#x27;72 hours&#x27;)
+            ON CONFLICT (key) DO NOTHING
+            &quot;&quot;&quot;,
+            UUID.fromString(key), requestHash, method, path);
+
+        if (rows == 1) {
+            return Optional.empty();   // we got the lock; proceed with request
+        }
+
+        // Key existed; return current state
+        return repo.findById(UUID.fromString(key));
+    }
+
+    public void recordCompletion(String key, int status,
+                                  Map&lt;String, String&gt; headers, String body) {
+        jdbc.update(&quot;&quot;&quot;
+            UPDATE idempotency_keys
+            SET response_status = ?, response_headers = ?::jsonb,
+                response_body = ?, status = &#x27;COMPLETED&#x27;
+            WHERE key = ?
+            &quot;&quot;&quot;,
+            status, json.writeValueAsString(headers), body, UUID.fromString(key));
+    }
+}
+```
+
+## Deeper Dive — Kafka Consumer Idempotency Pattern
+
+```java
+@Component
+public class IdempotentKafkaConsumer {
+
+    @Autowired private DedupRepo dedupRepo;
+    @Autowired private OrderService orderService;
+
+    @KafkaListener(topics = &quot;orders&quot;, groupId = &quot;order-processor&quot;)
+    @Transactional
+    public void consume(ConsumerRecord&lt;String, Order&gt; record,
+                        Acknowledgment ack) {
+        // Extract dedup key from message header or compute from content
+        UUID dedupKey = extractDedupKey(record);
+
+        // Try to record this message as processed
+        boolean isNew = dedupRepo.tryInsert(dedupKey, Instant.now());
+
+        if (!isNew) {
+            log.info(&quot;Duplicate message {} skipped&quot;, dedupKey);
+            ack.acknowledge();
+            return;
+        }
+
+        try {
+            // Process — same DB transaction as dedup insert
+            orderService.processOrder(record.value());
+            ack.acknowledge();
+        } catch (Exception e) {
+            // DB transaction rolls back BOTH the dedup insert AND business state
+            // Message will be re-delivered; will retry
+            throw e;
+        }
+    }
+}
+
+@Repository
+public class DedupRepo {
+    @Autowired private JdbcTemplate jdbc;
+
+    public boolean tryInsert(UUID key, Instant timestamp) {
+        try {
+            int rows = jdbc.update(
+                &quot;INSERT INTO message_dedup (msg_id, processed_at) VALUES (?, ?)&quot;,
+                key, Timestamp.from(timestamp));
+            return rows == 1;
+        } catch (DuplicateKeyException e) {
+            return false;   // already processed
+        }
+    }
+}
+```
+
+### Dedup Table Cleanup
+
+```sql
+-- Periodically clean old dedup records
+DELETE FROM message_dedup
+WHERE processed_at &lt; NOW() - INTERVAL &#x27;7 days&#x27;;
+
+-- Or use partition pruning for large-scale dedup
+CREATE TABLE message_dedup_2024_06 PARTITION OF message_dedup
+FOR VALUES FROM (&#x27;2024-06-01&#x27;) TO (&#x27;2024-07-01&#x27;);
+
+-- Drop old partitions monthly
+DROP TABLE message_dedup_2024_03;
+```
+
+## Deeper Dive — Common Idempotency Bugs
+
+### Bug 1: Idempotency Key Without Body Check
+
+```java
+// BAD: same key, different body → returns CACHED response anyway
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    return cache.get(key).orElseGet(() -&gt; {
+        Response r = doCharge(req);
+        cache.put(key, r);
+        return r;
+    });
+}
+
+// Attack scenario:
+// 1. Client sends ChargeRequest($100) with key &quot;abc&quot;
+// 2. Cache stores the result
+// 3. Client mistakenly sends ChargeRequest($1000) with SAME key &quot;abc&quot;
+// 4. Server returns cached &quot;charged $100&quot; response BUT $1000 was the actual intent
+//    → Silent loss; user gets wrong charge confirmation
+```
+
+```java
+// GOOD: hash the body; reject on mismatch
+public Response chargeIdempotent(UUID key, ChargeRequest req) {
+    String bodyHash = sha256(json.write(req));
+
+    Optional&lt;CachedResponse&gt; cached = cache.get(key);
+    if (cached.isPresent()) {
+        if (!cached.get().bodyHash().equals(bodyHash)) {
+            throw new IdempotencyKeyConflictException();
+        }
+        return cached.get().response();
+    }
+
+    Response r = doCharge(req);
+    cache.put(key, new CachedResponse(bodyHash, r));
+    return r;
+}
+```
+
+### Bug 2: Race Between Concurrent Requests with Same Key
+
+```java
+// BAD: both requests check cache, both proceed, both execute
+if (cache.get(key).isPresent()) return cache.get(key);
+Response r = doCharge(req);   // ← TWO concurrent calls execute
+cache.put(key, r);
+```
+
+```java
+// GOOD: atomic insert + state machine
+boolean isFirstRequest = cache.insertIfAbsent(key, &quot;PROCESSING&quot;);
+if (!isFirstRequest) {
+    // Another request is processing or completed
+    waitForResult(key);   // or return 409 / 202 &quot;Accepted, processing&quot;
+}
+
+try {
+    Response r = doCharge(req);
+    cache.update(key, &quot;COMPLETED&quot;, r);
+    return r;
+} catch (Exception e) {
+    cache.update(key, &quot;FAILED&quot;, null);
+    throw e;
+}
+```
+
+### Bug 3: Idempotency Without Considering Downstream Calls
+
+```java
+// BAD: server-side dedup but downstream calls happen multiple times
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+    paymentClient.charge(order.id());          // ← What if THIS retries?
+    inventoryClient.reserve(order.id());        // ← Or THIS?
+    notificationClient.send(order.id());        // ← Or THIS?
+    return order;
+}
+```
+
+```java
+// GOOD: each downstream call has its own idempotency
+@Idempotent
+public Order placeOrder(OrderRequest req) {
+    Order order = orderRepo.save(new Order(req));
+
+    // Each call uses order_id as idempotency key
+    paymentClient.charge(order.id(), order.id().toString());
+    inventoryClient.reserve(order.id(), order.id().toString());
+    notificationClient.send(order.id(), order.id().toString());
+
+    return order;
+}
+```
+
+### Bug 4: TTL Too Short
+
+```
+Idempotency TTL: 1 hour
+Customer service uses webhook retries with 24-hour backoff
+After 1 hour, webhook fires → idempotency cache empty → DUPLICATE charge
+
+LESSON: TTL must exceed maximum retry window of all sources
+RECOMMENDATION: 72-168 hours for payment-critical operations
+```
+
+## Deeper Dive — Idempotency for Different Operation Types
+
+```
+INSERT (CREATE):
+  Strategy: Unique constraint on natural key + idempotency key
+    INSERT INTO orders (..., idempotency_key)
+    VALUES (...)
+    ON CONFLICT (idempotency_key) DO UPDATE
+    SET retry_count = retry_count + 1
+    RETURNING ...
+  
+  Or: separate idempotency table that maps key → resource ID
+    INSERT INTO idempotency (key, resource_id) ON CONFLICT DO NOTHING
+
+UPDATE:
+  Strategy 1: Naturally idempotent via SET
+    UPDATE users SET email = &#x27;new@example.com&#x27; WHERE id = ?
+    → Multiple retries produce same end state
+  
+  Strategy 2: Version check (optimistic locking)
+    UPDATE users SET email = ?, version = ? + 1
+    WHERE id = ? AND version = ?
+    → Stale retries fail safely
+
+DELETE:
+  Strategy: Naturally idempotent
+    DELETE FROM users WHERE id = ?
+    → Repeating gives same result (id no longer exists)
+  
+  Or: Soft delete with idempotency
+    UPDATE users SET deleted_at = NOW()
+    WHERE id = ? AND deleted_at IS NULL
+
+EVENT EMISSION:
+  Strategy: Outbox pattern
+    INSERT INTO outbox (event_id, payload) ON CONFLICT DO NOTHING
+    → Idempotent at DB layer
+    → Relay handles at-least-once Kafka delivery
+    → Consumers must dedup
+
+INCREMENT/DECREMENT:
+  Strategy: Idempotency key + recorded operation
+    INSERT INTO operations (key, account_id, delta)
+    VALUES (?, ?, ?) ON CONFLICT DO NOTHING
+    UPDATE balances SET amount = (SELECT SUM(delta) FROM operations WHERE account_id = ?)
+    WHERE id = ?
+    → Sum-based; replays don&#x27;t double-count
+
+SEND EMAIL / SMS:
+  Strategy: Track sends by idempotency key
+    INSERT INTO email_sends (key, recipient, sent_at)
+    VALUES (?, ?, NOW()) ON CONFLICT (key) DO NOTHING
+    → If row inserted, fire the send
+    → If conflict, the send already happened
+```
+
+## Deeper Dive — When Idempotency Is Genuinely Hard
+
+### The Email Send Problem
+
+```
+SEND EMAIL CALLS THIRD-PARTY API
+  SES.send(...) → returns message_id
+  Network failure → did SES receive it?
+  
+  OPTION A: dedupTable + retry-on-success
+    Before SES call: INSERT INTO email_sends (key, status=&#x27;PENDING&#x27;)
+    Call SES
+    On success: UPDATE status=&#x27;SENT&#x27;, message_id=...
+    On failure: DELETE the row → can retry
+    On timeout: leave as PENDING; reconciliation job
+    
+    Risk: 5% double-send on uncertain timeout
+  
+  OPTION B: Use provider&#x27;s idempotency
+    AWS SES supports Idempotency-Key header (recently added)
+    Stripe also supports
+
+  REAL-WORLD: most teams accept rare double-send rather than complexity
+```
+
+### The Money-Send Problem
+
+```
+WIRE TRANSFER VIA EXTERNAL BANK
+  Bank API: no idempotency support
+  Retry → DOUBLE TRANSFER
+  
+  WHAT BANKS ACTUALLY DO:
+    Reconcile via wire confirmation file (daily batch)
+    Detect duplicates via amount + recipient + memo
+    Manual intervention for ambiguous cases
+    
+  ARCHITECTURE: explicit RECONCILIATION step
+    Wire request → record intent → submit to bank
+    Daily: compare intent ledger vs bank confirmation file
+    Mismatch → on-call alert + manual resolution
+```
+
+### The Push Notification Problem
+
+```
+FCM/APN: cannot guarantee delivery exactly once
+  Retry → DOUBLE PUSH
+  
+  MITIGATION:
+    1. Server-side dedup window: only attempt send if not sent in last 10s
+    2. Client-side dedup: notification_id in payload; ignore duplicates
+    3. Accept rare duplicates as acceptable UX cost
+```
+
+## Deeper Dive — Production Idempotency Architecture Decision
+
+```
+DECISION TREE:
+
+Is the operation a simple CRUD?
+├── Yes
+│   ├── CREATE → unique constraint or idempotency table
+│   ├── UPDATE → naturally idempotent if SET-based, or optimistic lock
+│   └── DELETE → naturally idempotent
+│
+└── No (complex business logic)
+    ├── Single-DB? → Idempotency table + transaction
+    ├── Cross-service? → Saga + outbox + per-step idempotency
+    └── Cross-DB without distributed tx?
+        ├── 2PC available? → JTA/Atomikos (rare modern use)
+        └── No → idempotency-key + reconciliation
+
+Cross-system call (external API)?
+├── External API supports idempotency? → use their key
+├── External API doesn&#x27;t? 
+│   ├── Acceptable to rare-duplicate? → accept it
+│   ├── Critical (money)? → reconciliation pattern
+│   └── Notification? → server-side rate limit + client dedup
+
+Storage layer?
+├── Single source of truth (Postgres)? → Easy
+├── Multi-region replicated? → CDC + idempotent consumer
+└── Cache layer? → Invalidate on write success only
+```
+
+## Practice
+
+1. **Audit an API.** For five POST endpoints in any system you know, identify which are idempotent and which aren&#x27;t. For the non-idempotent ones, propose a fix.
+2. **Idempotency-key middleware.** Implement a Spring middleware (`HandlerInterceptor`) that enforces idempotency via a Redis dedup store with 24-hour TTL.
+3. **Kafka consumer dedup.** Take a non-idempotent Kafka consumer. Add a dedup mechanism. Force-replay 100 messages; verify zero duplicate side effects.
+4. **Transactional outbox.** Implement the outbox pattern in a Spring + Postgres + Kafka stack. Force a Kafka outage; restore; verify all outbox rows are eventually published.
+5. **Fencing-token storage.** Design a storage table that enforces fencing tokens. Each write includes a token; the table rejects writes with stale tokens.
+6. **The irreversible-step exercise.** For a saga that includes &quot;send invoice email,&quot; design how to handle the irreversible step without causing duplicate sends on retry.
+7. **Dedup-store TTL.** For your team&#x27;s idempotency mechanism, decide the right TTL. Justify in terms of maximum client retry window.
+8. **Find a missing-idempotency bug.** In any open-source service, find an endpoint without idempotency. Propose the fix.
+9. **The compare-and-set pattern.** Replace a `x = x + 1` operation with a compare-and-set (`UPDATE x = old + 1 WHERE x = old`). Verify it&#x27;s safe under concurrent retries.
+10. **The skeptic conversation.** A senior engineer says &quot;we don&#x27;t need idempotency; we&#x27;ll just be careful not to retry.&quot; Write a 200-word response listing the four sources of retries this engineer cannot control.
+
+## Recap
+
+You should now be able to:
+
+- Articulate why **every operation in a distributed system will be retried** and the four sources of retries: client timeouts, broker redelivery, operator reruns, saga retries.
+- Distinguish **semantic idempotency** (operation naturally produces the same result on retry) from **mechanical idempotency** (system tracks and dedupes).
+- Implement the **Stripe-style Idempotency-Key pattern** with a dedup store, concurrent-retry handling, and TTL.
+- Implement **Kafka consumer dedup** via event IDs + a database unique constraint or Redis SETNX.
+- Distinguish **Kafka&#x27;s &quot;exactly-once&quot; semantics** (within Kafka only) from end-to-end exactly-once (which requires application-level idempotency).
+- Apply the **transactional outbox pattern** to atomically write to a database and publish to Kafka.
+- Use **fencing tokens** for safe distributed locking.
+- Handle **irreversible operations** by placing them last in sagas and accepting the rare-double-execution risk.
+- Cite **real incidents** caused by missing idempotency and recognize the production class of bugs they represent.
+- Apply the idempotency discipline to **every cross-service operation** as a default, not as an afterthought.
+
+## Next
+
+Continue to [Distributed Locking](./T08-distributed-locking.md) — when multiple processes need mutual exclusion across machines, the patterns and pitfalls of distributed locks (Redis Redlock, etcd, ZooKeeper, fencing tokens) and the common failure modes.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><div class="lbl">← Previous</div><div class="ttl">T06-distributed-transactions-2pc-saga</div><div class="sub">Distributed Transactions (2PC, Saga)</div></a><a class="next" href="../l5/c02-t08-distributed-locking.html"><div class="lbl">Next →</div><div class="ttl">T08-distributed-locking</div><div class="sub">Distributed Locking</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#where-idempotency-came-from-mathematics-networking-and-stripes-2015-productization" data-toc-link>Where Idempotency Came From — Mathematics, Networking, And Stripe&#x27;s 2015 Productization</a></li><li class="lvl-3"><a href="#the-networking-application-1970s1980s" data-toc-link>The Networking Application (1970s–1980s)</a></li><li class="lvl-3"><a href="#the-http-method-definitions-19961999" data-toc-link>The HTTP Method Definitions (1996–1999)</a></li><li class="lvl-3"><a href="#the-mid-2000s-web-service-era" data-toc-link>The Mid-2000s Web Service Era</a></li><li class="lvl-3"><a href="#stripes-idempotency-key-2015" data-toc-link>Stripe&#x27;s Idempotency Key (2015)</a></li><li class="lvl-3"><a href="#who-patrick-and-john-collison-are" data-toc-link>Who Patrick And John Collison Are</a></li><li class="lvl-3"><a href="#the-2017-standardization" data-toc-link>The 2017+ Standardization</a></li><li class="lvl-3"><a href="#the-kafka-exactly-once-semantics-2017" data-toc-link>The Kafka Exactly-Once Semantics (2017)</a></li><li class="lvl-3"><a href="#why-idempotency-now-pervades-distributed-systems" data-toc-link>Why Idempotency Now Pervades Distributed Systems</a></li><li class="lvl-2"><a href="#why-idempotency-specifically-the-senior-engineers-qa" data-toc-link>Why Idempotency, Specifically: The Senior Engineer&#x27;s Q&amp;amp;A</a></li><li class="lvl-3"><a href="#q1-why-is-idempotency-mandatory-in-distributed-systems" data-toc-link>Q1: Why is idempotency mandatory in distributed systems?</a></li><li class="lvl-3"><a href="#q2-how-does-idempotency-relate-to-at-least-once-delivery" data-toc-link>Q2: How does idempotency relate to at-least-once delivery?</a></li><li class="lvl-3"><a href="#q3-whats-the-right-scope-for-idempotency" data-toc-link>Q3: What&#x27;s the right scope for idempotency?</a></li><li class="lvl-3"><a href="#q4-whats-the-canonical-implementation-of-operation-level-idempotency" data-toc-link>Q4: What&#x27;s the canonical implementation of operation-level idempotency?</a></li><li class="lvl-3"><a href="#q5-when-does-idempotency-fail-to-help" data-toc-link>Q5: When does idempotency fail to help?</a></li><li class="lvl-3"><a href="#q6-how-does-this-relate-to-message-broker-delivery-semantics" data-toc-link>Q6: How does this relate to message broker delivery semantics?</a></li><li class="lvl-2"><a href="#common-misconceptions-explained" data-toc-link>Common Misconceptions Explained</a></li><li class="lvl-3"><a href="#idempotency-means-the-operation-is-safe-to-retry" data-toc-link>&quot;Idempotency means the operation is safe to retry.&quot;</a></li><li class="lvl-3"><a href="#get-requests-are-inherently-idempotent" data-toc-link>&quot;GET requests are inherently idempotent.&quot;</a></li><li class="lvl-3"><a href="#idempotency-keys-solve-all-distributed-system-retry-problems" data-toc-link>&quot;Idempotency keys solve all distributed-system retry problems.&quot;</a></li><li class="lvl-3"><a href="#kafkas-exactly-once-means-i-dont-need-idempotent-consumers" data-toc-link>&quot;Kafka&#x27;s exactly-once means I don&#x27;t need idempotent consumers.&quot;</a></li><li class="lvl-3"><a href="#idempotency-is-just-deduplication" data-toc-link>&quot;Idempotency is just deduplication.&quot;</a></li><li class="lvl-3"><a href="#idempotency-comes-for-free-with-put-and-delete" data-toc-link>&quot;Idempotency comes for free with PUT and DELETE.&quot;</a></li><li class="lvl-2"><a href="#the-retry-reality" data-toc-link>The Retry Reality</a></li><li class="lvl-2"><a href="#semantic-vs-mechanical-idempotency" data-toc-link>Semantic Vs Mechanical Idempotency</a></li><li class="lvl-3"><a href="#semantic-idempotency" data-toc-link>Semantic Idempotency</a></li><li class="lvl-3"><a href="#mechanical-idempotency" data-toc-link>Mechanical Idempotency</a></li><li class="lvl-2"><a href="#the-idempotency-key-pattern-stripe-style" data-toc-link>The Idempotency Key Pattern (Stripe-Style)</a></li><li class="lvl-3"><a href="#implementation-details" data-toc-link>Implementation Details</a></li><li class="lvl-3"><a href="#a-java-implementation" data-toc-link>A Java Implementation</a></li><li class="lvl-2"><a href="#idempotency-for-consumers-kafka-and-friends" data-toc-link>Idempotency For Consumers — Kafka And Friends</a></li><li class="lvl-3"><a href="#naturally-idempotent-consumers" data-toc-link>Naturally-Idempotent Consumers</a></li><li class="lvl-2"><a href="#kafka-exactly-once-a-closer-look" data-toc-link>Kafka &quot;Exactly-Once&quot; — A Closer Look</a></li><li class="lvl-2"><a href="#the-transactional-outbox-atomic-database-and-message-publish" data-toc-link>The Transactional Outbox — Atomic Database And Message Publish</a></li><li class="lvl-2"><a href="#fencing-tokens-idempotency-for-leader-bound-writes" data-toc-link>Fencing Tokens — Idempotency For Leader-Bound Writes</a></li><li class="lvl-2"><a href="#when-idempotency-is-impossible" data-toc-link>When Idempotency Is Impossible</a></li><li class="lvl-2"><a href="#production-incidents-tied-to-missing-idempotency" data-toc-link>Production Incidents Tied To Missing Idempotency</a></li><li class="lvl-2"><a href="#cross-language-notes" data-toc-link>Cross-Language Notes</a></li><li class="lvl-2"><a href="#trade-off-summary" data-toc-link>Trade-Off Summary</a></li><li class="lvl-2"><a href="#deeper-dive-spring-boot-idempotency-middleware-implementation" data-toc-link>Deeper Dive — Spring Boot Idempotency Middleware Implementation</a></li><li class="lvl-3"><a href="#idempotency-interceptor-with-redis-backing" data-toc-link>Idempotency Interceptor with Redis Backing</a></li><li class="lvl-3"><a href="#database-backed-idempotency-stronger-durability" data-toc-link>Database-Backed Idempotency (Stronger Durability)</a></li><li class="lvl-2"><a href="#deeper-dive-kafka-consumer-idempotency-pattern" data-toc-link>Deeper Dive — Kafka Consumer Idempotency Pattern</a></li><li class="lvl-3"><a href="#dedup-table-cleanup" data-toc-link>Dedup Table Cleanup</a></li><li class="lvl-2"><a href="#deeper-dive-common-idempotency-bugs" data-toc-link>Deeper Dive — Common Idempotency Bugs</a></li><li class="lvl-3"><a href="#bug-1-idempotency-key-without-body-check" data-toc-link>Bug 1: Idempotency Key Without Body Check</a></li><li class="lvl-3"><a href="#bug-2-race-between-concurrent-requests-with-same-key" data-toc-link>Bug 2: Race Between Concurrent Requests with Same Key</a></li><li class="lvl-3"><a href="#bug-3-idempotency-without-considering-downstream-calls" data-toc-link>Bug 3: Idempotency Without Considering Downstream Calls</a></li><li class="lvl-3"><a href="#bug-4-ttl-too-short" data-toc-link>Bug 4: TTL Too Short</a></li><li class="lvl-2"><a href="#deeper-dive-idempotency-for-different-operation-types" data-toc-link>Deeper Dive — Idempotency for Different Operation Types</a></li><li class="lvl-2"><a href="#deeper-dive-when-idempotency-is-genuinely-hard" data-toc-link>Deeper Dive — When Idempotency Is Genuinely Hard</a></li><li class="lvl-3"><a href="#the-email-send-problem" data-toc-link>The Email Send Problem</a></li><li class="lvl-3"><a href="#the-money-send-problem" data-toc-link>The Money-Send Problem</a></li><li class="lvl-3"><a href="#the-push-notification-problem" data-toc-link>The Push Notification Problem</a></li><li class="lvl-2"><a href="#deeper-dive-production-idempotency-architecture-decision" data-toc-link>Deeper Dive — Production Idempotency Architecture Decision</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

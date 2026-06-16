@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Practice platforms (LeetCode, HackerRank, AlgoExpert, Educative), collaborative editors (CoderPad, HackerRank Live), whiteboards (Excalidraw, Miro), mock-interview services (Pramp, Interviewing.io), and IDE setup for live coding.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

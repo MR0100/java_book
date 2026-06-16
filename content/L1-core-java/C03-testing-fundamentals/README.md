@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Core Java & OOP — Testing Fundamentals
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -28,4 +28,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 06 | Test-Driven Development (TDD) | `T06-test-driven-development-tdd.md` | planned |
 | 07 | Test coverage (JaCoCo) | `T07-test-coverage-jacoco.md` | planned |
 
-[Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L1 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

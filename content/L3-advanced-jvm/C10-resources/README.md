@@ -22,4 +22,4 @@ Books, docs, specs, and links for going deeper.
 
 - [L3 Resources](T01-l3-resources.md)
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

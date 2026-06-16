@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Cheatsheets and quick-reference material.
 
-[Back to L2 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L2 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

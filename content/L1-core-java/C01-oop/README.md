@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Core Java & OOP — Object-Oriented Programming
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -45,4 +45,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 > T20 is a **Phase 6 (2026+ Forward-Looking)** addition, hand-maintained;
 > per-topic frontmatter `status` is the source of truth.
 
-[Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L1 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

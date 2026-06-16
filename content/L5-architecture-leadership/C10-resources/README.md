@@ -22,4 +22,4 @@ Books, docs, specs, and links for going deeper.
 
 - [L5 Resources — Books, Papers, Blogs, Talks](T01-l5-resources.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

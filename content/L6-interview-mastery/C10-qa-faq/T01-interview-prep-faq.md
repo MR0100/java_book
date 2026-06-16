@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Q&A / FAQ — Interview Prep Frequently Asked Questions
 
-This topic is the **quick-answer reference** for the most common questions candidates ask while prepping for FAANGM and MNC interviews. Use [CONVENTIONS §9](../../../CONVENTIONS.md) Q&A format.
+This topic is the **quick-answer reference** for the most common questions candidates ask while prepping for FAANGM and MNC interviews. Use [CONVENTIONS §9](../../../templates/CONVENTIONS.md) Q&A format.
 
 ## Prep timing + cadence
 

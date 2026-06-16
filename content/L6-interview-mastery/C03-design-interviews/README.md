@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — Design Interviews (LLD & HLD)
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -30,4 +30,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 08 | HLD case study: Chat / messaging | `T08-hld-case-study-chat-messaging.md` | planned |
 | 09 | HLD case bundle: News feed, Rate limiter, Payments, Notifications | `T09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

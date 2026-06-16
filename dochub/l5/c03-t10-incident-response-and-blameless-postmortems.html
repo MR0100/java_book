@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Incident Response &amp; Blameless Postmortems — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="active" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Incident Response &amp; Blameless Postmortems</span></div>
+        <h1>Incident Response &amp; Blameless Postmortems</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C03-engineering-leadership/T10-incident-response-and-blameless-postmortems.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~55 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Incident Response &amp; Blameless Postmortems"
+slug: incident-response-and-blameless-postmortems
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Engineering Craft &amp; Leadership"
+type: concept
+difficulty: lead
+order: 10
+tags: [incident-response, postmortem, blameless, sev, mttr, mttd, mtbf, ic, incident-commander, five-whys, root-cause, john-allspaw, sidney-dekker, etsy, google-sre]
+prerequisites: [reliability-sli-slo-sla-redundancy-failover]
+status: complete
+estimated_minutes: 55
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="incident-response-blameless-postmortems">Incident Response &amp; Blameless Postmortems</h1>
+<p>When production breaks, the engineering team must do two things, in this order: <strong>stop the bleeding</strong>, then <strong>learn from it</strong>. Both are practices, not improvisations. The first uses <strong>incident command</strong> (a structured response with clear roles); the second uses <strong>blameless postmortems</strong> (John Allspaw's foundational 2012 Etsy post, building on Sidney Dekker's "Just Culture"). The discipline is what separates a team that recovers in 30 minutes from one that recovers in 4 hours; and a team that learns from each incident from one that repeats the same outage every six months.</p>
+<p>The depth bar here is <strong>the operational reality</strong> — what to do in the first 15 minutes, who runs the incident, what to communicate to whom, how to extract real lessons without punishing engineers who happened to be touching the failing code. We cover <strong>severity levels</strong> (SEV-1 through SEV-4), the <strong>Incident Commander</strong> role, the <strong>communications cadence</strong>, the <strong>5 Whys</strong> technique and its limits, and the <strong>action-items-with-owners</strong> discipline that turns lessons into change.</p>
+<h2 id="where-modern-incident-response-came-from-aviation-nasa-and-the-2012-etsy-essay">Where Modern Incident Response Came From — Aviation, NASA, And The 2012 Etsy Essay<a class="anchor" href="#where-modern-incident-response-came-from-aviation-nasa-and-the-2012-etsy-essay" aria-hidden="true">#</a></h2>
+<p>Modern software incident response practices descend from <strong>aviation safety culture</strong> (which crystallized in the 1980s) and <strong>NASA's post-mortem culture</strong> (which emerged after the Challenger disaster in 1986). The software industry's adoption was led by <strong>John Allspaw's 2012 Etsy essay</strong> that named "blameless postmortems" and reshaped the field.</p>
+<h3 id="the-aviation-safety-lineage-1970s1990s">The Aviation Safety Lineage (1970s–1990s)<a class="anchor" href="#the-aviation-safety-lineage-1970s1990s" aria-hidden="true">#</a></h3>
+<p>The conceptual foundation of modern incident response is <strong>Crew Resource Management (CRM)</strong>, developed by <strong>NASA's John Lauber and colleagues in 1979</strong>, in response to a series of fatal commercial aviation crashes. The crashes had a common pattern: technical equipment was working, but crew miscommunication or hierarchical pressure caused catastrophic errors.</p>
+<p>Specific tragedies that motivated CRM:</p>
+<ul>
+<li><strong>United Airlines Flight 173 (1978, Portland)</strong>: pilots focused on a landing-gear indicator while the plane ran out of fuel. 10 deaths.</li>
+<li><strong>Tenerife Disaster (1977, KLM 4805 + Pan Am 1736)</strong>: KLM captain's hierarchy intimidated co-pilots from voicing concerns. 583 deaths, the deadliest aviation accident in history.</li>
+</ul>
+<p>CRM's principles addressed these failures:</p>
+<ol>
+<li><strong>All crew members are responsible</strong> for safe operation, regardless of rank.</li>
+<li><strong>Junior members must speak up</strong> if they see problems; senior members must listen.</li>
+<li><strong>Communication is structured</strong> to prevent ambiguity.</li>
+<li><strong>Mistakes are systemic</strong>, not individual.</li>
+<li><strong>Investigation is blameless</strong> — the goal is learning, not punishment.</li>
+</ol>
+<p>By the late 1980s, CRM was mandatory in commercial aviation. <strong>Fatal accident rates dropped dramatically</strong> — from ~40 per million departures in 1970 to ~1 per million by 2010. CRM is widely credited with the bulk of this safety improvement.</p>
+<p>The software industry didn't immediately learn from aviation. The cultural translation took decades.</p>
+<h3 id="nasas-challenger-disaster-1986">NASA's Challenger Disaster (1986)<a class="anchor" href="#nasas-challenger-disaster-1986" aria-hidden="true">#</a></h3>
+<p>The <strong>Space Shuttle Challenger disaster</strong> (January 28, 1986) was a watershed moment for engineering safety culture. The investigation (Rogers Commission, 1986) identified:</p>
+<ol>
+<li><strong>Technical cause</strong>: O-ring seal failure due to cold temperature.</li>
+<li><strong>Organizational cause</strong>: Morton Thiokol engineers knew the O-rings were dangerous below freezing; NASA management overrode their concerns.</li>
+<li><strong>Cultural cause</strong>: NASA's "can-do" culture suppressed dissenting voices; the engineers who flagged the risk were ignored.</li>
+</ol>
+<p>The Challenger investigation <strong>named the systemic causes</strong>. It wasn't "the engineer who designed the O-rings made a mistake" — it was "the organization's decision process suppressed safety information."</p>
+<p>This framing — <em>systemic causes, not individual blame</em> — would later inform software incident response. <strong>Sidney Dekker</strong> (cognitive systems engineer, born 1962) developed the academic foundation in books like <em>The Field Guide to Understanding 'Human Error'</em> (2002, third edition 2014), which became required reading for safety-critical industries.</p>
+<h3 id="the-just-culture-movement-2000s">The "Just Culture" Movement (2000s)<a class="anchor" href="#the-just-culture-movement-2000s" aria-hidden="true">#</a></h3>
+<p>The 2000s saw aviation's CRM principles generalized into <strong>"Just Culture"</strong> thinking. The argument:</p>
+<ul>
+<li><strong>Pure no-blame culture is naive</strong>: there's a difference between honest mistakes (systemic) and reckless behavior (individual).</li>
+<li><strong>Pure blame culture is destructive</strong>: it suppresses reporting and learning.</li>
+<li><strong>Just culture distinguishes</strong>: honest mistakes get learning; reckless behavior gets accountability.</li>
+</ul>
+<p>Sidney Dekker's <em>Just Culture: Balancing Safety and Accountability</em> (2007) is the canonical reference. The concept influenced medicine (which had similar safety challenges), nuclear power, and eventually software.</p>
+<h3 id="john-allspaws-2012-etsy-essay">John Allspaw's 2012 Etsy Essay<a class="anchor" href="#john-allspaws-2012-etsy-essay" aria-hidden="true">#</a></h3>
+<p>The single most influential document for software incident response is <strong>John Allspaw's <a href="https://www.etsy.com/codeascraft/blameless-postmortems/"><em>Blameless PostMortems and a Just Culture</em></a></strong> (May 22, 2012, Etsy's Code as Craft blog).</p>
+<p>Allspaw was VP of Operations at Etsy at the time. He had been studying aviation safety culture and Sidney Dekker's work, and was applying the principles at Etsy. The essay introduced the software industry to:</p>
+<ol>
+<li><strong>Blameless postmortem</strong>: post-incident investigations focus on systemic causes, not individual blame.</li>
+<li><strong>Hindsight bias</strong>: investigators tend to assume responders "should have known" — they didn't, in the moment.</li>
+<li><strong>Learning over punishment</strong>: the goal is improving the system, not assigning blame.</li>
+<li><strong>Psychological safety</strong>: engineers must feel safe reporting incidents.</li>
+</ol>
+<p>The essay was <em>short but precise</em>. It cited Dekker explicitly. It contained specific operational guidance (questions to ask during postmortems).</p>
+<p>The essay's impact was enormous. Within 3 years, "blameless postmortem" was standard vocabulary across the industry. <strong>Google's SRE book (2016) codified the practice</strong>, citing Allspaw's essay. Today, "blameless postmortem" is the standard for incident review at almost every modern software company.</p>
+<h3 id="who-john-allspaw-is">Who John Allspaw Is<a class="anchor" href="#who-john-allspaw-is" aria-hidden="true">#</a></h3>
+<p><strong>John Allspaw</strong> has had a remarkable career. He was VP of Operations at Etsy from 2010–2016, where he established the blameless postmortem culture. He later co-founded <strong>Adaptive Capacity Labs</strong>, a consultancy focused on resilience engineering.</p>
+<p>His academic background: he completed a Master's in Human Factors and Systems Safety at Lund University under Sidney Dekker. The combination of operational experience (Etsy, before that Flickr) and formal safety-engineering education gave him the unique standing to bridge aviation safety practices to software.</p>
+<p>Allspaw's books <em>The Art of Capacity Planning</em> (2008) and the related work <em>Web Operations</em> (with Jesse Robbins, 2010) are required reading for operations engineers. His conference talks (Velocity, SRECon, multiple keynotes) have shaped a generation of SRE thinking.</p>
+<h3 id="the-google-sre-codification-2016">The Google SRE Codification (2016)<a class="anchor" href="#the-google-sre-codification-2016" aria-hidden="true">#</a></h3>
+<p>The Google SRE book (covered in <a href="c02-t15-reliability-sli-slo-sla-redundancy-failover.html">T15 of C02</a>) dedicated chapters to incident response and postmortems. The book formalized:</p>
+<ul>
+<li><strong>Incident Commander role</strong>: clear coordination authority.</li>
+<li><strong>Specific roles</strong>: communications lead, operations lead, planning lead.</li>
+<li><strong>Postmortem templates</strong>: structured documents.</li>
+<li><strong>Action item tracking</strong>: ensuring follow-through.</li>
+</ul>
+<p>These practices were Google-specific in the book but were quickly adopted industry-wide.</p>
+<h3 id="why-the-lineage-matters">Why The Lineage Matters<a class="anchor" href="#why-the-lineage-matters" aria-hidden="true">#</a></h3>
+<p>Modern software incident response is <em>not a software invention</em>. It descends from:</p>
+<ul>
+<li><strong>Aviation safety culture</strong> (CRM, just culture).</li>
+<li><strong>NASA's post-disaster investigations</strong> (Challenger).</li>
+<li><strong>Academic resilience engineering</strong> (Sidney Dekker, Erik Hollnagel).</li>
+<li><strong>Etsy's 2012 essay</strong> (John Allspaw).</li>
+<li><strong>Google's SRE codification</strong> (2016 book).</li>
+</ul>
+<p>The senior engineer's value: recognizing that these practices have <em>decades of evidence behind them</em>. When a team adopts blameless postmortems, they're inheriting aviation's hard-won safety knowledge.</p>
+<h2 id="why-incident-response-specifically-the-senior-engineers-qa">Why Incident Response, Specifically: The Senior Engineer's Q&amp;A<a class="anchor" href="#why-incident-response-specifically-the-senior-engineers-qa" aria-hidden="true">#</a></h2>
+<h3 id="q1-why-does-blamelessness-matter-so-much">Q1: Why does blamelessness matter so much?<a class="anchor" href="#q1-why-does-blamelessness-matter-so-much" aria-hidden="true">#</a></h3>
+<p>Because <strong>blame suppresses learning</strong>. When engineers fear punishment for incidents:</p>
+<ul>
+<li>They report fewer incidents (data shows ~50% reduction in self-reporting when blame is feared).</li>
+<li>They withhold context during investigations.</li>
+<li>They become risk-averse, slowing feature delivery.</li>
+<li>They leave the team (turnover increases).</li>
+</ul>
+<p>When blame is absent:</p>
+<ul>
+<li>Engineers report all incidents, even minor ones.</li>
+<li>Investigations get full context.</li>
+<li>The system improves faster.</li>
+<li>Engineers stay longer.</li>
+</ul>
+<p>Aviation has 50 years of data showing this. Software has 10+ years now. The pattern is robust.</p>
+<h3 id="q2-how-does-this-conflict-with-accountability">Q2: How does this conflict with accountability?<a class="anchor" href="#q2-how-does-this-conflict-with-accountability" aria-hidden="true">#</a></h3>
+<p>It doesn't, properly understood. <strong>Blameless ≠ accountability-free</strong>. Just culture distinguishes:</p>
+<ul>
+<li><strong>Honest mistakes</strong> (the engineer didn't know; the system allowed it): learning, no blame.</li>
+<li><strong>Reckless behavior</strong> (the engineer knowingly violated safety practices): accountability.</li>
+</ul>
+<p>In practice, almost all software incidents are honest mistakes — the engineer didn't know the consequence, or the system allowed the wrong action. Reckless behavior is rare and clearly distinguishable.</p>
+<p>The senior judgment: default to blameless; reserve accountability for genuine recklessness.</p>
+<h3 id="q3-why-have-an-incident-commander-role">Q3: Why have an Incident Commander role?<a class="anchor" href="#q3-why-have-an-incident-commander-role" aria-hidden="true">#</a></h3>
+<p>Because <strong>multiple people doing the same incident response in parallel is chaos</strong>. The Incident Commander:</p>
+<ul>
+<li><strong>Coordinates</strong> all response activities.</li>
+<li><strong>Decides</strong> what to do (with input from experts).</li>
+<li><strong>Communicates</strong> with stakeholders.</li>
+<li><strong>Authorizes</strong> specific actions (rollback, escalation).</li>
+</ul>
+<p>Without an IC, multiple engineers debug independently, miss each other's findings, and may take conflicting actions. With an IC, response is coordinated.</p>
+<p>The IC is typically <em>not</em> the most senior person — they're someone trained in incident response coordination. The senior engineer's role is often as <em>subject matter expert</em>, advising the IC.</p>
+<h3 id="q4-how-long-should-a-postmortem-take">Q4: How long should a postmortem take?<a class="anchor" href="#q4-how-long-should-a-postmortem-take" aria-hidden="true">#</a></h3>
+<p>Sized to the incident:</p>
+<ul>
+<li><strong>Minor incidents</strong> (small impact, quick resolution): 30-minute write-up.</li>
+<li><strong>Major incidents</strong> (significant impact): 1–2 hour write-up plus 1-hour review meeting.</li>
+<li><strong>Catastrophic incidents</strong> (high-visibility, regulatory implications): multi-day investigation, formal review board.</li>
+</ul>
+<p>The cost of a too-light postmortem: the same incident recurs. The cost of a too-heavy postmortem: engineering time consumed without proportionate learning.</p>
+<h3 id="q5-what-goes-in-a-postmortem-document">Q5: What goes in a postmortem document?<a class="anchor" href="#q5-what-goes-in-a-postmortem-document" aria-hidden="true">#</a></h3>
+<p>Standard sections:</p>
+<ol>
+<li><strong>Summary</strong>: one-paragraph description.</li>
+<li><strong>Impact</strong>: who was affected, how much, for how long.</li>
+<li><strong>Timeline</strong>: chronological events.</li>
+<li><strong>Root cause</strong>: systemic factors that allowed the incident.</li>
+<li><strong>What went well</strong>: successes during response.</li>
+<li><strong>What went poorly</strong>: failures during response.</li>
+<li><strong>Action items</strong>: specific changes to prevent recurrence, with owners and deadlines.</li>
+</ol>
+<p>The senior practice: <strong>action items must have owners and dates</strong>. Postmortems without specific action items don't drive improvement.</p>
+<h2 id="common-misconceptions-explained">Common Misconceptions Explained<a class="anchor" href="#common-misconceptions-explained" aria-hidden="true">#</a></h2>
+<h3 id="blameless-means-no-consequences">"Blameless means no consequences."<a class="anchor" href="#blameless-means-no-consequences" aria-hidden="true">#</a></h3>
+<p>False. Blameless means <strong>systemic investigation, not absence of consequences</strong>. Recurring reckless behavior should have consequences; systemic issues should be addressed by changing the system, not by punishing individuals.</p>
+<h3 id="5-whys-finds-root-causes">"5 Whys finds root causes."<a class="anchor" href="#5-whys-finds-root-causes" aria-hidden="true">#</a></h3>
+<p>Half true. <strong>The 5 Whys technique</strong> (asking "why?" five times) is a <em>starting point</em> for root cause analysis. It often surfaces useful information but can be misleading — there's rarely a single root cause; incidents have multiple contributing factors.</p>
+<p>The senior practice: use 5 Whys as a tool, not as the definitive analysis method. Consider multiple contributing factors.</p>
+<h3 id="postmortems-should-focus-on-technical-causes">"Postmortems should focus on technical causes."<a class="anchor" href="#postmortems-should-focus-on-technical-causes" aria-hidden="true">#</a></h3>
+<p>False. <strong>Most software incidents have organizational and process causes</strong> alongside technical ones. Focusing only on technical fixes misses the deeper improvements.</p>
+<h3 id="the-on-call-engineer-is-responsible-for-incidents">"The on-call engineer is responsible for incidents."<a class="anchor" href="#the-on-call-engineer-is-responsible-for-incidents" aria-hidden="true">#</a></h3>
+<p>False. Per blameless culture, the on-call engineer is the <em>first responder</em>, not the <em>cause</em>. Treating them as responsible deters engineers from being on-call.</p>
+<h3 id="we-dont-need-formal-incident-response-for-minor-issues">"We don't need formal incident response for minor issues."<a class="anchor" href="#we-dont-need-formal-incident-response-for-minor-issues" aria-hidden="true">#</a></h3>
+<p>Partially false. Even minor incidents benefit from light-weight investigation. Patterns emerge across many minor incidents that wouldn't be obvious from any single one. The discipline of always investigating prevents complacency.</p>
+<h3 id="action-items-will-be-addressed-eventually">"Action items will be addressed eventually."<a class="anchor" href="#action-items-will-be-addressed-eventually" aria-hidden="true">#</a></h3>
+<p>Often false. <strong>Action items without explicit owners and deadlines don't get done</strong>. Postmortems with unowned action items are theater.</p>
+<h2 id="severity-levels">Severity Levels<a class="anchor" href="#severity-levels" aria-hidden="true">#</a></h2>
+<p>A common scale:</p>
+<ul>
+<li><strong>SEV-1</strong>: complete outage of a critical surface. Page everyone. Resolve immediately.</li>
+<li><strong>SEV-2</strong>: significant degradation. Page on-call.</li>
+<li><strong>SEV-3</strong>: minor degradation. Address during business hours.</li>
+<li><strong>SEV-4</strong>: noticed but no customer impact. Track but no urgency.</li>
+</ul>
+<p>The trigger criteria should be explicit in the runbook — not "I think this is SEV-2," but "SEV-2 because checkout success rate dropped from 99% to 80%."</p>
+<h2 id="the-incident-roles">The Incident Roles<a class="anchor" href="#the-incident-roles" aria-hidden="true">#</a></h2>
+<p>For SEV-1 / SEV-2:</p>
+<ul>
+<li><strong>Incident Commander (IC)</strong>: runs the response; makes decisions; not necessarily the deepest expert.</li>
+<li><strong>Subject Matter Experts (SMEs)</strong>: do the diagnosis and fix; report to IC.</li>
+<li><strong>Communications</strong>: publishes updates internally and externally.</li>
+<li><strong>Scribe</strong>: records timeline, actions, decisions.</li>
+</ul>
+<p>The IC's job is to <strong>coordinate</strong>, not to fix. If the IC is also the only one debugging, no one is running the incident. <strong>Separating these roles is the difference between calm and panic.</strong></p>
+<h2 id="the-first-15-minutes">The First 15 Minutes<a class="anchor" href="#the-first-15-minutes" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  A[Alert fires]
+  A --> B[On-call ack]
+  B --> C{Assess severity}
+  C -->|"SEV-3+"| D[Investigate normally]
+  C -->|"SEV-1/2"| E[Declare incident]
+  E --> F[Assign IC]
+  F --> G[Open incident channel]
+  G --> H[Notify stakeholders]
+  H --> I[Begin mitigation]
+</div>
+<p>The discipline:
+1. <strong>Acknowledge fast</strong> — &lt; 5 min.
+2. <strong>Declare and assign IC fast</strong> — &lt; 10 min.
+3. <strong>Open a dedicated incident channel</strong> (Slack <code>#inc-NNN</code>) — all coordination there, not in DMs.
+4. <strong>First mitigation attempt</strong> — within 15 minutes for SEV-1.</p>
+<p>If you don't have a quick mitigation, <strong>revert the last change</strong>. A successful rollback before deep diagnosis often resolves the customer impact while the team continues investigating.</p>
+<h2 id="communications-cadence">Communications Cadence<a class="anchor" href="#communications-cadence" aria-hidden="true">#</a></h2>
+<p>Internal: post in the incident channel every 15–30 minutes, even if the update is "still investigating."</p>
+<p>External: SEV-1 / SEV-2 typically warrants a status page update within 30 minutes; updates as situation changes.</p>
+<p>The IC's communications template:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>**Incident #INC-2026-0042**
+Status: investigating | mitigating | monitoring | resolved
+Impact: ~5% of checkout requests failing since 14:32 UTC
+Current action: rolling back deploy v2.4.1
+Next update: 15:00 UTC
+IC: alex
+</code></pre></div>
+<p>Specific. Avoids panic. Stakeholders know what's happening.</p>
+<h2 id="mitigation-vs-resolution">Mitigation Vs Resolution<a class="anchor" href="#mitigation-vs-resolution" aria-hidden="true">#</a></h2>
+<p><strong>Mitigation</strong>: customer impact is reduced or eliminated, possibly by a workaround.
+<strong>Resolution</strong>: root cause is fixed.</p>
+<p>Mitigation often comes first; that's correct. A rollback that stops the bleeding is valid even if the underlying bug isn't fixed. Mark the incident resolved when impact ends; track the follow-up fix separately.</p>
+<h2 id="the-postmortem">The Postmortem<a class="anchor" href="#the-postmortem" aria-hidden="true">#</a></h2>
+<p>Within 24–72 hours of resolution, write the postmortem. Sections:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">markdown</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-markdown"># Incident: Checkout Failure 2026-08-15
+
+## Summary
+At 14:32 UTC, ~5% of checkout requests began failing with 500 errors. The
+team rolled back at 14:47 UTC; full recovery at 14:52 UTC. Duration: 20
+minutes. Impact: ~12,000 failed checkouts (~$80K lost revenue).
+
+## Timeline
+- 14:25 UTC: Deploy v2.4.1 begins.
+- 14:32 UTC: First alert fires.
+- 14:34 UTC: On-call ack; IC assigned.
+- 14:39 UTC: Cause identified as new field validation rejecting valid input.
+- 14:47 UTC: Rollback initiated.
+- 14:52 UTC: Metrics return to baseline.
+- 15:00 UTC: Incident closed.
+
+## Root Cause
+The new validation regex rejected international phone numbers containing
+the `+` character. The deploy passed pre-prod testing because test data
+did not include international formats.
+
+## What Went Well
+- Alert fired within 7 minutes.
+- IC declared within 2 minutes of ack.
+- Rollback path was tested and worked.
+
+## What Went Poorly
+- Test data did not include the actual production distribution.
+- The validation change was buried in a 300-line PR; reviewer missed.
+
+## Action Items
+- [ ] Add international phone test cases (owner: alex; due: Aug 22).
+- [ ] PR size limit enforced in CI (owner: sam; due: Sep 1).
+- [ ] Validation changes require test-data review (owner: kim; due: Sep 1).
+</code></pre></div>
+<p>The action items are the <em>output</em> of the postmortem. Each has an owner and a due date. Postmortems without action items teach the team nothing.</p>
+<h2 id="blamelessness">Blamelessness<a class="anchor" href="#blamelessness" aria-hidden="true">#</a></h2>
+<p>The key Etsy / Google SRE principle: <strong>assume good intent</strong>. The engineer who shipped the bug did the best they could with the information they had. The system failed; not the person.</p>
+<p>In practice:
+- The postmortem language is "the validation regex," not "alex's regex."
+- The 5 Whys lead to <em>systemic</em> causes, not personal ones.
+- No one is "in trouble" because of an incident.</p>
+<p>Why? Because <strong>punishing engineers for incidents teaches them to hide problems</strong>. A culture of fear produces longer outages, slower learning, and worse psychological safety. Blameless postmortems are correlated with <em>higher reliability</em>, not lower.</p>
+<p>This doesn't mean ignoring incompetence — but addressing it through ongoing performance management, not via the postmortem of one incident.</p>
+<h2 id="the-5-whys">The 5 Whys<a class="anchor" href="#the-5-whys" aria-hidden="true">#</a></h2>
+<p>A diagnosis technique: ask "why" 5 times to reach the root.</p>
+<ul>
+<li>The checkout failed. Why?</li>
+<li>The validation regex rejected valid input. Why?</li>
+<li>The regex was overly restrictive. Why?</li>
+<li>The author wasn't aware of international phone formats. Why?</li>
+<li>The test data didn't include them. Why?</li>
+<li>We've never measured test-data representativeness.</li>
+</ul>
+<p>Each "why" drives toward systemic causes. <strong>Stop at the systemic cause</strong>, not at "human error." "Human error" is <em>never</em> the root cause — it's the place to start asking why.</p>
+<p>The 5 Whys has limits — complex incidents have <em>many</em> contributing causes, not a single chain. Don't force a single root.</p>
+<h2 id="mttr-mttd-mtbf">MTTR, MTTD, MTBF<a class="anchor" href="#mttr-mttd-mtbf" aria-hidden="true">#</a></h2>
+<p>Operational metrics:</p>
+<ul>
+<li><strong>MTTD</strong> (Mean Time To Detect): from incident start to alert.</li>
+<li><strong>MTTR</strong> (Mean Time To Recover): from alert to mitigation.</li>
+<li><strong>MTBF</strong> (Mean Time Between Failures): inverse of failure rate.</li>
+</ul>
+<p>Track quarterly. Improving MTTD or MTTR is often where the team can move the needle fastest.</p>
+<h2 id="anti-patterns">Anti-Patterns<a class="anchor" href="#anti-patterns" aria-hidden="true">#</a></h2>
+<h3 id="the-witch-hunt">The Witch Hunt<a class="anchor" href="#the-witch-hunt" aria-hidden="true">#</a></h3>
+<p>The postmortem assigns blame. The engineer is "talked to." Others learn to hide problems. Outages take longer. Repeat.</p>
+<h3 id="the-action-item-graveyard">The Action-Item Graveyard<a class="anchor" href="#the-action-item-graveyard" aria-hidden="true">#</a></h3>
+<p>Action items are filed and forgotten. The same incident recurs in 6 months.</p>
+<p><strong>Fix</strong>: action items go to the team's backlog with due dates; reviewed at every postmortem retrospective.</p>
+<h3 id="the-it-wont-happen-again">The "It Won't Happen Again"<a class="anchor" href="#the-it-wont-happen-again" aria-hidden="true">#</a></h3>
+<p>Postmortem concludes "we'll be more careful." No systemic change. It happens again.</p>
+<p><strong>Fix</strong>: systemic action items, not aspirational ones.</p>
+<h3 id="the-postmortem-as-performance-review">The Postmortem As Performance Review<a class="anchor" href="#the-postmortem-as-performance-review" aria-hidden="true">#</a></h3>
+<p>Manager uses the postmortem to evaluate the on-call engineer. Engineer becomes defensive. Future incidents are concealed.</p>
+<h3 id="the-long-postmortem-nobody-reads">The Long Postmortem Nobody Reads<a class="anchor" href="#the-long-postmortem-nobody-reads" aria-hidden="true">#</a></h3>
+<p>The doc is 30 pages; full of detail nobody needs. The lesson is lost.</p>
+<p><strong>Fix</strong>: 1-2 page summary; details in appendix.</p>
+<h2 id="incident-tooling">Incident Tooling<a class="anchor" href="#incident-tooling" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Slack</strong> for incident channels.</li>
+<li><strong>PagerDuty / Opsgenie</strong> for paging.</li>
+<li><strong>incident.io / Rootly / Jeli</strong> as dedicated incident management.</li>
+<li><strong>Statuspage.io</strong> for external comms.</li>
+<li><strong>Postmortem template</strong> in the repo or wiki.</li>
+</ul>
+<h2 id="trade-off-summary">Trade-Off Summary<a class="anchor" href="#trade-off-summary" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Practice</th>
+<th>Cost</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IC role separated from SME</td>
+<td>Process learning</td>
+<td>Calm, coordinated response</td>
+</tr>
+<tr>
+<td>Incident channel</td>
+<td>Overhead</td>
+<td>Single source of truth</td>
+</tr>
+<tr>
+<td>24–72h postmortem</td>
+<td>Engineer time</td>
+<td>Learning extracted</td>
+</tr>
+<tr>
+<td>Action items with owners</td>
+<td>Backlog discipline</td>
+<td>Real change</td>
+</tr>
+<tr>
+<td>Blamelessness</td>
+<td>Cultural commitment</td>
+<td>Psychological safety; faster recovery</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A common L5 prompt: "Tell me about an incident you led." Strong answers (a) describe IC role, (b) name the mitigation taken, (c) describe the postmortem outcome, (d) cite action items that actually shipped, (e) acknowledge what went poorly.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Run an incident drill.</strong> Simulate a SEV-2; declare; assign IC; communicate; mitigate. Time each step.</li>
+<li><strong>Postmortem authoring.</strong> Take a real recent incident; write the postmortem using the template.</li>
+<li><strong>Action-item audit.</strong> For the last 5 postmortems, track action-item completion rate. Aim for &gt; 80%.</li>
+<li><strong>MTTR analysis.</strong> Compute your team's MTTR for the last quarter. Identify the bottleneck stage.</li>
+<li><strong>Blamelessness language audit.</strong> Re-read your team's postmortems; flag any blaming language; rewrite.</li>
+<li><strong>5 Whys exercise.</strong> For a recent incident, apply 5 Whys; identify the systemic cause.</li>
+<li><strong>Runbook coverage.</strong> For the top 5 alerts in your service, verify each has a runbook.</li>
+<li><strong>Tool selection.</strong> Evaluate one incident-management tool (incident.io, Rootly, Jeli) for your team.</li>
+<li><strong>On-call review.</strong> Interview an on-call engineer; identify what makes their experience worse.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we should hold engineers accountable for outages." Write a 200-word response on the cost of blame.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Apply <strong>severity levels</strong> with explicit trigger criteria.</li>
+<li>Run an incident as <strong>IC</strong>, separated from SME role.</li>
+<li>Open a <strong>dedicated incident channel</strong> and maintain <strong>15–30 minute communication cadence</strong>.</li>
+<li>Distinguish <strong>mitigation</strong> (impact reduced) from <strong>resolution</strong> (root cause fixed); accept mitigation first.</li>
+<li>Write a <strong>blameless postmortem</strong> within 24–72 hours with summary, timeline, root cause, what went well/poorly, action items.</li>
+<li>Apply <strong>5 Whys</strong> to reach systemic causes; reject "human error" as a root cause.</li>
+<li>Track <strong>MTTD, MTTR, MTBF</strong> as quarterly metrics.</li>
+<li>Recognize and refuse <strong>anti-patterns</strong>: witch hunt, action-item graveyard, "it won't happen again," postmortem-as-performance-review, long postmortem nobody reads.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c03-t11-on-call-and-production-ownership.html">On-Call &amp; Production Ownership</a> — the engineer's life of carrying the pager and owning the system 24/7.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Incident Response &amp; Blameless Postmortems&quot;
+slug: incident-response-and-blameless-postmortems
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Engineering Craft &amp; Leadership&quot;
+type: concept
+difficulty: lead
+order: 10
+tags: [incident-response, postmortem, blameless, sev, mttr, mttd, mtbf, ic, incident-commander, five-whys, root-cause, john-allspaw, sidney-dekker, etsy, google-sre]
+prerequisites: [reliability-sli-slo-sla-redundancy-failover]
+status: complete
+estimated_minutes: 55
+last_updated: 2026-06-08
+---
+
+# Incident Response &amp; Blameless Postmortems
+
+When production breaks, the engineering team must do two things, in this order: **stop the bleeding**, then **learn from it**. Both are practices, not improvisations. The first uses **incident command** (a structured response with clear roles); the second uses **blameless postmortems** (John Allspaw&#x27;s foundational 2012 Etsy post, building on Sidney Dekker&#x27;s &quot;Just Culture&quot;). The discipline is what separates a team that recovers in 30 minutes from one that recovers in 4 hours; and a team that learns from each incident from one that repeats the same outage every six months.
+
+The depth bar here is **the operational reality** — what to do in the first 15 minutes, who runs the incident, what to communicate to whom, how to extract real lessons without punishing engineers who happened to be touching the failing code. We cover **severity levels** (SEV-1 through SEV-4), the **Incident Commander** role, the **communications cadence**, the **5 Whys** technique and its limits, and the **action-items-with-owners** discipline that turns lessons into change.
+
+## Where Modern Incident Response Came From — Aviation, NASA, And The 2012 Etsy Essay
+
+Modern software incident response practices descend from **aviation safety culture** (which crystallized in the 1980s) and **NASA&#x27;s post-mortem culture** (which emerged after the Challenger disaster in 1986). The software industry&#x27;s adoption was led by **John Allspaw&#x27;s 2012 Etsy essay** that named &quot;blameless postmortems&quot; and reshaped the field.
+
+### The Aviation Safety Lineage (1970s–1990s)
+
+The conceptual foundation of modern incident response is **Crew Resource Management (CRM)**, developed by **NASA&#x27;s John Lauber and colleagues in 1979**, in response to a series of fatal commercial aviation crashes. The crashes had a common pattern: technical equipment was working, but crew miscommunication or hierarchical pressure caused catastrophic errors.
+
+Specific tragedies that motivated CRM:
+
+- **United Airlines Flight 173 (1978, Portland)**: pilots focused on a landing-gear indicator while the plane ran out of fuel. 10 deaths.
+- **Tenerife Disaster (1977, KLM 4805 + Pan Am 1736)**: KLM captain&#x27;s hierarchy intimidated co-pilots from voicing concerns. 583 deaths, the deadliest aviation accident in history.
+
+CRM&#x27;s principles addressed these failures:
+
+1. **All crew members are responsible** for safe operation, regardless of rank.
+2. **Junior members must speak up** if they see problems; senior members must listen.
+3. **Communication is structured** to prevent ambiguity.
+4. **Mistakes are systemic**, not individual.
+5. **Investigation is blameless** — the goal is learning, not punishment.
+
+By the late 1980s, CRM was mandatory in commercial aviation. **Fatal accident rates dropped dramatically** — from ~40 per million departures in 1970 to ~1 per million by 2010. CRM is widely credited with the bulk of this safety improvement.
+
+The software industry didn&#x27;t immediately learn from aviation. The cultural translation took decades.
+
+### NASA&#x27;s Challenger Disaster (1986)
+
+The **Space Shuttle Challenger disaster** (January 28, 1986) was a watershed moment for engineering safety culture. The investigation (Rogers Commission, 1986) identified:
+
+1. **Technical cause**: O-ring seal failure due to cold temperature.
+2. **Organizational cause**: Morton Thiokol engineers knew the O-rings were dangerous below freezing; NASA management overrode their concerns.
+3. **Cultural cause**: NASA&#x27;s &quot;can-do&quot; culture suppressed dissenting voices; the engineers who flagged the risk were ignored.
+
+The Challenger investigation **named the systemic causes**. It wasn&#x27;t &quot;the engineer who designed the O-rings made a mistake&quot; — it was &quot;the organization&#x27;s decision process suppressed safety information.&quot;
+
+This framing — *systemic causes, not individual blame* — would later inform software incident response. **Sidney Dekker** (cognitive systems engineer, born 1962) developed the academic foundation in books like *The Field Guide to Understanding &#x27;Human Error&#x27;* (2002, third edition 2014), which became required reading for safety-critical industries.
+
+### The &quot;Just Culture&quot; Movement (2000s)
+
+The 2000s saw aviation&#x27;s CRM principles generalized into **&quot;Just Culture&quot;** thinking. The argument:
+
+- **Pure no-blame culture is naive**: there&#x27;s a difference between honest mistakes (systemic) and reckless behavior (individual).
+- **Pure blame culture is destructive**: it suppresses reporting and learning.
+- **Just culture distinguishes**: honest mistakes get learning; reckless behavior gets accountability.
+
+Sidney Dekker&#x27;s *Just Culture: Balancing Safety and Accountability* (2007) is the canonical reference. The concept influenced medicine (which had similar safety challenges), nuclear power, and eventually software.
+
+### John Allspaw&#x27;s 2012 Etsy Essay
+
+The single most influential document for software incident response is **John Allspaw&#x27;s [*Blameless PostMortems and a Just Culture*](https://www.etsy.com/codeascraft/blameless-postmortems/)** (May 22, 2012, Etsy&#x27;s Code as Craft blog).
+
+Allspaw was VP of Operations at Etsy at the time. He had been studying aviation safety culture and Sidney Dekker&#x27;s work, and was applying the principles at Etsy. The essay introduced the software industry to:
+
+1. **Blameless postmortem**: post-incident investigations focus on systemic causes, not individual blame.
+2. **Hindsight bias**: investigators tend to assume responders &quot;should have known&quot; — they didn&#x27;t, in the moment.
+3. **Learning over punishment**: the goal is improving the system, not assigning blame.
+4. **Psychological safety**: engineers must feel safe reporting incidents.
+
+The essay was *short but precise*. It cited Dekker explicitly. It contained specific operational guidance (questions to ask during postmortems).
+
+The essay&#x27;s impact was enormous. Within 3 years, &quot;blameless postmortem&quot; was standard vocabulary across the industry. **Google&#x27;s SRE book (2016) codified the practice**, citing Allspaw&#x27;s essay. Today, &quot;blameless postmortem&quot; is the standard for incident review at almost every modern software company.
+
+### Who John Allspaw Is
+
+**John Allspaw** has had a remarkable career. He was VP of Operations at Etsy from 2010–2016, where he established the blameless postmortem culture. He later co-founded **Adaptive Capacity Labs**, a consultancy focused on resilience engineering.
+
+His academic background: he completed a Master&#x27;s in Human Factors and Systems Safety at Lund University under Sidney Dekker. The combination of operational experience (Etsy, before that Flickr) and formal safety-engineering education gave him the unique standing to bridge aviation safety practices to software.
+
+Allspaw&#x27;s books *The Art of Capacity Planning* (2008) and the related work *Web Operations* (with Jesse Robbins, 2010) are required reading for operations engineers. His conference talks (Velocity, SRECon, multiple keynotes) have shaped a generation of SRE thinking.
+
+### The Google SRE Codification (2016)
+
+The Google SRE book (covered in [T15 of C02](../C02-distributed-systems-and-system-design/T15-reliability-sli-slo-sla-redundancy-failover.md)) dedicated chapters to incident response and postmortems. The book formalized:
+
+- **Incident Commander role**: clear coordination authority.
+- **Specific roles**: communications lead, operations lead, planning lead.
+- **Postmortem templates**: structured documents.
+- **Action item tracking**: ensuring follow-through.
+
+These practices were Google-specific in the book but were quickly adopted industry-wide.
+
+### Why The Lineage Matters
+
+Modern software incident response is *not a software invention*. It descends from:
+
+- **Aviation safety culture** (CRM, just culture).
+- **NASA&#x27;s post-disaster investigations** (Challenger).
+- **Academic resilience engineering** (Sidney Dekker, Erik Hollnagel).
+- **Etsy&#x27;s 2012 essay** (John Allspaw).
+- **Google&#x27;s SRE codification** (2016 book).
+
+The senior engineer&#x27;s value: recognizing that these practices have *decades of evidence behind them*. When a team adopts blameless postmortems, they&#x27;re inheriting aviation&#x27;s hard-won safety knowledge.
+
+## Why Incident Response, Specifically: The Senior Engineer&#x27;s Q&amp;A
+
+### Q1: Why does blamelessness matter so much?
+
+Because **blame suppresses learning**. When engineers fear punishment for incidents:
+
+- They report fewer incidents (data shows ~50% reduction in self-reporting when blame is feared).
+- They withhold context during investigations.
+- They become risk-averse, slowing feature delivery.
+- They leave the team (turnover increases).
+
+When blame is absent:
+
+- Engineers report all incidents, even minor ones.
+- Investigations get full context.
+- The system improves faster.
+- Engineers stay longer.
+
+Aviation has 50 years of data showing this. Software has 10+ years now. The pattern is robust.
+
+### Q2: How does this conflict with accountability?
+
+It doesn&#x27;t, properly understood. **Blameless ≠ accountability-free**. Just culture distinguishes:
+
+- **Honest mistakes** (the engineer didn&#x27;t know; the system allowed it): learning, no blame.
+- **Reckless behavior** (the engineer knowingly violated safety practices): accountability.
+
+In practice, almost all software incidents are honest mistakes — the engineer didn&#x27;t know the consequence, or the system allowed the wrong action. Reckless behavior is rare and clearly distinguishable.
+
+The senior judgment: default to blameless; reserve accountability for genuine recklessness.
+
+### Q3: Why have an Incident Commander role?
+
+Because **multiple people doing the same incident response in parallel is chaos**. The Incident Commander:
+
+- **Coordinates** all response activities.
+- **Decides** what to do (with input from experts).
+- **Communicates** with stakeholders.
+- **Authorizes** specific actions (rollback, escalation).
+
+Without an IC, multiple engineers debug independently, miss each other&#x27;s findings, and may take conflicting actions. With an IC, response is coordinated.
+
+The IC is typically *not* the most senior person — they&#x27;re someone trained in incident response coordination. The senior engineer&#x27;s role is often as *subject matter expert*, advising the IC.
+
+### Q4: How long should a postmortem take?
+
+Sized to the incident:
+
+- **Minor incidents** (small impact, quick resolution): 30-minute write-up.
+- **Major incidents** (significant impact): 1–2 hour write-up plus 1-hour review meeting.
+- **Catastrophic incidents** (high-visibility, regulatory implications): multi-day investigation, formal review board.
+
+The cost of a too-light postmortem: the same incident recurs. The cost of a too-heavy postmortem: engineering time consumed without proportionate learning.
+
+### Q5: What goes in a postmortem document?
+
+Standard sections:
+
+1. **Summary**: one-paragraph description.
+2. **Impact**: who was affected, how much, for how long.
+3. **Timeline**: chronological events.
+4. **Root cause**: systemic factors that allowed the incident.
+5. **What went well**: successes during response.
+6. **What went poorly**: failures during response.
+7. **Action items**: specific changes to prevent recurrence, with owners and deadlines.
+
+The senior practice: **action items must have owners and dates**. Postmortems without specific action items don&#x27;t drive improvement.
+
+## Common Misconceptions Explained
+
+### &quot;Blameless means no consequences.&quot;
+
+False. Blameless means **systemic investigation, not absence of consequences**. Recurring reckless behavior should have consequences; systemic issues should be addressed by changing the system, not by punishing individuals.
+
+### &quot;5 Whys finds root causes.&quot;
+
+Half true. **The 5 Whys technique** (asking &quot;why?&quot; five times) is a *starting point* for root cause analysis. It often surfaces useful information but can be misleading — there&#x27;s rarely a single root cause; incidents have multiple contributing factors.
+
+The senior practice: use 5 Whys as a tool, not as the definitive analysis method. Consider multiple contributing factors.
+
+### &quot;Postmortems should focus on technical causes.&quot;
+
+False. **Most software incidents have organizational and process causes** alongside technical ones. Focusing only on technical fixes misses the deeper improvements.
+
+### &quot;The on-call engineer is responsible for incidents.&quot;
+
+False. Per blameless culture, the on-call engineer is the *first responder*, not the *cause*. Treating them as responsible deters engineers from being on-call.
+
+### &quot;We don&#x27;t need formal incident response for minor issues.&quot;
+
+Partially false. Even minor incidents benefit from light-weight investigation. Patterns emerge across many minor incidents that wouldn&#x27;t be obvious from any single one. The discipline of always investigating prevents complacency.
+
+### &quot;Action items will be addressed eventually.&quot;
+
+Often false. **Action items without explicit owners and deadlines don&#x27;t get done**. Postmortems with unowned action items are theater.
+
+## Severity Levels
+
+A common scale:
+
+- **SEV-1**: complete outage of a critical surface. Page everyone. Resolve immediately.
+- **SEV-2**: significant degradation. Page on-call.
+- **SEV-3**: minor degradation. Address during business hours.
+- **SEV-4**: noticed but no customer impact. Track but no urgency.
+
+The trigger criteria should be explicit in the runbook — not &quot;I think this is SEV-2,&quot; but &quot;SEV-2 because checkout success rate dropped from 99% to 80%.&quot;
+
+## The Incident Roles
+
+For SEV-1 / SEV-2:
+
+- **Incident Commander (IC)**: runs the response; makes decisions; not necessarily the deepest expert.
+- **Subject Matter Experts (SMEs)**: do the diagnosis and fix; report to IC.
+- **Communications**: publishes updates internally and externally.
+- **Scribe**: records timeline, actions, decisions.
+
+The IC&#x27;s job is to **coordinate**, not to fix. If the IC is also the only one debugging, no one is running the incident. **Separating these roles is the difference between calm and panic.**
+
+## The First 15 Minutes
+
+```mermaid
+flowchart TB
+  A[Alert fires]
+  A --&gt; B[On-call ack]
+  B --&gt; C{Assess severity}
+  C --&gt;|&quot;SEV-3+&quot;| D[Investigate normally]
+  C --&gt;|&quot;SEV-1/2&quot;| E[Declare incident]
+  E --&gt; F[Assign IC]
+  F --&gt; G[Open incident channel]
+  G --&gt; H[Notify stakeholders]
+  H --&gt; I[Begin mitigation]
+```
+
+The discipline:
+1. **Acknowledge fast** — &lt; 5 min.
+2. **Declare and assign IC fast** — &lt; 10 min.
+3. **Open a dedicated incident channel** (Slack `#inc-NNN`) — all coordination there, not in DMs.
+4. **First mitigation attempt** — within 15 minutes for SEV-1.
+
+If you don&#x27;t have a quick mitigation, **revert the last change**. A successful rollback before deep diagnosis often resolves the customer impact while the team continues investigating.
+
+## Communications Cadence
+
+Internal: post in the incident channel every 15–30 minutes, even if the update is &quot;still investigating.&quot;
+
+External: SEV-1 / SEV-2 typically warrants a status page update within 30 minutes; updates as situation changes.
+
+The IC&#x27;s communications template:
+
+```
+**Incident #INC-2026-0042**
+Status: investigating | mitigating | monitoring | resolved
+Impact: ~5% of checkout requests failing since 14:32 UTC
+Current action: rolling back deploy v2.4.1
+Next update: 15:00 UTC
+IC: alex
+```
+
+Specific. Avoids panic. Stakeholders know what&#x27;s happening.
+
+## Mitigation Vs Resolution
+
+**Mitigation**: customer impact is reduced or eliminated, possibly by a workaround.
+**Resolution**: root cause is fixed.
+
+Mitigation often comes first; that&#x27;s correct. A rollback that stops the bleeding is valid even if the underlying bug isn&#x27;t fixed. Mark the incident resolved when impact ends; track the follow-up fix separately.
+
+## The Postmortem
+
+Within 24–72 hours of resolution, write the postmortem. Sections:
+
+```markdown
+# Incident: Checkout Failure 2026-08-15
+
+## Summary
+At 14:32 UTC, ~5% of checkout requests began failing with 500 errors. The
+team rolled back at 14:47 UTC; full recovery at 14:52 UTC. Duration: 20
+minutes. Impact: ~12,000 failed checkouts (~$80K lost revenue).
+
+## Timeline
+- 14:25 UTC: Deploy v2.4.1 begins.
+- 14:32 UTC: First alert fires.
+- 14:34 UTC: On-call ack; IC assigned.
+- 14:39 UTC: Cause identified as new field validation rejecting valid input.
+- 14:47 UTC: Rollback initiated.
+- 14:52 UTC: Metrics return to baseline.
+- 15:00 UTC: Incident closed.
+
+## Root Cause
+The new validation regex rejected international phone numbers containing
+the `+` character. The deploy passed pre-prod testing because test data
+did not include international formats.
+
+## What Went Well
+- Alert fired within 7 minutes.
+- IC declared within 2 minutes of ack.
+- Rollback path was tested and worked.
+
+## What Went Poorly
+- Test data did not include the actual production distribution.
+- The validation change was buried in a 300-line PR; reviewer missed.
+
+## Action Items
+- [ ] Add international phone test cases (owner: alex; due: Aug 22).
+- [ ] PR size limit enforced in CI (owner: sam; due: Sep 1).
+- [ ] Validation changes require test-data review (owner: kim; due: Sep 1).
+```
+
+The action items are the *output* of the postmortem. Each has an owner and a due date. Postmortems without action items teach the team nothing.
+
+## Blamelessness
+
+The key Etsy / Google SRE principle: **assume good intent**. The engineer who shipped the bug did the best they could with the information they had. The system failed; not the person.
+
+In practice:
+- The postmortem language is &quot;the validation regex,&quot; not &quot;alex&#x27;s regex.&quot;
+- The 5 Whys lead to *systemic* causes, not personal ones.
+- No one is &quot;in trouble&quot; because of an incident.
+
+Why? Because **punishing engineers for incidents teaches them to hide problems**. A culture of fear produces longer outages, slower learning, and worse psychological safety. Blameless postmortems are correlated with *higher reliability*, not lower.
+
+This doesn&#x27;t mean ignoring incompetence — but addressing it through ongoing performance management, not via the postmortem of one incident.
+
+## The 5 Whys
+
+A diagnosis technique: ask &quot;why&quot; 5 times to reach the root.
+
+- The checkout failed. Why?
+- The validation regex rejected valid input. Why?
+- The regex was overly restrictive. Why?
+- The author wasn&#x27;t aware of international phone formats. Why?
+- The test data didn&#x27;t include them. Why?
+- We&#x27;ve never measured test-data representativeness.
+
+Each &quot;why&quot; drives toward systemic causes. **Stop at the systemic cause**, not at &quot;human error.&quot; &quot;Human error&quot; is *never* the root cause — it&#x27;s the place to start asking why.
+
+The 5 Whys has limits — complex incidents have *many* contributing causes, not a single chain. Don&#x27;t force a single root.
+
+## MTTR, MTTD, MTBF
+
+Operational metrics:
+
+- **MTTD** (Mean Time To Detect): from incident start to alert.
+- **MTTR** (Mean Time To Recover): from alert to mitigation.
+- **MTBF** (Mean Time Between Failures): inverse of failure rate.
+
+Track quarterly. Improving MTTD or MTTR is often where the team can move the needle fastest.
+
+## Anti-Patterns
+
+### The Witch Hunt
+
+The postmortem assigns blame. The engineer is &quot;talked to.&quot; Others learn to hide problems. Outages take longer. Repeat.
+
+### The Action-Item Graveyard
+
+Action items are filed and forgotten. The same incident recurs in 6 months.
+
+**Fix**: action items go to the team&#x27;s backlog with due dates; reviewed at every postmortem retrospective.
+
+### The &quot;It Won&#x27;t Happen Again&quot;
+
+Postmortem concludes &quot;we&#x27;ll be more careful.&quot; No systemic change. It happens again.
+
+**Fix**: systemic action items, not aspirational ones.
+
+### The Postmortem As Performance Review
+
+Manager uses the postmortem to evaluate the on-call engineer. Engineer becomes defensive. Future incidents are concealed.
+
+### The Long Postmortem Nobody Reads
+
+The doc is 30 pages; full of detail nobody needs. The lesson is lost.
+
+**Fix**: 1-2 page summary; details in appendix.
+
+## Incident Tooling
+
+- **Slack** for incident channels.
+- **PagerDuty / Opsgenie** for paging.
+- **incident.io / Rootly / Jeli** as dedicated incident management.
+- **Statuspage.io** for external comms.
+- **Postmortem template** in the repo or wiki.
+
+## Trade-Off Summary
+
+| Practice | Cost | Value |
+|----------|------|-------|
+| IC role separated from SME | Process learning | Calm, coordinated response |
+| Incident channel | Overhead | Single source of truth |
+| 24–72h postmortem | Engineer time | Learning extracted |
+| Action items with owners | Backlog discipline | Real change |
+| Blamelessness | Cultural commitment | Psychological safety; faster recovery |
+
+&gt; [!INTERVIEW]
+&gt; A common L5 prompt: &quot;Tell me about an incident you led.&quot; Strong answers (a) describe IC role, (b) name the mitigation taken, (c) describe the postmortem outcome, (d) cite action items that actually shipped, (e) acknowledge what went poorly.
+
+## Practice
+
+1. **Run an incident drill.** Simulate a SEV-2; declare; assign IC; communicate; mitigate. Time each step.
+2. **Postmortem authoring.** Take a real recent incident; write the postmortem using the template.
+3. **Action-item audit.** For the last 5 postmortems, track action-item completion rate. Aim for &gt; 80%.
+4. **MTTR analysis.** Compute your team&#x27;s MTTR for the last quarter. Identify the bottleneck stage.
+5. **Blamelessness language audit.** Re-read your team&#x27;s postmortems; flag any blaming language; rewrite.
+6. **5 Whys exercise.** For a recent incident, apply 5 Whys; identify the systemic cause.
+7. **Runbook coverage.** For the top 5 alerts in your service, verify each has a runbook.
+8. **Tool selection.** Evaluate one incident-management tool (incident.io, Rootly, Jeli) for your team.
+9. **On-call review.** Interview an on-call engineer; identify what makes their experience worse.
+10. **The skeptic conversation.** A senior engineer says &quot;we should hold engineers accountable for outages.&quot; Write a 200-word response on the cost of blame.
+
+## Recap
+
+You should now be able to:
+
+- Apply **severity levels** with explicit trigger criteria.
+- Run an incident as **IC**, separated from SME role.
+- Open a **dedicated incident channel** and maintain **15–30 minute communication cadence**.
+- Distinguish **mitigation** (impact reduced) from **resolution** (root cause fixed); accept mitigation first.
+- Write a **blameless postmortem** within 24–72 hours with summary, timeline, root cause, what went well/poorly, action items.
+- Apply **5 Whys** to reach systemic causes; reject &quot;human error&quot; as a root cause.
+- Track **MTTD, MTTR, MTBF** as quarterly metrics.
+- Recognize and refuse **anti-patterns**: witch hunt, action-item graveyard, &quot;it won&#x27;t happen again,&quot; postmortem-as-performance-review, long postmortem nobody reads.
+
+## Next
+
+Continue to [On-Call &amp; Production Ownership](./T11-on-call-and-production-ownership.md) — the engineer&#x27;s life of carrying the pager and owning the system 24/7.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><div class="lbl">← Previous</div><div class="ttl">T09-cross-team-collaboration-and-communication</div><div class="sub">Cross-Team Collaboration &amp; Communication</div></a><a class="next" href="../l5/c03-t11-on-call-and-production-ownership.html"><div class="lbl">Next →</div><div class="ttl">T11-on-call-and-production-ownership</div><div class="sub">On-Call &amp; Production Ownership</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#where-modern-incident-response-came-from-aviation-nasa-and-the-2012-etsy-essay" data-toc-link>Where Modern Incident Response Came From — Aviation, NASA, And The 2012 Etsy Essay</a></li><li class="lvl-3"><a href="#the-aviation-safety-lineage-1970s1990s" data-toc-link>The Aviation Safety Lineage (1970s–1990s)</a></li><li class="lvl-3"><a href="#nasas-challenger-disaster-1986" data-toc-link>NASA&#x27;s Challenger Disaster (1986)</a></li><li class="lvl-3"><a href="#the-just-culture-movement-2000s" data-toc-link>The &quot;Just Culture&quot; Movement (2000s)</a></li><li class="lvl-3"><a href="#john-allspaws-2012-etsy-essay" data-toc-link>John Allspaw&#x27;s 2012 Etsy Essay</a></li><li class="lvl-3"><a href="#who-john-allspaw-is" data-toc-link>Who John Allspaw Is</a></li><li class="lvl-3"><a href="#the-google-sre-codification-2016" data-toc-link>The Google SRE Codification (2016)</a></li><li class="lvl-3"><a href="#why-the-lineage-matters" data-toc-link>Why The Lineage Matters</a></li><li class="lvl-2"><a href="#why-incident-response-specifically-the-senior-engineers-qa" data-toc-link>Why Incident Response, Specifically: The Senior Engineer&#x27;s Q&amp;amp;A</a></li><li class="lvl-3"><a href="#q1-why-does-blamelessness-matter-so-much" data-toc-link>Q1: Why does blamelessness matter so much?</a></li><li class="lvl-3"><a href="#q2-how-does-this-conflict-with-accountability" data-toc-link>Q2: How does this conflict with accountability?</a></li><li class="lvl-3"><a href="#q3-why-have-an-incident-commander-role" data-toc-link>Q3: Why have an Incident Commander role?</a></li><li class="lvl-3"><a href="#q4-how-long-should-a-postmortem-take" data-toc-link>Q4: How long should a postmortem take?</a></li><li class="lvl-3"><a href="#q5-what-goes-in-a-postmortem-document" data-toc-link>Q5: What goes in a postmortem document?</a></li><li class="lvl-2"><a href="#common-misconceptions-explained" data-toc-link>Common Misconceptions Explained</a></li><li class="lvl-3"><a href="#blameless-means-no-consequences" data-toc-link>&quot;Blameless means no consequences.&quot;</a></li><li class="lvl-3"><a href="#5-whys-finds-root-causes" data-toc-link>&quot;5 Whys finds root causes.&quot;</a></li><li class="lvl-3"><a href="#postmortems-should-focus-on-technical-causes" data-toc-link>&quot;Postmortems should focus on technical causes.&quot;</a></li><li class="lvl-3"><a href="#the-on-call-engineer-is-responsible-for-incidents" data-toc-link>&quot;The on-call engineer is responsible for incidents.&quot;</a></li><li class="lvl-3"><a href="#we-dont-need-formal-incident-response-for-minor-issues" data-toc-link>&quot;We don&#x27;t need formal incident response for minor issues.&quot;</a></li><li class="lvl-3"><a href="#action-items-will-be-addressed-eventually" data-toc-link>&quot;Action items will be addressed eventually.&quot;</a></li><li class="lvl-2"><a href="#severity-levels" data-toc-link>Severity Levels</a></li><li class="lvl-2"><a href="#the-incident-roles" data-toc-link>The Incident Roles</a></li><li class="lvl-2"><a href="#the-first-15-minutes" data-toc-link>The First 15 Minutes</a></li><li class="lvl-2"><a href="#communications-cadence" data-toc-link>Communications Cadence</a></li><li class="lvl-2"><a href="#mitigation-vs-resolution" data-toc-link>Mitigation Vs Resolution</a></li><li class="lvl-2"><a href="#the-postmortem" data-toc-link>The Postmortem</a></li><li class="lvl-2"><a href="#blamelessness" data-toc-link>Blamelessness</a></li><li class="lvl-2"><a href="#the-5-whys" data-toc-link>The 5 Whys</a></li><li class="lvl-2"><a href="#mttr-mttd-mtbf" data-toc-link>MTTR, MTTD, MTBF</a></li><li class="lvl-2"><a href="#anti-patterns" data-toc-link>Anti-Patterns</a></li><li class="lvl-3"><a href="#the-witch-hunt" data-toc-link>The Witch Hunt</a></li><li class="lvl-3"><a href="#the-action-item-graveyard" data-toc-link>The Action-Item Graveyard</a></li><li class="lvl-3"><a href="#the-it-wont-happen-again" data-toc-link>The &quot;It Won&#x27;t Happen Again&quot;</a></li><li class="lvl-3"><a href="#the-postmortem-as-performance-review" data-toc-link>The Postmortem As Performance Review</a></li><li class="lvl-3"><a href="#the-long-postmortem-nobody-reads" data-toc-link>The Long Postmortem Nobody Reads</a></li><li class="lvl-2"><a href="#incident-tooling" data-toc-link>Incident Tooling</a></li><li class="lvl-2"><a href="#trade-off-summary" data-toc-link>Trade-Off Summary</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

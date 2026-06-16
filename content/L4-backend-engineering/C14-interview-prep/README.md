@@ -22,4 +22,4 @@ Interview questions asked at MNCs for this experience level. Use the fixed Q&A f
 
 - [Interview Prep: Senior Backend Engineer](T01-interview-prep-senior-backend.md)
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

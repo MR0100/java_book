@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Model Fine-Tuning Architecture — When, How, Infrastructure — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="active" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span></div>
+        <h1>Model Fine-Tuning Architecture — When, How, Infrastructure</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C11-ai-system-architecture/T05-model-fine-tuning-architecture-decisions.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">staff</span><span class="meta-pill mins">~50 min</span><span class="meta-pill date">updated 2026-06-10</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Model Fine-Tuning Architecture — When, How, Infrastructure"
+slug: model-fine-tuning-architecture-decisions
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "AI System Architecture"
+type: concept
+difficulty: staff
+order: 5
+tags: [fine-tuning, lora, qlora, sft, rlhf, dpo, peft, training-infrastructure, gpu, model-serving, model-registry, vs-rag, distillation, ablation]
+prerequisites: [rag-patterns, when-to-use-llms-vs-traditional-ml, ai-gateway-design]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-10</p>
+<hr>
+<h1 id="model-fine-tuning-architecture-when-how-infrastructure">Model Fine-Tuning Architecture — When, How, Infrastructure</h1>
+<p>Fine-tuning is the AI equivalent of switching from "configuration" to "custom hardware" — bigger upfront cost, ongoing operational responsibility, but unique capabilities. In 2026 fine-tuning has become more accessible (LoRA, QLoRA, hosted fine-tuning APIs) but the architectural decision of "should we fine-tune?" remains one of the highest-stakes calls in AI strategy.</p>
+<p>This topic covers the architectural side of fine-tuning: when it beats RAG and prompting, how to choose between full fine-tuning, LoRA, distillation, and DPO, the infrastructure required (GPU clusters, training pipelines, model registries, A/B serving), and the operational patterns for keeping fine-tuned models in production for years.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c11-t01-when-to-use-llms-vs-traditional-ml.html">When to Use LLMs vs Traditional ML</a>, <a href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html">RAG Patterns</a>, <a href="c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html">AI Gateway Design</a>. Familiarity with basic ML training concepts helps.</p></div></div>
+<h2 id="fine-tuning-vs-rag-vs-prompting">Fine-Tuning vs RAG vs Prompting<a class="anchor" href="#fine-tuning-vs-rag-vs-prompting" aria-hidden="true">#</a></h2>
+<p>The first question isn't "how to fine-tune" — it's "should I?". This is a 3-way comparison.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Prompting</th>
+<th>RAG</th>
+<th>Fine-Tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changes</strong></td>
+<td>The input prompt</td>
+<td>Retrieval context added at runtime</td>
+<td>Model weights modified</td>
+</tr>
+<tr>
+<td><strong>Cost to start</strong></td>
+<td>$0</td>
+<td>Embedding + storage</td>
+<td>$1K-$1M+</td>
+</tr>
+<tr>
+<td><strong>Latency added</strong></td>
+<td>None</td>
+<td>+200-500ms (retrieval)</td>
+<td>None (or less)</td>
+</tr>
+<tr>
+<td><strong>Knowledge update</strong></td>
+<td>Edit prompt</td>
+<td>Re-index docs</td>
+<td>Re-train</td>
+</tr>
+<tr>
+<td><strong>Provenance</strong></td>
+<td>Easy (cite prompt)</td>
+<td>Easy (cite retrieved chunks)</td>
+<td>Hard (knowledge baked in)</td>
+</tr>
+<tr>
+<td><strong>Per-query cost</strong></td>
+<td>Standard</td>
+<td>Standard + retrieval</td>
+<td>Often LOWER (smaller model)</td>
+</tr>
+<tr>
+<td><strong>New domain</strong></td>
+<td>Limited</td>
+<td>Add documents</td>
+<td>Train on new domain</td>
+</tr>
+<tr>
+<td><strong>New behavior</strong></td>
+<td>Hard</td>
+<td>Hard</td>
+<td>Native</td>
+</tr>
+<tr>
+<td><strong>Hallucination</strong></td>
+<td>Medium</td>
+<td>Lower (grounded)</td>
+<td>Higher (no grounding)</td>
+</tr>
+<tr>
+<td><strong>Best for</strong></td>
+<td>Generic tasks</td>
+<td>Knowledge-grounded Q&amp;A</td>
+<td>Stylistic tasks, low-cost serving</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="when-fine-tuning-wins">When Fine-Tuning Wins<a class="anchor" href="#when-fine-tuning-wins" aria-hidden="true">#</a></h3>
+<ol>
+<li>
+<p><strong>You need consistent tone/format that prompting can't reliably enforce.</strong> Example: customer support replies in a specific brand voice, generated SQL in your exact format conventions, code with your team's style.</p>
+</li>
+<li>
+<p><strong>You want a smaller/faster/cheaper model for serving.</strong> Distill GPT-4 quality into a 7B Llama variant. Serving cost drops 10-100×.</p>
+</li>
+<li>
+<p><strong>You have a stable task with abundant labeled data.</strong> 50K+ labeled examples of "this question → that answer" pattern.</p>
+</li>
+<li>
+<p><strong>You need to teach a specific reasoning pattern not in base model training.</strong> Domain-specific decision frameworks, custom code analysis.</p>
+</li>
+<li>
+<p><strong>You need to remove certain behaviors.</strong> Base model says things you don't want (legal disclaimers, refusals). DPO can train against these.</p>
+</li>
+<li>
+<p><strong>You need consistent structured output the base model can't reliably produce.</strong> Long JSON schemas with many fields.</p>
+</li>
+</ol>
+<h3 id="when-fine-tuning-is-wrong">When Fine-Tuning Is Wrong<a class="anchor" href="#when-fine-tuning-is-wrong" aria-hidden="true">#</a></h3>
+<ol>
+<li>
+<p><strong>Information that changes frequently.</strong> RAG. Always RAG for current data.</p>
+</li>
+<li>
+<p><strong>You have &lt;1K labeled examples.</strong> Prompt engineering or few-shot. Not enough signal to fine-tune well.</p>
+</li>
+<li>
+<p><strong>You need to add huge knowledge.</strong> Fine-tuning is bad at memorization; RAG is great at it.</p>
+</li>
+<li>
+<p><strong>You can solve it with a better prompt.</strong> Try first. Many "we need to fine-tune" turn out to need better prompts.</p>
+</li>
+<li>
+<p><strong>Stable open-weights model doesn't exist for your need.</strong> Pre-2024 you had to deal with this; 2026 has Llama 3.1, Mistral, Qwen, Gemma — but still gaps exist.</p>
+</li>
+<li>
+<p><strong>You can't afford ongoing operational responsibility.</strong> Fine-tuned models are infrastructure. You own them, you maintain them, you re-tune them as base models evolve.</p>
+</li>
+</ol>
+<h2 id="fine-tuning-methods-the-trade-off-space">Fine-Tuning Methods — The Trade-Off Space<a class="anchor" href="#fine-tuning-methods-the-trade-off-space" aria-hidden="true">#</a></h2>
+<h3 id="full-fine-tuning-sft-supervised-fine-tuning">Full Fine-Tuning (SFT — Supervised Fine-Tuning)<a class="anchor" href="#full-fine-tuning-sft-supervised-fine-tuning" aria-hidden="true">#</a></h3>
+<p>Update all model weights on your dataset.</p>
+<ul>
+<li><strong>Cost</strong>: $10K-$1M+ depending on model size and data</li>
+<li><strong>Hardware</strong>: Multi-GPU cluster (8× A100 minimum for 70B models)</li>
+<li><strong>Time</strong>: Days to weeks</li>
+<li><strong>Quality</strong>: Highest possible</li>
+<li><strong>Storage</strong>: Full copy of model weights per fine-tune</li>
+<li><strong>When</strong>: Strategic core model, willing to invest</li>
+</ul>
+<h3 id="lora-low-rank-adaptation">LoRA (Low-Rank Adaptation)<a class="anchor" href="#lora-low-rank-adaptation" aria-hidden="true">#</a></h3>
+<p>Train small "adapter" matrices instead of full weights. The adapter is added to the base model at inference.</p>
+<ul>
+<li><strong>Cost</strong>: $100-$10K</li>
+<li><strong>Hardware</strong>: Single GPU often sufficient (24GB)</li>
+<li><strong>Time</strong>: Hours</li>
+<li><strong>Quality</strong>: 90-95% of full fine-tuning</li>
+<li><strong>Storage</strong>: Adapter is ~1% size of base model (megabytes)</li>
+<li><strong>When</strong>: Most fine-tuning needs in 2026</li>
+</ul>
+<p>LoRA is the default choice unless you have a specific reason for full fine-tuning. You can hold dozens of LoRA adapters and swap them in seconds.</p>
+<h3 id="qlora-quantized-lora">QLoRA (Quantized LoRA)<a class="anchor" href="#qlora-quantized-lora" aria-hidden="true">#</a></h3>
+<p>LoRA + 4-bit quantized base model. Even smaller GPU memory footprint.</p>
+<ul>
+<li><strong>Cost</strong>: $50-$5K</li>
+<li><strong>Hardware</strong>: Consumer GPU (24GB RTX 4090) can fine-tune 70B models</li>
+<li><strong>Time</strong>: Hours</li>
+<li><strong>Quality</strong>: Comparable to LoRA</li>
+<li><strong>When</strong>: Budget-constrained or experimentation</li>
+</ul>
+<h3 id="dpo-direct-preference-optimization">DPO (Direct Preference Optimization)<a class="anchor" href="#dpo-direct-preference-optimization" aria-hidden="true">#</a></h3>
+<p>Train on preference pairs ("response A is better than response B for this prompt") rather than supervised labels. Successor to RLHF, simpler to operate.</p>
+<ul>
+<li><strong>Cost</strong>: $500-$50K</li>
+<li><strong>Data</strong>: Need preference pairs, often from human feedback</li>
+<li><strong>When</strong>: You want to shape model behavior beyond what supervised data shows (refusal patterns, tone, formatting preferences)</li>
+</ul>
+<h3 id="distillation">Distillation<a class="anchor" href="#distillation" aria-hidden="true">#</a></h3>
+<p>Train a smaller "student" model to mimic a bigger "teacher" model's outputs.</p>
+<ul>
+<li><strong>Cost</strong>: $1K-$100K</li>
+<li><strong>Output</strong>: Small model (1B-13B) approximating GPT-4-class quality on your task</li>
+<li><strong>Serving cost</strong>: 10-100× cheaper than the teacher</li>
+<li><strong>When</strong>: High-volume serving where cost dominates</li>
+</ul>
+<p>Distillation is the secret weapon for production economics. Real example: a 100M-call/day classification task, GPT-4 cost $50K/month, distilled 7B model cost $300/month with 92% of the quality.</p>
+<h3 id="rag-augmented-fine-tuning">RAG-Augmented Fine-Tuning<a class="anchor" href="#rag-augmented-fine-tuning" aria-hidden="true">#</a></h3>
+<p>Train the model to use retrieved context better. The model learns to "trust" the RAG content over its parametric knowledge.</p>
+<ul>
+<li><strong>When</strong>: Production RAG that still hallucinates despite good context</li>
+</ul>
+<h3 id="continual-learning">Continual Learning<a class="anchor" href="#continual-learning" aria-hidden="true">#</a></h3>
+<p>Periodically re-fine-tune as your data grows. Drift mitigation built into the lifecycle.</p>
+<h2 id="the-decision-matrix">The Decision Matrix<a class="anchor" href="#the-decision-matrix" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>                          Quality requirement
+                          ▲
+                          │
+                          │      Full SFT
+                          │           ●
+                          │      LoRA
+                          │           ●
+                          │
+                          │  Distillation        Base model + RAG
+                          │     ●                    ●
+                          │
+                          │  Prompt eng
+                          │     ●
+                          │
+                          └──────────────────────────────▶ Cost (training + serving)
+</code></pre></div>
+<p>Pick the leftmost point that hits your quality bar.</p>
+<h2 id="infrastructure-what-you-need">Infrastructure — What You Need<a class="anchor" href="#infrastructure-what-you-need" aria-hidden="true">#</a></h2>
+<h3 id="training-infrastructure">Training Infrastructure<a class="anchor" href="#training-infrastructure" aria-hidden="true">#</a></h3>
+<p>For LoRA fine-tuning of 7B-13B models:
+- 1× A100 80GB OR 1× H100 80GB OR 2× A100 40GB
+- $3-$10/hour spot pricing
+- Total cost for typical run: $50-$500</p>
+<p>For full fine-tuning of 70B models:
+- 8× H100 (or 16× A100)
+- ~$50K-$200K for a single training run
+- Multi-node setups need fast networking (InfiniBand)</p>
+<h3 id="serving-infrastructure">Serving Infrastructure<a class="anchor" href="#serving-infrastructure" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Model Size</th>
+<th>Min GPU</th>
+<th>Throughput</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7B (FP16)</td>
+<td>1× A10G</td>
+<td>1000 tok/s</td>
+<td>$0.50/hr base</td>
+</tr>
+<tr>
+<td>13B (FP16)</td>
+<td>1× A100 40GB</td>
+<td>800 tok/s</td>
+<td>Most common</td>
+</tr>
+<tr>
+<td>13B (INT8)</td>
+<td>1× A10G</td>
+<td>800 tok/s</td>
+<td>4× cheaper, ~2% quality loss</td>
+</tr>
+<tr>
+<td>70B (FP16)</td>
+<td>4× A100 80GB</td>
+<td>400 tok/s</td>
+<td>$12/hr</td>
+</tr>
+<tr>
+<td>70B (INT4)</td>
+<td>2× A100 40GB</td>
+<td>350 tok/s</td>
+<td>4× cheaper, ~5% quality loss</td>
+</tr>
+</tbody>
+</table></div>
+<p>For 24/7 serving: reserved instances. For variable load: serverless inference (Modal, Replicate).</p>
+<h3 id="model-registry">Model Registry<a class="anchor" href="#model-registry" aria-hidden="true">#</a></h3>
+<p>A versioned store for trained models, like git for weights:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>registry/
+  /models/
+    /support-bot-v1/        (full SFT of Llama-3.1-8B)
+      /weights.safetensors
+      /config.json
+      /metadata.yaml
+    /support-bot-v2-lora/   (LoRA adapter)
+      /adapter.safetensors  (50MB vs 16GB)
+      /base: llama-3.1-8b
+      /metadata.yaml
+</code></pre></div>
+<p>Tooling: MLflow, Weights &amp; Biases, HuggingFace Hub, or custom S3 + Postgres.</p>
+<h3 id="training-pipeline">Training Pipeline<a class="anchor" href="#training-pipeline" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>┌──────────┐   ┌────────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│ Data     │──▶│ Validation │──▶│ Training │──▶│ Eval     │──▶│ Registry │
+│ Curation │   │ &amp; Cleaning │   │ Job      │   │ Suite    │   │          │
+└──────────┘   └────────────┘   └──────────┘   └──────────┘   └──────────┘
+                                       │            │
+                                       │            ├─PASS─▶ Deploy
+                                       │            └─FAIL─▶ Re-train
+                                       ▼
+                                 ┌──────────┐
+                                 │ Metrics  │
+                                 │ tracking │
+                                 └──────────┘
+</code></pre></div>
+<p>Each stage is automated. Re-runnable. Hyperparameters tracked. Reproducible.</p>
+<h2 id="java-backend-integration">Java Backend Integration<a class="anchor" href="#java-backend-integration" aria-hidden="true">#</a></h2>
+<h3 id="calling-a-fine-tuned-model">Calling a Fine-Tuned Model<a class="anchor" href="#calling-a-fine-tuned-model" aria-hidden="true">#</a></h3>
+<p>Most fine-tuned models are served on internal infrastructure (vLLM, TGI, Triton) with an OpenAI-compatible API. Spring AI works against it:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  ai:
+    openai:
+      base-url: http://internal-vllm:8000/v1   # ← your fine-tuned model
+      api-key: not-needed
+      chat:
+        options:
+          model: support-bot-v2-lora
+</code></pre></div>
+<p>Application code is identical to using GPT-4.</p>
+<h3 id="multi-model-routing">Multi-Model Routing<a class="anchor" href="#multi-model-routing" aria-hidden="true">#</a></h3>
+<p>For mixed deployments (custom model for primary use case, hosted LLM for fallback):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class RoutedAIService {
+
+    @Autowired @Qualifier(&quot;custom&quot;) private ChatClient custom;
+    @Autowired @Qualifier(&quot;openai&quot;) private ChatClient openai;
+
+    public String chat(String userId, String message, RequestContext ctx) {
+        if (ctx.feature().equals(&quot;support_chat&quot;)) {
+            try {
+                return custom.prompt().user(message).call().content();
+            } catch (Exception e) {
+                log.warn(&quot;Custom model failed, falling back to OpenAI&quot;, e);
+                meter.counter(&quot;model.fallback&quot;).increment();
+                return openai.prompt().user(message).call().content();
+            }
+        }
+        return openai.prompt().user(message).call().content();
+    }
+}
+</code></pre></div>
+<h3 id="shadow-mode-for-new-models">Shadow Mode for New Models<a class="anchor" href="#shadow-mode-for-new-models" aria-hidden="true">#</a></h3>
+<p>Before serving traffic from a new fine-tuned model, shadow it:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public String chat(String message) {
+    String prodResponse = prodModel.chat(message);
+
+    // Asynchronously also query the new model; compare quality
+    CompletableFuture.runAsync(() -&gt; {
+        String shadowResponse = shadowModel.chat(message);
+        comparator.record(message, prodResponse, shadowResponse);
+    });
+
+    return prodResponse;
+}
+</code></pre></div>
+<p>Build a comparison dataset; have humans/LLM-judge grade them. Promote only if shadow consistently better.</p>
+<h2 id="operational-patterns">Operational Patterns<a class="anchor" href="#operational-patterns" aria-hidden="true">#</a></h2>
+<h3 id="ab-testing-models">A/B Testing Models<a class="anchor" href="#ab-testing-models" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public String chat(String userId, String message) {
+    String variant = experimentService.getVariant(userId, &quot;model_test&quot;);
+    return switch (variant) {
+        case &quot;control&quot; -&gt; baseModel.chat(message);
+        case &quot;treatment&quot; -&gt; finetunedModel.chat(message);
+        default -&gt; baseModel.chat(message);
+    };
+}
+</code></pre></div>
+<p>Track per-variant metrics:
+- Task success rate (proxy: re-asks)
+- Latency
+- Cost
+- User feedback ratio</p>
+<p>Ramp on improvement.</p>
+<h3 id="re-training-cadence">Re-Training Cadence<a class="anchor" href="#re-training-cadence" aria-hidden="true">#</a></h3>
+<p>Base models update; your data drifts; fine-tunes stale.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Cadence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base model upgrade (Llama 3.1 → 3.2)</td>
+<td>Re-tune within 3 months</td>
+</tr>
+<tr>
+<td>Eval pass rate drops &gt; 5%</td>
+<td>Investigate / re-tune</td>
+</tr>
+<tr>
+<td>New product category</td>
+<td>Targeted addition to training data</td>
+</tr>
+<tr>
+<td>Quarterly review</td>
+<td>Re-tune even if metrics stable, with fresh data</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="cost-lifecycle">Cost Lifecycle<a class="anchor" href="#cost-lifecycle" aria-hidden="true">#</a></h3>
+<p>A fine-tune project's costs:
+- <strong>Year 1 (build)</strong>: $50K-$500K — data labeling, training runs, infra
+- <strong>Year 2-5 (operate)</strong>: $10K-$50K/year — re-training, monitoring, eval
+- <strong>Serving (ongoing)</strong>: depends on volume; often LOWER than hosted LLM at scale</p>
+<p>At what scale fine-tuning becomes cheaper than hosted LLMs:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Threshold = (Annual training cost) / (Per-token cost saved)
+</code></pre></div>
+<p>For typical 70B fine-tune with $50K/year ongoing and 50% per-token saving vs hosted: ~50B tokens/year ≈ 130M/day. High-volume use cases.</p>
+<p>For very high volume (1B+ tokens/day) the case for fine-tune becomes obvious. For &lt;100M tokens/day, prompting/RAG usually wins on TCO.</p>
+<h2 id="data-strategy-often-the-hard-part">Data Strategy — Often the Hard Part<a class="anchor" href="#data-strategy-often-the-hard-part" aria-hidden="true">#</a></h2>
+<p>Fine-tuning quality is bounded by data quality. Architecture for data:</p>
+<h3 id="sourcing">Sourcing<a class="anchor" href="#sourcing" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>From production logs</strong>: real queries + accepted responses. Get human approval before training on them.</li>
+<li><strong>From human labelers</strong>: highest quality, slow, expensive ($1-$50/label depending on complexity).</li>
+<li><strong>From a teacher model</strong>: GPT-4 generates training data for your smaller model (distillation).</li>
+<li><strong>From rules/templates</strong>: synthetic data for stable categories. Combine with human review.</li>
+</ul>
+<h3 id="versioning">Versioning<a class="anchor" href="#versioning" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>data/
+  /training/
+    /v1-baseline/
+      /examples.jsonl     (10K examples)
+      /provenance.yaml    (where each came from)
+    /v2-added-billing/
+      /examples.jsonl     (15K — added 5K billing examples)
+</code></pre></div>
+<p>Reproducibility: training run X used dataset Y at commit Z.</p>
+<h3 id="quality-gating">Quality Gating<a class="anchor" href="#quality-gating" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">python</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-python">def filter_examples(examples):
+    return [
+        e for e in examples
+        if len(e.input) &gt; 10
+        and len(e.output) &gt; 5
+        and not contains_pii(e.input)
+        and not contains_pii(e.output)
+        and not contains_offensive(e.output)
+    ]
+</code></pre></div>
+<p>Bad training data = bad model. Tooling for cleaning matters.</p>
+<h2 id="evaluation-even-harder-than-rag-eval">Evaluation — Even Harder than RAG Eval<a class="anchor" href="#evaluation-even-harder-than-rag-eval" aria-hidden="true">#</a></h2>
+<p>You're evaluating a model, not a prompt. Patterns:</p>
+<h3 id="held-out-test-set">Held-Out Test Set<a class="anchor" href="#held-out-test-set" aria-hidden="true">#</a></h3>
+<ul>
+<li>Curate 1K+ test cases NOT in training</li>
+<li>Run after every training run</li>
+<li>Track pass rate, hallucination rate, quality metrics</li>
+<li>Gate deployment</li>
+</ul>
+<h3 id="production-comparison">Production Comparison<a class="anchor" href="#production-comparison" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">python</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-python">def grade_pair(prod_response, candidate_response, prompt):
+    return llm_judge(f&quot;&quot;&quot;
+        Which response is better? Or are they equivalent?
+        Prompt: {prompt}
+        Response A: {prod_response}
+        Response B: {candidate_response}
+    &quot;&quot;&quot;).winner
+</code></pre></div>
+<p>Statistical sample of production traffic, paired comparisons, judge by LLM or humans.</p>
+<h3 id="ablation-studies">Ablation Studies<a class="anchor" href="#ablation-studies" aria-hidden="true">#</a></h3>
+<p>To understand if fine-tuning is "working" beyond just better prompting:
+- Run base model with same prompt → baseline
+- Run fine-tuned model with same prompt → after-tuning
+- Compare. Real fine-tuning gain should be visible.</p>
+<h3 id="adversarial-testing">Adversarial Testing<a class="anchor" href="#adversarial-testing" aria-hidden="true">#</a></h3>
+<p>Probe specific failure modes:
+- Out-of-distribution inputs (random topics)
+- Prompt injection attempts
+- Edge cases from production</p>
+<h2 id="privacy-and-compliance">Privacy and Compliance<a class="anchor" href="#privacy-and-compliance" aria-hidden="true">#</a></h2>
+<p>Fine-tuning has unique privacy/compliance dimensions:</p>
+<h3 id="training-data-privacy">Training Data Privacy<a class="anchor" href="#training-data-privacy" aria-hidden="true">#</a></h3>
+<ul>
+<li>Training data may contain PII → model may regurgitate it</li>
+<li>"Right to be forgotten" → need ability to retrain without specific data</li>
+<li>Solution: PII scrubbing pre-training, on-demand retraining</li>
+</ul>
+<h3 id="model-as-data-store">Model as Data Store<a class="anchor" href="#model-as-data-store" aria-hidden="true">#</a></h3>
+<p>A fine-tuned model is a derived data product. In GDPR/CCPA terms, it processes personal data. Document this in DPIAs.</p>
+<h3 id="geographic-restrictions">Geographic Restrictions<a class="anchor" href="#geographic-restrictions" aria-hidden="true">#</a></h3>
+<p>Some regions require on-premises serving. Fine-tunes give you control to deploy where required.</p>
+<h2 id="common-pitfalls">Common Pitfalls<a class="anchor" href="#common-pitfalls" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Fine-tuning when prompting would have worked.</strong> Burn $50K, 3 months, then realize 30 minutes of prompt engineering would have gotten the same result.</p><p>[!WARNING]
+<strong>Insufficient data.</strong> Fine-tuning with &lt;500 examples often makes models worse, not better.</p>
+<p>[!WARNING]
+<strong>No held-out eval set.</strong> Train on everything, deploy, surprise — quality drops on inputs not in training.</p>
+<p>[!WARNING]
+<strong>Forgetting base capabilities.</strong> Fine-tuning on narrow data can make the model "forget" general capabilities. Mix in general examples.</p>
+<p>[!WARNING]
+<strong>No rollback plan.</strong> Deploy a fine-tune, find a regression, can't quickly switch back. Maintain a registry of previous good models.</p>
+<p>[!WARNING]
+<strong>Training data contamination.</strong> Test cases accidentally in training data → eval looks great, production tanks.</p>
+<p>[!WARNING]
+<strong>No monitoring of base model upgrades.</strong> Llama 3.1 → 3.2 → your fine-tune is now stale; re-tune on schedule.</p>
+<p>[!WARNING]
+<strong>PII regurgitation.</strong> Fine-tuned model says things it learned from your training data. Audit before serving.</p>
+<p>[!WARNING]
+<strong>Underestimating ongoing cost.</strong> Fine-tuning is not "build once." Plan for re-tuning every 3-12 months.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Decide before doing.</strong> For 5 hypothetical features, write down whether to use prompting, RAG, LoRA, or distillation. Justify each.</li>
+<li><strong>LoRA fine-tune a 7B model.</strong> Llama-3.1-8B with 10K examples on a single GPU. Measure quality vs base model.</li>
+<li><strong>Distillation experiment.</strong> Generate training data with GPT-4, fine-tune Llama-3.1-8B. Compare serving cost to GPT-4.</li>
+<li><strong>Shadow mode deployment.</strong> Run a fine-tune in shadow for a week. Build comparison dataset. Evaluate.</li>
+<li><strong>A/B test in production.</strong> 10% traffic to fine-tune, 90% control. Measure per-variant outcomes.</li>
+<li><strong>Eval harness.</strong> Build 500-case held-out set. Automated runs on every training. CI/CD gate.</li>
+<li><strong>Data pipeline.</strong> Source → clean → version → train. Document provenance for every example.</li>
+<li><strong>Cost model.</strong> For your use case, model TCO of: prompted GPT-4, distilled 7B, full SFT 13B over 3 years.</li>
+<li><strong>Disaster drill.</strong> Deploy a bad fine-tune to staging. Practice rollback. Time it.</li>
+<li><strong>PII audit.</strong> Send adversarial probes to fine-tuned model. Verify no training data leakage.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we should fine-tune to get faster responses." Write a 300-word response with the right trade-off analysis.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Decide between prompting, RAG, and fine-tuning based on use case characteristics</li>
+<li>Choose between full SFT, LoRA, QLoRA, DPO, and distillation</li>
+<li>Plan the infrastructure: training GPUs, serving GPUs, model registry, training pipeline</li>
+<li>Integrate fine-tuned models into a Java backend via OpenAI-compatible serving (vLLM, TGI)</li>
+<li>Operate the model lifecycle: A/B testing, shadow mode, re-training cadence</li>
+<li>Architect the data pipeline: sourcing, versioning, quality gating, PII handling</li>
+<li>Build eval harnesses appropriate for fine-tuned models (held-out tests, production comparison, adversarial)</li>
+<li>Forecast TCO including training, infrastructure, ongoing re-training, monitoring</li>
+<li>Avoid the common pitfalls: insufficient data, training contamination, forgetting base capabilities, PII regurgitation</li>
+</ul>
+<p>Fine-tuning is the most strategic AI decision a company makes — biggest upfront cost, longest commitment, but unique benefits (consistent behavior, low serving cost at scale, ownership). Most companies should NOT fine-tune. The ones who should should treat it as multi-year infrastructure investment, not a one-time experiment.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c11-t06-ai-safety-and-prompt-injection-defense.html">AI Safety &amp; Prompt Injection Defense</a> — defending against the new class of LLM-specific security threats.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Model Fine-Tuning Architecture — When, How, Infrastructure&quot;
+slug: model-fine-tuning-architecture-decisions
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;AI System Architecture&quot;
+type: concept
+difficulty: staff
+order: 5
+tags: [fine-tuning, lora, qlora, sft, rlhf, dpo, peft, training-infrastructure, gpu, model-serving, model-registry, vs-rag, distillation, ablation]
+prerequisites: [rag-patterns, when-to-use-llms-vs-traditional-ml, ai-gateway-design]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-10
+---
+
+# Model Fine-Tuning Architecture — When, How, Infrastructure
+
+Fine-tuning is the AI equivalent of switching from &quot;configuration&quot; to &quot;custom hardware&quot; — bigger upfront cost, ongoing operational responsibility, but unique capabilities. In 2026 fine-tuning has become more accessible (LoRA, QLoRA, hosted fine-tuning APIs) but the architectural decision of &quot;should we fine-tune?&quot; remains one of the highest-stakes calls in AI strategy.
+
+This topic covers the architectural side of fine-tuning: when it beats RAG and prompting, how to choose between full fine-tuning, LoRA, distillation, and DPO, the infrastructure required (GPU clusters, training pipelines, model registries, A/B serving), and the operational patterns for keeping fine-tuned models in production for years.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [When to Use LLMs vs Traditional ML](T01-when-to-use-llms-vs-traditional-ml.md), [RAG Patterns](../../L4-backend-engineering/C18-ai-llm-integration/T05-rag-retrieval-augmented-generation-patterns.md), [AI Gateway Design](T02-ai-gateway-design-rate-limiting-fallback-caching.md). Familiarity with basic ML training concepts helps.
+
+## Fine-Tuning vs RAG vs Prompting
+
+The first question isn&#x27;t &quot;how to fine-tune&quot; — it&#x27;s &quot;should I?&quot;. This is a 3-way comparison.
+
+| Aspect | Prompting | RAG | Fine-Tuning |
+|---|---|---|---|
+| **What changes** | The input prompt | Retrieval context added at runtime | Model weights modified |
+| **Cost to start** | $0 | Embedding + storage | $1K-$1M+ |
+| **Latency added** | None | +200-500ms (retrieval) | None (or less) |
+| **Knowledge update** | Edit prompt | Re-index docs | Re-train |
+| **Provenance** | Easy (cite prompt) | Easy (cite retrieved chunks) | Hard (knowledge baked in) |
+| **Per-query cost** | Standard | Standard + retrieval | Often LOWER (smaller model) |
+| **New domain** | Limited | Add documents | Train on new domain |
+| **New behavior** | Hard | Hard | Native |
+| **Hallucination** | Medium | Lower (grounded) | Higher (no grounding) |
+| **Best for** | Generic tasks | Knowledge-grounded Q&amp;A | Stylistic tasks, low-cost serving |
+
+### When Fine-Tuning Wins
+
+1. **You need consistent tone/format that prompting can&#x27;t reliably enforce.** Example: customer support replies in a specific brand voice, generated SQL in your exact format conventions, code with your team&#x27;s style.
+
+2. **You want a smaller/faster/cheaper model for serving.** Distill GPT-4 quality into a 7B Llama variant. Serving cost drops 10-100×.
+
+3. **You have a stable task with abundant labeled data.** 50K+ labeled examples of &quot;this question → that answer&quot; pattern.
+
+4. **You need to teach a specific reasoning pattern not in base model training.** Domain-specific decision frameworks, custom code analysis.
+
+5. **You need to remove certain behaviors.** Base model says things you don&#x27;t want (legal disclaimers, refusals). DPO can train against these.
+
+6. **You need consistent structured output the base model can&#x27;t reliably produce.** Long JSON schemas with many fields.
+
+### When Fine-Tuning Is Wrong
+
+1. **Information that changes frequently.** RAG. Always RAG for current data.
+
+2. **You have &lt;1K labeled examples.** Prompt engineering or few-shot. Not enough signal to fine-tune well.
+
+3. **You need to add huge knowledge.** Fine-tuning is bad at memorization; RAG is great at it.
+
+4. **You can solve it with a better prompt.** Try first. Many &quot;we need to fine-tune&quot; turn out to need better prompts.
+
+5. **Stable open-weights model doesn&#x27;t exist for your need.** Pre-2024 you had to deal with this; 2026 has Llama 3.1, Mistral, Qwen, Gemma — but still gaps exist.
+
+6. **You can&#x27;t afford ongoing operational responsibility.** Fine-tuned models are infrastructure. You own them, you maintain them, you re-tune them as base models evolve.
+
+## Fine-Tuning Methods — The Trade-Off Space
+
+### Full Fine-Tuning (SFT — Supervised Fine-Tuning)
+
+Update all model weights on your dataset.
+
+- **Cost**: $10K-$1M+ depending on model size and data
+- **Hardware**: Multi-GPU cluster (8× A100 minimum for 70B models)
+- **Time**: Days to weeks
+- **Quality**: Highest possible
+- **Storage**: Full copy of model weights per fine-tune
+- **When**: Strategic core model, willing to invest
+
+### LoRA (Low-Rank Adaptation)
+
+Train small &quot;adapter&quot; matrices instead of full weights. The adapter is added to the base model at inference.
+
+- **Cost**: $100-$10K
+- **Hardware**: Single GPU often sufficient (24GB)
+- **Time**: Hours
+- **Quality**: 90-95% of full fine-tuning
+- **Storage**: Adapter is ~1% size of base model (megabytes)
+- **When**: Most fine-tuning needs in 2026
+
+LoRA is the default choice unless you have a specific reason for full fine-tuning. You can hold dozens of LoRA adapters and swap them in seconds.
+
+### QLoRA (Quantized LoRA)
+
+LoRA + 4-bit quantized base model. Even smaller GPU memory footprint.
+
+- **Cost**: $50-$5K
+- **Hardware**: Consumer GPU (24GB RTX 4090) can fine-tune 70B models
+- **Time**: Hours
+- **Quality**: Comparable to LoRA
+- **When**: Budget-constrained or experimentation
+
+### DPO (Direct Preference Optimization)
+
+Train on preference pairs (&quot;response A is better than response B for this prompt&quot;) rather than supervised labels. Successor to RLHF, simpler to operate.
+
+- **Cost**: $500-$50K
+- **Data**: Need preference pairs, often from human feedback
+- **When**: You want to shape model behavior beyond what supervised data shows (refusal patterns, tone, formatting preferences)
+
+### Distillation
+
+Train a smaller &quot;student&quot; model to mimic a bigger &quot;teacher&quot; model&#x27;s outputs.
+
+- **Cost**: $1K-$100K
+- **Output**: Small model (1B-13B) approximating GPT-4-class quality on your task
+- **Serving cost**: 10-100× cheaper than the teacher
+- **When**: High-volume serving where cost dominates
+
+Distillation is the secret weapon for production economics. Real example: a 100M-call/day classification task, GPT-4 cost $50K/month, distilled 7B model cost $300/month with 92% of the quality.
+
+### RAG-Augmented Fine-Tuning
+
+Train the model to use retrieved context better. The model learns to &quot;trust&quot; the RAG content over its parametric knowledge.
+
+- **When**: Production RAG that still hallucinates despite good context
+
+### Continual Learning
+
+Periodically re-fine-tune as your data grows. Drift mitigation built into the lifecycle.
+
+## The Decision Matrix
+
+```
+                          Quality requirement
+                          ▲
+                          │
+                          │      Full SFT
+                          │           ●
+                          │      LoRA
+                          │           ●
+                          │
+                          │  Distillation        Base model + RAG
+                          │     ●                    ●
+                          │
+                          │  Prompt eng
+                          │     ●
+                          │
+                          └──────────────────────────────▶ Cost (training + serving)
+```
+
+Pick the leftmost point that hits your quality bar.
+
+## Infrastructure — What You Need
+
+### Training Infrastructure
+
+For LoRA fine-tuning of 7B-13B models:
+- 1× A100 80GB OR 1× H100 80GB OR 2× A100 40GB
+- $3-$10/hour spot pricing
+- Total cost for typical run: $50-$500
+
+For full fine-tuning of 70B models:
+- 8× H100 (or 16× A100)
+- ~$50K-$200K for a single training run
+- Multi-node setups need fast networking (InfiniBand)
+
+### Serving Infrastructure
+
+| Model Size | Min GPU | Throughput | Notes |
+|---|---|---|---|
+| 7B (FP16) | 1× A10G | 1000 tok/s | $0.50/hr base |
+| 13B (FP16) | 1× A100 40GB | 800 tok/s | Most common |
+| 13B (INT8) | 1× A10G | 800 tok/s | 4× cheaper, ~2% quality loss |
+| 70B (FP16) | 4× A100 80GB | 400 tok/s | $12/hr |
+| 70B (INT4) | 2× A100 40GB | 350 tok/s | 4× cheaper, ~5% quality loss |
+
+For 24/7 serving: reserved instances. For variable load: serverless inference (Modal, Replicate).
+
+### Model Registry
+
+A versioned store for trained models, like git for weights:
+
+```
+registry/
+  /models/
+    /support-bot-v1/        (full SFT of Llama-3.1-8B)
+      /weights.safetensors
+      /config.json
+      /metadata.yaml
+    /support-bot-v2-lora/   (LoRA adapter)
+      /adapter.safetensors  (50MB vs 16GB)
+      /base: llama-3.1-8b
+      /metadata.yaml
+```
+
+Tooling: MLflow, Weights &amp; Biases, HuggingFace Hub, or custom S3 + Postgres.
+
+### Training Pipeline
+
+```
+┌──────────┐   ┌────────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│ Data     │──▶│ Validation │──▶│ Training │──▶│ Eval     │──▶│ Registry │
+│ Curation │   │ &amp; Cleaning │   │ Job      │   │ Suite    │   │          │
+└──────────┘   └────────────┘   └──────────┘   └──────────┘   └──────────┘
+                                       │            │
+                                       │            ├─PASS─▶ Deploy
+                                       │            └─FAIL─▶ Re-train
+                                       ▼
+                                 ┌──────────┐
+                                 │ Metrics  │
+                                 │ tracking │
+                                 └──────────┘
+```
+
+Each stage is automated. Re-runnable. Hyperparameters tracked. Reproducible.
+
+## Java Backend Integration
+
+### Calling a Fine-Tuned Model
+
+Most fine-tuned models are served on internal infrastructure (vLLM, TGI, Triton) with an OpenAI-compatible API. Spring AI works against it:
+
+```yaml
+spring:
+  ai:
+    openai:
+      base-url: http://internal-vllm:8000/v1   # ← your fine-tuned model
+      api-key: not-needed
+      chat:
+        options:
+          model: support-bot-v2-lora
+```
+
+Application code is identical to using GPT-4.
+
+### Multi-Model Routing
+
+For mixed deployments (custom model for primary use case, hosted LLM for fallback):
+
+```java
+@Service
+public class RoutedAIService {
+
+    @Autowired @Qualifier(&quot;custom&quot;) private ChatClient custom;
+    @Autowired @Qualifier(&quot;openai&quot;) private ChatClient openai;
+
+    public String chat(String userId, String message, RequestContext ctx) {
+        if (ctx.feature().equals(&quot;support_chat&quot;)) {
+            try {
+                return custom.prompt().user(message).call().content();
+            } catch (Exception e) {
+                log.warn(&quot;Custom model failed, falling back to OpenAI&quot;, e);
+                meter.counter(&quot;model.fallback&quot;).increment();
+                return openai.prompt().user(message).call().content();
+            }
+        }
+        return openai.prompt().user(message).call().content();
+    }
+}
+```
+
+### Shadow Mode for New Models
+
+Before serving traffic from a new fine-tuned model, shadow it:
+
+```java
+public String chat(String message) {
+    String prodResponse = prodModel.chat(message);
+
+    // Asynchronously also query the new model; compare quality
+    CompletableFuture.runAsync(() -&gt; {
+        String shadowResponse = shadowModel.chat(message);
+        comparator.record(message, prodResponse, shadowResponse);
+    });
+
+    return prodResponse;
+}
+```
+
+Build a comparison dataset; have humans/LLM-judge grade them. Promote only if shadow consistently better.
+
+## Operational Patterns
+
+### A/B Testing Models
+
+```java
+public String chat(String userId, String message) {
+    String variant = experimentService.getVariant(userId, &quot;model_test&quot;);
+    return switch (variant) {
+        case &quot;control&quot; -&gt; baseModel.chat(message);
+        case &quot;treatment&quot; -&gt; finetunedModel.chat(message);
+        default -&gt; baseModel.chat(message);
+    };
+}
+```
+
+Track per-variant metrics:
+- Task success rate (proxy: re-asks)
+- Latency
+- Cost
+- User feedback ratio
+
+Ramp on improvement.
+
+### Re-Training Cadence
+
+Base models update; your data drifts; fine-tunes stale.
+
+| Trigger | Cadence |
+|---|---|
+| Base model upgrade (Llama 3.1 → 3.2) | Re-tune within 3 months |
+| Eval pass rate drops &gt; 5% | Investigate / re-tune |
+| New product category | Targeted addition to training data |
+| Quarterly review | Re-tune even if metrics stable, with fresh data |
+
+### Cost Lifecycle
+
+A fine-tune project&#x27;s costs:
+- **Year 1 (build)**: $50K-$500K — data labeling, training runs, infra
+- **Year 2-5 (operate)**: $10K-$50K/year — re-training, monitoring, eval
+- **Serving (ongoing)**: depends on volume; often LOWER than hosted LLM at scale
+
+At what scale fine-tuning becomes cheaper than hosted LLMs:
+
+```
+Threshold = (Annual training cost) / (Per-token cost saved)
+```
+
+For typical 70B fine-tune with $50K/year ongoing and 50% per-token saving vs hosted: ~50B tokens/year ≈ 130M/day. High-volume use cases.
+
+For very high volume (1B+ tokens/day) the case for fine-tune becomes obvious. For &lt;100M tokens/day, prompting/RAG usually wins on TCO.
+
+## Data Strategy — Often the Hard Part
+
+Fine-tuning quality is bounded by data quality. Architecture for data:
+
+### Sourcing
+
+- **From production logs**: real queries + accepted responses. Get human approval before training on them.
+- **From human labelers**: highest quality, slow, expensive ($1-$50/label depending on complexity).
+- **From a teacher model**: GPT-4 generates training data for your smaller model (distillation).
+- **From rules/templates**: synthetic data for stable categories. Combine with human review.
+
+### Versioning
+
+```
+data/
+  /training/
+    /v1-baseline/
+      /examples.jsonl     (10K examples)
+      /provenance.yaml    (where each came from)
+    /v2-added-billing/
+      /examples.jsonl     (15K — added 5K billing examples)
+```
+
+Reproducibility: training run X used dataset Y at commit Z.
+
+### Quality Gating
+
+```python
+def filter_examples(examples):
+    return [
+        e for e in examples
+        if len(e.input) &gt; 10
+        and len(e.output) &gt; 5
+        and not contains_pii(e.input)
+        and not contains_pii(e.output)
+        and not contains_offensive(e.output)
+    ]
+```
+
+Bad training data = bad model. Tooling for cleaning matters.
+
+## Evaluation — Even Harder than RAG Eval
+
+You&#x27;re evaluating a model, not a prompt. Patterns:
+
+### Held-Out Test Set
+
+- Curate 1K+ test cases NOT in training
+- Run after every training run
+- Track pass rate, hallucination rate, quality metrics
+- Gate deployment
+
+### Production Comparison
+
+```python
+def grade_pair(prod_response, candidate_response, prompt):
+    return llm_judge(f&quot;&quot;&quot;
+        Which response is better? Or are they equivalent?
+        Prompt: {prompt}
+        Response A: {prod_response}
+        Response B: {candidate_response}
+    &quot;&quot;&quot;).winner
+```
+
+Statistical sample of production traffic, paired comparisons, judge by LLM or humans.
+
+### Ablation Studies
+
+To understand if fine-tuning is &quot;working&quot; beyond just better prompting:
+- Run base model with same prompt → baseline
+- Run fine-tuned model with same prompt → after-tuning
+- Compare. Real fine-tuning gain should be visible.
+
+### Adversarial Testing
+
+Probe specific failure modes:
+- Out-of-distribution inputs (random topics)
+- Prompt injection attempts
+- Edge cases from production
+
+## Privacy and Compliance
+
+Fine-tuning has unique privacy/compliance dimensions:
+
+### Training Data Privacy
+
+- Training data may contain PII → model may regurgitate it
+- &quot;Right to be forgotten&quot; → need ability to retrain without specific data
+- Solution: PII scrubbing pre-training, on-demand retraining
+
+### Model as Data Store
+
+A fine-tuned model is a derived data product. In GDPR/CCPA terms, it processes personal data. Document this in DPIAs.
+
+### Geographic Restrictions
+
+Some regions require on-premises serving. Fine-tunes give you control to deploy where required.
+
+## Common Pitfalls
+
+&gt; [!WARNING]
+&gt; **Fine-tuning when prompting would have worked.** Burn $50K, 3 months, then realize 30 minutes of prompt engineering would have gotten the same result.
+
+&gt; [!WARNING]
+&gt; **Insufficient data.** Fine-tuning with &lt;500 examples often makes models worse, not better.
+
+&gt; [!WARNING]
+&gt; **No held-out eval set.** Train on everything, deploy, surprise — quality drops on inputs not in training.
+
+&gt; [!WARNING]
+&gt; **Forgetting base capabilities.** Fine-tuning on narrow data can make the model &quot;forget&quot; general capabilities. Mix in general examples.
+
+&gt; [!WARNING]
+&gt; **No rollback plan.** Deploy a fine-tune, find a regression, can&#x27;t quickly switch back. Maintain a registry of previous good models.
+
+&gt; [!WARNING]
+&gt; **Training data contamination.** Test cases accidentally in training data → eval looks great, production tanks.
+
+&gt; [!WARNING]
+&gt; **No monitoring of base model upgrades.** Llama 3.1 → 3.2 → your fine-tune is now stale; re-tune on schedule.
+
+&gt; [!WARNING]
+&gt; **PII regurgitation.** Fine-tuned model says things it learned from your training data. Audit before serving.
+
+&gt; [!WARNING]
+&gt; **Underestimating ongoing cost.** Fine-tuning is not &quot;build once.&quot; Plan for re-tuning every 3-12 months.
+
+## Practice
+
+1. **Decide before doing.** For 5 hypothetical features, write down whether to use prompting, RAG, LoRA, or distillation. Justify each.
+2. **LoRA fine-tune a 7B model.** Llama-3.1-8B with 10K examples on a single GPU. Measure quality vs base model.
+3. **Distillation experiment.** Generate training data with GPT-4, fine-tune Llama-3.1-8B. Compare serving cost to GPT-4.
+4. **Shadow mode deployment.** Run a fine-tune in shadow for a week. Build comparison dataset. Evaluate.
+5. **A/B test in production.** 10% traffic to fine-tune, 90% control. Measure per-variant outcomes.
+6. **Eval harness.** Build 500-case held-out set. Automated runs on every training. CI/CD gate.
+7. **Data pipeline.** Source → clean → version → train. Document provenance for every example.
+8. **Cost model.** For your use case, model TCO of: prompted GPT-4, distilled 7B, full SFT 13B over 3 years.
+9. **Disaster drill.** Deploy a bad fine-tune to staging. Practice rollback. Time it.
+10. **PII audit.** Send adversarial probes to fine-tuned model. Verify no training data leakage.
+11. **The skeptic conversation.** A senior engineer says &quot;we should fine-tune to get faster responses.&quot; Write a 300-word response with the right trade-off analysis.
+
+## Recap
+
+You should now be able to:
+
+- Decide between prompting, RAG, and fine-tuning based on use case characteristics
+- Choose between full SFT, LoRA, QLoRA, DPO, and distillation
+- Plan the infrastructure: training GPUs, serving GPUs, model registry, training pipeline
+- Integrate fine-tuned models into a Java backend via OpenAI-compatible serving (vLLM, TGI)
+- Operate the model lifecycle: A/B testing, shadow mode, re-training cadence
+- Architect the data pipeline: sourcing, versioning, quality gating, PII handling
+- Build eval harnesses appropriate for fine-tuned models (held-out tests, production comparison, adversarial)
+- Forecast TCO including training, infrastructure, ongoing re-training, monitoring
+- Avoid the common pitfalls: insufficient data, training contamination, forgetting base capabilities, PII regurgitation
+
+Fine-tuning is the most strategic AI decision a company makes — biggest upfront cost, longest commitment, but unique benefits (consistent behavior, low serving cost at scale, ownership). Most companies should NOT fine-tune. The ones who should should treat it as multi-year infrastructure investment, not a one-time experiment.
+
+## Next
+
+Continue to [AI Safety &amp; Prompt Injection Defense](T06-ai-safety-and-prompt-injection-defense.md) — defending against the new class of LLM-specific security threats.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><div class="lbl">← Previous</div><div class="ttl">T04-rag-at-scale-millions-of-docs-fresh-data</div><div class="sub">RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</div></a><a class="next" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><div class="lbl">Next →</div><div class="ttl">T06-ai-safety-and-prompt-injection-defense</div><div class="sub">AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#fine-tuning-vs-rag-vs-prompting" data-toc-link>Fine-Tuning vs RAG vs Prompting</a></li><li class="lvl-3"><a href="#when-fine-tuning-wins" data-toc-link>When Fine-Tuning Wins</a></li><li class="lvl-3"><a href="#when-fine-tuning-is-wrong" data-toc-link>When Fine-Tuning Is Wrong</a></li><li class="lvl-2"><a href="#fine-tuning-methods-the-trade-off-space" data-toc-link>Fine-Tuning Methods — The Trade-Off Space</a></li><li class="lvl-3"><a href="#full-fine-tuning-sft-supervised-fine-tuning" data-toc-link>Full Fine-Tuning (SFT — Supervised Fine-Tuning)</a></li><li class="lvl-3"><a href="#lora-low-rank-adaptation" data-toc-link>LoRA (Low-Rank Adaptation)</a></li><li class="lvl-3"><a href="#qlora-quantized-lora" data-toc-link>QLoRA (Quantized LoRA)</a></li><li class="lvl-3"><a href="#dpo-direct-preference-optimization" data-toc-link>DPO (Direct Preference Optimization)</a></li><li class="lvl-3"><a href="#distillation" data-toc-link>Distillation</a></li><li class="lvl-3"><a href="#rag-augmented-fine-tuning" data-toc-link>RAG-Augmented Fine-Tuning</a></li><li class="lvl-3"><a href="#continual-learning" data-toc-link>Continual Learning</a></li><li class="lvl-2"><a href="#the-decision-matrix" data-toc-link>The Decision Matrix</a></li><li class="lvl-2"><a href="#infrastructure-what-you-need" data-toc-link>Infrastructure — What You Need</a></li><li class="lvl-3"><a href="#training-infrastructure" data-toc-link>Training Infrastructure</a></li><li class="lvl-3"><a href="#serving-infrastructure" data-toc-link>Serving Infrastructure</a></li><li class="lvl-3"><a href="#model-registry" data-toc-link>Model Registry</a></li><li class="lvl-3"><a href="#training-pipeline" data-toc-link>Training Pipeline</a></li><li class="lvl-2"><a href="#java-backend-integration" data-toc-link>Java Backend Integration</a></li><li class="lvl-3"><a href="#calling-a-fine-tuned-model" data-toc-link>Calling a Fine-Tuned Model</a></li><li class="lvl-3"><a href="#multi-model-routing" data-toc-link>Multi-Model Routing</a></li><li class="lvl-3"><a href="#shadow-mode-for-new-models" data-toc-link>Shadow Mode for New Models</a></li><li class="lvl-2"><a href="#operational-patterns" data-toc-link>Operational Patterns</a></li><li class="lvl-3"><a href="#ab-testing-models" data-toc-link>A/B Testing Models</a></li><li class="lvl-3"><a href="#re-training-cadence" data-toc-link>Re-Training Cadence</a></li><li class="lvl-3"><a href="#cost-lifecycle" data-toc-link>Cost Lifecycle</a></li><li class="lvl-2"><a href="#data-strategy-often-the-hard-part" data-toc-link>Data Strategy — Often the Hard Part</a></li><li class="lvl-3"><a href="#sourcing" data-toc-link>Sourcing</a></li><li class="lvl-3"><a href="#versioning" data-toc-link>Versioning</a></li><li class="lvl-3"><a href="#quality-gating" data-toc-link>Quality Gating</a></li><li class="lvl-2"><a href="#evaluation-even-harder-than-rag-eval" data-toc-link>Evaluation — Even Harder than RAG Eval</a></li><li class="lvl-3"><a href="#held-out-test-set" data-toc-link>Held-Out Test Set</a></li><li class="lvl-3"><a href="#production-comparison" data-toc-link>Production Comparison</a></li><li class="lvl-3"><a href="#ablation-studies" data-toc-link>Ablation Studies</a></li><li class="lvl-3"><a href="#adversarial-testing" data-toc-link>Adversarial Testing</a></li><li class="lvl-2"><a href="#privacy-and-compliance" data-toc-link>Privacy and Compliance</a></li><li class="lvl-3"><a href="#training-data-privacy" data-toc-link>Training Data Privacy</a></li><li class="lvl-3"><a href="#model-as-data-store" data-toc-link>Model as Data Store</a></li><li class="lvl-3"><a href="#geographic-restrictions" data-toc-link>Geographic Restrictions</a></li><li class="lvl-2"><a href="#common-pitfalls" data-toc-link>Common Pitfalls</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

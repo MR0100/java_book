@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="active" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span></div>
+        <h1>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</h1>
+        <div><span class="source-path">examples/k8s-manifests/spring-boot-3-deployment</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><p>A production-grade baseline for running a Spring Boot 3 service (the book's
+<code>url-shortener</code>) on Kubernetes 1.29+. Every file is heavily commented; this
+README is the map.</p>
+<h2 id="what-this-demonstrates">What this demonstrates<a class="anchor" href="#what-this-demonstrates" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>configmap.yaml</code></td>
+<td>Namespace (with Istio injection + Pod Security Admission <code>restricted</code>), a token-less ServiceAccount, and a non-secret ConfigMap. Apply this <strong>first</strong> — the others depend on the namespace/SA.</td>
+</tr>
+<tr>
+<td><code>deployment.yaml</code></td>
+<td>The full <strong>security hardening checklist</strong> (L4/C08/T19), JVM container right-sizing (L5/C03/T15), and Actuator-backed startup/readiness/liveness probes (L4/C10).</td>
+</tr>
+<tr>
+<td><code>service.yaml</code></td>
+<td>A ClusterIP Service with an Istio-named <code>http</code> port spanning both canary subsets.</td>
+</tr>
+<tr>
+<td><code>hpa.yaml</code></td>
+<td><code>autoscaling/v2</code> HPA on CPU, with commented examples for memory and Prometheus-Adapter custom metrics, plus <code>behavior</code> anti-flap tuning.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="the-hardening-checklist-l4c08t19-where-each-control-lives">The hardening checklist (L4/C08/T19) — where each control lives<a class="anchor" href="#the-hardening-checklist-l4c08t19-where-each-control-lives" aria-hidden="true">#</a></h2>
+<p>All in <code>deployment.yaml</code> unless noted:</p>
+<ul>
+<li><code>runAsNonRoot: true</code>, <code>runAsUser/runAsGroup: 1000</code> — never run as root.</li>
+<li><code>readOnlyRootFilesystem: true</code> — immutable container FS, with writable
+  <code>emptyDir</code> volumes mounted only at <code>/tmp</code> and <code>/var/tmp</code>.</li>
+<li><code>allowPrivilegeEscalation: false</code>, <code>privileged: false</code>.</li>
+<li><code>capabilities.drop: [ALL]</code> — strip every Linux capability.</li>
+<li><code>seccompProfile.type: RuntimeDefault</code> — block dangerous syscalls.</li>
+<li><code>automountServiceAccountToken: false</code> — on both the pod and the SA
+  (<code>configmap.yaml</code>).</li>
+<li>Digest-pinned image (<code>@sha256:...</code>) — immutable, reproducible deploys.</li>
+<li>Pod Security Admission <code>enforce: restricted</code> at the namespace level
+  (<code>configmap.yaml</code>) — the cluster rejects any pod that regresses on the above.</li>
+</ul>
+<h2 id="jvm-right-sizing-l5c03t15">JVM right-sizing (L5/C03/T15)<a class="anchor" href="#jvm-right-sizing-l5c03t15" aria-hidden="true">#</a></h2>
+<p>The container sets <code>-XX:MaxRAMPercentage=75.0</code> instead of a fixed <code>-Xmx</code>. The
+JVM is cgroup-aware (JDK 10+), so the heap scales with the <strong>container memory
+limit</strong>, leaving ~25% headroom for off-heap memory (metaspace, thread stacks,
+code cache, direct buffers). Setting <code>-Xmx == limit</code> is the classic cause of
+container OOM-kills. See the inline comments on the <code>resources</code> and <code>env</code>
+blocks.</p>
+<h2 id="probes-l4c10">Probes (L4/C10)<a class="anchor" href="#probes-l4c10" aria-hidden="true">#</a></h2>
+<p>Wired to Spring Boot Actuator health groups:</p>
+<ul>
+<li><strong>startupProbe</strong> → <code>/actuator/health/readiness</code> — covers slow JVM cold start
+  (up to 150s) so a long boot isn't mistaken for a hang.</li>
+<li><strong>readinessProbe</strong> → <code>/actuator/health/readiness</code> — pulls the pod from
+  Service endpoints when a dependency is down, <strong>without</strong> restarting it.</li>
+<li><strong>livenessProbe</strong> → <code>/actuator/health/liveness</code> — restarts only on
+  unrecoverable state. Keep it dependency-free to avoid restart storms.</li>
+</ul>
+<h2 id="apply">Apply<a class="anchor" href="#apply" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># 1) Namespace + ServiceAccount + ConfigMap (creates the namespace).
+kubectl apply -f configmap.yaml
+
+# 2) Workload + Service + autoscaler.
+kubectl apply -f deployment.yaml -f service.yaml -f hpa.yaml
+
+# Watch the rollout.
+kubectl -n url-shortener rollout status deploy/url-shortener
+kubectl -n url-shortener get pods,svc,hpa
+
+# Quick health check from inside the cluster.
+kubectl -n url-shortener exec deploy/url-shortener -c url-shortener -- \
+  wget -qO- http://localhost:8080/actuator/health/readiness
+</code></pre></div>
+<h2 id="before-you-apply-substitutions">Before you apply — substitutions<a class="anchor" href="#before-you-apply-substitutions" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Image digest</strong>: replace the placeholder
+  <code>registry.example.com/url-shortener@sha256:0000...</code> in <code>deployment.yaml</code> with
+  your CI-built digest (<code>crane digest registry.example.com/url-shortener:1.0.0</code>).</li>
+<li><strong>Secrets</strong>: the ConfigMap holds non-secret config only. Create a <code>Secret</code>
+  (or <code>ExternalSecret</code>) for <code>SPRING_DATASOURCE_PASSWORD</code> and reference it from
+  the Deployment with <code>secretKeyRef</code>.</li>
+<li><strong>Replica/HPA bounds, resource sizes, zone topology keys</strong>: tune to your
+  cluster and SLOs.</li>
+</ul>
+<h2 id="source-files">Source files<a class="anchor" href="#source-files" aria-hidden="true">#</a></h2>
+<p><em>4 key file(s) from <code>examples/k8s-manifests/spring-boot-3-deployment/</code>. Truncated files are marked; see the repo for the full source.</em></p>
+<h3 id="configmapyaml"><code>configmap.yaml</code><a class="anchor" href="#configmapyaml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># =============================================================================
+# ConfigMap + supporting Namespace &amp; ServiceAccount for url-shortener
+# -----------------------------------------------------------------------------
+# Multiple documents in one file, separated by `---`. The Namespace and
+# ServiceAccount are kept here so `deployment.yaml` (which references both)
+# applies cleanly as a bundle.
+#
+# IMPORTANT: a ConfigMap is for NON-SECRET configuration only. It is stored in
+# etcd in plaintext and is trivially readable by anyone with get-configmap RBAC.
+# Database passwords, JWT signing keys, and API tokens belong in a Secret (or,
+# better, an ExternalSecret synced from Vault / cloud secret manager). See the
+# top-level README's &quot;secrets&quot; note.
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: url-shortener
+  labels:
+    app.kubernetes.io/part-of: url-shortener-platform
+    # Turn on automatic Istio sidecar injection for every pod in this namespace.
+    # This is the canonical way to enroll a namespace in the mesh.
+    istio-injection: enabled
+    # Pod Security Admission (PSA) — enforce the `restricted` profile at the
+    # namespace level. This makes the kubelet REJECT any pod that violates the
+    # hardening in deployment.yaml (root, privileged, missing seccomp, etc.),
+    # so a future careless manifest can't silently ship insecure. (L4/C08/T19)
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+# Belt-and-suspenders: even though the pod sets automountServiceAccountToken:
+# false, we also disable it at the SA level so any pod using this SA defaults to
+# no token mount. (L4/C08/T19)
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: url-shortener-config
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+data:
+  # ---- Spring runtime ----
+  SPRING_PROFILES_ACTIVE: &quot;prod,kubernetes&quot;
+  SERVER_PORT: &quot;8080&quot;
+  # Graceful shutdown: stop accepting requests on SIGTERM and drain in-flight
+  # ones (pairs with terminationGracePeriodSeconds + preStop in deployment.yaml).
+  SERVER_SHUTDOWN: &quot;graceful&quot;
+  SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE: &quot;30s&quot;
+
+  # ---- Actuator: expose ONLY what the platform needs ----
+  # Probes hit health/liveness + health/readiness; Prometheus scrapes
+  # /actuator/prometheus (see observability-stack/). Do NOT expose `env`,
+  # `heapdump`, `threaddump`, or `loggers` publicly.
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: &quot;health,info,prometheus&quot;
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: &quot;true&quot;
+  # Show readiness/liveness group details so probe failures are debuggable.
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: &quot;when_authorized&quot;
+  # Drive Spring's readiness state from the lifecycle so it flips to OUT_OF_
+  # SERVICE during shutdown — the readiness probe then de-registers the pod.
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: &quot;readinessState,db&quot;
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_LIVENESS_INCLUDE: &quot;livenessState&quot;
+  # Tag every metric with the app + version so dashboards can slice by canary.
+  MANAGEMENT_METRICS_TAGS_APPLICATION: &quot;url-shortener&quot;
+
+  # ---- App config (non-secret) ----
+  URLSHORTENER_BASEURL: &quot;https://sho.rt&quot;
+  URLSHORTENER_CACHE_TTL_SECONDS: &quot;3600&quot;
+  # Example: DB host/port/name are not secret; the PASSWORD is — keep it in a
+  # Secret and reference it via SPRING_DATASOURCE_PASSWORD from secretKeyRef.
+  SPRING_DATASOURCE_URL: &quot;jdbc:postgresql://postgres.url-shortener.svc.cluster.local:5432/urlshortener&quot;
+  SPRING_DATASOURCE_USERNAME: &quot;urlshortener_app&quot;
+</code></pre></div>
+<h3 id="deploymentyaml"><code>deployment.yaml</code><a class="anchor" href="#deploymentyaml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># =============================================================================
+# Hardened Spring Boot 3 Deployment
+# -----------------------------------------------------------------------------
+# Backing topics:
+#   - L4/C08/T19  Container &amp; Kubernetes security hardening (the securityContext
+#                 block below is a near-1:1 implementation of that topic).
+#   - L5/C03/T15  Right-sizing the JVM in containers (-XX:MaxRAMPercentage and
+#                 why container memory limits != JVM heap).
+#   - L4/C10      Observability (Actuator health probes feed k8s lifecycle).
+#
+# This manifest deploys the `url-shortener` Spring Boot service used elsewhere
+# in the book. It is deliberately over-commented: read it top-to-bottom as a
+# checklist of what &quot;production-grade&quot; means for a JVM workload on Kubernetes
+# 1.29+.
+# =============================================================================
+apiVersion: apps/v1           # Deployment has been GA under apps/v1 since k8s 1.9.
+kind: Deployment
+metadata:
+  name: url-shortener
+  namespace: url-shortener    # Run in a dedicated namespace (see top-level README).
+  labels:
+    # The recommended Kubernetes &quot;app.kubernetes.io/*&quot; label set. Tools, the
+    # Istio mesh, and Prometheus selectors all key off these.
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: url-shortener-platform
+    app.kubernetes.io/version: &quot;1.0.0&quot;
+    # Istio uses `app` and `version` for telemetry grouping and DestinationRule
+    # subset selection. `version: v1` is the subset the canary (istio-canary/)
+    # routes 90% of traffic to.
+    app: url-shortener
+    version: v1
+spec:
+  # Start with &gt;=2 replicas so a single node drain / rolling update never takes
+  # the service to zero. The HPA (hpa.yaml) will scale this further under load;
+  # once an HPA owns the object, omit hard-coded values here to avoid fighting
+  # it (kubectl apply + HPA both writing `replicas` causes thrash). We keep it
+  # for the very first rollout before the HPA's metrics are available.
+  replicas: 2
+  # Pods not Ready for 10 minutes during a rollout count as a failed rollout.
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 5     # Keep 5 old ReplicaSets for rollback; default 10.
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: url-shortener
+      app.kubernetes.io/instance: url-shortener
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1             # Allow 1 extra pod above desired during rollout.
+      maxUnavailable: 0       # Never drop below desired capacity — zero-downtime.
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: url-shortener
+        app.kubernetes.io/instance: url-shortener
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: url-shortener-platform
+        app.kubernetes.io/version: &quot;1.0.0&quot;
+        app: url-shortener
+        version: v1
+      annotations:
+        # Istio sidecar injection is normally enabled by labelling the namespace
+        # `istio-injection=enabled`. This annotation is the per-pod override and
+        # documents the intent explicitly.
+        sidecar.istio.io/inject: &quot;true&quot;
+        # NOTE: We deliberately do NOT add prometheus.io/scrape annotations.
+        # Scraping is configured declaratively via a ServiceMonitor in
+        # observability-stack/ (the Prometheus-Operator pattern), which is the
+        # current best practice over annotation-based scraping.
+    spec:
+      # -----------------------------------------------------------------------
+      # SECURITY HARDENING (L4/C08/T19)
+      # -----------------------------------------------------------------------
+      # Do not mount the default ServiceAccount token. Most app pods never call
+      # the Kubernetes API; mounting the token only widens the blast radius if
+      # the pod is compromised. Set to true only for pods that genuinely talk to
+      # the API server, and then scope the SA's RBAC tightly.
+      automountServiceAccountToken: false
+      # Use a dedicated, minimally-privileged ServiceAccount rather than
+      # `default`. (Define it separately; referenced here by name.)
+      serviceAccountName: url-shortener
+      # Pod-level securityContext: applies to all containers unless overridden.
+      securityContext:
+        runAsNonRoot: true        # Kubelet refuses to start the pod if the image
+                                  # resolves to UID 0. Defense-in-depth against
+                                  # images that forgot to drop root.
+        runAsUser: 1000           # Explicit non-root UID. Your Dockerfile should
+        runAsGroup: 1000          # `USER 1000` and chown app files to 1000:1000.
+        fsGroup: 1000             # Volumes (the emptyDir below) are group-owned
+                                  # by 1000 so the non-root process can write.
+        seccompProfile:
+          # RuntimeDefault applies the container runtime's default seccomp
+          # profile, blocking ~44 dangerous syscalls. This is the single
+          # highest-value, lowest-risk hardening flag for a JVM workload.
+          type: RuntimeDefault
+      # Spread pods across zones/nodes for resilience. topologySpreadConstraints
+      # is the modern replacement for most podAntiAffinity use cases.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          # Spread across availability zones first (best for surviving an AZ
+          # outage). Requires nodes labelled with topology.kubernetes.io/zone.
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway   # Soft: don't block scheduling if
+                                              # zones are imbalanced/unavailable.
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: url-shortener
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname  # Then avoid stacking on one node.
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: url-shortener
+      # ALTERNATIVE / ADDITION: a stricter &quot;never two replicas on one node&quot; rule
+      # via podAntiAffinity. Prefer topologySpreadConstraints above; uncomment
+      # this only if you need a hard guarantee.
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/name: url-shortener
+      #         topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 45  # Give the JVM time to drain in-flight
+                                         # requests on SIGTERM (Spring graceful
+                                         # shutdown: server.shutdown=graceful).
+      containers:
+        - name: url-shortener
+          # -------------------------------------------------------------------
+          # IMAGE: digest-pinned, NOT a mutable tag.
+          # -------------------------------------------------------------------
+          # Pinning by @sha256 digest makes the deployment immutable and
+          # reproducible: `:latest` (or even `:1.0.0`) can be repointed at new
+          # bytes, but a digest cannot. SUBSTITUTE the digest below with the one
+          # your CI emits (`docker buildx ... --push` prints it, or
+          # `crane digest registry.example.com/url-shortener:1.0.0`).
+          image: registry.example.com/url-shortener@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          imagePullPolicy: IfNotPresent  # Safe with digests: a digest is unique,
+                                         # so a cached layer is always correct.
+          ports:
+            - name: http          # Named port; probes and the Service refer to
+              containerPort: 8080  # it by name so the number lives in one place.
+              protocol: TCP
+          # -------------------------------------------------------------------
+          # JVM RIGHT-SIZING (L5/C03/T15)
+          # -------------------------------------------------------------------
+          # The JVM is container-aware since JDK 10+ (UseContainerSupport, on by
+          # default): it reads the cgroup memory limit, NOT the node's RAM.
+          # -Xmx is NOT set. Instead -XX:MaxRAMPercentage lets the heap scale
+          # with the container limit, so the same image works at 512Mi or 4Gi.
+          # Rule of thumb: leave ~25% headroom for non-heap memory (metaspace,
+          # thread stacks, code cache, direct buffers, GC structures) — that is
+          # what OOM-kills JVMs whose -Xmx == container limit.
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: &gt;-
+                -XX:MaxRAMPercentage=75.0
+                -XX:InitialRAMPercentage=50.0
+                -XX:+UseG1GC
+                -XX:+ExitOnOutOfMemoryError
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: url-shortener-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: url-shortener-config
+                  key: SERVER_PORT
+          envFrom:
+            # Pull the rest of the non-secret config in bulk. SECRETS (DB
+            # passwords, API keys) must come from a Secret/ExternalSecret, never
+            # a ConfigMap — out of scope here but noted in the README.
+            - configMapRef:
+                name: url-shortener-config
+          # -------------------------------------------------------------------
+          # RESOURCES: requests == scheduling guarantee, limits == ceiling.
+          # -------------------------------------------------------------------
+          resources:
+            requests:
+              # The scheduler reserves this; it is also the baseline the HPA
+              # measures CPU utilization against (averageUtilization is % of
+              # request). Set requests to steady-state usage.
+              cpu: &quot;250m&quot;
+              memory: &quot;512Mi&quot;
+            limits:
+              # CPU limit: throttles (does not kill). Many shops omit the CPU
+              # limit to avoid latency from throttling, keeping only the request.
+              # We set one here for predictability; tune per your SLOs.
+              cpu: &quot;1000m&quot;
+              # Memory limit: a hard ceiling — exceed it and the kernel OOM-kills
+              # the container. MaxRAMPercentage=75 of 1024Mi ~= 768Mi heap,
+              # leaving ~256Mi for off-heap. memory request == limit (no burst)
+              # is the safest default for the JVM.
+              memory: &quot;1024Mi&quot;
+          # -------------------------------------------------------------------
+          # CONTAINER-LEVEL SECURITY CONTEXT (L4/C08/T19)
+          # -------------------------------------------------------------------
+          securityContext:
+            allowPrivilegeEscalation: false  # Blocks setuid binaries from gaining
+                                             # more privs than the parent process.
+            privileged: false
+            readOnlyRootFilesystem: true     # The container FS is immutable. An
+                                             # attacker who lands RCE cannot drop
+                                             # a binary or rewrite the app. This
+                                             # is why we mount writable emptyDirs
+                                             # below for the few paths that MUST
+                                             # be writable.
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL          # Drop every Linux capability. A plain HTTP service
+                               # listening on 8080 (an unprivileged port) needs
+                               # none of them. If you must bind &lt;1024, add
+                               # NET_BIND_SERVICE back — but don't; use 8080.
+          # -------------------------------------------------------------------
+          # WRITABLE PATHS under a read-only root filesystem.
+          # -------------------------------------------------------------------
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp          # Tomcat/Jetty unpack work dirs, JVM temp
+                                       # files, and many libs assume /tmp writes.
+            - name: spring-tmp
+              mountPath: /var/tmp      # Some Spring Boot fat-jar extractions use
+                                       # /var/tmp; cheap to provide.
+          # -------------------------------------------------------------------
+          # PROBES — wired to Spring Boot Actuator (L4/C10).
+          # -------------------------------------------------------------------
+          # Spring Boot exposes split health groups on Actuator when
+          # management.endpoint.health.probes.enabled=true (auto-enabled on k8s):
+          #   /actuator/health/liveness   — is the app deadlocked / unrecoverable?
+          #   /actuator/health/readiness  — can it serve traffic right now?
+          #
+          # startupProbe guards slow JVM cold-starts: liveness/readiness are
+          # suspended until startup succeeds, so a 40s boot is never mistaken for
+          # a hang and killed.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30   # 30 * 5s = 150s max boot budget before giving
+                                   # up. Generous for a JVM + DB connection pool.
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3    # 3 failed checks =&gt; pulled from Service
+                                   # endpoints (stops receiving traffic) but NOT
+                                   # restarted. Self-heals when dependency
+                                   # recovers (e.g. DB blip).
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            # Start liveness only after startupProbe passes; the explicit delay
+            # is a belt-and-suspenders fallback if startupProbe is removed.
+            initialDelaySeconds: 0
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3    # 3 failures =&gt; container restarted. Keep
+                                   # liveness CHEAP and dependency-free; never
+                                   # let a DB outage trip liveness or you get a
+                                   # restart storm across every replica.
+            successThreshold: 1
+          # Graceful shutdown: on SIGTERM, Spring (server.shutdown=graceful)
+          # stops accepting new requests and drains. A small preStop sleep gives
+          # kube-proxy / Istio time to remove this pod from endpoints before the
+          # process exits, eliminating the &quot;connection refused&quot; race.
+          lifecycle:
+            preStop:
+              exec:
+                command: [&quot;sh&quot;, &quot;-c&quot;, &quot;sleep 5&quot;]
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi     # Bound the writable scratch space so a runaway
+                                 # temp-file leak can't fill the node.
+        - name: spring-tmp
+          emptyDir:
+            sizeLimit: 64Mi
+</code></pre></div>
+<h3 id="hpayaml"><code>hpa.yaml</code><a class="anchor" href="#hpayaml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># =============================================================================
+# HorizontalPodAutoscaler (autoscaling/v2)
+# -----------------------------------------------------------------------------
+# Scales the url-shortener Deployment between 2 and 10 replicas based on CPU.
+# autoscaling/v2 is the current GA API (v1 only supported a single CPU target;
+# v2 adds memory, multiple metrics, custom/external metrics, and `behavior`
+# tuning). v2beta2 is removed in modern clusters — always use v2.
+# =============================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: url-shortener        # The HPA now OWNS .spec.replicas of this
+                              # Deployment. Don't also set replicas in CI/GitOps
+                              # or the two controllers will fight.
+  minReplicas: 2              # Floor: matches the Deployment so a scale-to-zero
+                              # never happens for an always-on service.
+  maxReplicas: 10             # Ceiling: protects the cluster/budget. Size this
+                              # to your node capacity and DB connection limits —
+                              # 10 JVM pods each with a 10-conn pool = 100 DB
+                              # connections; make sure the DB can take it.
+  metrics:
+    # --- Metric 1: CPU (the classic signal) -------------------------------
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          # Percentage of the POD'S CPU *request* (250m in deployment.yaml), not
+          # of a core and not of the limit. 70% of 250m = 175m average across
+          # pods triggers scale-out. Keep below 100% so there's burst headroom.
+          averageUtilization: 70
+    # --- Metric 2: memory (optional, commented) ---------------------------
+    # JVM memory is a poor autoscaling signal: the heap fills toward MaxRAM%
+    # and stays high regardless of load, so memory-based scaling tends to
+    # latch at max. Prefer CPU or a request-rate custom metric. Shown for
+    # completeness:
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: Utilization
+    #       averageUtilization: 80
+    #
+    # --- Metric 3: CUSTOM METRIC (the better signal for web apps) ---------
+    # The most meaningful autoscaler for a request-driven service is
+    # requests-per-second per pod, exposed via the Prometheus Adapter (which
+    # serves custom.metrics.k8s.io from the Prometheus you set up in
+    # observability-stack/). Example — scale to keep ~50 rps/pod:
+    # - type: Pods
+    #   pods:
+    #     metric:
+    #       name: http_server_requests_seconds_count_rate   # from Micrometer
+    #     target:
+    #       type: AverageValue
+    #       averageValue: &quot;50&quot;
+    #
+    # Or an EXTERNAL metric (queue depth, etc.) via external.metrics.k8s.io:
+    # - type: External
+    #   external:
+    #     metric:
+    #       name: pubsub_subscription_num_undelivered_messages
+    #     target:
+    #       type: AverageValue
+    #       averageValue: &quot;100&quot;
+  # ---------------------------------------------------------------------------
+  # behavior: tame flapping (scale up fast, scale down slow). Without this the
+  # HPA can thrash, churning pods and connection pools.
+  # ---------------------------------------------------------------------------
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30   # Look back 30s; react quickly to spikes.
+      policies:
+        - type: Percent
+          value: 100                   # Allow doubling pod count...
+          periodSeconds: 30
+        - type: Pods
+          value: 4                     # ...or +4 pods, whichever is larger.
+          periodSeconds: 30
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 min of sustained low load before
+                                       # scaling in — avoids yo-yoing and the
+                                       # cold-start cost of bringing JVMs back.
+      policies:
+        - type: Percent
+          value: 50                    # Remove at most 50% of pods per minute.
+          periodSeconds: 60
+      selectPolicy: Max
+</code></pre></div>
+<h3 id="serviceyaml"><code>service.yaml</code><a class="anchor" href="#serviceyaml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># =============================================================================
+# Service for url-shortener
+# -----------------------------------------------------------------------------
+# A ClusterIP Service is the stable, in-cluster virtual IP + DNS name
+# (url-shortener.url-shortener.svc.cluster.local) that load-balances across the
+# Deployment's Ready pods. Istio's VirtualService/DestinationRule (see
+# istio-canary/) route to THIS Service by host; subset selection then splits
+# traffic across the v1/v2 pod labels.
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortener
+  namespace: url-shortener
+  labels:
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: url-shortener-platform
+    # Istio convention; helps the mesh group telemetry by service.
+    app: url-shortener
+spec:
+  type: ClusterIP            # Internal only. Expose externally via an Istio
+                            # Gateway / Ingress, not by flipping this to
+                            # LoadBalancer.
+  selector:
+    # Selects ALL versions (v1 AND v2). Note this intentionally omits the
+    # `version` label so the Service spans both canary subsets; Istio handles
+    # the split. The selector matches the Deployment's pod labels.
+    app.kubernetes.io/name: url-shortener
+    app.kubernetes.io/instance: url-shortener
+  ports:
+    - name: http            # MUST be named for Istio protocol detection. The
+                            # `http-` / `http` prefix tells Istio this is L7
+                            # HTTP, enabling routing, retries, and metrics.
+                            # Naming it `tcp` would disable all L7 features.
+      port: 80              # Service port (what clients call).
+      targetPort: http      # Refers to the container's named port (8080).
+      protocol: TCP
+  # Optional: keep a client's connections pinned to one pod. Usually leave as
+  # the default (None) for stateless services and let Istio do smarter LB.
+  # sessionAffinity: None
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># `spring-boot-3-deployment/` — Hardened Deployment, Service, HPA, ConfigMap
+
+A production-grade baseline for running a Spring Boot 3 service (the book&#x27;s
+`url-shortener`) on Kubernetes 1.29+. Every file is heavily commented; this
+README is the map.
+
+## What this demonstrates
+
+| File | Demonstrates |
+|------|--------------|
+| `configmap.yaml` | Namespace (with Istio injection + Pod Security Admission `restricted`), a token-less ServiceAccount, and a non-secret ConfigMap. Apply this **first** — the others depend on the namespace/SA. |
+| `deployment.yaml` | The full **security hardening checklist** (L4/C08/T19), JVM container right-sizing (L5/C03/T15), and Actuator-backed startup/readiness/liveness probes (L4/C10). |
+| `service.yaml` | A ClusterIP Service with an Istio-named `http` port spanning both canary subsets. |
+| `hpa.yaml` | `autoscaling/v2` HPA on CPU, with commented examples for memory and Prometheus-Adapter custom metrics, plus `behavior` anti-flap tuning. |
+
+## The hardening checklist (L4/C08/T19) — where each control lives
+
+All in `deployment.yaml` unless noted:
+
+- `runAsNonRoot: true`, `runAsUser/runAsGroup: 1000` — never run as root.
+- `readOnlyRootFilesystem: true` — immutable container FS, with writable
+  `emptyDir` volumes mounted only at `/tmp` and `/var/tmp`.
+- `allowPrivilegeEscalation: false`, `privileged: false`.
+- `capabilities.drop: [ALL]` — strip every Linux capability.
+- `seccompProfile.type: RuntimeDefault` — block dangerous syscalls.
+- `automountServiceAccountToken: false` — on both the pod and the SA
+  (`configmap.yaml`).
+- Digest-pinned image (`@sha256:...`) — immutable, reproducible deploys.
+- Pod Security Admission `enforce: restricted` at the namespace level
+  (`configmap.yaml`) — the cluster rejects any pod that regresses on the above.
+
+## JVM right-sizing (L5/C03/T15)
+
+The container sets `-XX:MaxRAMPercentage=75.0` instead of a fixed `-Xmx`. The
+JVM is cgroup-aware (JDK 10+), so the heap scales with the **container memory
+limit**, leaving ~25% headroom for off-heap memory (metaspace, thread stacks,
+code cache, direct buffers). Setting `-Xmx == limit` is the classic cause of
+container OOM-kills. See the inline comments on the `resources` and `env`
+blocks.
+
+## Probes (L4/C10)
+
+Wired to Spring Boot Actuator health groups:
+
+- **startupProbe** → `/actuator/health/readiness` — covers slow JVM cold start
+  (up to 150s) so a long boot isn&#x27;t mistaken for a hang.
+- **readinessProbe** → `/actuator/health/readiness` — pulls the pod from
+  Service endpoints when a dependency is down, **without** restarting it.
+- **livenessProbe** → `/actuator/health/liveness` — restarts only on
+  unrecoverable state. Keep it dependency-free to avoid restart storms.
+
+## Apply
+
+```bash
+# 1) Namespace + ServiceAccount + ConfigMap (creates the namespace).
+kubectl apply -f configmap.yaml
+
+# 2) Workload + Service + autoscaler.
+kubectl apply -f deployment.yaml -f service.yaml -f hpa.yaml
+
+# Watch the rollout.
+kubectl -n url-shortener rollout status deploy/url-shortener
+kubectl -n url-shortener get pods,svc,hpa
+
+# Quick health check from inside the cluster.
+kubectl -n url-shortener exec deploy/url-shortener -c url-shortener -- \
+  wget -qO- http://localhost:8080/actuator/health/readiness
+```
+
+## Before you apply — substitutions
+
+- **Image digest**: replace the placeholder
+  `registry.example.com/url-shortener@sha256:0000...` in `deployment.yaml` with
+  your CI-built digest (`crane digest registry.example.com/url-shortener:1.0.0`).
+- **Secrets**: the ConfigMap holds non-secret config only. Create a `Secret`
+  (or `ExternalSecret`) for `SPRING_DATASOURCE_PASSWORD` and reference it from
+  the Deployment with `secretKeyRef`.
+- **Replica/HPA bounds, resource sizes, zone topology keys**: tune to your
+  cluster and SLOs.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/k8s-manifests--observability-stack.html"><div class="lbl">← Previous</div><div class="ttl">observability-stack</div><div class="sub">observability-stack/ — Metrics + tracing for the url-shortener</div></a><span></span></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-this-demonstrates" data-toc-link>What this demonstrates</a></li><li class="lvl-2"><a href="#the-hardening-checklist-l4c08t19-where-each-control-lives" data-toc-link>The hardening checklist (L4/C08/T19) — where each control lives</a></li><li class="lvl-2"><a href="#jvm-right-sizing-l5c03t15" data-toc-link>JVM right-sizing (L5/C03/T15)</a></li><li class="lvl-2"><a href="#probes-l4c10" data-toc-link>Probes (L4/C10)</a></li><li class="lvl-2"><a href="#apply" data-toc-link>Apply</a></li><li class="lvl-2"><a href="#before-you-apply-substitutions" data-toc-link>Before you apply — substitutions</a></li><li class="lvl-2"><a href="#source-files" data-toc-link>Source files</a></li><li class="lvl-3"><a href="#configmapyaml" data-toc-link>configmap.yaml</a></li><li class="lvl-3"><a href="#deploymentyaml" data-toc-link>deployment.yaml</a></li><li class="lvl-3"><a href="#hpayaml" data-toc-link>hpa.yaml</a></li><li class="lvl-3"><a href="#serviceyaml" data-toc-link>service.yaml</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

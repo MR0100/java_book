@@ -54,4 +54,4 @@ A self-graded mock-interview gauntlet: one coding round, one design round (LLD o
 
 ## This is the final module
 
-Loop back to any earlier module via the [master curriculum](../../CURRICULUM.md).
+Loop back to any earlier module via the [master curriculum](../../docs/CONTENTS.md).

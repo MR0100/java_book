@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Quick question to answer reference for this module.
 
-[Back to L0 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L0 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

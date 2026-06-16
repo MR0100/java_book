@@ -20,4 +20,4 @@ Exercises plus this module's end-of-level project.
 
 **Level project.** A small data-processing tool (streams + I/O) or a simple REST service backed by a database via JDBC.
 
-[Back to L2 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L2 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Atomic Variables — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="active" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Atomic Variables</span></div>
+        <h1>Atomic Variables</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T11-atomic-variables.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~145 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Atomic Variables"
+slug: atomic-variables
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 11
+tags: [atomic, atomicinteger, atomiclong, atomicboolean, atomicreference, atomic-int-array, atomic-long-array, atomic-reference-array, atomic-markable-reference, atomic-stamped-reference, atomic-integer-field-updater, atomic-long-field-updater, atomic-reference-field-updater, longadder, doubleadder, longaccumulator, doubleaccumulator, cas, compare-and-swap, compare-and-exchange, weak-compare-and-set, weakcompareandset, lock-cmpxchg, ldxr-stxr, ll-sc, casal, casal-armv81, lse, cas-loop, optimistic-concurrency, lock-free, treiber-stack, aba-problem, stamp-counter, mark-bit, contended, false-sharing, striped-counter, cellscell, get-and-set, get-and-add, get-and-update, accumulate-and-get, lazy-set, varhandle, jep-193, memory-ordering, plain, opaque, acquire-release, volatile-mode, fence, full-fence, store-fence, load-fence, memory-fence, double-checked-locking, unsafe-replacement, jep-9, hardware-cas, x86-tso, arm-weak-memory]
+prerequisites: [concurrent-collections, synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks, how-computers-run-programs-cpu-memory-binary]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="atomic-variables">Atomic Variables</h1>
+<p><code>synchronized</code> (T03), <code>Lock</code> (T08), and the synchronizers (T09) all rely — at the deepest level — on <strong>one</strong> hardware primitive: an atomic <em>read-modify-write</em> instruction that lets a single thread perform "read this word, decide based on the value, write a new value" <em>as one indivisible operation no other thread can observe halfway through</em>. On every modern CPU that primitive is <strong>compare-and-swap</strong> (CAS): "atomically, if memory[addr] == expected, write memory[addr] = newValue; return whether the write happened." From CAS alone, plus a tight retry loop, you can build <em>every</em> concurrent primitive without ever calling a lock — counter increments, lock-free stacks, AQS state CAS, FutureTask result publication, ConcurrentHashMap bucket insertion, monitor inflation. The <code>java.util.concurrent.atomic</code> package is Java's surfacing of CAS as an API — <code>AtomicInteger</code>, <code>AtomicLong</code>, <code>AtomicReference</code>, plus a dozen more — and the JDK 9+ <code>VarHandle</code> is the modern unified replacement.</p>
+<p>The depth-bar requirement isn't "use <code>AtomicInteger</code> instead of <code>synchronized</code> for counters." At the <strong>language</strong> layer, the atomic classes expose <strong><code>get</code>/<code>set</code>/<code>compareAndSet</code>/<code>getAndAdd</code>/<code>updateAndGet</code></strong> plus variants over the same <code>volatile</code>-backed value, organized as a small zoo (scalars <code>Atomic{Int,Long,Boolean,Reference}</code>, arrays <code>Atomic*Array</code>, field updaters <code>Atomic*FieldUpdater</code>, the modern accumulators <code>LongAdder</code>/<code>LongAccumulator</code>/<code>DoubleAdder</code>/<code>DoubleAccumulator</code>) plus the <em>ABA-safe</em> pair (<code>AtomicStampedReference</code>, <code>AtomicMarkableReference</code>). At the <strong>mechanism</strong> layer, the canonical <strong>CAS-loop idiom</strong> — <code>for(;;) { v = get(); n = f(v); if (compareAndSet(v, n)) return n; }</code> — is the fundamental lock-free update pattern; every <code>updateAndGet</code>/<code>accumulateAndGet</code>/<code>getAndIncrement</code> compiles to it. At the <strong>hardware</strong> layer, the CAS itself is <em>one instruction</em> on x86 (<code>LOCK CMPXCHG</code>, ~20–40 cycles, full memory barrier) and an LL/SC pair on ARM64 (<code>LDAXR</code>/<code>STLXR</code> retry loop, or a single <code>CASAL</code> under ARMv8.1+ LSE), and the <em>memory-ordering</em> modes exposed via <code>VarHandle</code> (Plain / Opaque / Acquire-Release / Volatile per JEP 193) map directly to the CPU's fence inventory. At the <strong>scaling</strong> layer, <code>LongAdder</code> solves the cache-line ping-pong problem of <code>AtomicLong</code>-under-contention by striping the counter across <code>@Contended</code>-padded cells indexed by thread probe — a 100× throughput improvement under heavy concurrent increments at the cost of O(cells) <code>sum()</code>. We will cover all four layers, finishing with the lock-free Treiber-stack pattern that the JDK uses internally in CompletableFuture, FutureTask, and AQS itself.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t10-concurrent-collections.html">Concurrent collections</a> (L3/C01/T10) — CHM uses CAS for empty buckets, LongAdder for size(); <a href="c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html">Synchronizers</a> (L3/C01/T09) — AQS state CAS; <a href="c01-t08-locks-reentrantlock-readwritelock-stampedlock.html">Locks</a> (L3/C01/T08) — every <code>tryAcquire</code> is a CAS; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized, monitors &amp; intrinsic locks</a> (L3/C01/T03) — <code>LOCK CMPXCHG</code> and the hardware CAS instruction; <a href="../l0/c01-t01-how-computers-run-programs-cpu-memory-binary.html">How Computers Run Programs</a> (L0/C01/T01) — CPU instructions, atomic operations.</p></div></div>
+<h2 id="why-atomic-variables-volatile-is-not-enough">Why Atomic Variables — <code>volatile</code> Is Not Enough<a class="anchor" href="#why-atomic-variables-volatile-is-not-enough" aria-hidden="true">#</a></h2>
+<p><code>volatile</code> (T12) gives you <strong>visibility</strong>: any thread reading a <code>volatile int</code> sees the latest write any other thread made. But it does <em>not</em> give you <strong>atomicity over read-modify-write</strong> sequences. The classic broken pattern:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile int counter;
+// thread A and thread B both run:
+counter = counter + 1;          // ✗ three steps: read, add, write — interleaved → lost updates
+</code></pre></div>
+<p>Even though every read sees the latest write, between <em>this</em> thread's read and write <em>another</em> thread can interleave its own write. The increment is not atomic — it's a read, an add, and a write. Two threads doing <code>counter++</code> 1 million times each yield a count somewhere between <em>1 million</em> (every other increment lost) and <em>2 million</em> — the "lost update" problem.</p>
+<p>The fix is either a lock (T08) — heavyweight for a single counter — or <strong>CAS</strong>: read the value, compute the new value, <em>atomically</em> write the new value only if the old value is still there.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicInteger counter = new AtomicInteger();
+counter.incrementAndGet();      // ✓ atomic — uses CAS internally
+</code></pre></div>
+<p>Inside <code>incrementAndGet</code>, the JVM emits a CAS-loop that retries until success. From the outside, the operation looks atomic.</p>
+<h2 id="cas-compare-and-swap">CAS — Compare-and-Swap<a class="anchor" href="#cas-compare-and-swap" aria-hidden="true">#</a></h2>
+<p>The hardware primitive every atomic class is built on. Conceptually:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// atomic — no other thread can observe an intermediate state
+boolean compareAndSet(int* addr, int expected, int newValue) {
+    if (*addr == expected) {
+        *addr = newValue;
+        return true;
+    }
+    return false;
+}
+</code></pre></div>
+<p>On x86, this is one instruction:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">asm</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-asm">lock cmpxchg [addr], rcx     ; if [addr]==rax then [addr]=rcx, ZF=1; else rax=[addr], ZF=0
+</code></pre></div>
+<p><code>LOCK CMPXCHG</code> is atomic (no other core observes a torn intermediate), serves as a <strong>full memory barrier</strong>, and costs ~20-40 cycles. On a modern Skylake-or-later core, that's ~5-10 ns of wall time — comparable to a single L1 cache miss. This is <em>the</em> primitive that makes lock-free concurrency feasible on commodity hardware.</p>
+<p>On ARM64 (a weakly-ordered architecture), CAS is an <strong>LL/SC</strong> (load-link/store-conditional) pair:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">asm</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-asm">retry:
+   ldaxr   x3, [x0]         ; load-acquire-exclusive
+   cmp     x3, x1            ; compare to expected
+   b.ne    fail
+   stlxr   w4, x2, [x0]      ; store-release-exclusive (fails if line was touched)
+   cbnz    w4, retry         ; retry on failure
+</code></pre></div>
+<p>ARMv8.1+ added the <code>CASAL</code>/<code>CASA</code>/<code>CASL</code> family — single-instruction CAS with various memory-ordering options. HotSpot uses these under <code>-XX:+UseLSE</code> when supported, dropping the LL/SC retry loop.</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Every lock-free primitive in the JDK reduces to CAS.</strong> AQS state transitions, CHM bucket inserts, ObjectMonitor inflations, FutureTask result publications, CompletableFuture stack pushes — all are CAS at the bottom. The hardware instruction is the absolute floor of concurrent programming on commodity CPUs.</p></div></div>
+<h2 id="the-cas-loop-idiom">The CAS-Loop Idiom<a class="anchor" href="#the-cas-loop-idiom" aria-hidden="true">#</a></h2>
+<p>The fundamental lock-free update pattern. Every operation more complex than "atomically set this value" uses it:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final int getAndAdd(int delta) {
+    for (;;) {
+        int current = get();                              // read
+        int next    = current + delta;                    // compute
+        if (compareAndSet(current, next)) return current; // atomic-write-if-unchanged
+        // CAS failed → another thread updated — loop and retry
+    }
+}
+</code></pre></div>
+<p>Three steps: <strong>read</strong>, <strong>compute</strong>, <strong>CAS</strong>. Under no contention, the loop runs once. Under contention, the CAS fails (because another thread's CAS got there first), and we re-read and recompute. Eventually some thread wins; on average, in light contention, the expected number of retries is bounded by the number of contending threads.</p>
+<p>Three things to internalize:</p>
+<ol>
+<li><strong>The compute step must be pure (no side effects).</strong> It can re-execute many times on retry.</li>
+<li><strong>The loop is wait-free under no contention, lock-free overall.</strong> No thread ever blocks; eventually, <em>some</em> thread always succeeds.</li>
+<li><strong>Under high contention, throughput degrades.</strong> Threads spin in the retry loop wasting CPU. This is why <code>LongAdder</code> (below) exists — to spread contention across cells.</li>
+</ol>
+<div class="mermaid">flowchart TB
+  Read["current = get()"]
+  Comp["next = compute(current)"]
+  CAS{"compareAndSet(current, next)?"}
+  Read --> Comp --> CAS
+  CAS -- yes --> Done["return — atomic update completed"]
+  CAS -- no --> Read
+  Note["under no contention: 1 iteration.<br/>under contention: retry until success.<br/>compute must be pure (re-execution-safe)."]
+</div>
+<h2 id="atomicinteger-atomiclong-atomicboolean-scalar-atomics"><code>AtomicInteger</code>, <code>AtomicLong</code>, <code>AtomicBoolean</code> — Scalar Atomics<a class="anchor" href="#atomicinteger-atomiclong-atomicboolean-scalar-atomics" aria-hidden="true">#</a></h2>
+<p>The API surface — all three look essentially the same (substitute the type):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicInteger ai = new AtomicInteger(0);
+
+// reads
+int v = ai.get();                       // volatile load — atomic, ordered
+int v = ai.getOpaque();                  // atomic, NO ordering (JDK 9+)
+int v = ai.getAcquire();                 // acquire-mode load (JDK 9+)
+int v = ai.getPlain();                   // plain read — no atomic guarantees (JDK 9+)
+
+// writes
+ai.set(v);                               // volatile store — atomic, ordered
+ai.lazySet(v);                           // release-mode store — equivalent to setRelease (JDK 9+)
+ai.setOpaque(v); ai.setRelease(v); ai.setPlain(v);
+
+// CAS operations
+boolean ok = ai.compareAndSet(expect, update);          // strong CAS
+boolean ok = ai.weakCompareAndSet(expect, update);     // weak CAS (may spuriously fail)
+int prev   = ai.compareAndExchange(expect, update);     // returns the witnessed value (JDK 9+)
+
+// CAS-loop helpers
+int prev = ai.getAndIncrement();         // ++
+int next = ai.incrementAndGet();
+int prev = ai.getAndDecrement();
+int next = ai.decrementAndGet();
+int prev = ai.getAndAdd(delta);
+int next = ai.addAndGet(delta);
+int prev = ai.getAndSet(v);              // returns prior value
+
+// functional CAS-loop helpers (JDK 8+)
+int next = ai.updateAndGet(x -&gt; x * 2);                       // CAS-loop with unary fn
+int prev = ai.getAndUpdate(x -&gt; x * 2);
+int next = ai.accumulateAndGet(delta, (a, b) -&gt; a + b);       // CAS-loop with binary fn
+int prev = ai.getAndAccumulate(delta, (a, b) -&gt; a + b);
+</code></pre></div>
+<p>Three things worth knowing:</p>
+<ul>
+<li><strong><code>get()</code> is a volatile load</strong> — same cost as reading any <code>volatile int</code> (≈1 ns on modern hardware; effectively free). No CAS, no fence beyond the implicit volatile-load ordering.</li>
+<li><strong><code>lazySet(v)</code></strong> stores with <em>release</em> semantics but <em>no</em> full fence — useful for "publish but don't synchronize" patterns (most commonly: zero out a reference to help GC). Negligibly faster than <code>set()</code>, but the JIT can sometimes elide more.</li>
+<li><strong><code>updateAndGet(fn)</code></strong> is the modern way to write a CAS loop. Pass a pure function; the implementation does the loop for you. Avoid hand-writing CAS loops when this exists.</li>
+</ul>
+<h3 id="atomicintegervalue-is-volatile-int"><code>AtomicInteger.value</code> is <code>volatile int</code><a class="anchor" href="#atomicintegervalue-is-volatile-int" aria-hidden="true">#</a></h3>
+<p>Under the hood, all the atomic classes wrap a single <code>volatile</code> field:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class AtomicInteger {
+    private static final VarHandle VALUE;       // JDK 9+ — was Unsafe before
+    static { VALUE = MethodHandles.lookup().findVarHandle(AtomicInteger.class, &quot;value&quot;, int.class); }
+
+    private volatile int value;                  // the actual storage
+
+    public final int get() { return value; }
+    public final boolean compareAndSet(int expect, int update) {
+        return VALUE.compareAndSet(this, expect, update);
+    }
+    public final int incrementAndGet() {
+        return VALUE.getAndAdd(this, 1) + 1;
+    }
+    // ...
+}
+</code></pre></div>
+<p>The wrapper exists for one reason: to expose CAS-style operations on a <code>volatile</code> field. The JIT compiles <code>compareAndSet</code> directly to <code>LOCK CMPXCHG</code> (x86) or LL/SC (ARM) — no method-call overhead in hot code.</p>
+<h2 id="atomicreferencev-and-lock-free-data-structures"><code>AtomicReference&lt;V&gt;</code> — and Lock-Free Data Structures<a class="anchor" href="#atomicreferencev-and-lock-free-data-structures" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicReference&lt;Node&gt; head = new AtomicReference&lt;&gt;();
+
+// Treiber stack push (lock-free LIFO)
+void push(V value) {
+    Node newNode = new Node(value);
+    for (;;) {
+        Node oldHead = head.get();
+        newNode.next = oldHead;
+        if (head.compareAndSet(oldHead, newNode)) return;
+    }
+}
+
+// Treiber stack pop
+V pop() {
+    for (;;) {
+        Node oldHead = head.get();
+        if (oldHead == null) return null;
+        Node newHead = oldHead.next;
+        if (head.compareAndSet(oldHead, newHead)) return oldHead.value;
+    }
+}
+</code></pre></div>
+<p>This is <strong>Treiber's stack</strong> (R.K. Treiber, 1986) — the simplest lock-free data structure. The same CAS-loop idiom applied to a head pointer. Every push and pop is a single CAS on the head; collisions retry. CompletableFuture's completion stack (T07), FutureTask's waiter stack (T06), ObjectMonitor's cxq (T03) all use this pattern.</p>
+<h3 id="the-aba-problem-when-cas-lies">The ABA Problem — When CAS Lies<a class="anchor" href="#the-aba-problem-when-cas-lies" aria-hidden="true">#</a></h3>
+<p>Treiber's stack has a subtle bug that only matters when nodes are recycled:</p>
+<ol>
+<li>Thread A reads <code>head = NodeX</code>.</li>
+<li>Thread A about to CAS <code>head: NodeX → NodeY</code>.</li>
+<li>Thread B pops NodeX (head = NodeX.next).</li>
+<li>Thread B pops more.</li>
+<li>Thread B pushes NodeX (recycled from a pool) — head = NodeX again.</li>
+<li>Thread A's CAS sees <code>head == NodeX</code> → <strong>succeeds</strong>! But the stack is now in a corrupted state.</li>
+</ol>
+<p>The CAS could not distinguish "the original NodeX is still here" from "a recycled NodeX happens to be here now with completely different siblings." This is the <strong>ABA problem</strong>: value goes A → B → A; CAS treats the second A as the first A.</p>
+<p>In Java, ABA is rare in practice because the GC keeps nodes alive while there's still a reference (so they can't be recycled mid-CAS). It bites when:</p>
+<ul>
+<li>You implement an explicit node pool (recycling Nodes to avoid GC pressure).</li>
+<li>You use <code>Atomic*FieldUpdater</code> over a long-lived field where stamps matter.</li>
+<li>You implement lock-free algorithms over arrays of integers or longs where values genuinely repeat.</li>
+</ul>
+<h3 id="atomicstampedreference-and-atomicmarkablereference-aba-defeated"><code>AtomicStampedReference</code> and <code>AtomicMarkableReference</code> — ABA defeated<a class="anchor" href="#atomicstampedreference-and-atomicmarkablereference-aba-defeated" aria-hidden="true">#</a></h3>
+<p>The fix: pair the reference with a counter (stamp) or a bit (mark), and CAS <em>both atomically</em>. Any change increments the stamp; ABA is impossible because the stamp differs.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicStampedReference&lt;Node&gt; stamped = new AtomicStampedReference&lt;&gt;(initial, 0);
+
+// push (with stamp increment)
+void push(V v) {
+    int[] stampHolder = new int[1];
+    for (;;) {
+        Node oldHead = stamped.get(stampHolder);
+        int oldStamp = stampHolder[0];
+        Node newNode = new Node(v, oldHead);
+        if (stamped.compareAndSet(oldHead, newNode, oldStamp, oldStamp + 1)) return;
+    }
+}
+</code></pre></div>
+<p>Every CAS bumps the stamp by 1. Even if the reference value returns to a prior state, the stamp doesn't — so the CAS will fail. The cost: each operation is now two CAS'd values atomically, which on most hardware means it's implemented via a <em>double-width</em> CAS (16 bytes on 64-bit) or via an auxiliary wrapper object that's CAS-replaced. Either way, slightly more expensive than the plain <code>AtomicReference</code> — but ABA-safe.</p>
+<p><code>AtomicMarkableReference</code> is the same idea with a boolean mark instead of an int stamp — for cases where you only need to record "logically deleted" status alongside the pointer.</p>
+<div class="mermaid">flowchart TB
+  Plain["Plain AtomicReference"]
+  Plain --> ABA["ABA possible<br/>(value cycles A → B → A;<br/>CAS thinks A is still original)"]
+  Stamped["AtomicStampedReference"]
+  Stamped --> Safe["ABA prevented<br/>(stamp increments on every CAS;<br/>even if value repeats, stamp doesn't)"]
+  Note["JVM's GC usually prevents ABA in practice (nodes aren't recycled).<br/>Use stamped/markable when you have explicit pooling or repeating values."]
+</div>
+<h2 id="atomicfieldupdater-avoiding-the-per-instance-object-cost"><code>Atomic*FieldUpdater</code> — Avoiding the Per-Instance Object Cost<a class="anchor" href="#atomicfieldupdater-avoiding-the-per-instance-object-cost" aria-hidden="true">#</a></h2>
+<p>Every <code>AtomicInteger</code> is a <strong>separate object</strong> — at least 16 bytes of object header + 4 bytes of value + padding = 24 bytes on a 64-bit JVM. Wrapping every per-instance counter inflates memory dramatically in objects with many concurrent fields.</p>
+<p>The fix: a <em>static</em> <code>Atomic*FieldUpdater</code> that operates on a regular <code>volatile</code> field of any instance via reflection.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Node {
+    volatile int sequence;                                  // regular volatile field
+    static final AtomicIntegerFieldUpdater&lt;Node&gt; SEQUENCE =
+        AtomicIntegerFieldUpdater.newUpdater(Node.class, &quot;sequence&quot;);
+
+    void incrementSequence() {
+        SEQUENCE.incrementAndGet(this);                      // CAS the field of THIS instance
+    }
+}
+</code></pre></div>
+<p>The <code>Updater</code> is a static singleton; each <code>Node</code> has only a <code>volatile int</code> (4 bytes), not a 24-byte <code>AtomicInteger</code>. JDK 9+ replaced the underlying mechanism with <code>VarHandle</code>, but the API surface is unchanged.</p>
+<p>When to use updaters:</p>
+<ul>
+<li>You have <em>many</em> objects with per-instance CAS-updateable fields (e.g., nodes in a lock-free data structure).</li>
+<li>Memory matters more than the small reflective lookup overhead.</li>
+</ul>
+<p>When <em>not</em> to use updaters:</p>
+<ul>
+<li>Small number of instances → just use <code>AtomicInteger</code>.</li>
+<li>The field's name might be obfuscated/refactored → reflection-based lookup is brittle to renames.</li>
+</ul>
+<p>Modern code prefers <code>VarHandle</code> directly (next section), which <code>Atomic*FieldUpdater</code> is implemented on internally. New code rarely needs <code>Updater</code> types except for compatibility with pre-JDK-9 patterns.</p>
+<h2 id="longadder-and-longaccumulator-striped-counters-for-hot-increments"><code>LongAdder</code> and <code>LongAccumulator</code> — Striped Counters for Hot Increments<a class="anchor" href="#longadder-and-longaccumulator-striped-counters-for-hot-increments" aria-hidden="true">#</a></h2>
+<p><code>AtomicLong.incrementAndGet()</code> is fast — uncontended, ~10 ns. Under <em>contention</em> from many threads, it becomes pathological: every increment CAS's the same word, every CAS pulls the cache line exclusive on <em>some</em> core, and the line ping-pongs across cores. With 32 threads incrementing one counter, throughput can drop to ~1 increment per microsecond — 30× slower than a single thread.</p>
+<p><code>LongAdder</code> (JDK 8) fixes this with <strong>striped cells</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class LongAdder {
+    private transient volatile long base;
+    private transient volatile Cell[] cells;
+
+    @jdk.internal.vm.annotation.Contended           // pad to cache-line size
+    static final class Cell {
+        volatile long value;
+    }
+
+    public void add(long x) {
+        Cell[] as; long b, v; int m; Cell a;
+        if ((as = cells) != null || !casBase(b = base, b + x)) {
+            // base contended; use a cell
+            boolean uncontended = true;
+            if (as == null || (m = as.length - 1) &lt; 0 ||
+                (a = as[getProbe() &amp; m]) == null ||             // hash this thread to a cell
+                !(uncontended = a.cas(v = a.value, v + x))) {
+                longAccumulate(x, null, uncontended);            // grow cells or retry
+            }
+        }
+    }
+
+    public long sum() {
+        long sum = base;
+        Cell[] as = cells;
+        if (as != null) for (Cell a : as) if (a != null) sum += a.value;
+        return sum;
+    }
+}
+</code></pre></div>
+<p>The pattern:</p>
+<ul>
+<li><strong>Base counter</strong> for the uncontended fast path (single CAS).</li>
+<li><strong>Cell array</strong> indexed by a per-thread probe (<code>Thread.threadLocalRandomProbe</code>). Each thread hashes to a cell and CAS's <em>just that cell</em>.</li>
+<li><strong><code>@Contended</code> padding</strong> ensures each cell sits in its own cache line — no false sharing.</li>
+<li><strong><code>sum()</code></strong> walks <code>base + Σ cells</code>. <strong>O(cells)</strong> — typically 4-16 cells, so ~50-100 ns.</li>
+</ul>
+<div class="mermaid">flowchart LR
+  AL["AtomicLong<br/>single counter"]
+  AL --> Bot["all CAS the same cache line<br/>→ ping-pong on N cores"]
+  Bot --> Slow["throughput collapses<br/>under heavy contention"]
+  LA["LongAdder<br/>base + striped cells"]
+  LA --> Cell["each thread CAS's its own cell<br/>(separate cache lines)"]
+  Cell --> Fast["near-linear scaling<br/>up to (#cells, ~CPU count)"]
+  LA --> SumO["sum() is O(cells) — not atomic"]
+</div>
+<h3 id="when-longadder-beats-atomiclong-and-when-it-doesnt">When LongAdder beats AtomicLong (and when it doesn't)<a class="anchor" href="#when-longadder-beats-atomiclong-and-when-it-doesnt" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Write-heavy / read-rare</strong>: LongAdder dominates. Stats counters, metrics, throughput meters, CHM size — all use LongAdder internally.</li>
+<li><strong>Read-heavy / write-rare</strong>: AtomicLong wins. <code>get()</code> is O(1) and you rarely pay the cost of incrementing.</li>
+<li><strong>Strict atomicity required</strong>: AtomicLong. <code>LongAdder.sum()</code> is not atomic — it's the sum of point-in-time reads, so two threads each reading <code>sum()</code> between increments may see different values.</li>
+</ul>
+<h3 id="longaccumulator-generalized-longadder"><code>LongAccumulator</code> — generalized LongAdder<a class="anchor" href="#longaccumulator-generalized-longadder" aria-hidden="true">#</a></h3>
+<p><code>LongAdder</code> is hardcoded to sum (<code>(a, b) → a + b</code>). <code>LongAccumulator</code> takes a <code>LongBinaryOperator</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+max.accumulate(42);
+max.accumulate(17);
+max.accumulate(99);
+long m = max.get();              // 99
+</code></pre></div>
+<p>Useful for non-sum aggregations: max, min, multiplication, custom reduction. Same striping behaviour, same <code>O(cells)</code> <code>get()</code>.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Why is <code>LongAdder</code> faster than <code>AtomicLong</code> under contention?" — Senior answer: <strong>AtomicLong concentrates all increments onto one cache line; under N concurrent writers, the line ping-pongs across cores via the cache coherence protocol (MESI invalidate-and-reacquire), serializing throughput. LongAdder stripes the counter across <code>@Contended</code>-padded cells indexed by a per-thread probe, so each thread CAS's its own cache line. Cost: <code>sum()</code> is O(cells), not O(1). Use LongAdder when increments are hot and reads are rare; AtomicLong when reads are hot and increments are rare.</strong></p></div></div>
+<h2 id="varhandle-the-modern-unified-api-jdk-9"><code>VarHandle</code> — the Modern Unified API (JDK 9+)<a class="anchor" href="#varhandle-the-modern-unified-api-jdk-9" aria-hidden="true">#</a></h2>
+<p>Before JDK 9, all atomic operations were implemented via <code>sun.misc.Unsafe</code> — an internal, unstable, dangerous API the JDK never officially exposed. The atomic classes (<code>AtomicInteger</code>, etc.) and <code>Atomic*FieldUpdater</code> were the <em>only</em> sanctioned ways to perform atomic operations.</p>
+<p>JDK 9 (JEP 193) introduced <code>VarHandle</code> — a typed, safe, unified API for atomic memory access, with explicit memory-ordering control. Now:</p>
+<ul>
+<li><code>AtomicInteger.compareAndSet</code> is implemented via a static <code>VarHandle</code> to <code>value</code>.</li>
+<li><code>Atomic*FieldUpdater</code> is implemented via <code>MethodHandles.privateLookupIn(...)</code> + <code>VarHandle</code>.</li>
+<li>User code can directly use <code>VarHandle</code> for custom atomic patterns without the per-instance object cost or the reflective updater overhead.</li>
+</ul>
+<h3 id="varhandle-example"><code>VarHandle</code> example<a class="anchor" href="#varhandle-example" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Node {
+    volatile Object value;
+    static final VarHandle VALUE;
+    static {
+        try {
+            VALUE = MethodHandles.lookup().findVarHandle(Node.class, &quot;value&quot;, Object.class);
+        } catch (Exception e) { throw new ExceptionInInitializerError(e); }
+    }
+
+    void update() {
+        Object oldVal, newVal;
+        do {
+            oldVal = VALUE.getVolatile(this);
+            newVal = compute(oldVal);
+        } while (!VALUE.compareAndSet(this, oldVal, newVal));
+    }
+}
+</code></pre></div>
+<p><code>MethodHandles.lookup().findVarHandle(class, name, type)</code> builds a static VarHandle bound to the named field. The VarHandle exposes:</p>
+<ul>
+<li><strong>Reads:</strong> <code>getVolatile</code>, <code>getAcquire</code>, <code>getOpaque</code>, <code>get</code> (plain — JDK 9+; rarely used).</li>
+<li><strong>Writes:</strong> <code>setVolatile</code>, <code>setRelease</code>, <code>setOpaque</code>, <code>set</code>.</li>
+<li><strong>CAS:</strong> <code>compareAndSet</code> (strong), <code>weakCompareAndSet</code>, <code>weakCompareAndSetAcquire</code>, <code>weakCompareAndSetRelease</code>, <code>weakCompareAndSetPlain</code>.</li>
+<li><strong>Compare-and-exchange:</strong> <code>compareAndExchange</code>, <code>compareAndExchangeAcquire</code>, <code>compareAndExchangeRelease</code> — return the witnessed value, useful when you want the <em>old</em> value regardless of CAS success.</li>
+<li><strong>Atomic update helpers:</strong> <code>getAndSet</code>, <code>getAndAdd</code>, <code>getAndAddAcquire</code>, <code>getAndAddRelease</code>.</li>
+</ul>
+<h3 id="memory-ordering-modes-jep-193s-full-hierarchy">Memory-ordering modes — JEP 193's full hierarchy<a class="anchor" href="#memory-ordering-modes-jep-193s-full-hierarchy" aria-hidden="true">#</a></h3>
+<p>JEP 193 codified five memory-access modes, each defining a precise contract:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th style="text-align: center;">Atomicity</th>
+<th>Ordering</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Plain</strong> (<code>get</code>/<code>set</code>)</td>
+<td style="text-align: center;">atomic for <code>int</code>/<code>long</code>/<code>reference</code> (per JMM)</td>
+<td>no inter-thread ordering</td>
+<td>~free (just a memory read/write)</td>
+</tr>
+<tr>
+<td><strong>Opaque</strong> (<code>getOpaque</code>/<code>setOpaque</code>)</td>
+<td style="text-align: center;">atomic + per-variable program order</td>
+<td>no cross-variable ordering</td>
+<td>~free</td>
+</tr>
+<tr>
+<td><strong>Acquire / Release</strong> (<code>getAcquire</code>/<code>setRelease</code>)</td>
+<td style="text-align: center;">atomic + acquire/release semantics</td>
+<td>release-before-acquire ordering on this var</td>
+<td>small fence on weakly-ordered CPUs</td>
+</tr>
+<tr>
+<td><strong>Volatile</strong> (<code>getVolatile</code>/<code>setVolatile</code>)</td>
+<td style="text-align: center;">atomic + sequential consistency over volatile vars</td>
+<td>full ordering</td>
+<td>x86: free; ARM: <code>LDAR</code>/<code>STLR</code> + <code>DMB ISH</code></td>
+</tr>
+<tr>
+<td><strong>CAS / GetAndX</strong></td>
+<td style="text-align: center;">atomic + full ordering</td>
+<td>full memory barrier</td>
+<td>one <code>LOCK CMPXCHG</code> (x86) or LL/SC (ARM)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The semantics are a strict hierarchy: each mode includes the guarantees of the modes above it (Plain ⊂ Opaque ⊂ Acquire/Release ⊂ Volatile ⊂ CAS).</p>
+<p>The two practical takeaways:</p>
+<ol>
+<li><strong>On x86</strong>, the cost differences are minor — TSO makes plain stores/loads behave like acquire/release for free, and <code>LOCK CMPXCHG</code> is the only "expensive" instruction. Most code can use <code>volatile</code> (the default for <code>AtomicInteger.get</code>/<code>set</code>) without measurable penalty.</li>
+<li><strong>On ARM</strong>, the differences are real — explicit fences (<code>DMB ISH</code>) cost cycles, and using <code>Opaque</code> / <code>Acquire</code>-<code>Release</code> modes where appropriate can give meaningful speedups in hot lock-free code. Modern HotSpot generates the right fence per mode.</li>
+</ol>
+<div class="mermaid">flowchart TB
+  Modes["Memory ordering modes (JEP 193)"]
+  Modes --> P["Plain<br/>atomic (per JMM), no ordering<br/>≈ free"]
+  Modes --> O["Opaque<br/>atomic + per-var program order<br/>≈ free"]
+  Modes --> AR["Acquire / Release<br/>+ release-before-acquire pair<br/>small fence on ARM"]
+  Modes --> V["Volatile<br/>+ sequential consistency<br/>x86: free; ARM: LDAR/STLR"]
+  Modes --> C["CAS / getAndX<br/>+ full memory barrier<br/>LOCK CMPXCHG / LL-SC"]
+  Strict["each mode ⊃ the prior — strict hierarchy"]
+</div>
+<h2 id="weak-vs-strong-cas">Weak vs Strong CAS<a class="anchor" href="#weak-vs-strong-cas" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">boolean ok = vh.compareAndSet(this, expected, newValue);          // STRONG
+boolean ok = vh.weakCompareAndSet(this, expected, newValue);     // WEAK
+</code></pre></div>
+<p>Both <em>atomically</em> check-and-swap. The difference:</p>
+<ul>
+<li><strong>Strong CAS</strong> is guaranteed to fail <em>only</em> when the value mismatched. If the value matched, the swap <em>will</em> succeed.</li>
+<li><strong>Weak CAS</strong> <em>may spuriously fail</em> even when the value matched. This happens on ARM when the LL/SC monitor is "lost" for unrelated reasons (cache-line contention from any nearby memory access, even reads). On x86, weak and strong CAS compile to the same instruction (<code>LOCK CMPXCHG</code>) — there's no difference.</li>
+</ul>
+<p>The rationale: ARM's LL/SC reservation can be invalidated by <em>any</em> event touching the cache line — including loads from other cores. A strong CAS would have to retry the LL/SC pair internally on spurious failures; a weak CAS lets the <em>caller</em> handle retries explicitly. Since most CAS callers are already in a retry loop, weak CAS lets the loop be the retry mechanism — no double-retry inside the strong CAS.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// in a CAS loop — weak is fine; the loop is already retrying
+for (;;) {
+    int v = get();
+    if (weakCompareAndSet(v, v + 1)) break;       // ✓ weak is fine in a loop
+}
+
+// outside a loop — strong is needed
+if (compareAndSet(0, 1)) {                         // ✓ strong; must not spuriously fail
+    initialize();                                    // critical: only one thread should do this
+}
+</code></pre></div>
+<p>The performance difference is meaningful on ARM (avoiding the strong CAS's internal retry); on x86 it's nothing. Modern code mostly uses strong CAS for safety; weak appears in lock-free hot loops where every cycle counts.</p>
+<h2 id="performance-the-numbers">Performance — the Numbers<a class="anchor" href="#performance-the-numbers" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Op</th>
+<th style="text-align: right;">Uncontended</th>
+<th style="text-align: right;">Contended (N threads on same word)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AtomicInteger.get()</code></td>
+<td style="text-align: right;">~1 ns (volatile load)</td>
+<td style="text-align: right;">~1 ns (reads scale)</td>
+</tr>
+<tr>
+<td><code>AtomicInteger.set(v)</code></td>
+<td style="text-align: right;">~1 ns (volatile store)</td>
+<td style="text-align: right;">scales, no CAS</td>
+</tr>
+<tr>
+<td><code>AtomicInteger.compareAndSet</code> (x86)</td>
+<td style="text-align: right;">~10-20 ns (<code>LOCK CMPXCHG</code>)</td>
+<td style="text-align: right;">retry × N; throughput ~1/N</td>
+</tr>
+<tr>
+<td><code>AtomicInteger.compareAndSet</code> (ARM64)</td>
+<td style="text-align: right;">~15-30 ns (LL/SC or CAS)</td>
+<td style="text-align: right;">similar scaling</td>
+</tr>
+<tr>
+<td><code>AtomicInteger.incrementAndGet</code></td>
+<td style="text-align: right;">~10-20 ns</td>
+<td style="text-align: right;">throughput collapses to ~1 inc / cache-line latency</td>
+</tr>
+<tr>
+<td><code>LongAdder.increment</code></td>
+<td style="text-align: right;">~10-20 ns</td>
+<td style="text-align: right;"><strong>near-linear scaling</strong> — ~100× faster than AtomicLong under heavy contention</td>
+</tr>
+<tr>
+<td><code>LongAdder.sum()</code></td>
+<td style="text-align: right;">~50-100 ns</td>
+<td style="text-align: right;">O(cells) — moderate scaling</td>
+</tr>
+<tr>
+<td><code>AtomicReference.compareAndSet</code></td>
+<td style="text-align: right;">~15-30 ns</td>
+<td style="text-align: right;">same as int</td>
+</tr>
+<tr>
+<td><code>VarHandle.compareAndSet</code></td>
+<td style="text-align: right;">identical to AtomicX (same machine code)</td>
+<td style="text-align: right;">same</td>
+</tr>
+</tbody>
+</table></div>
+<p>The pattern: <strong>uncontended is fast; contended on the same word is slow; contended across separate cache lines (LongAdder) is fast again.</strong> The key insight: it's not the CAS itself that's slow, it's the <strong>cache line ping-pong</strong> under contention. Avoid contention on a single word and you have lock-free at full speed.</p>
+<h3 id="false-sharing-the-silent-cas-killer">False sharing — the silent CAS killer<a class="anchor" href="#false-sharing-the-silent-cas-killer" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Stats {
+    AtomicLong reads = new AtomicLong();
+    AtomicLong writes = new AtomicLong();      // adjacent in memory to reads
+}
+</code></pre></div>
+<p><code>reads</code> and <code>writes</code> may share an L1 cache line (64 bytes). Even though they're independent counters, <em>every</em> CAS on one invalidates the other's cache line on every core. Performance hit identical to genuinely contending on one word — <strong>false sharing</strong>.</p>
+<p>The fix: <code>@Contended</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Stats {
+    @jdk.internal.vm.annotation.Contended AtomicLong reads = new AtomicLong();
+    @jdk.internal.vm.annotation.Contended AtomicLong writes = new AtomicLong();
+}
+</code></pre></div>
+<p><code>@Contended</code> is JVM-internal (requires <code>-XX:-RestrictContended</code> for application code, or use of <code>sun.misc.Contended</code> reflectively). It pads the annotated field to occupy its own cache line. <code>LongAdder.Cell</code> uses this internally; application code rarely needs it unless extreme contention has been measured.</p>
+<h2 id="lock-free-patterns">Lock-Free Patterns<a class="anchor" href="#lock-free-patterns" aria-hidden="true">#</a></h2>
+<h3 id="treiber-stack-shown-above-push-and-pop-at-head">Treiber stack (shown above) — push and pop at head<a class="anchor" href="#treiber-stack-shown-above-push-and-pop-at-head" aria-hidden="true">#</a></h3>
+<p>The hello-world of lock-free. CAS on the head pointer.</p>
+<h3 id="michael-scott-queue-t10-two-pointers">Michael-Scott queue (T10) — two pointers<a class="anchor" href="#michael-scott-queue-t10-two-pointers" aria-hidden="true">#</a></h3>
+<p>CAS on tail.next and head.next. Each pointer's update is one CAS; coordination via lazy updates of head/tail.</p>
+<h3 id="atomic-accumulator-pattern">Atomic accumulator pattern<a class="anchor" href="#atomic-accumulator-pattern" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// thread-safe maximum
+AtomicLong max = new AtomicLong(Long.MIN_VALUE);
+void recordMax(long v) {
+    long cur;
+    while ((cur = max.get()) &lt; v &amp;&amp; !max.compareAndSet(cur, v));
+}
+</code></pre></div>
+<p>CAS-loop with a condition. Works for any monotonic update (min, max, etc.).</p>
+<h3 id="single-writer-race-free-publication">Single-writer race-free publication<a class="anchor" href="#single-writer-race-free-publication" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile Config currentConfig;
+VarHandle CONFIG = ...;
+
+void publish(Config newConfig) {
+    CONFIG.setRelease(this, newConfig);              // publish with release semantics
+}
+
+Config read() {
+    return (Config) CONFIG.getAcquire(this);          // read with acquire semantics
+}
+</code></pre></div>
+<p>The release/acquire pair gives ordering: every write inside <code>newConfig</code> (before <code>publish</code>) is visible to threads reading after <code>getAcquire</code>. No lock; no CAS; just a one-way fence on each side. Used in configuration hot-reload, snapshot publication.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="treating-on-a-volatile-as-atomic">Treating <code>++</code> on a volatile as atomic<a class="anchor" href="#treating-on-a-volatile-as-atomic" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile int counter;
+counter++;     // ✗ NOT ATOMIC — reads, adds, writes (3 separate steps)
+</code></pre></div>
+<p>Use <code>AtomicInteger.incrementAndGet()</code> or <code>LongAdder.increment()</code>.</p>
+<h3 id="cas-looping-when-atomicity-must-span-multiple-variables">CAS-looping when atomicity must span multiple variables<a class="anchor" href="#cas-looping-when-atomicity-must-span-multiple-variables" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicInteger a = new AtomicInteger();
+AtomicInteger b = new AtomicInteger();
+// trying to atomically update both:
+a.set(...); b.set(...);     // ✗ NOT atomic across both
+</code></pre></div>
+<p>Two independent CAS's cannot be atomic together. Either pack into one CAS-able value, use a lock, or design so they don't need to be atomic together. STM (software transactional memory) exists but is rarely a good fit.</p>
+<h3 id="forgetting-aba-on-recycled-pointers">Forgetting ABA on recycled pointers<a class="anchor" href="#forgetting-aba-on-recycled-pointers" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// pool of nodes — recycled
+class Pool { Node take() {...} void put(Node n) {...} }
+// CAS-based stack using pooled nodes:
+// → ABA possible because Node references can repeat
+</code></pre></div>
+<p>Use <code>AtomicStampedReference</code> or don't pool. JDK GC usually prevents this in non-pooled code; if you're pooling, you're now responsible for the ABA prevention.</p>
+<h3 id="using-longadder-where-you-need-an-exact-snapshot">Using LongAdder where you need an exact snapshot<a class="anchor" href="#using-longadder-where-you-need-an-exact-snapshot" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">LongAdder counter = new LongAdder();
+// ...
+if (counter.sum() == 100) doSomething();     // ✗ sum is point-in-time approximate
+</code></pre></div>
+<p><code>sum()</code> is the sum of point-in-time reads — between cells, other threads may increment. Don't use it for control flow that needs exactness. For exact, use <code>AtomicLong</code> with the contention cost.</p>
+<h3 id="lazyset-for-synchronization"><code>lazySet</code> for synchronization<a class="anchor" href="#lazyset-for-synchronization" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicReference&lt;X&gt; ref;
+ref.lazySet(newValue);
+// other thread does ref.get() expecting newValue
+</code></pre></div>
+<p><code>lazySet</code> is <em>release-only</em>; the get on the other thread must use <em>acquire</em> (which <code>get()</code> does — it's volatile-load). This works, but the <em>intent</em> is unclear. Prefer <code>setRelease</code> (JDK 9+ VarHandle) which names the semantics.</p>
+<h3 id="spinning-forever-on-a-contended-cas">Spinning forever on a contended CAS<a class="anchor" href="#spinning-forever-on-a-contended-cas" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">while (!atomic.compareAndSet(expect, update));   // ✗ infinite loop if expect never matches
+</code></pre></div>
+<p>A CAS-loop must have a way to make progress. If your <code>expect</code> value depends on what you read, re-read inside the loop; if it's invariant, re-design.</p>
+<h3 id="calling-compareandset-where-set-would-do">Calling <code>compareAndSet</code> where <code>set</code> would do<a class="anchor" href="#calling-compareandset-where-set-would-do" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">if (atomic.compareAndSet(0, 1)) initialize();   // ✓ correct for &quot;first one wins&quot;
+atomic.compareAndSet(atomic.get(), newVal);     // ✗ pointless — race between get and CAS
+</code></pre></div>
+<p><code>atomic.set(newVal)</code> would have the same effect with one volatile store. CAS is for "only if value is X" semantics.</p>
+<h3 id="using-atomicfieldupdater-on-a-non-volatile-field">Using <code>Atomic*FieldUpdater</code> on a non-volatile field<a class="anchor" href="#using-atomicfieldupdater-on-a-non-volatile-field" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Node { int seq; static final ATOM = ... AtomicIntegerFieldUpdater.newUpdater(...,&quot;seq&quot;); }
+                  // ✗ &quot;seq&quot; is not volatile → newUpdater throws IllegalArgumentException at class init
+</code></pre></div>
+<p>Updaters require the target field to be <code>volatile</code>. The check is at static init time; you'll get an exception when the class loads.</p>
+<h3 id="boxing-in-cas-loops">Boxing in CAS loops<a class="anchor" href="#boxing-in-cas-loops" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicReference&lt;Integer&gt; count = new AtomicReference&lt;&gt;(0);
+count.updateAndGet(x -&gt; x + 1);     // ✗ allocates a new Integer per increment
+</code></pre></div>
+<p>Reference CAS-loops on boxed types allocate per increment. Use <code>AtomicInteger</code> for primitive ints. Or <code>LongAccumulator</code> for hot non-sum cases.</p>
+<h2 id="observability">Observability<a class="anchor" href="#observability" aria-hidden="true">#</a></h2>
+<h3 id="cycle-counting">Cycle counting<a class="anchor" href="#cycle-counting" aria-hidden="true">#</a></h3>
+<p>For hot lock-free code, count actual CAS retries. Use <code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly</code> (with hsdis) and check that your CAS loop emits one <code>LOCK CMPXCHG</code> per iteration. Use JMH to measure throughput vs core count — if throughput doesn't scale linearly, you have contention or false sharing.</p>
+<h3 id="contended-impact"><code>@Contended</code> impact<a class="anchor" href="#contended-impact" aria-hidden="true">#</a></h3>
+<p>To confirm false sharing is killing performance, profile with <code>perf c2c</code> (Linux) — it reports cache-line contention. After applying <code>@Contended</code> to the hot atomic fields, re-run; the contention line should disappear.</p>
+<h3 id="jfr">JFR<a class="anchor" href="#jfr" aria-hidden="true">#</a></h3>
+<p><code>jdk.LockSamples</code> and the CPU-sampling events don't directly capture CAS contention — CAS retries look like normal CPU work. To find lock-free contention, the <em>only</em> tool is throughput measurement under increasing thread counts: if you see sub-linear scaling, contention is the cause.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Walk me through what <code>AtomicInteger.incrementAndGet()</code> does." — Senior answer:</p><ol>
+<li><strong>API.</strong> Returns <code>incrementAndGet()</code> — increment the value by 1, return the new value.</li>
+<li><strong>JIT lowering.</strong> Compiled to a CAS loop: read the volatile field, compute +1, attempt <code>compareAndSet(old, old+1)</code>, retry on failure.</li>
+<li><strong>Hardware.</strong> On x86: each CAS is one <code>LOCK CMPXCHG</code> instruction, atomic + full memory barrier, ~20-40 cycles. On ARM64: an <code>LDAXR</code>/<code>STLXR</code> pair (or a single <code>CASAL</code> under LSE), ~30-50 cycles, ARM's weak memory model requires explicit fences for ordering.</li>
+<li><strong>Contention behavior.</strong> Under heavy contention, the cache line ping-pongs between cores via MESI; throughput collapses to ~1 increment per cache-line latency. Use <code>LongAdder</code> instead — stripes across <code>@Contended</code>-padded cells.</li>
+</ol>
+<p>[!INTERVIEW]
+Short Q&amp;A:</p>
+<ol>
+<li><strong>Why isn't <code>volatile</code> enough for <code>counter++</code>?</strong> It's three steps (read, add, write); other threads can interleave. Use atomic CAS.</li>
+<li><strong>What's CAS?</strong> Compare-and-swap: atomically, if memory == expected, write newValue. Hardware: <code>LOCK CMPXCHG</code> (x86) or LL/SC (ARM).</li>
+<li><strong>What's the CAS-loop idiom?</strong> <code>for(;;) { v = get(); n = f(v); if (cas(v, n)) break; }</code>. Pure read-compute-CAS, retry on failure.</li>
+<li><strong>What's the ABA problem?</strong> Value changes A → B → A; CAS sees A and thinks nothing changed, but state did. Solution: <code>AtomicStampedReference</code> (pair value with a stamp; bump stamp on every CAS).</li>
+<li><strong><code>AtomicLong</code> vs <code>LongAdder</code>?</strong> AtomicLong concentrates writes on one cache line — contention bottleneck. LongAdder stripes across <code>@Contended</code>-padded cells indexed by per-thread probe — near-linear scaling. Cost: <code>sum()</code> is O(cells).</li>
+<li><strong>Weak vs strong CAS?</strong> Strong is guaranteed to fail only on value mismatch. Weak may spuriously fail (ARM LL/SC reservation lost). In a CAS loop, weak is fine (loop is the retry); outside, use strong.</li>
+<li><strong>What is <code>VarHandle</code>?</strong> JDK 9+ API for atomic memory access with explicit memory-ordering modes. Replaces <code>sun.misc.Unsafe</code> for safe code and is the underlying implementation of <code>AtomicInteger</code> and <code>Atomic*FieldUpdater</code>.</li>
+<li><strong>Five memory-ordering modes (JEP 193)?</strong> Plain (no ordering, just atomic), Opaque (per-variable order), Acquire/Release (one-way fence pair), Volatile (sequential consistency), CAS (full barrier). Strict hierarchy.</li>
+<li><strong>Why is <code>lazySet</code> faster than <code>set</code>?</strong> Release-only semantics (no full memory barrier). The reader's volatile-load provides the acquire. Slightly faster on weakly-ordered hardware.</li>
+<li><strong>What's false sharing?</strong> Two unrelated atomic fields in adjacent memory share an L1 cache line; updates to one invalidate the line for cores accessing the other. Fix: <code>@Contended</code> padding.</li>
+<li><strong><code>Atomic*FieldUpdater</code> — when and why?</strong> When you have many objects each needing a CAS-updateable field, and per-instance <code>AtomicInteger</code> overhead (~24 bytes) is too much. The updater is a static singleton; each object has only a <code>volatile int</code> (4 bytes).</li>
+<li><strong>Treiber stack?</strong> Lock-free LIFO using one <code>AtomicReference</code> to the head. <code>push</code>: CAS-replace head with new node. <code>pop</code>: CAS-advance head to next.</li>
+<li><strong>Why does CAS work with <code>volatile</code> semantics for free on x86?</strong> TSO (Total Store Order) — x86's memory model already orders almost everything; the only reordering it allows is store-to-load forwarding, which <code>LOCK</code>-prefixed instructions block. So CAS gives full ordering as a free side-effect.</li>
+<li><strong>Why doesn't <code>LongAdder.sum()</code> give an atomic snapshot?</strong> It walks cells one at a time; between cells, other threads can increment. The "sum" is approximate.</li>
+<li><strong>Are atomic variables virtual-thread-friendly?</strong> Completely — they're CPU instructions, no parking, no carrier interaction. Always fine.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Counter increment race.</strong> Two threads each increment a <code>volatile int</code> 1M times. Measure the final count (should be &lt; 2M). Replace with <code>AtomicInteger.incrementAndGet</code>; confirm 2M exactly.</li>
+<li><strong>CAS-loop implementation.</strong> Implement <code>incrementAndGet</code> yourself with <code>get</code> + <code>compareAndSet</code> in a loop. Confirm it works identically to the built-in.</li>
+<li><strong>ABA reproduction (with a pool).</strong> Build a Treiber stack with an explicit node pool (recycle popped nodes). Construct an ABA sequence using sleeps. Observe corruption. Switch to <code>AtomicStampedReference</code>; verify ABA is defeated.</li>
+<li><strong><code>AtomicLong</code> cache-line contention.</strong> Build a counter incremented 1M times from N threads (N = 1, 2, 4, 8, 16). Plot throughput. Confirm collapse beyond ~4 threads.</li>
+<li><strong><code>LongAdder</code> scaling.</strong> Same setup as (4) but with <code>LongAdder</code>. Confirm near-linear scaling up to physical core count.</li>
+<li><strong><code>LongAdder.sum()</code> cost.</strong> Measure <code>sum()</code> time vs cell count. Confirm O(cells).</li>
+<li><strong>False sharing.</strong> Build two <code>AtomicLong</code> fields side-by-side; have two threads each hammer one. Measure throughput. Then add 64-byte padding between them (or <code>@Contended</code>); re-measure. Confirm 5-10× speedup.</li>
+<li><strong><code>VarHandle</code> direct use.</strong> Without using <code>AtomicInteger</code>, build a thread-safe counter using <code>VarHandle</code> directly. Compare performance to <code>AtomicInteger</code>; confirm equivalent.</li>
+<li><strong>Memory-ordering modes.</strong> Build a benchmark that publishes a <code>Map</code> reference via <code>setRelease</code>/<code>getAcquire</code>. Compare cost to <code>setVolatile</code>/<code>getVolatile</code>. On ARM, observe the release/acquire pair is faster.</li>
+<li><strong>Treiber stack benchmark.</strong> Implement Treiber's stack with <code>AtomicReference</code>. Compare push/pop throughput vs <code>ConcurrentLinkedDeque</code> and <code>Collections.synchronizedList(LinkedList)</code>.</li>
+<li><strong>Weak vs strong CAS in a loop.</strong> Build a CAS loop with both <code>compareAndSet</code> and <code>weakCompareAndSet</code>. On ARM, measure throughput difference; on x86, confirm they're identical.</li>
+<li><strong><code>AtomicReferenceFieldUpdater</code> memory savings.</strong> Build 1M nodes, each with an atomic counter via (a) embedded <code>AtomicLong</code>, (b) <code>volatile long</code> + static <code>LongFieldUpdater</code>. Measure heap. Confirm (b) is ~5× smaller.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>State <strong>why volatile alone isn't enough</strong>: <code>counter++</code> is read-modify-write (three steps); other threads can interleave. CAS provides atomicity over the whole read-modify-write.</li>
+<li>Explain <strong>the CAS hardware primitive</strong>: <code>LOCK CMPXCHG</code> on x86 (one instruction, full barrier, ~20-40 cycles); LL/SC pair (<code>LDAXR</code>/<code>STLXR</code>) on ARM64, with ARMv8.1 <code>CASAL</code> as the single-instruction alternative. Every atomic class is built on this.</li>
+<li>Write the <strong>canonical CAS-loop idiom</strong>: <code>for(;;) { v = get(); n = f(v); if (cas(v, n)) break; }</code>. The compute function must be pure (re-execution-safe); the loop is wait-free under no contention and lock-free overall.</li>
+<li>Use <strong>the scalar atomics</strong> (<code>AtomicInteger</code>, <code>AtomicLong</code>, <code>AtomicBoolean</code>, <code>AtomicReference</code>) for their respective types; pick CAS variants (<code>compareAndSet</code> / <code>weakCompareAndSet</code> / <code>compareAndExchange</code>) by need; prefer the <em>functional</em> helpers (<code>updateAndGet</code>, <code>accumulateAndGet</code>) over hand-written CAS loops.</li>
+<li>Build <strong>lock-free data structures</strong> using <code>AtomicReference</code> + CAS-loop — Treiber stack as the canonical example; Michael-Scott queue (T10) as the FIFO equivalent.</li>
+<li>Recognize and defeat the <strong>ABA problem</strong>: value cycles A → B → A; CAS thinks nothing changed. Fix: <code>AtomicStampedReference</code> (pair value with stamp; bump on every update). Mostly relevant when you pool/recycle nodes; JDK GC usually prevents ABA in non-pooled code.</li>
+<li>Use <strong><code>Atomic*FieldUpdater</code></strong> to avoid per-instance <code>AtomicInteger</code> (~24-byte) overhead when you have many objects each needing a CAS-updateable field; understand that the underlying mechanism since JDK 9 is <code>VarHandle</code>.</li>
+<li>Distinguish <strong><code>AtomicLong</code></strong> (cache-line ping-pong under contention; ~1 inc per line-latency under heavy load) from <strong><code>LongAdder</code></strong> (striped <code>@Contended</code>-padded cells indexed by per-thread probe; near-linear scaling). <code>LongAdder.sum()</code> is O(cells) and not an atomic snapshot. Use LongAdder for write-heavy counters; AtomicLong for read-heavy.</li>
+<li>Generalize via <strong><code>LongAccumulator</code></strong> to non-sum aggregations (max, min, custom <code>LongBinaryOperator</code>) with the same striping behaviour.</li>
+<li>Use <strong><code>VarHandle</code></strong> (JDK 9+) as the modern atomic-memory-access API; understand it underlies <code>AtomicInteger</code> and <code>Atomic*FieldUpdater</code>; pick <strong>memory-ordering modes</strong> (Plain ⊂ Opaque ⊂ Acquire/Release ⊂ Volatile ⊂ CAS per JEP 193) per need — on x86 the cost difference is negligible, on ARM the differences are real.</li>
+<li>Choose <strong>weak vs strong CAS</strong>: strong is guaranteed to fail only on value mismatch; weak may spuriously fail (ARM LL/SC reservation lost). In a CAS loop, weak is fine; outside, use strong.</li>
+<li>Quote the <strong>performance numbers</strong>: uncontended CAS ~10-30 ns; under heavy single-word contention, throughput collapses to ~1 op per cache-line latency; LongAdder restores near-linear scaling; <code>get()</code> on AtomicX is volatile-load-fast (~1 ns).</li>
+<li>Defeat <strong>false sharing</strong> with <code>@Contended</code> padding when two unrelated atomic fields share a cache line.</li>
+<li>Avoid the <strong>ten common bugs</strong>: treating <code>++</code> on volatile as atomic; CAS-looping across multiple variables; ABA on recycled pointers; using <code>LongAdder.sum()</code> for exact-control flow; <code>lazySet</code> semantic confusion; infinite-spin CAS loops with stale <code>expect</code>; pointless CAS where <code>set</code> suffices; updaters on non-volatile fields; boxing in CAS loops; mis-applying <code>@Contended</code> (it's restricted to JDK internals unless <code>-XX:-RestrictContended</code>).</li>
+<li>State the <strong>virtual-thread compatibility</strong>: atomic operations are CPU instructions, no parking, no carrier interaction — fully VT-friendly always.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t12-java-memory-model-happens-before-volatile.html">Java Memory Model (happens-before, volatile)</a> — the <em>specification</em> underneath every concurrency primitive we've covered. We'll dissect the JMM's <em>happens-before</em> relation (the formal definition + the eight enumerated rules: program order, monitor lock, volatile, thread start/join, transitive closure, etc.), the precise semantics of <code>volatile</code> (atomic load/store of 32/64-bit values, no out-of-order reads through the variable), <code>final</code> field initialization guarantees, the <em>as-if-serial</em> compiler-reordering rules, and how the JIT realises the JMM on x86's TSO vs ARM's weakly-ordered model. T11's atomic operations are the <em>implementations</em>; T12 is the <em>spec</em> they implement to.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Atomic Variables&quot;
+slug: atomic-variables
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 11
+tags: [atomic, atomicinteger, atomiclong, atomicboolean, atomicreference, atomic-int-array, atomic-long-array, atomic-reference-array, atomic-markable-reference, atomic-stamped-reference, atomic-integer-field-updater, atomic-long-field-updater, atomic-reference-field-updater, longadder, doubleadder, longaccumulator, doubleaccumulator, cas, compare-and-swap, compare-and-exchange, weak-compare-and-set, weakcompareandset, lock-cmpxchg, ldxr-stxr, ll-sc, casal, casal-armv81, lse, cas-loop, optimistic-concurrency, lock-free, treiber-stack, aba-problem, stamp-counter, mark-bit, contended, false-sharing, striped-counter, cellscell, get-and-set, get-and-add, get-and-update, accumulate-and-get, lazy-set, varhandle, jep-193, memory-ordering, plain, opaque, acquire-release, volatile-mode, fence, full-fence, store-fence, load-fence, memory-fence, double-checked-locking, unsafe-replacement, jep-9, hardware-cas, x86-tso, arm-weak-memory]
+prerequisites: [concurrent-collections, synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks, how-computers-run-programs-cpu-memory-binary]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08
+---
+
+# Atomic Variables
+
+`synchronized` (T03), `Lock` (T08), and the synchronizers (T09) all rely — at the deepest level — on **one** hardware primitive: an atomic *read-modify-write* instruction that lets a single thread perform &quot;read this word, decide based on the value, write a new value&quot; *as one indivisible operation no other thread can observe halfway through*. On every modern CPU that primitive is **compare-and-swap** (CAS): &quot;atomically, if memory[addr] == expected, write memory[addr] = newValue; return whether the write happened.&quot; From CAS alone, plus a tight retry loop, you can build *every* concurrent primitive without ever calling a lock — counter increments, lock-free stacks, AQS state CAS, FutureTask result publication, ConcurrentHashMap bucket insertion, monitor inflation. The `java.util.concurrent.atomic` package is Java&#x27;s surfacing of CAS as an API — `AtomicInteger`, `AtomicLong`, `AtomicReference`, plus a dozen more — and the JDK 9+ `VarHandle` is the modern unified replacement.
+
+The depth-bar requirement isn&#x27;t &quot;use `AtomicInteger` instead of `synchronized` for counters.&quot; At the **language** layer, the atomic classes expose **`get`/`set`/`compareAndSet`/`getAndAdd`/`updateAndGet`** plus variants over the same `volatile`-backed value, organized as a small zoo (scalars `Atomic{Int,Long,Boolean,Reference}`, arrays `Atomic*Array`, field updaters `Atomic*FieldUpdater`, the modern accumulators `LongAdder`/`LongAccumulator`/`DoubleAdder`/`DoubleAccumulator`) plus the *ABA-safe* pair (`AtomicStampedReference`, `AtomicMarkableReference`). At the **mechanism** layer, the canonical **CAS-loop idiom** — `for(;;) { v = get(); n = f(v); if (compareAndSet(v, n)) return n; }` — is the fundamental lock-free update pattern; every `updateAndGet`/`accumulateAndGet`/`getAndIncrement` compiles to it. At the **hardware** layer, the CAS itself is *one instruction* on x86 (`LOCK CMPXCHG`, ~20–40 cycles, full memory barrier) and an LL/SC pair on ARM64 (`LDAXR`/`STLXR` retry loop, or a single `CASAL` under ARMv8.1+ LSE), and the *memory-ordering* modes exposed via `VarHandle` (Plain / Opaque / Acquire-Release / Volatile per JEP 193) map directly to the CPU&#x27;s fence inventory. At the **scaling** layer, `LongAdder` solves the cache-line ping-pong problem of `AtomicLong`-under-contention by striping the counter across `@Contended`-padded cells indexed by thread probe — a 100× throughput improvement under heavy concurrent increments at the cost of O(cells) `sum()`. We will cover all four layers, finishing with the lock-free Treiber-stack pattern that the JDK uses internally in CompletableFuture, FutureTask, and AQS itself.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Concurrent collections](./T10-concurrent-collections.md) (L3/C01/T10) — CHM uses CAS for empty buckets, LongAdder for size(); [Synchronizers](./T09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md) (L3/C01/T09) — AQS state CAS; [Locks](./T08-locks-reentrantlock-readwritelock-stampedlock.md) (L3/C01/T08) — every `tryAcquire` is a CAS; [synchronized, monitors &amp; intrinsic locks](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — `LOCK CMPXCHG` and the hardware CAS instruction; [How Computers Run Programs](../../L0-foundations/C01-cs-foundations/T01-how-computers-run-programs-cpu-memory-binary.md) (L0/C01/T01) — CPU instructions, atomic operations.
+
+## Why Atomic Variables — `volatile` Is Not Enough
+
+`volatile` (T12) gives you **visibility**: any thread reading a `volatile int` sees the latest write any other thread made. But it does *not* give you **atomicity over read-modify-write** sequences. The classic broken pattern:
+
+```java
+volatile int counter;
+// thread A and thread B both run:
+counter = counter + 1;          // ✗ three steps: read, add, write — interleaved → lost updates
+```
+
+Even though every read sees the latest write, between *this* thread&#x27;s read and write *another* thread can interleave its own write. The increment is not atomic — it&#x27;s a read, an add, and a write. Two threads doing `counter++` 1 million times each yield a count somewhere between *1 million* (every other increment lost) and *2 million* — the &quot;lost update&quot; problem.
+
+The fix is either a lock (T08) — heavyweight for a single counter — or **CAS**: read the value, compute the new value, *atomically* write the new value only if the old value is still there.
+
+```java
+AtomicInteger counter = new AtomicInteger();
+counter.incrementAndGet();      // ✓ atomic — uses CAS internally
+```
+
+Inside `incrementAndGet`, the JVM emits a CAS-loop that retries until success. From the outside, the operation looks atomic.
+
+## CAS — Compare-and-Swap
+
+The hardware primitive every atomic class is built on. Conceptually:
+
+```java
+// atomic — no other thread can observe an intermediate state
+boolean compareAndSet(int* addr, int expected, int newValue) {
+    if (*addr == expected) {
+        *addr = newValue;
+        return true;
+    }
+    return false;
+}
+```
+
+On x86, this is one instruction:
+
+```asm
+lock cmpxchg [addr], rcx     ; if [addr]==rax then [addr]=rcx, ZF=1; else rax=[addr], ZF=0
+```
+
+`LOCK CMPXCHG` is atomic (no other core observes a torn intermediate), serves as a **full memory barrier**, and costs ~20-40 cycles. On a modern Skylake-or-later core, that&#x27;s ~5-10 ns of wall time — comparable to a single L1 cache miss. This is *the* primitive that makes lock-free concurrency feasible on commodity hardware.
+
+On ARM64 (a weakly-ordered architecture), CAS is an **LL/SC** (load-link/store-conditional) pair:
+
+```asm
+retry:
+   ldaxr   x3, [x0]         ; load-acquire-exclusive
+   cmp     x3, x1            ; compare to expected
+   b.ne    fail
+   stlxr   w4, x2, [x0]      ; store-release-exclusive (fails if line was touched)
+   cbnz    w4, retry         ; retry on failure
+```
+
+ARMv8.1+ added the `CASAL`/`CASA`/`CASL` family — single-instruction CAS with various memory-ordering options. HotSpot uses these under `-XX:+UseLSE` when supported, dropping the LL/SC retry loop.
+
+&gt; [!IMPORTANT]
+&gt; **Every lock-free primitive in the JDK reduces to CAS.** AQS state transitions, CHM bucket inserts, ObjectMonitor inflations, FutureTask result publications, CompletableFuture stack pushes — all are CAS at the bottom. The hardware instruction is the absolute floor of concurrent programming on commodity CPUs.
+
+## The CAS-Loop Idiom
+
+The fundamental lock-free update pattern. Every operation more complex than &quot;atomically set this value&quot; uses it:
+
+```java
+public final int getAndAdd(int delta) {
+    for (;;) {
+        int current = get();                              // read
+        int next    = current + delta;                    // compute
+        if (compareAndSet(current, next)) return current; // atomic-write-if-unchanged
+        // CAS failed → another thread updated — loop and retry
+    }
+}
+```
+
+Three steps: **read**, **compute**, **CAS**. Under no contention, the loop runs once. Under contention, the CAS fails (because another thread&#x27;s CAS got there first), and we re-read and recompute. Eventually some thread wins; on average, in light contention, the expected number of retries is bounded by the number of contending threads.
+
+Three things to internalize:
+
+1. **The compute step must be pure (no side effects).** It can re-execute many times on retry.
+2. **The loop is wait-free under no contention, lock-free overall.** No thread ever blocks; eventually, *some* thread always succeeds.
+3. **Under high contention, throughput degrades.** Threads spin in the retry loop wasting CPU. This is why `LongAdder` (below) exists — to spread contention across cells.
+
+```mermaid
+flowchart TB
+  Read[&quot;current = get()&quot;]
+  Comp[&quot;next = compute(current)&quot;]
+  CAS{&quot;compareAndSet(current, next)?&quot;}
+  Read --&gt; Comp --&gt; CAS
+  CAS -- yes --&gt; Done[&quot;return — atomic update completed&quot;]
+  CAS -- no --&gt; Read
+  Note[&quot;under no contention: 1 iteration.&lt;br/&gt;under contention: retry until success.&lt;br/&gt;compute must be pure (re-execution-safe).&quot;]
+```
+
+## `AtomicInteger`, `AtomicLong`, `AtomicBoolean` — Scalar Atomics
+
+The API surface — all three look essentially the same (substitute the type):
+
+```java
+AtomicInteger ai = new AtomicInteger(0);
+
+// reads
+int v = ai.get();                       // volatile load — atomic, ordered
+int v = ai.getOpaque();                  // atomic, NO ordering (JDK 9+)
+int v = ai.getAcquire();                 // acquire-mode load (JDK 9+)
+int v = ai.getPlain();                   // plain read — no atomic guarantees (JDK 9+)
+
+// writes
+ai.set(v);                               // volatile store — atomic, ordered
+ai.lazySet(v);                           // release-mode store — equivalent to setRelease (JDK 9+)
+ai.setOpaque(v); ai.setRelease(v); ai.setPlain(v);
+
+// CAS operations
+boolean ok = ai.compareAndSet(expect, update);          // strong CAS
+boolean ok = ai.weakCompareAndSet(expect, update);     // weak CAS (may spuriously fail)
+int prev   = ai.compareAndExchange(expect, update);     // returns the witnessed value (JDK 9+)
+
+// CAS-loop helpers
+int prev = ai.getAndIncrement();         // ++
+int next = ai.incrementAndGet();
+int prev = ai.getAndDecrement();
+int next = ai.decrementAndGet();
+int prev = ai.getAndAdd(delta);
+int next = ai.addAndGet(delta);
+int prev = ai.getAndSet(v);              // returns prior value
+
+// functional CAS-loop helpers (JDK 8+)
+int next = ai.updateAndGet(x -&gt; x * 2);                       // CAS-loop with unary fn
+int prev = ai.getAndUpdate(x -&gt; x * 2);
+int next = ai.accumulateAndGet(delta, (a, b) -&gt; a + b);       // CAS-loop with binary fn
+int prev = ai.getAndAccumulate(delta, (a, b) -&gt; a + b);
+```
+
+Three things worth knowing:
+
+- **`get()` is a volatile load** — same cost as reading any `volatile int` (≈1 ns on modern hardware; effectively free). No CAS, no fence beyond the implicit volatile-load ordering.
+- **`lazySet(v)`** stores with *release* semantics but *no* full fence — useful for &quot;publish but don&#x27;t synchronize&quot; patterns (most commonly: zero out a reference to help GC). Negligibly faster than `set()`, but the JIT can sometimes elide more.
+- **`updateAndGet(fn)`** is the modern way to write a CAS loop. Pass a pure function; the implementation does the loop for you. Avoid hand-writing CAS loops when this exists.
+
+### `AtomicInteger.value` is `volatile int`
+
+Under the hood, all the atomic classes wrap a single `volatile` field:
+
+```java
+public class AtomicInteger {
+    private static final VarHandle VALUE;       // JDK 9+ — was Unsafe before
+    static { VALUE = MethodHandles.lookup().findVarHandle(AtomicInteger.class, &quot;value&quot;, int.class); }
+
+    private volatile int value;                  // the actual storage
+
+    public final int get() { return value; }
+    public final boolean compareAndSet(int expect, int update) {
+        return VALUE.compareAndSet(this, expect, update);
+    }
+    public final int incrementAndGet() {
+        return VALUE.getAndAdd(this, 1) + 1;
+    }
+    // ...
+}
+```
+
+The wrapper exists for one reason: to expose CAS-style operations on a `volatile` field. The JIT compiles `compareAndSet` directly to `LOCK CMPXCHG` (x86) or LL/SC (ARM) — no method-call overhead in hot code.
+
+## `AtomicReference&lt;V&gt;` — and Lock-Free Data Structures
+
+```java
+AtomicReference&lt;Node&gt; head = new AtomicReference&lt;&gt;();
+
+// Treiber stack push (lock-free LIFO)
+void push(V value) {
+    Node newNode = new Node(value);
+    for (;;) {
+        Node oldHead = head.get();
+        newNode.next = oldHead;
+        if (head.compareAndSet(oldHead, newNode)) return;
+    }
+}
+
+// Treiber stack pop
+V pop() {
+    for (;;) {
+        Node oldHead = head.get();
+        if (oldHead == null) return null;
+        Node newHead = oldHead.next;
+        if (head.compareAndSet(oldHead, newHead)) return oldHead.value;
+    }
+}
+```
+
+This is **Treiber&#x27;s stack** (R.K. Treiber, 1986) — the simplest lock-free data structure. The same CAS-loop idiom applied to a head pointer. Every push and pop is a single CAS on the head; collisions retry. CompletableFuture&#x27;s completion stack (T07), FutureTask&#x27;s waiter stack (T06), ObjectMonitor&#x27;s cxq (T03) all use this pattern.
+
+### The ABA Problem — When CAS Lies
+
+Treiber&#x27;s stack has a subtle bug that only matters when nodes are recycled:
+
+1. Thread A reads `head = NodeX`.
+2. Thread A about to CAS `head: NodeX → NodeY`.
+3. Thread B pops NodeX (head = NodeX.next).
+4. Thread B pops more.
+5. Thread B pushes NodeX (recycled from a pool) — head = NodeX again.
+6. Thread A&#x27;s CAS sees `head == NodeX` → **succeeds**! But the stack is now in a corrupted state.
+
+The CAS could not distinguish &quot;the original NodeX is still here&quot; from &quot;a recycled NodeX happens to be here now with completely different siblings.&quot; This is the **ABA problem**: value goes A → B → A; CAS treats the second A as the first A.
+
+In Java, ABA is rare in practice because the GC keeps nodes alive while there&#x27;s still a reference (so they can&#x27;t be recycled mid-CAS). It bites when:
+
+- You implement an explicit node pool (recycling Nodes to avoid GC pressure).
+- You use `Atomic*FieldUpdater` over a long-lived field where stamps matter.
+- You implement lock-free algorithms over arrays of integers or longs where values genuinely repeat.
+
+### `AtomicStampedReference` and `AtomicMarkableReference` — ABA defeated
+
+The fix: pair the reference with a counter (stamp) or a bit (mark), and CAS *both atomically*. Any change increments the stamp; ABA is impossible because the stamp differs.
+
+```java
+AtomicStampedReference&lt;Node&gt; stamped = new AtomicStampedReference&lt;&gt;(initial, 0);
+
+// push (with stamp increment)
+void push(V v) {
+    int[] stampHolder = new int[1];
+    for (;;) {
+        Node oldHead = stamped.get(stampHolder);
+        int oldStamp = stampHolder[0];
+        Node newNode = new Node(v, oldHead);
+        if (stamped.compareAndSet(oldHead, newNode, oldStamp, oldStamp + 1)) return;
+    }
+}
+```
+
+Every CAS bumps the stamp by 1. Even if the reference value returns to a prior state, the stamp doesn&#x27;t — so the CAS will fail. The cost: each operation is now two CAS&#x27;d values atomically, which on most hardware means it&#x27;s implemented via a *double-width* CAS (16 bytes on 64-bit) or via an auxiliary wrapper object that&#x27;s CAS-replaced. Either way, slightly more expensive than the plain `AtomicReference` — but ABA-safe.
+
+`AtomicMarkableReference` is the same idea with a boolean mark instead of an int stamp — for cases where you only need to record &quot;logically deleted&quot; status alongside the pointer.
+
+```mermaid
+flowchart TB
+  Plain[&quot;Plain AtomicReference&quot;]
+  Plain --&gt; ABA[&quot;ABA possible&lt;br/&gt;(value cycles A → B → A;&lt;br/&gt;CAS thinks A is still original)&quot;]
+  Stamped[&quot;AtomicStampedReference&quot;]
+  Stamped --&gt; Safe[&quot;ABA prevented&lt;br/&gt;(stamp increments on every CAS;&lt;br/&gt;even if value repeats, stamp doesn&#x27;t)&quot;]
+  Note[&quot;JVM&#x27;s GC usually prevents ABA in practice (nodes aren&#x27;t recycled).&lt;br/&gt;Use stamped/markable when you have explicit pooling or repeating values.&quot;]
+```
+
+## `Atomic*FieldUpdater` — Avoiding the Per-Instance Object Cost
+
+Every `AtomicInteger` is a **separate object** — at least 16 bytes of object header + 4 bytes of value + padding = 24 bytes on a 64-bit JVM. Wrapping every per-instance counter inflates memory dramatically in objects with many concurrent fields.
+
+The fix: a *static* `Atomic*FieldUpdater` that operates on a regular `volatile` field of any instance via reflection.
+
+```java
+class Node {
+    volatile int sequence;                                  // regular volatile field
+    static final AtomicIntegerFieldUpdater&lt;Node&gt; SEQUENCE =
+        AtomicIntegerFieldUpdater.newUpdater(Node.class, &quot;sequence&quot;);
+
+    void incrementSequence() {
+        SEQUENCE.incrementAndGet(this);                      // CAS the field of THIS instance
+    }
+}
+```
+
+The `Updater` is a static singleton; each `Node` has only a `volatile int` (4 bytes), not a 24-byte `AtomicInteger`. JDK 9+ replaced the underlying mechanism with `VarHandle`, but the API surface is unchanged.
+
+When to use updaters:
+
+- You have *many* objects with per-instance CAS-updateable fields (e.g., nodes in a lock-free data structure).
+- Memory matters more than the small reflective lookup overhead.
+
+When *not* to use updaters:
+
+- Small number of instances → just use `AtomicInteger`.
+- The field&#x27;s name might be obfuscated/refactored → reflection-based lookup is brittle to renames.
+
+Modern code prefers `VarHandle` directly (next section), which `Atomic*FieldUpdater` is implemented on internally. New code rarely needs `Updater` types except for compatibility with pre-JDK-9 patterns.
+
+## `LongAdder` and `LongAccumulator` — Striped Counters for Hot Increments
+
+`AtomicLong.incrementAndGet()` is fast — uncontended, ~10 ns. Under *contention* from many threads, it becomes pathological: every increment CAS&#x27;s the same word, every CAS pulls the cache line exclusive on *some* core, and the line ping-pongs across cores. With 32 threads incrementing one counter, throughput can drop to ~1 increment per microsecond — 30× slower than a single thread.
+
+`LongAdder` (JDK 8) fixes this with **striped cells**:
+
+```java
+public class LongAdder {
+    private transient volatile long base;
+    private transient volatile Cell[] cells;
+
+    @jdk.internal.vm.annotation.Contended           // pad to cache-line size
+    static final class Cell {
+        volatile long value;
+    }
+
+    public void add(long x) {
+        Cell[] as; long b, v; int m; Cell a;
+        if ((as = cells) != null || !casBase(b = base, b + x)) {
+            // base contended; use a cell
+            boolean uncontended = true;
+            if (as == null || (m = as.length - 1) &lt; 0 ||
+                (a = as[getProbe() &amp; m]) == null ||             // hash this thread to a cell
+                !(uncontended = a.cas(v = a.value, v + x))) {
+                longAccumulate(x, null, uncontended);            // grow cells or retry
+            }
+        }
+    }
+
+    public long sum() {
+        long sum = base;
+        Cell[] as = cells;
+        if (as != null) for (Cell a : as) if (a != null) sum += a.value;
+        return sum;
+    }
+}
+```
+
+The pattern:
+
+- **Base counter** for the uncontended fast path (single CAS).
+- **Cell array** indexed by a per-thread probe (`Thread.threadLocalRandomProbe`). Each thread hashes to a cell and CAS&#x27;s *just that cell*.
+- **`@Contended` padding** ensures each cell sits in its own cache line — no false sharing.
+- **`sum()`** walks `base + Σ cells`. **O(cells)** — typically 4-16 cells, so ~50-100 ns.
+
+```mermaid
+flowchart LR
+  AL[&quot;AtomicLong&lt;br/&gt;single counter&quot;]
+  AL --&gt; Bot[&quot;all CAS the same cache line&lt;br/&gt;→ ping-pong on N cores&quot;]
+  Bot --&gt; Slow[&quot;throughput collapses&lt;br/&gt;under heavy contention&quot;]
+  LA[&quot;LongAdder&lt;br/&gt;base + striped cells&quot;]
+  LA --&gt; Cell[&quot;each thread CAS&#x27;s its own cell&lt;br/&gt;(separate cache lines)&quot;]
+  Cell --&gt; Fast[&quot;near-linear scaling&lt;br/&gt;up to (#cells, ~CPU count)&quot;]
+  LA --&gt; SumO[&quot;sum() is O(cells) — not atomic&quot;]
+```
+
+### When LongAdder beats AtomicLong (and when it doesn&#x27;t)
+
+- **Write-heavy / read-rare**: LongAdder dominates. Stats counters, metrics, throughput meters, CHM size — all use LongAdder internally.
+- **Read-heavy / write-rare**: AtomicLong wins. `get()` is O(1) and you rarely pay the cost of incrementing.
+- **Strict atomicity required**: AtomicLong. `LongAdder.sum()` is not atomic — it&#x27;s the sum of point-in-time reads, so two threads each reading `sum()` between increments may see different values.
+
+### `LongAccumulator` — generalized LongAdder
+
+`LongAdder` is hardcoded to sum (`(a, b) → a + b`). `LongAccumulator` takes a `LongBinaryOperator`:
+
+```java
+LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+max.accumulate(42);
+max.accumulate(17);
+max.accumulate(99);
+long m = max.get();              // 99
+```
+
+Useful for non-sum aggregations: max, min, multiplication, custom reduction. Same striping behaviour, same `O(cells)` `get()`.
+
+&gt; [!INTERVIEW]
+&gt; &quot;Why is `LongAdder` faster than `AtomicLong` under contention?&quot; — Senior answer: **AtomicLong concentrates all increments onto one cache line; under N concurrent writers, the line ping-pongs across cores via the cache coherence protocol (MESI invalidate-and-reacquire), serializing throughput. LongAdder stripes the counter across `@Contended`-padded cells indexed by a per-thread probe, so each thread CAS&#x27;s its own cache line. Cost: `sum()` is O(cells), not O(1). Use LongAdder when increments are hot and reads are rare; AtomicLong when reads are hot and increments are rare.**
+
+## `VarHandle` — the Modern Unified API (JDK 9+)
+
+Before JDK 9, all atomic operations were implemented via `sun.misc.Unsafe` — an internal, unstable, dangerous API the JDK never officially exposed. The atomic classes (`AtomicInteger`, etc.) and `Atomic*FieldUpdater` were the *only* sanctioned ways to perform atomic operations.
+
+JDK 9 (JEP 193) introduced `VarHandle` — a typed, safe, unified API for atomic memory access, with explicit memory-ordering control. Now:
+
+- `AtomicInteger.compareAndSet` is implemented via a static `VarHandle` to `value`.
+- `Atomic*FieldUpdater` is implemented via `MethodHandles.privateLookupIn(...)` + `VarHandle`.
+- User code can directly use `VarHandle` for custom atomic patterns without the per-instance object cost or the reflective updater overhead.
+
+### `VarHandle` example
+
+```java
+class Node {
+    volatile Object value;
+    static final VarHandle VALUE;
+    static {
+        try {
+            VALUE = MethodHandles.lookup().findVarHandle(Node.class, &quot;value&quot;, Object.class);
+        } catch (Exception e) { throw new ExceptionInInitializerError(e); }
+    }
+
+    void update() {
+        Object oldVal, newVal;
+        do {
+            oldVal = VALUE.getVolatile(this);
+            newVal = compute(oldVal);
+        } while (!VALUE.compareAndSet(this, oldVal, newVal));
+    }
+}
+```
+
+`MethodHandles.lookup().findVarHandle(class, name, type)` builds a static VarHandle bound to the named field. The VarHandle exposes:
+
+- **Reads:** `getVolatile`, `getAcquire`, `getOpaque`, `get` (plain — JDK 9+; rarely used).
+- **Writes:** `setVolatile`, `setRelease`, `setOpaque`, `set`.
+- **CAS:** `compareAndSet` (strong), `weakCompareAndSet`, `weakCompareAndSetAcquire`, `weakCompareAndSetRelease`, `weakCompareAndSetPlain`.
+- **Compare-and-exchange:** `compareAndExchange`, `compareAndExchangeAcquire`, `compareAndExchangeRelease` — return the witnessed value, useful when you want the *old* value regardless of CAS success.
+- **Atomic update helpers:** `getAndSet`, `getAndAdd`, `getAndAddAcquire`, `getAndAddRelease`.
+
+### Memory-ordering modes — JEP 193&#x27;s full hierarchy
+
+JEP 193 codified five memory-access modes, each defining a precise contract:
+
+| Mode | Atomicity | Ordering | Cost |
+|------|:---------:|----------|------|
+| **Plain** (`get`/`set`) | atomic for `int`/`long`/`reference` (per JMM) | no inter-thread ordering | ~free (just a memory read/write) |
+| **Opaque** (`getOpaque`/`setOpaque`) | atomic + per-variable program order | no cross-variable ordering | ~free |
+| **Acquire / Release** (`getAcquire`/`setRelease`) | atomic + acquire/release semantics | release-before-acquire ordering on this var | small fence on weakly-ordered CPUs |
+| **Volatile** (`getVolatile`/`setVolatile`) | atomic + sequential consistency over volatile vars | full ordering | x86: free; ARM: `LDAR`/`STLR` + `DMB ISH` |
+| **CAS / GetAndX** | atomic + full ordering | full memory barrier | one `LOCK CMPXCHG` (x86) or LL/SC (ARM) |
+
+The semantics are a strict hierarchy: each mode includes the guarantees of the modes above it (Plain ⊂ Opaque ⊂ Acquire/Release ⊂ Volatile ⊂ CAS).
+
+The two practical takeaways:
+
+1. **On x86**, the cost differences are minor — TSO makes plain stores/loads behave like acquire/release for free, and `LOCK CMPXCHG` is the only &quot;expensive&quot; instruction. Most code can use `volatile` (the default for `AtomicInteger.get`/`set`) without measurable penalty.
+2. **On ARM**, the differences are real — explicit fences (`DMB ISH`) cost cycles, and using `Opaque` / `Acquire`-`Release` modes where appropriate can give meaningful speedups in hot lock-free code. Modern HotSpot generates the right fence per mode.
+
+```mermaid
+flowchart TB
+  Modes[&quot;Memory ordering modes (JEP 193)&quot;]
+  Modes --&gt; P[&quot;Plain&lt;br/&gt;atomic (per JMM), no ordering&lt;br/&gt;≈ free&quot;]
+  Modes --&gt; O[&quot;Opaque&lt;br/&gt;atomic + per-var program order&lt;br/&gt;≈ free&quot;]
+  Modes --&gt; AR[&quot;Acquire / Release&lt;br/&gt;+ release-before-acquire pair&lt;br/&gt;small fence on ARM&quot;]
+  Modes --&gt; V[&quot;Volatile&lt;br/&gt;+ sequential consistency&lt;br/&gt;x86: free; ARM: LDAR/STLR&quot;]
+  Modes --&gt; C[&quot;CAS / getAndX&lt;br/&gt;+ full memory barrier&lt;br/&gt;LOCK CMPXCHG / LL-SC&quot;]
+  Strict[&quot;each mode ⊃ the prior — strict hierarchy&quot;]
+```
+
+## Weak vs Strong CAS
+
+```java
+boolean ok = vh.compareAndSet(this, expected, newValue);          // STRONG
+boolean ok = vh.weakCompareAndSet(this, expected, newValue);     // WEAK
+```
+
+Both *atomically* check-and-swap. The difference:
+
+- **Strong CAS** is guaranteed to fail *only* when the value mismatched. If the value matched, the swap *will* succeed.
+- **Weak CAS** *may spuriously fail* even when the value matched. This happens on ARM when the LL/SC monitor is &quot;lost&quot; for unrelated reasons (cache-line contention from any nearby memory access, even reads). On x86, weak and strong CAS compile to the same instruction (`LOCK CMPXCHG`) — there&#x27;s no difference.
+
+The rationale: ARM&#x27;s LL/SC reservation can be invalidated by *any* event touching the cache line — including loads from other cores. A strong CAS would have to retry the LL/SC pair internally on spurious failures; a weak CAS lets the *caller* handle retries explicitly. Since most CAS callers are already in a retry loop, weak CAS lets the loop be the retry mechanism — no double-retry inside the strong CAS.
+
+```java
+// in a CAS loop — weak is fine; the loop is already retrying
+for (;;) {
+    int v = get();
+    if (weakCompareAndSet(v, v + 1)) break;       // ✓ weak is fine in a loop
+}
+
+// outside a loop — strong is needed
+if (compareAndSet(0, 1)) {                         // ✓ strong; must not spuriously fail
+    initialize();                                    // critical: only one thread should do this
+}
+```
+
+The performance difference is meaningful on ARM (avoiding the strong CAS&#x27;s internal retry); on x86 it&#x27;s nothing. Modern code mostly uses strong CAS for safety; weak appears in lock-free hot loops where every cycle counts.
+
+## Performance — the Numbers
+
+| Op | Uncontended | Contended (N threads on same word) |
+|----|------------:|-----------------------------------:|
+| `AtomicInteger.get()` | ~1 ns (volatile load) | ~1 ns (reads scale) |
+| `AtomicInteger.set(v)` | ~1 ns (volatile store) | scales, no CAS |
+| `AtomicInteger.compareAndSet` (x86) | ~10-20 ns (`LOCK CMPXCHG`) | retry × N; throughput ~1/N |
+| `AtomicInteger.compareAndSet` (ARM64) | ~15-30 ns (LL/SC or CAS) | similar scaling |
+| `AtomicInteger.incrementAndGet` | ~10-20 ns | throughput collapses to ~1 inc / cache-line latency |
+| `LongAdder.increment` | ~10-20 ns | **near-linear scaling** — ~100× faster than AtomicLong under heavy contention |
+| `LongAdder.sum()` | ~50-100 ns | O(cells) — moderate scaling |
+| `AtomicReference.compareAndSet` | ~15-30 ns | same as int |
+| `VarHandle.compareAndSet` | identical to AtomicX (same machine code) | same |
+
+The pattern: **uncontended is fast; contended on the same word is slow; contended across separate cache lines (LongAdder) is fast again.** The key insight: it&#x27;s not the CAS itself that&#x27;s slow, it&#x27;s the **cache line ping-pong** under contention. Avoid contention on a single word and you have lock-free at full speed.
+
+### False sharing — the silent CAS killer
+
+```java
+class Stats {
+    AtomicLong reads = new AtomicLong();
+    AtomicLong writes = new AtomicLong();      // adjacent in memory to reads
+}
+```
+
+`reads` and `writes` may share an L1 cache line (64 bytes). Even though they&#x27;re independent counters, *every* CAS on one invalidates the other&#x27;s cache line on every core. Performance hit identical to genuinely contending on one word — **false sharing**.
+
+The fix: `@Contended`:
+
+```java
+class Stats {
+    @jdk.internal.vm.annotation.Contended AtomicLong reads = new AtomicLong();
+    @jdk.internal.vm.annotation.Contended AtomicLong writes = new AtomicLong();
+}
+```
+
+`@Contended` is JVM-internal (requires `-XX:-RestrictContended` for application code, or use of `sun.misc.Contended` reflectively). It pads the annotated field to occupy its own cache line. `LongAdder.Cell` uses this internally; application code rarely needs it unless extreme contention has been measured.
+
+## Lock-Free Patterns
+
+### Treiber stack (shown above) — push and pop at head
+
+The hello-world of lock-free. CAS on the head pointer.
+
+### Michael-Scott queue (T10) — two pointers
+
+CAS on tail.next and head.next. Each pointer&#x27;s update is one CAS; coordination via lazy updates of head/tail.
+
+### Atomic accumulator pattern
+
+```java
+// thread-safe maximum
+AtomicLong max = new AtomicLong(Long.MIN_VALUE);
+void recordMax(long v) {
+    long cur;
+    while ((cur = max.get()) &lt; v &amp;&amp; !max.compareAndSet(cur, v));
+}
+```
+
+CAS-loop with a condition. Works for any monotonic update (min, max, etc.).
+
+### Single-writer race-free publication
+
+```java
+volatile Config currentConfig;
+VarHandle CONFIG = ...;
+
+void publish(Config newConfig) {
+    CONFIG.setRelease(this, newConfig);              // publish with release semantics
+}
+
+Config read() {
+    return (Config) CONFIG.getAcquire(this);          // read with acquire semantics
+}
+```
+
+The release/acquire pair gives ordering: every write inside `newConfig` (before `publish`) is visible to threads reading after `getAcquire`. No lock; no CAS; just a one-way fence on each side. Used in configuration hot-reload, snapshot publication.
+
+## Common Mistakes
+
+### Treating `++` on a volatile as atomic
+
+```java
+volatile int counter;
+counter++;     // ✗ NOT ATOMIC — reads, adds, writes (3 separate steps)
+```
+
+Use `AtomicInteger.incrementAndGet()` or `LongAdder.increment()`.
+
+### CAS-looping when atomicity must span multiple variables
+
+```java
+AtomicInteger a = new AtomicInteger();
+AtomicInteger b = new AtomicInteger();
+// trying to atomically update both:
+a.set(...); b.set(...);     // ✗ NOT atomic across both
+```
+
+Two independent CAS&#x27;s cannot be atomic together. Either pack into one CAS-able value, use a lock, or design so they don&#x27;t need to be atomic together. STM (software transactional memory) exists but is rarely a good fit.
+
+### Forgetting ABA on recycled pointers
+
+```java
+// pool of nodes — recycled
+class Pool { Node take() {...} void put(Node n) {...} }
+// CAS-based stack using pooled nodes:
+// → ABA possible because Node references can repeat
+```
+
+Use `AtomicStampedReference` or don&#x27;t pool. JDK GC usually prevents this in non-pooled code; if you&#x27;re pooling, you&#x27;re now responsible for the ABA prevention.
+
+### Using LongAdder where you need an exact snapshot
+
+```java
+LongAdder counter = new LongAdder();
+// ...
+if (counter.sum() == 100) doSomething();     // ✗ sum is point-in-time approximate
+```
+
+`sum()` is the sum of point-in-time reads — between cells, other threads may increment. Don&#x27;t use it for control flow that needs exactness. For exact, use `AtomicLong` with the contention cost.
+
+### `lazySet` for synchronization
+
+```java
+AtomicReference&lt;X&gt; ref;
+ref.lazySet(newValue);
+// other thread does ref.get() expecting newValue
+```
+
+`lazySet` is *release-only*; the get on the other thread must use *acquire* (which `get()` does — it&#x27;s volatile-load). This works, but the *intent* is unclear. Prefer `setRelease` (JDK 9+ VarHandle) which names the semantics.
+
+### Spinning forever on a contended CAS
+
+```java
+while (!atomic.compareAndSet(expect, update));   // ✗ infinite loop if expect never matches
+```
+
+A CAS-loop must have a way to make progress. If your `expect` value depends on what you read, re-read inside the loop; if it&#x27;s invariant, re-design.
+
+### Calling `compareAndSet` where `set` would do
+
+```java
+if (atomic.compareAndSet(0, 1)) initialize();   // ✓ correct for &quot;first one wins&quot;
+atomic.compareAndSet(atomic.get(), newVal);     // ✗ pointless — race between get and CAS
+```
+
+`atomic.set(newVal)` would have the same effect with one volatile store. CAS is for &quot;only if value is X&quot; semantics.
+
+### Using `Atomic*FieldUpdater` on a non-volatile field
+
+```java
+class Node { int seq; static final ATOM = ... AtomicIntegerFieldUpdater.newUpdater(...,&quot;seq&quot;); }
+                  // ✗ &quot;seq&quot; is not volatile → newUpdater throws IllegalArgumentException at class init
+```
+
+Updaters require the target field to be `volatile`. The check is at static init time; you&#x27;ll get an exception when the class loads.
+
+### Boxing in CAS loops
+
+```java
+AtomicReference&lt;Integer&gt; count = new AtomicReference&lt;&gt;(0);
+count.updateAndGet(x -&gt; x + 1);     // ✗ allocates a new Integer per increment
+```
+
+Reference CAS-loops on boxed types allocate per increment. Use `AtomicInteger` for primitive ints. Or `LongAccumulator` for hot non-sum cases.
+
+## Observability
+
+### Cycle counting
+
+For hot lock-free code, count actual CAS retries. Use `-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly` (with hsdis) and check that your CAS loop emits one `LOCK CMPXCHG` per iteration. Use JMH to measure throughput vs core count — if throughput doesn&#x27;t scale linearly, you have contention or false sharing.
+
+### `@Contended` impact
+
+To confirm false sharing is killing performance, profile with `perf c2c` (Linux) — it reports cache-line contention. After applying `@Contended` to the hot atomic fields, re-run; the contention line should disappear.
+
+### JFR
+
+`jdk.LockSamples` and the CPU-sampling events don&#x27;t directly capture CAS contention — CAS retries look like normal CPU work. To find lock-free contention, the *only* tool is throughput measurement under increasing thread counts: if you see sub-linear scaling, contention is the cause.
+
+&gt; [!INTERVIEW]
+&gt; &quot;Walk me through what `AtomicInteger.incrementAndGet()` does.&quot; — Senior answer:
+&gt;
+&gt; 1. **API.** Returns `incrementAndGet()` — increment the value by 1, return the new value.
+&gt; 2. **JIT lowering.** Compiled to a CAS loop: read the volatile field, compute +1, attempt `compareAndSet(old, old+1)`, retry on failure.
+&gt; 3. **Hardware.** On x86: each CAS is one `LOCK CMPXCHG` instruction, atomic + full memory barrier, ~20-40 cycles. On ARM64: an `LDAXR`/`STLXR` pair (or a single `CASAL` under LSE), ~30-50 cycles, ARM&#x27;s weak memory model requires explicit fences for ordering.
+&gt; 4. **Contention behavior.** Under heavy contention, the cache line ping-pongs between cores via MESI; throughput collapses to ~1 increment per cache-line latency. Use `LongAdder` instead — stripes across `@Contended`-padded cells.
+
+&gt; [!INTERVIEW]
+&gt; Short Q&amp;A:
+&gt;
+&gt; 1. **Why isn&#x27;t `volatile` enough for `counter++`?** It&#x27;s three steps (read, add, write); other threads can interleave. Use atomic CAS.
+&gt; 2. **What&#x27;s CAS?** Compare-and-swap: atomically, if memory == expected, write newValue. Hardware: `LOCK CMPXCHG` (x86) or LL/SC (ARM).
+&gt; 3. **What&#x27;s the CAS-loop idiom?** `for(;;) { v = get(); n = f(v); if (cas(v, n)) break; }`. Pure read-compute-CAS, retry on failure.
+&gt; 4. **What&#x27;s the ABA problem?** Value changes A → B → A; CAS sees A and thinks nothing changed, but state did. Solution: `AtomicStampedReference` (pair value with a stamp; bump stamp on every CAS).
+&gt; 5. **`AtomicLong` vs `LongAdder`?** AtomicLong concentrates writes on one cache line — contention bottleneck. LongAdder stripes across `@Contended`-padded cells indexed by per-thread probe — near-linear scaling. Cost: `sum()` is O(cells).
+&gt; 6. **Weak vs strong CAS?** Strong is guaranteed to fail only on value mismatch. Weak may spuriously fail (ARM LL/SC reservation lost). In a CAS loop, weak is fine (loop is the retry); outside, use strong.
+&gt; 7. **What is `VarHandle`?** JDK 9+ API for atomic memory access with explicit memory-ordering modes. Replaces `sun.misc.Unsafe` for safe code and is the underlying implementation of `AtomicInteger` and `Atomic*FieldUpdater`.
+&gt; 8. **Five memory-ordering modes (JEP 193)?** Plain (no ordering, just atomic), Opaque (per-variable order), Acquire/Release (one-way fence pair), Volatile (sequential consistency), CAS (full barrier). Strict hierarchy.
+&gt; 9. **Why is `lazySet` faster than `set`?** Release-only semantics (no full memory barrier). The reader&#x27;s volatile-load provides the acquire. Slightly faster on weakly-ordered hardware.
+&gt; 10. **What&#x27;s false sharing?** Two unrelated atomic fields in adjacent memory share an L1 cache line; updates to one invalidate the line for cores accessing the other. Fix: `@Contended` padding.
+&gt; 11. **`Atomic*FieldUpdater` — when and why?** When you have many objects each needing a CAS-updateable field, and per-instance `AtomicInteger` overhead (~24 bytes) is too much. The updater is a static singleton; each object has only a `volatile int` (4 bytes).
+&gt; 12. **Treiber stack?** Lock-free LIFO using one `AtomicReference` to the head. `push`: CAS-replace head with new node. `pop`: CAS-advance head to next.
+&gt; 13. **Why does CAS work with `volatile` semantics for free on x86?** TSO (Total Store Order) — x86&#x27;s memory model already orders almost everything; the only reordering it allows is store-to-load forwarding, which `LOCK`-prefixed instructions block. So CAS gives full ordering as a free side-effect.
+&gt; 14. **Why doesn&#x27;t `LongAdder.sum()` give an atomic snapshot?** It walks cells one at a time; between cells, other threads can increment. The &quot;sum&quot; is approximate.
+&gt; 15. **Are atomic variables virtual-thread-friendly?** Completely — they&#x27;re CPU instructions, no parking, no carrier interaction. Always fine.
+
+## Practice
+
+1. **Counter increment race.** Two threads each increment a `volatile int` 1M times. Measure the final count (should be &lt; 2M). Replace with `AtomicInteger.incrementAndGet`; confirm 2M exactly.
+2. **CAS-loop implementation.** Implement `incrementAndGet` yourself with `get` + `compareAndSet` in a loop. Confirm it works identically to the built-in.
+3. **ABA reproduction (with a pool).** Build a Treiber stack with an explicit node pool (recycle popped nodes). Construct an ABA sequence using sleeps. Observe corruption. Switch to `AtomicStampedReference`; verify ABA is defeated.
+4. **`AtomicLong` cache-line contention.** Build a counter incremented 1M times from N threads (N = 1, 2, 4, 8, 16). Plot throughput. Confirm collapse beyond ~4 threads.
+5. **`LongAdder` scaling.** Same setup as (4) but with `LongAdder`. Confirm near-linear scaling up to physical core count.
+6. **`LongAdder.sum()` cost.** Measure `sum()` time vs cell count. Confirm O(cells).
+7. **False sharing.** Build two `AtomicLong` fields side-by-side; have two threads each hammer one. Measure throughput. Then add 64-byte padding between them (or `@Contended`); re-measure. Confirm 5-10× speedup.
+8. **`VarHandle` direct use.** Without using `AtomicInteger`, build a thread-safe counter using `VarHandle` directly. Compare performance to `AtomicInteger`; confirm equivalent.
+9. **Memory-ordering modes.** Build a benchmark that publishes a `Map` reference via `setRelease`/`getAcquire`. Compare cost to `setVolatile`/`getVolatile`. On ARM, observe the release/acquire pair is faster.
+10. **Treiber stack benchmark.** Implement Treiber&#x27;s stack with `AtomicReference`. Compare push/pop throughput vs `ConcurrentLinkedDeque` and `Collections.synchronizedList(LinkedList)`.
+11. **Weak vs strong CAS in a loop.** Build a CAS loop with both `compareAndSet` and `weakCompareAndSet`. On ARM, measure throughput difference; on x86, confirm they&#x27;re identical.
+12. **`AtomicReferenceFieldUpdater` memory savings.** Build 1M nodes, each with an atomic counter via (a) embedded `AtomicLong`, (b) `volatile long` + static `LongFieldUpdater`. Measure heap. Confirm (b) is ~5× smaller.
+
+## Recap
+
+You should now be able to:
+
+- State **why volatile alone isn&#x27;t enough**: `counter++` is read-modify-write (three steps); other threads can interleave. CAS provides atomicity over the whole read-modify-write.
+- Explain **the CAS hardware primitive**: `LOCK CMPXCHG` on x86 (one instruction, full barrier, ~20-40 cycles); LL/SC pair (`LDAXR`/`STLXR`) on ARM64, with ARMv8.1 `CASAL` as the single-instruction alternative. Every atomic class is built on this.
+- Write the **canonical CAS-loop idiom**: `for(;;) { v = get(); n = f(v); if (cas(v, n)) break; }`. The compute function must be pure (re-execution-safe); the loop is wait-free under no contention and lock-free overall.
+- Use **the scalar atomics** (`AtomicInteger`, `AtomicLong`, `AtomicBoolean`, `AtomicReference`) for their respective types; pick CAS variants (`compareAndSet` / `weakCompareAndSet` / `compareAndExchange`) by need; prefer the *functional* helpers (`updateAndGet`, `accumulateAndGet`) over hand-written CAS loops.
+- Build **lock-free data structures** using `AtomicReference` + CAS-loop — Treiber stack as the canonical example; Michael-Scott queue (T10) as the FIFO equivalent.
+- Recognize and defeat the **ABA problem**: value cycles A → B → A; CAS thinks nothing changed. Fix: `AtomicStampedReference` (pair value with stamp; bump on every update). Mostly relevant when you pool/recycle nodes; JDK GC usually prevents ABA in non-pooled code.
+- Use **`Atomic*FieldUpdater`** to avoid per-instance `AtomicInteger` (~24-byte) overhead when you have many objects each needing a CAS-updateable field; understand that the underlying mechanism since JDK 9 is `VarHandle`.
+- Distinguish **`AtomicLong`** (cache-line ping-pong under contention; ~1 inc per line-latency under heavy load) from **`LongAdder`** (striped `@Contended`-padded cells indexed by per-thread probe; near-linear scaling). `LongAdder.sum()` is O(cells) and not an atomic snapshot. Use LongAdder for write-heavy counters; AtomicLong for read-heavy.
+- Generalize via **`LongAccumulator`** to non-sum aggregations (max, min, custom `LongBinaryOperator`) with the same striping behaviour.
+- Use **`VarHandle`** (JDK 9+) as the modern atomic-memory-access API; understand it underlies `AtomicInteger` and `Atomic*FieldUpdater`; pick **memory-ordering modes** (Plain ⊂ Opaque ⊂ Acquire/Release ⊂ Volatile ⊂ CAS per JEP 193) per need — on x86 the cost difference is negligible, on ARM the differences are real.
+- Choose **weak vs strong CAS**: strong is guaranteed to fail only on value mismatch; weak may spuriously fail (ARM LL/SC reservation lost). In a CAS loop, weak is fine; outside, use strong.
+- Quote the **performance numbers**: uncontended CAS ~10-30 ns; under heavy single-word contention, throughput collapses to ~1 op per cache-line latency; LongAdder restores near-linear scaling; `get()` on AtomicX is volatile-load-fast (~1 ns).
+- Defeat **false sharing** with `@Contended` padding when two unrelated atomic fields share a cache line.
+- Avoid the **ten common bugs**: treating `++` on volatile as atomic; CAS-looping across multiple variables; ABA on recycled pointers; using `LongAdder.sum()` for exact-control flow; `lazySet` semantic confusion; infinite-spin CAS loops with stale `expect`; pointless CAS where `set` suffices; updaters on non-volatile fields; boxing in CAS loops; mis-applying `@Contended` (it&#x27;s restricted to JDK internals unless `-XX:-RestrictContended`).
+- State the **virtual-thread compatibility**: atomic operations are CPU instructions, no parking, no carrier interaction — fully VT-friendly always.
+
+## Next
+
+Continue to [Java Memory Model (happens-before, volatile)](./T12-java-memory-model-happens-before-volatile.md) — the *specification* underneath every concurrency primitive we&#x27;ve covered. We&#x27;ll dissect the JMM&#x27;s *happens-before* relation (the formal definition + the eight enumerated rules: program order, monitor lock, volatile, thread start/join, transitive closure, etc.), the precise semantics of `volatile` (atomic load/store of 32/64-bit values, no out-of-order reads through the variable), `final` field initialization guarantees, the *as-if-serial* compiler-reordering rules, and how the JIT realises the JMM on x86&#x27;s TSO vs ARM&#x27;s weakly-ordered model. T11&#x27;s atomic operations are the *implementations*; T12 is the *spec* they implement to.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t10-concurrent-collections.html"><div class="lbl">← Previous</div><div class="ttl">T10-concurrent-collections</div><div class="sub">Concurrent Collections</div></a><a class="next" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><div class="lbl">Next →</div><div class="ttl">T12-java-memory-model-happens-before-volatile</div><div class="sub">Java Memory Model (happens-before, volatile)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-atomic-variables-volatile-is-not-enough" data-toc-link>Why Atomic Variables — volatile Is Not Enough</a></li><li class="lvl-2"><a href="#cas-compare-and-swap" data-toc-link>CAS — Compare-and-Swap</a></li><li class="lvl-2"><a href="#the-cas-loop-idiom" data-toc-link>The CAS-Loop Idiom</a></li><li class="lvl-2"><a href="#atomicinteger-atomiclong-atomicboolean-scalar-atomics" data-toc-link>AtomicInteger, AtomicLong, AtomicBoolean — Scalar Atomics</a></li><li class="lvl-3"><a href="#atomicintegervalue-is-volatile-int" data-toc-link>AtomicInteger.value is volatile int</a></li><li class="lvl-2"><a href="#atomicreferencev-and-lock-free-data-structures" data-toc-link>AtomicReference&amp;lt;V&amp;gt; — and Lock-Free Data Structures</a></li><li class="lvl-3"><a href="#the-aba-problem-when-cas-lies" data-toc-link>The ABA Problem — When CAS Lies</a></li><li class="lvl-3"><a href="#atomicstampedreference-and-atomicmarkablereference-aba-defeated" data-toc-link>AtomicStampedReference and AtomicMarkableReference — ABA defeated</a></li><li class="lvl-2"><a href="#atomicfieldupdater-avoiding-the-per-instance-object-cost" data-toc-link>Atomic*FieldUpdater — Avoiding the Per-Instance Object Cost</a></li><li class="lvl-2"><a href="#longadder-and-longaccumulator-striped-counters-for-hot-increments" data-toc-link>LongAdder and LongAccumulator — Striped Counters for Hot Increments</a></li><li class="lvl-3"><a href="#when-longadder-beats-atomiclong-and-when-it-doesnt" data-toc-link>When LongAdder beats AtomicLong (and when it doesn&#x27;t)</a></li><li class="lvl-3"><a href="#longaccumulator-generalized-longadder" data-toc-link>LongAccumulator — generalized LongAdder</a></li><li class="lvl-2"><a href="#varhandle-the-modern-unified-api-jdk-9" data-toc-link>VarHandle — the Modern Unified API (JDK 9+)</a></li><li class="lvl-3"><a href="#varhandle-example" data-toc-link>VarHandle example</a></li><li class="lvl-3"><a href="#memory-ordering-modes-jep-193s-full-hierarchy" data-toc-link>Memory-ordering modes — JEP 193&#x27;s full hierarchy</a></li><li class="lvl-2"><a href="#weak-vs-strong-cas" data-toc-link>Weak vs Strong CAS</a></li><li class="lvl-2"><a href="#performance-the-numbers" data-toc-link>Performance — the Numbers</a></li><li class="lvl-3"><a href="#false-sharing-the-silent-cas-killer" data-toc-link>False sharing — the silent CAS killer</a></li><li class="lvl-2"><a href="#lock-free-patterns" data-toc-link>Lock-Free Patterns</a></li><li class="lvl-3"><a href="#treiber-stack-shown-above-push-and-pop-at-head" data-toc-link>Treiber stack (shown above) — push and pop at head</a></li><li class="lvl-3"><a href="#michael-scott-queue-t10-two-pointers" data-toc-link>Michael-Scott queue (T10) — two pointers</a></li><li class="lvl-3"><a href="#atomic-accumulator-pattern" data-toc-link>Atomic accumulator pattern</a></li><li class="lvl-3"><a href="#single-writer-race-free-publication" data-toc-link>Single-writer race-free publication</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#treating-on-a-volatile-as-atomic" data-toc-link>Treating ++ on a volatile as atomic</a></li><li class="lvl-3"><a href="#cas-looping-when-atomicity-must-span-multiple-variables" data-toc-link>CAS-looping when atomicity must span multiple variables</a></li><li class="lvl-3"><a href="#forgetting-aba-on-recycled-pointers" data-toc-link>Forgetting ABA on recycled pointers</a></li><li class="lvl-3"><a href="#using-longadder-where-you-need-an-exact-snapshot" data-toc-link>Using LongAdder where you need an exact snapshot</a></li><li class="lvl-3"><a href="#lazyset-for-synchronization" data-toc-link>lazySet for synchronization</a></li><li class="lvl-3"><a href="#spinning-forever-on-a-contended-cas" data-toc-link>Spinning forever on a contended CAS</a></li><li class="lvl-3"><a href="#calling-compareandset-where-set-would-do" data-toc-link>Calling compareAndSet where set would do</a></li><li class="lvl-3"><a href="#using-atomicfieldupdater-on-a-non-volatile-field" data-toc-link>Using Atomic*FieldUpdater on a non-volatile field</a></li><li class="lvl-3"><a href="#boxing-in-cas-loops" data-toc-link>Boxing in CAS loops</a></li><li class="lvl-2"><a href="#observability" data-toc-link>Observability</a></li><li class="lvl-3"><a href="#cycle-counting" data-toc-link>Cycle counting</a></li><li class="lvl-3"><a href="#contended-impact" data-toc-link>@Contended impact</a></li><li class="lvl-3"><a href="#jfr" data-toc-link>JFR</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

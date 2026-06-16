@@ -22,4 +22,4 @@ Tooling and environment setup relevant to this level.
 
 - [Tools for Architecture & Leadership](T01-tools-for-architecture-and-leadership.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

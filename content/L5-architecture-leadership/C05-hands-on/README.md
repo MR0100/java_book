@@ -24,4 +24,4 @@ Exercises plus this module's end-of-level project.
 
 - [Level Project: System Design Portfolio](T01-level-project-system-design-portfolio.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

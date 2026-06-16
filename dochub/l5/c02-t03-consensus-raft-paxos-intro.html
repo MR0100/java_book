@@ -1,0 +1,2012 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Consensus (Raft / Paxos, Intro) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="active" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Consensus (Raft / Paxos, Intro)</span></div>
+        <h1>Consensus (Raft / Paxos, Intro)</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T03-consensus-raft-paxos-intro.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~80 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Consensus (Raft / Paxos, Intro)"
+slug: consensus-raft-paxos-intro
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Distributed Systems &amp; System Design"
+type: concept
+difficulty: lead
+order: 3
+tags: [consensus, raft, paxos, multi-paxos, leslie-lamport, diego-ongaro, john-ousterhout, etcd, zookeeper, consul, leader-election, log-replication, quorum, majority, safety, liveness, flp-impossibility, byzantine, pbft, jraft, atomix, copycat, distributed-state-machine]
+prerequisites: [cap-theorem-and-pacelc, consistency-models-strong-eventual]
+status: complete
+estimated_minutes: 80
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="consensus-raft-paxos-intro">Consensus (Raft / Paxos, Intro)</h1>
+<p>How does a distributed system agree on <em>anything</em>? When five replicas hold a counter and concurrent writes arrive, how do all five end up with the same value? When a cluster has a leader and the leader dies, how do the survivors agree on a new leader without two of them claiming the role simultaneously (the dreaded split-brain)? <strong>Consensus algorithms</strong> are the mathematical machinery that solves this problem — a class of protocols that allow a set of unreliable processes (each of which may crash or be slow) to agree on a single value, despite some fraction of them failing or being temporarily partitioned. Without consensus, no distributed database can offer linearizability (<a href="c02-t02-consistency-models-strong-eventual.html">T02</a>), no leader election is safe, no distributed lock is actually exclusive, no Kubernetes control plane can decide anything. <strong>Consensus is the substrate underneath every "strongly consistent" distributed system.</strong></p>
+<p>Two algorithms have defined the field: <strong>Paxos</strong> (Leslie Lamport, 1989, published 1998 in "The Part-Time Parliament," reformulated in 2001's "Paxos Made Simple") and <strong>Raft</strong> (Diego Ongaro and John Ousterhout, 2014, designed explicitly for understandability after Paxos's notorious complexity). Paxos came first and is foundational; Raft followed and is what the industry actually deploys in new systems because it's reasonable to implement without a PhD. The third entrant — Viewstamped Replication (Brian Oki and Barbara Liskov, 1988) — predates both and influenced both; the recent <strong>PBFT</strong> (Castro and Liskov, 1999) and successors extend consensus to handle <em>Byzantine</em> failures (malicious / arbitrary behavior, not just crashes), at significantly higher cost.</p>
+<p>The depth bar here is <strong>the actual mechanism</strong> — what Raft does in steady state, how leader election handles failure, how log replication ensures the same sequence of operations applies on every replica, how the <strong>2f+1 quorum rule</strong> lets the system tolerate <code>f</code> simultaneous failures with <code>2f+1</code> total replicas — not just naming the algorithm. We trace what happens on the wire when a Raft node sends an AppendEntries RPC, when an election starts, when a partitioned minority finds itself rejoining a healed cluster. We name the production systems that implement consensus — <strong>etcd</strong> (Kubernetes, CoreDNS), <strong>ZooKeeper</strong> (Hadoop, Kafka pre-KIP-500), <strong>Consul</strong> (HashiCorp), <strong>CockroachDB</strong> (per-range Raft), <strong>Spanner</strong> (Paxos), <strong>MongoDB</strong> (a Raft variant), <strong>Kafka KRaft</strong> (replaces ZooKeeper) — and what each does with consensus underneath. We name the canonical failures consensus prevents (split-brain, double-leader, lost-commit, inconsistent-state) and the engineering investments that make it tractable (the bounded quorum requirement, the leader-based leader steady-state, the snapshot mechanisms for log compaction). By the end you will explain Raft's mechanics to a junior engineer in 30 minutes, predict any consensus system's behavior under f failures, refuse the wrong consensus choice (using DynamoDB-style AP storage for a leader-election problem, for example), and operate the most common Java consensus library (<code>jraft</code> or Atomix) with awareness of its failure modes.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t01-cap-theorem-and-pacelc.html">CAP</a> (consensus is the engineering that lets a system be CP); <a href="c02-t02-consistency-models-strong-eventual.html">Consistency Models</a> (linearizability needs consensus). This is an <em>intro</em> — the topic introduces Raft well and Paxos lightly; deeper consensus theory (Multi-Paxos, EPaxos, Flexible Paxos, the Heidi Howard work) is graduate material.</p></div></div>
+<h2 id="the-history-of-consensus-a-40-year-intellectual-journey">The History Of Consensus — A 40-Year Intellectual Journey<a class="anchor" href="#the-history-of-consensus-a-40-year-intellectual-journey" aria-hidden="true">#</a></h2>
+<p>The consensus problem is one of computer science's <em>oldest</em> unsolved-then-solved problems. The path from the problem's identification (early 1970s) through the production deployments of 2026 took <strong>roughly 40 years</strong>, with key figures, key papers, and key failures along the way. Understanding the lineage matters because it tells you <em>why each successive algorithm exists</em> — what flaw in the previous one it was trying to fix.</p>
+<h3 id="the-pre-paxos-era-the-1980s-foundation">The Pre-Paxos Era: The 1980s Foundation<a class="anchor" href="#the-pre-paxos-era-the-1980s-foundation" aria-hidden="true">#</a></h3>
+<p>The consensus problem was formalized in the early 1980s, building on three foundational results:</p>
+<h4 id="1-the-byzantine-generals-problem-lamport-shostak-pease-1982">1. The Byzantine Generals Problem (Lamport, Shostak, Pease, 1982)<a class="anchor" href="#1-the-byzantine-generals-problem-lamport-shostak-pease-1982" aria-hidden="true">#</a></h4>
+<p><a href="https://lamport.azurewebsites.net/pubs/byz.pdf"><em>The Byzantine Generals Problem</em></a> (Lamport et al., July 1982) introduced the canonical formulation of distributed agreement under malicious failure. The setting: several generals must coordinate an attack on a city; some generals are traitors who send conflicting messages. The result: agreement requires <strong>at least 3f+1 generals to tolerate f traitors</strong> if message authentication is unavailable, or <strong>2f+1 with authentication</strong>.</p>
+<p>This paper coined the term <em>Byzantine</em> (Lamport later said he picked it because Byzantium "no longer existed and the name would not offend any ethnic group"). It established that consensus has <em>fault-model-dependent thresholds</em>: crash-fault-tolerance requires fewer nodes than Byzantine-fault-tolerance.</p>
+<h4 id="2-the-flp-impossibility-result-fischer-lynch-paterson-1985">2. The FLP Impossibility Result (Fischer, Lynch, Paterson, 1985)<a class="anchor" href="#2-the-flp-impossibility-result-fischer-lynch-paterson-1985" aria-hidden="true">#</a></h4>
+<p><a href="https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf"><em>Impossibility of Distributed Consensus with One Faulty Process</em></a> (April 1985) proved that <strong>in an asynchronous network, no deterministic consensus algorithm can guarantee both safety and termination if even one process can crash</strong>. The proof is by constructing an infinite sequence of message delays that prevent termination.</p>
+<p>FLP was a <strong>devastating result</strong> for the field: it meant that any practical consensus algorithm must either (a) sacrifice determinism (use randomization or timeouts), (b) sacrifice termination (allow the algorithm to hang under worst-case conditions), or (c) sacrifice asynchrony (require bounded message delays).</p>
+<p>Real Paxos and Raft work around FLP by <strong>using randomized timeouts</strong>: they almost always terminate but cannot guarantee it in worst-case adversarial timing. In practice, this is acceptable because the worst-case adversarial timing is astronomically unlikely.</p>
+<h4 id="3-viewstamped-replication-brian-oki-and-barbara-liskov-1988">3. Viewstamped Replication (Brian Oki and Barbara Liskov, 1988)<a class="anchor" href="#3-viewstamped-replication-brian-oki-and-barbara-liskov-1988" aria-hidden="true">#</a></h4>
+<p>Often forgotten, <a href="https://pmg.csail.mit.edu/papers/vr.pdf"><em>Viewstamped Replication: A New Primary Copy Method to Support Highly-Available Distributed Systems</em></a> (August 1988) presented an algorithm that solved the same problem Paxos solved a year later, with a <em>more readable</em> structure. Liskov herself has noted (in various retrospectives) that Viewstamped Replication and Paxos are <em>fundamentally equivalent</em> — both reduce to the same core algorithm — but Paxos got the publicity.</p>
+<p>The historical accident: Liskov's paper was published in a SOSP workshop and didn't reach the broader systems community as widely. Lamport's Paxos paper, despite being rejected from its first submission, eventually became the canonical reference. Modern algorithms like Raft owe more structurally to Viewstamped Replication than to Paxos — Raft's "leader + followers + log" shape is essentially VR's "primary + backups + log" shape.</p>
+<h3 id="the-paxos-era-lamports-famously-obscure-paper">The Paxos Era — Lamport's Famously Obscure Paper<a class="anchor" href="#the-paxos-era-lamports-famously-obscure-paper" aria-hidden="true">#</a></h3>
+<h4 id="leslie-lamport-who-he-is-and-why-he-wrote-paxos">Leslie Lamport, Who He Is, And Why He Wrote Paxos<a class="anchor" href="#leslie-lamport-who-he-is-and-why-he-wrote-paxos" aria-hidden="true">#</a></h4>
+<p><strong>Leslie Lamport</strong> (born 1941) is one of the foundational figures of distributed systems. He received the <strong>2013 Turing Award</strong> for "fundamental contributions to the theory and practice of distributed and concurrent systems." Among his prior contributions:</p>
+<ul>
+<li><strong>Lamport timestamps</strong> (1978, see <a href="c02-t09-clocks-and-ordering-logical-vector-clocks.html">T09</a>) — the logical clocks used in every consensus algorithm.</li>
+<li><strong>LaTeX</strong> (1985) — the document preparation system, derived from Knuth's TeX.</li>
+<li><strong>Byzantine Generals</strong> (1982) — as above.</li>
+<li><strong>Bakery algorithm</strong> (1974) — mutual exclusion for shared memory.</li>
+</ul>
+<p>Lamport worked at SRI, then DEC's Systems Research Center (1985–2001), then Microsoft Research (2001–present). His SRC career was the period during which he developed Paxos.</p>
+<h4 id="the-1989-submission-and-the-1998-publication">The 1989 Submission And The 1998 Publication<a class="anchor" href="#the-1989-submission-and-the-1998-publication" aria-hidden="true">#</a></h4>
+<p>Lamport's <a href="https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf"><em>The Part-Time Parliament</em></a> was <strong>submitted in 1989</strong> and <strong>rejected</strong>. The reviewers (Lamport later wrote in his retrospective) found the paper's allegorical framing — pretending the algorithm was discovered on the Aegean island of "Paxos" by a parliament of vacationing politicians — to be obscure and unprofessional.</p>
+<p>Lamport sat on the paper for years. In 1996, Butler Lampson at DEC SRC presented Paxos in a more accessible way, citing Lamport's unpublished work. This created demand, and in <strong>May 1998</strong> the paper was finally published in <em>ACM Transactions on Computer Systems</em>. Lamport's biographical sketch in the paper described "the late Greek archaeologist Λεωνίδας Παξός" — the joke being that the entire framing was a fiction.</p>
+<h4 id="why-paxos-is-so-hard-to-understand">Why Paxos Is So Hard To Understand<a class="anchor" href="#why-paxos-is-so-hard-to-understand" aria-hidden="true">#</a></h4>
+<p>The 1998 Paxos paper is widely considered <em>one of the hardest papers in distributed systems to read</em>. The allegorical framing was abandoned for serious presentations, and Lamport himself wrote <a href="https://lamport.azurewebsites.net/pubs/paxos-simple.pdf"><em>Paxos Made Simple</em></a> (November 2001) — a 14-page re-explanation. Even <em>Paxos Made Simple</em> is widely considered hard to read.</p>
+<p>The reasons:
+- Lamport's formal style emphasizes <strong>invariants and proofs</strong> rather than algorithmic flow.
+- The paper distinguishes between <strong>Single-Decree Paxos</strong> (the basic version) and <strong>Multi-Paxos</strong> (running Single-Decree repeatedly for a log) without clearly separating them.
+- The roles (Proposer, Acceptor, Learner) can be played by the same process, but the paper doesn't initially make this clear.
+- Implementation details (leader election, log truncation, snapshots) are <em>not covered</em> in the original paper, leading to the <em>Paxos Made Live</em> paper (Chandra, Griesemer, Redstone at Google, 2007) describing what it took to actually deploy Paxos in production.</p>
+<p>This obscurity directly motivated the Raft design.</p>
+<h3 id="the-production-paxos-era-chubby-zookeeper-and-multi-paxos">The Production-Paxos Era — Chubby, ZooKeeper, And Multi-Paxos<a class="anchor" href="#the-production-paxos-era-chubby-zookeeper-and-multi-paxos" aria-hidden="true">#</a></h3>
+<h4 id="googles-chubby-lock-service-2006">Google's Chubby Lock Service (2006)<a class="anchor" href="#googles-chubby-lock-service-2006" aria-hidden="true">#</a></h4>
+<p><a href="https://research.google/pubs/the-chubby-lock-service-for-loosely-coupled-distributed-systems/"><em>The Chubby lock service for loosely-coupled distributed systems</em></a> (Burrows, OSDI 2006) was the first major <em>production</em> description of Paxos in use. Chubby was Google's distributed coordination service, used internally for leader election, name service, and configuration storage for GFS, BigTable, and MapReduce.</p>
+<p>Chubby revealed <em>what Paxos required in production</em>:
+- Leader election (Multi-Paxos with a stable leader).
+- Log compaction via snapshots.
+- Cell membership changes.
+- Client-session handling.
+- The reality that <strong>most of the code is the non-Paxos parts</strong>.</p>
+<h4 id="yahoos-zookeeper-2008">Yahoo's ZooKeeper (2008)<a class="anchor" href="#yahoos-zookeeper-2008" aria-hidden="true">#</a></h4>
+<p>ZooKeeper (Apache top-level project from 2008) implemented a Paxos variant called <strong>Zab</strong> (ZooKeeper Atomic Broadcast). Zab differed from classical Paxos by emphasizing <em>broadcast semantics</em>: every committed transaction is delivered to every replica in the same order.</p>
+<p>ZooKeeper became enormously influential because it was the <strong>first widely-available consensus system that engineers outside of Google could deploy</strong>. Hadoop, HBase, Kafka (pre-KRaft), Solr, Storm, Mesos all used ZooKeeper. Curator (Apache, originally from Netflix) provided Java patterns on top.</p>
+<h4 id="paxos-made-live-2007">Paxos Made Live (2007)<a class="anchor" href="#paxos-made-live-2007" aria-hidden="true">#</a></h4>
+<p>The Google paper <a href="https://research.google/pubs/paxos-made-live-an-engineering-perspective/"><em>Paxos Made Live - An Engineering Perspective</em></a> (Chandra, Griesemer, Redstone, 2007) documented the engineering work required to deploy Paxos. Critical observation:</p>
+<blockquote>
+<p>"There are significant gaps between the description of the Paxos algorithm and the needs of a real-world system. In order to build a real-world system, an expert needs to use numerous ideas scattered in the literature and make several relatively small protocol extensions. The cumulative effort will be substantial and the final system will be based on an unproven protocol."</p>
+</blockquote>
+<p>This paper effectively documented that <strong>getting Paxos right requires roughly 18 months of engineering work</strong> even with expert engineers. This created the demand for a <em>more comprehensible</em> algorithm — which is where Raft enters.</p>
+<h3 id="the-raft-era-ongaro-ousterhouts-pedagogical-revolution">The Raft Era — Ongaro &amp; Ousterhout's Pedagogical Revolution<a class="anchor" href="#the-raft-era-ongaro-ousterhouts-pedagogical-revolution" aria-hidden="true">#</a></h3>
+<h4 id="why-raft-was-created-2014">Why Raft Was Created (2014)<a class="anchor" href="#why-raft-was-created-2014" aria-hidden="true">#</a></h4>
+<p>Diego Ongaro's <a href="https://github.com/ongardie/dissertation/blob/master/online.pdf"><em>Consensus: Bridging Theory and Practice</em></a> (Stanford PhD dissertation, 2014, advised by John Ousterhout) opened with an explicit complaint:</p>
+<blockquote>
+<p>"Despite Paxos having served as the foundation of consensus protocols in industry and academia for over a decade, ... Paxos is exceptionally difficult to understand. ... It is widely accepted that Paxos has, alternatively, helped or hindered the field, depending on whom you ask."</p>
+</blockquote>
+<p>Ongaro and Ousterhout designed Raft with a <em>pedagogical</em> primary goal: <strong>the algorithm should be understandable</strong>. They specifically decomposed consensus into three sub-problems (leader election, log replication, safety) that could be reasoned about independently — a structural choice Paxos doesn't make.</p>
+<p>The Raft paper <a href="https://raft.github.io/raft.pdf"><em>In Search of an Understandable Consensus Algorithm</em></a> (Ongaro &amp; Ousterhout, USENIX ATC 2014) was conducted with a <em>user study</em>: graduate students were taught either Paxos or Raft, then quizzed. Raft outscored Paxos significantly. The paper's title is the punchline.</p>
+<h4 id="who-john-ousterhout-is">Who John Ousterhout Is<a class="anchor" href="#who-john-ousterhout-is" aria-hidden="true">#</a></h4>
+<p><strong>John Ousterhout</strong> (born 1954) is a Stanford CS professor with a long systems career. Among his prior contributions:
+- <strong>Tcl/Tk</strong> (1988) — the scripting language and toolkit.
+- <strong>Log-Structured Filesystem (LFS, 1992)</strong> — the precursor to ZFS, btrfs, and modern flash-aware filesystems.
+- <strong>RAMCloud</strong> (2009–) — a distributed in-memory store, the project that motivated Raft.</p>
+<p>Ousterhout was Ongaro's PhD advisor, and Raft emerged from RAMCloud's need for a consensus algorithm Ousterhout could <strong>explain to a class of graduate students in one lecture</strong>.</p>
+<h4 id="rafts-rapid-adoption">Raft's Rapid Adoption<a class="anchor" href="#rafts-rapid-adoption" aria-hidden="true">#</a></h4>
+<p>Raft was adopted in production with unprecedented speed for a distributed systems algorithm:</p>
+<ul>
+<li><strong>etcd</strong> (CoreOS, 2013–2014): Raft-based key-value store. Became the storage backbone of Kubernetes.</li>
+<li><strong>Consul</strong> (HashiCorp, 2014): Raft-based service registry.</li>
+<li><strong>CockroachDB</strong> (2015): Raft per data range.</li>
+<li><strong>TiDB</strong> (PingCAP, 2016): Raft per region.</li>
+<li><strong>MongoDB</strong> (3.2, 2015): replica set election uses a Raft-like algorithm.</li>
+<li><strong>Kafka KRaft</strong> (2021): replaces ZooKeeper-based controller with Raft.</li>
+</ul>
+<p>By 2020, <strong>Raft had displaced Paxos as the default new-system choice</strong> for crash-fault-tolerant consensus. Paxos remains in use in older systems (Google Spanner, Chubby) and in academic research (EPaxos, Flexible Paxos), but new systems pick Raft.</p>
+<h2 id="why-consensus-specifically-the-senior-engineers-qa">Why Consensus, Specifically: The Senior Engineer's Q&amp;A<a class="anchor" href="#why-consensus-specifically-the-senior-engineers-qa" aria-hidden="true">#</a></h2>
+<h3 id="q1-why-do-we-need-consensus-at-all">Q1: Why do we need consensus at all?<a class="anchor" href="#q1-why-do-we-need-consensus-at-all" aria-hidden="true">#</a></h3>
+<p>Because <strong>distributed systems must agree on something</strong> despite failures. Without consensus, you cannot:
+- Elect a single leader (two leaders = split-brain).
+- Maintain a consistent replicated state.
+- Implement distributed locks that are actually exclusive.
+- Provide linearizable reads from a replicated store.
+- Coordinate distributed transactions correctly.</p>
+<p>CAP says you cannot have linearizability + availability during partition. Consensus is <em>how you achieve linearizability</em>. If you give up linearizability (choose AP), you don't need consensus. If you need linearizability (need CP), consensus is the only known way.</p>
+<h3 id="q2-why-is-consensus-computationally-expensive">Q2: Why is consensus computationally expensive?<a class="anchor" href="#q2-why-is-consensus-computationally-expensive" aria-hidden="true">#</a></h3>
+<p>The mechanical cost: each consensus operation requires at least one <strong>round-trip to a majority of nodes</strong>. For a 5-node cluster (tolerating 2 failures), that's writing to and hearing back from 3 nodes. Across a data center, each round-trip is ~0.5–1 ms; across a region, ~10 ms; across the globe, ~100 ms.</p>
+<p>Consensus systems therefore have <strong>fundamentally higher write latency than non-consensus systems</strong>. A single Postgres write is ~1 ms; a CockroachDB write (per-range Raft) is ~10–20 ms for cross-AZ replication. The cost is the consensus round-trips.</p>
+<p>The senior judgment: pay this cost only when you need linearizability. For high-volume, low-consistency data (logs, metrics, sessions), don't.</p>
+<h3 id="q3-why-2f1-and-not-some-other-number">Q3: Why 2f+1 and not some other number?<a class="anchor" href="#q3-why-2f1-and-not-some-other-number" aria-hidden="true">#</a></h3>
+<p>The math: to tolerate f failures while still having a majority, you need 2f+1 total nodes. This guarantees that <strong>any two majorities overlap by at least one node</strong>, which is the safety mechanism — that overlapping node prevents two different decisions from both achieving quorum.</p>
+<p>For f=1 (tolerate one failure), 2f+1=3.
+For f=2 (tolerate two failures), 2f+1=5.
+For f=3 (tolerate three failures), 2f+1=7.</p>
+<p>The cost is proportional to the failure tolerance. Most production deployments use 3 or 5; very few use 7+.</p>
+<h3 id="q4-how-does-this-compare-to-byzantine-fault-tolerance">Q4: How does this compare to Byzantine fault tolerance?<a class="anchor" href="#q4-how-does-this-compare-to-byzantine-fault-tolerance" aria-hidden="true">#</a></h3>
+<p>Raft and Paxos handle <strong>crash failures</strong> (a node stops responding). They do <em>not</em> handle <strong>Byzantine failures</strong> (a node sends incorrect or malicious messages). Byzantine consensus (PBFT, HotStuff, the algorithms underlying public blockchains) requires <strong>3f+1 nodes</strong> to tolerate f Byzantine failures, and is significantly more expensive.</p>
+<p>The senior question: do you need to tolerate malicious nodes? For internal enterprise infrastructure (etcd, ZooKeeper, etc.), the answer is no — all nodes are owned by the same team. For public blockchains and trustless systems, yes. The 3f+1 cost is paid only when malicious-node tolerance is required.</p>
+<h3 id="q5-when-should-i-use-consensus-and-when-shouldnt-i">Q5: When should I use consensus and when shouldn't I?<a class="anchor" href="#q5-when-should-i-use-consensus-and-when-shouldnt-i" aria-hidden="true">#</a></h3>
+<p><strong>Use consensus for</strong>:
+- Leader election (Kubernetes uses etcd for this).
+- Distributed locks that must be safe.
+- Strongly-consistent metadata stores (service discovery, config distribution).
+- Distributed transactions that must be linearizable.</p>
+<p><strong>Don't use consensus for</strong>:
+- High-volume application data (use eventually-consistent stores like Cassandra or DynamoDB).
+- Read-heavy workloads (read from replicas, even if writes go through consensus).
+- Caching (use Redis or Memcached).
+- Logging and analytics.</p>
+<p>The senior heuristic: <strong>consensus is for the <em>control plane<em>, not the </em>data plane</em></strong>. Your service-discovery, leader-election, and config-distribution use consensus; your application's actual data uses cheaper replication strategies.</p>
+<h2 id="the-mechanism-in-depth-rafts-three-sub-problems">The Mechanism In Depth — Raft's Three Sub-Problems<a class="anchor" href="#the-mechanism-in-depth-rafts-three-sub-problems" aria-hidden="true">#</a></h2>
+<p>The pedagogical insight of Raft is that consensus decomposes into three problems that can be reasoned about independently.</p>
+<h3 id="sub-problem-1-leader-election">Sub-Problem 1: Leader Election<a class="anchor" href="#sub-problem-1-leader-election" aria-hidden="true">#</a></h3>
+<p>Without a leader, every node would propose values independently, and the algorithm would have to resolve conflicts on each one. Raft elects a <em>single leader per term</em>, and that leader serializes all writes. The election uses:</p>
+<ul>
+<li><strong>Randomized timeouts</strong>: each follower has a 150–300 ms randomized election timeout. The first one to timeout becomes a candidate.</li>
+<li><strong>Term numbers</strong>: monotonically-increasing integers. A new election bumps the term.</li>
+<li><strong>Vote restriction</strong>: a voter only votes for a candidate whose log is at least as up-to-date as their own.</li>
+</ul>
+<p>The randomization solves the FLP problem: in pathological synchronization, elections could repeat indefinitely, but random timeouts make this practically impossible.</p>
+<h3 id="sub-problem-2-log-replication">Sub-Problem 2: Log Replication<a class="anchor" href="#sub-problem-2-log-replication" aria-hidden="true">#</a></h3>
+<p>Once elected, the leader appends operations to its log, replicates to followers via <code>AppendEntries</code> RPCs, and commits when a majority has replicated. The log is the source of truth; the state machine is derived by applying committed log entries in order.</p>
+<p>The mechanical guarantee: <strong>if a log entry is committed in term T, every leader of term &gt; T contains that entry</strong>. This comes from the election rule (voters only vote for up-to-date logs) combined with majority quorum overlap.</p>
+<h3 id="sub-problem-3-safety">Sub-Problem 3: Safety<a class="anchor" href="#sub-problem-3-safety" aria-hidden="true">#</a></h3>
+<p>Raft guarantees that <strong>no two leaders commit conflicting entries for the same log index</strong>. The safety property follows from the quorum overlap: any committed entry was acknowledged by a majority, and any new leader must have been elected by a majority, so the new leader has at least one node from the committing majority, which means it has the committed entry.</p>
+<p>This is the <strong>same algebraic argument as Paxos</strong> but expressed via different mechanisms. Raft's separation makes the argument easier to follow.</p>
+<h2 id="common-misconceptions-explained">Common Misconceptions Explained<a class="anchor" href="#common-misconceptions-explained" aria-hidden="true">#</a></h2>
+<h3 id="paxos-and-raft-are-different-algorithms">"Paxos and Raft are different algorithms."<a class="anchor" href="#paxos-and-raft-are-different-algorithms" aria-hidden="true">#</a></h3>
+<p>Half true. <strong>They solve the same problem and use the same algebraic structure</strong> (majority quorum, term/ballot numbers, leader-based steady state). The differences are in <em>exposition</em> and <em>operational detail</em>, not in the core algorithm. A Multi-Paxos implementation and a Raft implementation, optimized for the same workload, perform almost identically.</p>
+<h3 id="consensus-systems-are-slow">"Consensus systems are slow."<a class="anchor" href="#consensus-systems-are-slow" aria-hidden="true">#</a></h3>
+<p>Misleading. <strong>Consensus adds ~5–10 ms of latency per operation</strong> (the majority round-trip), which is significant for in-data-center workloads but negligible for cross-region or human-perceptible operations. The cost is per-write; reads can be served from replicas without consensus overhead.</p>
+<h3 id="raft-tolerates-byzantine-failures">"Raft tolerates Byzantine failures."<a class="anchor" href="#raft-tolerates-byzantine-failures" aria-hidden="true">#</a></h3>
+<p>False. Raft handles crash failures only. Byzantine consensus is a separate algorithm class.</p>
+<h3 id="etcd-is-the-same-as-zookeeper">"etcd is the same as ZooKeeper."<a class="anchor" href="#etcd-is-the-same-as-zookeeper" aria-hidden="true">#</a></h3>
+<p>Half true. Both provide consensus-backed coordination. The differences:
+- <strong>etcd</strong>: Raft-based, HTTP/gRPC API, lease-based (ephemeral) keys, used by Kubernetes.
+- <strong>ZooKeeper</strong>: Zab-based, native TCP protocol, ephemeral z-nodes, used by Hadoop ecosystem.</p>
+<p>For new projects, etcd is generally preferred because of its simpler operational model and the Kubernetes-native integration.</p>
+<h3 id="consensus-solves-all-distributed-systems-problems">"Consensus solves all distributed-systems problems."<a class="anchor" href="#consensus-solves-all-distributed-systems-problems" aria-hidden="true">#</a></h3>
+<p>False. Consensus solves the <em>agreement</em> problem. It does not solve:
+- Throughput scaling (consensus is a bottleneck if you put it on every operation).
+- Cross-system transactions (sagas remain necessary).
+- Geographic distribution (consensus across regions is high-latency).
+- Disagreement-by-design (event-driven systems prefer eventual consistency).</p>
+<p>The senior judgment: consensus is one tool among many. Use it where its strengths (safety, linearizability) match your needs; reach for other tools where its weaknesses (latency, throughput) bind.</p>
+<h2 id="what-consensus-means">What Consensus Means<a class="anchor" href="#what-consensus-means" aria-hidden="true">#</a></h2>
+<p>Formally, a consensus algorithm has three properties:</p>
+<ol>
+<li><strong>Agreement</strong>: all non-faulty processes decide the same value.</li>
+<li><strong>Validity</strong>: the decided value was proposed by some process.</li>
+<li><strong>Termination</strong>: every non-faulty process eventually decides.</li>
+</ol>
+<p>The challenge: any of these processes might crash, run slowly, or be cut off by a network partition. The algorithm must handle this without sacrificing agreement (which would produce split-brain). <strong>The FLP impossibility result</strong> (Fischer, Lynch, Paterson, 1985) proved that no deterministic algorithm can guarantee all three in an asynchronous network — there is <em>some</em> failure pattern that prevents termination. Real algorithms (Paxos, Raft) sidestep FLP by using <em>randomized timeouts</em> to break symmetry, providing probabilistic — not deterministic — termination.</p>
+<h2 id="the-quorum-rule-why-2f1">The Quorum Rule — Why 2f+1<a class="anchor" href="#the-quorum-rule-why-2f1" aria-hidden="true">#</a></h2>
+<p>A consensus system tolerates <code>f</code> simultaneous failures by having <code>2f + 1</code> total replicas. The math:</p>
+<ul>
+<li>3 replicas tolerate 1 failure (<code>f=1</code>, <code>2f+1=3</code>).</li>
+<li>5 replicas tolerate 2 failures (<code>f=2</code>, <code>2f+1=5</code>).</li>
+<li>7 replicas tolerate 3 failures (<code>f=3</code>, <code>2f+1=7</code>).</li>
+</ul>
+<p>Why this exact ratio? Because every decision must be approved by a <strong>majority</strong> of the replicas. With <code>2f + 1</code> total, the majority is <code>f + 1</code>. Two different decisions can each get a majority only if <code>2(f+1) ≤ 2f+1</code>, which is <code>2f+2 ≤ 2f+1</code> — false. So two different decisions cannot both get a majority. <strong>Two majorities of a 2f+1 set always overlap by at least one node</strong>, and that overlapping node ensures consistency.</p>
+<div class="mermaid">flowchart TB
+  subgraph Q1["Decision A: majority of 5"]
+    N1[N1]
+    N2[N2]
+    N3[N3]
+  end
+  subgraph Q2["Decision B: majority of 5"]
+    N3b[N3]
+    N4[N4]
+    N5[N5]
+  end
+  Note["N3 is in BOTH majorities;<br/>N3 cannot accept both A and B."]
+</div>
+<p>The corollary: <strong>the system survives if up to <code>f</code> nodes are down, but freezes if <code>f+1</code> or more are down</strong> (no majority is reachable). Three-replica clusters are common; five-replica is the next step up for higher availability.</p>
+<h2 id="raft-in-detail">Raft — In Detail<a class="anchor" href="#raft-in-detail" aria-hidden="true">#</a></h2>
+<p>Raft (2014) was designed to be understandable. It decomposes consensus into three problems that can be reasoned about separately: <strong>leader election</strong>, <strong>log replication</strong>, and <strong>safety</strong>.</p>
+<h3 id="roles-and-terms">Roles And Terms<a class="anchor" href="#roles-and-terms" aria-hidden="true">#</a></h3>
+<p>At any moment, every node is in one of three roles:</p>
+<ul>
+<li><strong>Leader</strong>: handles client requests, replicates the log to followers.</li>
+<li><strong>Follower</strong>: passive; accepts updates from the leader.</li>
+<li><strong>Candidate</strong>: a node that has timed out without hearing from a leader and is trying to become one.</li>
+</ul>
+<p><strong>Time is divided into "terms"</strong> — monotonically increasing integers. Each term has <em>at most one</em> leader. A term that begins with an election and no winner ends with a new election in a higher-numbered term.</p>
+<h3 id="steady-state-operation">Steady-State Operation<a class="anchor" href="#steady-state-operation" aria-hidden="true">#</a></h3>
+<div class="mermaid">sequenceDiagram
+  participant C as Client
+  participant L as Leader
+  participant F1 as Follower 1
+  participant F2 as Follower 2
+  participant F3 as Follower 3
+  participant F4 as Follower 4
+
+  C->>L: write request (e.g., set x = 5)
+  L->>L: append to local log (uncommitted)
+  par broadcast
+    L->>F1: AppendEntries
+    L->>F2: AppendEntries
+    L->>F3: AppendEntries
+    L->>F4: AppendEntries
+  end
+  F1-->>L: ack
+  F2-->>L: ack
+  Note over L: majority (3 of 5) acked; commit
+  L->>L: apply to state machine
+  L-->>C: success
+  par later heartbeats
+    L->>F1: AppendEntries (commit index advanced)
+    L->>F2: AppendEntries
+    L->>F3: AppendEntries
+    L->>F4: AppendEntries
+  end
+</div>
+<p>The leader appends the operation to its log, broadcasts to followers, waits for majority ack, then commits. <strong>Commitment requires majority</strong>. Once committed, the operation is durable — even if the leader crashes, any new leader will have it (proven below).</p>
+<h3 id="heartbeats-and-election">Heartbeats And Election<a class="anchor" href="#heartbeats-and-election" aria-hidden="true">#</a></h3>
+<p>The leader sends periodic AppendEntries (often empty — heartbeats) to all followers, every ~50 ms. Followers reset their election timeout on each heartbeat. If a follower's election timeout expires (typical: 150–300 ms randomized) without a heartbeat, it suspects the leader has failed and starts an election:</p>
+<div class="mermaid">sequenceDiagram
+  participant F as Follower (term=4)
+  participant Peers as Other followers
+
+  Note over F: election timeout fires
+  F->>F: state = Candidate, term = 5
+  F->>F: vote for self
+  par request votes
+    F->>Peers: RequestVote(term=5, logIndex=last)
+  end
+  Peers-->>F: voteGranted
+  Note over F: received majority votes
+  F->>F: state = Leader
+  F->>Peers: AppendEntries (heartbeat, term=5)
+</div>
+<p>Each node votes for at most one candidate per term, and only if the candidate's log is <em>at least as up-to-date</em> as the voter's. If two candidates split the votes, neither gets a majority; the election times out and both try again with a higher term. The randomized timeouts mean one usually wins the next round.</p>
+<h3 id="log-replication-and-safety">Log Replication And Safety<a class="anchor" href="#log-replication-and-safety" aria-hidden="true">#</a></h3>
+<p>Every entry in the log has a term and an index. Two key invariants:</p>
+<ol>
+<li><strong>Log Matching</strong>: if two logs have an entry at the same index with the same term, they are identical up to that index. (Means: once a log entry is replicated, the prefix is fixed.)</li>
+<li><strong>Leader Completeness</strong>: if a log entry is committed in term T, every leader of term &gt; T contains that entry. (Means: committed entries are never lost.)</li>
+</ol>
+<p>The Leader Completeness property comes from the election rule: a candidate is elected only with a majority vote, and each voter votes only if the candidate's log is up-to-date. The majority that elected the candidate must contain at least one node from the majority that committed any prior entry (quorum overlap), and that node would only vote for a candidate with that entry — therefore the new leader has it.</p>
+<p>This is the central beauty of Raft: a small set of rules (majority quorum, log-up-to-date voting) produces strong safety guarantees algebraically.</p>
+<h3 id="failure-scenarios">Failure Scenarios<a class="anchor" href="#failure-scenarios" aria-hidden="true">#</a></h3>
+<p>What does Raft actually do under various failures?</p>
+<ul>
+<li><strong>Leader crash</strong>: followers' election timers expire; a new leader is elected; client requests resume (after a brief unavailability window of ~150–300 ms).</li>
+<li><strong>Follower crash</strong>: leader notices unack'd messages; client requests still proceed if majority of followers are alive.</li>
+<li><strong>Network partition (minority side)</strong>: minority cannot elect a leader (no majority); minority side refuses writes, returns errors. The cluster is unavailable on this side.</li>
+<li><strong>Network partition (majority side)</strong>: majority side keeps the leader (or elects a new one if the old leader was on the minority side); writes proceed normally.</li>
+<li><strong>Partition heals</strong>: minority side rejoins; followers update their logs from the leader. Any uncommitted writes on the minority side are discarded (correctly — they never reached majority).</li>
+</ul>
+<div class="mermaid">flowchart TB
+  subgraph Partition["During partition: 2 vs 3"]
+    Minority["2 nodes (minority)<br/>cannot elect, refuse writes"]
+    Majority["3 nodes (majority)<br/>elects leader, accepts writes"]
+  end
+  subgraph Healed["After heal"]
+    All["5 nodes<br/>former minority catches up<br/>from majority's log"]
+  end
+  Partition --> Healed
+</div>
+<p>The minority side's behavior — refusing writes — is the <strong>CP</strong> choice from CAP (<a href="c02-t01-cap-theorem-and-pacelc.html">T01</a>). It is the cost paid to preserve consistency.</p>
+<h2 id="paxos-a-sketch">Paxos — A Sketch<a class="anchor" href="#paxos-a-sketch" aria-hidden="true">#</a></h2>
+<p>Paxos is older, more general, more confusing, and less widely implemented. The basic idea:</p>
+<ul>
+<li>Phase 1 (Prepare): a proposer asks acceptors to promise not to accept proposals with a lower number. Acceptors that promise return any previously-accepted value.</li>
+<li>Phase 2 (Accept): if a majority promised, the proposer sends a value (the highest previously-accepted, if any, otherwise its own) to be accepted. Acceptors that haven't broken their promise accept.</li>
+<li>A value is <em>chosen</em> when a majority has accepted it.</li>
+</ul>
+<p>Two rounds per operation; multiple-Paxos optimizations bundle the prepare phase into a one-time leader election, after which only accept rounds run (essentially like Raft's steady state). Variants — Multi-Paxos, EPaxos (Egalitarian Paxos), Flexible Paxos (Heidi Howard's thesis), Cheap Paxos — relax constraints to gain throughput or availability.</p>
+<p>Most modern systems that "use Paxos" use Multi-Paxos in shape much like Raft's steady state. The differences are subtle for the practitioner; Raft's recognizable structure (leader, logs, AppendEntries) is the operational model most teams hold in their heads.</p>
+<h2 id="real-systems-using-consensus">Real Systems Using Consensus<a class="anchor" href="#real-systems-using-consensus" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>System</th>
+<th>Consensus</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>etcd</strong></td>
+<td>Raft</td>
+<td>Kubernetes' state store; distributed configuration; service discovery</td>
+</tr>
+<tr>
+<td><strong>ZooKeeper</strong></td>
+<td>Zab (Paxos variant)</td>
+<td>Hadoop, Kafka pre-KIP-500, distributed coordination</td>
+</tr>
+<tr>
+<td><strong>Consul</strong></td>
+<td>Raft</td>
+<td>Service mesh, KV store, distributed locking</td>
+</tr>
+<tr>
+<td><strong>CockroachDB</strong></td>
+<td>Raft (per range)</td>
+<td>Strongly-consistent multi-region SQL</td>
+</tr>
+<tr>
+<td><strong>Spanner</strong></td>
+<td>Paxos</td>
+<td>Google's global SQL with strong consistency</td>
+</tr>
+<tr>
+<td><strong>MongoDB</strong></td>
+<td>Raft variant ("replica set election")</td>
+<td>Replica set coordination</td>
+</tr>
+<tr>
+<td><strong>Kafka KRaft</strong></td>
+<td>Raft</td>
+<td>Replaces ZooKeeper for Kafka's metadata (Kafka 3.x+)</td>
+</tr>
+<tr>
+<td><strong>TiDB</strong></td>
+<td>Raft (per region)</td>
+<td>Distributed SQL</td>
+</tr>
+<tr>
+<td><strong>Riak</strong></td>
+<td>(older) Riak Core / now uses Raft</td>
+<td>Distributed KV</td>
+</tr>
+<tr>
+<td><strong>HashiCorp Nomad</strong></td>
+<td>Raft</td>
+<td>Cluster orchestrator</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Pattern</strong>: most systems published 2014+ use Raft. Older systems use Paxos variants. The decision factor was rarely correctness (both are correct); it was understandability and operational tooling.</p>
+<h2 id="when-you-need-consensus-and-when-you-dont">When You Need Consensus (And When You Don't)<a class="anchor" href="#when-you-need-consensus-and-when-you-dont" aria-hidden="true">#</a></h2>
+<p>Consensus is <strong>expensive</strong> — every operation pays for a majority round-trip. Use it where you must, not where you can avoid it.</p>
+<h3 id="need-consensus">Need Consensus<a class="anchor" href="#need-consensus" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Leader election</strong> in any distributed system.</li>
+<li><strong>Distributed locks</strong> that must be safe (no two clients hold the lock simultaneously).</li>
+<li><strong>Strongly-consistent state</strong> (Kubernetes' "what pods exist" registry).</li>
+<li><strong>Linearizable counter / sequence</strong> (a monotonically increasing global ID).</li>
+<li><strong>Atomic commit</strong> across partitions of a database.</li>
+<li><strong>Configuration distribution</strong> (the source of truth for "what services are deployed where").</li>
+</ul>
+<h3 id="dont-need-consensus">Don't Need Consensus<a class="anchor" href="#dont-need-consensus" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>High-volume writes</strong> where eventual consistency is fine (analytics events, logs).</li>
+<li><strong>Read-heavy workloads</strong> (use a consensus-backed write path, read from replicas eventually).</li>
+<li><strong>Sharded data</strong> where each shard can have its own leader (CockroachDB, Spanner — per-range Raft, not global).</li>
+<li><strong>Cache invalidation</strong> (eventual is fine; consensus is overkill).</li>
+<li><strong>Pub/sub at scale</strong> (Kafka per-partition ordering is enough; full consensus would tank throughput).</li>
+</ul>
+<p>The expensive operation should be infrequent (leader election, config change); the high-volume operations should ride on top without paying full consensus cost per operation.</p>
+<h2 id="java-implementations-and-libraries">Java Implementations And Libraries<a class="anchor" href="#java-implementations-and-libraries" aria-hidden="true">#</a></h2>
+<p>Several mature options:</p>
+<ul>
+<li><strong>Apache Curator</strong> — high-level ZooKeeper client; leader election, distributed locks, queues.</li>
+<li><strong>etcd-java</strong> — JDK client for etcd; consensus via etcd cluster.</li>
+<li><strong>jraft</strong> (Sofa-jraft, Alibaba) — pure-Java Raft implementation; embeddable in JVM apps.</li>
+<li><strong>Atomix</strong> (Camunda's distributed coordination toolkit) — Raft-based; Java APIs for distributed primitives.</li>
+<li><strong>Apache Ratis</strong> — Java Raft library; used by Hadoop Ozone and others.</li>
+<li><strong>Akka Cluster Sharding + Distributed Data</strong> — uses gossip + CRDTs, not strict consensus, but provides similar building blocks.</li>
+</ul>
+<p>For Spring Boot teams, <strong>Spring Cloud + Consul</strong> or <strong>Spring Cloud + ZooKeeper</strong> is the path of least resistance — the consensus system runs externally; the Spring app uses it via a client library.</p>
+<h3 id="simple-leader-election-with-curator">Simple Leader Election With Curator<a class="anchor" href="#simple-leader-election-with-curator" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">LeaderSelector selector = new LeaderSelector(client, &quot;/myapp/leader&quot;,
+    new LeaderSelectorListenerAdapter() {
+      @Override
+      public void takeLeadership(CuratorFramework client) {
+        // I am the leader; do leader work until interrupted
+        while (running) {
+          doLeaderWork();
+          Thread.sleep(5000);
+        }
+      }
+    });
+selector.autoRequeue();
+selector.start();
+</code></pre></div>
+<p>ZooKeeper provides the consensus; the application gets a <code>takeLeadership</code> callback when its node holds the lock. On crash, ZooKeeper releases the lock (ephemeral z-node), and another node takes leadership.</p>
+<h2 id="failure-modes-specific-to-consensus-systems">Failure Modes Specific To Consensus Systems<a class="anchor" href="#failure-modes-specific-to-consensus-systems" aria-hidden="true">#</a></h2>
+<h3 id="split-brain">Split-Brain<a class="anchor" href="#split-brain" aria-hidden="true">#</a></h3>
+<p>Two leaders simultaneously believe they are leader. <strong>Properly-implemented Raft cannot have split-brain</strong> (the term mechanism guarantees only one leader per term; the majority-vote rule guarantees terms don't overlap with valid commits). Real-world "split-brain" reports are almost always implementation bugs or misconfigurations (timeouts too short causing rapid leader churn that <em>appears</em> split-brain to clients).</p>
+<h3 id="unbounded-log-growth">Unbounded Log Growth<a class="anchor" href="#unbounded-log-growth" aria-hidden="true">#</a></h3>
+<p>Raft's log grows forever unless compacted. Each operation is appended; logs of long-lived clusters can be gigabytes. <strong>Snapshots</strong> (a periodic checkpoint of the state machine + a log truncation) compact the log. Implementations must produce snapshots safely without blocking the leader.</p>
+<h3 id="slow-follower">Slow Follower<a class="anchor" href="#slow-follower" aria-hidden="true">#</a></h3>
+<p>A follower lags arbitrarily behind the leader. Sometimes the follower catches up; sometimes it falls so far behind it needs a snapshot transfer. Operators must monitor and respond.</p>
+<h3 id="election-storms">Election Storms<a class="anchor" href="#election-storms" aria-hidden="true">#</a></h3>
+<p>Misconfigured timeouts (too short) cause rapid leader churn — every time a leader is elected, it gets demoted before establishing leadership. The cluster spends all its time in elections. The fix: increase <code>electionTimeout</code> to be significantly larger than the worst-case network round-trip; tune with Jepsen-style testing.</p>
+<h3 id="quorum-loss">Quorum Loss<a class="anchor" href="#quorum-loss" aria-hidden="true">#</a></h3>
+<p>If more than <code>f</code> nodes fail, the cluster cannot make progress. Recovery requires bringing nodes back online, or in extreme cases a manual "force quorum" override that risks data loss. The discipline: provision enough nodes that two simultaneous failures don't break the cluster.</p>
+<h2 id="byzantine-failures-a-brief-note">Byzantine Failures — A Brief Note<a class="anchor" href="#byzantine-failures-a-brief-note" aria-hidden="true">#</a></h2>
+<p>Raft and Paxos assume <strong>crash failures</strong> — nodes that fail by stopping, not by sending wrong data. <strong>Byzantine failure</strong> means a node can behave arbitrarily (malicious, corrupt, bug). Byzantine consensus (PBFT, HotStuff, the algorithms behind blockchain consensus) requires <code>3f + 1</code> nodes to tolerate <code>f</code> Byzantine failures and is significantly more expensive. Public blockchains (Bitcoin, Ethereum, etc.) deal with Byzantine consensus at internet scale via different mechanisms (proof-of-work, proof-of-stake) — outside the scope of this topic.</p>
+<p>For ordinary enterprise infrastructure, crash-fault-tolerant consensus (Raft, Paxos) is sufficient because the nodes are all owned by the same team.</p>
+<h2 id="trade-off-summary">Trade-Off Summary<a class="anchor" href="#trade-off-summary" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distributed lock</td>
+<td>etcd / ZooKeeper / Consul via Curator</td>
+</tr>
+<tr>
+<td>Kubernetes-style state</td>
+<td>etcd (already in the cluster)</td>
+</tr>
+<tr>
+<td>Distributed config</td>
+<td>Consul KV</td>
+</tr>
+<tr>
+<td>Multi-region SQL</td>
+<td>CockroachDB / Spanner</td>
+</tr>
+<tr>
+<td>Replicated state machine in JVM</td>
+<td>jraft / Atomix</td>
+</tr>
+<tr>
+<td>Cross-region with strong consistency</td>
+<td>accept latency cost; use Spanner / CockroachDB</td>
+</tr>
+<tr>
+<td>High-volume sharded writes</td>
+<td>per-shard consensus (CockroachDB, TiDB)</td>
+</tr>
+<tr>
+<td>Eventual consistency is fine</td>
+<td>DynamoDB / Cassandra — no consensus per write</td>
+</tr>
+<tr>
+<td>Byzantine fault tolerance</td>
+<td>Tendermint / HotStuff / blockchain (rare)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A common L5 prompt: "Explain Raft." Strong answers cover (a) the three roles (leader, follower, candidate), (b) terms and the safety property they enforce, (c) the majority quorum and its <code>2f+1</code> justification, (d) what happens on partition (minority can't elect; majority continues), (e) at least one real-world consequence (etcd is the Kubernetes substrate).</p></div></div>
+<h2 id="deeper-dive-raft-protocol-walkthrough-concrete-example">Deeper Dive — Raft Protocol Walkthrough (Concrete Example)<a class="anchor" href="#deeper-dive-raft-protocol-walkthrough-concrete-example" aria-hidden="true">#</a></h2>
+<h3 id="5-node-cluster-normal-operation">5-Node Cluster Normal Operation<a class="anchor" href="#5-node-cluster-normal-operation" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>INITIAL STATE: 5 nodes (N1, N2, N3, N4, N5)
+  All start as followers, term = 0
+
+LEADER ELECTION:
+  T+150ms (random election timeout) → N3 becomes candidate
+  N3 increments term to 1, votes for itself
+  N3 sends RequestVote to N1, N2, N4, N5
+  N1, N2, N4 respond YES (3 votes including N3 = majority)
+  N5 was offline; N3 still wins
+
+  N3 becomes LEADER (term 1)
+
+NORMAL WRITE FLOW:
+  Client sends &quot;SET x = 5&quot; to N3 (leader)
+
+  Step 1: APPEND TO LEADER LOG
+    N3 appends log entry {term: 1, index: 1, cmd: &quot;SET x = 5&quot;}
+    N3 log is now: [{1, 1, &quot;SET x = 5&quot;}]
+
+  Step 2: REPLICATE TO FOLLOWERS
+    N3 sends AppendEntries(term=1, leaderId=N3, prevIndex=0, entries=[...]) to all
+    N1, N2, N4 append entry to their logs
+    N5 still offline
+
+  Step 3: WAIT FOR MAJORITY ACK
+    N1, N2, N4 send ACK to N3
+    N3 has 4/5 nodes acked (including self) → MAJORITY
+
+  Step 4: COMMIT
+    N3 commits entry (commitIndex = 1)
+    N3 applies &quot;SET x = 5&quot; to state machine
+    N3 responds OK to client
+
+  Step 5: NOTIFY FOLLOWERS OF COMMIT
+    Next heartbeat carries commitIndex = 1
+    N1, N2, N4 commit + apply to their state machines
+    N5 will catch up when reconnected
+</code></pre></div>
+<h3 id="leader-election-sequence-leader-crash">Leader Election Sequence (Leader Crash)<a class="anchor" href="#leader-election-sequence-leader-crash" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>N3 (leader, term 1) crashes at T+5s
+
+FOLLOWER TIMEOUTS:
+  T+5.3s — N1's election timeout expires (random 150-300ms)
+  N1 increments term to 2, becomes candidate
+  N1 votes for itself, sends RequestVote(term=2) to others
+
+  T+5.31s — N2 receives RequestVote(term=2)
+    N2 has not voted in term 2 → grants vote
+    N2 updates its term to 2
+  Same for N4
+
+  N1 has 3 votes (self + N2 + N4) = MAJORITY of 5
+  N1 BECOMES LEADER (term 2)
+
+  T+5.32s — N1 sends initial heartbeat as leader
+
+WHAT IF SPLIT VOTE?
+  At T+5.3s, both N1 AND N5 timeout simultaneously
+  Each becomes candidate in term 2, votes for self
+  N2 votes for whichever's RequestVote it received first (e.g., N1)
+  N4 votes for the other (e.g., N5)
+  Neither gets majority → election fails
+  Both wait random timeout, retry in term 3
+  Eventually one wins (randomization breaks ties)
+</code></pre></div>
+<h3 id="network-partition-scenario">Network Partition Scenario<a class="anchor" href="#network-partition-scenario" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: N3 (leader) and N4, N5 partitioned from N1, N2
+
+PARTITION SIDE A (N3, N4, N5) — has 3 nodes
+  N3 is leader; can append entries to log
+  But CAN'T COMMIT — needs majority (3 of 5)
+  Wait, N3 has 3 nodes, that's majority! → Can commit if all 3 ack
+
+  ACTUALLY: depends on which nodes are on which side
+
+PARTITION SIDE B (N1, N2) — has 2 nodes
+  Election timeout fires; N1 or N2 starts election
+  N1 increments term to 2, requests votes
+  Only N2 can respond on this side
+  2/5 votes = no majority → election FAILS
+  Side B is UNAVAILABLE for writes; can serve stale reads
+
+PARTITION HEALS:
+  N3 still leader (term 1)
+  N1 incremented term during failed elections (now term N)
+  When N3 sees higher term → steps down
+  New election happens; new leader is whoever has most up-to-date log
+  Cluster resumes normal operation
+</code></pre></div>
+<h2 id="deeper-dive-java-consensus-library-examples">Deeper Dive — Java Consensus Library Examples<a class="anchor" href="#deeper-dive-java-consensus-library-examples" aria-hidden="true">#</a></h2>
+<h3 id="apache-curator-zookeeper-leader-election">Apache Curator (ZooKeeper) Leader Election<a class="anchor" href="#apache-curator-zookeeper-leader-election" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class LeaderElectionService implements LeaderSelectorListener {
+
+    private final CuratorFramework client;
+    private final LeaderSelector leaderSelector;
+    private final AtomicBoolean isLeader = new AtomicBoolean();
+
+    public LeaderElectionService() {
+        this.client = CuratorFrameworkFactory.newClient(
+            &quot;zk1:2181,zk2:2181,zk3:2181&quot;,
+            new ExponentialBackoffRetry(1000, 3)
+        );
+        client.start();
+
+        this.leaderSelector = new LeaderSelector(client, &quot;/election/my-app&quot;, this);
+        leaderSelector.autoRequeue();   // re-enter election if I lose leadership
+    }
+
+    @PostConstruct
+    public void start() {
+        leaderSelector.start();
+    }
+
+    @Override
+    public void takeLeadership(CuratorFramework client) throws Exception {
+        isLeader.set(true);
+        log.info(&quot;I am now the leader!&quot;);
+
+        try {
+            // Do leader-only work; e.g., periodic batch job
+            while (!Thread.currentThread().isInterrupted()) {
+                doLeaderWork();
+                Thread.sleep(10_000);
+            }
+        } finally {
+            isLeader.set(false);
+            log.info(&quot;I am no longer the leader&quot;);
+        }
+    }
+
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
+        if (newState != ConnectionState.RECONNECTED) {
+            // Lost connection; we may no longer be leader
+            isLeader.set(false);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="etcd-jetcd-leader-election">etcd jetcd Leader Election<a class="anchor" href="#etcd-jetcd-leader-election" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class EtcdLeaderElection {
+    private final Client etcd;
+    private LeaderKey leadership;
+
+    public EtcdLeaderElection() {
+        this.etcd = Client.builder()
+            .endpoints(&quot;http://etcd1:2379&quot;, &quot;http://etcd2:2379&quot;, &quot;http://etcd3:2379&quot;)
+            .build();
+    }
+
+    public CompletableFuture&lt;Void&gt; campaignAsLeader() {
+        // Lease — releases leadership if we crash
+        return etcd.getLeaseClient().grant(30)
+            .thenCompose(leaseResp -&gt; {
+                long leaseId = leaseResp.getID();
+
+                // Renew lease in background
+                etcd.getLeaseClient().keepAlive(leaseId, ...);
+
+                // Campaign
+                return etcd.getElectionClient()
+                    .campaign(
+                        ByteSequence.from(&quot;/elections/my-app&quot;, UTF_8),
+                        leaseId,
+                        ByteSequence.from(myNodeId, UTF_8)
+                    )
+                    .thenAccept(resp -&gt; {
+                        leadership = resp.getLeader();
+                        log.info(&quot;Elected as leader: {}&quot;, leadership);
+                        doLeaderWork();
+                    });
+            });
+    }
+}
+</code></pre></div>
+<h3 id="spring-cloud-kubernetes-leader-election">Spring Cloud Kubernetes Leader Election<a class="anchor" href="#spring-cloud-kubernetes-leader-election" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  cloud:
+    kubernetes:
+      leader:
+        enabled: true
+        config-map-name: my-app-leader
+        namespace: default
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class K8sLeaderElection {
+    @EventListener
+    public void onGranted(OnGrantedEvent event) {
+        log.info(&quot;I am the leader&quot;);
+        startLeaderWork();
+    }
+
+    @EventListener
+    public void onRevoked(OnRevokedEvent event) {
+        log.info(&quot;I am no longer the leader&quot;);
+        stopLeaderWork();
+    }
+}
+</code></pre></div>
+<p>K8s ConfigMap-based leader election; uses K8s API resource versioning for atomic CAS. Simpler than ZK/etcd for K8s-native apps.</p>
+<h2 id="deeper-dive-when-you-need-consensus">Deeper Dive — When You Need Consensus<a class="anchor" href="#deeper-dive-when-you-need-consensus" aria-hidden="true">#</a></h2>
+<h3 id="need-consensus_1">Need consensus<a class="anchor" href="#need-consensus_1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Leader election</strong></td>
+<td>Need to agree on which node is primary</td>
+</tr>
+<tr>
+<td><strong>Distributed lock</strong></td>
+<td>Mutual exclusion across processes</td>
+</tr>
+<tr>
+<td><strong>Configuration storage</strong></td>
+<td>All nodes must see same config eventually + atomically</td>
+</tr>
+<tr>
+<td><strong>Service discovery</strong></td>
+<td>Single source of truth for what's running where</td>
+</tr>
+<tr>
+<td><strong>Cluster membership</strong></td>
+<td>Who's in the cluster — agreed upon</td>
+</tr>
+<tr>
+<td><strong>State machine replication</strong></td>
+<td>Replicated DB with linearizable writes</td>
+</tr>
+<tr>
+<td><strong>Sequence numbers / IDs</strong></td>
+<td>Unique monotonic IDs across cluster</td>
+</tr>
+<tr>
+<td><strong>Replicated log</strong></td>
+<td>Cross-replica ordered command sequence</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="dont-need-consensus_1">Don't need consensus<a class="anchor" href="#dont-need-consensus_1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Better approach</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distributed cache</td>
+<td>LRU eviction; eventually consistent OK</td>
+</tr>
+<tr>
+<td>Counters</td>
+<td>CRDT or sharded counters</td>
+</tr>
+<tr>
+<td>Read replicas</td>
+<td>Primary + async replication</td>
+</tr>
+<tr>
+<td>Idempotent operations</td>
+<td>Idempotency key + retry</td>
+</tr>
+<tr>
+<td>Eventually consistent K/V</td>
+<td>DynamoDB, Cassandra (quorum reads)</td>
+</tr>
+<tr>
+<td>Async messaging</td>
+<td>Kafka (uses consensus internally for metadata only)</td>
+</tr>
+<tr>
+<td>Sharded data</td>
+<td>Per-shard consensus, not global</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deeper-dive-consensus-system-comparison-matrix">Deeper Dive — Consensus System Comparison Matrix<a class="anchor" href="#deeper-dive-consensus-system-comparison-matrix" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>System</th>
+<th>Algorithm</th>
+<th>Best for</th>
+<th>Throughput</th>
+<th>Latency</th>
+<th>API Style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>etcd</strong></td>
+<td>Raft</td>
+<td>K8s coordination, config</td>
+<td>~10K writes/sec</td>
+<td>~10ms</td>
+<td>gRPC + HTTP/JSON</td>
+</tr>
+<tr>
+<td><strong>ZooKeeper</strong></td>
+<td>Zab (Paxos variant)</td>
+<td>Hadoop/Kafka coordination</td>
+<td>~10K writes/sec</td>
+<td>~10ms</td>
+<td>Tree-of-nodes API</td>
+</tr>
+<tr>
+<td><strong>Consul</strong></td>
+<td>Raft</td>
+<td>Service mesh, service discovery</td>
+<td>~5K writes/sec</td>
+<td>~10ms</td>
+<td>HTTP/JSON + DNS</td>
+</tr>
+<tr>
+<td><strong>etcd-raft library</strong></td>
+<td>Raft</td>
+<td>Embed in your service</td>
+<td>varies</td>
+<td>varies</td>
+<td>Go library</td>
+</tr>
+<tr>
+<td><strong>Hashicorp Raft</strong></td>
+<td>Raft</td>
+<td>Embed in Go service</td>
+<td>varies</td>
+<td>varies</td>
+<td>Go library</td>
+</tr>
+<tr>
+<td><strong>Atomix</strong></td>
+<td>Raft</td>
+<td>Java distributed primitives</td>
+<td>~5-20K ops/sec</td>
+<td>~10-50ms</td>
+<td>Java embedded</td>
+</tr>
+<tr>
+<td><strong>Apache Ratis</strong></td>
+<td>Raft</td>
+<td>Embedded in Hadoop/Ozone</td>
+<td>varies</td>
+<td>varies</td>
+<td>Java library</td>
+</tr>
+<tr>
+<td><strong>CockroachDB</strong></td>
+<td>Raft per-range</td>
+<td>Distributed strong-consistency DB</td>
+<td>Millions/sec total</td>
+<td>~10ms reads, ~100ms cross-region writes</td>
+<td>SQL</td>
+</tr>
+<tr>
+<td><strong>Spanner</strong></td>
+<td>Paxos per-tablet</td>
+<td>Global strong-consistency DB</td>
+<td>Millions/sec total</td>
+<td>~10ms reads, ~100ms cross-region writes</td>
+<td>SQL</td>
+</tr>
+<tr>
+<td><strong>TiDB</strong></td>
+<td>Raft per-region</td>
+<td>MySQL-compatible distributed DB</td>
+<td>Millions/sec</td>
+<td>~10ms</td>
+<td>MySQL protocol</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deeper-dive-operational-considerations">Deeper Dive — Operational Considerations<a class="anchor" href="#deeper-dive-operational-considerations" aria-hidden="true">#</a></h2>
+<h3 id="cluster-sizing">Cluster Sizing<a class="anchor" href="#cluster-sizing" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>NODES vs FAILURE TOLERANCE:
+  3 nodes: tolerates 1 failure
+  5 nodes: tolerates 2 failures
+  7 nodes: tolerates 3 failures
+  9 nodes: tolerates 4 failures
+
+WHY ODD NUMBER:
+  4 nodes: needs majority (3) — same tolerance as 5 (2 failures)
+  So 4 wastes a node; 5 gives same protection for 1 more
+
+DON'T GO TOO BIG:
+  Each write needs majority ack
+  More nodes = more parallel acks = MORE LATENCY (not less)
+  5-7 is sweet spot for most use cases
+  9 only for very high reliability requirements
+</code></pre></div>
+<h3 id="geographic-distribution">Geographic Distribution<a class="anchor" href="#geographic-distribution" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SINGLE REGION:
+  All nodes in same AZ → AZ failure kills cluster
+  AZ-distributed: 3 AZs × 1 node = tolerates AZ outage
+
+MULTI-REGION:
+  Cross-region latency adds to consensus
+  Typically 50-100ms RTT
+  Every write commit pays this round-trip
+  → Latency-sensitive workloads stay single-region
+  → Spanner's TrueTime amortizes this; CockroachDB allows lease moves
+
+WITNESS NODES:
+  Light nodes that participate in voting but don't store data
+  Used to break ties without paying full data cost
+</code></pre></div>
+<h3 id="snapshotting-and-log-compaction">Snapshotting and Log Compaction<a class="anchor" href="#snapshotting-and-log-compaction" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PROBLEM: log grows forever; full log replay on new-node bootstrap is slow
+
+SNAPSHOT:
+  Periodically (e.g., every 10K entries) take state machine snapshot
+  Compact log: discard entries before snapshot
+  New nodes restore from snapshot + apply remaining log entries
+
+ETCD SNAPSHOT INTERVAL:
+  --snapshot-count=100000  (default 10K)
+
+ZOOKEEPER SNAPSHOT:
+  After N transactions or M minutes
+</code></pre></div>
+<h3 id="common-operational-pitfalls">Common Operational Pitfalls<a class="anchor" href="#common-operational-pitfalls" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>1. ELECTION TIMEOUT TOO LOW
+   Symptom: leader churn during normal operation
+   Cause: network jitter &gt; timeout
+   Fix: timeout should be 10-20× max network RTT
+
+2. ELECTION TIMEOUT TOO HIGH
+   Symptom: long unavailability after leader crash
+   Cause: too conservative
+   Fix: tune to your network; etcd default 1000ms is usually fine
+
+3. SLOW DISK
+   Symptom: high latency, occasional unavailability
+   Cause: fsync per commit; slow disk blocks everything
+   Fix: SSD; tune --max-snapshot-files / --max-wal-files
+
+4. CROSS-REGION PRIMARY
+   Symptom: high write latency
+   Cause: replicas need to round-trip cross-region
+   Fix: keep primary co-located with most writes; use lease-based primary moves
+
+5. OUT-OF-DATE NODE REJOINS
+   Symptom: long delay after node restart
+   Cause: log replay from start
+   Fix: snapshot + send to new node; faster than log replay
+</code></pre></div>
+<h2 id="deeper-dive-real-world-consensus-failures">Deeper Dive — Real-World Consensus Failures<a class="anchor" href="#deeper-dive-real-world-consensus-failures" aria-hidden="true">#</a></h2>
+<h3 id="split-brain-pre-consensus-era">Split-Brain (Pre-Consensus Era)<a class="anchor" href="#split-brain-pre-consensus-era" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: 2-node &quot;active-passive&quot; cluster
+  Active node crashes
+  Passive promotes itself
+  Network heals
+  Original &quot;crashed&quot; node comes back, still thinks it's active
+  Now BOTH nodes accept writes → data corruption
+
+LESSON: 2-node clusters can't be properly highly available
+Need 3+ for proper consensus
+</code></pre></div>
+<h3 id="mongos-2018-election-storm">Mongo's 2018 Election Storm<a class="anchor" href="#mongos-2018-election-storm" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: MongoDB replica set with election timeout 5s
+  Network blip &gt; 5s on primary
+  Secondaries elect new primary
+  Primary recovers, network heals
+  Old primary's writes get rolled back
+  Some writes LOST despite &quot;majority&quot; write concern
+
+FIX:
+  Set writeConcern: majority + wtimeout
+  Use journaled writes (j: true)
+  Monitor election count; alert on &gt;1/day
+</code></pre></div>
+<h3 id="etcd-disk-full-incident">etcd Disk-Full Incident<a class="anchor" href="#etcd-disk-full-incident" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: etcd cluster disk fills
+  Leader can't fsync; commits fail
+  K8s control plane becomes unresponsive
+  Mass pod evictions trigger (controllers can't update status)
+
+PREVENTION:
+  Alert on etcd disk &gt; 80%
+  Use defragmentation (etcdctl defrag) periodically
+  Compact history (etcdctl compact &lt;revision&gt;)
+</code></pre></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Walk a Raft trace.</strong> Sketch a 5-node Raft cluster. Trace a write through it, naming the AppendEntries messages and acks. Now trace a leader crash and election. Now trace a partition that isolates the leader.</li>
+<li><strong>Quorum arithmetic.</strong> For a 7-node cluster, what's the worst-case number of simultaneous failures it survives? How many would prevent progress?</li>
+<li><strong>Find consensus in your stack.</strong> Identify every consensus system in your production stack — etcd, ZK, Consul, etc. For each, name what it coordinates.</li>
+<li><strong>Implement leader election.</strong> Use Apache Curator to implement leader election in a Spring Boot app. Run two instances; kill one; verify the other becomes leader.</li>
+<li><strong>The split-brain story.</strong> Find a real-world split-brain incident in any public postmortem. Identify the implementation bug or misconfiguration that caused it.</li>
+<li><strong>Election timeout tuning.</strong> For an etcd cluster, identify the election timeout. Estimate worst-case round-trip in your network. Decide whether the timeout is appropriate.</li>
+<li><strong>Compare consensus systems.</strong> Read the docs for etcd, ZooKeeper, and Consul. Compare their consensus algorithms, their APIs, and their operational characteristics. Recommend one for a new project.</li>
+<li><strong>Snapshot story.</strong> In any consensus system, find evidence of snapshot/log-compaction. Explain when it runs and what it prevents.</li>
+<li><strong>Byzantine consideration.</strong> Explain why a public blockchain needs Byzantine consensus and ordinary enterprise infrastructure does not.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we'll just use leader election with a heartbeat." Write a 200-word response on why distributed locks without consensus are subtly broken.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Articulate <strong>consensus</strong> as the property of distributed agreement under failure (agreement, validity, termination) and recognize the <strong>FLP impossibility</strong> as why algorithms use randomization.</li>
+<li>Apply the <strong>2f+1 quorum rule</strong> and explain why two majorities of a 2f+1 set always overlap.</li>
+<li>Trace <strong>Raft</strong> in steady state (leader's AppendEntries to majority), under leader failure (election with randomized timeouts, term increment), and under partition (minority refuses writes, majority continues).</li>
+<li>Recognize the <strong>Log Matching</strong> and <strong>Leader Completeness</strong> properties as the algebraic guarantees of safety.</li>
+<li>Sketch <strong>Paxos</strong> at a high level — Prepare and Accept phases, the role of the proposer/acceptor — and recognize Multi-Paxos as functionally equivalent to Raft's steady state.</li>
+<li>Map <strong>production consensus systems</strong> to their algorithms: etcd / ZooKeeper / Consul / CockroachDB / Spanner / Kafka KRaft.</li>
+<li>Choose when to <strong>use consensus</strong> (leader election, locks, strongly-consistent state) and when not (high-volume eventual-consistency workloads).</li>
+<li>Use <strong>Java consensus libraries</strong> — Curator, jraft, Atomix, etcd-java — for distributed coordination in Spring Boot.</li>
+<li>Recognize and prevent <strong>consensus-specific failure modes</strong> — split-brain (impossible if implemented correctly), unbounded log growth, slow followers, election storms, quorum loss.</li>
+<li>Distinguish <strong>crash-fault-tolerant</strong> consensus (Raft, Paxos) from <strong>Byzantine-fault-tolerant</strong> consensus (PBFT, HotStuff, blockchain) and explain when each is needed.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t04-replication-strategies.html">Replication Strategies</a> — the patterns for keeping multiple copies of data: single-leader (Postgres / MySQL), multi-leader (CRDTs, multi-master), leaderless (DynamoDB, Cassandra). Each strategy's consistency properties build on consensus, eventual consistency, or both.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Consensus (Raft / Paxos, Intro)&quot;
+slug: consensus-raft-paxos-intro
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Distributed Systems &amp; System Design&quot;
+type: concept
+difficulty: lead
+order: 3
+tags: [consensus, raft, paxos, multi-paxos, leslie-lamport, diego-ongaro, john-ousterhout, etcd, zookeeper, consul, leader-election, log-replication, quorum, majority, safety, liveness, flp-impossibility, byzantine, pbft, jraft, atomix, copycat, distributed-state-machine]
+prerequisites: [cap-theorem-and-pacelc, consistency-models-strong-eventual]
+status: complete
+estimated_minutes: 80
+last_updated: 2026-06-08
+---
+
+# Consensus (Raft / Paxos, Intro)
+
+How does a distributed system agree on *anything*? When five replicas hold a counter and concurrent writes arrive, how do all five end up with the same value? When a cluster has a leader and the leader dies, how do the survivors agree on a new leader without two of them claiming the role simultaneously (the dreaded split-brain)? **Consensus algorithms** are the mathematical machinery that solves this problem — a class of protocols that allow a set of unreliable processes (each of which may crash or be slow) to agree on a single value, despite some fraction of them failing or being temporarily partitioned. Without consensus, no distributed database can offer linearizability ([T02](./T02-consistency-models-strong-eventual.md)), no leader election is safe, no distributed lock is actually exclusive, no Kubernetes control plane can decide anything. **Consensus is the substrate underneath every &quot;strongly consistent&quot; distributed system.**
+
+Two algorithms have defined the field: **Paxos** (Leslie Lamport, 1989, published 1998 in &quot;The Part-Time Parliament,&quot; reformulated in 2001&#x27;s &quot;Paxos Made Simple&quot;) and **Raft** (Diego Ongaro and John Ousterhout, 2014, designed explicitly for understandability after Paxos&#x27;s notorious complexity). Paxos came first and is foundational; Raft followed and is what the industry actually deploys in new systems because it&#x27;s reasonable to implement without a PhD. The third entrant — Viewstamped Replication (Brian Oki and Barbara Liskov, 1988) — predates both and influenced both; the recent **PBFT** (Castro and Liskov, 1999) and successors extend consensus to handle *Byzantine* failures (malicious / arbitrary behavior, not just crashes), at significantly higher cost.
+
+The depth bar here is **the actual mechanism** — what Raft does in steady state, how leader election handles failure, how log replication ensures the same sequence of operations applies on every replica, how the **2f+1 quorum rule** lets the system tolerate `f` simultaneous failures with `2f+1` total replicas — not just naming the algorithm. We trace what happens on the wire when a Raft node sends an AppendEntries RPC, when an election starts, when a partitioned minority finds itself rejoining a healed cluster. We name the production systems that implement consensus — **etcd** (Kubernetes, CoreDNS), **ZooKeeper** (Hadoop, Kafka pre-KIP-500), **Consul** (HashiCorp), **CockroachDB** (per-range Raft), **Spanner** (Paxos), **MongoDB** (a Raft variant), **Kafka KRaft** (replaces ZooKeeper) — and what each does with consensus underneath. We name the canonical failures consensus prevents (split-brain, double-leader, lost-commit, inconsistent-state) and the engineering investments that make it tractable (the bounded quorum requirement, the leader-based leader steady-state, the snapshot mechanisms for log compaction). By the end you will explain Raft&#x27;s mechanics to a junior engineer in 30 minutes, predict any consensus system&#x27;s behavior under f failures, refuse the wrong consensus choice (using DynamoDB-style AP storage for a leader-election problem, for example), and operate the most common Java consensus library (`jraft` or Atomix) with awareness of its failure modes.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [CAP](./T01-cap-theorem-and-pacelc.md) (consensus is the engineering that lets a system be CP); [Consistency Models](./T02-consistency-models-strong-eventual.md) (linearizability needs consensus). This is an *intro* — the topic introduces Raft well and Paxos lightly; deeper consensus theory (Multi-Paxos, EPaxos, Flexible Paxos, the Heidi Howard work) is graduate material.
+
+## The History Of Consensus — A 40-Year Intellectual Journey
+
+The consensus problem is one of computer science&#x27;s *oldest* unsolved-then-solved problems. The path from the problem&#x27;s identification (early 1970s) through the production deployments of 2026 took **roughly 40 years**, with key figures, key papers, and key failures along the way. Understanding the lineage matters because it tells you *why each successive algorithm exists* — what flaw in the previous one it was trying to fix.
+
+### The Pre-Paxos Era: The 1980s Foundation
+
+The consensus problem was formalized in the early 1980s, building on three foundational results:
+
+#### 1. The Byzantine Generals Problem (Lamport, Shostak, Pease, 1982)
+
+[*The Byzantine Generals Problem*](https://lamport.azurewebsites.net/pubs/byz.pdf) (Lamport et al., July 1982) introduced the canonical formulation of distributed agreement under malicious failure. The setting: several generals must coordinate an attack on a city; some generals are traitors who send conflicting messages. The result: agreement requires **at least 3f+1 generals to tolerate f traitors** if message authentication is unavailable, or **2f+1 with authentication**.
+
+This paper coined the term *Byzantine* (Lamport later said he picked it because Byzantium &quot;no longer existed and the name would not offend any ethnic group&quot;). It established that consensus has *fault-model-dependent thresholds*: crash-fault-tolerance requires fewer nodes than Byzantine-fault-tolerance.
+
+#### 2. The FLP Impossibility Result (Fischer, Lynch, Paterson, 1985)
+
+[*Impossibility of Distributed Consensus with One Faulty Process*](https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf) (April 1985) proved that **in an asynchronous network, no deterministic consensus algorithm can guarantee both safety and termination if even one process can crash**. The proof is by constructing an infinite sequence of message delays that prevent termination.
+
+FLP was a **devastating result** for the field: it meant that any practical consensus algorithm must either (a) sacrifice determinism (use randomization or timeouts), (b) sacrifice termination (allow the algorithm to hang under worst-case conditions), or (c) sacrifice asynchrony (require bounded message delays).
+
+Real Paxos and Raft work around FLP by **using randomized timeouts**: they almost always terminate but cannot guarantee it in worst-case adversarial timing. In practice, this is acceptable because the worst-case adversarial timing is astronomically unlikely.
+
+#### 3. Viewstamped Replication (Brian Oki and Barbara Liskov, 1988)
+
+Often forgotten, [*Viewstamped Replication: A New Primary Copy Method to Support Highly-Available Distributed Systems*](https://pmg.csail.mit.edu/papers/vr.pdf) (August 1988) presented an algorithm that solved the same problem Paxos solved a year later, with a *more readable* structure. Liskov herself has noted (in various retrospectives) that Viewstamped Replication and Paxos are *fundamentally equivalent* — both reduce to the same core algorithm — but Paxos got the publicity.
+
+The historical accident: Liskov&#x27;s paper was published in a SOSP workshop and didn&#x27;t reach the broader systems community as widely. Lamport&#x27;s Paxos paper, despite being rejected from its first submission, eventually became the canonical reference. Modern algorithms like Raft owe more structurally to Viewstamped Replication than to Paxos — Raft&#x27;s &quot;leader + followers + log&quot; shape is essentially VR&#x27;s &quot;primary + backups + log&quot; shape.
+
+### The Paxos Era — Lamport&#x27;s Famously Obscure Paper
+
+#### Leslie Lamport, Who He Is, And Why He Wrote Paxos
+
+**Leslie Lamport** (born 1941) is one of the foundational figures of distributed systems. He received the **2013 Turing Award** for &quot;fundamental contributions to the theory and practice of distributed and concurrent systems.&quot; Among his prior contributions:
+
+- **Lamport timestamps** (1978, see [T09](./T09-clocks-and-ordering-logical-vector-clocks.md)) — the logical clocks used in every consensus algorithm.
+- **LaTeX** (1985) — the document preparation system, derived from Knuth&#x27;s TeX.
+- **Byzantine Generals** (1982) — as above.
+- **Bakery algorithm** (1974) — mutual exclusion for shared memory.
+
+Lamport worked at SRI, then DEC&#x27;s Systems Research Center (1985–2001), then Microsoft Research (2001–present). His SRC career was the period during which he developed Paxos.
+
+#### The 1989 Submission And The 1998 Publication
+
+Lamport&#x27;s [*The Part-Time Parliament*](https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf) was **submitted in 1989** and **rejected**. The reviewers (Lamport later wrote in his retrospective) found the paper&#x27;s allegorical framing — pretending the algorithm was discovered on the Aegean island of &quot;Paxos&quot; by a parliament of vacationing politicians — to be obscure and unprofessional.
+
+Lamport sat on the paper for years. In 1996, Butler Lampson at DEC SRC presented Paxos in a more accessible way, citing Lamport&#x27;s unpublished work. This created demand, and in **May 1998** the paper was finally published in *ACM Transactions on Computer Systems*. Lamport&#x27;s biographical sketch in the paper described &quot;the late Greek archaeologist Λεωνίδας Παξός&quot; — the joke being that the entire framing was a fiction.
+
+#### Why Paxos Is So Hard To Understand
+
+The 1998 Paxos paper is widely considered *one of the hardest papers in distributed systems to read*. The allegorical framing was abandoned for serious presentations, and Lamport himself wrote [*Paxos Made Simple*](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf) (November 2001) — a 14-page re-explanation. Even *Paxos Made Simple* is widely considered hard to read.
+
+The reasons:
+- Lamport&#x27;s formal style emphasizes **invariants and proofs** rather than algorithmic flow.
+- The paper distinguishes between **Single-Decree Paxos** (the basic version) and **Multi-Paxos** (running Single-Decree repeatedly for a log) without clearly separating them.
+- The roles (Proposer, Acceptor, Learner) can be played by the same process, but the paper doesn&#x27;t initially make this clear.
+- Implementation details (leader election, log truncation, snapshots) are *not covered* in the original paper, leading to the *Paxos Made Live* paper (Chandra, Griesemer, Redstone at Google, 2007) describing what it took to actually deploy Paxos in production.
+
+This obscurity directly motivated the Raft design.
+
+### The Production-Paxos Era — Chubby, ZooKeeper, And Multi-Paxos
+
+#### Google&#x27;s Chubby Lock Service (2006)
+
+[*The Chubby lock service for loosely-coupled distributed systems*](https://research.google/pubs/the-chubby-lock-service-for-loosely-coupled-distributed-systems/) (Burrows, OSDI 2006) was the first major *production* description of Paxos in use. Chubby was Google&#x27;s distributed coordination service, used internally for leader election, name service, and configuration storage for GFS, BigTable, and MapReduce.
+
+Chubby revealed *what Paxos required in production*:
+- Leader election (Multi-Paxos with a stable leader).
+- Log compaction via snapshots.
+- Cell membership changes.
+- Client-session handling.
+- The reality that **most of the code is the non-Paxos parts**.
+
+#### Yahoo&#x27;s ZooKeeper (2008)
+
+ZooKeeper (Apache top-level project from 2008) implemented a Paxos variant called **Zab** (ZooKeeper Atomic Broadcast). Zab differed from classical Paxos by emphasizing *broadcast semantics*: every committed transaction is delivered to every replica in the same order.
+
+ZooKeeper became enormously influential because it was the **first widely-available consensus system that engineers outside of Google could deploy**. Hadoop, HBase, Kafka (pre-KRaft), Solr, Storm, Mesos all used ZooKeeper. Curator (Apache, originally from Netflix) provided Java patterns on top.
+
+#### Paxos Made Live (2007)
+
+The Google paper [*Paxos Made Live - An Engineering Perspective*](https://research.google/pubs/paxos-made-live-an-engineering-perspective/) (Chandra, Griesemer, Redstone, 2007) documented the engineering work required to deploy Paxos. Critical observation:
+
+&gt; &quot;There are significant gaps between the description of the Paxos algorithm and the needs of a real-world system. In order to build a real-world system, an expert needs to use numerous ideas scattered in the literature and make several relatively small protocol extensions. The cumulative effort will be substantial and the final system will be based on an unproven protocol.&quot;
+
+This paper effectively documented that **getting Paxos right requires roughly 18 months of engineering work** even with expert engineers. This created the demand for a *more comprehensible* algorithm — which is where Raft enters.
+
+### The Raft Era — Ongaro &amp; Ousterhout&#x27;s Pedagogical Revolution
+
+#### Why Raft Was Created (2014)
+
+Diego Ongaro&#x27;s [*Consensus: Bridging Theory and Practice*](https://github.com/ongardie/dissertation/blob/master/online.pdf) (Stanford PhD dissertation, 2014, advised by John Ousterhout) opened with an explicit complaint:
+
+&gt; &quot;Despite Paxos having served as the foundation of consensus protocols in industry and academia for over a decade, ... Paxos is exceptionally difficult to understand. ... It is widely accepted that Paxos has, alternatively, helped or hindered the field, depending on whom you ask.&quot;
+
+Ongaro and Ousterhout designed Raft with a *pedagogical* primary goal: **the algorithm should be understandable**. They specifically decomposed consensus into three sub-problems (leader election, log replication, safety) that could be reasoned about independently — a structural choice Paxos doesn&#x27;t make.
+
+The Raft paper [*In Search of an Understandable Consensus Algorithm*](https://raft.github.io/raft.pdf) (Ongaro &amp; Ousterhout, USENIX ATC 2014) was conducted with a *user study*: graduate students were taught either Paxos or Raft, then quizzed. Raft outscored Paxos significantly. The paper&#x27;s title is the punchline.
+
+#### Who John Ousterhout Is
+
+**John Ousterhout** (born 1954) is a Stanford CS professor with a long systems career. Among his prior contributions:
+- **Tcl/Tk** (1988) — the scripting language and toolkit.
+- **Log-Structured Filesystem (LFS, 1992)** — the precursor to ZFS, btrfs, and modern flash-aware filesystems.
+- **RAMCloud** (2009–) — a distributed in-memory store, the project that motivated Raft.
+
+Ousterhout was Ongaro&#x27;s PhD advisor, and Raft emerged from RAMCloud&#x27;s need for a consensus algorithm Ousterhout could **explain to a class of graduate students in one lecture**.
+
+#### Raft&#x27;s Rapid Adoption
+
+Raft was adopted in production with unprecedented speed for a distributed systems algorithm:
+
+- **etcd** (CoreOS, 2013–2014): Raft-based key-value store. Became the storage backbone of Kubernetes.
+- **Consul** (HashiCorp, 2014): Raft-based service registry.
+- **CockroachDB** (2015): Raft per data range.
+- **TiDB** (PingCAP, 2016): Raft per region.
+- **MongoDB** (3.2, 2015): replica set election uses a Raft-like algorithm.
+- **Kafka KRaft** (2021): replaces ZooKeeper-based controller with Raft.
+
+By 2020, **Raft had displaced Paxos as the default new-system choice** for crash-fault-tolerant consensus. Paxos remains in use in older systems (Google Spanner, Chubby) and in academic research (EPaxos, Flexible Paxos), but new systems pick Raft.
+
+## Why Consensus, Specifically: The Senior Engineer&#x27;s Q&amp;A
+
+### Q1: Why do we need consensus at all?
+
+Because **distributed systems must agree on something** despite failures. Without consensus, you cannot:
+- Elect a single leader (two leaders = split-brain).
+- Maintain a consistent replicated state.
+- Implement distributed locks that are actually exclusive.
+- Provide linearizable reads from a replicated store.
+- Coordinate distributed transactions correctly.
+
+CAP says you cannot have linearizability + availability during partition. Consensus is *how you achieve linearizability*. If you give up linearizability (choose AP), you don&#x27;t need consensus. If you need linearizability (need CP), consensus is the only known way.
+
+### Q2: Why is consensus computationally expensive?
+
+The mechanical cost: each consensus operation requires at least one **round-trip to a majority of nodes**. For a 5-node cluster (tolerating 2 failures), that&#x27;s writing to and hearing back from 3 nodes. Across a data center, each round-trip is ~0.5–1 ms; across a region, ~10 ms; across the globe, ~100 ms.
+
+Consensus systems therefore have **fundamentally higher write latency than non-consensus systems**. A single Postgres write is ~1 ms; a CockroachDB write (per-range Raft) is ~10–20 ms for cross-AZ replication. The cost is the consensus round-trips.
+
+The senior judgment: pay this cost only when you need linearizability. For high-volume, low-consistency data (logs, metrics, sessions), don&#x27;t.
+
+### Q3: Why 2f+1 and not some other number?
+
+The math: to tolerate f failures while still having a majority, you need 2f+1 total nodes. This guarantees that **any two majorities overlap by at least one node**, which is the safety mechanism — that overlapping node prevents two different decisions from both achieving quorum.
+
+For f=1 (tolerate one failure), 2f+1=3.
+For f=2 (tolerate two failures), 2f+1=5.
+For f=3 (tolerate three failures), 2f+1=7.
+
+The cost is proportional to the failure tolerance. Most production deployments use 3 or 5; very few use 7+.
+
+### Q4: How does this compare to Byzantine fault tolerance?
+
+Raft and Paxos handle **crash failures** (a node stops responding). They do *not* handle **Byzantine failures** (a node sends incorrect or malicious messages). Byzantine consensus (PBFT, HotStuff, the algorithms underlying public blockchains) requires **3f+1 nodes** to tolerate f Byzantine failures, and is significantly more expensive.
+
+The senior question: do you need to tolerate malicious nodes? For internal enterprise infrastructure (etcd, ZooKeeper, etc.), the answer is no — all nodes are owned by the same team. For public blockchains and trustless systems, yes. The 3f+1 cost is paid only when malicious-node tolerance is required.
+
+### Q5: When should I use consensus and when shouldn&#x27;t I?
+
+**Use consensus for**:
+- Leader election (Kubernetes uses etcd for this).
+- Distributed locks that must be safe.
+- Strongly-consistent metadata stores (service discovery, config distribution).
+- Distributed transactions that must be linearizable.
+
+**Don&#x27;t use consensus for**:
+- High-volume application data (use eventually-consistent stores like Cassandra or DynamoDB).
+- Read-heavy workloads (read from replicas, even if writes go through consensus).
+- Caching (use Redis or Memcached).
+- Logging and analytics.
+
+The senior heuristic: **consensus is for the *control plane*, not the *data plane***. Your service-discovery, leader-election, and config-distribution use consensus; your application&#x27;s actual data uses cheaper replication strategies.
+
+## The Mechanism In Depth — Raft&#x27;s Three Sub-Problems
+
+The pedagogical insight of Raft is that consensus decomposes into three problems that can be reasoned about independently.
+
+### Sub-Problem 1: Leader Election
+
+Without a leader, every node would propose values independently, and the algorithm would have to resolve conflicts on each one. Raft elects a *single leader per term*, and that leader serializes all writes. The election uses:
+
+- **Randomized timeouts**: each follower has a 150–300 ms randomized election timeout. The first one to timeout becomes a candidate.
+- **Term numbers**: monotonically-increasing integers. A new election bumps the term.
+- **Vote restriction**: a voter only votes for a candidate whose log is at least as up-to-date as their own.
+
+The randomization solves the FLP problem: in pathological synchronization, elections could repeat indefinitely, but random timeouts make this practically impossible.
+
+### Sub-Problem 2: Log Replication
+
+Once elected, the leader appends operations to its log, replicates to followers via `AppendEntries` RPCs, and commits when a majority has replicated. The log is the source of truth; the state machine is derived by applying committed log entries in order.
+
+The mechanical guarantee: **if a log entry is committed in term T, every leader of term &gt; T contains that entry**. This comes from the election rule (voters only vote for up-to-date logs) combined with majority quorum overlap.
+
+### Sub-Problem 3: Safety
+
+Raft guarantees that **no two leaders commit conflicting entries for the same log index**. The safety property follows from the quorum overlap: any committed entry was acknowledged by a majority, and any new leader must have been elected by a majority, so the new leader has at least one node from the committing majority, which means it has the committed entry.
+
+This is the **same algebraic argument as Paxos** but expressed via different mechanisms. Raft&#x27;s separation makes the argument easier to follow.
+
+## Common Misconceptions Explained
+
+### &quot;Paxos and Raft are different algorithms.&quot;
+
+Half true. **They solve the same problem and use the same algebraic structure** (majority quorum, term/ballot numbers, leader-based steady state). The differences are in *exposition* and *operational detail*, not in the core algorithm. A Multi-Paxos implementation and a Raft implementation, optimized for the same workload, perform almost identically.
+
+### &quot;Consensus systems are slow.&quot;
+
+Misleading. **Consensus adds ~5–10 ms of latency per operation** (the majority round-trip), which is significant for in-data-center workloads but negligible for cross-region or human-perceptible operations. The cost is per-write; reads can be served from replicas without consensus overhead.
+
+### &quot;Raft tolerates Byzantine failures.&quot;
+
+False. Raft handles crash failures only. Byzantine consensus is a separate algorithm class.
+
+### &quot;etcd is the same as ZooKeeper.&quot;
+
+Half true. Both provide consensus-backed coordination. The differences:
+- **etcd**: Raft-based, HTTP/gRPC API, lease-based (ephemeral) keys, used by Kubernetes.
+- **ZooKeeper**: Zab-based, native TCP protocol, ephemeral z-nodes, used by Hadoop ecosystem.
+
+For new projects, etcd is generally preferred because of its simpler operational model and the Kubernetes-native integration.
+
+### &quot;Consensus solves all distributed-systems problems.&quot;
+
+False. Consensus solves the *agreement* problem. It does not solve:
+- Throughput scaling (consensus is a bottleneck if you put it on every operation).
+- Cross-system transactions (sagas remain necessary).
+- Geographic distribution (consensus across regions is high-latency).
+- Disagreement-by-design (event-driven systems prefer eventual consistency).
+
+The senior judgment: consensus is one tool among many. Use it where its strengths (safety, linearizability) match your needs; reach for other tools where its weaknesses (latency, throughput) bind.
+
+## What Consensus Means
+
+Formally, a consensus algorithm has three properties:
+
+1. **Agreement**: all non-faulty processes decide the same value.
+2. **Validity**: the decided value was proposed by some process.
+3. **Termination**: every non-faulty process eventually decides.
+
+The challenge: any of these processes might crash, run slowly, or be cut off by a network partition. The algorithm must handle this without sacrificing agreement (which would produce split-brain). **The FLP impossibility result** (Fischer, Lynch, Paterson, 1985) proved that no deterministic algorithm can guarantee all three in an asynchronous network — there is *some* failure pattern that prevents termination. Real algorithms (Paxos, Raft) sidestep FLP by using *randomized timeouts* to break symmetry, providing probabilistic — not deterministic — termination.
+
+## The Quorum Rule — Why 2f+1
+
+A consensus system tolerates `f` simultaneous failures by having `2f + 1` total replicas. The math:
+
+- 3 replicas tolerate 1 failure (`f=1`, `2f+1=3`).
+- 5 replicas tolerate 2 failures (`f=2`, `2f+1=5`).
+- 7 replicas tolerate 3 failures (`f=3`, `2f+1=7`).
+
+Why this exact ratio? Because every decision must be approved by a **majority** of the replicas. With `2f + 1` total, the majority is `f + 1`. Two different decisions can each get a majority only if `2(f+1) ≤ 2f+1`, which is `2f+2 ≤ 2f+1` — false. So two different decisions cannot both get a majority. **Two majorities of a 2f+1 set always overlap by at least one node**, and that overlapping node ensures consistency.
+
+```mermaid
+flowchart TB
+  subgraph Q1[&quot;Decision A: majority of 5&quot;]
+    N1[N1]
+    N2[N2]
+    N3[N3]
+  end
+  subgraph Q2[&quot;Decision B: majority of 5&quot;]
+    N3b[N3]
+    N4[N4]
+    N5[N5]
+  end
+  Note[&quot;N3 is in BOTH majorities;&lt;br/&gt;N3 cannot accept both A and B.&quot;]
+```
+
+The corollary: **the system survives if up to `f` nodes are down, but freezes if `f+1` or more are down** (no majority is reachable). Three-replica clusters are common; five-replica is the next step up for higher availability.
+
+## Raft — In Detail
+
+Raft (2014) was designed to be understandable. It decomposes consensus into three problems that can be reasoned about separately: **leader election**, **log replication**, and **safety**.
+
+### Roles And Terms
+
+At any moment, every node is in one of three roles:
+
+- **Leader**: handles client requests, replicates the log to followers.
+- **Follower**: passive; accepts updates from the leader.
+- **Candidate**: a node that has timed out without hearing from a leader and is trying to become one.
+
+**Time is divided into &quot;terms&quot;** — monotonically increasing integers. Each term has *at most one* leader. A term that begins with an election and no winner ends with a new election in a higher-numbered term.
+
+### Steady-State Operation
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant L as Leader
+  participant F1 as Follower 1
+  participant F2 as Follower 2
+  participant F3 as Follower 3
+  participant F4 as Follower 4
+
+  C-&gt;&gt;L: write request (e.g., set x = 5)
+  L-&gt;&gt;L: append to local log (uncommitted)
+  par broadcast
+    L-&gt;&gt;F1: AppendEntries
+    L-&gt;&gt;F2: AppendEntries
+    L-&gt;&gt;F3: AppendEntries
+    L-&gt;&gt;F4: AppendEntries
+  end
+  F1--&gt;&gt;L: ack
+  F2--&gt;&gt;L: ack
+  Note over L: majority (3 of 5) acked; commit
+  L-&gt;&gt;L: apply to state machine
+  L--&gt;&gt;C: success
+  par later heartbeats
+    L-&gt;&gt;F1: AppendEntries (commit index advanced)
+    L-&gt;&gt;F2: AppendEntries
+    L-&gt;&gt;F3: AppendEntries
+    L-&gt;&gt;F4: AppendEntries
+  end
+```
+
+The leader appends the operation to its log, broadcasts to followers, waits for majority ack, then commits. **Commitment requires majority**. Once committed, the operation is durable — even if the leader crashes, any new leader will have it (proven below).
+
+### Heartbeats And Election
+
+The leader sends periodic AppendEntries (often empty — heartbeats) to all followers, every ~50 ms. Followers reset their election timeout on each heartbeat. If a follower&#x27;s election timeout expires (typical: 150–300 ms randomized) without a heartbeat, it suspects the leader has failed and starts an election:
+
+```mermaid
+sequenceDiagram
+  participant F as Follower (term=4)
+  participant Peers as Other followers
+
+  Note over F: election timeout fires
+  F-&gt;&gt;F: state = Candidate, term = 5
+  F-&gt;&gt;F: vote for self
+  par request votes
+    F-&gt;&gt;Peers: RequestVote(term=5, logIndex=last)
+  end
+  Peers--&gt;&gt;F: voteGranted
+  Note over F: received majority votes
+  F-&gt;&gt;F: state = Leader
+  F-&gt;&gt;Peers: AppendEntries (heartbeat, term=5)
+```
+
+Each node votes for at most one candidate per term, and only if the candidate&#x27;s log is *at least as up-to-date* as the voter&#x27;s. If two candidates split the votes, neither gets a majority; the election times out and both try again with a higher term. The randomized timeouts mean one usually wins the next round.
+
+### Log Replication And Safety
+
+Every entry in the log has a term and an index. Two key invariants:
+
+1. **Log Matching**: if two logs have an entry at the same index with the same term, they are identical up to that index. (Means: once a log entry is replicated, the prefix is fixed.)
+2. **Leader Completeness**: if a log entry is committed in term T, every leader of term &gt; T contains that entry. (Means: committed entries are never lost.)
+
+The Leader Completeness property comes from the election rule: a candidate is elected only with a majority vote, and each voter votes only if the candidate&#x27;s log is up-to-date. The majority that elected the candidate must contain at least one node from the majority that committed any prior entry (quorum overlap), and that node would only vote for a candidate with that entry — therefore the new leader has it.
+
+This is the central beauty of Raft: a small set of rules (majority quorum, log-up-to-date voting) produces strong safety guarantees algebraically.
+
+### Failure Scenarios
+
+What does Raft actually do under various failures?
+
+- **Leader crash**: followers&#x27; election timers expire; a new leader is elected; client requests resume (after a brief unavailability window of ~150–300 ms).
+- **Follower crash**: leader notices unack&#x27;d messages; client requests still proceed if majority of followers are alive.
+- **Network partition (minority side)**: minority cannot elect a leader (no majority); minority side refuses writes, returns errors. The cluster is unavailable on this side.
+- **Network partition (majority side)**: majority side keeps the leader (or elects a new one if the old leader was on the minority side); writes proceed normally.
+- **Partition heals**: minority side rejoins; followers update their logs from the leader. Any uncommitted writes on the minority side are discarded (correctly — they never reached majority).
+
+```mermaid
+flowchart TB
+  subgraph Partition[&quot;During partition: 2 vs 3&quot;]
+    Minority[&quot;2 nodes (minority)&lt;br/&gt;cannot elect, refuse writes&quot;]
+    Majority[&quot;3 nodes (majority)&lt;br/&gt;elects leader, accepts writes&quot;]
+  end
+  subgraph Healed[&quot;After heal&quot;]
+    All[&quot;5 nodes&lt;br/&gt;former minority catches up&lt;br/&gt;from majority&#x27;s log&quot;]
+  end
+  Partition --&gt; Healed
+```
+
+The minority side&#x27;s behavior — refusing writes — is the **CP** choice from CAP ([T01](./T01-cap-theorem-and-pacelc.md)). It is the cost paid to preserve consistency.
+
+## Paxos — A Sketch
+
+Paxos is older, more general, more confusing, and less widely implemented. The basic idea:
+
+- Phase 1 (Prepare): a proposer asks acceptors to promise not to accept proposals with a lower number. Acceptors that promise return any previously-accepted value.
+- Phase 2 (Accept): if a majority promised, the proposer sends a value (the highest previously-accepted, if any, otherwise its own) to be accepted. Acceptors that haven&#x27;t broken their promise accept.
+- A value is *chosen* when a majority has accepted it.
+
+Two rounds per operation; multiple-Paxos optimizations bundle the prepare phase into a one-time leader election, after which only accept rounds run (essentially like Raft&#x27;s steady state). Variants — Multi-Paxos, EPaxos (Egalitarian Paxos), Flexible Paxos (Heidi Howard&#x27;s thesis), Cheap Paxos — relax constraints to gain throughput or availability.
+
+Most modern systems that &quot;use Paxos&quot; use Multi-Paxos in shape much like Raft&#x27;s steady state. The differences are subtle for the practitioner; Raft&#x27;s recognizable structure (leader, logs, AppendEntries) is the operational model most teams hold in their heads.
+
+## Real Systems Using Consensus
+
+| System | Consensus | Role |
+|--------|-----------|------|
+| **etcd** | Raft | Kubernetes&#x27; state store; distributed configuration; service discovery |
+| **ZooKeeper** | Zab (Paxos variant) | Hadoop, Kafka pre-KIP-500, distributed coordination |
+| **Consul** | Raft | Service mesh, KV store, distributed locking |
+| **CockroachDB** | Raft (per range) | Strongly-consistent multi-region SQL |
+| **Spanner** | Paxos | Google&#x27;s global SQL with strong consistency |
+| **MongoDB** | Raft variant (&quot;replica set election&quot;) | Replica set coordination |
+| **Kafka KRaft** | Raft | Replaces ZooKeeper for Kafka&#x27;s metadata (Kafka 3.x+) |
+| **TiDB** | Raft (per region) | Distributed SQL |
+| **Riak** | (older) Riak Core / now uses Raft | Distributed KV |
+| **HashiCorp Nomad** | Raft | Cluster orchestrator |
+
+**Pattern**: most systems published 2014+ use Raft. Older systems use Paxos variants. The decision factor was rarely correctness (both are correct); it was understandability and operational tooling.
+
+## When You Need Consensus (And When You Don&#x27;t)
+
+Consensus is **expensive** — every operation pays for a majority round-trip. Use it where you must, not where you can avoid it.
+
+### Need Consensus
+
+- **Leader election** in any distributed system.
+- **Distributed locks** that must be safe (no two clients hold the lock simultaneously).
+- **Strongly-consistent state** (Kubernetes&#x27; &quot;what pods exist&quot; registry).
+- **Linearizable counter / sequence** (a monotonically increasing global ID).
+- **Atomic commit** across partitions of a database.
+- **Configuration distribution** (the source of truth for &quot;what services are deployed where&quot;).
+
+### Don&#x27;t Need Consensus
+
+- **High-volume writes** where eventual consistency is fine (analytics events, logs).
+- **Read-heavy workloads** (use a consensus-backed write path, read from replicas eventually).
+- **Sharded data** where each shard can have its own leader (CockroachDB, Spanner — per-range Raft, not global).
+- **Cache invalidation** (eventual is fine; consensus is overkill).
+- **Pub/sub at scale** (Kafka per-partition ordering is enough; full consensus would tank throughput).
+
+The expensive operation should be infrequent (leader election, config change); the high-volume operations should ride on top without paying full consensus cost per operation.
+
+## Java Implementations And Libraries
+
+Several mature options:
+
+- **Apache Curator** — high-level ZooKeeper client; leader election, distributed locks, queues.
+- **etcd-java** — JDK client for etcd; consensus via etcd cluster.
+- **jraft** (Sofa-jraft, Alibaba) — pure-Java Raft implementation; embeddable in JVM apps.
+- **Atomix** (Camunda&#x27;s distributed coordination toolkit) — Raft-based; Java APIs for distributed primitives.
+- **Apache Ratis** — Java Raft library; used by Hadoop Ozone and others.
+- **Akka Cluster Sharding + Distributed Data** — uses gossip + CRDTs, not strict consensus, but provides similar building blocks.
+
+For Spring Boot teams, **Spring Cloud + Consul** or **Spring Cloud + ZooKeeper** is the path of least resistance — the consensus system runs externally; the Spring app uses it via a client library.
+
+### Simple Leader Election With Curator
+
+```java
+LeaderSelector selector = new LeaderSelector(client, &quot;/myapp/leader&quot;,
+    new LeaderSelectorListenerAdapter() {
+      @Override
+      public void takeLeadership(CuratorFramework client) {
+        // I am the leader; do leader work until interrupted
+        while (running) {
+          doLeaderWork();
+          Thread.sleep(5000);
+        }
+      }
+    });
+selector.autoRequeue();
+selector.start();
+```
+
+ZooKeeper provides the consensus; the application gets a `takeLeadership` callback when its node holds the lock. On crash, ZooKeeper releases the lock (ephemeral z-node), and another node takes leadership.
+
+## Failure Modes Specific To Consensus Systems
+
+### Split-Brain
+
+Two leaders simultaneously believe they are leader. **Properly-implemented Raft cannot have split-brain** (the term mechanism guarantees only one leader per term; the majority-vote rule guarantees terms don&#x27;t overlap with valid commits). Real-world &quot;split-brain&quot; reports are almost always implementation bugs or misconfigurations (timeouts too short causing rapid leader churn that *appears* split-brain to clients).
+
+### Unbounded Log Growth
+
+Raft&#x27;s log grows forever unless compacted. Each operation is appended; logs of long-lived clusters can be gigabytes. **Snapshots** (a periodic checkpoint of the state machine + a log truncation) compact the log. Implementations must produce snapshots safely without blocking the leader.
+
+### Slow Follower
+
+A follower lags arbitrarily behind the leader. Sometimes the follower catches up; sometimes it falls so far behind it needs a snapshot transfer. Operators must monitor and respond.
+
+### Election Storms
+
+Misconfigured timeouts (too short) cause rapid leader churn — every time a leader is elected, it gets demoted before establishing leadership. The cluster spends all its time in elections. The fix: increase `electionTimeout` to be significantly larger than the worst-case network round-trip; tune with Jepsen-style testing.
+
+### Quorum Loss
+
+If more than `f` nodes fail, the cluster cannot make progress. Recovery requires bringing nodes back online, or in extreme cases a manual &quot;force quorum&quot; override that risks data loss. The discipline: provision enough nodes that two simultaneous failures don&#x27;t break the cluster.
+
+## Byzantine Failures — A Brief Note
+
+Raft and Paxos assume **crash failures** — nodes that fail by stopping, not by sending wrong data. **Byzantine failure** means a node can behave arbitrarily (malicious, corrupt, bug). Byzantine consensus (PBFT, HotStuff, the algorithms behind blockchain consensus) requires `3f + 1` nodes to tolerate `f` Byzantine failures and is significantly more expensive. Public blockchains (Bitcoin, Ethereum, etc.) deal with Byzantine consensus at internet scale via different mechanisms (proof-of-work, proof-of-stake) — outside the scope of this topic.
+
+For ordinary enterprise infrastructure, crash-fault-tolerant consensus (Raft, Paxos) is sufficient because the nodes are all owned by the same team.
+
+## Trade-Off Summary
+
+| Need | Use |
+|------|-----|
+| Distributed lock | etcd / ZooKeeper / Consul via Curator |
+| Kubernetes-style state | etcd (already in the cluster) |
+| Distributed config | Consul KV |
+| Multi-region SQL | CockroachDB / Spanner |
+| Replicated state machine in JVM | jraft / Atomix |
+| Cross-region with strong consistency | accept latency cost; use Spanner / CockroachDB |
+| High-volume sharded writes | per-shard consensus (CockroachDB, TiDB) |
+| Eventual consistency is fine | DynamoDB / Cassandra — no consensus per write |
+| Byzantine fault tolerance | Tendermint / HotStuff / blockchain (rare) |
+
+&gt; [!INTERVIEW]
+&gt; A common L5 prompt: &quot;Explain Raft.&quot; Strong answers cover (a) the three roles (leader, follower, candidate), (b) terms and the safety property they enforce, (c) the majority quorum and its `2f+1` justification, (d) what happens on partition (minority can&#x27;t elect; majority continues), (e) at least one real-world consequence (etcd is the Kubernetes substrate).
+
+## Deeper Dive — Raft Protocol Walkthrough (Concrete Example)
+
+### 5-Node Cluster Normal Operation
+
+```
+INITIAL STATE: 5 nodes (N1, N2, N3, N4, N5)
+  All start as followers, term = 0
+
+LEADER ELECTION:
+  T+150ms (random election timeout) → N3 becomes candidate
+  N3 increments term to 1, votes for itself
+  N3 sends RequestVote to N1, N2, N4, N5
+  N1, N2, N4 respond YES (3 votes including N3 = majority)
+  N5 was offline; N3 still wins
+
+  N3 becomes LEADER (term 1)
+
+NORMAL WRITE FLOW:
+  Client sends &quot;SET x = 5&quot; to N3 (leader)
+
+  Step 1: APPEND TO LEADER LOG
+    N3 appends log entry {term: 1, index: 1, cmd: &quot;SET x = 5&quot;}
+    N3 log is now: [{1, 1, &quot;SET x = 5&quot;}]
+
+  Step 2: REPLICATE TO FOLLOWERS
+    N3 sends AppendEntries(term=1, leaderId=N3, prevIndex=0, entries=[...]) to all
+    N1, N2, N4 append entry to their logs
+    N5 still offline
+
+  Step 3: WAIT FOR MAJORITY ACK
+    N1, N2, N4 send ACK to N3
+    N3 has 4/5 nodes acked (including self) → MAJORITY
+
+  Step 4: COMMIT
+    N3 commits entry (commitIndex = 1)
+    N3 applies &quot;SET x = 5&quot; to state machine
+    N3 responds OK to client
+
+  Step 5: NOTIFY FOLLOWERS OF COMMIT
+    Next heartbeat carries commitIndex = 1
+    N1, N2, N4 commit + apply to their state machines
+    N5 will catch up when reconnected
+```
+
+### Leader Election Sequence (Leader Crash)
+
+```
+N3 (leader, term 1) crashes at T+5s
+
+FOLLOWER TIMEOUTS:
+  T+5.3s — N1&#x27;s election timeout expires (random 150-300ms)
+  N1 increments term to 2, becomes candidate
+  N1 votes for itself, sends RequestVote(term=2) to others
+
+  T+5.31s — N2 receives RequestVote(term=2)
+    N2 has not voted in term 2 → grants vote
+    N2 updates its term to 2
+  Same for N4
+
+  N1 has 3 votes (self + N2 + N4) = MAJORITY of 5
+  N1 BECOMES LEADER (term 2)
+
+  T+5.32s — N1 sends initial heartbeat as leader
+
+WHAT IF SPLIT VOTE?
+  At T+5.3s, both N1 AND N5 timeout simultaneously
+  Each becomes candidate in term 2, votes for self
+  N2 votes for whichever&#x27;s RequestVote it received first (e.g., N1)
+  N4 votes for the other (e.g., N5)
+  Neither gets majority → election fails
+  Both wait random timeout, retry in term 3
+  Eventually one wins (randomization breaks ties)
+```
+
+### Network Partition Scenario
+
+```
+SCENARIO: N3 (leader) and N4, N5 partitioned from N1, N2
+
+PARTITION SIDE A (N3, N4, N5) — has 3 nodes
+  N3 is leader; can append entries to log
+  But CAN&#x27;T COMMIT — needs majority (3 of 5)
+  Wait, N3 has 3 nodes, that&#x27;s majority! → Can commit if all 3 ack
+
+  ACTUALLY: depends on which nodes are on which side
+
+PARTITION SIDE B (N1, N2) — has 2 nodes
+  Election timeout fires; N1 or N2 starts election
+  N1 increments term to 2, requests votes
+  Only N2 can respond on this side
+  2/5 votes = no majority → election FAILS
+  Side B is UNAVAILABLE for writes; can serve stale reads
+
+PARTITION HEALS:
+  N3 still leader (term 1)
+  N1 incremented term during failed elections (now term N)
+  When N3 sees higher term → steps down
+  New election happens; new leader is whoever has most up-to-date log
+  Cluster resumes normal operation
+```
+
+## Deeper Dive — Java Consensus Library Examples
+
+### Apache Curator (ZooKeeper) Leader Election
+
+```java
+@Component
+public class LeaderElectionService implements LeaderSelectorListener {
+
+    private final CuratorFramework client;
+    private final LeaderSelector leaderSelector;
+    private final AtomicBoolean isLeader = new AtomicBoolean();
+
+    public LeaderElectionService() {
+        this.client = CuratorFrameworkFactory.newClient(
+            &quot;zk1:2181,zk2:2181,zk3:2181&quot;,
+            new ExponentialBackoffRetry(1000, 3)
+        );
+        client.start();
+
+        this.leaderSelector = new LeaderSelector(client, &quot;/election/my-app&quot;, this);
+        leaderSelector.autoRequeue();   // re-enter election if I lose leadership
+    }
+
+    @PostConstruct
+    public void start() {
+        leaderSelector.start();
+    }
+
+    @Override
+    public void takeLeadership(CuratorFramework client) throws Exception {
+        isLeader.set(true);
+        log.info(&quot;I am now the leader!&quot;);
+
+        try {
+            // Do leader-only work; e.g., periodic batch job
+            while (!Thread.currentThread().isInterrupted()) {
+                doLeaderWork();
+                Thread.sleep(10_000);
+            }
+        } finally {
+            isLeader.set(false);
+            log.info(&quot;I am no longer the leader&quot;);
+        }
+    }
+
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
+        if (newState != ConnectionState.RECONNECTED) {
+            // Lost connection; we may no longer be leader
+            isLeader.set(false);
+        }
+    }
+}
+```
+
+### etcd jetcd Leader Election
+
+```java
+@Component
+public class EtcdLeaderElection {
+    private final Client etcd;
+    private LeaderKey leadership;
+
+    public EtcdLeaderElection() {
+        this.etcd = Client.builder()
+            .endpoints(&quot;http://etcd1:2379&quot;, &quot;http://etcd2:2379&quot;, &quot;http://etcd3:2379&quot;)
+            .build();
+    }
+
+    public CompletableFuture&lt;Void&gt; campaignAsLeader() {
+        // Lease — releases leadership if we crash
+        return etcd.getLeaseClient().grant(30)
+            .thenCompose(leaseResp -&gt; {
+                long leaseId = leaseResp.getID();
+
+                // Renew lease in background
+                etcd.getLeaseClient().keepAlive(leaseId, ...);
+
+                // Campaign
+                return etcd.getElectionClient()
+                    .campaign(
+                        ByteSequence.from(&quot;/elections/my-app&quot;, UTF_8),
+                        leaseId,
+                        ByteSequence.from(myNodeId, UTF_8)
+                    )
+                    .thenAccept(resp -&gt; {
+                        leadership = resp.getLeader();
+                        log.info(&quot;Elected as leader: {}&quot;, leadership);
+                        doLeaderWork();
+                    });
+            });
+    }
+}
+```
+
+### Spring Cloud Kubernetes Leader Election
+
+```yaml
+spring:
+  cloud:
+    kubernetes:
+      leader:
+        enabled: true
+        config-map-name: my-app-leader
+        namespace: default
+```
+
+```java
+@Component
+public class K8sLeaderElection {
+    @EventListener
+    public void onGranted(OnGrantedEvent event) {
+        log.info(&quot;I am the leader&quot;);
+        startLeaderWork();
+    }
+
+    @EventListener
+    public void onRevoked(OnRevokedEvent event) {
+        log.info(&quot;I am no longer the leader&quot;);
+        stopLeaderWork();
+    }
+}
+```
+
+K8s ConfigMap-based leader election; uses K8s API resource versioning for atomic CAS. Simpler than ZK/etcd for K8s-native apps.
+
+## Deeper Dive — When You Need Consensus
+
+### Need consensus
+
+| Use case | Why |
+|---|---|
+| **Leader election** | Need to agree on which node is primary |
+| **Distributed lock** | Mutual exclusion across processes |
+| **Configuration storage** | All nodes must see same config eventually + atomically |
+| **Service discovery** | Single source of truth for what&#x27;s running where |
+| **Cluster membership** | Who&#x27;s in the cluster — agreed upon |
+| **State machine replication** | Replicated DB with linearizable writes |
+| **Sequence numbers / IDs** | Unique monotonic IDs across cluster |
+| **Replicated log** | Cross-replica ordered command sequence |
+
+### Don&#x27;t need consensus
+
+| Use case | Better approach |
+|---|---|
+| Distributed cache | LRU eviction; eventually consistent OK |
+| Counters | CRDT or sharded counters |
+| Read replicas | Primary + async replication |
+| Idempotent operations | Idempotency key + retry |
+| Eventually consistent K/V | DynamoDB, Cassandra (quorum reads) |
+| Async messaging | Kafka (uses consensus internally for metadata only) |
+| Sharded data | Per-shard consensus, not global |
+
+## Deeper Dive — Consensus System Comparison Matrix
+
+| System | Algorithm | Best for | Throughput | Latency | API Style |
+|---|---|---|---|---|---|
+| **etcd** | Raft | K8s coordination, config | ~10K writes/sec | ~10ms | gRPC + HTTP/JSON |
+| **ZooKeeper** | Zab (Paxos variant) | Hadoop/Kafka coordination | ~10K writes/sec | ~10ms | Tree-of-nodes API |
+| **Consul** | Raft | Service mesh, service discovery | ~5K writes/sec | ~10ms | HTTP/JSON + DNS |
+| **etcd-raft library** | Raft | Embed in your service | varies | varies | Go library |
+| **Hashicorp Raft** | Raft | Embed in Go service | varies | varies | Go library |
+| **Atomix** | Raft | Java distributed primitives | ~5-20K ops/sec | ~10-50ms | Java embedded |
+| **Apache Ratis** | Raft | Embedded in Hadoop/Ozone | varies | varies | Java library |
+| **CockroachDB** | Raft per-range | Distributed strong-consistency DB | Millions/sec total | ~10ms reads, ~100ms cross-region writes | SQL |
+| **Spanner** | Paxos per-tablet | Global strong-consistency DB | Millions/sec total | ~10ms reads, ~100ms cross-region writes | SQL |
+| **TiDB** | Raft per-region | MySQL-compatible distributed DB | Millions/sec | ~10ms | MySQL protocol |
+
+## Deeper Dive — Operational Considerations
+
+### Cluster Sizing
+
+```
+NODES vs FAILURE TOLERANCE:
+  3 nodes: tolerates 1 failure
+  5 nodes: tolerates 2 failures
+  7 nodes: tolerates 3 failures
+  9 nodes: tolerates 4 failures
+
+WHY ODD NUMBER:
+  4 nodes: needs majority (3) — same tolerance as 5 (2 failures)
+  So 4 wastes a node; 5 gives same protection for 1 more
+
+DON&#x27;T GO TOO BIG:
+  Each write needs majority ack
+  More nodes = more parallel acks = MORE LATENCY (not less)
+  5-7 is sweet spot for most use cases
+  9 only for very high reliability requirements
+```
+
+### Geographic Distribution
+
+```
+SINGLE REGION:
+  All nodes in same AZ → AZ failure kills cluster
+  AZ-distributed: 3 AZs × 1 node = tolerates AZ outage
+
+MULTI-REGION:
+  Cross-region latency adds to consensus
+  Typically 50-100ms RTT
+  Every write commit pays this round-trip
+  → Latency-sensitive workloads stay single-region
+  → Spanner&#x27;s TrueTime amortizes this; CockroachDB allows lease moves
+
+WITNESS NODES:
+  Light nodes that participate in voting but don&#x27;t store data
+  Used to break ties without paying full data cost
+```
+
+### Snapshotting and Log Compaction
+
+```
+PROBLEM: log grows forever; full log replay on new-node bootstrap is slow
+
+SNAPSHOT:
+  Periodically (e.g., every 10K entries) take state machine snapshot
+  Compact log: discard entries before snapshot
+  New nodes restore from snapshot + apply remaining log entries
+
+ETCD SNAPSHOT INTERVAL:
+  --snapshot-count=100000  (default 10K)
+
+ZOOKEEPER SNAPSHOT:
+  After N transactions or M minutes
+```
+
+### Common Operational Pitfalls
+
+```
+1. ELECTION TIMEOUT TOO LOW
+   Symptom: leader churn during normal operation
+   Cause: network jitter &gt; timeout
+   Fix: timeout should be 10-20× max network RTT
+
+2. ELECTION TIMEOUT TOO HIGH
+   Symptom: long unavailability after leader crash
+   Cause: too conservative
+   Fix: tune to your network; etcd default 1000ms is usually fine
+
+3. SLOW DISK
+   Symptom: high latency, occasional unavailability
+   Cause: fsync per commit; slow disk blocks everything
+   Fix: SSD; tune --max-snapshot-files / --max-wal-files
+
+4. CROSS-REGION PRIMARY
+   Symptom: high write latency
+   Cause: replicas need to round-trip cross-region
+   Fix: keep primary co-located with most writes; use lease-based primary moves
+
+5. OUT-OF-DATE NODE REJOINS
+   Symptom: long delay after node restart
+   Cause: log replay from start
+   Fix: snapshot + send to new node; faster than log replay
+```
+
+## Deeper Dive — Real-World Consensus Failures
+
+### Split-Brain (Pre-Consensus Era)
+
+```
+SCENARIO: 2-node &quot;active-passive&quot; cluster
+  Active node crashes
+  Passive promotes itself
+  Network heals
+  Original &quot;crashed&quot; node comes back, still thinks it&#x27;s active
+  Now BOTH nodes accept writes → data corruption
+
+LESSON: 2-node clusters can&#x27;t be properly highly available
+Need 3+ for proper consensus
+```
+
+### Mongo&#x27;s 2018 Election Storm
+
+```
+SCENARIO: MongoDB replica set with election timeout 5s
+  Network blip &gt; 5s on primary
+  Secondaries elect new primary
+  Primary recovers, network heals
+  Old primary&#x27;s writes get rolled back
+  Some writes LOST despite &quot;majority&quot; write concern
+
+FIX:
+  Set writeConcern: majority + wtimeout
+  Use journaled writes (j: true)
+  Monitor election count; alert on &gt;1/day
+```
+
+### etcd Disk-Full Incident
+
+```
+SCENARIO: etcd cluster disk fills
+  Leader can&#x27;t fsync; commits fail
+  K8s control plane becomes unresponsive
+  Mass pod evictions trigger (controllers can&#x27;t update status)
+
+PREVENTION:
+  Alert on etcd disk &gt; 80%
+  Use defragmentation (etcdctl defrag) periodically
+  Compact history (etcdctl compact &lt;revision&gt;)
+```
+
+## Practice
+
+1. **Walk a Raft trace.** Sketch a 5-node Raft cluster. Trace a write through it, naming the AppendEntries messages and acks. Now trace a leader crash and election. Now trace a partition that isolates the leader.
+2. **Quorum arithmetic.** For a 7-node cluster, what&#x27;s the worst-case number of simultaneous failures it survives? How many would prevent progress?
+3. **Find consensus in your stack.** Identify every consensus system in your production stack — etcd, ZK, Consul, etc. For each, name what it coordinates.
+4. **Implement leader election.** Use Apache Curator to implement leader election in a Spring Boot app. Run two instances; kill one; verify the other becomes leader.
+5. **The split-brain story.** Find a real-world split-brain incident in any public postmortem. Identify the implementation bug or misconfiguration that caused it.
+6. **Election timeout tuning.** For an etcd cluster, identify the election timeout. Estimate worst-case round-trip in your network. Decide whether the timeout is appropriate.
+7. **Compare consensus systems.** Read the docs for etcd, ZooKeeper, and Consul. Compare their consensus algorithms, their APIs, and their operational characteristics. Recommend one for a new project.
+8. **Snapshot story.** In any consensus system, find evidence of snapshot/log-compaction. Explain when it runs and what it prevents.
+9. **Byzantine consideration.** Explain why a public blockchain needs Byzantine consensus and ordinary enterprise infrastructure does not.
+10. **The skeptic conversation.** A senior engineer says &quot;we&#x27;ll just use leader election with a heartbeat.&quot; Write a 200-word response on why distributed locks without consensus are subtly broken.
+
+## Recap
+
+You should now be able to:
+
+- Articulate **consensus** as the property of distributed agreement under failure (agreement, validity, termination) and recognize the **FLP impossibility** as why algorithms use randomization.
+- Apply the **2f+1 quorum rule** and explain why two majorities of a 2f+1 set always overlap.
+- Trace **Raft** in steady state (leader&#x27;s AppendEntries to majority), under leader failure (election with randomized timeouts, term increment), and under partition (minority refuses writes, majority continues).
+- Recognize the **Log Matching** and **Leader Completeness** properties as the algebraic guarantees of safety.
+- Sketch **Paxos** at a high level — Prepare and Accept phases, the role of the proposer/acceptor — and recognize Multi-Paxos as functionally equivalent to Raft&#x27;s steady state.
+- Map **production consensus systems** to their algorithms: etcd / ZooKeeper / Consul / CockroachDB / Spanner / Kafka KRaft.
+- Choose when to **use consensus** (leader election, locks, strongly-consistent state) and when not (high-volume eventual-consistency workloads).
+- Use **Java consensus libraries** — Curator, jraft, Atomix, etcd-java — for distributed coordination in Spring Boot.
+- Recognize and prevent **consensus-specific failure modes** — split-brain (impossible if implemented correctly), unbounded log growth, slow followers, election storms, quorum loss.
+- Distinguish **crash-fault-tolerant** consensus (Raft, Paxos) from **Byzantine-fault-tolerant** consensus (PBFT, HotStuff, blockchain) and explain when each is needed.
+
+## Next
+
+Continue to [Replication Strategies](./T04-replication-strategies.md) — the patterns for keeping multiple copies of data: single-leader (Postgres / MySQL), multi-leader (CRDTs, multi-master), leaderless (DynamoDB, Cassandra). Each strategy&#x27;s consistency properties build on consensus, eventual consistency, or both.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c02-t02-consistency-models-strong-eventual.html"><div class="lbl">← Previous</div><div class="ttl">T02-consistency-models-strong-eventual</div><div class="sub">Consistency Models (Strong, Eventual)</div></a><a class="next" href="../l5/c02-t04-replication-strategies.html"><div class="lbl">Next →</div><div class="ttl">T04-replication-strategies</div><div class="sub">Replication Strategies</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-history-of-consensus-a-40-year-intellectual-journey" data-toc-link>The History Of Consensus — A 40-Year Intellectual Journey</a></li><li class="lvl-3"><a href="#the-pre-paxos-era-the-1980s-foundation" data-toc-link>The Pre-Paxos Era: The 1980s Foundation</a></li><li class="lvl-3"><a href="#the-paxos-era-lamports-famously-obscure-paper" data-toc-link>The Paxos Era — Lamport&#x27;s Famously Obscure Paper</a></li><li class="lvl-3"><a href="#the-production-paxos-era-chubby-zookeeper-and-multi-paxos" data-toc-link>The Production-Paxos Era — Chubby, ZooKeeper, And Multi-Paxos</a></li><li class="lvl-3"><a href="#the-raft-era-ongaro-ousterhouts-pedagogical-revolution" data-toc-link>The Raft Era — Ongaro &amp;amp; Ousterhout&#x27;s Pedagogical Revolution</a></li><li class="lvl-2"><a href="#why-consensus-specifically-the-senior-engineers-qa" data-toc-link>Why Consensus, Specifically: The Senior Engineer&#x27;s Q&amp;amp;A</a></li><li class="lvl-3"><a href="#q1-why-do-we-need-consensus-at-all" data-toc-link>Q1: Why do we need consensus at all?</a></li><li class="lvl-3"><a href="#q2-why-is-consensus-computationally-expensive" data-toc-link>Q2: Why is consensus computationally expensive?</a></li><li class="lvl-3"><a href="#q3-why-2f1-and-not-some-other-number" data-toc-link>Q3: Why 2f+1 and not some other number?</a></li><li class="lvl-3"><a href="#q4-how-does-this-compare-to-byzantine-fault-tolerance" data-toc-link>Q4: How does this compare to Byzantine fault tolerance?</a></li><li class="lvl-3"><a href="#q5-when-should-i-use-consensus-and-when-shouldnt-i" data-toc-link>Q5: When should I use consensus and when shouldn&#x27;t I?</a></li><li class="lvl-2"><a href="#the-mechanism-in-depth-rafts-three-sub-problems" data-toc-link>The Mechanism In Depth — Raft&#x27;s Three Sub-Problems</a></li><li class="lvl-3"><a href="#sub-problem-1-leader-election" data-toc-link>Sub-Problem 1: Leader Election</a></li><li class="lvl-3"><a href="#sub-problem-2-log-replication" data-toc-link>Sub-Problem 2: Log Replication</a></li><li class="lvl-3"><a href="#sub-problem-3-safety" data-toc-link>Sub-Problem 3: Safety</a></li><li class="lvl-2"><a href="#common-misconceptions-explained" data-toc-link>Common Misconceptions Explained</a></li><li class="lvl-3"><a href="#paxos-and-raft-are-different-algorithms" data-toc-link>&quot;Paxos and Raft are different algorithms.&quot;</a></li><li class="lvl-3"><a href="#consensus-systems-are-slow" data-toc-link>&quot;Consensus systems are slow.&quot;</a></li><li class="lvl-3"><a href="#raft-tolerates-byzantine-failures" data-toc-link>&quot;Raft tolerates Byzantine failures.&quot;</a></li><li class="lvl-3"><a href="#etcd-is-the-same-as-zookeeper" data-toc-link>&quot;etcd is the same as ZooKeeper.&quot;</a></li><li class="lvl-3"><a href="#consensus-solves-all-distributed-systems-problems" data-toc-link>&quot;Consensus solves all distributed-systems problems.&quot;</a></li><li class="lvl-2"><a href="#what-consensus-means" data-toc-link>What Consensus Means</a></li><li class="lvl-2"><a href="#the-quorum-rule-why-2f1" data-toc-link>The Quorum Rule — Why 2f+1</a></li><li class="lvl-2"><a href="#raft-in-detail" data-toc-link>Raft — In Detail</a></li><li class="lvl-3"><a href="#roles-and-terms" data-toc-link>Roles And Terms</a></li><li class="lvl-3"><a href="#steady-state-operation" data-toc-link>Steady-State Operation</a></li><li class="lvl-3"><a href="#heartbeats-and-election" data-toc-link>Heartbeats And Election</a></li><li class="lvl-3"><a href="#log-replication-and-safety" data-toc-link>Log Replication And Safety</a></li><li class="lvl-3"><a href="#failure-scenarios" data-toc-link>Failure Scenarios</a></li><li class="lvl-2"><a href="#paxos-a-sketch" data-toc-link>Paxos — A Sketch</a></li><li class="lvl-2"><a href="#real-systems-using-consensus" data-toc-link>Real Systems Using Consensus</a></li><li class="lvl-2"><a href="#when-you-need-consensus-and-when-you-dont" data-toc-link>When You Need Consensus (And When You Don&#x27;t)</a></li><li class="lvl-3"><a href="#need-consensus" data-toc-link>Need Consensus</a></li><li class="lvl-3"><a href="#dont-need-consensus" data-toc-link>Don&#x27;t Need Consensus</a></li><li class="lvl-2"><a href="#java-implementations-and-libraries" data-toc-link>Java Implementations And Libraries</a></li><li class="lvl-3"><a href="#simple-leader-election-with-curator" data-toc-link>Simple Leader Election With Curator</a></li><li class="lvl-2"><a href="#failure-modes-specific-to-consensus-systems" data-toc-link>Failure Modes Specific To Consensus Systems</a></li><li class="lvl-3"><a href="#split-brain" data-toc-link>Split-Brain</a></li><li class="lvl-3"><a href="#unbounded-log-growth" data-toc-link>Unbounded Log Growth</a></li><li class="lvl-3"><a href="#slow-follower" data-toc-link>Slow Follower</a></li><li class="lvl-3"><a href="#election-storms" data-toc-link>Election Storms</a></li><li class="lvl-3"><a href="#quorum-loss" data-toc-link>Quorum Loss</a></li><li class="lvl-2"><a href="#byzantine-failures-a-brief-note" data-toc-link>Byzantine Failures — A Brief Note</a></li><li class="lvl-2"><a href="#trade-off-summary" data-toc-link>Trade-Off Summary</a></li><li class="lvl-2"><a href="#deeper-dive-raft-protocol-walkthrough-concrete-example" data-toc-link>Deeper Dive — Raft Protocol Walkthrough (Concrete Example)</a></li><li class="lvl-3"><a href="#5-node-cluster-normal-operation" data-toc-link>5-Node Cluster Normal Operation</a></li><li class="lvl-3"><a href="#leader-election-sequence-leader-crash" data-toc-link>Leader Election Sequence (Leader Crash)</a></li><li class="lvl-3"><a href="#network-partition-scenario" data-toc-link>Network Partition Scenario</a></li><li class="lvl-2"><a href="#deeper-dive-java-consensus-library-examples" data-toc-link>Deeper Dive — Java Consensus Library Examples</a></li><li class="lvl-3"><a href="#apache-curator-zookeeper-leader-election" data-toc-link>Apache Curator (ZooKeeper) Leader Election</a></li><li class="lvl-3"><a href="#etcd-jetcd-leader-election" data-toc-link>etcd jetcd Leader Election</a></li><li class="lvl-3"><a href="#spring-cloud-kubernetes-leader-election" data-toc-link>Spring Cloud Kubernetes Leader Election</a></li><li class="lvl-2"><a href="#deeper-dive-when-you-need-consensus" data-toc-link>Deeper Dive — When You Need Consensus</a></li><li class="lvl-3"><a href="#need-consensus_1" data-toc-link>Need consensus</a></li><li class="lvl-3"><a href="#dont-need-consensus_1" data-toc-link>Don&#x27;t need consensus</a></li><li class="lvl-2"><a href="#deeper-dive-consensus-system-comparison-matrix" data-toc-link>Deeper Dive — Consensus System Comparison Matrix</a></li><li class="lvl-2"><a href="#deeper-dive-operational-considerations" data-toc-link>Deeper Dive — Operational Considerations</a></li><li class="lvl-3"><a href="#cluster-sizing" data-toc-link>Cluster Sizing</a></li><li class="lvl-3"><a href="#geographic-distribution" data-toc-link>Geographic Distribution</a></li><li class="lvl-3"><a href="#snapshotting-and-log-compaction" data-toc-link>Snapshotting and Log Compaction</a></li><li class="lvl-3"><a href="#common-operational-pitfalls" data-toc-link>Common Operational Pitfalls</a></li><li class="lvl-2"><a href="#deeper-dive-real-world-consensus-failures" data-toc-link>Deeper Dive — Real-World Consensus Failures</a></li><li class="lvl-3"><a href="#split-brain-pre-consensus-era" data-toc-link>Split-Brain (Pre-Consensus Era)</a></li><li class="lvl-3"><a href="#mongos-2018-election-storm" data-toc-link>Mongo&#x27;s 2018 Election Storm</a></li><li class="lvl-3"><a href="#etcd-disk-full-incident" data-toc-link>etcd Disk-Full Incident</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

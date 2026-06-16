@@ -24,4 +24,4 @@ Exercises plus this module's end-of-level project.
 
 - [L4 Level Project: Production-Grade REST Service](T01-level-project-production-grade-rest-service.md)
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Virtual Threads (Project Loom) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="active" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Virtual Threads (Project Loom)</span></div>
+        <h1>Virtual Threads (Project Loom)</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T14-virtual-threads-project-loom.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~175 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Virtual Threads (Project Loom)"
+slug: virtual-threads-project-loom
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 14
+tags: [virtual-thread, project-loom, jep-444, jep-491, jep-446, jep-462, loom, continuation, jdk-internal-vm-continuation, mount, unmount, carrier-thread, carrier-pool, forkjoinpool-carrier, virtualthread-state-machine, parked-virtual-thread, pinned, native-frame, jni-frame, ffm-downcall, synchronized-pinning, monitor-pinning, jdk-21-pinning, jdk-24-fix, object-monitor-vt-aware, freeze-frames, unfreeze-frames, stack-on-heap, thread-of-virtual, start-virtual-thread, new-virtual-thread-per-task-executor, daemon-virtual, norm-priority, is-virtual, scoped-value, threadlocal-replacement, structured-concurrency, structured-task-scope, shutdown-on-failure, shutdown-on-success, don-t-pool-virtual-threads, semaphore-limiter, jdk-trace-pinned-threads, jfr-virtual-thread-pinned, jfr-virtual-thread-start, jfr-virtual-thread-end, jcmd-thread-dump-json, goroutine, kotlin-coroutine, erlang-process, m-n-scheduling]
+prerequisites: [fork-join-framework, java-memory-model-happens-before-volatile, atomic-variables, concurrent-collections, locks-reentrantlock-readwritelock-stampedlock, wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states, threads-and-runnable]
+status: complete
+estimated_minutes: 175
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="virtual-threads-project-loom">Virtual Threads (Project Loom)</h1>
+<p>A platform thread costs ~1 MB of stack reservation and ~50–100 µs to create (T01). A modern OS caps you at a few thousand concurrent threads. Modern servers handle hundreds of thousands of concurrent connections. The math has been broken for two decades: backend Java code can't have one thread per request — it must multiplex requests over a small pool of platform threads, hand-coding async pipelines via <code>CompletableFuture</code> (T07), reactive streams, and async APIs. <strong>Project Loom</strong> (JEP 444, JDK 21) reverses this. A <strong>virtual thread</strong> is a JVM-managed thread costing ~200–1000 bytes of heap — <em>thousands of times cheaper</em> than a platform thread — designed so the JDK can host <strong>millions</strong> of them concurrently. The slogan: <strong>"one thread per task" is cheap again</strong>, and <em>every blocking API call you know</em> (<code>Thread.sleep</code>, <code>Socket.read</code>, <code>Lock.lock</code>, <code>Object.wait</code>) unmounts the virtual thread from its carrier so the carrier is freed to run another.</p>
+<p>The depth-bar requirement isn't "use <code>Thread.ofVirtual().start(...)</code>." At the <strong>language</strong> layer, virtual threads are <em>just</em> <code>Thread</code> instances — <code>java.lang.Thread</code> returns one whose <code>isVirtual()</code> is <code>true</code>, all the existing <code>Thread</code>/<code>InterruptedException</code>/<code>InterruptedException</code> APIs apply unchanged — but with special memory and scheduling properties that the JVM enforces invisibly. At the <strong>mechanism</strong> layer, a virtual thread runs by <strong>mounting</strong> on a <em>carrier</em> (a real platform thread from a dedicated <code>ForkJoinPool</code>): it executes normal bytecode on the carrier's OS stack until it hits a blocking operation (<code>LockSupport.park</code>, <code>Socket.read</code>, etc.), at which point its stack frames are <em>frozen</em> onto the heap via <code>jdk.internal.vm.Continuation.yield</code>, the carrier is freed, and when the blocking event completes the virtual thread is <strong>resubmitted</strong> to the scheduler to be picked up by (possibly a different) carrier where its frames are unfrozen back onto an OS stack. At the <strong>state</strong> layer, internally a <code>VirtualThread</code> runs a ~19-state machine (<code>NEW</code>, <code>STARTED</code>, <code>RUNNING</code>, <code>PARKING</code>, <code>PARKED</code>, <code>PINNED</code>, <code>TIMED_PARKING</code>, <code>TIMED_PARKED</code>, <code>TIMED_PINNED</code>, <code>UNPARKED</code>, <code>YIELDING</code>, <code>YIELDED</code>, <code>BLOCKING</code>, <code>BLOCKED</code>, <code>WAITING</code>, <code>WAIT</code>, <code>TIMED_WAITING</code>, <code>TIMED_WAIT</code>, <code>TERMINATED</code>) collapsed to the six public <code>Thread.State</code> values from T02. At the <strong>failure-mode</strong> layer, <strong>pinning</strong> — when a virtual thread cannot unmount because of a native (JNI/FFM) stack frame or, <em>pre-JDK 24</em>, a <code>synchronized</code> block — holds its carrier hostage; the JDK 21–23 advice "use <code>ReentrantLock</code> instead of <code>synchronized</code> for hot blocking paths" came from this, and <strong>JEP 491 (JDK 24)</strong> fixed it by making <code>ObjectMonitor::enter</code> virtual-thread-aware. We will cover all four layers and finish with <strong>scoped values</strong> (JEP 446) and <strong>structured concurrency</strong> (JEP 462) — the Loom-era replacements for <code>ThreadLocal</code> and <code>CompletableFuture</code>-chains.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t13-fork-join-framework.html">Fork/Join framework</a> (L3/C01/T13) — the carrier pool <em>is</em> a <code>ForkJoinPool</code>; <a href="c01-t12-java-memory-model-happens-before-volatile.html">Java Memory Model</a> (L3/C01/T12) — JMM unchanged for VTs; <a href="c01-t08-locks-reentrantlock-readwritelock-stampedlock.html">Locks</a> (L3/C01/T08) — <code>LockSupport.park</code> is <em>the</em> unmount hook; <a href="c01-t04-wait-notify-notifyall.html">wait/notify</a> (L3/C01/T04) — pinning fix in JEP 491; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized</a> (L3/C01/T03) — <code>ObjectMonitor::enter</code> is now VT-aware (JDK 24+); <a href="c01-t02-thread-lifecycle-and-states.html">Thread lifecycle &amp; states</a> (L3/C01/T02) — <code>Thread.State</code> six-values collapsed from internal ~19; <a href="c01-t01-threads-and-runnable.html">Threads &amp; Runnable</a> (L3/C01/T01) — platform thread cost ladder this fixes.</p></div></div>
+<h2 id="the-problem-one-thread-per-task-was-too-expensive">The Problem — "One Thread Per Task" Was Too Expensive<a class="anchor" href="#the-problem-one-thread-per-task-was-too-expensive" aria-hidden="true">#</a></h2>
+<p>A server's natural shape is one logical task per concurrent request — handle, await DB, await partner API, respond. The natural code is <em>blocking</em>: <code>db.query(...)</code> returns the result; control flow is sequential and trivial to read. But a platform thread per request hits two walls:</p>
+<ol>
+<li><strong>Memory.</strong> ~1 MB stack per thread. 10,000 requests = ~10 GB of stack reservation. At 100,000, you're out of address space.</li>
+<li><strong>OS limit.</strong> Linux's default <code>nproc</code> cap is in the thousands per user; even with tuning, the kernel scheduler thrashes at high thread counts.</li>
+</ol>
+<p>The industry response since ~2010 was <em>asynchronous programming</em>: split the request into "before the await" and "after the await" callbacks; the OS thread runs many requests in interleaved fashion; the kernel's IO multiplexing (<code>epoll</code>, <code>kqueue</code>) wakes the right callback when data arrives. This works — Netty, Vert.x, Spring WebFlux, the whole reactive-streams ecosystem — but it <em>changes the programming model</em>. Sequential blocking code becomes a graph of CompletableFuture chains; exceptions become harder to reason about; debugging stack traces lose the conceptual call hierarchy.</p>
+<p>Virtual threads make the cost of "one thread per task" <em>not matter</em>. The runtime maps <strong>many virtual threads</strong> onto <strong>a small number of platform threads</strong> (the carriers), but to the application code, each virtual thread <em>is</em> a thread — same API, same semantics, same blocking calls. You write sequential blocking code; the runtime makes it scale.</p>
+<div class="mermaid">flowchart LR
+  Old["Old model: one OS thread per task<br/>OOM at 10K threads"]
+  Async["Async pipelines (callbacks, CF)<br/>scales, but model is convoluted"]
+  VT["Virtual threads (JDK 21+)<br/>blocking model + cheap threads"]
+  Old --> Async
+  Async --> VT
+  Note["VTs reverse the trend:<br/>the natural blocking model becomes the scalable one."]
+</div>
+<h2 id="what-a-virtual-thread-is">What a Virtual Thread Is<a class="anchor" href="#what-a-virtual-thread-is" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Thread vt = Thread.ofVirtual().start(() -&gt; {
+    System.out.println(Thread.currentThread().isVirtual());   // true
+    Thread.sleep(1000);                                          // unmounts; carrier freed
+    System.out.println(&quot;done&quot;);
+});
+vt.join();
+</code></pre></div>
+<p>A virtual thread is:</p>
+<ul>
+<li><strong>A <code>Thread</code> instance.</strong> <code>Thread.ofVirtual().start(...)</code> returns a <code>java.lang.Thread</code> (specifically a <code>VirtualThread</code> subclass). All Thread APIs work.</li>
+<li><strong>JVM-managed.</strong> No OS thread per VT. The JVM schedules them onto a small pool of <em>carrier</em> platform threads.</li>
+<li><strong>Cheap.</strong> ~200–1000 bytes of heap for the VT object + continuation + small initial stack. 1 million VTs ≈ 1 GB of heap.</li>
+<li><strong>Always daemon.</strong> Cannot keep the JVM alive (the <code>setDaemon(false)</code> setter is a no-op).</li>
+<li><strong>Always normal priority.</strong> <code>setPriority(...)</code> is a no-op.</li>
+<li><strong>Identified by <code>isVirtual()</code>.</strong> <code>Thread.currentThread().isVirtual()</code> distinguishes VTs from platform threads.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Thread.currentThread().isVirtual();              // false on a regular thread; true inside a VT
+</code></pre></div>
+<h2 id="the-mount-unmount-lifecycle">The Mount / Unmount Lifecycle<a class="anchor" href="#the-mount-unmount-lifecycle" aria-hidden="true">#</a></h2>
+<p>The core mechanism. A virtual thread "runs" by <strong>mounting</strong> on a carrier platform thread:</p>
+<div class="mermaid">sequenceDiagram
+  participant Sched as VT scheduler<br/>(carrier pool)
+  participant Carrier as Carrier (platform thread)
+  participant VT as Virtual thread
+  participant Heap as Heap (continuation)
+
+  Sched->>Carrier: pick VT from scheduler queue
+  Carrier->>VT: Continuation.run() — unfreeze frames onto carrier's stack
+  Note over Carrier,VT: VT now MOUNTED — runs as if normal thread
+  VT->>VT: executes bytecode on carrier
+  VT->>VT: hits a blocking call (e.g., Socket.read, LockSupport.park)
+  VT->>Heap: Continuation.yield() — freeze frames to heap
+  Carrier->>Sched: carrier returns to pool — picks next VT
+  Note over Heap: VT now UNMOUNTED — frames on heap, no OS thread held
+  Note over Sched: meanwhile: blocking event completes (data arrives, lock released)
+  Sched->>Sched: VT resubmitted to scheduler queue
+  Sched->>Carrier: pick the VT (possibly different carrier this time)
+  Carrier->>VT: Continuation.run() again — unfreeze frames
+  Note over Carrier,VT: VT now REMOUNTED — continues from yield point
+</div>
+<p>Three things to internalize:</p>
+<ol>
+<li><strong>The VT's stack is sometimes on the OS stack (mounted), sometimes on the heap (unmounted).</strong> Move between them is the freeze/unfreeze.</li>
+<li><strong>The carrier may change across mounts.</strong> The VT doesn't have affinity to a specific carrier. Don't rely on <code>Thread.currentThread()</code> identity remaining stable across blocks (it does at the <em>Thread</em> level — the VT identity is stable — but the <em>carrier</em> identity is not).</li>
+<li><strong>Unmounting is what makes scaling possible.</strong> A million parked VTs hold <em>zero</em> OS threads; the carrier pool stays small.</li>
+</ol>
+<h2 id="continuations-the-underlying-mechanism">Continuations — the Underlying Mechanism<a class="anchor" href="#continuations-the-underlying-mechanism" aria-hidden="true">#</a></h2>
+<p>The <code>jdk.internal.vm.Continuation</code> class is the <em>actual</em> mechanism. A <code>Continuation</code> captures the call-stack state at a <code>yield</code> point and resumes it on the next <code>run</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// pseudo-API — internal, JEP 444 specific
+class Continuation {
+    Continuation(ContinuationScope scope, Runnable body) { ... }
+    void run();                          // start or resume — pushes frames onto current OS stack
+    static boolean yield(ContinuationScope scope);   // suspend — freeze frames to heap
+}
+</code></pre></div>
+<p>The VT internals:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class VirtualThread {
+    private final Continuation cont;
+    private volatile int state;             // ~19-state machine
+    private Thread carrierThread;            // the platform thread currently running this VT (or null)
+
+    void run() {
+        // called by the carrier
+        cont.run();                          // runs until the body completes or yields
+        if (cont.isDone()) {
+            state = TERMINATED;
+        } else {
+            // yielded — already enqueued elsewhere via park()
+        }
+    }
+}
+</code></pre></div>
+<p>When the VT's code calls <code>LockSupport.park</code>, the VM detects we're inside a Continuation and <code>yield</code>s instead of parking the OS thread:</p>
+<ul>
+<li><code>LockSupport.park(blocker)</code> → <code>VirtualThread.park()</code> → <code>Continuation.yield(VT_SCOPE)</code> → frames frozen → carrier returns to scheduler.</li>
+</ul>
+<p>When the parker wakes (via <code>LockSupport.unpark(vt)</code>), the VT is enqueued back into the scheduler. A carrier picks it up and calls <code>cont.run()</code>; the frames are unfrozen and execution continues just past the yield point.</p>
+<p>The freezing/unfreezing is implemented by <strong>stack walking</strong>: the JVM walks the carrier's OS stack from the VT's entry point, copying each frame's state (locals, operand stack, return address) into heap-allocated frame objects. Unfreezing reverses: rebuild OS-stack frames from heap frames.</p>
+<p>The cost: <strong>~100-500 ns per mount/unmount</strong> (depending on stack depth). The frozen stack is typically a few hundred bytes to a few kilobytes. Compare with the ~1 µs futex park + the 1 MB platform-thread stack — the VT is dramatically cheaper.</p>
+<div class="mermaid">flowchart TB
+  Mount["VT mounted on carrier"]
+  Code["VT bytecode runs on carrier's OS stack"]
+  Hit["blocking call (LockSupport.park / Socket.read)"]
+  Yield["Continuation.yield — JVM walks stack, copies frames to heap"]
+  Heap["frames now on heap (~hundreds of bytes)"]
+  Carrier["carrier returns — picks next VT or parks itself"]
+  Wait["..waiting for the unblock event..."]
+  Wake["unpark / I/O ready → VT resubmitted to scheduler"]
+  Pick["scheduler hands VT to a carrier"]
+  Unfreeze["Continuation.run — frames rebuilt on carrier's OS stack"]
+  Continue["VT resumes from yield point"]
+  Mount --> Code --> Hit --> Yield --> Heap --> Carrier --> Wait --> Wake --> Pick --> Unfreeze --> Continue
+</div>
+<h2 id="the-carrier-pool">The Carrier Pool<a class="anchor" href="#the-carrier-pool" aria-hidden="true">#</a></h2>
+<p>The default scheduler for virtual threads is a dedicated <strong><code>ForkJoinPool</code></strong> sized to <code>Runtime.availableProcessors()</code>. Configurable via:</p>
+<ul>
+<li><code>-Djdk.virtualThreadScheduler.parallelism=N</code> — default carrier count.</li>
+<li><code>-Djdk.virtualThreadScheduler.maxPoolSize=N</code> — upper bound (default 256).</li>
+<li><code>-Djdk.virtualThreadScheduler.minRunnable=N</code> — min runnable carriers.</li>
+</ul>
+<p>This carrier pool is <em>separate</em> from <code>ForkJoinPool.commonPool()</code>. The two coexist:</p>
+<ul>
+<li><strong>Common pool</strong>: serves <code>Stream.parallel</code>, <code>CompletableFuture.*Async</code>, etc.</li>
+<li><strong>Virtual-thread carrier pool</strong>: serves all virtual threads.</li>
+</ul>
+<div class="mermaid">flowchart TB
+  JVM["JVM"]
+  Common["ForkJoinPool.commonPool()<br/>(cores-1 workers)<br/>for parallelStream, CF Async"]
+  Carrier["VT carrier pool<br/>(ForkJoinPool, sized to cores)<br/>runs millions of virtual threads"]
+  VT1["VirtualThread #1"]
+  VT2["VirtualThread #2"]
+  VTn["VirtualThread #n"]
+  JVM --> Common
+  JVM --> Carrier
+  VT1 -. mounts on .-> Carrier
+  VT2 -. mounts on .-> Carrier
+  VTn -. mounts on .-> Carrier
+</div>
+<p>A given carrier runs many VTs over its lifetime — mount one, it parks, mount another, it parks, etc. The carrier itself is a regular <code>Thread</code> named like <code>ForkJoinPool-2-worker-N</code> and visible in thread dumps.</p>
+<h2 id="the-state-machine">The State Machine<a class="anchor" href="#the-state-machine" aria-hidden="true">#</a></h2>
+<p>T02 introduced the 6 public <code>Thread.State</code> values. A <code>VirtualThread</code> runs a richer ~19-state internal machine, collapsed to those six for <code>getState()</code>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Internal VT state</th>
+<th>Public <code>Thread.State</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NEW</code>, <code>STARTED</code></td>
+<td><code>RUNNABLE</code> (until mounted)</td>
+</tr>
+<tr>
+<td><code>RUNNING</code> (mounted), <code>UNPARKED</code>, transitions</td>
+<td><code>RUNNABLE</code></td>
+</tr>
+<tr>
+<td><code>YIELDING</code>, <code>YIELDED</code></td>
+<td><code>RUNNABLE</code></td>
+</tr>
+<tr>
+<td><code>PARKING</code>, <code>PARKED</code></td>
+<td><code>WAITING</code></td>
+</tr>
+<tr>
+<td><code>TIMED_PARKING</code>, <code>TIMED_PARKED</code></td>
+<td><code>TIMED_WAITING</code></td>
+</tr>
+<tr>
+<td><code>PINNED</code>, <code>TIMED_PINNED</code></td>
+<td><code>WAITING</code> / <code>TIMED_WAITING</code></td>
+</tr>
+<tr>
+<td><code>BLOCKING</code>, <code>BLOCKED</code></td>
+<td><code>BLOCKED</code></td>
+</tr>
+<tr>
+<td><code>WAIT</code>, <code>TIMED_WAIT</code></td>
+<td><code>WAITING</code> / <code>TIMED_WAITING</code></td>
+</tr>
+<tr>
+<td><code>TERMINATED</code></td>
+<td><code>TERMINATED</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The extra internal states are for <em>scheduler optimization</em>: knowing that a VT is "about to park" vs "fully parked" vs "pinned" lets the runtime decide whether to compensate, whether to unpark prematurely, whether to break the carrier free.</p>
+<p>The public API only exposes the 6 values to keep existing code working unchanged — a thread dump on a JVM full of VTs reads the same as one on platform threads.</p>
+<h2 id="pinning-when-a-virtual-thread-cannot-unmount">Pinning — When a Virtual Thread Cannot Unmount<a class="anchor" href="#pinning-when-a-virtual-thread-cannot-unmount" aria-hidden="true">#</a></h2>
+<p>A VT is <strong>pinned</strong> when the JVM cannot safely freeze its stack. The carrier is then held hostage for the duration of the block — defeating the whole point of virtual threads.</p>
+<p>The pinning conditions:</p>
+<ol>
+<li>
+<p><strong>Native (JNI) frames on the stack at the moment of park.</strong> The JVM can't move native C/C++ frames to the heap — they're tied to the OS thread's stack. If a VT calls into JNI and the JNI code itself blocks (or makes a callback to Java that blocks), the carrier is pinned for the duration.</p>
+</li>
+<li>
+<p><strong>FFM (Foreign Function &amp; Memory) downcalls (JEP 454).</strong> Same problem — FFM downcalls go through native code; if blocking happens with one on the stack, pin.</p>
+</li>
+<li>
+<p><strong>Class initialization (<code>&lt;clinit&gt;</code>).</strong> The JVM holds an initialization lock during the static initializer; a VT mid-static-init pins.</p>
+</li>
+<li>
+<p><strong><code>synchronized</code> block — pre-JEP-491 (JDK 21–23).</strong> The pre-JEP-491 <code>ObjectMonitor::enter</code> parked the <em>carrier</em> on contention rather than the VT, holding the carrier captive. This was <em>the</em> dominant pinning source pre-JDK 24 and the reason the recommendation was "swap synchronized for ReentrantLock on hot virtual-thread blocking paths."</p>
+</li>
+</ol>
+<h3 id="jep-491-jdk-24-the-synchronized-pinning-fix">JEP 491 (JDK 24) — the synchronized pinning fix<a class="anchor" href="#jep-491-jdk-24-the-synchronized-pinning-fix" aria-hidden="true">#</a></h3>
+<p>JEP 491 reworked the HotSpot monitor implementation so a VT blocked in <code>synchronized</code> <em>unmounts</em> cleanly:</p>
+<ul>
+<li><code>ObjectMonitor::enter</code> detects a virtual-thread caller.</li>
+<li>Instead of parking the carrier directly, it freezes the VT's continuation onto the heap (same path as <code>LockSupport.park</code>).</li>
+<li>The carrier is released to run other VTs.</li>
+<li>On lock release, the waiting VT is resubmitted to the scheduler.</li>
+<li>The fix extends to <code>Object.wait</code> (T04) similarly.</li>
+</ul>
+<p>Post-JDK-24, the <em>remaining</em> pinning conditions are:</p>
+<ul>
+<li><strong>Native/JNI frames</strong> (genuine ABI limitation).</li>
+<li><strong>FFM downcalls</strong> (same).</li>
+<li><strong>Class init</strong> (initialization lock — a JVM internal).</li>
+</ul>
+<p>These are all <em>rare</em> in normal application code. Most user code is now pinning-free on JDK 24+.</p>
+<div class="mermaid">flowchart TB
+  PreFix["JDK 21–23 pinning sources"]
+  PreFix --> P1["synchronized (on contention or wait)"]
+  PreFix --> P2["Object.wait inside synchronized"]
+  PreFix --> P3["JNI / FFM downcall"]
+  PreFix --> P4["class init"]
+  PostFix["JDK 24+ (JEP 491) pinning sources"]
+  PostFix --> R1["JNI / FFM downcall (genuine)"]
+  PostFix --> R2["class init (rare)"]
+  Note["JEP 491 removed the dominant cause —<br/>synchronized + Object.wait now unmount cleanly."]
+</div>
+<h3 id="observing-pinning">Observing pinning<a class="anchor" href="#observing-pinning" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>JDK 21–23</strong>: <code>-Djdk.tracePinnedThreads=full</code> (or <code>short</code>) — JVM flag that logged every pin event with a stack trace.</li>
+<li><strong>JDK 24+</strong>: The flag was <em>removed</em>. Use <strong>JFR</strong>: enable <code>jdk.VirtualThreadPinned</code> (default-on in profile config). Each pin event records the reason and stack.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.start duration=60s settings=profile
+# ... after the recording, open in JMC ...
+# look for jdk.VirtualThreadPinned events
+</code></pre></div>
+<p>A few pinned events per second is acceptable. Hundreds or thousands per second indicate a genuine code-shape problem (native frames in a hot blocking path, or pre-JDK-24 synchronized in a contended loop).</p>
+<h2 id="creating-virtual-threads-the-full-api">Creating Virtual Threads — the Full API<a class="anchor" href="#creating-virtual-threads-the-full-api" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// 1. Builder API
+Thread vt = Thread.ofVirtual()
+    .name(&quot;my-vt&quot;)
+    .uncaughtExceptionHandler((t, e) -&gt; log.error(&quot;vt failed&quot;, e))
+    .start(() -&gt; doWork());
+
+// 2. Unstarted (configure, then start)
+Thread vt = Thread.ofVirtual().unstarted(() -&gt; doWork());
+// ... configure ...
+vt.start();
+
+// 3. Convenience shortcut
+Thread vt = Thread.startVirtualThread(() -&gt; doWork());
+
+// 4. ExecutorService — every submit creates a fresh VT
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (var req : requests) executor.submit(() -&gt; handle(req));
+}
+
+// 5. VirtualThread factory for legacy code
+ThreadFactory factory = Thread.ofVirtual().factory();
+new ThreadPoolExecutor(0, Integer.MAX_VALUE, ..., factory);   // ⚠ DON'T pool VTs (next section)
+</code></pre></div>
+<p><strong>The recommended modern shape</strong>: <code>Executors.newVirtualThreadPerTaskExecutor()</code>. Every <code>submit</code>/<code>execute</code> spawns a fresh virtual thread; no pooling, no queueing, no rejection — every task gets its own thread. The underlying carrier pool handles the actual execution.</p>
+<h2 id="dont-pool-virtual-threads">"Don't Pool Virtual Threads"<a class="anchor" href="#dont-pool-virtual-threads" aria-hidden="true">#</a></h2>
+<p>The single most important guideline:</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Virtual threads are throw-away. Don't pool them.</strong> They cost ~200–1000 bytes; creating one is essentially free; pooling them is a performance <em>anti-optimization</em> (you'd be adding queueing latency and contention for no benefit).</p><p>For <strong>concurrency limiting</strong> (limiting downstream calls), use a <strong><code>Semaphore</code></strong> (T09) around the work, not a thread-pool size. The semaphore allows N concurrent tasks; the rest park on the semaphore (which itself unmounts cleanly).</p></div></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ DON'T:
+ExecutorService pool = Executors.newFixedThreadPool(50, Thread.ofVirtual().factory());
+
+// ✓ DO:
+ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
+Semaphore dbLimit = new Semaphore(20);
+
+pool.submit(() -&gt; {
+    dbLimit.acquire();
+    try { db.query(...); } finally { dbLimit.release(); }
+});
+</code></pre></div>
+<p>The semaphore bounds <em>downstream concurrency</em> (database connections, partner API rate limits). Virtual threads handle the <em>upstream concurrency</em> (number of in-flight tasks). Two orthogonal bounds, decoupled.</p>
+<h2 id="threadlocal-in-the-virtual-thread-era">ThreadLocal in the Virtual-Thread Era<a class="anchor" href="#threadlocal-in-the-virtual-thread-era" aria-hidden="true">#</a></h2>
+<p><code>ThreadLocal</code> works with virtual threads — but a million virtual threads with <code>ThreadLocal</code> entries is a million entries in the thread-local map. Plus, the "carrier-affinity" expectation many ThreadLocal users have is broken (a VT may resume on a different carrier).</p>
+<p>The Loom-era replacement: <strong><code>ScopedValue</code></strong> (JEP 446, preview JDK 21–24, expected to standardize):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// declare a scoped value
+static final ScopedValue&lt;User&gt; CURRENT_USER = ScopedValue.newInstance();
+
+// bind for the duration of a scope
+ScopedValue.where(CURRENT_USER, alice).run(() -&gt; {
+    // inside this scope, CURRENT_USER.get() returns alice
+    handle(req);
+});
+
+// inside handle:
+User u = CURRENT_USER.get();
+</code></pre></div>
+<p>Three differences from <code>ThreadLocal</code>:</p>
+<ol>
+<li><strong>Lexically scoped</strong>: bound only for the duration of the <code>run</code>/<code>call</code> lambda; auto-cleared when the lambda returns.</li>
+<li><strong>Immutable</strong>: cannot be set after binding; cannot be modified.</li>
+<li><strong>Cheaper</strong>: stored in a per-thread (or per-VT) linked list of scopes, not a hash map.</li>
+</ol>
+<p>Use ScopedValue for request context (current user, trace ID, MDC) where ThreadLocal would have leaked or required manual cleanup. ThreadLocal still works for backward compatibility.</p>
+<h2 id="structured-concurrency-preview-jep-462">Structured Concurrency Preview — JEP 462<a class="anchor" href="#structured-concurrency-preview-jep-462" aria-hidden="true">#</a></h2>
+<p>T15 covers this fully. The headline:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Supplier&lt;User&gt;       userF  = scope.fork(() -&gt; fetchUser(id));
+    Supplier&lt;List&lt;Order&gt;&gt; ordF  = scope.fork(() -&gt; fetchOrders(id));
+    scope.join();                 // wait for both — any failure cancels the other
+    scope.throwIfFailed();        // propagate the exception
+    return render(userF.get(), ordF.get());
+}
+</code></pre></div>
+<p>The try-with-resources scope:</p>
+<ul>
+<li>Forks subtasks (each a new virtual thread).</li>
+<li><code>join()</code> waits for all.</li>
+<li>If any fails, <code>ShutdownOnFailure</code> cancels the rest.</li>
+<li><code>close()</code> (auto via try-with-resources) cancels any still-running tasks.</li>
+</ul>
+<p>This is the <em>correct</em> way to fan out + join with virtual threads. It replaces <code>CompletableFuture.allOf</code> chains with lexical scope + standard exception propagation. T15 has the full mechanics.</p>
+<h2 id="performance-numbers">Performance Numbers<a class="anchor" href="#performance-numbers" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Op</th>
+<th>Approximate cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Virtual thread creation</td>
+<td>~1 µs (heap allocation + scheduler enqueue)</td>
+</tr>
+<tr>
+<td>Mount (continuation.run)</td>
+<td>~100-300 ns + frame unfreeze</td>
+</tr>
+<tr>
+<td>Unmount (continuation.yield)</td>
+<td>~100-500 ns + frame freeze</td>
+</tr>
+<tr>
+<td><code>Thread.sleep</code> (1 ms wake)</td>
+<td>~1 µs + ~1 ms wall</td>
+</tr>
+<tr>
+<td><code>Socket.read</code> (server response)</td>
+<td>latency-bound; CPU cost ~0 (parked the whole time)</td>
+</tr>
+<tr>
+<td>Memory per parked VT</td>
+<td>~200-1000 bytes (heap continuation)</td>
+</tr>
+<tr>
+<td>Memory per parked platform thread</td>
+<td>~1 MB (OS stack reservation)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The headline: <strong>10,000 virtual threads cost ~10 MB; 10,000 platform threads cost ~10 GB.</strong> Three orders of magnitude.</p>
+<h2 id="comparison-with-other-languages">Comparison with Other Languages<a class="anchor" href="#comparison-with-other-languages" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Model</th>
+<th>Mount/unmount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java VT</td>
+<td>M:N (virtual on carrier)</td>
+<td>yes — Continuation freeze/unfreeze</td>
+</tr>
+<tr>
+<td>Go (goroutine)</td>
+<td>M:N (goroutine on M=kernel-thread)</td>
+<td>yes — runtime manages</td>
+</tr>
+<tr>
+<td>Kotlin coroutine</td>
+<td>suspend functions (language-level)</td>
+<td>yes — compiled state machine</td>
+</tr>
+<tr>
+<td>Erlang process</td>
+<td>M:N (BEAM-managed)</td>
+<td>yes — own scheduler</td>
+</tr>
+<tr>
+<td>Python asyncio</td>
+<td>single-thread event loop (no thread switch)</td>
+<td>no — await is cooperative</td>
+</tr>
+<tr>
+<td>Rust async/await</td>
+<td>event loop or thread pool</td>
+<td>no — futures are state machines</td>
+</tr>
+</tbody>
+</table></div>
+<p>Java virtual threads are most similar to Go goroutines — same M:N model, same fundamental mount/unmount mechanism. The key difference: Java VTs are <em>transparent</em> — existing thread-based code "just works"; Go goroutines required a language redesign.</p>
+<h2 id="adoption-story">Adoption Story<a class="anchor" href="#adoption-story" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>JDK</th>
+<th>Status</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-21</td>
+<td>not available</td>
+<td>use platform threads + async pipelines (CF, reactive)</td>
+</tr>
+<tr>
+<td>21 (initial release)</td>
+<td>preview → final</td>
+<td>use VTs for IO-bound work; audit <code>synchronized</code> for pinning</td>
+</tr>
+<tr>
+<td>22</td>
+<td>unchanged</td>
+<td>same</td>
+</tr>
+<tr>
+<td>23</td>
+<td>unchanged</td>
+<td>same</td>
+</tr>
+<tr>
+<td>24 (JEP 491)</td>
+<td><code>synchronized</code> pinning fixed</td>
+<td><strong>all blocking code works pinning-free except native/FFM</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The migration in 2026:</p>
+<ul>
+<li><strong>Replace <code>Executors.newFixedThreadPool(N)</code> with <code>Executors.newVirtualThreadPerTaskExecutor()</code></strong> for IO-bound workloads.</li>
+<li><strong>Remove artificial concurrency caps</strong> that existed only because platform threads were expensive.</li>
+<li><strong>Audit ThreadLocal</strong> for memory growth at high VT counts; migrate to ScopedValue where appropriate.</li>
+<li><strong>Profile for pinning</strong> on JDK 24+ via JFR; ensure rate is bounded.</li>
+<li><strong>Adopt StructuredTaskScope</strong> for fan-out patterns instead of CompletableFuture chains.</li>
+</ul>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="pooling-virtual-threads">Pooling virtual threads<a class="anchor" href="#pooling-virtual-threads" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Executors.newFixedThreadPool(100, Thread.ofVirtual().factory());   // ✗ pointless
+</code></pre></div>
+<p>VTs aren't expensive to create. Use <code>newVirtualThreadPerTaskExecutor()</code>. For concurrency limiting, use a <code>Semaphore</code> (T09).</p>
+<h3 id="pinning-blindness-on-hot-blocking-paths">Pinning blindness on hot blocking paths<a class="anchor" href="#pinning-blindness-on-hot-blocking-paths" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (lock) {
+    httpClient.get(url);     // ✗ pre-JDK-24: pins carrier through HTTP latency
+}
+</code></pre></div>
+<p>Pre-JDK 24: the synchronized pinned the carrier. JDK 24+: this code is fine. If you're on JDK 21–23, refactor to ReentrantLock or upgrade to JDK 24.</p>
+<h3 id="threadlocal-per-vt-growth"><code>ThreadLocal</code> per-VT growth<a class="anchor" href="#threadlocal-per-vt-growth" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static final ThreadLocal&lt;MyContext&gt; CTX = new ThreadLocal&lt;&gt;();
+// in each of 1 million VTs:
+CTX.set(new MyContext(...));   // ✗ 1 million entries in the thread-local map
+</code></pre></div>
+<p>Use <code>ScopedValue</code> (JEP 446) for request context; auto-cleared when scope ends.</p>
+<h3 id="setting-daemon-priority">Setting daemon / priority<a class="anchor" href="#setting-daemon-priority" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Thread.ofVirtual().start(...).setDaemon(false);   // ✗ no-op; VTs are always daemon
+Thread.ofVirtual().start(...).setPriority(MAX);    // ✗ no-op
+</code></pre></div>
+<p>These setters silently do nothing on VTs.</p>
+<h3 id="expecting-a-specific-carrier">Expecting a specific carrier<a class="anchor" href="#expecting-a-specific-carrier" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Object obj = ...;
+// thread-local cache: relies on &quot;same thread&quot; identity
+// but a VT may resume on a different carrier
+</code></pre></div>
+<p>The VT identity (<code>Thread.currentThread()</code>) is stable. The <em>carrier</em> identity is not — don't rely on it.</p>
+<h3 id="heavy-cpu-bound-work-in-virtual-threads">Heavy CPU-bound work in virtual threads<a class="anchor" href="#heavy-cpu-bound-work-in-virtual-threads" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+    pool.submit(() -&gt; heavyMatrixMultiply());      // ✗ no benefit; CPU work doesn't unmount
+}
+</code></pre></div>
+<p>Virtual threads excel at blocking I/O. For CPU-bound work, use platform threads or Fork/Join (T13). The carrier pool will be saturated and you'll get no advantage.</p>
+<h3 id="mixing-vt-with-synchronized-on-jdk-21-23-hot-paths">Mixing VT with <code>synchronized</code> on JDK 21-23 hot paths<a class="anchor" href="#mixing-vt-with-synchronized-on-jdk-21-23-hot-paths" aria-hidden="true">#</a></h3>
+<p>The pinning starves your carrier pool. Either upgrade to JDK 24 or use ReentrantLock for hot paths.</p>
+<h3 id="threadsleep0-to-yield-vt-meaningless"><code>Thread.sleep(0)</code> to "yield" — VT-meaningless<a class="anchor" href="#threadsleep0-to-yield-vt-meaningless" aria-hidden="true">#</a></h3>
+<p><code>Thread.sleep(0)</code> yields the platform-thread scheduler — for a VT, it's mostly a no-op. Use <code>Thread.yield()</code> if you genuinely want to yield (also rare).</p>
+<h3 id="class-init-in-hot-paths">Class init in hot paths<a class="anchor" href="#class-init-in-hot-paths" aria-hidden="true">#</a></h3>
+<p>A class with an expensive static initializer is loaded; thousands of VTs hit it simultaneously; all pin on the init lock for the duration. Initialize warm classes at startup (<code>Class.forName(...)</code>) before high-traffic code runs.</p>
+<h3 id="spinning-waits-in-vts">Spinning waits in VTs<a class="anchor" href="#spinning-waits-in-vts" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">while (!ready) { /* tight loop */ }     // ✗ doesn't yield; carrier stuck
+</code></pre></div>
+<p>VTs only unmount at blocking calls. A tight CPU loop pins the carrier just like a platform thread. Use <code>Thread.onSpinWait()</code> for <em>very brief</em> spins (microseconds); otherwise use a proper blocking primitive.</p>
+<h2 id="observability">Observability<a class="anchor" href="#observability" aria-hidden="true">#</a></h2>
+<h3 id="thread-dumps">Thread dumps<a class="anchor" href="#thread-dumps" aria-hidden="true">#</a></h3>
+<p><code>jstack</code> and <code>jcmd Thread.print</code> work for platform threads. For VTs, the modern command is:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; Thread.dump_to_file -format=json /tmp/dump.json
+</code></pre></div>
+<p>This produces a <em>grouped</em> dump — VTs are organized by their <code>StructuredTaskScope</code> parent (if any), and the JSON format scales to millions of threads. Plain <code>jstack</code> would print one entry per VT and be unreadable.</p>
+<p>The dump shows each VT's state, stack, and (if structured-concurrency) scope membership. Use this to find pinning, runaway VTs, or scope hierarchy bugs.</p>
+<h3 id="jfr-events">JFR events<a class="anchor" href="#jfr-events" aria-hidden="true">#</a></h3>
+<ul>
+<li><code>jdk.VirtualThreadStart</code>, <code>jdk.VirtualThreadEnd</code> — lifecycle.</li>
+<li><code>jdk.VirtualThreadPinned</code> — pin events, with the reason and stack.</li>
+<li><code>jdk.VirtualThreadSubmitFailed</code> — scheduler back-pressure.</li>
+</ul>
+<p>Aggregate over a session to see pinning hotspots, throughput, and lifecycle patterns.</p>
+<h3 id="monitoring-carrier-saturation">Monitoring carrier saturation<a class="anchor" href="#monitoring-carrier-saturation" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ForkJoinPool fjp = (ForkJoinPool) /* the carrier pool — via reflection */;
+int active = fjp.getActiveThreadCount();
+int parallelism = fjp.getParallelism();
+</code></pre></div>
+<p>If active consistently equals parallelism, carriers are saturated — investigate pinning or true CPU saturation. Healthy VT-heavy IO-bound code shows low active count (most carriers idle, waiting for VTs to unpark).</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Walk me through what happens when a virtual thread calls <code>Thread.sleep(1000)</code>." — Senior answer:</p><ol>
+<li><strong><code>Thread.sleep</code> is intercepted.</strong> The JVM detects we're inside a virtual thread (the calling Thread is a <code>VirtualThread</code>).</li>
+<li><strong>Continuation.yield.</strong> The VM walks the carrier's OS stack from the VT's entry frame; each frame's state (locals, operand stack) is copied into a heap-allocated frame object.</li>
+<li><strong>Carrier released.</strong> The carrier's <code>runWorker</code> loop continues, picking the next runnable VT from the scheduler queue.</li>
+<li><strong>VT is enqueued for delayed wake.</strong> A timer is scheduled to mark the VT runnable after 1000 ms.</li>
+<li><strong>Wake.</strong> The timer fires; the VT is resubmitted to the scheduler.</li>
+<li><strong>Remount.</strong> A carrier (possibly different from the original) picks up the VT, calls <code>Continuation.run</code>, the heap frames are walked and rebuilt on the carrier's OS stack.</li>
+<li><strong>Resume.</strong> Execution continues just past the <code>Thread.sleep</code> call.</li>
+</ol>
+<p>[!INTERVIEW]
+Short Q&amp;A:</p>
+<ol>
+<li><strong>What's a virtual thread?</strong> JVM-managed thread costing ~200–1000 bytes (vs ~1 MB for a platform thread). Implemented via continuations that can be frozen onto the heap and resumed on any carrier.</li>
+<li><strong>What's the carrier pool?</strong> A <code>ForkJoinPool</code> sized to <code>Runtime.availableProcessors()</code> that runs virtual threads. Separate from <code>ForkJoinPool.commonPool()</code>.</li>
+<li><strong>What's mount/unmount?</strong> Mount: VT runs on a carrier's OS stack via Continuation.run. Unmount: VT's frames are frozen to the heap via Continuation.yield; carrier is freed.</li>
+<li><strong>What's pinning?</strong> A VT that cannot unmount, holding its carrier hostage. Causes: JNI/FFM frames, pre-JDK-24 synchronized, class init.</li>
+<li><strong>What did JEP 491 (JDK 24) fix?</strong> <code>ObjectMonitor::enter</code> is now VT-aware — <code>synchronized</code> blocked VTs unmount cleanly. Same for <code>Object.wait</code>.</li>
+<li><strong>How do you create a virtual thread?</strong> <code>Thread.ofVirtual().start(r)</code>, <code>Thread.startVirtualThread(r)</code>, or <code>Executors.newVirtualThreadPerTaskExecutor().submit(r)</code>.</li>
+<li><strong>Why "don't pool virtual threads"?</strong> They're throw-away (~1 µs to create). Pooling adds latency and contention for no benefit. For concurrency limits, use a Semaphore.</li>
+<li><strong>What's <code>ScopedValue</code>?</strong> Lexically-scoped immutable per-thread value; the Loom-era replacement for ThreadLocal that's cheaper and auto-cleared. JEP 446.</li>
+<li><strong>What's <code>StructuredTaskScope</code>?</strong> Fork-and-join scope for virtual threads; ShutdownOnFailure cancels remaining on first failure. JEP 462. The structured-concurrency way to do "fan out + join."</li>
+<li><strong>How do VT thread dumps differ?</strong> <code>jcmd ... Thread.dump_to_file -format=json</code> produces grouped JSON dumps that scale to millions of VTs. Plain <code>jstack</code> would be unreadable.</li>
+<li><strong>How is pinning observed?</strong> Pre-JDK-24: <code>-Djdk.tracePinnedThreads</code>. JDK 24+: JFR <code>jdk.VirtualThreadPinned</code> event.</li>
+<li><strong>VT vs CPU-bound work?</strong> Don't use VTs for CPU-bound — no unmount benefit, just overhead. Use platform threads or Fork/Join.</li>
+<li><strong>VT vs goroutine?</strong> Same M:N model, same continuation mechanism, different developer surface. Java's VT API is transparent (existing code "just works"); Go required a language redesign.</li>
+<li><strong>What stays the same with VTs?</strong> JMM, happens-before, synchronization primitives, blocking API semantics. Existing concurrent code works correctly.</li>
+<li><strong>VT in 2026 — when to migrate?</strong> IO-bound workloads on JDK 21+: replace fixed pools with <code>newVirtualThreadPerTaskExecutor()</code>. JDK 24+: no more synchronized-pinning concerns; almost any blocking code is VT-friendly.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Spawn a million VTs.</strong> Use <code>Executors.newVirtualThreadPerTaskExecutor()</code> to spawn 1M VTs, each sleeping 1 s. Measure peak memory; confirm ~1-2 GB heap. Repeat with 1M platform threads; observe OOM.</li>
+<li><strong>Carrier saturation.</strong> Spin a VT in a tight CPU loop. Confirm one carrier is pinned at 100% CPU. Spawn carriers count + 1 such VTs; observe extra VTs never get to run.</li>
+<li><strong>Mount/unmount latency.</strong> Benchmark <code>Thread.sleep(1)</code> from 100 platform threads vs 100 VTs. Measure mount/unmount overhead in the VT case.</li>
+<li><strong>Pinning observation (JDK 21–23).</strong> Run with <code>-Djdk.tracePinnedThreads=full</code>. Have a VT enter a <code>synchronized</code> block and call <code>Thread.sleep(100)</code>. Observe the pin event with stack.</li>
+<li><strong>JEP 491 verification (JDK 24+).</strong> Same scenario as (4); confirm no pin event. Add a native (JNI) call inside the synchronized block; observe pin re-appears.</li>
+<li><strong><code>Semaphore</code> for concurrency limiting.</strong> With 10,000 VTs, gate them through a <code>Semaphore(50)</code> around a "DB call" sleep. Observe at most 50 carriers' VTs in the "DB call" at any moment.</li>
+<li><strong><code>ScopedValue</code> vs <code>ThreadLocal</code>.</strong> Build the same per-request context with both. Run 1M VTs; measure heap. Confirm ScopedValue is lower.</li>
+<li><strong><code>StructuredTaskScope</code> fork-join.</strong> Use <code>ShutdownOnFailure</code> to fork three concurrent calls; one throws. Confirm the others are cancelled and the throw propagates.</li>
+<li><strong><code>Thread.dump_to_file</code> format=json.</strong> Generate a JSON thread dump of a JVM with 10,000 VTs. Parse it; group VTs by scope; identify any pinned ones.</li>
+<li><strong>JFR pinning events.</strong> Run a benchmark with <code>jcmd JFR.start settings=profile</code>. Trigger pinning (e.g., synchronized + sleep on JDK 21). Examine the JFR file in JMC for <code>jdk.VirtualThreadPinned</code> events with stack traces.</li>
+<li><strong>Migration from <code>newFixedThreadPool</code>.</strong> Take an existing benchmark using <code>newFixedThreadPool(200)</code> for IO-bound tasks. Replace with <code>newVirtualThreadPerTaskExecutor()</code>. Measure throughput; observe substantial improvement.</li>
+<li><strong>Carrier count tuning.</strong> Set <code>-Djdk.virtualThreadScheduler.parallelism=4</code> (vs default 8 on 8-core). Run an IO-bound workload. Compare throughput; observe diminishing returns past CPU count for IO-bound work.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Defend <strong>why virtual threads exist</strong>: platform threads cost ~1 MB + ~50-100 µs each, capping JVMs at thousands of concurrent threads; modern servers need millions of concurrent in-flight tasks; virtual threads make "one thread per task" cheap again.</li>
+<li>Describe <strong>what a virtual thread is</strong>: a <code>java.lang.Thread</code> (specifically a <code>VirtualThread</code>) whose <code>isVirtual()</code> is <code>true</code>; JVM-managed; ~200-1000 bytes; always daemon; always normal priority.</li>
+<li>Walk through the <strong>mount/unmount lifecycle</strong>: mount = <code>Continuation.run</code> rebuilds frames on the carrier's OS stack; execution runs as normal thread until blocking call (<code>LockSupport.park</code>, <code>Socket.read</code>, etc.); unmount = <code>Continuation.yield</code> walks the stack and freezes frames to heap; carrier released; on wake, VT resubmitted to scheduler; possibly different carrier picks it up and <code>Continuation.run</code>s it again.</li>
+<li>Identify the <strong>carrier pool</strong> (a <code>ForkJoinPool</code> sized to <code>Runtime.availableProcessors()</code>, configurable via <code>-Djdk.virtualThreadScheduler.parallelism</code>), distinct from <code>ForkJoinPool.commonPool()</code>.</li>
+<li>Map the <strong>~19 internal VT states</strong> to the <strong>6 public <code>Thread.State</code></strong> values from T02; recognize the extra internal states are for scheduler optimization.</li>
+<li>Identify the <strong>pinning conditions</strong>: native (JNI/FFM) frames on stack at park time, pre-JEP-491 <code>synchronized</code> and <code>Object.wait</code>, class initialization. State that <strong>JEP 491 (JDK 24)</strong> fixed the <code>synchronized</code>/<code>wait</code> pinning by making <code>ObjectMonitor::enter</code> VT-aware.</li>
+<li>Create virtual threads correctly: <code>Thread.ofVirtual().start(...)</code>, <code>Thread.startVirtualThread(...)</code>, or <code>Executors.newVirtualThreadPerTaskExecutor()</code>. <strong>Never pool virtual threads</strong> — use a <code>Semaphore</code> for concurrency limiting instead.</li>
+<li>Use <strong><code>ScopedValue</code></strong> (JEP 446, preview) for per-request context instead of <code>ThreadLocal</code> to avoid heap growth at high VT counts.</li>
+<li>Preview <strong><code>StructuredTaskScope</code></strong> (JEP 462) for fan-out + join patterns: lexical scope, <code>ShutdownOnFailure</code> cancels remaining on first failure, replaces <code>CompletableFuture.allOf</code> chains.</li>
+<li>State the <strong>performance numbers</strong>: VT creation ~1 µs; mount/unmount ~100-500 ns; memory per parked VT ~200-1000 bytes; throughput in IO-bound workloads scales to millions of VTs per JVM.</li>
+<li>Recognize VT is <strong>not</strong> for CPU-bound work (no unmount benefit; use Fork/Join or platform pool) — only for IO-bound or blocking work.</li>
+<li>Diagnose VT issues via <strong><code>jcmd Thread.dump_to_file -format=json</code></strong> for grouped thread dumps, <strong>JFR <code>jdk.VirtualThreadPinned</code></strong> events on JDK 24+, and <strong><code>-Djdk.tracePinnedThreads</code></strong> pre-JDK 24.</li>
+<li>Apply the <strong>2026 migration</strong>: replace <code>Executors.newFixedThreadPool(N)</code> with <code>Executors.newVirtualThreadPerTaskExecutor()</code>; remove artificial concurrency caps; audit <code>ThreadLocal</code> for high-VT-count growth; profile for pinning on JDK 24+; adopt <code>StructuredTaskScope</code> for fan-out.</li>
+<li>Avoid the <strong>ten common bugs</strong>: pooling VTs; pinning blindness on hot blocking paths; ThreadLocal per-VT growth; setting daemon/priority; expecting specific carrier; heavy CPU work in VTs; pre-JDK-24 hot synchronized; sleep(0) as yield; class init in hot paths; tight spin loops.</li>
+<li>Compare with <strong>other languages</strong>: Go goroutines (similar M:N + continuation model); Kotlin coroutines (language-level suspend); Python asyncio (single-threaded event loop, fundamentally different); Erlang processes (BEAM-managed, similar lightweight model).</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t15-structured-concurrency.html">Structured concurrency</a> — the JEP 462 (preview) API designed for virtual threads: <code>StructuredTaskScope.ShutdownOnFailure</code> for "all-or-nothing" fan-out; <code>ShutdownOnSuccess</code> for "first-wins"; custom <code>Subtask</code> policies; scope inheritance for hierarchical cancellation; the relationship to <code>CompletableFuture.allOf</code>/<code>anyOf</code> (T07) and <code>invokeAll</code>/<code>invokeAny</code> (T05); and why "structured" — every forked task's lifetime is bounded by a lexical scope, just like try-with-resources and try/finally — is the most important programming-model shift in concurrent Java since the JDK 5 <code>java.util.concurrent</code> package.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Virtual Threads (Project Loom)&quot;
+slug: virtual-threads-project-loom
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 14
+tags: [virtual-thread, project-loom, jep-444, jep-491, jep-446, jep-462, loom, continuation, jdk-internal-vm-continuation, mount, unmount, carrier-thread, carrier-pool, forkjoinpool-carrier, virtualthread-state-machine, parked-virtual-thread, pinned, native-frame, jni-frame, ffm-downcall, synchronized-pinning, monitor-pinning, jdk-21-pinning, jdk-24-fix, object-monitor-vt-aware, freeze-frames, unfreeze-frames, stack-on-heap, thread-of-virtual, start-virtual-thread, new-virtual-thread-per-task-executor, daemon-virtual, norm-priority, is-virtual, scoped-value, threadlocal-replacement, structured-concurrency, structured-task-scope, shutdown-on-failure, shutdown-on-success, don-t-pool-virtual-threads, semaphore-limiter, jdk-trace-pinned-threads, jfr-virtual-thread-pinned, jfr-virtual-thread-start, jfr-virtual-thread-end, jcmd-thread-dump-json, goroutine, kotlin-coroutine, erlang-process, m-n-scheduling]
+prerequisites: [fork-join-framework, java-memory-model-happens-before-volatile, atomic-variables, concurrent-collections, locks-reentrantlock-readwritelock-stampedlock, wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states, threads-and-runnable]
+status: complete
+estimated_minutes: 175
+last_updated: 2026-06-08
+---
+
+# Virtual Threads (Project Loom)
+
+A platform thread costs ~1 MB of stack reservation and ~50–100 µs to create (T01). A modern OS caps you at a few thousand concurrent threads. Modern servers handle hundreds of thousands of concurrent connections. The math has been broken for two decades: backend Java code can&#x27;t have one thread per request — it must multiplex requests over a small pool of platform threads, hand-coding async pipelines via `CompletableFuture` (T07), reactive streams, and async APIs. **Project Loom** (JEP 444, JDK 21) reverses this. A **virtual thread** is a JVM-managed thread costing ~200–1000 bytes of heap — *thousands of times cheaper* than a platform thread — designed so the JDK can host **millions** of them concurrently. The slogan: **&quot;one thread per task&quot; is cheap again**, and *every blocking API call you know* (`Thread.sleep`, `Socket.read`, `Lock.lock`, `Object.wait`) unmounts the virtual thread from its carrier so the carrier is freed to run another.
+
+The depth-bar requirement isn&#x27;t &quot;use `Thread.ofVirtual().start(...)`.&quot; At the **language** layer, virtual threads are *just* `Thread` instances — `java.lang.Thread` returns one whose `isVirtual()` is `true`, all the existing `Thread`/`InterruptedException`/`InterruptedException` APIs apply unchanged — but with special memory and scheduling properties that the JVM enforces invisibly. At the **mechanism** layer, a virtual thread runs by **mounting** on a *carrier* (a real platform thread from a dedicated `ForkJoinPool`): it executes normal bytecode on the carrier&#x27;s OS stack until it hits a blocking operation (`LockSupport.park`, `Socket.read`, etc.), at which point its stack frames are *frozen* onto the heap via `jdk.internal.vm.Continuation.yield`, the carrier is freed, and when the blocking event completes the virtual thread is **resubmitted** to the scheduler to be picked up by (possibly a different) carrier where its frames are unfrozen back onto an OS stack. At the **state** layer, internally a `VirtualThread` runs a ~19-state machine (`NEW`, `STARTED`, `RUNNING`, `PARKING`, `PARKED`, `PINNED`, `TIMED_PARKING`, `TIMED_PARKED`, `TIMED_PINNED`, `UNPARKED`, `YIELDING`, `YIELDED`, `BLOCKING`, `BLOCKED`, `WAITING`, `WAIT`, `TIMED_WAITING`, `TIMED_WAIT`, `TERMINATED`) collapsed to the six public `Thread.State` values from T02. At the **failure-mode** layer, **pinning** — when a virtual thread cannot unmount because of a native (JNI/FFM) stack frame or, *pre-JDK 24*, a `synchronized` block — holds its carrier hostage; the JDK 21–23 advice &quot;use `ReentrantLock` instead of `synchronized` for hot blocking paths&quot; came from this, and **JEP 491 (JDK 24)** fixed it by making `ObjectMonitor::enter` virtual-thread-aware. We will cover all four layers and finish with **scoped values** (JEP 446) and **structured concurrency** (JEP 462) — the Loom-era replacements for `ThreadLocal` and `CompletableFuture`-chains.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Fork/Join framework](./T13-fork-join-framework.md) (L3/C01/T13) — the carrier pool *is* a `ForkJoinPool`; [Java Memory Model](./T12-java-memory-model-happens-before-volatile.md) (L3/C01/T12) — JMM unchanged for VTs; [Locks](./T08-locks-reentrantlock-readwritelock-stampedlock.md) (L3/C01/T08) — `LockSupport.park` is *the* unmount hook; [wait/notify](./T04-wait-notify-notifyall.md) (L3/C01/T04) — pinning fix in JEP 491; [synchronized](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — `ObjectMonitor::enter` is now VT-aware (JDK 24+); [Thread lifecycle &amp; states](./T02-thread-lifecycle-and-states.md) (L3/C01/T02) — `Thread.State` six-values collapsed from internal ~19; [Threads &amp; Runnable](./T01-threads-and-runnable.md) (L3/C01/T01) — platform thread cost ladder this fixes.
+
+## The Problem — &quot;One Thread Per Task&quot; Was Too Expensive
+
+A server&#x27;s natural shape is one logical task per concurrent request — handle, await DB, await partner API, respond. The natural code is *blocking*: `db.query(...)` returns the result; control flow is sequential and trivial to read. But a platform thread per request hits two walls:
+
+1. **Memory.** ~1 MB stack per thread. 10,000 requests = ~10 GB of stack reservation. At 100,000, you&#x27;re out of address space.
+2. **OS limit.** Linux&#x27;s default `nproc` cap is in the thousands per user; even with tuning, the kernel scheduler thrashes at high thread counts.
+
+The industry response since ~2010 was *asynchronous programming*: split the request into &quot;before the await&quot; and &quot;after the await&quot; callbacks; the OS thread runs many requests in interleaved fashion; the kernel&#x27;s IO multiplexing (`epoll`, `kqueue`) wakes the right callback when data arrives. This works — Netty, Vert.x, Spring WebFlux, the whole reactive-streams ecosystem — but it *changes the programming model*. Sequential blocking code becomes a graph of CompletableFuture chains; exceptions become harder to reason about; debugging stack traces lose the conceptual call hierarchy.
+
+Virtual threads make the cost of &quot;one thread per task&quot; *not matter*. The runtime maps **many virtual threads** onto **a small number of platform threads** (the carriers), but to the application code, each virtual thread *is* a thread — same API, same semantics, same blocking calls. You write sequential blocking code; the runtime makes it scale.
+
+```mermaid
+flowchart LR
+  Old[&quot;Old model: one OS thread per task&lt;br/&gt;OOM at 10K threads&quot;]
+  Async[&quot;Async pipelines (callbacks, CF)&lt;br/&gt;scales, but model is convoluted&quot;]
+  VT[&quot;Virtual threads (JDK 21+)&lt;br/&gt;blocking model + cheap threads&quot;]
+  Old --&gt; Async
+  Async --&gt; VT
+  Note[&quot;VTs reverse the trend:&lt;br/&gt;the natural blocking model becomes the scalable one.&quot;]
+```
+
+## What a Virtual Thread Is
+
+```java
+Thread vt = Thread.ofVirtual().start(() -&gt; {
+    System.out.println(Thread.currentThread().isVirtual());   // true
+    Thread.sleep(1000);                                          // unmounts; carrier freed
+    System.out.println(&quot;done&quot;);
+});
+vt.join();
+```
+
+A virtual thread is:
+
+- **A `Thread` instance.** `Thread.ofVirtual().start(...)` returns a `java.lang.Thread` (specifically a `VirtualThread` subclass). All Thread APIs work.
+- **JVM-managed.** No OS thread per VT. The JVM schedules them onto a small pool of *carrier* platform threads.
+- **Cheap.** ~200–1000 bytes of heap for the VT object + continuation + small initial stack. 1 million VTs ≈ 1 GB of heap.
+- **Always daemon.** Cannot keep the JVM alive (the `setDaemon(false)` setter is a no-op).
+- **Always normal priority.** `setPriority(...)` is a no-op.
+- **Identified by `isVirtual()`.** `Thread.currentThread().isVirtual()` distinguishes VTs from platform threads.
+
+```java
+Thread.currentThread().isVirtual();              // false on a regular thread; true inside a VT
+```
+
+## The Mount / Unmount Lifecycle
+
+The core mechanism. A virtual thread &quot;runs&quot; by **mounting** on a carrier platform thread:
+
+```mermaid
+sequenceDiagram
+  participant Sched as VT scheduler&lt;br/&gt;(carrier pool)
+  participant Carrier as Carrier (platform thread)
+  participant VT as Virtual thread
+  participant Heap as Heap (continuation)
+
+  Sched-&gt;&gt;Carrier: pick VT from scheduler queue
+  Carrier-&gt;&gt;VT: Continuation.run() — unfreeze frames onto carrier&#x27;s stack
+  Note over Carrier,VT: VT now MOUNTED — runs as if normal thread
+  VT-&gt;&gt;VT: executes bytecode on carrier
+  VT-&gt;&gt;VT: hits a blocking call (e.g., Socket.read, LockSupport.park)
+  VT-&gt;&gt;Heap: Continuation.yield() — freeze frames to heap
+  Carrier-&gt;&gt;Sched: carrier returns to pool — picks next VT
+  Note over Heap: VT now UNMOUNTED — frames on heap, no OS thread held
+  Note over Sched: meanwhile: blocking event completes (data arrives, lock released)
+  Sched-&gt;&gt;Sched: VT resubmitted to scheduler queue
+  Sched-&gt;&gt;Carrier: pick the VT (possibly different carrier this time)
+  Carrier-&gt;&gt;VT: Continuation.run() again — unfreeze frames
+  Note over Carrier,VT: VT now REMOUNTED — continues from yield point
+```
+
+Three things to internalize:
+
+1. **The VT&#x27;s stack is sometimes on the OS stack (mounted), sometimes on the heap (unmounted).** Move between them is the freeze/unfreeze.
+2. **The carrier may change across mounts.** The VT doesn&#x27;t have affinity to a specific carrier. Don&#x27;t rely on `Thread.currentThread()` identity remaining stable across blocks (it does at the *Thread* level — the VT identity is stable — but the *carrier* identity is not).
+3. **Unmounting is what makes scaling possible.** A million parked VTs hold *zero* OS threads; the carrier pool stays small.
+
+## Continuations — the Underlying Mechanism
+
+The `jdk.internal.vm.Continuation` class is the *actual* mechanism. A `Continuation` captures the call-stack state at a `yield` point and resumes it on the next `run`:
+
+```java
+// pseudo-API — internal, JEP 444 specific
+class Continuation {
+    Continuation(ContinuationScope scope, Runnable body) { ... }
+    void run();                          // start or resume — pushes frames onto current OS stack
+    static boolean yield(ContinuationScope scope);   // suspend — freeze frames to heap
+}
+```
+
+The VT internals:
+
+```java
+class VirtualThread {
+    private final Continuation cont;
+    private volatile int state;             // ~19-state machine
+    private Thread carrierThread;            // the platform thread currently running this VT (or null)
+
+    void run() {
+        // called by the carrier
+        cont.run();                          // runs until the body completes or yields
+        if (cont.isDone()) {
+            state = TERMINATED;
+        } else {
+            // yielded — already enqueued elsewhere via park()
+        }
+    }
+}
+```
+
+When the VT&#x27;s code calls `LockSupport.park`, the VM detects we&#x27;re inside a Continuation and `yield`s instead of parking the OS thread:
+
+- `LockSupport.park(blocker)` → `VirtualThread.park()` → `Continuation.yield(VT_SCOPE)` → frames frozen → carrier returns to scheduler.
+
+When the parker wakes (via `LockSupport.unpark(vt)`), the VT is enqueued back into the scheduler. A carrier picks it up and calls `cont.run()`; the frames are unfrozen and execution continues just past the yield point.
+
+The freezing/unfreezing is implemented by **stack walking**: the JVM walks the carrier&#x27;s OS stack from the VT&#x27;s entry point, copying each frame&#x27;s state (locals, operand stack, return address) into heap-allocated frame objects. Unfreezing reverses: rebuild OS-stack frames from heap frames.
+
+The cost: **~100-500 ns per mount/unmount** (depending on stack depth). The frozen stack is typically a few hundred bytes to a few kilobytes. Compare with the ~1 µs futex park + the 1 MB platform-thread stack — the VT is dramatically cheaper.
+
+```mermaid
+flowchart TB
+  Mount[&quot;VT mounted on carrier&quot;]
+  Code[&quot;VT bytecode runs on carrier&#x27;s OS stack&quot;]
+  Hit[&quot;blocking call (LockSupport.park / Socket.read)&quot;]
+  Yield[&quot;Continuation.yield — JVM walks stack, copies frames to heap&quot;]
+  Heap[&quot;frames now on heap (~hundreds of bytes)&quot;]
+  Carrier[&quot;carrier returns — picks next VT or parks itself&quot;]
+  Wait[&quot;..waiting for the unblock event...&quot;]
+  Wake[&quot;unpark / I/O ready → VT resubmitted to scheduler&quot;]
+  Pick[&quot;scheduler hands VT to a carrier&quot;]
+  Unfreeze[&quot;Continuation.run — frames rebuilt on carrier&#x27;s OS stack&quot;]
+  Continue[&quot;VT resumes from yield point&quot;]
+  Mount --&gt; Code --&gt; Hit --&gt; Yield --&gt; Heap --&gt; Carrier --&gt; Wait --&gt; Wake --&gt; Pick --&gt; Unfreeze --&gt; Continue
+```
+
+## The Carrier Pool
+
+The default scheduler for virtual threads is a dedicated **`ForkJoinPool`** sized to `Runtime.availableProcessors()`. Configurable via:
+
+- `-Djdk.virtualThreadScheduler.parallelism=N` — default carrier count.
+- `-Djdk.virtualThreadScheduler.maxPoolSize=N` — upper bound (default 256).
+- `-Djdk.virtualThreadScheduler.minRunnable=N` — min runnable carriers.
+
+This carrier pool is *separate* from `ForkJoinPool.commonPool()`. The two coexist:
+
+- **Common pool**: serves `Stream.parallel`, `CompletableFuture.*Async`, etc.
+- **Virtual-thread carrier pool**: serves all virtual threads.
+
+```mermaid
+flowchart TB
+  JVM[&quot;JVM&quot;]
+  Common[&quot;ForkJoinPool.commonPool()&lt;br/&gt;(cores-1 workers)&lt;br/&gt;for parallelStream, CF Async&quot;]
+  Carrier[&quot;VT carrier pool&lt;br/&gt;(ForkJoinPool, sized to cores)&lt;br/&gt;runs millions of virtual threads&quot;]
+  VT1[&quot;VirtualThread #1&quot;]
+  VT2[&quot;VirtualThread #2&quot;]
+  VTn[&quot;VirtualThread #n&quot;]
+  JVM --&gt; Common
+  JVM --&gt; Carrier
+  VT1 -. mounts on .-&gt; Carrier
+  VT2 -. mounts on .-&gt; Carrier
+  VTn -. mounts on .-&gt; Carrier
+```
+
+A given carrier runs many VTs over its lifetime — mount one, it parks, mount another, it parks, etc. The carrier itself is a regular `Thread` named like `ForkJoinPool-2-worker-N` and visible in thread dumps.
+
+## The State Machine
+
+T02 introduced the 6 public `Thread.State` values. A `VirtualThread` runs a richer ~19-state internal machine, collapsed to those six for `getState()`:
+
+| Internal VT state | Public `Thread.State` |
+|-------------------|-----------------------|
+| `NEW`, `STARTED` | `RUNNABLE` (until mounted) |
+| `RUNNING` (mounted), `UNPARKED`, transitions | `RUNNABLE` |
+| `YIELDING`, `YIELDED` | `RUNNABLE` |
+| `PARKING`, `PARKED` | `WAITING` |
+| `TIMED_PARKING`, `TIMED_PARKED` | `TIMED_WAITING` |
+| `PINNED`, `TIMED_PINNED` | `WAITING` / `TIMED_WAITING` |
+| `BLOCKING`, `BLOCKED` | `BLOCKED` |
+| `WAIT`, `TIMED_WAIT` | `WAITING` / `TIMED_WAITING` |
+| `TERMINATED` | `TERMINATED` |
+
+The extra internal states are for *scheduler optimization*: knowing that a VT is &quot;about to park&quot; vs &quot;fully parked&quot; vs &quot;pinned&quot; lets the runtime decide whether to compensate, whether to unpark prematurely, whether to break the carrier free.
+
+The public API only exposes the 6 values to keep existing code working unchanged — a thread dump on a JVM full of VTs reads the same as one on platform threads.
+
+## Pinning — When a Virtual Thread Cannot Unmount
+
+A VT is **pinned** when the JVM cannot safely freeze its stack. The carrier is then held hostage for the duration of the block — defeating the whole point of virtual threads.
+
+The pinning conditions:
+
+1. **Native (JNI) frames on the stack at the moment of park.** The JVM can&#x27;t move native C/C++ frames to the heap — they&#x27;re tied to the OS thread&#x27;s stack. If a VT calls into JNI and the JNI code itself blocks (or makes a callback to Java that blocks), the carrier is pinned for the duration.
+
+2. **FFM (Foreign Function &amp; Memory) downcalls (JEP 454).** Same problem — FFM downcalls go through native code; if blocking happens with one on the stack, pin.
+
+3. **Class initialization (`&lt;clinit&gt;`).** The JVM holds an initialization lock during the static initializer; a VT mid-static-init pins.
+
+4. **`synchronized` block — pre-JEP-491 (JDK 21–23).** The pre-JEP-491 `ObjectMonitor::enter` parked the *carrier* on contention rather than the VT, holding the carrier captive. This was *the* dominant pinning source pre-JDK 24 and the reason the recommendation was &quot;swap synchronized for ReentrantLock on hot virtual-thread blocking paths.&quot;
+
+### JEP 491 (JDK 24) — the synchronized pinning fix
+
+JEP 491 reworked the HotSpot monitor implementation so a VT blocked in `synchronized` *unmounts* cleanly:
+
+- `ObjectMonitor::enter` detects a virtual-thread caller.
+- Instead of parking the carrier directly, it freezes the VT&#x27;s continuation onto the heap (same path as `LockSupport.park`).
+- The carrier is released to run other VTs.
+- On lock release, the waiting VT is resubmitted to the scheduler.
+- The fix extends to `Object.wait` (T04) similarly.
+
+Post-JDK-24, the *remaining* pinning conditions are:
+
+- **Native/JNI frames** (genuine ABI limitation).
+- **FFM downcalls** (same).
+- **Class init** (initialization lock — a JVM internal).
+
+These are all *rare* in normal application code. Most user code is now pinning-free on JDK 24+.
+
+```mermaid
+flowchart TB
+  PreFix[&quot;JDK 21–23 pinning sources&quot;]
+  PreFix --&gt; P1[&quot;synchronized (on contention or wait)&quot;]
+  PreFix --&gt; P2[&quot;Object.wait inside synchronized&quot;]
+  PreFix --&gt; P3[&quot;JNI / FFM downcall&quot;]
+  PreFix --&gt; P4[&quot;class init&quot;]
+  PostFix[&quot;JDK 24+ (JEP 491) pinning sources&quot;]
+  PostFix --&gt; R1[&quot;JNI / FFM downcall (genuine)&quot;]
+  PostFix --&gt; R2[&quot;class init (rare)&quot;]
+  Note[&quot;JEP 491 removed the dominant cause —&lt;br/&gt;synchronized + Object.wait now unmount cleanly.&quot;]
+```
+
+### Observing pinning
+
+- **JDK 21–23**: `-Djdk.tracePinnedThreads=full` (or `short`) — JVM flag that logged every pin event with a stack trace.
+- **JDK 24+**: The flag was *removed*. Use **JFR**: enable `jdk.VirtualThreadPinned` (default-on in profile config). Each pin event records the reason and stack.
+
+```bash
+jcmd &lt;pid&gt; JFR.start duration=60s settings=profile
+# ... after the recording, open in JMC ...
+# look for jdk.VirtualThreadPinned events
+```
+
+A few pinned events per second is acceptable. Hundreds or thousands per second indicate a genuine code-shape problem (native frames in a hot blocking path, or pre-JDK-24 synchronized in a contended loop).
+
+## Creating Virtual Threads — the Full API
+
+```java
+// 1. Builder API
+Thread vt = Thread.ofVirtual()
+    .name(&quot;my-vt&quot;)
+    .uncaughtExceptionHandler((t, e) -&gt; log.error(&quot;vt failed&quot;, e))
+    .start(() -&gt; doWork());
+
+// 2. Unstarted (configure, then start)
+Thread vt = Thread.ofVirtual().unstarted(() -&gt; doWork());
+// ... configure ...
+vt.start();
+
+// 3. Convenience shortcut
+Thread vt = Thread.startVirtualThread(() -&gt; doWork());
+
+// 4. ExecutorService — every submit creates a fresh VT
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (var req : requests) executor.submit(() -&gt; handle(req));
+}
+
+// 5. VirtualThread factory for legacy code
+ThreadFactory factory = Thread.ofVirtual().factory();
+new ThreadPoolExecutor(0, Integer.MAX_VALUE, ..., factory);   // ⚠ DON&#x27;T pool VTs (next section)
+```
+
+**The recommended modern shape**: `Executors.newVirtualThreadPerTaskExecutor()`. Every `submit`/`execute` spawns a fresh virtual thread; no pooling, no queueing, no rejection — every task gets its own thread. The underlying carrier pool handles the actual execution.
+
+## &quot;Don&#x27;t Pool Virtual Threads&quot;
+
+The single most important guideline:
+
+&gt; [!IMPORTANT]
+&gt; **Virtual threads are throw-away. Don&#x27;t pool them.** They cost ~200–1000 bytes; creating one is essentially free; pooling them is a performance *anti-optimization* (you&#x27;d be adding queueing latency and contention for no benefit).
+&gt;
+&gt; For **concurrency limiting** (limiting downstream calls), use a **`Semaphore`** (T09) around the work, not a thread-pool size. The semaphore allows N concurrent tasks; the rest park on the semaphore (which itself unmounts cleanly).
+
+```java
+// ✗ DON&#x27;T:
+ExecutorService pool = Executors.newFixedThreadPool(50, Thread.ofVirtual().factory());
+
+// ✓ DO:
+ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
+Semaphore dbLimit = new Semaphore(20);
+
+pool.submit(() -&gt; {
+    dbLimit.acquire();
+    try { db.query(...); } finally { dbLimit.release(); }
+});
+```
+
+The semaphore bounds *downstream concurrency* (database connections, partner API rate limits). Virtual threads handle the *upstream concurrency* (number of in-flight tasks). Two orthogonal bounds, decoupled.
+
+## ThreadLocal in the Virtual-Thread Era
+
+`ThreadLocal` works with virtual threads — but a million virtual threads with `ThreadLocal` entries is a million entries in the thread-local map. Plus, the &quot;carrier-affinity&quot; expectation many ThreadLocal users have is broken (a VT may resume on a different carrier).
+
+The Loom-era replacement: **`ScopedValue`** (JEP 446, preview JDK 21–24, expected to standardize):
+
+```java
+// declare a scoped value
+static final ScopedValue&lt;User&gt; CURRENT_USER = ScopedValue.newInstance();
+
+// bind for the duration of a scope
+ScopedValue.where(CURRENT_USER, alice).run(() -&gt; {
+    // inside this scope, CURRENT_USER.get() returns alice
+    handle(req);
+});
+
+// inside handle:
+User u = CURRENT_USER.get();
+```
+
+Three differences from `ThreadLocal`:
+
+1. **Lexically scoped**: bound only for the duration of the `run`/`call` lambda; auto-cleared when the lambda returns.
+2. **Immutable**: cannot be set after binding; cannot be modified.
+3. **Cheaper**: stored in a per-thread (or per-VT) linked list of scopes, not a hash map.
+
+Use ScopedValue for request context (current user, trace ID, MDC) where ThreadLocal would have leaked or required manual cleanup. ThreadLocal still works for backward compatibility.
+
+## Structured Concurrency Preview — JEP 462
+
+T15 covers this fully. The headline:
+
+```java
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Supplier&lt;User&gt;       userF  = scope.fork(() -&gt; fetchUser(id));
+    Supplier&lt;List&lt;Order&gt;&gt; ordF  = scope.fork(() -&gt; fetchOrders(id));
+    scope.join();                 // wait for both — any failure cancels the other
+    scope.throwIfFailed();        // propagate the exception
+    return render(userF.get(), ordF.get());
+}
+```
+
+The try-with-resources scope:
+
+- Forks subtasks (each a new virtual thread).
+- `join()` waits for all.
+- If any fails, `ShutdownOnFailure` cancels the rest.
+- `close()` (auto via try-with-resources) cancels any still-running tasks.
+
+This is the *correct* way to fan out + join with virtual threads. It replaces `CompletableFuture.allOf` chains with lexical scope + standard exception propagation. T15 has the full mechanics.
+
+## Performance Numbers
+
+| Op | Approximate cost |
+|----|-----------------|
+| Virtual thread creation | ~1 µs (heap allocation + scheduler enqueue) |
+| Mount (continuation.run) | ~100-300 ns + frame unfreeze |
+| Unmount (continuation.yield) | ~100-500 ns + frame freeze |
+| `Thread.sleep` (1 ms wake) | ~1 µs + ~1 ms wall |
+| `Socket.read` (server response) | latency-bound; CPU cost ~0 (parked the whole time) |
+| Memory per parked VT | ~200-1000 bytes (heap continuation) |
+| Memory per parked platform thread | ~1 MB (OS stack reservation) |
+
+The headline: **10,000 virtual threads cost ~10 MB; 10,000 platform threads cost ~10 GB.** Three orders of magnitude.
+
+## Comparison with Other Languages
+
+| Language | Model | Mount/unmount |
+|----------|-------|--------------|
+| Java VT | M:N (virtual on carrier) | yes — Continuation freeze/unfreeze |
+| Go (goroutine) | M:N (goroutine on M=kernel-thread) | yes — runtime manages |
+| Kotlin coroutine | suspend functions (language-level) | yes — compiled state machine |
+| Erlang process | M:N (BEAM-managed) | yes — own scheduler |
+| Python asyncio | single-thread event loop (no thread switch) | no — await is cooperative |
+| Rust async/await | event loop or thread pool | no — futures are state machines |
+
+Java virtual threads are most similar to Go goroutines — same M:N model, same fundamental mount/unmount mechanism. The key difference: Java VTs are *transparent* — existing thread-based code &quot;just works&quot;; Go goroutines required a language redesign.
+
+## Adoption Story
+
+| JDK | Status | Recommendation |
+|-----|--------|----------------|
+| Pre-21 | not available | use platform threads + async pipelines (CF, reactive) |
+| 21 (initial release) | preview → final | use VTs for IO-bound work; audit `synchronized` for pinning |
+| 22 | unchanged | same |
+| 23 | unchanged | same |
+| 24 (JEP 491) | `synchronized` pinning fixed | **all blocking code works pinning-free except native/FFM** |
+
+The migration in 2026:
+
+- **Replace `Executors.newFixedThreadPool(N)` with `Executors.newVirtualThreadPerTaskExecutor()`** for IO-bound workloads.
+- **Remove artificial concurrency caps** that existed only because platform threads were expensive.
+- **Audit ThreadLocal** for memory growth at high VT counts; migrate to ScopedValue where appropriate.
+- **Profile for pinning** on JDK 24+ via JFR; ensure rate is bounded.
+- **Adopt StructuredTaskScope** for fan-out patterns instead of CompletableFuture chains.
+
+## Common Mistakes
+
+### Pooling virtual threads
+
+```java
+Executors.newFixedThreadPool(100, Thread.ofVirtual().factory());   // ✗ pointless
+```
+
+VTs aren&#x27;t expensive to create. Use `newVirtualThreadPerTaskExecutor()`. For concurrency limiting, use a `Semaphore` (T09).
+
+### Pinning blindness on hot blocking paths
+
+```java
+synchronized (lock) {
+    httpClient.get(url);     // ✗ pre-JDK-24: pins carrier through HTTP latency
+}
+```
+
+Pre-JDK 24: the synchronized pinned the carrier. JDK 24+: this code is fine. If you&#x27;re on JDK 21–23, refactor to ReentrantLock or upgrade to JDK 24.
+
+### `ThreadLocal` per-VT growth
+
+```java
+static final ThreadLocal&lt;MyContext&gt; CTX = new ThreadLocal&lt;&gt;();
+// in each of 1 million VTs:
+CTX.set(new MyContext(...));   // ✗ 1 million entries in the thread-local map
+```
+
+Use `ScopedValue` (JEP 446) for request context; auto-cleared when scope ends.
+
+### Setting daemon / priority
+
+```java
+Thread.ofVirtual().start(...).setDaemon(false);   // ✗ no-op; VTs are always daemon
+Thread.ofVirtual().start(...).setPriority(MAX);    // ✗ no-op
+```
+
+These setters silently do nothing on VTs.
+
+### Expecting a specific carrier
+
+```java
+Object obj = ...;
+// thread-local cache: relies on &quot;same thread&quot; identity
+// but a VT may resume on a different carrier
+```
+
+The VT identity (`Thread.currentThread()`) is stable. The *carrier* identity is not — don&#x27;t rely on it.
+
+### Heavy CPU-bound work in virtual threads
+
+```java
+try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+    pool.submit(() -&gt; heavyMatrixMultiply());      // ✗ no benefit; CPU work doesn&#x27;t unmount
+}
+```
+
+Virtual threads excel at blocking I/O. For CPU-bound work, use platform threads or Fork/Join (T13). The carrier pool will be saturated and you&#x27;ll get no advantage.
+
+### Mixing VT with `synchronized` on JDK 21-23 hot paths
+
+The pinning starves your carrier pool. Either upgrade to JDK 24 or use ReentrantLock for hot paths.
+
+### `Thread.sleep(0)` to &quot;yield&quot; — VT-meaningless
+
+`Thread.sleep(0)` yields the platform-thread scheduler — for a VT, it&#x27;s mostly a no-op. Use `Thread.yield()` if you genuinely want to yield (also rare).
+
+### Class init in hot paths
+
+A class with an expensive static initializer is loaded; thousands of VTs hit it simultaneously; all pin on the init lock for the duration. Initialize warm classes at startup (`Class.forName(...)`) before high-traffic code runs.
+
+### Spinning waits in VTs
+
+```java
+while (!ready) { /* tight loop */ }     // ✗ doesn&#x27;t yield; carrier stuck
+```
+
+VTs only unmount at blocking calls. A tight CPU loop pins the carrier just like a platform thread. Use `Thread.onSpinWait()` for *very brief* spins (microseconds); otherwise use a proper blocking primitive.
+
+## Observability
+
+### Thread dumps
+
+`jstack` and `jcmd Thread.print` work for platform threads. For VTs, the modern command is:
+
+```bash
+jcmd &lt;pid&gt; Thread.dump_to_file -format=json /tmp/dump.json
+```
+
+This produces a *grouped* dump — VTs are organized by their `StructuredTaskScope` parent (if any), and the JSON format scales to millions of threads. Plain `jstack` would print one entry per VT and be unreadable.
+
+The dump shows each VT&#x27;s state, stack, and (if structured-concurrency) scope membership. Use this to find pinning, runaway VTs, or scope hierarchy bugs.
+
+### JFR events
+
+- `jdk.VirtualThreadStart`, `jdk.VirtualThreadEnd` — lifecycle.
+- `jdk.VirtualThreadPinned` — pin events, with the reason and stack.
+- `jdk.VirtualThreadSubmitFailed` — scheduler back-pressure.
+
+Aggregate over a session to see pinning hotspots, throughput, and lifecycle patterns.
+
+### Monitoring carrier saturation
+
+```java
+ForkJoinPool fjp = (ForkJoinPool) /* the carrier pool — via reflection */;
+int active = fjp.getActiveThreadCount();
+int parallelism = fjp.getParallelism();
+```
+
+If active consistently equals parallelism, carriers are saturated — investigate pinning or true CPU saturation. Healthy VT-heavy IO-bound code shows low active count (most carriers idle, waiting for VTs to unpark).
+
+&gt; [!INTERVIEW]
+&gt; &quot;Walk me through what happens when a virtual thread calls `Thread.sleep(1000)`.&quot; — Senior answer:
+&gt;
+&gt; 1. **`Thread.sleep` is intercepted.** The JVM detects we&#x27;re inside a virtual thread (the calling Thread is a `VirtualThread`).
+&gt; 2. **Continuation.yield.** The VM walks the carrier&#x27;s OS stack from the VT&#x27;s entry frame; each frame&#x27;s state (locals, operand stack) is copied into a heap-allocated frame object.
+&gt; 3. **Carrier released.** The carrier&#x27;s `runWorker` loop continues, picking the next runnable VT from the scheduler queue.
+&gt; 4. **VT is enqueued for delayed wake.** A timer is scheduled to mark the VT runnable after 1000 ms.
+&gt; 5. **Wake.** The timer fires; the VT is resubmitted to the scheduler.
+&gt; 6. **Remount.** A carrier (possibly different from the original) picks up the VT, calls `Continuation.run`, the heap frames are walked and rebuilt on the carrier&#x27;s OS stack.
+&gt; 7. **Resume.** Execution continues just past the `Thread.sleep` call.
+
+&gt; [!INTERVIEW]
+&gt; Short Q&amp;A:
+&gt;
+&gt; 1. **What&#x27;s a virtual thread?** JVM-managed thread costing ~200–1000 bytes (vs ~1 MB for a platform thread). Implemented via continuations that can be frozen onto the heap and resumed on any carrier.
+&gt; 2. **What&#x27;s the carrier pool?** A `ForkJoinPool` sized to `Runtime.availableProcessors()` that runs virtual threads. Separate from `ForkJoinPool.commonPool()`.
+&gt; 3. **What&#x27;s mount/unmount?** Mount: VT runs on a carrier&#x27;s OS stack via Continuation.run. Unmount: VT&#x27;s frames are frozen to the heap via Continuation.yield; carrier is freed.
+&gt; 4. **What&#x27;s pinning?** A VT that cannot unmount, holding its carrier hostage. Causes: JNI/FFM frames, pre-JDK-24 synchronized, class init.
+&gt; 5. **What did JEP 491 (JDK 24) fix?** `ObjectMonitor::enter` is now VT-aware — `synchronized` blocked VTs unmount cleanly. Same for `Object.wait`.
+&gt; 6. **How do you create a virtual thread?** `Thread.ofVirtual().start(r)`, `Thread.startVirtualThread(r)`, or `Executors.newVirtualThreadPerTaskExecutor().submit(r)`.
+&gt; 7. **Why &quot;don&#x27;t pool virtual threads&quot;?** They&#x27;re throw-away (~1 µs to create). Pooling adds latency and contention for no benefit. For concurrency limits, use a Semaphore.
+&gt; 8. **What&#x27;s `ScopedValue`?** Lexically-scoped immutable per-thread value; the Loom-era replacement for ThreadLocal that&#x27;s cheaper and auto-cleared. JEP 446.
+&gt; 9. **What&#x27;s `StructuredTaskScope`?** Fork-and-join scope for virtual threads; ShutdownOnFailure cancels remaining on first failure. JEP 462. The structured-concurrency way to do &quot;fan out + join.&quot;
+&gt; 10. **How do VT thread dumps differ?** `jcmd ... Thread.dump_to_file -format=json` produces grouped JSON dumps that scale to millions of VTs. Plain `jstack` would be unreadable.
+&gt; 11. **How is pinning observed?** Pre-JDK-24: `-Djdk.tracePinnedThreads`. JDK 24+: JFR `jdk.VirtualThreadPinned` event.
+&gt; 12. **VT vs CPU-bound work?** Don&#x27;t use VTs for CPU-bound — no unmount benefit, just overhead. Use platform threads or Fork/Join.
+&gt; 13. **VT vs goroutine?** Same M:N model, same continuation mechanism, different developer surface. Java&#x27;s VT API is transparent (existing code &quot;just works&quot;); Go required a language redesign.
+&gt; 14. **What stays the same with VTs?** JMM, happens-before, synchronization primitives, blocking API semantics. Existing concurrent code works correctly.
+&gt; 15. **VT in 2026 — when to migrate?** IO-bound workloads on JDK 21+: replace fixed pools with `newVirtualThreadPerTaskExecutor()`. JDK 24+: no more synchronized-pinning concerns; almost any blocking code is VT-friendly.
+
+## Practice
+
+1. **Spawn a million VTs.** Use `Executors.newVirtualThreadPerTaskExecutor()` to spawn 1M VTs, each sleeping 1 s. Measure peak memory; confirm ~1-2 GB heap. Repeat with 1M platform threads; observe OOM.
+2. **Carrier saturation.** Spin a VT in a tight CPU loop. Confirm one carrier is pinned at 100% CPU. Spawn carriers count + 1 such VTs; observe extra VTs never get to run.
+3. **Mount/unmount latency.** Benchmark `Thread.sleep(1)` from 100 platform threads vs 100 VTs. Measure mount/unmount overhead in the VT case.
+4. **Pinning observation (JDK 21–23).** Run with `-Djdk.tracePinnedThreads=full`. Have a VT enter a `synchronized` block and call `Thread.sleep(100)`. Observe the pin event with stack.
+5. **JEP 491 verification (JDK 24+).** Same scenario as (4); confirm no pin event. Add a native (JNI) call inside the synchronized block; observe pin re-appears.
+6. **`Semaphore` for concurrency limiting.** With 10,000 VTs, gate them through a `Semaphore(50)` around a &quot;DB call&quot; sleep. Observe at most 50 carriers&#x27; VTs in the &quot;DB call&quot; at any moment.
+7. **`ScopedValue` vs `ThreadLocal`.** Build the same per-request context with both. Run 1M VTs; measure heap. Confirm ScopedValue is lower.
+8. **`StructuredTaskScope` fork-join.** Use `ShutdownOnFailure` to fork three concurrent calls; one throws. Confirm the others are cancelled and the throw propagates.
+9. **`Thread.dump_to_file` format=json.** Generate a JSON thread dump of a JVM with 10,000 VTs. Parse it; group VTs by scope; identify any pinned ones.
+10. **JFR pinning events.** Run a benchmark with `jcmd JFR.start settings=profile`. Trigger pinning (e.g., synchronized + sleep on JDK 21). Examine the JFR file in JMC for `jdk.VirtualThreadPinned` events with stack traces.
+11. **Migration from `newFixedThreadPool`.** Take an existing benchmark using `newFixedThreadPool(200)` for IO-bound tasks. Replace with `newVirtualThreadPerTaskExecutor()`. Measure throughput; observe substantial improvement.
+12. **Carrier count tuning.** Set `-Djdk.virtualThreadScheduler.parallelism=4` (vs default 8 on 8-core). Run an IO-bound workload. Compare throughput; observe diminishing returns past CPU count for IO-bound work.
+
+## Recap
+
+You should now be able to:
+
+- Defend **why virtual threads exist**: platform threads cost ~1 MB + ~50-100 µs each, capping JVMs at thousands of concurrent threads; modern servers need millions of concurrent in-flight tasks; virtual threads make &quot;one thread per task&quot; cheap again.
+- Describe **what a virtual thread is**: a `java.lang.Thread` (specifically a `VirtualThread`) whose `isVirtual()` is `true`; JVM-managed; ~200-1000 bytes; always daemon; always normal priority.
+- Walk through the **mount/unmount lifecycle**: mount = `Continuation.run` rebuilds frames on the carrier&#x27;s OS stack; execution runs as normal thread until blocking call (`LockSupport.park`, `Socket.read`, etc.); unmount = `Continuation.yield` walks the stack and freezes frames to heap; carrier released; on wake, VT resubmitted to scheduler; possibly different carrier picks it up and `Continuation.run`s it again.
+- Identify the **carrier pool** (a `ForkJoinPool` sized to `Runtime.availableProcessors()`, configurable via `-Djdk.virtualThreadScheduler.parallelism`), distinct from `ForkJoinPool.commonPool()`.
+- Map the **~19 internal VT states** to the **6 public `Thread.State`** values from T02; recognize the extra internal states are for scheduler optimization.
+- Identify the **pinning conditions**: native (JNI/FFM) frames on stack at park time, pre-JEP-491 `synchronized` and `Object.wait`, class initialization. State that **JEP 491 (JDK 24)** fixed the `synchronized`/`wait` pinning by making `ObjectMonitor::enter` VT-aware.
+- Create virtual threads correctly: `Thread.ofVirtual().start(...)`, `Thread.startVirtualThread(...)`, or `Executors.newVirtualThreadPerTaskExecutor()`. **Never pool virtual threads** — use a `Semaphore` for concurrency limiting instead.
+- Use **`ScopedValue`** (JEP 446, preview) for per-request context instead of `ThreadLocal` to avoid heap growth at high VT counts.
+- Preview **`StructuredTaskScope`** (JEP 462) for fan-out + join patterns: lexical scope, `ShutdownOnFailure` cancels remaining on first failure, replaces `CompletableFuture.allOf` chains.
+- State the **performance numbers**: VT creation ~1 µs; mount/unmount ~100-500 ns; memory per parked VT ~200-1000 bytes; throughput in IO-bound workloads scales to millions of VTs per JVM.
+- Recognize VT is **not** for CPU-bound work (no unmount benefit; use Fork/Join or platform pool) — only for IO-bound or blocking work.
+- Diagnose VT issues via **`jcmd Thread.dump_to_file -format=json`** for grouped thread dumps, **JFR `jdk.VirtualThreadPinned`** events on JDK 24+, and **`-Djdk.tracePinnedThreads`** pre-JDK 24.
+- Apply the **2026 migration**: replace `Executors.newFixedThreadPool(N)` with `Executors.newVirtualThreadPerTaskExecutor()`; remove artificial concurrency caps; audit `ThreadLocal` for high-VT-count growth; profile for pinning on JDK 24+; adopt `StructuredTaskScope` for fan-out.
+- Avoid the **ten common bugs**: pooling VTs; pinning blindness on hot blocking paths; ThreadLocal per-VT growth; setting daemon/priority; expecting specific carrier; heavy CPU work in VTs; pre-JDK-24 hot synchronized; sleep(0) as yield; class init in hot paths; tight spin loops.
+- Compare with **other languages**: Go goroutines (similar M:N + continuation model); Kotlin coroutines (language-level suspend); Python asyncio (single-threaded event loop, fundamentally different); Erlang processes (BEAM-managed, similar lightweight model).
+
+## Next
+
+Continue to [Structured concurrency](./T15-structured-concurrency.md) — the JEP 462 (preview) API designed for virtual threads: `StructuredTaskScope.ShutdownOnFailure` for &quot;all-or-nothing&quot; fan-out; `ShutdownOnSuccess` for &quot;first-wins&quot;; custom `Subtask` policies; scope inheritance for hierarchical cancellation; the relationship to `CompletableFuture.allOf`/`anyOf` (T07) and `invokeAll`/`invokeAny` (T05); and why &quot;structured&quot; — every forked task&#x27;s lifetime is bounded by a lexical scope, just like try-with-resources and try/finally — is the most important programming-model shift in concurrent Java since the JDK 5 `java.util.concurrent` package.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t13-fork-join-framework.html"><div class="lbl">← Previous</div><div class="ttl">T13-fork-join-framework</div><div class="sub">Fork/Join Framework</div></a><a class="next" href="../l3/c01-t15-structured-concurrency.html"><div class="lbl">Next →</div><div class="ttl">T15-structured-concurrency</div><div class="sub">Structured Concurrency</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-problem-one-thread-per-task-was-too-expensive" data-toc-link>The Problem — &quot;One Thread Per Task&quot; Was Too Expensive</a></li><li class="lvl-2"><a href="#what-a-virtual-thread-is" data-toc-link>What a Virtual Thread Is</a></li><li class="lvl-2"><a href="#the-mount-unmount-lifecycle" data-toc-link>The Mount / Unmount Lifecycle</a></li><li class="lvl-2"><a href="#continuations-the-underlying-mechanism" data-toc-link>Continuations — the Underlying Mechanism</a></li><li class="lvl-2"><a href="#the-carrier-pool" data-toc-link>The Carrier Pool</a></li><li class="lvl-2"><a href="#the-state-machine" data-toc-link>The State Machine</a></li><li class="lvl-2"><a href="#pinning-when-a-virtual-thread-cannot-unmount" data-toc-link>Pinning — When a Virtual Thread Cannot Unmount</a></li><li class="lvl-3"><a href="#jep-491-jdk-24-the-synchronized-pinning-fix" data-toc-link>JEP 491 (JDK 24) — the synchronized pinning fix</a></li><li class="lvl-3"><a href="#observing-pinning" data-toc-link>Observing pinning</a></li><li class="lvl-2"><a href="#creating-virtual-threads-the-full-api" data-toc-link>Creating Virtual Threads — the Full API</a></li><li class="lvl-2"><a href="#dont-pool-virtual-threads" data-toc-link>&quot;Don&#x27;t Pool Virtual Threads&quot;</a></li><li class="lvl-2"><a href="#threadlocal-in-the-virtual-thread-era" data-toc-link>ThreadLocal in the Virtual-Thread Era</a></li><li class="lvl-2"><a href="#structured-concurrency-preview-jep-462" data-toc-link>Structured Concurrency Preview — JEP 462</a></li><li class="lvl-2"><a href="#performance-numbers" data-toc-link>Performance Numbers</a></li><li class="lvl-2"><a href="#comparison-with-other-languages" data-toc-link>Comparison with Other Languages</a></li><li class="lvl-2"><a href="#adoption-story" data-toc-link>Adoption Story</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#pooling-virtual-threads" data-toc-link>Pooling virtual threads</a></li><li class="lvl-3"><a href="#pinning-blindness-on-hot-blocking-paths" data-toc-link>Pinning blindness on hot blocking paths</a></li><li class="lvl-3"><a href="#threadlocal-per-vt-growth" data-toc-link>ThreadLocal per-VT growth</a></li><li class="lvl-3"><a href="#setting-daemon-priority" data-toc-link>Setting daemon / priority</a></li><li class="lvl-3"><a href="#expecting-a-specific-carrier" data-toc-link>Expecting a specific carrier</a></li><li class="lvl-3"><a href="#heavy-cpu-bound-work-in-virtual-threads" data-toc-link>Heavy CPU-bound work in virtual threads</a></li><li class="lvl-3"><a href="#mixing-vt-with-synchronized-on-jdk-21-23-hot-paths" data-toc-link>Mixing VT with synchronized on JDK 21-23 hot paths</a></li><li class="lvl-3"><a href="#threadsleep0-to-yield-vt-meaningless" data-toc-link>Thread.sleep(0) to &quot;yield&quot; — VT-meaningless</a></li><li class="lvl-3"><a href="#class-init-in-hot-paths" data-toc-link>Class init in hot paths</a></li><li class="lvl-3"><a href="#spinning-waits-in-vts" data-toc-link>Spinning waits in VTs</a></li><li class="lvl-2"><a href="#observability" data-toc-link>Observability</a></li><li class="lvl-3"><a href="#thread-dumps" data-toc-link>Thread dumps</a></li><li class="lvl-3"><a href="#jfr-events" data-toc-link>JFR events</a></li><li class="lvl-3"><a href="#monitoring-carrier-saturation" data-toc-link>Monitoring carrier saturation</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

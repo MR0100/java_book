@@ -20,4 +20,4 @@ Exercises plus this module's end-of-level project.
 
 **Level project.** A small command-line application (number-guessing game or to-do list) using variables, control flow, loops, methods, and user input.
 
-[Back to L0 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L0 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

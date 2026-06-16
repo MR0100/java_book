@@ -22,4 +22,4 @@ Idioms, anti-patterns, and common pitfalls for this level.
 
 - [L5 Best Practices & Pitfalls](T01-best-practices-and-pitfalls-l5.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

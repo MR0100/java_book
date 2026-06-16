@@ -1,0 +1,1912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link active" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🎯</span><span>Ch. 8 · L6 — Interview Mastery</span></div><div class="chapter-path">content/L6-interview-mastery/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l6/overview.html" data-q="l6 — interview mastery (faangm + mnc) content/l6-interview-mastery/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · foundations of interviewing content/l6-interview-mastery/c01-foundations-of-interviewing/readme.md content/l6-interview-mastery/c01-foundations-of-interviewing/t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.md content/l6-interview-mastery/c01-foundations-of-interviewing/t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.md content/l6-interview-mastery/c01-foundations-of-interviewing/t03-the-interviewer-s-rubric-signals-scoring-calibration.md content/l6-interview-mastery/c01-foundations-of-interviewing/t04-big-o-time-and-space-complexity.md content/l6-interview-mastery/c01-foundations-of-interviewing/t05-communication-mechanics-clarify-structure-think-aloud-recover.md content/l6-interview-mastery/c01-foundations-of-interviewing/t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md"><summary><span class="caret">▶</span><span>C01 · Foundations Of Interviewing</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — foundations of interviewing content/l6-interview-mastery/c01-foundations-of-interviewing/readme.md"><a class="" href="../l6/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="how tech interviews &amp; leveling work (mnc vs faangm) content/l6-interview-mastery/c01-foundations-of-interviewing/t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.md"><a class="" href="../l6/c01-t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.html"><span>How Tech Interviews &amp; Leveling Work (MNC vs FAANGM)</span><span class="kind-pill "></span></a></li><li data-q="the interview funnel — recruiter, screen, loop, debrief, offer content/l6-interview-mastery/c01-foundations-of-interviewing/t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.md"><a class="" href="../l6/c01-t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.html"><span>The Interview Funnel — Recruiter, Screen, Loop, Debrief, Offer</span><span class="kind-pill "></span></a></li><li data-q="the interviewer&#x27;s rubric — signals, scoring, calibration content/l6-interview-mastery/c01-foundations-of-interviewing/t03-the-interviewer-s-rubric-signals-scoring-calibration.md"><a class="" href="../l6/c01-t03-the-interviewer-s-rubric-signals-scoring-calibration.html"><span>The Interviewer&#x27;s Rubric — Signals, Scoring, Calibration</span><span class="kind-pill "></span></a></li><li data-q="big-o / time &amp; space complexity content/l6-interview-mastery/c01-foundations-of-interviewing/t04-big-o-time-and-space-complexity.md"><a class="" href="../l6/c01-t04-big-o-time-and-space-complexity.html"><span>Big-O / Time &amp; Space Complexity</span><span class="kind-pill "></span></a></li><li data-q="communication mechanics — clarify, structure, think-aloud, recover content/l6-interview-mastery/c01-foundations-of-interviewing/t05-communication-mechanics-clarify-structure-think-aloud-recover.md"><a class="" href="../l6/c01-t05-communication-mechanics-clarify-structure-think-aloud-recover.html"><span>Communication Mechanics — Clarify, Structure, Think-Aloud, Recover</span><span class="kind-pill "></span></a></li><li data-q="prep system — weeks-out plan, mock cadence, day-of routine content/l6-interview-mastery/c01-foundations-of-interviewing/t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md"><a class="" href="../l6/c01-t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.html"><span>Prep System — Weeks-Out Plan, Mock Cadence, Day-Of Routine</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · dsa for interviews content/l6-interview-mastery/c02-dsa-for-interviews/readme.md content/l6-interview-mastery/c02-dsa-for-interviews/t01-arrays-and-strings.md content/l6-interview-mastery/c02-dsa-for-interviews/t02-hashing.md content/l6-interview-mastery/c02-dsa-for-interviews/t03-two-pointers-and-sliding-window.md content/l6-interview-mastery/c02-dsa-for-interviews/t04-recursion-and-backtracking.md content/l6-interview-mastery/c02-dsa-for-interviews/t05-sorting-and-searching.md content/l6-interview-mastery/c02-dsa-for-interviews/t06-linked-lists.md content/l6-interview-mastery/c02-dsa-for-interviews/t07-stacks-and-queues.md content/l6-interview-mastery/c02-dsa-for-interviews/t08-trees-and-bsts.md content/l6-interview-mastery/c02-dsa-for-interviews/t09-graphs-bfs-dfs-shortest-paths.md content/l6-interview-mastery/c02-dsa-for-interviews/t10-heaps-and-priority-queues.md content/l6-interview-mastery/c02-dsa-for-interviews/t11-tries.md content/l6-interview-mastery/c02-dsa-for-interviews/t12-dynamic-programming.md content/l6-interview-mastery/c02-dsa-for-interviews/t13-greedy-algorithms.md content/l6-interview-mastery/c02-dsa-for-interviews/t14-coding-interview-patterns-and-problem-solving-framework.md"><summary><span class="caret">▶</span><span>C02 · DSA For Interviews</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — dsa for interviews (java) content/l6-interview-mastery/c02-dsa-for-interviews/readme.md"><a class="" href="../l6/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="arrays &amp; strings content/l6-interview-mastery/c02-dsa-for-interviews/t01-arrays-and-strings.md"><a class="" href="../l6/c02-t01-arrays-and-strings.html"><span>Arrays &amp; Strings</span><span class="kind-pill "></span></a></li><li data-q="hashing content/l6-interview-mastery/c02-dsa-for-interviews/t02-hashing.md"><a class="" href="../l6/c02-t02-hashing.html"><span>Hashing</span><span class="kind-pill "></span></a></li><li data-q="two pointers &amp; sliding window content/l6-interview-mastery/c02-dsa-for-interviews/t03-two-pointers-and-sliding-window.md"><a class="" href="../l6/c02-t03-two-pointers-and-sliding-window.html"><span>Two Pointers &amp; Sliding Window</span><span class="kind-pill "></span></a></li><li data-q="recursion &amp; backtracking content/l6-interview-mastery/c02-dsa-for-interviews/t04-recursion-and-backtracking.md"><a class="" href="../l6/c02-t04-recursion-and-backtracking.html"><span>Recursion &amp; Backtracking</span><span class="kind-pill "></span></a></li><li data-q="sorting &amp; searching content/l6-interview-mastery/c02-dsa-for-interviews/t05-sorting-and-searching.md"><a class="" href="../l6/c02-t05-sorting-and-searching.html"><span>Sorting &amp; Searching</span><span class="kind-pill "></span></a></li><li data-q="linked lists content/l6-interview-mastery/c02-dsa-for-interviews/t06-linked-lists.md"><a class="" href="../l6/c02-t06-linked-lists.html"><span>Linked Lists</span><span class="kind-pill "></span></a></li><li data-q="stacks &amp; queues content/l6-interview-mastery/c02-dsa-for-interviews/t07-stacks-and-queues.md"><a class="" href="../l6/c02-t07-stacks-and-queues.html"><span>Stacks &amp; Queues</span><span class="kind-pill "></span></a></li><li data-q="trees &amp; bsts content/l6-interview-mastery/c02-dsa-for-interviews/t08-trees-and-bsts.md"><a class="" href="../l6/c02-t08-trees-and-bsts.html"><span>Trees &amp; BSTs</span><span class="kind-pill "></span></a></li><li data-q="graphs (bfs/dfs, shortest paths) content/l6-interview-mastery/c02-dsa-for-interviews/t09-graphs-bfs-dfs-shortest-paths.md"><a class="" href="../l6/c02-t09-graphs-bfs-dfs-shortest-paths.html"><span>Graphs (BFS/DFS, Shortest Paths)</span><span class="kind-pill "></span></a></li><li data-q="heaps &amp; priority queues content/l6-interview-mastery/c02-dsa-for-interviews/t10-heaps-and-priority-queues.md"><a class="" href="../l6/c02-t10-heaps-and-priority-queues.html"><span>Heaps &amp; Priority Queues</span><span class="kind-pill "></span></a></li><li data-q="tries content/l6-interview-mastery/c02-dsa-for-interviews/t11-tries.md"><a class="" href="../l6/c02-t11-tries.html"><span>Tries</span><span class="kind-pill "></span></a></li><li data-q="dynamic programming content/l6-interview-mastery/c02-dsa-for-interviews/t12-dynamic-programming.md"><a class="" href="../l6/c02-t12-dynamic-programming.html"><span>Dynamic Programming</span><span class="kind-pill "></span></a></li><li data-q="greedy algorithms content/l6-interview-mastery/c02-dsa-for-interviews/t13-greedy-algorithms.md"><a class="" href="../l6/c02-t13-greedy-algorithms.html"><span>Greedy Algorithms</span><span class="kind-pill "></span></a></li><li data-q="coding interview patterns &amp; problem-solving framework content/l6-interview-mastery/c02-dsa-for-interviews/t14-coding-interview-patterns-and-problem-solving-framework.md"><a class="" href="../l6/c02-t14-coding-interview-patterns-and-problem-solving-framework.html"><span>Coding Interview Patterns &amp; Problem-Solving Framework</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design interviews content/l6-interview-mastery/c03-design-interviews/readme.md content/l6-interview-mastery/c03-design-interviews/t01-low-level-design-ood-interviews-framework.md content/l6-interview-mastery/c03-design-interviews/t02-ood-case-study-parking-lot.md content/l6-interview-mastery/c03-design-interviews/t03-ood-case-study-splitwise.md content/l6-interview-mastery/c03-design-interviews/t04-ood-case-study-library-management.md content/l6-interview-mastery/c03-design-interviews/t05-machine-coding-round-flipkart-style-90-minute-build.md content/l6-interview-mastery/c03-design-interviews/t06-high-level-system-design-interviews-framework.md content/l6-interview-mastery/c03-design-interviews/t07-hld-case-study-url-shortener.md content/l6-interview-mastery/c03-design-interviews/t08-hld-case-study-chat-messaging.md content/l6-interview-mastery/c03-design-interviews/t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.md"><summary><span class="caret">▶</span><span>C03 · Design Interviews</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — design interviews (lld &amp; hld) content/l6-interview-mastery/c03-design-interviews/readme.md"><a class="" href="../l6/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="low-level design (ood) interviews — framework content/l6-interview-mastery/c03-design-interviews/t01-low-level-design-ood-interviews-framework.md"><a class="" href="../l6/c03-t01-low-level-design-ood-interviews-framework.html"><span>Low-Level Design (OOD) Interviews — Framework</span><span class="kind-pill "></span></a></li><li data-q="ood case study: parking lot content/l6-interview-mastery/c03-design-interviews/t02-ood-case-study-parking-lot.md"><a class="" href="../l6/c03-t02-ood-case-study-parking-lot.html"><span>OOD Case Study: Parking Lot</span><span class="kind-pill "></span></a></li><li data-q="ood case study: splitwise content/l6-interview-mastery/c03-design-interviews/t03-ood-case-study-splitwise.md"><a class="" href="../l6/c03-t03-ood-case-study-splitwise.html"><span>OOD Case Study: Splitwise</span><span class="kind-pill "></span></a></li><li data-q="ood case study: library management content/l6-interview-mastery/c03-design-interviews/t04-ood-case-study-library-management.md"><a class="" href="../l6/c03-t04-ood-case-study-library-management.html"><span>OOD Case Study: Library Management</span><span class="kind-pill "></span></a></li><li data-q="machine coding round (flipkart-style 90-minute build) content/l6-interview-mastery/c03-design-interviews/t05-machine-coding-round-flipkart-style-90-minute-build.md"><a class="" href="../l6/c03-t05-machine-coding-round-flipkart-style-90-minute-build.html"><span>Machine Coding Round (Flipkart-style 90-Minute Build)</span><span class="kind-pill "></span></a></li><li data-q="high-level / system design interviews — framework content/l6-interview-mastery/c03-design-interviews/t06-high-level-system-design-interviews-framework.md"><a class="" href="../l6/c03-t06-high-level-system-design-interviews-framework.html"><span>High-Level / System Design Interviews — Framework</span><span class="kind-pill "></span></a></li><li data-q="hld case study: url shortener content/l6-interview-mastery/c03-design-interviews/t07-hld-case-study-url-shortener.md"><a class="" href="../l6/c03-t07-hld-case-study-url-shortener.html"><span>HLD Case Study: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="hld case study: chat / messaging content/l6-interview-mastery/c03-design-interviews/t08-hld-case-study-chat-messaging.md"><a class="" href="../l6/c03-t08-hld-case-study-chat-messaging.html"><span>HLD Case Study: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="hld case bundle: news feed, rate limiter, payments, notifications content/l6-interview-mastery/c03-design-interviews/t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.md"><a class="" href="../l6/c03-t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.html"><span>HLD Case Bundle: News Feed, Rate Limiter, Payments, Notifications</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · behavioral and company tracks content/l6-interview-mastery/c04-behavioral-and-company-tracks/readme.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t01-behavioral-interviews-star-car-sbi.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t02-java-specific-interview-q-and-a-by-level.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t03-company-track-amazon-leadership-principles.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t04-company-track-google.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t05-company-track-meta.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t06-company-track-apple.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t07-company-track-netflix.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t08-company-track-microsoft.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t09-company-track-flipkart.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t12-mock-interviews-and-self-grading-rubrics.md"><summary><span class="caret">▶</span><span>C04 · Behavioral And Company Tracks</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — behavioral &amp; company tracks content/l6-interview-mastery/c04-behavioral-and-company-tracks/readme.md"><a class="" href="../l6/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="behavioural interviews (star, car, sbi) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t01-behavioral-interviews-star-car-sbi.md"><a class="" href="../l6/c04-t01-behavioral-interviews-star-car-sbi.html"><span>Behavioural Interviews (STAR, CAR, SBI)</span><span class="kind-pill "></span></a></li><li data-q="java-specific interview q&amp;a (by level) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t02-java-specific-interview-q-and-a-by-level.md"><a class="" href="../l6/c04-t02-java-specific-interview-q-and-a-by-level.html"><span>Java-Specific Interview Q&amp;A (by Level)</span><span class="kind-pill "></span></a></li><li data-q="company track: amazon (leadership principles) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t03-company-track-amazon-leadership-principles.md"><a class="" href="../l6/c04-t03-company-track-amazon-leadership-principles.html"><span>Company Track: Amazon (Leadership Principles)</span><span class="kind-pill "></span></a></li><li data-q="company track: google content/l6-interview-mastery/c04-behavioral-and-company-tracks/t04-company-track-google.md"><a class="" href="../l6/c04-t04-company-track-google.html"><span>Company Track: Google</span><span class="kind-pill "></span></a></li><li data-q="company track: meta content/l6-interview-mastery/c04-behavioral-and-company-tracks/t05-company-track-meta.md"><a class="" href="../l6/c04-t05-company-track-meta.html"><span>Company Track: Meta</span><span class="kind-pill "></span></a></li><li data-q="company track: apple content/l6-interview-mastery/c04-behavioral-and-company-tracks/t06-company-track-apple.md"><a class="" href="../l6/c04-t06-company-track-apple.html"><span>Company Track: Apple</span><span class="kind-pill "></span></a></li><li data-q="company track: netflix content/l6-interview-mastery/c04-behavioral-and-company-tracks/t07-company-track-netflix.md"><a class="" href="../l6/c04-t07-company-track-netflix.html"><span>Company Track: Netflix</span><span class="kind-pill "></span></a></li><li data-q="company track: microsoft content/l6-interview-mastery/c04-behavioral-and-company-tracks/t08-company-track-microsoft.md"><a class="" href="../l6/c04-t08-company-track-microsoft.html"><span>Company Track: Microsoft</span><span class="kind-pill "></span></a></li><li data-q="company track: flipkart content/l6-interview-mastery/c04-behavioral-and-company-tracks/t09-company-track-flipkart.md"><a class="" href="../l6/c04-t09-company-track-flipkart.html"><span>Company Track: Flipkart</span><span class="kind-pill "></span></a></li><li data-q="company track: indian unicorns (razorpay, phonepe, swiggy, zomato, cred, myntra) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.md"><a class="" href="../l6/c04-t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.html"><span>Company Track: Indian Unicorns (Razorpay, PhonePe, Swiggy, Zomato, Cred, Myntra)</span><span class="kind-pill "></span></a></li><li data-q="company track: banking &amp; finance tech (goldman, jpmc, morgan stanley, barclays) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.md"><a class="" href="../l6/c04-t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.html"><span>Company Track: Banking &amp; Finance Tech (Goldman, JPMC, Morgan Stanley, Barclays)</span><span class="kind-pill "></span></a></li><li data-q="mock interviews &amp; self-grading rubrics content/l6-interview-mastery/c04-behavioral-and-company-tracks/t12-mock-interviews-and-self-grading-rubrics.md"><a class="" href="../l6/c04-t12-mock-interviews-and-self-grading-rubrics.html"><span>Mock Interviews &amp; Self-Grading Rubrics</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · resume profile and career content/l6-interview-mastery/c05-resume-profile-and-career/readme.md content/l6-interview-mastery/c05-resume-profile-and-career/t01-resume-fundamentals-structure-length-ats-friendly-format.md content/l6-interview-mastery/c05-resume-profile-and-career/t02-writing-impactful-bullet-points-xyz-formula-metrics.md content/l6-interview-mastery/c05-resume-profile-and-career/t03-tailoring-resume-per-company-and-role.md content/l6-interview-mastery/c05-resume-profile-and-career/t04-linkedin-profile-and-recruiter-seo.md content/l6-interview-mastery/c05-resume-profile-and-career/t05-github-profile-projects-and-portfolio.md content/l6-interview-mastery/c05-resume-profile-and-career/t06-cover-letters-and-cold-outreach.md content/l6-interview-mastery/c05-resume-profile-and-career/t07-referrals-sourcing-and-asking.md content/l6-interview-mastery/c05-resume-profile-and-career/t08-job-search-pipeline-and-application-tracking.md content/l6-interview-mastery/c05-resume-profile-and-career/t09-offer-evaluation-and-salary-negotiation.md content/l6-interview-mastery/c05-resume-profile-and-career/t10-first-90-days-onboarding-and-demonstrating-impact.md"><summary><span class="caret">▶</span><span>C05 · Resume Profile And Career</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — resume, profile &amp; career preparation content/l6-interview-mastery/c05-resume-profile-and-career/readme.md"><a class="" href="../l6/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="resume fundamentals — structure, length, ats-friendly format content/l6-interview-mastery/c05-resume-profile-and-career/t01-resume-fundamentals-structure-length-ats-friendly-format.md"><a class="" href="../l6/c05-t01-resume-fundamentals-structure-length-ats-friendly-format.html"><span>Resume Fundamentals — Structure, Length, ATS-Friendly Format</span><span class="kind-pill "></span></a></li><li data-q="writing impactful bullet points (xyz formula, metrics) content/l6-interview-mastery/c05-resume-profile-and-career/t02-writing-impactful-bullet-points-xyz-formula-metrics.md"><a class="" href="../l6/c05-t02-writing-impactful-bullet-points-xyz-formula-metrics.html"><span>Writing Impactful Bullet Points (XYZ Formula, Metrics)</span><span class="kind-pill "></span></a></li><li data-q="tailoring resume per company &amp; role content/l6-interview-mastery/c05-resume-profile-and-career/t03-tailoring-resume-per-company-and-role.md"><a class="" href="../l6/c05-t03-tailoring-resume-per-company-and-role.html"><span>Tailoring Resume Per Company &amp; Role</span><span class="kind-pill "></span></a></li><li data-q="linkedin profile &amp; recruiter seo content/l6-interview-mastery/c05-resume-profile-and-career/t04-linkedin-profile-and-recruiter-seo.md"><a class="" href="../l6/c05-t04-linkedin-profile-and-recruiter-seo.html"><span>LinkedIn Profile &amp; Recruiter SEO</span><span class="kind-pill "></span></a></li><li data-q="github profile, projects &amp; portfolio content/l6-interview-mastery/c05-resume-profile-and-career/t05-github-profile-projects-and-portfolio.md"><a class="" href="../l6/c05-t05-github-profile-projects-and-portfolio.html"><span>GitHub Profile, Projects &amp; Portfolio</span><span class="kind-pill "></span></a></li><li data-q="cover letters &amp; cold outreach content/l6-interview-mastery/c05-resume-profile-and-career/t06-cover-letters-and-cold-outreach.md"><a class="" href="../l6/c05-t06-cover-letters-and-cold-outreach.html"><span>Cover Letters &amp; Cold Outreach</span><span class="kind-pill "></span></a></li><li data-q="referrals — sourcing and asking content/l6-interview-mastery/c05-resume-profile-and-career/t07-referrals-sourcing-and-asking.md"><a class="" href="../l6/c05-t07-referrals-sourcing-and-asking.html"><span>Referrals — Sourcing and Asking</span><span class="kind-pill "></span></a></li><li data-q="job-search pipeline &amp; application tracking content/l6-interview-mastery/c05-resume-profile-and-career/t08-job-search-pipeline-and-application-tracking.md"><a class="" href="../l6/c05-t08-job-search-pipeline-and-application-tracking.html"><span>Job-Search Pipeline &amp; Application Tracking</span><span class="kind-pill "></span></a></li><li data-q="offer evaluation &amp; salary negotiation content/l6-interview-mastery/c05-resume-profile-and-career/t09-offer-evaluation-and-salary-negotiation.md"><a class="" href="../l6/c05-t09-offer-evaluation-and-salary-negotiation.html"><span>Offer Evaluation &amp; Salary Negotiation</span><span class="kind-pill "></span></a></li><li data-q="first 90 days — onboarding &amp; demonstrating impact content/l6-interview-mastery/c05-resume-profile-and-career/t10-first-90-days-onboarding-and-demonstrating-impact.md"><a class="" href="../l6/c05-t10-first-90-days-onboarding-and-demonstrating-impact.html"><span>First 90 Days — Onboarding &amp; Demonstrating Impact</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c06 · staff level interview question banks content/l6-interview-mastery/c06-staff-level-interview-question-banks/readme.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t01-java-language-and-core-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t02-java-concurrency-jvm-and-performance-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t03-collections-and-data-structures-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t04-spring-and-spring-boot-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t05-databases-and-persistence-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t06-system-design-and-architecture-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t07-distributed-systems-and-messaging-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t08-microservices-apis-and-cloud-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t09-security-devops-and-observability-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t10-behavioural-and-leadership-staff-principal-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t11-project-management-and-engineering-process-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t12-agile-scrum-and-team-practices-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.md"><summary><span class="caret">▶</span><span>C06 · Staff Level Interview Question Banks</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — staff-level interview question banks content/l6-interview-mastery/c06-staff-level-interview-question-banks/readme.md"><a class="" href="../l6/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="java language &amp; core — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t01-java-language-and-core-q-and-a-bank.md"><a class="" href="../l6/c06-t01-java-language-and-core-q-and-a-bank.html"><span>Java Language &amp; Core — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="java concurrency, jvm &amp; performance — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t02-java-concurrency-jvm-and-performance-q-and-a-bank.md"><a class="active" href="../l6/c06-t02-java-concurrency-jvm-and-performance-q-and-a-bank.html"><span>Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="collections &amp; data structures — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t03-collections-and-data-structures-q-and-a-bank.md"><a class="" href="../l6/c06-t03-collections-and-data-structures-q-and-a-bank.html"><span>Collections &amp; Data Structures — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="spring &amp; spring boot — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t04-spring-and-spring-boot-q-and-a-bank.md"><a class="" href="../l6/c06-t04-spring-and-spring-boot-q-and-a-bank.html"><span>Spring &amp; Spring Boot — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="databases &amp; persistence — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t05-databases-and-persistence-q-and-a-bank.md"><a class="" href="../l6/c06-t05-databases-and-persistence-q-and-a-bank.html"><span>Databases &amp; Persistence — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="system design &amp; architecture — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t06-system-design-and-architecture-q-and-a-bank.md"><a class="" href="../l6/c06-t06-system-design-and-architecture-q-and-a-bank.html"><span>System Design &amp; Architecture — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="distributed systems &amp; messaging — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t07-distributed-systems-and-messaging-q-and-a-bank.md"><a class="" href="../l6/c06-t07-distributed-systems-and-messaging-q-and-a-bank.html"><span>Distributed Systems &amp; Messaging — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="microservices, apis &amp; cloud — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t08-microservices-apis-and-cloud-q-and-a-bank.md"><a class="" href="../l6/c06-t08-microservices-apis-and-cloud-q-and-a-bank.html"><span>Microservices, APIs &amp; Cloud — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="security, devops &amp; observability — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t09-security-devops-and-observability-q-and-a-bank.md"><a class="" href="../l6/c06-t09-security-devops-and-observability-q-and-a-bank.html"><span>Security, DevOps &amp; Observability — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="behavioural &amp; leadership (staff / principal) — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t10-behavioural-and-leadership-staff-principal-q-and-a-bank.md"><a class="" href="../l6/c06-t10-behavioural-and-leadership-staff-principal-q-and-a-bank.html"><span>Behavioural &amp; Leadership (Staff / Principal) — Q&amp;A Bank</span><span class="kind-pill "></span></a></li><li data-q="project management &amp; engineering process — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t11-project-management-and-engineering-process-q-and-a-bank.md"><a class="" href="../l6/c06-t11-project-management-and-engineering-process-q-and-a-bank.html"><span>Project Management &amp; Engineering Process — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="agile, scrum &amp; team practices — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t12-agile-scrum-and-team-practices-q-and-a-bank.md"><a class="" href="../l6/c06-t12-agile-scrum-and-team-practices-q-and-a-bank.html"><span>Agile, Scrum &amp; Team Practices — Q&amp;A Bank</span><span class="kind-pill "></span></a></li><li data-q="engineering tools (jira, confluence, git, ide, monitoring) — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.md"><a class="" href="../l6/c06-t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.html"><span>Engineering Tools (Jira, Confluence, Git, IDE, Monitoring) — Q&amp;A Bank</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · tools and environment content/l6-interview-mastery/c07-tools-and-environment/readme.md content/l6-interview-mastery/c07-tools-and-environment/t01-tools-for-interview-prep.md"><summary><span class="caret">▶</span><span>C07 · Tools And Environment</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — tools &amp; environment content/l6-interview-mastery/c07-tools-and-environment/readme.md"><a class="" href="../l6/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools &amp; environment for interview prep content/l6-interview-mastery/c07-tools-and-environment/t01-tools-for-interview-prep.md"><a class="" href="../l6/c07-t01-tools-for-interview-prep.html"><span>Tools &amp; Environment for Interview Prep</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · hands on content/l6-interview-mastery/c08-hands-on/readme.md content/l6-interview-mastery/c08-hands-on/t01-mock-interview-gauntlet.md"><summary><span class="caret">▶</span><span>C08 · Hands On</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — hands-on content/l6-interview-mastery/c08-hands-on/readme.md"><a class="" href="../l6/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l6 level project — mock interview gauntlet content/l6-interview-mastery/c08-hands-on/t01-mock-interview-gauntlet.md"><a class="" href="../l6/c08-t01-mock-interview-gauntlet.html"><span>L6 Level Project — Mock Interview Gauntlet</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · best practices content/l6-interview-mastery/c09-best-practices/readme.md content/l6-interview-mastery/c09-best-practices/t01-interview-best-practices-and-pitfalls.md"><summary><span class="caret">▶</span><span>C09 · Best Practices</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — best practices &amp; pitfalls content/l6-interview-mastery/c09-best-practices/readme.md"><a class="" href="../l6/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="best practices &amp; pitfalls — interview anti-patterns content/l6-interview-mastery/c09-best-practices/t01-interview-best-practices-and-pitfalls.md"><a class="" href="../l6/c09-t01-interview-best-practices-and-pitfalls.html"><span>Best Practices &amp; Pitfalls — Interview Anti-Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · qa faq content/l6-interview-mastery/c10-qa-faq/readme.md content/l6-interview-mastery/c10-qa-faq/t01-interview-prep-faq.md"><summary><span class="caret">▶</span><span>C10 · QA FAQ</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — q&amp;a / faq content/l6-interview-mastery/c10-qa-faq/readme.md"><a class="" href="../l6/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="q&amp;a / faq — interview prep frequently asked questions content/l6-interview-mastery/c10-qa-faq/t01-interview-prep-faq.md"><a class="" href="../l6/c10-t01-interview-prep-faq.html"><span>Q&amp;A / FAQ — Interview Prep Frequently Asked Questions</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · cheatsheets content/l6-interview-mastery/c11-cheatsheets/readme.md content/l6-interview-mastery/c11-cheatsheets/t01-l6-cheatsheets.md"><summary><span class="caret">▶</span><span>C11 · Cheatsheets</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — cheatsheets &amp; reference content/l6-interview-mastery/c11-cheatsheets/readme.md"><a class="" href="../l6/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l6 cheatsheets — one-pagers for the loop content/l6-interview-mastery/c11-cheatsheets/t01-l6-cheatsheets.md"><a class="" href="../l6/c11-t01-l6-cheatsheets.html"><span>L6 Cheatsheets — One-Pagers for the Loop</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · cross module index content/l6-interview-mastery/c12-cross-module-index/readme.md content/l6-interview-mastery/c12-cross-module-index/t01-cross-module-interview-index.md"><summary><span class="caret">▶</span><span>C12 · Cross Module Index</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — cross-module interview index content/l6-interview-mastery/c12-cross-module-index/readme.md"><a class="" href="../l6/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cross-module interview index content/l6-interview-mastery/c12-cross-module-index/t01-cross-module-interview-index.md"><a class="" href="../l6/c12-t01-cross-module-interview-index.html"><span>Cross-Module Interview Index</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · resources content/l6-interview-mastery/c13-resources/readme.md content/l6-interview-mastery/c13-resources/t01-resources-books-courses-blogs.md"><summary><span class="caret">▶</span><span>C13 · Resources</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — resources content/l6-interview-mastery/c13-resources/readme.md"><a class="" href="../l6/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="resources — books, courses, blogs, communities content/l6-interview-mastery/c13-resources/t01-resources-books-courses-blogs.md"><a class="" href="../l6/c13-t01-resources-books-courses-blogs.html"><span>Resources — Books, Courses, Blogs, Communities</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · mock interview library content/l6-interview-mastery/c14-mock-interview-library/readme.md content/l6-interview-mastery/c14-mock-interview-library/t01-mock-faang-senior-backend-coding.md content/l6-interview-mastery/c14-mock-interview-library/t02-mock-faang-staff-system-design.md content/l6-interview-mastery/c14-mock-interview-library/t03-mock-amazon-leadership-principles-behavioral.md content/l6-interview-mastery/c14-mock-interview-library/t04-mock-stripe-payment-system-design.md content/l6-interview-mastery/c14-mock-interview-library/t05-mock-indian-unicorn-senior-coding.md content/l6-interview-mastery/c14-mock-interview-library/t06-mock-banking-jvm-deep-interview.md content/l6-interview-mastery/c14-mock-interview-library/t07-mock-staff-architect-google-l6.md content/l6-interview-mastery/c14-mock-interview-library/t08-mock-cross-functional-staff-meta-e6.md content/l6-interview-mastery/c14-mock-interview-library/t09-mock-tech-lead-behavioral.md content/l6-interview-mastery/c14-mock-interview-library/t10-mock-hiring-manager-round.md content/l6-interview-mastery/c14-mock-interview-library/t11-mock-bar-raiser-executive-round.md content/l6-interview-mastery/c14-mock-interview-library/t12-mock-ai-ml-platform-engineer-2026.md content/l6-interview-mastery/c14-mock-interview-library/t13-mock-negotiation-conversation.md content/l6-interview-mastery/c14-mock-interview-library/t14-mock-90-day-plan-presentation.md content/l6-interview-mastery/c14-mock-interview-library/t15-anti-patterns-what-not-to-say.md"><summary><span class="caret">▶</span><span>C14 · Mock Interview Library</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — mock interview library content/l6-interview-mastery/c14-mock-interview-library/readme.md"><a class="" href="../l6/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="mock: faang senior backend — coding round content/l6-interview-mastery/c14-mock-interview-library/t01-mock-faang-senior-backend-coding.md"><a class="" href="../l6/c14-t01-mock-faang-senior-backend-coding.html"><span>Mock: FAANG Senior Backend — Coding Round</span><span class="kind-pill "></span></a></li><li data-q="mock: faang staff — system design round content/l6-interview-mastery/c14-mock-interview-library/t02-mock-faang-staff-system-design.md"><a class="" href="../l6/c14-t02-mock-faang-staff-system-design.html"><span>Mock: FAANG Staff — System Design Round</span><span class="kind-pill "></span></a></li><li data-q="mock: amazon-style leadership principles — behavioral round content/l6-interview-mastery/c14-mock-interview-library/t03-mock-amazon-leadership-principles-behavioral.md"><a class="" href="../l6/c14-t03-mock-amazon-leadership-principles-behavioral.html"><span>Mock: Amazon-Style Leadership Principles — Behavioral Round</span><span class="kind-pill "></span></a></li><li data-q="mock: stripe-style payment — system design round content/l6-interview-mastery/c14-mock-interview-library/t04-mock-stripe-payment-system-design.md"><a class="" href="../l6/c14-t04-mock-stripe-payment-system-design.html"><span>Mock: Stripe-Style Payment — System Design Round</span><span class="kind-pill "></span></a></li><li data-q="mock: indian unicorn senior — coding + lld round content/l6-interview-mastery/c14-mock-interview-library/t05-mock-indian-unicorn-senior-coding.md"><a class="" href="../l6/c14-t05-mock-indian-unicorn-senior-coding.html"><span>Mock: Indian Unicorn Senior — Coding + LLD Round</span><span class="kind-pill "></span></a></li><li data-q="mock: banking jvm-deep interview (goldman-style) content/l6-interview-mastery/c14-mock-interview-library/t06-mock-banking-jvm-deep-interview.md"><a class="" href="../l6/c14-t06-mock-banking-jvm-deep-interview.html"><span>Mock: Banking JVM-Deep Interview (Goldman-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: staff architect (google l6-style) content/l6-interview-mastery/c14-mock-interview-library/t07-mock-staff-architect-google-l6.md"><a class="" href="../l6/c14-t07-mock-staff-architect-google-l6.html"><span>Mock: Staff Architect (Google L6-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: cross-functional staff (meta e6-style) content/l6-interview-mastery/c14-mock-interview-library/t08-mock-cross-functional-staff-meta-e6.md"><a class="" href="../l6/c14-t08-mock-cross-functional-staff-meta-e6.html"><span>Mock: Cross-Functional Staff (Meta E6-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: tech lead — behavioral round content/l6-interview-mastery/c14-mock-interview-library/t09-mock-tech-lead-behavioral.md"><a class="" href="../l6/c14-t09-mock-tech-lead-behavioral.html"><span>Mock: Tech Lead — Behavioral Round</span><span class="kind-pill "></span></a></li><li data-q="mock: hiring manager round content/l6-interview-mastery/c14-mock-interview-library/t10-mock-hiring-manager-round.md"><a class="" href="../l6/c14-t10-mock-hiring-manager-round.html"><span>Mock: Hiring Manager Round</span><span class="kind-pill "></span></a></li><li data-q="mock: bar raiser / executive round content/l6-interview-mastery/c14-mock-interview-library/t11-mock-bar-raiser-executive-round.md"><a class="" href="../l6/c14-t11-mock-bar-raiser-executive-round.html"><span>Mock: Bar Raiser / Executive Round</span><span class="kind-pill "></span></a></li><li data-q="mock: ai/ml platform engineer (2026) content/l6-interview-mastery/c14-mock-interview-library/t12-mock-ai-ml-platform-engineer-2026.md"><a class="" href="../l6/c14-t12-mock-ai-ml-platform-engineer-2026.html"><span>Mock: AI/ML Platform Engineer (2026)</span><span class="kind-pill "></span></a></li><li data-q="mock: compensation negotiation (verbatim) content/l6-interview-mastery/c14-mock-interview-library/t13-mock-negotiation-conversation.md"><a class="" href="../l6/c14-t13-mock-negotiation-conversation.html"><span>Mock: Compensation Negotiation (Verbatim)</span><span class="kind-pill "></span></a></li><li data-q="mock: the 90-day plan presentation content/l6-interview-mastery/c14-mock-interview-library/t14-mock-90-day-plan-presentation.md"><a class="" href="../l6/c14-t14-mock-90-day-plan-presentation.html"><span>Mock: The 90-Day Plan Presentation</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns: what not to say content/l6-interview-mastery/c14-mock-interview-library/t15-anti-patterns-what-not-to-say.md"><a class="" href="../l6/c14-t15-anti-patterns-what-not-to-say.html"><span>Anti-Patterns: What NOT To Say</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l6/index.html">L6 — Interview Mastery</a><span class="sep">/</span><span>Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)</span></div>
+        <h1>Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)</h1>
+        <div><span class="source-path">content/L6-interview-mastery/C06-staff-level-interview-question-banks/T02-java-concurrency-jvm-and-performance-q-and-a-bank.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~70 min</span><span class="meta-pill date">updated 2026-06-09</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)"
+slug: java-concurrency-jvm-and-performance-q-and-a-bank
+level: L6
+module: "Interview Mastery (FAANGM + MNC)"
+section: "Staff-Level Interview Question Banks"
+type: interview-qa
+difficulty: senior
+order: 2
+tags: [java, concurrency, jvm, gc, jmm, virtual-threads, qa, qa-bank, staff]
+prerequisites: [java-language-and-core-q-and-a-bank]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-09</p>
+<hr>
+<h1 id="java-concurrency-jvm-performance-qa-bank-staff-level">Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)</h1>
+<p><strong>70+ questions</strong> on threading, the Java Memory Model, executors, async, virtual threads (Project Loom), GC algorithms, class loaders, JIT, profiling, and tuning. This is <strong>the deepest question bank in the L6 set</strong> — these topics decide senior+ banking/Goldman/JPMC + Microsoft + Amazon SDE-II/III loops.</p>
+<h2 id="threading-fundamentals">Threading Fundamentals<a class="anchor" href="#threading-fundamentals" aria-hidden="true">#</a></h2>
+<h3 id="q-what-does-threadstart-do-that-threadrun-doesnt">Q: What does <code>Thread.start()</code> do that <code>Thread.run()</code> doesn't?<a class="anchor" href="#q-what-does-threadstart-do-that-threadrun-doesnt" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> junior</li>
+<li><strong>Asked at:</strong> universal</li>
+</ul>
+<p><strong>Answer.</strong> <code>start()</code> registers the thread with the OS scheduler and invokes <code>run()</code> on the new thread. Calling <code>run()</code> directly executes the method on the <em>current</em> thread — no concurrency. <code>start()</code> can only be called once; calling it twice throws <code>IllegalThreadStateException</code>.</p>
+<h3 id="q-difference-between-runnable-callable-and-supplier">Q: Difference between <code>Runnable</code>, <code>Callable</code>, and <code>Supplier</code>?<a class="anchor" href="#q-difference-between-runnable-callable-and-supplier" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> junior-mid</li>
+<li><strong>Asked at:</strong> universal</li>
+</ul>
+<p><strong>Answer.</strong> <strong><code>Runnable</code></strong> — <code>void run()</code>, no checked exceptions, no return. <strong><code>Callable&lt;V&gt;</code></strong> — <code>V call() throws Exception</code>, returns a value, can throw checked. <strong><code>Supplier&lt;T&gt;</code></strong> — <code>T get()</code>, functional interface, no exceptions. Submit <code>Runnable</code>/<code>Callable</code> to <code>ExecutorService</code>; use <code>Supplier</code> for lazy value provision or <code>CompletableFuture.supplyAsync</code>.</p>
+<h3 id="q-explain-executorservices-submit-vs-execute">Q: Explain <code>ExecutorService</code>'s <code>submit</code> vs <code>execute</code>.<a class="anchor" href="#q-explain-executorservices-submit-vs-execute" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid</li>
+<li><strong>Asked at:</strong> universal</li>
+</ul>
+<p><strong>Answer.</strong> <code>execute(Runnable)</code> — fire and forget; uncaught exceptions go to the thread's <code>UncaughtExceptionHandler</code>. <code>submit(Runnable/Callable)</code> — returns a <code>Future</code>; <strong>exceptions are swallowed unless you call <code>future.get()</code></strong> (which then throws <code>ExecutionException</code>). The silent-swallow is the #1 production bug — always either <code>get()</code> or wrap with a logging future.</p>
+<p><strong>Follow-ups:</strong>
+- How do you log all exceptions from <code>submit</code>?
+- <code>invokeAll</code> vs <code>invokeAny</code>?</p>
+<h3 id="q-walk-through-what-happens-when-you-submit-task-n-to-a-threadpoolexecutor">Q: Walk through what happens when you submit task #N to a <code>ThreadPoolExecutor</code>.<a class="anchor" href="#q-walk-through-what-happens-when-you-submit-task-n-to-a-threadpoolexecutor" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> banking, Goldman, Microsoft, Amazon</li>
+</ul>
+<p><strong>Answer.</strong> This is <strong>the</strong> canonical pool question:</p>
+<ol>
+<li>If <code>&lt; corePoolSize</code> threads exist, <strong>create a new thread</strong> to run the task.</li>
+<li>Else, attempt to <strong>enqueue</strong> the task in the work queue.</li>
+<li>If the queue is full, attempt to <strong>create a new thread</strong> up to <code>maximumPoolSize</code>.</li>
+<li>If at <code>maxPoolSize</code> and queue is full, <strong>invoke the <code>RejectedExecutionHandler</code></strong> (default: <code>AbortPolicy</code> → throws <code>RejectedExecutionException</code>).</li>
+</ol>
+<p>So an <strong>unbounded queue</strong> means threads never go above <code>corePoolSize</code>. A <strong>bounded queue</strong> + <code>maxPoolSize &gt; corePoolSize</code> lets the pool grow under burst.</p>
+<p><strong>Follow-ups:</strong>
+- <code>LinkedBlockingQueue</code> default capacity? (<code>Integer.MAX_VALUE</code> — effectively unbounded — dangerous.)
+- Rejection handlers — when use each (Abort/CallerRuns/Discard/DiscardOldest)?</p>
+<h3 id="q-why-is-executorsnewcachedthreadpool-dangerous-in-production">Q: Why is <code>Executors.newCachedThreadPool</code> dangerous in production?<a class="anchor" href="#q-why-is-executorsnewcachedthreadpool-dangerous-in-production" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> It uses <code>SynchronousQueue</code> + <code>Integer.MAX_VALUE</code> max pool. Under sustained burst it creates a thread per task, exhausts memory, and crashes with <code>OutOfMemoryError: unable to create native thread</code>. Brian Goetz explicitly warns against it. Use a fixed-size pool or carefully tuned <code>ThreadPoolExecutor</code>.</p>
+<h3 id="q-executorsnewfixedthreadpool-whats-its-hidden-danger">Q: <code>Executors.newFixedThreadPool</code> — what's its hidden danger?<a class="anchor" href="#q-executorsnewfixedthreadpool-whats-its-hidden-danger" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> banking, performance-conscious</li>
+</ul>
+<p><strong>Answer.</strong> Backed by <code>LinkedBlockingQueue</code> with <strong>unbounded capacity</strong>. Under sustained load with slow consumers, queue grows without limit → OOM. Always use <code>ThreadPoolExecutor</code> directly with a bounded queue + explicit rejection policy.</p>
+<h3 id="q-forkjoinpool-vs-threadpoolexecutor-when-each">Q: <code>ForkJoinPool</code> vs <code>ThreadPoolExecutor</code> — when each?<a class="anchor" href="#q-forkjoinpool-vs-threadpoolexecutor-when-each" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> JVM-curious, Microsoft, Amazon senior</li>
+</ul>
+<p><strong>Answer.</strong> <code>ForkJoinPool</code> uses <strong>work-stealing</strong> — idle threads pull tasks from other threads' deques. Optimal for divide-and-conquer (<code>RecursiveTask</code>/<code>RecursiveAction</code>) and CPU-bound parallel work. <code>ThreadPoolExecutor</code> uses a shared work queue, optimal for independent task submission. Parallel streams + <code>CompletableFuture</code> async (default) use the <strong>common ForkJoinPool</strong>, sized <code>cores - 1</code>. Sharing the common pool with everything else can starve your app — use a custom pool for I/O-bound work.</p>
+<p><strong>Follow-ups:</strong>
+- How do you change common-pool size? (<code>-Djava.util.concurrent.ForkJoinPool.common.parallelism</code>.)
+- Why was work-stealing introduced?</p>
+<h3 id="q-explain-completablefuture-composition-thenapply-vs-thencompose">Q: Explain <code>CompletableFuture</code> composition — <code>thenApply</code> vs <code>thenCompose</code>.<a class="anchor" href="#q-explain-completablefuture-composition-thenapply-vs-thencompose" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Spring async shops, banking</li>
+</ul>
+<p><strong>Answer.</strong> <code>thenApply(Function&lt;T,U&gt;)</code> — transforms a <code>CompletableFuture&lt;T&gt;</code> to <code>CompletableFuture&lt;U&gt;</code> via a synchronous function. <code>thenCompose(Function&lt;T,CompletableFuture&lt;U&gt;&gt;)</code> — flattens nested futures: returns <code>CompletableFuture&lt;U&gt;</code> when the function itself returns a <code>CompletableFuture&lt;U&gt;</code>. Without it you'd get <code>CompletableFuture&lt;CompletableFuture&lt;U&gt;&gt;</code>. Use <code>thenApply</code> for fast transformations; <code>thenCompose</code> when the next step is itself async.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// thenApply — sync transform
+fetchUser(id).thenApply(User::name);             // CF&lt;String&gt;
+// thenCompose — async chain (avoid nesting)
+fetchUser(id).thenCompose(this::fetchOrdersFor); // CF&lt;List&lt;Order&gt;&gt;, not CF&lt;CF&lt;...&gt;&gt;
+</code></pre></div>
+<p><strong>Follow-ups:</strong>
+- <code>thenCombine</code> vs <code>thenCompose</code>?
+- What about <code>allOf</code> / <code>anyOf</code>?</p>
+<h3 id="q-how-do-you-set-a-timeout-on-a-completablefuture">Q: How do you set a timeout on a <code>CompletableFuture</code>?<a class="anchor" href="#q-how-do-you-set-a-timeout-on-a-completablefuture" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> universal modern</li>
+</ul>
+<p><strong>Answer.</strong> Java 9+: <code>orTimeout(long, TimeUnit)</code> completes exceptionally with <code>TimeoutException</code> if not done in time. <code>completeOnTimeout(value, timeout, unit)</code> completes successfully with a fallback value. Pre-Java-9: schedule a manual <code>ScheduledExecutor</code> task that calls <code>future.completeExceptionally()</code>.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">fetchUser(id)
+    .orTimeout(2, TimeUnit.SECONDS)
+    .exceptionally(e -&gt; User.GUEST);
+</code></pre></div>
+<h3 id="q-whats-the-difference-between-reentrantlock-and-synchronized">Q: What's the difference between <code>ReentrantLock</code> and <code>synchronized</code>?<a class="anchor" href="#q-whats-the-difference-between-reentrantlock-and-synchronized" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> universal Java</li>
+</ul>
+<p><strong>Answer.</strong> Both are mutex. <code>ReentrantLock</code> adds: <strong>fairness</strong> (FIFO option), <strong><code>tryLock</code></strong> (non-blocking attempt), <strong><code>tryLock(timeout)</code></strong>, <strong><code>lockInterruptibly</code></strong> (acquirable thread interruption-aware), <strong>multiple Condition variables per lock</strong> (vs one wait-set on monitors). Cost: must <code>unlock()</code> in <code>finally</code>; verbose vs <code>synchronized</code>. Use <code>ReentrantLock</code> when you need any of those features; else <code>synchronized</code> is simpler.</p>
+<h3 id="q-explain-readwritelock-and-stampedlock">Q: Explain <code>ReadWriteLock</code> and <code>StampedLock</code>.<a class="anchor" href="#q-explain-readwritelock-and-stampedlock" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, performance-critical</li>
+</ul>
+<p><strong>Answer.</strong> <strong><code>ReadWriteLock</code></strong> — separate read + write locks; multiple concurrent readers OR one writer. Reads cheap, writes block. Good for read-mostly state. <strong><code>StampedLock</code></strong> (Java 8) — adds <strong>optimistic reads</strong>: <code>long stamp = lock.tryOptimisticRead(); ...; if (!lock.validate(stamp)) { fallback to read lock; }</code>. Optimistic reads have no acquisition cost; useful for ultra-hot read paths. <strong>Not reentrant</strong>, no Condition support. Trickier to use correctly.</p>
+<h3 id="q-difference-between-countdownlatch-cyclicbarrier-phaser-and-semaphore">Q: Difference between <code>CountDownLatch</code>, <code>CyclicBarrier</code>, <code>Phaser</code>, and <code>Semaphore</code>?<a class="anchor" href="#q-difference-between-countdownlatch-cyclicbarrier-phaser-and-semaphore" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Java-deep shops</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong><code>CountDownLatch(N)</code></strong> — one-shot; threads <code>await()</code> until N <code>countDown()</code> calls happen. Not reusable.
+- <strong><code>CyclicBarrier(N)</code></strong> — reusable; all N threads must reach the barrier before all proceed. Supports an optional barrier-action.
+- <strong><code>Phaser</code></strong> — like <code>CyclicBarrier</code> but supports <strong>dynamic registration</strong> + multi-phase. Threads can join/leave between phases.
+- <strong><code>Semaphore(permits)</code></strong> — caps concurrent access to N permits; <code>acquire</code>/<code>release</code>. Use for rate-limiting/connection pools.</p>
+<h3 id="q-explain-atomicxxx-and-cas">Q: Explain <code>AtomicXxx</code> and CAS.<a class="anchor" href="#q-explain-atomicxxx-and-cas" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> Atomic types (<code>AtomicInteger</code>, <code>AtomicLong</code>, <code>AtomicReference</code>) use <strong>Compare-And-Swap</strong> (CAS) — a CPU instruction (<code>CMPXCHG</code> on x86, <code>LDREX/STREX</code> on ARM) that atomically swaps a value if-and-only-if it matches the expected old value. Lock-free, scales better than <code>synchronized</code> under low contention. Under high contention, retries pile up and CAS can be slower than a lock.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">AtomicInteger c = new AtomicInteger();
+c.incrementAndGet();           // CAS loop
+c.compareAndSet(expected, new); // explicit CAS
+</code></pre></div>
+<p><strong>Follow-ups:</strong>
+- What's the ABA problem?
+- <code>AtomicStampedReference</code> — what does it solve?</p>
+<h3 id="q-whats-the-aba-problem-and-how-do-you-avoid-it">Q: What's the ABA problem and how do you avoid it?<a class="anchor" href="#q-whats-the-aba-problem-and-how-do-you-avoid-it" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, lock-free-curious</li>
+</ul>
+<p><strong>Answer.</strong> CAS only checks value equality — not history. Thread T1 reads value A, gets pre-empted. T2 changes A → B → A. T1's CAS succeeds even though state changed underneath. Most code is fine; lock-free data structures (Treiber stack, linked lists) can be corrupted. Fix: use <strong><code>AtomicStampedReference&lt;V&gt;</code></strong> which pairs a value with a monotonically-incrementing stamp.</p>
+<h3 id="q-longadder-vs-atomiclong-when-each">Q: <code>LongAdder</code> vs <code>AtomicLong</code> — when each?<a class="anchor" href="#q-longadder-vs-atomiclong-when-each" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, perf-conscious</li>
+</ul>
+<p><strong>Answer.</strong> Under low contention, identical. Under <strong>high contention</strong>, <code>AtomicLong</code> becomes a hotspot — every CAS conflicts. <code>LongAdder</code> (Java 8) keeps <strong>per-thread (per-stripe) counters</strong> that sum on read. Writes scale linearly with cores; reads cost a sum. Use <code>LongAdder</code> for write-heavy stats counters (metrics, request counts). Use <code>AtomicLong</code> when reads are frequent and writes infrequent.</p>
+<h3 id="q-explain-threadlocal-and-the-memory-leak-risk">Q: Explain <code>ThreadLocal</code> and the memory-leak risk.<a class="anchor" href="#q-explain-threadlocal-and-the-memory-leak-risk" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Tomcat-using shops, banking</li>
+</ul>
+<p><strong>Answer.</strong> <code>ThreadLocal&lt;T&gt;</code> gives each thread its own copy of a value. The thread-local map is stored on the <code>Thread</code> object. <strong>Leak risk in app servers</strong>: when a thread returns to the pool, its ThreadLocal entries persist. If those values reference your app's classloader, you prevent app undeploy → classloader leak. Mitigation: always call <code>remove()</code> in a <code>finally</code> block. Java 21+ introduces <strong><code>ScopedValue</code></strong> as the replacement — scoped to a try-with-resources block; auto-cleaned.</p>
+<h3 id="q-whats-scopedvalue-java-21-and-why">Q: What's <code>ScopedValue</code> (Java 21+) and why?<a class="anchor" href="#q-whats-scopedvalue-java-21-and-why" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops, virtual-thread-curious</li>
+</ul>
+<p><strong>Answer.</strong> <code>ScopedValue&lt;T&gt;</code> is a successor to <code>ThreadLocal</code>, designed for <strong>virtual threads</strong>. ThreadLocal stores per-thread state — with millions of virtual threads, this scales poorly. ScopedValue is <strong>immutable</strong>, <strong>lexically scoped</strong> (bound during a specific call), and shared efficiently across virtual threads. <code>ScopedValue.where(USER, currentUser).run(() -&gt; ...)</code>.</p>
+<h2 id="java-memory-model">Java Memory Model<a class="anchor" href="#java-memory-model" aria-hidden="true">#</a></h2>
+<h3 id="q-explain-happens-before-edges">Q: Explain happens-before edges.<a class="anchor" href="#q-explain-happens-before-edges" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, Microsoft, Amazon senior</li>
+</ul>
+<p><strong>Answer.</strong> Happens-before is a <strong>partial ordering</strong> of operations such that if A happens-before B, A's effects are visible to B. Edges:
+1. <strong>Program order</strong> within a single thread.
+2. <strong>Monitor lock release</strong> → subsequent acquire of same lock.
+3. <strong>Volatile write</strong> → subsequent read of same volatile.
+4. <strong>Thread.start()</strong> → first action of started thread.
+5. <strong>Thread's last action</strong> → another thread's <code>Thread.join()</code> return.
+6. <strong>Final field freeze</strong> at end of constructor → reader's first read of constructed object (when published safely).
+7. <strong>Transitive</strong> — if A hb B and B hb C, then A hb C.</p>
+<p>Without an edge, the JVM/CPU may <strong>reorder reads/writes</strong> for performance. Visibility bugs are silent and platform-specific (x86 vs ARM differ).</p>
+<h3 id="q-why-does-double-checked-locking-need-volatile">Q: Why does double-checked locking need <code>volatile</code>?<a class="anchor" href="#q-why-does-double-checked-locking-need-volatile" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> Classic broken pattern (pre-Java-5):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private static Singleton instance;
+public static Singleton getInstance() {
+    if (instance == null) {
+        synchronized (Singleton.class) {
+            if (instance == null) instance = new Singleton();
+        }
+    }
+    return instance;
+}
+</code></pre></div>
+<p><code>new Singleton()</code> is three steps: allocate, run constructor, assign reference. The JVM/CPU may reorder so reference is assigned <em>before</em> constructor finishes. Another thread sees non-null <code>instance</code> and uses a partially-constructed object. Java 5+ fixes this with <code>volatile</code> — the volatile write ensures the constructor completes before the reference is published.</p>
+<p>Alternative without <code>volatile</code>: <strong>holder idiom</strong> — a static inner class loaded lazily by the class loader, which guarantees thread-safe single initialisation.</p>
+<h3 id="q-whats-safe-publication">Q: What's safe publication?<a class="anchor" href="#q-whats-safe-publication" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, deep concurrency</li>
+</ul>
+<p><strong>Answer.</strong> Publishing an object so other threads see it in a fully-constructed state. Techniques:
+- <strong><code>final</code> fields</strong> — JMM guarantees final-field freeze at end of constructor.
+- <strong><code>volatile</code> field</strong> — write to volatile after construction.
+- <strong><code>synchronized</code></strong> block.
+- <strong><code>AtomicReference.set</code></strong>.
+- <strong>Static initialiser</strong> — JVM guarantees once-only thread-safe class init.
+- <strong><code>ConcurrentHashMap.put</code></strong> before any other thread reads.</p>
+<p>Bad: assigning to a regular (non-volatile, non-final) field after construction — reader may see uninitialised state.</p>
+<h3 id="q-why-is-volatile-array-element-not-really-volatile">Q: Why is <code>volatile</code> array element not really volatile?<a class="anchor" href="#q-why-is-volatile-array-element-not-really-volatile" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, deep concurrency</li>
+</ul>
+<p><strong>Answer.</strong> <code>volatile int[] arr</code> makes the <strong>reference</strong> volatile — writes/reads to the variable <code>arr</code> are volatile. <strong>Elements</strong> (<code>arr[0]</code>) are regular memory accesses. To make element-level access volatile, use <code>AtomicIntegerArray</code> or Java 9+ <code>VarHandle</code>.</p>
+<h3 id="q-what-is-false-sharing">Q: What is false sharing?<a class="anchor" href="#q-what-is-false-sharing" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, low-latency shops, Microsoft</li>
+</ul>
+<p><strong>Answer.</strong> CPU caches load memory in <strong>cache lines</strong> (typically 64 bytes). If two threads update different variables that happen to fall on the <strong>same cache line</strong>, the cache-coherence protocol invalidates the line for the other CPU on every write — destroying parallelism. Mitigation: <strong>pad</strong> the variables to separate cache lines, or use Java 8+ <code>@Contended</code> annotation (requires <code>-XX:-RestrictContended</code>). <code>LongAdder</code> uses <code>@Contended</code> internally on its stripes.</p>
+<h2 id="deadlock-liveness">Deadlock + Liveness<a class="anchor" href="#deadlock-liveness" aria-hidden="true">#</a></h2>
+<h3 id="q-how-do-you-reproduce-a-deadlock-with-2-threads-2-locks">Q: How do you reproduce a deadlock with 2 threads + 2 locks?<a class="anchor" href="#q-how-do-you-reproduce-a-deadlock-with-2-threads-2-locks" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> universal</li>
+</ul>
+<p><strong>Answer.</strong> Two threads acquire two locks in opposite order:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Thread A: lock(L1); ... lock(L2);
+Thread B: lock(L2); ... lock(L1);
+</code></pre></div>
+<p>T1 holds L1, waits for L2. T2 holds L2, waits for L1. Deadlock. <strong>Fix</strong>: always acquire locks in a consistent global order (e.g., sort by <code>System.identityHashCode</code>). Or use <code>tryLock</code> with timeout + backoff.</p>
+<h3 id="q-how-do-you-detect-a-deadlock-in-production">Q: How do you detect a deadlock in production?<a class="anchor" href="#q-how-do-you-detect-a-deadlock-in-production" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, oncall-heavy shops</li>
+</ul>
+<p><strong>Answer.</strong> <code>jstack &lt;pid&gt;</code> → look for <code>Found N deadlocks</code> at the bottom. Also visible via <code>jconsole</code> / VisualVM. JMX <code>ThreadMXBean.findDeadlockedThreads()</code> returns thread IDs programmatically. In production, set up an alert if <code>findDeadlockedThreads</code> returns non-empty. Heap dumps via <code>jcmd &lt;pid&gt; GC.heap_dump</code> also help when deadlock is intermittent.</p>
+<h3 id="q-whats-livelock-vs-starvation">Q: What's livelock vs starvation?<a class="anchor" href="#q-whats-livelock-vs-starvation" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking</li>
+</ul>
+<p><strong>Answer.</strong> <strong>Livelock</strong> — threads aren't blocked but keep yielding to each other, making no progress (two polite people stepping aside in a corridor). <strong>Starvation</strong> — a thread never gets the CPU or lock because others always win. Fix livelock with backoff + jitter; fix starvation with fairness flags (<code>new ReentrantLock(true)</code>) or queue-based wakeups.</p>
+<h2 id="virtual-threads-project-loom">Virtual Threads (Project Loom)<a class="anchor" href="#virtual-threads-project-loom" aria-hidden="true">#</a></h2>
+<h3 id="q-what-are-virtual-threads-java-21">Q: What are virtual threads (Java 21+)?<a class="anchor" href="#q-what-are-virtual-threads-java-21" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops 2024+</li>
+</ul>
+<p><strong>Answer.</strong> Lightweight threads managed by the JVM, mounted on <strong>carrier threads</strong> (platform threads, typically <code>ForkJoinPool.commonPool()</code> size). When a virtual thread blocks (I/O, sleep), it <strong>unmounts</strong> from its carrier so the carrier can run another virtual thread. Stack is allocated on the heap, growable, ~few KB initially. You can have millions of virtual threads vs ~thousands of platform threads. Replaces reactive complexity for I/O-bound workloads. <code>Thread.ofVirtual().start()</code> or <code>Executors.newVirtualThreadPerTaskExecutor()</code>.</p>
+<h3 id="q-whats-thread-pinning-and-when-does-it-happen">Q: What's thread pinning and when does it happen?<a class="anchor" href="#q-whats-thread-pinning-and-when-does-it-happen" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops 2024+</li>
+</ul>
+<p><strong>Answer.</strong> A virtual thread is <strong>pinned</strong> to its carrier when it can't unmount during blocking. Pinned because:
+1. <strong><code>synchronized</code> block holding the monitor</strong> — the JVM can't unmount safely.
+2. <strong>JNI / native frames</strong> on the stack.</p>
+<p>Pinned virtual threads starve carrier threads, defeating Loom's benefits. <strong>Fix</strong>: replace <code>synchronized</code> with <code>ReentrantLock</code> (which Loom-aware). Track with <code>-Djdk.tracePinnedThreads=full</code>. Virtual threads + traditional <code>synchronized</code> code can be slower than platform threads.</p>
+<h3 id="q-when-would-virtual-threads-not-help">Q: When would virtual threads NOT help?<a class="anchor" href="#q-when-would-virtual-threads-not-help" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Microsoft, Amazon, modern shops</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong>CPU-bound</strong> workloads — virtual threads give no parallelism beyond carrier count.
+- <strong>Pinned operations</strong> (synchronized blocks, JNI) — pin defeats unmount.
+- <strong>Memory-bound</strong> — each virtual thread still has stack frames.
+- <strong>Blocking JDBC drivers</strong> — pre-Loom JDBC drivers may pin or block carriers. Most newer drivers (PostgreSQL, MySQL) are Loom-friendly; some still aren't.</p>
+<h3 id="q-structured-concurrency-what-problem-does-it-solve">Q: Structured concurrency — what problem does it solve?<a class="anchor" href="#q-structured-concurrency-what-problem-does-it-solve" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops 2024+</li>
+</ul>
+<p><strong>Answer.</strong> <code>StructuredTaskScope</code> (Java 21+, preview→GA) bundles related concurrent tasks so they share a lifecycle. If one fails or is cancelled, the rest are cancelled. Replaces nested <code>CompletableFuture</code> mess where cancellation propagation is manual. Aligns concurrency lifetime with lexical scope — easier to reason about.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Future&lt;User&gt; u = scope.fork(() -&gt; fetchUser(id));
+    Future&lt;List&lt;Order&gt;&gt; o = scope.fork(() -&gt; fetchOrders(id));
+    scope.join().throwIfFailed();
+    return new UserOrders(u.resultNow(), o.resultNow());
+}
+// On exception or scope close, both tasks cancelled.
+</code></pre></div>
+<h2 id="producer-consumer">Producer-Consumer<a class="anchor" href="#producer-consumer" aria-hidden="true">#</a></h2>
+<h3 id="q-implement-a-bounded-buffer-with-waitnotify">Q: Implement a bounded buffer with wait/notify.<a class="anchor" href="#q-implement-a-bounded-buffer-with-waitnotify" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> Java-deep shops</li>
+</ul>
+<p><strong>Answer.</strong></p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class BoundedBuffer&lt;T&gt; {
+    private final Object[] buf;
+    private int head, tail, count;
+    public BoundedBuffer(int cap) { buf = new Object[cap]; }
+    public synchronized void put(T x) throws InterruptedException {
+        while (count == buf.length) wait();         // always loop, never if
+        buf[tail] = x;
+        tail = (tail + 1) % buf.length;
+        count++;
+        notifyAll();
+    }
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public synchronized T take() throws InterruptedException {
+        while (count == 0) wait();
+        T x = (T) buf[head];
+        head = (head + 1) % buf.length;
+        count--;
+        notifyAll();
+        return x;
+    }
+}
+</code></pre></div>
+<p>Key points: <strong>always loop on the condition</strong> (spurious wakeups + state may change between notify and re-acquire); always <code>notifyAll</code> (cheap correctness over fragile <code>notify</code>); use <strong><code>BlockingQueue</code></strong> in production instead.</p>
+<h3 id="q-when-to-use-blockingqueue-types">Q: When to use <code>BlockingQueue</code> types?<a class="anchor" href="#q-when-to-use-blockingqueue-types" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> Java-deep shops</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong><code>ArrayBlockingQueue(N)</code></strong> — bounded, FIFO, single lock.
+- <strong><code>LinkedBlockingQueue</code></strong> — optionally bounded, two locks (head + tail), higher throughput under contention.
+- <strong><code>SynchronousQueue</code></strong> — capacity 0; hand-off between producer and consumer.
+- <strong><code>PriorityBlockingQueue</code></strong> — unbounded heap-ordered.
+- <strong><code>DelayQueue</code></strong> — elements available only when delay expires (timers).
+- <strong><code>LinkedTransferQueue</code></strong> — like LinkedBlockingQueue + direct hand-off via <code>transfer</code>.</p>
+<h3 id="q-whats-the-difference-between-threadsleep-objectwait-and-locksupportpark">Q: What's the difference between <code>Thread.sleep</code>, <code>Object.wait</code>, and <code>LockSupport.park</code>?<a class="anchor" href="#q-whats-the-difference-between-threadsleep-objectwait-and-locksupportpark" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Java-deep</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong><code>Thread.sleep(ms)</code></strong> — pauses; does NOT release any held monitor.
+- <strong><code>Object.wait()</code></strong> — releases the monitor of <code>this</code> (must be called inside <code>synchronized</code> block on <code>this</code>); resumes on <code>notify</code>/<code>notifyAll</code>/timeout/interrupt.
+- <strong><code>LockSupport.park()</code></strong> — low-level primitive; does NOT touch monitors; released by <code>unpark(thread)</code>. Used to build higher-level synchronisers.</p>
+<h3 id="q-cooperative-cancellation-handling-interruptedexception">Q: Cooperative cancellation — handling <code>InterruptedException</code>.<a class="anchor" href="#q-cooperative-cancellation-handling-interruptedexception" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, oncall-heavy</li>
+</ul>
+<p><strong>Answer.</strong> Never swallow <code>InterruptedException</code>. Either:
+1. <strong>Re-throw</strong> it (let the caller decide).
+2. <strong>Restore the interrupt flag</strong>: <code>Thread.currentThread().interrupt();</code> and continue.</p>
+<p>If you swallow without restoring, downstream blocking calls won't notice the interrupt and your shutdown won't terminate. <strong>Anti-pattern</strong>: <code>try { Thread.sleep(...); } catch (InterruptedException e) { /* ignored */ }</code>.</p>
+<h2 id="jvm-internals">JVM Internals<a class="anchor" href="#jvm-internals" aria-hidden="true">#</a></h2>
+<h3 id="q-walk-through-the-jvm-runtime-data-areas">Q: Walk through the JVM runtime data areas.<a class="anchor" href="#q-walk-through-the-jvm-runtime-data-areas" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, Microsoft, Amazon, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong>Heap</strong> — all objects; shared across threads; GC-managed; split young (Eden + 2 survivor) + old (tenured).
+- <strong>Stack</strong> — per thread; method frames with locals, operand stack, return address. <code>-Xss</code> controls size.
+- <strong>Metaspace</strong> (post-PermGen, Java 8+) — class metadata; native memory, not heap; sized via <code>-XX:MaxMetaspaceSize</code>.
+- <strong>PC register</strong> — per thread; address of current bytecode instruction.
+- <strong>Native method stack</strong> — per thread; for JNI calls.
+- <strong>Code cache</strong> — JIT-compiled native code; sized via <code>-XX:ReservedCodeCacheSize</code>.
+- <strong>Direct memory</strong> — off-heap <code>ByteBuffer.allocateDirect</code> allocations.</p>
+<h3 id="q-why-was-permgen-replaced-with-metaspace">Q: Why was PermGen replaced with Metaspace?<a class="anchor" href="#q-why-was-permgen-replaced-with-metaspace" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, Java-history-curious</li>
+</ul>
+<p><strong>Answer.</strong> PermGen (≤ Java 7) was a fixed-size region for class metadata, interned strings, and class loaders. Sizing was painful — too small → <code>OutOfMemoryError: PermGen space</code>; too large → wasted heap. Metaspace (Java 8+) lives in <strong>native memory</strong> outside the heap, auto-grows by default (cap via <code>MaxMetaspaceSize</code>). Interned strings moved to the heap (Java 7).</p>
+<h3 id="q-explain-class-loaders-parent-first-delegation">Q: Explain class loaders + parent-first delegation.<a class="anchor" href="#q-explain-class-loaders-parent-first-delegation" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Tomcat-using shops, banking</li>
+</ul>
+<p><strong>Answer.</strong> Three (Java 9+ renamed): <strong>Bootstrap</strong> loads <code>rt.jar</code>/core JDK classes (native). <strong>Platform</strong> (was Ext) loads JDK extension modules. <strong>App / System</strong> loads classpath / modulepath. Loading is <strong>parent-first</strong> — child asks parent before loading itself. Prevents core classes from being overridden. <strong>Custom class loaders</strong> for Tomcat (per-app isolation), OSGi (modular containers), hot-reload.</p>
+<p><strong>Follow-ups:</strong>
+- Why does Tomcat use per-app class loaders?
+- <code>ClassNotFoundException</code> vs <code>NoClassDefFoundError</code>?</p>
+<h3 id="q-difference-between-classnotfoundexception-and-noclassdeffounderror">Q: Difference between <code>ClassNotFoundException</code> and <code>NoClassDefFoundError</code>?<a class="anchor" href="#q-difference-between-classnotfoundexception-and-noclassdeffounderror" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> banking, debugging-heavy</li>
+</ul>
+<p><strong>Answer.</strong> <strong><code>ClassNotFoundException</code></strong> — explicit <code>Class.forName(name)</code> failed; class never loaded. Checked exception. <strong><code>NoClassDefFoundError</code></strong> — class was successfully compiled but missing at runtime (probably due to deployment / classpath issue), or a static initialiser previously failed. Error, not exception. Hint: NCDFE often means a missing JAR or wrong classpath.</p>
+<h3 id="q-whats-the-object-header-and-how-big-is-it">Q: What's the object header and how big is it?<a class="anchor" href="#q-whats-the-object-header-and-how-big-is-it" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> Every Java object has a header containing the <strong>mark word</strong> (identity hashcode, GC age, lock state) and a <strong>klass pointer</strong> (pointer to the class metadata). With <strong>compressed oops</strong> (default for heaps ≤ 32 GB), an Object instance is <strong>16 bytes</strong> (12-byte header + 4-byte alignment padding). Without compressed oops, it's 24 bytes. Arrays add 4 bytes for length.</p>
+<h3 id="q-what-are-compressed-oops">Q: What are compressed oops?<a class="anchor" href="#q-what-are-compressed-oops" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, Microsoft</li>
+</ul>
+<p><strong>Answer.</strong> "Ordinary object pointers" compressed to <strong>32 bits</strong> instead of 64 — saves ~50% on heap pointers. Works because the JVM aligns objects to 8 bytes, so the bottom 3 bits are always 0; multiply the 32-bit value by 8 to get the real address. Caps usable heap at <strong>~32 GB</strong> (4 GB × 8). Beyond 32 GB, JVM disables compressed oops automatically — heap becomes less efficient. Hence the "32 GB cliff": going from 31 GB to 33 GB heap can make your app slower due to lost compression.</p>
+<h3 id="q-tlab-what-and-why">Q: TLAB — what and why?<a class="anchor" href="#q-tlab-what-and-why" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> <strong>Thread-Local Allocation Buffer</strong> — each thread gets a chunk of the young generation; allocates from its own TLAB via bump pointer (just increment), no synchronisation. When TLAB exhausts, request a new one. Makes <code>new Object()</code> essentially free in the common case. Visible via <code>-XX:+PrintTLAB</code>.</p>
+<h3 id="q-whats-escape-analysis-and-scalar-replacement">Q: What's escape analysis and scalar replacement?<a class="anchor" href="#q-whats-escape-analysis-and-scalar-replacement" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> JIT-time analysis: if an object's reference doesn't <strong>escape</strong> its allocating method (not stored in a field, not returned, not passed to escapable code), the JIT can <strong>scalar-replace</strong> it — break the object into its fields and keep them in registers. Avoids heap allocation entirely. Most short-lived objects benefit; lambdas + iterators especially. View with <code>-XX:+PrintEscapeAnalysis -XX:+PrintEliminateAllocations</code>.</p>
+<h2 id="garbage-collection">Garbage Collection<a class="anchor" href="#garbage-collection" aria-hidden="true">#</a></h2>
+<h3 id="q-generational-hypothesis-what-is-it">Q: Generational hypothesis — what is it?<a class="anchor" href="#q-generational-hypothesis-what-is-it" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> universal Java senior</li>
+</ul>
+<p><strong>Answer.</strong> Most objects die young. Group them by age — collect young gen frequently (cheap, lots of garbage), promote survivors to old gen (rare, slow). All major Java GCs (Serial, Parallel, G1, Shenandoah, ZGC-now-generational) are generational. Young = Eden + 2 Survivor spaces (S0/S1). Promotion threshold tunable.</p>
+<h3 id="q-g1-how-does-it-work">Q: G1 — how does it work?<a class="anchor" href="#q-g1-how-does-it-work" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> universal Java senior</li>
+</ul>
+<p><strong>Answer.</strong> <strong>Garbage-First</strong> is region-based: heap split into ~2k regions of 1-32 MB each. Each region is either young (Eden/Survivor) or old. GC picks the regions with the most garbage first (the "garbage-first" heuristic). <strong>Mixed collections</strong> include young + some old regions. Predictable pause-time target (<code>-XX:MaxGCPauseMillis</code>, default 200 ms). Default GC since Java 9. Trade-off: more CPU overhead vs Parallel; better pause behaviour for typical app heaps (4-32 GB).</p>
+<h3 id="q-zgc-vs-shenandoah-vs-g1-when-each">Q: ZGC vs Shenandoah vs G1 — when each?<a class="anchor" href="#q-zgc-vs-shenandoah-vs-g1-when-each" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, low-latency shops</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong>G1</strong>: default; balanced throughput/pause; good for 4-32 GB heaps; pauses 50-200 ms typical.
+- <strong>ZGC</strong>: sub-ms pauses regardless of heap size; great for <strong>large heaps (&gt; 16 GB)</strong> + strict latency SLOs. Generational since Java 21 (catching up on throughput). Uses <strong>colored pointers</strong> + <strong>load barriers</strong>.
+- <strong>Shenandoah</strong>: similar goals to ZGC, different implementation (Brooks pointers). Red Hat's offering. Also low-pause.</p>
+<p>Pick ZGC/Shenandoah when <strong>tail latency</strong> (p99/p999) dominates; G1 when throughput matters more.</p>
+<h3 id="q-whats-generational-zgc">Q: What's generational ZGC?<a class="anchor" href="#q-whats-generational-zgc" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops 2024+</li>
+</ul>
+<p><strong>Answer.</strong> Java 21 added generational mode to ZGC (previously non-generational — collected the whole heap each cycle). Now ZGC has young + old generations like G1, dramatically reducing CPU overhead for typical workloads with high young-gen churn. Brings ZGC much closer to G1's throughput while keeping sub-ms pauses. Enable with <code>-XX:+UseZGC -XX:+ZGenerational</code> (or just <code>-XX:+UseZGC</code> in Java 23+).</p>
+<h3 id="q-when-does-full-gc-happen-with-g1">Q: When does Full GC happen with G1?<a class="anchor" href="#q-when-does-full-gc-happen-with-g1" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> debugging-heavy shops</li>
+</ul>
+<p><strong>Answer.</strong> G1's mixed collection should normally keep up. Full GC (single-threaded stop-the-world) happens when:
+1. <strong>Concurrent mode failure</strong> — old gen filled before concurrent mark completed.
+2. <strong>Allocation failure</strong> during young/mixed collection.
+3. <strong>Explicit <code>System.gc()</code></strong> (configurable).
+4. <strong>Humongous object allocation</strong> failure (objects &gt; 50% of region size).</p>
+<p>Full GC is bad — long pause, indicates undersized heap or bad tuning. Look at GC logs (<code>-Xlog:gc*</code>).</p>
+<h3 id="q-how-do-you-read-gc-logs">Q: How do you read GC logs?<a class="anchor" href="#q-how-do-you-read-gc-logs" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, oncall-heavy</li>
+</ul>
+<p><strong>Answer.</strong> Enable with <code>-Xlog:gc*:gc.log</code> (Java 9+ unified logging). Look for:
+- <strong>Pause times</strong> — should be &lt; target.
+- <strong>Allocation rate</strong> — MB/s allocated; high rate stresses GC.
+- <strong>Promotion failure</strong> — young gen can't promote, falls back to Full GC.
+- <strong>Concurrent mode failure</strong> — same.
+- <strong>Frequency</strong> — Young GC every few seconds is normal; old GC every few minutes.</p>
+<p>Tools: <strong>GCViewer</strong>, <strong>GCEasy.io</strong>, <strong>JFR + Mission Control</strong>.</p>
+<h3 id="q-what-is-string-deduplication">Q: What is string deduplication?<a class="anchor" href="#q-what-is-string-deduplication" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> large-heap shops</li>
+</ul>
+<p><strong>Answer.</strong> G1 + ZGC option (<code>-XX:+UseStringDeduplication</code>) that scans surviving Strings during GC and de-duplicates their backing char/byte arrays — multiple <code>String</code> objects with identical content share storage. Useful when your app has many duplicate Strings (typical: configuration, user data, log messages). Saves 10-30% heap in some workloads.</p>
+<h2 id="jit-performance">JIT + Performance<a class="anchor" href="#jit-performance" aria-hidden="true">#</a></h2>
+<h3 id="q-tiered-compilation-what-are-the-tiers">Q: Tiered compilation — what are the tiers?<a class="anchor" href="#q-tiered-compilation-what-are-the-tiers" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> HotSpot uses 5 tiers (0-4):
+- <strong>Tier 0</strong> — interpreter (slow, no compilation).
+- <strong>Tier 1</strong> — C1 with full optimisation (no profile).
+- <strong>Tier 2</strong> — C1 with invocation+backedge profiling.
+- <strong>Tier 3</strong> — C1 with full profiling.
+- <strong>Tier 4</strong> — C2 with all optimisations (most expensive).</p>
+<p>The JVM compiles methods up tiers as they get hot. Visible with <code>-XX:+PrintCompilation</code>. <strong>Cold start</strong> runs at tier 0; <strong>warmup</strong> is the time to reach tier 4. AOT (GraalVM native-image) eliminates warmup at cost of runtime peak performance.</p>
+<h3 id="q-what-is-deoptimisation">Q: What is deoptimisation?<a class="anchor" href="#q-what-is-deoptimisation" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> JIT compiles methods based on observed types/branches. If at runtime the assumption is invalidated (new subclass loaded, branch never taken before now hit), the JIT <strong>deoptimises</strong> — reverts to the interpreter, may recompile later. Visible with <code>-XX:+PrintCompilation</code> (look for <code>!</code> markers). Heavy deopt indicates pathological code; usually harmless.</p>
+<h3 id="q-osr-what-is-on-stack-replacement">Q: OSR — what is on-stack replacement?<a class="anchor" href="#q-osr-what-is-on-stack-replacement" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> Normally methods get JIT-compiled on the next invocation. OSR compiles <strong>while a method is already running</strong> — necessary for methods with long-running loops (the loop never returns to be re-invoked). The JIT generates an OSR variant that takes over at a back-edge. Look for <code>% OSR</code> markers in <code>-XX:+PrintCompilation</code>. Microbenchmarks that put everything in <code>main</code> often only get OSR'd — JMH avoids this trap.</p>
+<h3 id="q-what-is-graal-jit">Q: What is Graal JIT?<a class="anchor" href="#q-what-is-graal-jit" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops, JVM-curious</li>
+</ul>
+<p><strong>Answer.</strong> A JIT compiler written in Java (vs C2 in C++), part of GraalVM. Enable with <code>-XX:+UseJVMCICompiler</code>. On some workloads (especially Streams, dynamic languages) Graal beats C2 by 10-20%; on others C2 still wins. Optional replacement for C2; also used for native-image AOT compilation.</p>
+<h3 id="q-graalvm-native-image-what-does-it-cost">Q: GraalVM native-image — what does it cost?<a class="anchor" href="#q-graalvm-native-image-what-does-it-cost" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops, serverless-curious</li>
+</ul>
+<p><strong>Answer.</strong> Ahead-of-time compiles Java to a native binary. <strong>Benefits</strong>: startup ~50ms (vs 5s for Spring Boot JVM), no warmup, small memory footprint — great for serverless / CLI / containers. <strong>Costs</strong>: (a) <strong>reflection config required</strong> — must declare reflectively-accessed classes; (b) <strong>no JIT</strong> — can't optimise based on runtime profile; (c) <strong>build-time class initialisation</strong> — some libraries break; (d) <strong>build is slow</strong> (~minutes); (e) <strong>interpreter performance ceiling</strong> vs HotSpot's JIT peak. Spring Boot 3 + Quarkus / Micronaut have native-image support.</p>
+<h3 id="q-whats-crac">Q: What's CRaC?<a class="anchor" href="#q-whats-crac" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops</li>
+</ul>
+<p><strong>Answer.</strong> Coordinated Restore at Checkpoint — JVM feature to snapshot a running process and restore later. After warmup, dump a checkpoint; new instances restore from snapshot in ~100ms instead of cold-starting. Spring Boot 3.2+ integrates CRaC. Especially useful for serverless cold-start mitigation. Different from GraalVM native (which eliminates JVM entirely); CRaC keeps the JVM.</p>
+<h2 id="profiling-memory-leaks">Profiling + Memory Leaks<a class="anchor" href="#profiling-memory-leaks" aria-hidden="true">#</a></h2>
+<h3 id="q-how-do-you-profile-a-java-service-in-production-with-minimal-overhead">Q: How do you profile a Java service in production with minimal overhead?<a class="anchor" href="#q-how-do-you-profile-a-java-service-in-production-with-minimal-overhead" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, oncall-heavy</li>
+</ul>
+<p><strong>Answer.</strong> <strong>JFR (Java Flight Recorder)</strong> — built-in since Java 11; near-zero overhead (1-2%); start with <code>jcmd &lt;pid&gt; JFR.start duration=60s filename=profile.jfr</code>; analyse in <strong>JMC (Mission Control)</strong>. <strong>async-profiler</strong> — flame graphs for CPU + allocations; very low overhead; sample-based; not bundled, easy to install. Avoid heavy profilers (YourKit, JProfiler) in prod.</p>
+<h3 id="q-how-do-you-diagnose-a-memory-leak">Q: How do you diagnose a memory leak?<a class="anchor" href="#q-how-do-you-diagnose-a-memory-leak" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, oncall-heavy</li>
+</ul>
+<p><strong>Answer.</strong>
+1. <strong>Detect</strong>: heap usage trending up over time; <code>OutOfMemoryError: Java heap space</code>.
+2. <strong>Snapshot</strong>: <code>jcmd &lt;pid&gt; GC.heap_dump &lt;file&gt;</code> or <code>jmap -dump:format=b,file=&lt;f&gt; &lt;pid&gt;</code>.
+3. <strong>Analyse</strong>: Eclipse MAT — open dump, click "Leak Suspects Report". Look at <strong>dominator tree</strong> (objects retaining the most heap), <strong>GC roots</strong> (why an object isn't collected).
+4. <strong>Common culprits</strong>: <code>static Collection</code> growing unbounded; ThreadLocal not removed; listener not unregistered; cache without TTL; classloader leak (especially in Tomcat).</p>
+<h3 id="q-whats-a-threadlocal-leak-in-app-servers">Q: What's a ThreadLocal leak in app servers?<a class="anchor" href="#q-whats-a-threadlocal-leak-in-app-servers" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> Tomcat-using shops</li>
+</ul>
+<p><strong>Answer.</strong> Worker threads in a thread pool persist across requests. If your code sets <code>ThreadLocal.set(...)</code> and forgets to call <code>remove()</code>, the value lives as long as the worker thread does. Worse: if the value references your app's classloader (e.g., your value's class was loaded by the webapp loader), undeploying the app can't reclaim the classloader. Eclipse MAT will show the leak. Always wrap ThreadLocal access in try-finally with <code>remove()</code>.</p>
+<h3 id="q-what-is-jmh-and-why-use-it">Q: What is JMH and why use it?<a class="anchor" href="#q-what-is-jmh-and-why-use-it" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> banking, perf-curious</li>
+</ul>
+<p><strong>Answer.</strong> <strong>Java Microbenchmark Harness</strong> — the official tool for microbenchmarks. Handles <strong>warmup</strong> (avoid pre-JIT measurements), <strong>dead-code elimination</strong> (returns must be consumed), <strong>constant folding</strong> (inputs must be hidden), <strong>forks</strong> (isolate JIT state per run). Hand-rolled <code>System.nanoTime()</code> loops produce nonsense numbers. JMH is the only way to get trustworthy microbenchmarks.</p>
+<h3 id="q-why-does-systemgc-not-always-trigger-a-gc">Q: Why does <code>System.gc()</code> not always trigger a GC?<a class="anchor" href="#q-why-does-systemgc-not-always-trigger-a-gc" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> universal</li>
+</ul>
+<p><strong>Answer.</strong> It's a <strong>hint</strong> to the JVM; can be disabled with <code>-XX:+DisableExplicitGC</code>. Even when honoured, the GC chooses what to collect — may be just a young collection. Anti-pattern in production code: calls disrupt the JVM's adaptive sizing. Acceptable in tests/benchmarks to force a baseline state.</p>
+<h2 id="container-aware-jvm">Container-Aware JVM<a class="anchor" href="#container-aware-jvm" aria-hidden="true">#</a></h2>
+<h3 id="q-why-was-old-java-8-oomkilled-in-kubernetes">Q: Why was old Java 8 OOMKilled in Kubernetes?<a class="anchor" href="#q-why-was-old-java-8-oomkilled-in-kubernetes" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops 2024+</li>
+</ul>
+<p><strong>Answer.</strong> Pre-Java 8u131, JVM read host CPU/memory from <code>/proc/cpuinfo</code> and <code>/proc/meminfo</code> — not the cgroup limit. A pod with 2 CPU + 2 GB limit on a 64-core / 256 GB host saw 64 cores + 256 GB; sized heap accordingly; got OOMKilled when usage exceeded 2 GB. <strong>Fix</strong>: Java 8u191+ and Java 10+ are container-aware (<code>-XX:+UseContainerSupport</code> default). Tune heap as percentage: <code>-XX:MaxRAMPercentage=75</code>.</p>
+<h3 id="q-how-do-you-size-jvm-heap-for-a-kubernetes-pod">Q: How do you size JVM heap for a Kubernetes pod?<a class="anchor" href="#q-how-do-you-size-jvm-heap-for-a-kubernetes-pod" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> senior</li>
+<li><strong>Asked at:</strong> modern shops</li>
+</ul>
+<p><strong>Answer.</strong> Pod memory limit = heap + metaspace + code cache + direct buffers + JIT scratch + thread stacks + native libs. Heap typically 50-75% of pod limit. Use <code>-XX:MaxRAMPercentage=75</code> (cleaner than <code>-Xmx</code> for containers — adapts when pod limit changes). Monitor RSS (<code>kubectl top pod</code>) vs heap to validate. Allow headroom for native memory tracking (<code>-XX:NativeMemoryTracking=summary</code>).</p>
+<h2 id="tooling">Tooling<a class="anchor" href="#tooling" aria-hidden="true">#</a></h2>
+<h3 id="q-whats-jstack-jmap-jcmd">Q: What's <code>jstack</code>, <code>jmap</code>, <code>jcmd</code>?<a class="anchor" href="#q-whats-jstack-jmap-jcmd" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> debugging-heavy</li>
+</ul>
+<p><strong>Answer.</strong>
+- <strong><code>jstack &lt;pid&gt;</code></strong> — thread dump; shows all threads' stack traces and lock state. Finds deadlocks. Run multiple times to find hot paths.
+- <strong><code>jmap -histo &lt;pid&gt;</code></strong> — class instance count + size histogram. <code>jmap -dump:format=b,file=&lt;f&gt; &lt;pid&gt;</code> — heap dump for MAT.
+- <strong><code>jcmd &lt;pid&gt;</code></strong> — Swiss army knife. <code>jcmd &lt;pid&gt; help</code>. Subcommands include <code>GC.heap_dump</code>, <code>JFR.start/stop</code>, <code>VM.flags</code>, <code>Thread.print</code>.
+- <strong><code>jstat -gc &lt;pid&gt; 1s</code></strong> — GC stats in real time.
+- <strong><code>jps</code></strong> — list Java processes.</p>
+<h3 id="q-whats-the-difference-between-jstack-thread-dump-and-a-jfr">Q: What's the difference between <code>jstack</code> thread dump and a JFR?<a class="anchor" href="#q-whats-the-difference-between-jstack-thread-dump-and-a-jfr" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Difficulty:</strong> mid-senior</li>
+<li><strong>Asked at:</strong> debugging-heavy</li>
+</ul>
+<p><strong>Answer.</strong> <code>jstack</code> is a one-shot snapshot of all thread stacks — see what's happening <em>now</em>. <strong>JFR</strong> is continuous low-overhead profiling — sample CPU, allocations, IO, GC, lock contention over a time window. Use <code>jstack</code> for live debugging ("why are my threads stuck?"); JFR for production profiling and post-incident analysis.</p>
+<h2 id="deeper-dive-code-backed-walkthroughs">Deeper Dive — Code-Backed Walkthroughs<a class="anchor" href="#deeper-dive-code-backed-walkthroughs" aria-hidden="true">#</a></h2>
+<h3 id="1-threadpoolexecutor-what-happens-when-task-n-is-submitted">1. ThreadPoolExecutor — what happens when task N is submitted<a class="anchor" href="#1-threadpoolexecutor-what-happens-when-task-n-is-submitted" aria-hidden="true">#</a></h3>
+<p>The canonical concurrency interview question. Walk through with code:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ThreadPoolExecutor pool = new ThreadPoolExecutor(
+    /* corePoolSize  */ 2,
+    /* maximumPoolSize */ 5,
+    /* keepAliveTime */ 60, TimeUnit.SECONDS,
+    /* workQueue     */ new ArrayBlockingQueue&lt;&gt;(3),   // BOUNDED
+    /* threadFactory */ Executors.defaultThreadFactory(),
+    /* handler       */ new ThreadPoolExecutor.AbortPolicy()
+);
+
+// Submit 10 tasks, each sleeps 5 sec.
+for (int i = 0; i &lt; 10; i++) {
+    int taskId = i;
+    try {
+        pool.execute(() -&gt; {
+            System.out.println(&quot;Task &quot; + taskId + &quot; on &quot; + Thread.currentThread().getName());
+            try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+        });
+    } catch (RejectedExecutionException e) {
+        System.out.println(&quot;Task &quot; + taskId + &quot; REJECTED&quot;);
+    }
+}
+</code></pre></div>
+<p><strong>Step-by-step trace</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>&lt; corePoolSize threads exist → <strong>create thread 1</strong>, run task 0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>&lt; corePoolSize → <strong>create thread 2</strong>, run task 1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>corePool full → <strong>enqueue</strong> in workQueue (size 1)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>enqueue (queue size 2)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>enqueue (queue size 3 — queue full)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>queue full → &lt; maximumPoolSize → <strong>create thread 3</strong>, run task 5</td>
+</tr>
+<tr>
+<td>6</td>
+<td>create thread 4</td>
+</tr>
+<tr>
+<td>7</td>
+<td>create thread 5 (now at maximumPoolSize)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>queue full + at maximumPoolSize → <strong>RejectedExecutionException</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td>rejected</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Probe</strong>: "What if I use <code>LinkedBlockingQueue</code> with default constructor?" → Default <code>LinkedBlockingQueue</code> capacity = <code>Integer.MAX_VALUE</code>. Queue never fills → pool never grows beyond <code>corePoolSize</code> → <code>maximumPoolSize</code> is meaningless.</p>
+<p><strong>Probe</strong>: "Best <code>RejectedExecutionHandler</code>?" → Depends. <code>AbortPolicy</code> (default) throws; <code>CallerRunsPolicy</code> runs on caller thread (back-pressure!); <code>DiscardPolicy</code> silently drops; <code>DiscardOldestPolicy</code> evicts queue head. For most prod: <code>CallerRunsPolicy</code> provides natural back-pressure.</p>
+<h3 id="2-completablefuture-composition-real-world-chain">2. CompletableFuture composition — real-world chain<a class="anchor" href="#2-completablefuture-composition-real-world-chain" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class OrderProcessor {
+    private final UserService users;
+    private final InventoryService inventory;
+    private final PaymentService payments;
+    private final EmailService email;
+    private final Executor executor;       // bounded pool, NOT common ForkJoinPool
+
+    public CompletableFuture&lt;OrderResult&gt; placeOrder(Long orderId) {
+        return CompletableFuture.supplyAsync(() -&gt; users.fetch(orderId), executor)
+            .thenCombine(
+                CompletableFuture.supplyAsync(() -&gt; inventory.reserve(orderId), executor),
+                (user, reservation) -&gt; new ValidatedOrder(user, reservation))
+            .thenCompose(validated -&gt; CompletableFuture
+                .supplyAsync(() -&gt; payments.charge(validated), executor)
+                .thenApply(payment -&gt; new ChargedOrder(validated, payment)))
+            .thenCompose(charged -&gt; CompletableFuture
+                .runAsync(() -&gt; email.sendConfirmation(charged), executor)
+                .thenApply(v -&gt; new OrderResult(charged.id(), &quot;OK&quot;)))
+            .orTimeout(5, TimeUnit.SECONDS)
+            .exceptionally(ex -&gt; {
+                log.error(&quot;Order {} failed&quot;, orderId, ex);
+                return new OrderResult(orderId, &quot;FAILED: &quot; + ex.getMessage());
+            });
+    }
+}
+</code></pre></div>
+<p><strong>Pattern recap</strong>:
+- <code>supplyAsync(supplier, executor)</code> — async fetch returning a value.
+- <code>thenCombine(otherFuture, biFn)</code> — parallel; waits for both; combines.
+- <code>thenCompose(fn returning CF)</code> — sequential async chain; flattens nested futures.
+- <code>thenApply(fn returning value)</code> — sync transform.
+- <code>runAsync(runnable, executor)</code> — async side-effect, returns <code>CF&lt;Void&gt;</code>.
+- <code>orTimeout(time, unit)</code> — bound execution; completes exceptionally with <code>TimeoutException</code> if exceeded (Java 9+).
+- <code>exceptionally(fn)</code> — fallback on any upstream error.</p>
+<p><strong>Probe</strong>: "Why pass <code>executor</code>?" → Without it, async ops use the default common ForkJoinPool, shared with everything else (parallel streams, async tasks across the JVM). Heavy work starves other consumers. Always specify your own bounded pool.</p>
+<p><strong>Probe</strong>: "Why <code>thenCompose</code> instead of nested <code>thenApply</code>?" → <code>thenApply(x -&gt; someAsync(x))</code> returns <code>CF&lt;CF&lt;U&gt;&gt;</code> — nested future. <code>thenCompose</code> flattens to <code>CF&lt;U&gt;</code>.</p>
+<h3 id="3-virtual-thread-pinning-demo">3. Virtual thread pinning demo<a class="anchor" href="#3-virtual-thread-pinning-demo" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class PinningDemo {
+    private final Lock lock = new ReentrantLock();     // Loom-friendly
+
+    public void goodMethod() {
+        lock.lock();
+        try {
+            // blocking IO here is FINE — virtual thread unmounts cleanly
+            sleep(Duration.ofSeconds(1));
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private final Object monitor = new Object();
+
+    public void badMethod() {
+        synchronized (monitor) {        // PINS virtual thread
+            // blocking IO here pins to carrier; starves other vthreads
+            sleep(Duration.ofSeconds(1));
+        }
+    }
+}
+
+// Demonstrate:
+public static void main(String[] args) {
+    var demo = new PinningDemo();
+    var exec = Executors.newVirtualThreadPerTaskExecutor();
+    long start = System.currentTimeMillis();
+    var futures = IntStream.range(0, 100)
+        .mapToObj(i -&gt; CompletableFuture.runAsync(demo::badMethod, exec))   // try goodMethod for contrast
+        .toList();
+    futures.forEach(CompletableFuture::join);
+    System.out.printf(&quot;Elapsed: %d ms%n&quot;, System.currentTimeMillis() - start);
+}
+</code></pre></div>
+<p>Run with <code>-Djdk.tracePinnedThreads=full</code> — JVM logs every pinning event with stack trace.</p>
+<p><strong>With <code>synchronized</code></strong>: pinning serialises virtual threads onto carriers; 100 tasks on default ~CPU-count carriers takes seconds-per-batch. <strong>With <code>ReentrantLock</code></strong>: virtual thread unmounts cleanly; all 100 tasks complete in ~1 sec total.</p>
+<p><strong>Probe</strong>: "What else causes pinning?" → JNI frames on the stack; some pre-Loom legacy code paths. <strong>Probe</strong>: "Why was <code>synchronized</code> not made Loom-friendly?" → Performance + JVM-spec implications; refactor to <code>ReentrantLock</code> instead.</p>
+<h3 id="4-structured-concurrency-replacing-completablefuture-mess">4. Structured concurrency — replacing CompletableFuture mess<a class="anchor" href="#4-structured-concurrency-replacing-completablefuture-mess" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public OrderResult placeOrderStructured(Long orderId) throws InterruptedException {
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        Subtask&lt;User&gt; userTask = scope.fork(() -&gt; users.fetch(orderId));
+        Subtask&lt;Reservation&gt; resTask = scope.fork(() -&gt; inventory.reserve(orderId));
+
+        scope.join().throwIfFailed();      // wait + propagate first failure (cancels rest)
+
+        var validated = new ValidatedOrder(userTask.get(), resTask.get());
+
+        // Sequential dependent step.
+        var payment = payments.charge(validated);
+        email.sendConfirmation(new ChargedOrder(validated, payment));
+
+        return new OrderResult(orderId, &quot;OK&quot;);
+    } catch (StructuredTaskScope.FailedException e) {
+        return new OrderResult(orderId, &quot;FAILED: &quot; + e.getCause().getMessage());
+    }
+}
+</code></pre></div>
+<p>Why this beats nested <code>CompletableFuture</code>:
+- <strong>Failure cancellation propagates</strong> automatically — if <code>users.fetch</code> throws, <code>inventory.reserve</code> is cancelled.
+- <strong>Lifecycle is lexical</strong> — try-with-resources ensures cleanup.
+- <strong>Imperative reading</strong> — easier than chained <code>thenCompose</code>.
+- <strong>Loom-native</strong> — built on virtual threads.</p>
+<p><strong>Probe</strong>: "When use raw <code>CompletableFuture</code> instead?" → When you need fine-grained timeout per step + complex composition graphs (DAG, not tree). Structured concurrency is simpler but more restrictive.</p>
+<h3 id="5-gc-tuning-concrete-flags-tracing">5. GC tuning — concrete flags + tracing<a class="anchor" href="#5-gc-tuning-concrete-flags-tracing" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># G1 (default since Java 9) — tune pause target:
+java -Xms8G -Xmx8G \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=200 \
+     -XX:G1HeapRegionSize=16M \
+     -Xlog:gc*:gc.log:time,uptime,level,tags \
+     -jar app.jar
+
+# ZGC — sub-ms pauses, large heap (Java 17+, generational since Java 21):
+java -Xms32G -Xmx32G \
+     -XX:+UseZGC \
+     -XX:+ZGenerational \                  # generational mode (default in Java 23+)
+     -Xlog:gc*:gc.log \
+     -jar app.jar
+
+# Container-aware (Java 17+):
+java -XX:MaxRAMPercentage=75 \             # use 75% of container memory limit
+     -XX:InitialRAMPercentage=50 \
+     -jar app.jar
+</code></pre></div>
+<p><strong>Reading the GC log</strong> (key fields):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">[2.345s][info][gc] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 248M-&gt;180M(1024M) 18.245ms
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                                |
+                                                                                pause time
+</code></pre></div>
+<p>Look for:
+- Pause times &gt; target (200ms): G1 isn't keeping up.
+- Increasing pause times over time: heap fragmentation; consider ZGC.
+- "Concurrent Mark Cycle" frequency: too frequent = old-gen pressure.
+- Full GC: G1 fell back to single-threaded stop-the-world — bad; means OOM is imminent.</p>
+<p><strong>Probe</strong>: "Diagnosing high p99 latency: GC?" → Enable <code>-Xlog:gc*</code> + correlate pause times with request latencies. If p99 spikes align with GC pauses → tune. Else look elsewhere.</p>
+<h3 id="6-jfr-java-flight-recorder-workflow">6. JFR (Java Flight Recorder) workflow<a class="anchor" href="#6-jfr-java-flight-recorder-workflow" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Start continuous recording on a running JVM (Java 11+):
+jcmd &lt;pid&gt; JFR.start duration=60s filename=profile.jfr
+
+# Check status:
+jcmd &lt;pid&gt; JFR.check
+
+# Dump current data:
+jcmd &lt;pid&gt; JFR.dump filename=now.jfr
+
+# Stop the recording:
+jcmd &lt;pid&gt; JFR.stop name=1
+
+# Open in JMC (download from https://www.oracle.com/java/technologies/jdk-mission-control.html):
+jmc profile.jfr
+</code></pre></div>
+<p><strong>What to look for</strong>:
+- <strong>CPU profile</strong> — top methods by CPU; flame graph view.
+- <strong>Allocation profile</strong> — top methods allocating; helps find GC pressure source.
+- <strong>Lock contention</strong> — <code>synchronized</code> blocks + <code>Lock</code> waits; ThreadLocal hotspots.
+- <strong>GC events</strong> — pause times, allocation rates, promotion failures.
+- <strong>Compilations</strong> — JIT activity; deopt events.</p>
+<p><strong>Async-profiler alternative</strong> — lower overhead, flame graphs out of the box:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -jar -agentpath:/path/to/libasyncProfiler.so=start,event=cpu,file=cpu.html app.jar
+</code></pre></div>
+<p>Output is interactive SVG flame graph; click to drill down.</p>
+<h3 id="7-memory-leak-diagnosis">7. Memory leak diagnosis<a class="anchor" href="#7-memory-leak-diagnosis" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Common leak: static collection grows unbounded.
+public class CacheService {
+    private static final Map&lt;String, byte[]&gt; CACHE = new HashMap&lt;&gt;();    // NEVER evicts
+
+    public byte[] get(String key) {
+        return CACHE.computeIfAbsent(key, this::loadFromDisk);
+    }
+    private byte[] loadFromDisk(String key) { /* read large blob */ }
+}
+</code></pre></div>
+<p><strong>Detection workflow</strong>:</p>
+<ol>
+<li>Heap usage trends up over time (Grafana JVM dashboard).</li>
+<li>Take heap dump: <code>jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof</code>.</li>
+<li>Open in <strong>Eclipse MAT</strong>.</li>
+<li>Click "Leak Suspects Report".</li>
+<li><strong>Dominator Tree</strong> view — sort by retained size; top entry is usually the leak.</li>
+<li><strong>Path to GC Root</strong> — see what's holding the reference.</li>
+</ol>
+<p>For the CacheService above, dominator tree would show <code>CacheService.CACHE</code> HashMap as the top dominator; path to GC root → static field of <code>CacheService</code>.</p>
+<p><strong>Fix</strong>: replace with bounded cache (Caffeine) + TTL + max size.</p>
+<h3 id="8-false-sharing-demonstration-contended">8. False sharing demonstration + <code>@Contended</code><a class="anchor" href="#8-false-sharing-demonstration-contended" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class FalseSharing {
+    // BAD: a + b will share a cache line; concurrent updates from different threads invalidate.
+    static class SharedFields {
+        long a;
+        long b;
+    }
+
+    // FIXED: @Contended pads each field to its own cache line (Java 8+).
+    static class PaddedFields {
+        @jdk.internal.vm.annotation.Contended  // requires -XX:-RestrictContended
+        long a;
+        @jdk.internal.vm.annotation.Contended
+        long b;
+    }
+}
+</code></pre></div>
+<p><strong>Benchmark</strong> (JMH-style): two threads updating <code>a</code> and <code>b</code> concurrently. <code>SharedFields</code> ~5× slower than <code>PaddedFields</code> due to cache-coherence ping-pong.</p>
+<p><code>LongAdder</code> uses <code>@Contended</code> internally for its stripes — that's why it scales better than <code>AtomicLong</code> under contention.</p>
+<p><strong>Probe</strong>: "Why isn't <code>@Contended</code> enabled by default?" → It wastes memory (per-field padding). Used only where measurement shows benefit.</p>
+<h2 id="sources-further-reading">Sources &amp; Further Reading<a class="anchor" href="#sources-further-reading" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="https://jcip.net/">Java Concurrency in Practice — Brian Goetz</a></li>
+<li><a href="https://www.oreilly.com/library/view/optimizing-java/9781492025788/">Optimizing Java — Benjamin Evans</a></li>
+<li><a href="https://docs.oracle.com/javase/specs/jvms/se21/html/index.html">JVM Specification</a></li>
+<li><a href="https://inside.java/">Inside Java (Oracle official blog)</a></li>
+<li><a href="https://openjdk.org/jeps/0">JEP Index — Java Enhancement Proposals</a></li>
+<li><a href="https://github.com/async-profiler/async-profiler">Async Profiler</a></li>
+<li><a href="https://www.oracle.com/java/technologies/jdk-mission-control.html">JFR + JMC</a></li>
+</ul>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to answer <strong>70+ questions</strong> spanning thread fundamentals, JMM happens-before, synchronisation primitives, virtual threads + structured concurrency, JVM data areas, class loaders, GC algorithms (G1 / ZGC / Shenandoah), JIT internals, profiling tools, memory-leak diagnosis, container-aware JVM. These are the topics that decide banking, Goldman, Amazon SDE-II/III, Microsoft 62/63 loops.</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c06-t03-collections-and-data-structures-q-and-a-bank.html">Collections &amp; Data Structures — Q&amp;A Bank</a>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)&quot;
+slug: java-concurrency-jvm-and-performance-q-and-a-bank
+level: L6
+module: &quot;Interview Mastery (FAANGM + MNC)&quot;
+section: &quot;Staff-Level Interview Question Banks&quot;
+type: interview-qa
+difficulty: senior
+order: 2
+tags: [java, concurrency, jvm, gc, jmm, virtual-threads, qa, qa-bank, staff]
+prerequisites: [java-language-and-core-q-and-a-bank]
+status: complete
+estimated_minutes: 70
+last_updated: 2026-06-09
+---
+
+# Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)
+
+**70+ questions** on threading, the Java Memory Model, executors, async, virtual threads (Project Loom), GC algorithms, class loaders, JIT, profiling, and tuning. This is **the deepest question bank in the L6 set** — these topics decide senior+ banking/Goldman/JPMC + Microsoft + Amazon SDE-II/III loops.
+
+## Threading Fundamentals
+
+### Q: What does `Thread.start()` do that `Thread.run()` doesn&#x27;t?
+
+- **Difficulty:** junior
+- **Asked at:** universal
+
+**Answer.** `start()` registers the thread with the OS scheduler and invokes `run()` on the new thread. Calling `run()` directly executes the method on the *current* thread — no concurrency. `start()` can only be called once; calling it twice throws `IllegalThreadStateException`.
+
+### Q: Difference between `Runnable`, `Callable`, and `Supplier`?
+
+- **Difficulty:** junior-mid
+- **Asked at:** universal
+
+**Answer.** **`Runnable`** — `void run()`, no checked exceptions, no return. **`Callable&lt;V&gt;`** — `V call() throws Exception`, returns a value, can throw checked. **`Supplier&lt;T&gt;`** — `T get()`, functional interface, no exceptions. Submit `Runnable`/`Callable` to `ExecutorService`; use `Supplier` for lazy value provision or `CompletableFuture.supplyAsync`.
+
+### Q: Explain `ExecutorService`&#x27;s `submit` vs `execute`.
+
+- **Difficulty:** mid
+- **Asked at:** universal
+
+**Answer.** `execute(Runnable)` — fire and forget; uncaught exceptions go to the thread&#x27;s `UncaughtExceptionHandler`. `submit(Runnable/Callable)` — returns a `Future`; **exceptions are swallowed unless you call `future.get()`** (which then throws `ExecutionException`). The silent-swallow is the #1 production bug — always either `get()` or wrap with a logging future.
+
+**Follow-ups:**
+- How do you log all exceptions from `submit`?
+- `invokeAll` vs `invokeAny`?
+
+### Q: Walk through what happens when you submit task #N to a `ThreadPoolExecutor`.
+
+- **Difficulty:** mid-senior
+- **Asked at:** banking, Goldman, Microsoft, Amazon
+
+**Answer.** This is **the** canonical pool question:
+
+1. If `&lt; corePoolSize` threads exist, **create a new thread** to run the task.
+2. Else, attempt to **enqueue** the task in the work queue.
+3. If the queue is full, attempt to **create a new thread** up to `maximumPoolSize`.
+4. If at `maxPoolSize` and queue is full, **invoke the `RejectedExecutionHandler`** (default: `AbortPolicy` → throws `RejectedExecutionException`).
+
+So an **unbounded queue** means threads never go above `corePoolSize`. A **bounded queue** + `maxPoolSize &gt; corePoolSize` lets the pool grow under burst.
+
+**Follow-ups:**
+- `LinkedBlockingQueue` default capacity? (`Integer.MAX_VALUE` — effectively unbounded — dangerous.)
+- Rejection handlers — when use each (Abort/CallerRuns/Discard/DiscardOldest)?
+
+### Q: Why is `Executors.newCachedThreadPool` dangerous in production?
+
+- **Difficulty:** mid-senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** It uses `SynchronousQueue` + `Integer.MAX_VALUE` max pool. Under sustained burst it creates a thread per task, exhausts memory, and crashes with `OutOfMemoryError: unable to create native thread`. Brian Goetz explicitly warns against it. Use a fixed-size pool or carefully tuned `ThreadPoolExecutor`.
+
+### Q: `Executors.newFixedThreadPool` — what&#x27;s its hidden danger?
+
+- **Difficulty:** mid-senior
+- **Asked at:** banking, performance-conscious
+
+**Answer.** Backed by `LinkedBlockingQueue` with **unbounded capacity**. Under sustained load with slow consumers, queue grows without limit → OOM. Always use `ThreadPoolExecutor` directly with a bounded queue + explicit rejection policy.
+
+### Q: `ForkJoinPool` vs `ThreadPoolExecutor` — when each?
+
+- **Difficulty:** senior
+- **Asked at:** JVM-curious, Microsoft, Amazon senior
+
+**Answer.** `ForkJoinPool` uses **work-stealing** — idle threads pull tasks from other threads&#x27; deques. Optimal for divide-and-conquer (`RecursiveTask`/`RecursiveAction`) and CPU-bound parallel work. `ThreadPoolExecutor` uses a shared work queue, optimal for independent task submission. Parallel streams + `CompletableFuture` async (default) use the **common ForkJoinPool**, sized `cores - 1`. Sharing the common pool with everything else can starve your app — use a custom pool for I/O-bound work.
+
+**Follow-ups:**
+- How do you change common-pool size? (`-Djava.util.concurrent.ForkJoinPool.common.parallelism`.)
+- Why was work-stealing introduced?
+
+### Q: Explain `CompletableFuture` composition — `thenApply` vs `thenCompose`.
+
+- **Difficulty:** senior
+- **Asked at:** Spring async shops, banking
+
+**Answer.** `thenApply(Function&lt;T,U&gt;)` — transforms a `CompletableFuture&lt;T&gt;` to `CompletableFuture&lt;U&gt;` via a synchronous function. `thenCompose(Function&lt;T,CompletableFuture&lt;U&gt;&gt;)` — flattens nested futures: returns `CompletableFuture&lt;U&gt;` when the function itself returns a `CompletableFuture&lt;U&gt;`. Without it you&#x27;d get `CompletableFuture&lt;CompletableFuture&lt;U&gt;&gt;`. Use `thenApply` for fast transformations; `thenCompose` when the next step is itself async.
+
+```java
+// thenApply — sync transform
+fetchUser(id).thenApply(User::name);             // CF&lt;String&gt;
+// thenCompose — async chain (avoid nesting)
+fetchUser(id).thenCompose(this::fetchOrdersFor); // CF&lt;List&lt;Order&gt;&gt;, not CF&lt;CF&lt;...&gt;&gt;
+```
+
+**Follow-ups:**
+- `thenCombine` vs `thenCompose`?
+- What about `allOf` / `anyOf`?
+
+### Q: How do you set a timeout on a `CompletableFuture`?
+
+- **Difficulty:** mid-senior
+- **Asked at:** universal modern
+
+**Answer.** Java 9+: `orTimeout(long, TimeUnit)` completes exceptionally with `TimeoutException` if not done in time. `completeOnTimeout(value, timeout, unit)` completes successfully with a fallback value. Pre-Java-9: schedule a manual `ScheduledExecutor` task that calls `future.completeExceptionally()`.
+
+```java
+fetchUser(id)
+    .orTimeout(2, TimeUnit.SECONDS)
+    .exceptionally(e -&gt; User.GUEST);
+```
+
+### Q: What&#x27;s the difference between `ReentrantLock` and `synchronized`?
+
+- **Difficulty:** mid-senior
+- **Asked at:** universal Java
+
+**Answer.** Both are mutex. `ReentrantLock` adds: **fairness** (FIFO option), **`tryLock`** (non-blocking attempt), **`tryLock(timeout)`**, **`lockInterruptibly`** (acquirable thread interruption-aware), **multiple Condition variables per lock** (vs one wait-set on monitors). Cost: must `unlock()` in `finally`; verbose vs `synchronized`. Use `ReentrantLock` when you need any of those features; else `synchronized` is simpler.
+
+### Q: Explain `ReadWriteLock` and `StampedLock`.
+
+- **Difficulty:** senior
+- **Asked at:** banking, performance-critical
+
+**Answer.** **`ReadWriteLock`** — separate read + write locks; multiple concurrent readers OR one writer. Reads cheap, writes block. Good for read-mostly state. **`StampedLock`** (Java 8) — adds **optimistic reads**: `long stamp = lock.tryOptimisticRead(); ...; if (!lock.validate(stamp)) { fallback to read lock; }`. Optimistic reads have no acquisition cost; useful for ultra-hot read paths. **Not reentrant**, no Condition support. Trickier to use correctly.
+
+### Q: Difference between `CountDownLatch`, `CyclicBarrier`, `Phaser`, and `Semaphore`?
+
+- **Difficulty:** senior
+- **Asked at:** Java-deep shops
+
+**Answer.**
+- **`CountDownLatch(N)`** — one-shot; threads `await()` until N `countDown()` calls happen. Not reusable.
+- **`CyclicBarrier(N)`** — reusable; all N threads must reach the barrier before all proceed. Supports an optional barrier-action.
+- **`Phaser`** — like `CyclicBarrier` but supports **dynamic registration** + multi-phase. Threads can join/leave between phases.
+- **`Semaphore(permits)`** — caps concurrent access to N permits; `acquire`/`release`. Use for rate-limiting/connection pools.
+
+### Q: Explain `AtomicXxx` and CAS.
+
+- **Difficulty:** mid-senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** Atomic types (`AtomicInteger`, `AtomicLong`, `AtomicReference`) use **Compare-And-Swap** (CAS) — a CPU instruction (`CMPXCHG` on x86, `LDREX/STREX` on ARM) that atomically swaps a value if-and-only-if it matches the expected old value. Lock-free, scales better than `synchronized` under low contention. Under high contention, retries pile up and CAS can be slower than a lock.
+
+```java
+AtomicInteger c = new AtomicInteger();
+c.incrementAndGet();           // CAS loop
+c.compareAndSet(expected, new); // explicit CAS
+```
+
+**Follow-ups:**
+- What&#x27;s the ABA problem?
+- `AtomicStampedReference` — what does it solve?
+
+### Q: What&#x27;s the ABA problem and how do you avoid it?
+
+- **Difficulty:** senior
+- **Asked at:** banking, lock-free-curious
+
+**Answer.** CAS only checks value equality — not history. Thread T1 reads value A, gets pre-empted. T2 changes A → B → A. T1&#x27;s CAS succeeds even though state changed underneath. Most code is fine; lock-free data structures (Treiber stack, linked lists) can be corrupted. Fix: use **`AtomicStampedReference&lt;V&gt;`** which pairs a value with a monotonically-incrementing stamp.
+
+### Q: `LongAdder` vs `AtomicLong` — when each?
+
+- **Difficulty:** senior
+- **Asked at:** banking, perf-conscious
+
+**Answer.** Under low contention, identical. Under **high contention**, `AtomicLong` becomes a hotspot — every CAS conflicts. `LongAdder` (Java 8) keeps **per-thread (per-stripe) counters** that sum on read. Writes scale linearly with cores; reads cost a sum. Use `LongAdder` for write-heavy stats counters (metrics, request counts). Use `AtomicLong` when reads are frequent and writes infrequent.
+
+### Q: Explain `ThreadLocal` and the memory-leak risk.
+
+- **Difficulty:** senior
+- **Asked at:** Tomcat-using shops, banking
+
+**Answer.** `ThreadLocal&lt;T&gt;` gives each thread its own copy of a value. The thread-local map is stored on the `Thread` object. **Leak risk in app servers**: when a thread returns to the pool, its ThreadLocal entries persist. If those values reference your app&#x27;s classloader, you prevent app undeploy → classloader leak. Mitigation: always call `remove()` in a `finally` block. Java 21+ introduces **`ScopedValue`** as the replacement — scoped to a try-with-resources block; auto-cleaned.
+
+### Q: What&#x27;s `ScopedValue` (Java 21+) and why?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops, virtual-thread-curious
+
+**Answer.** `ScopedValue&lt;T&gt;` is a successor to `ThreadLocal`, designed for **virtual threads**. ThreadLocal stores per-thread state — with millions of virtual threads, this scales poorly. ScopedValue is **immutable**, **lexically scoped** (bound during a specific call), and shared efficiently across virtual threads. `ScopedValue.where(USER, currentUser).run(() -&gt; ...)`.
+
+## Java Memory Model
+
+### Q: Explain happens-before edges.
+
+- **Difficulty:** senior
+- **Asked at:** banking, Microsoft, Amazon senior
+
+**Answer.** Happens-before is a **partial ordering** of operations such that if A happens-before B, A&#x27;s effects are visible to B. Edges:
+1. **Program order** within a single thread.
+2. **Monitor lock release** → subsequent acquire of same lock.
+3. **Volatile write** → subsequent read of same volatile.
+4. **Thread.start()** → first action of started thread.
+5. **Thread&#x27;s last action** → another thread&#x27;s `Thread.join()` return.
+6. **Final field freeze** at end of constructor → reader&#x27;s first read of constructed object (when published safely).
+7. **Transitive** — if A hb B and B hb C, then A hb C.
+
+Without an edge, the JVM/CPU may **reorder reads/writes** for performance. Visibility bugs are silent and platform-specific (x86 vs ARM differ).
+
+### Q: Why does double-checked locking need `volatile`?
+
+- **Difficulty:** senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** Classic broken pattern (pre-Java-5):
+
+```java
+private static Singleton instance;
+public static Singleton getInstance() {
+    if (instance == null) {
+        synchronized (Singleton.class) {
+            if (instance == null) instance = new Singleton();
+        }
+    }
+    return instance;
+}
+```
+
+`new Singleton()` is three steps: allocate, run constructor, assign reference. The JVM/CPU may reorder so reference is assigned *before* constructor finishes. Another thread sees non-null `instance` and uses a partially-constructed object. Java 5+ fixes this with `volatile` — the volatile write ensures the constructor completes before the reference is published.
+
+Alternative without `volatile`: **holder idiom** — a static inner class loaded lazily by the class loader, which guarantees thread-safe single initialisation.
+
+### Q: What&#x27;s safe publication?
+
+- **Difficulty:** senior
+- **Asked at:** banking, deep concurrency
+
+**Answer.** Publishing an object so other threads see it in a fully-constructed state. Techniques:
+- **`final` fields** — JMM guarantees final-field freeze at end of constructor.
+- **`volatile` field** — write to volatile after construction.
+- **`synchronized`** block.
+- **`AtomicReference.set`**.
+- **Static initialiser** — JVM guarantees once-only thread-safe class init.
+- **`ConcurrentHashMap.put`** before any other thread reads.
+
+Bad: assigning to a regular (non-volatile, non-final) field after construction — reader may see uninitialised state.
+
+### Q: Why is `volatile` array element not really volatile?
+
+- **Difficulty:** senior
+- **Asked at:** banking, deep concurrency
+
+**Answer.** `volatile int[] arr` makes the **reference** volatile — writes/reads to the variable `arr` are volatile. **Elements** (`arr[0]`) are regular memory accesses. To make element-level access volatile, use `AtomicIntegerArray` or Java 9+ `VarHandle`.
+
+### Q: What is false sharing?
+
+- **Difficulty:** senior
+- **Asked at:** banking, low-latency shops, Microsoft
+
+**Answer.** CPU caches load memory in **cache lines** (typically 64 bytes). If two threads update different variables that happen to fall on the **same cache line**, the cache-coherence protocol invalidates the line for the other CPU on every write — destroying parallelism. Mitigation: **pad** the variables to separate cache lines, or use Java 8+ `@Contended` annotation (requires `-XX:-RestrictContended`). `LongAdder` uses `@Contended` internally on its stripes.
+
+## Deadlock + Liveness
+
+### Q: How do you reproduce a deadlock with 2 threads + 2 locks?
+
+- **Difficulty:** mid-senior
+- **Asked at:** universal
+
+**Answer.** Two threads acquire two locks in opposite order:
+
+```java
+Thread A: lock(L1); ... lock(L2);
+Thread B: lock(L2); ... lock(L1);
+```
+
+T1 holds L1, waits for L2. T2 holds L2, waits for L1. Deadlock. **Fix**: always acquire locks in a consistent global order (e.g., sort by `System.identityHashCode`). Or use `tryLock` with timeout + backoff.
+
+### Q: How do you detect a deadlock in production?
+
+- **Difficulty:** senior
+- **Asked at:** banking, oncall-heavy shops
+
+**Answer.** `jstack &lt;pid&gt;` → look for `Found N deadlocks` at the bottom. Also visible via `jconsole` / VisualVM. JMX `ThreadMXBean.findDeadlockedThreads()` returns thread IDs programmatically. In production, set up an alert if `findDeadlockedThreads` returns non-empty. Heap dumps via `jcmd &lt;pid&gt; GC.heap_dump` also help when deadlock is intermittent.
+
+### Q: What&#x27;s livelock vs starvation?
+
+- **Difficulty:** senior
+- **Asked at:** banking
+
+**Answer.** **Livelock** — threads aren&#x27;t blocked but keep yielding to each other, making no progress (two polite people stepping aside in a corridor). **Starvation** — a thread never gets the CPU or lock because others always win. Fix livelock with backoff + jitter; fix starvation with fairness flags (`new ReentrantLock(true)`) or queue-based wakeups.
+
+## Virtual Threads (Project Loom)
+
+### Q: What are virtual threads (Java 21+)?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops 2024+
+
+**Answer.** Lightweight threads managed by the JVM, mounted on **carrier threads** (platform threads, typically `ForkJoinPool.commonPool()` size). When a virtual thread blocks (I/O, sleep), it **unmounts** from its carrier so the carrier can run another virtual thread. Stack is allocated on the heap, growable, ~few KB initially. You can have millions of virtual threads vs ~thousands of platform threads. Replaces reactive complexity for I/O-bound workloads. `Thread.ofVirtual().start()` or `Executors.newVirtualThreadPerTaskExecutor()`.
+
+### Q: What&#x27;s thread pinning and when does it happen?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops 2024+
+
+**Answer.** A virtual thread is **pinned** to its carrier when it can&#x27;t unmount during blocking. Pinned because:
+1. **`synchronized` block holding the monitor** — the JVM can&#x27;t unmount safely.
+2. **JNI / native frames** on the stack.
+
+Pinned virtual threads starve carrier threads, defeating Loom&#x27;s benefits. **Fix**: replace `synchronized` with `ReentrantLock` (which Loom-aware). Track with `-Djdk.tracePinnedThreads=full`. Virtual threads + traditional `synchronized` code can be slower than platform threads.
+
+### Q: When would virtual threads NOT help?
+
+- **Difficulty:** senior
+- **Asked at:** Microsoft, Amazon, modern shops
+
+**Answer.**
+- **CPU-bound** workloads — virtual threads give no parallelism beyond carrier count.
+- **Pinned operations** (synchronized blocks, JNI) — pin defeats unmount.
+- **Memory-bound** — each virtual thread still has stack frames.
+- **Blocking JDBC drivers** — pre-Loom JDBC drivers may pin or block carriers. Most newer drivers (PostgreSQL, MySQL) are Loom-friendly; some still aren&#x27;t.
+
+### Q: Structured concurrency — what problem does it solve?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops 2024+
+
+**Answer.** `StructuredTaskScope` (Java 21+, preview→GA) bundles related concurrent tasks so they share a lifecycle. If one fails or is cancelled, the rest are cancelled. Replaces nested `CompletableFuture` mess where cancellation propagation is manual. Aligns concurrency lifetime with lexical scope — easier to reason about.
+
+```java
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Future&lt;User&gt; u = scope.fork(() -&gt; fetchUser(id));
+    Future&lt;List&lt;Order&gt;&gt; o = scope.fork(() -&gt; fetchOrders(id));
+    scope.join().throwIfFailed();
+    return new UserOrders(u.resultNow(), o.resultNow());
+}
+// On exception or scope close, both tasks cancelled.
+```
+
+## Producer-Consumer
+
+### Q: Implement a bounded buffer with wait/notify.
+
+- **Difficulty:** mid-senior
+- **Asked at:** Java-deep shops
+
+**Answer.**
+
+```java
+class BoundedBuffer&lt;T&gt; {
+    private final Object[] buf;
+    private int head, tail, count;
+    public BoundedBuffer(int cap) { buf = new Object[cap]; }
+    public synchronized void put(T x) throws InterruptedException {
+        while (count == buf.length) wait();         // always loop, never if
+        buf[tail] = x;
+        tail = (tail + 1) % buf.length;
+        count++;
+        notifyAll();
+    }
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public synchronized T take() throws InterruptedException {
+        while (count == 0) wait();
+        T x = (T) buf[head];
+        head = (head + 1) % buf.length;
+        count--;
+        notifyAll();
+        return x;
+    }
+}
+```
+
+Key points: **always loop on the condition** (spurious wakeups + state may change between notify and re-acquire); always `notifyAll` (cheap correctness over fragile `notify`); use **`BlockingQueue`** in production instead.
+
+### Q: When to use `BlockingQueue` types?
+
+- **Difficulty:** mid-senior
+- **Asked at:** Java-deep shops
+
+**Answer.**
+- **`ArrayBlockingQueue(N)`** — bounded, FIFO, single lock.
+- **`LinkedBlockingQueue`** — optionally bounded, two locks (head + tail), higher throughput under contention.
+- **`SynchronousQueue`** — capacity 0; hand-off between producer and consumer.
+- **`PriorityBlockingQueue`** — unbounded heap-ordered.
+- **`DelayQueue`** — elements available only when delay expires (timers).
+- **`LinkedTransferQueue`** — like LinkedBlockingQueue + direct hand-off via `transfer`.
+
+### Q: What&#x27;s the difference between `Thread.sleep`, `Object.wait`, and `LockSupport.park`?
+
+- **Difficulty:** senior
+- **Asked at:** Java-deep
+
+**Answer.**
+- **`Thread.sleep(ms)`** — pauses; does NOT release any held monitor.
+- **`Object.wait()`** — releases the monitor of `this` (must be called inside `synchronized` block on `this`); resumes on `notify`/`notifyAll`/timeout/interrupt.
+- **`LockSupport.park()`** — low-level primitive; does NOT touch monitors; released by `unpark(thread)`. Used to build higher-level synchronisers.
+
+### Q: Cooperative cancellation — handling `InterruptedException`.
+
+- **Difficulty:** senior
+- **Asked at:** banking, oncall-heavy
+
+**Answer.** Never swallow `InterruptedException`. Either:
+1. **Re-throw** it (let the caller decide).
+2. **Restore the interrupt flag**: `Thread.currentThread().interrupt();` and continue.
+
+If you swallow without restoring, downstream blocking calls won&#x27;t notice the interrupt and your shutdown won&#x27;t terminate. **Anti-pattern**: `try { Thread.sleep(...); } catch (InterruptedException e) { /* ignored */ }`.
+
+## JVM Internals
+
+### Q: Walk through the JVM runtime data areas.
+
+- **Difficulty:** senior
+- **Asked at:** banking, Microsoft, Amazon, JVM-curious
+
+**Answer.**
+- **Heap** — all objects; shared across threads; GC-managed; split young (Eden + 2 survivor) + old (tenured).
+- **Stack** — per thread; method frames with locals, operand stack, return address. `-Xss` controls size.
+- **Metaspace** (post-PermGen, Java 8+) — class metadata; native memory, not heap; sized via `-XX:MaxMetaspaceSize`.
+- **PC register** — per thread; address of current bytecode instruction.
+- **Native method stack** — per thread; for JNI calls.
+- **Code cache** — JIT-compiled native code; sized via `-XX:ReservedCodeCacheSize`.
+- **Direct memory** — off-heap `ByteBuffer.allocateDirect` allocations.
+
+### Q: Why was PermGen replaced with Metaspace?
+
+- **Difficulty:** senior
+- **Asked at:** banking, Java-history-curious
+
+**Answer.** PermGen (≤ Java 7) was a fixed-size region for class metadata, interned strings, and class loaders. Sizing was painful — too small → `OutOfMemoryError: PermGen space`; too large → wasted heap. Metaspace (Java 8+) lives in **native memory** outside the heap, auto-grows by default (cap via `MaxMetaspaceSize`). Interned strings moved to the heap (Java 7).
+
+### Q: Explain class loaders + parent-first delegation.
+
+- **Difficulty:** senior
+- **Asked at:** Tomcat-using shops, banking
+
+**Answer.** Three (Java 9+ renamed): **Bootstrap** loads `rt.jar`/core JDK classes (native). **Platform** (was Ext) loads JDK extension modules. **App / System** loads classpath / modulepath. Loading is **parent-first** — child asks parent before loading itself. Prevents core classes from being overridden. **Custom class loaders** for Tomcat (per-app isolation), OSGi (modular containers), hot-reload.
+
+**Follow-ups:**
+- Why does Tomcat use per-app class loaders?
+- `ClassNotFoundException` vs `NoClassDefFoundError`?
+
+### Q: Difference between `ClassNotFoundException` and `NoClassDefFoundError`?
+
+- **Difficulty:** mid-senior
+- **Asked at:** banking, debugging-heavy
+
+**Answer.** **`ClassNotFoundException`** — explicit `Class.forName(name)` failed; class never loaded. Checked exception. **`NoClassDefFoundError`** — class was successfully compiled but missing at runtime (probably due to deployment / classpath issue), or a static initialiser previously failed. Error, not exception. Hint: NCDFE often means a missing JAR or wrong classpath.
+
+### Q: What&#x27;s the object header and how big is it?
+
+- **Difficulty:** senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** Every Java object has a header containing the **mark word** (identity hashcode, GC age, lock state) and a **klass pointer** (pointer to the class metadata). With **compressed oops** (default for heaps ≤ 32 GB), an Object instance is **16 bytes** (12-byte header + 4-byte alignment padding). Without compressed oops, it&#x27;s 24 bytes. Arrays add 4 bytes for length.
+
+### Q: What are compressed oops?
+
+- **Difficulty:** senior
+- **Asked at:** banking, Microsoft
+
+**Answer.** &quot;Ordinary object pointers&quot; compressed to **32 bits** instead of 64 — saves ~50% on heap pointers. Works because the JVM aligns objects to 8 bytes, so the bottom 3 bits are always 0; multiply the 32-bit value by 8 to get the real address. Caps usable heap at **~32 GB** (4 GB × 8). Beyond 32 GB, JVM disables compressed oops automatically — heap becomes less efficient. Hence the &quot;32 GB cliff&quot;: going from 31 GB to 33 GB heap can make your app slower due to lost compression.
+
+### Q: TLAB — what and why?
+
+- **Difficulty:** senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** **Thread-Local Allocation Buffer** — each thread gets a chunk of the young generation; allocates from its own TLAB via bump pointer (just increment), no synchronisation. When TLAB exhausts, request a new one. Makes `new Object()` essentially free in the common case. Visible via `-XX:+PrintTLAB`.
+
+### Q: What&#x27;s escape analysis and scalar replacement?
+
+- **Difficulty:** senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** JIT-time analysis: if an object&#x27;s reference doesn&#x27;t **escape** its allocating method (not stored in a field, not returned, not passed to escapable code), the JIT can **scalar-replace** it — break the object into its fields and keep them in registers. Avoids heap allocation entirely. Most short-lived objects benefit; lambdas + iterators especially. View with `-XX:+PrintEscapeAnalysis -XX:+PrintEliminateAllocations`.
+
+## Garbage Collection
+
+### Q: Generational hypothesis — what is it?
+
+- **Difficulty:** senior
+- **Asked at:** universal Java senior
+
+**Answer.** Most objects die young. Group them by age — collect young gen frequently (cheap, lots of garbage), promote survivors to old gen (rare, slow). All major Java GCs (Serial, Parallel, G1, Shenandoah, ZGC-now-generational) are generational. Young = Eden + 2 Survivor spaces (S0/S1). Promotion threshold tunable.
+
+### Q: G1 — how does it work?
+
+- **Difficulty:** senior
+- **Asked at:** universal Java senior
+
+**Answer.** **Garbage-First** is region-based: heap split into ~2k regions of 1-32 MB each. Each region is either young (Eden/Survivor) or old. GC picks the regions with the most garbage first (the &quot;garbage-first&quot; heuristic). **Mixed collections** include young + some old regions. Predictable pause-time target (`-XX:MaxGCPauseMillis`, default 200 ms). Default GC since Java 9. Trade-off: more CPU overhead vs Parallel; better pause behaviour for typical app heaps (4-32 GB).
+
+### Q: ZGC vs Shenandoah vs G1 — when each?
+
+- **Difficulty:** senior
+- **Asked at:** banking, low-latency shops
+
+**Answer.**
+- **G1**: default; balanced throughput/pause; good for 4-32 GB heaps; pauses 50-200 ms typical.
+- **ZGC**: sub-ms pauses regardless of heap size; great for **large heaps (&gt; 16 GB)** + strict latency SLOs. Generational since Java 21 (catching up on throughput). Uses **colored pointers** + **load barriers**.
+- **Shenandoah**: similar goals to ZGC, different implementation (Brooks pointers). Red Hat&#x27;s offering. Also low-pause.
+
+Pick ZGC/Shenandoah when **tail latency** (p99/p999) dominates; G1 when throughput matters more.
+
+### Q: What&#x27;s generational ZGC?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops 2024+
+
+**Answer.** Java 21 added generational mode to ZGC (previously non-generational — collected the whole heap each cycle). Now ZGC has young + old generations like G1, dramatically reducing CPU overhead for typical workloads with high young-gen churn. Brings ZGC much closer to G1&#x27;s throughput while keeping sub-ms pauses. Enable with `-XX:+UseZGC -XX:+ZGenerational` (or just `-XX:+UseZGC` in Java 23+).
+
+### Q: When does Full GC happen with G1?
+
+- **Difficulty:** senior
+- **Asked at:** debugging-heavy shops
+
+**Answer.** G1&#x27;s mixed collection should normally keep up. Full GC (single-threaded stop-the-world) happens when:
+1. **Concurrent mode failure** — old gen filled before concurrent mark completed.
+2. **Allocation failure** during young/mixed collection.
+3. **Explicit `System.gc()`** (configurable).
+4. **Humongous object allocation** failure (objects &gt; 50% of region size).
+
+Full GC is bad — long pause, indicates undersized heap or bad tuning. Look at GC logs (`-Xlog:gc*`).
+
+### Q: How do you read GC logs?
+
+- **Difficulty:** senior
+- **Asked at:** banking, oncall-heavy
+
+**Answer.** Enable with `-Xlog:gc*:gc.log` (Java 9+ unified logging). Look for:
+- **Pause times** — should be &lt; target.
+- **Allocation rate** — MB/s allocated; high rate stresses GC.
+- **Promotion failure** — young gen can&#x27;t promote, falls back to Full GC.
+- **Concurrent mode failure** — same.
+- **Frequency** — Young GC every few seconds is normal; old GC every few minutes.
+
+Tools: **GCViewer**, **GCEasy.io**, **JFR + Mission Control**.
+
+### Q: What is string deduplication?
+
+- **Difficulty:** senior
+- **Asked at:** large-heap shops
+
+**Answer.** G1 + ZGC option (`-XX:+UseStringDeduplication`) that scans surviving Strings during GC and de-duplicates their backing char/byte arrays — multiple `String` objects with identical content share storage. Useful when your app has many duplicate Strings (typical: configuration, user data, log messages). Saves 10-30% heap in some workloads.
+
+## JIT + Performance
+
+### Q: Tiered compilation — what are the tiers?
+
+- **Difficulty:** senior
+- **Asked at:** banking, JVM-curious
+
+**Answer.** HotSpot uses 5 tiers (0-4):
+- **Tier 0** — interpreter (slow, no compilation).
+- **Tier 1** — C1 with full optimisation (no profile).
+- **Tier 2** — C1 with invocation+backedge profiling.
+- **Tier 3** — C1 with full profiling.
+- **Tier 4** — C2 with all optimisations (most expensive).
+
+The JVM compiles methods up tiers as they get hot. Visible with `-XX:+PrintCompilation`. **Cold start** runs at tier 0; **warmup** is the time to reach tier 4. AOT (GraalVM native-image) eliminates warmup at cost of runtime peak performance.
+
+### Q: What is deoptimisation?
+
+- **Difficulty:** senior
+- **Asked at:** JVM-curious
+
+**Answer.** JIT compiles methods based on observed types/branches. If at runtime the assumption is invalidated (new subclass loaded, branch never taken before now hit), the JIT **deoptimises** — reverts to the interpreter, may recompile later. Visible with `-XX:+PrintCompilation` (look for `!` markers). Heavy deopt indicates pathological code; usually harmless.
+
+### Q: OSR — what is on-stack replacement?
+
+- **Difficulty:** senior
+- **Asked at:** JVM-curious
+
+**Answer.** Normally methods get JIT-compiled on the next invocation. OSR compiles **while a method is already running** — necessary for methods with long-running loops (the loop never returns to be re-invoked). The JIT generates an OSR variant that takes over at a back-edge. Look for `% OSR` markers in `-XX:+PrintCompilation`. Microbenchmarks that put everything in `main` often only get OSR&#x27;d — JMH avoids this trap.
+
+### Q: What is Graal JIT?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops, JVM-curious
+
+**Answer.** A JIT compiler written in Java (vs C2 in C++), part of GraalVM. Enable with `-XX:+UseJVMCICompiler`. On some workloads (especially Streams, dynamic languages) Graal beats C2 by 10-20%; on others C2 still wins. Optional replacement for C2; also used for native-image AOT compilation.
+
+### Q: GraalVM native-image — what does it cost?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops, serverless-curious
+
+**Answer.** Ahead-of-time compiles Java to a native binary. **Benefits**: startup ~50ms (vs 5s for Spring Boot JVM), no warmup, small memory footprint — great for serverless / CLI / containers. **Costs**: (a) **reflection config required** — must declare reflectively-accessed classes; (b) **no JIT** — can&#x27;t optimise based on runtime profile; (c) **build-time class initialisation** — some libraries break; (d) **build is slow** (~minutes); (e) **interpreter performance ceiling** vs HotSpot&#x27;s JIT peak. Spring Boot 3 + Quarkus / Micronaut have native-image support.
+
+### Q: What&#x27;s CRaC?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops
+
+**Answer.** Coordinated Restore at Checkpoint — JVM feature to snapshot a running process and restore later. After warmup, dump a checkpoint; new instances restore from snapshot in ~100ms instead of cold-starting. Spring Boot 3.2+ integrates CRaC. Especially useful for serverless cold-start mitigation. Different from GraalVM native (which eliminates JVM entirely); CRaC keeps the JVM.
+
+## Profiling + Memory Leaks
+
+### Q: How do you profile a Java service in production with minimal overhead?
+
+- **Difficulty:** senior
+- **Asked at:** banking, oncall-heavy
+
+**Answer.** **JFR (Java Flight Recorder)** — built-in since Java 11; near-zero overhead (1-2%); start with `jcmd &lt;pid&gt; JFR.start duration=60s filename=profile.jfr`; analyse in **JMC (Mission Control)**. **async-profiler** — flame graphs for CPU + allocations; very low overhead; sample-based; not bundled, easy to install. Avoid heavy profilers (YourKit, JProfiler) in prod.
+
+### Q: How do you diagnose a memory leak?
+
+- **Difficulty:** senior
+- **Asked at:** banking, oncall-heavy
+
+**Answer.**
+1. **Detect**: heap usage trending up over time; `OutOfMemoryError: Java heap space`.
+2. **Snapshot**: `jcmd &lt;pid&gt; GC.heap_dump &lt;file&gt;` or `jmap -dump:format=b,file=&lt;f&gt; &lt;pid&gt;`.
+3. **Analyse**: Eclipse MAT — open dump, click &quot;Leak Suspects Report&quot;. Look at **dominator tree** (objects retaining the most heap), **GC roots** (why an object isn&#x27;t collected).
+4. **Common culprits**: `static Collection` growing unbounded; ThreadLocal not removed; listener not unregistered; cache without TTL; classloader leak (especially in Tomcat).
+
+### Q: What&#x27;s a ThreadLocal leak in app servers?
+
+- **Difficulty:** senior
+- **Asked at:** Tomcat-using shops
+
+**Answer.** Worker threads in a thread pool persist across requests. If your code sets `ThreadLocal.set(...)` and forgets to call `remove()`, the value lives as long as the worker thread does. Worse: if the value references your app&#x27;s classloader (e.g., your value&#x27;s class was loaded by the webapp loader), undeploying the app can&#x27;t reclaim the classloader. Eclipse MAT will show the leak. Always wrap ThreadLocal access in try-finally with `remove()`.
+
+### Q: What is JMH and why use it?
+
+- **Difficulty:** senior
+- **Asked at:** banking, perf-curious
+
+**Answer.** **Java Microbenchmark Harness** — the official tool for microbenchmarks. Handles **warmup** (avoid pre-JIT measurements), **dead-code elimination** (returns must be consumed), **constant folding** (inputs must be hidden), **forks** (isolate JIT state per run). Hand-rolled `System.nanoTime()` loops produce nonsense numbers. JMH is the only way to get trustworthy microbenchmarks.
+
+### Q: Why does `System.gc()` not always trigger a GC?
+
+- **Difficulty:** mid-senior
+- **Asked at:** universal
+
+**Answer.** It&#x27;s a **hint** to the JVM; can be disabled with `-XX:+DisableExplicitGC`. Even when honoured, the GC chooses what to collect — may be just a young collection. Anti-pattern in production code: calls disrupt the JVM&#x27;s adaptive sizing. Acceptable in tests/benchmarks to force a baseline state.
+
+## Container-Aware JVM
+
+### Q: Why was old Java 8 OOMKilled in Kubernetes?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops 2024+
+
+**Answer.** Pre-Java 8u131, JVM read host CPU/memory from `/proc/cpuinfo` and `/proc/meminfo` — not the cgroup limit. A pod with 2 CPU + 2 GB limit on a 64-core / 256 GB host saw 64 cores + 256 GB; sized heap accordingly; got OOMKilled when usage exceeded 2 GB. **Fix**: Java 8u191+ and Java 10+ are container-aware (`-XX:+UseContainerSupport` default). Tune heap as percentage: `-XX:MaxRAMPercentage=75`.
+
+### Q: How do you size JVM heap for a Kubernetes pod?
+
+- **Difficulty:** senior
+- **Asked at:** modern shops
+
+**Answer.** Pod memory limit = heap + metaspace + code cache + direct buffers + JIT scratch + thread stacks + native libs. Heap typically 50-75% of pod limit. Use `-XX:MaxRAMPercentage=75` (cleaner than `-Xmx` for containers — adapts when pod limit changes). Monitor RSS (`kubectl top pod`) vs heap to validate. Allow headroom for native memory tracking (`-XX:NativeMemoryTracking=summary`).
+
+## Tooling
+
+### Q: What&#x27;s `jstack`, `jmap`, `jcmd`?
+
+- **Difficulty:** mid-senior
+- **Asked at:** debugging-heavy
+
+**Answer.**
+- **`jstack &lt;pid&gt;`** — thread dump; shows all threads&#x27; stack traces and lock state. Finds deadlocks. Run multiple times to find hot paths.
+- **`jmap -histo &lt;pid&gt;`** — class instance count + size histogram. `jmap -dump:format=b,file=&lt;f&gt; &lt;pid&gt;` — heap dump for MAT.
+- **`jcmd &lt;pid&gt;`** — Swiss army knife. `jcmd &lt;pid&gt; help`. Subcommands include `GC.heap_dump`, `JFR.start/stop`, `VM.flags`, `Thread.print`.
+- **`jstat -gc &lt;pid&gt; 1s`** — GC stats in real time.
+- **`jps`** — list Java processes.
+
+### Q: What&#x27;s the difference between `jstack` thread dump and a JFR?
+
+- **Difficulty:** mid-senior
+- **Asked at:** debugging-heavy
+
+**Answer.** `jstack` is a one-shot snapshot of all thread stacks — see what&#x27;s happening *now*. **JFR** is continuous low-overhead profiling — sample CPU, allocations, IO, GC, lock contention over a time window. Use `jstack` for live debugging (&quot;why are my threads stuck?&quot;); JFR for production profiling and post-incident analysis.
+
+## Deeper Dive — Code-Backed Walkthroughs
+
+### 1. ThreadPoolExecutor — what happens when task N is submitted
+
+The canonical concurrency interview question. Walk through with code:
+
+```java
+ThreadPoolExecutor pool = new ThreadPoolExecutor(
+    /* corePoolSize  */ 2,
+    /* maximumPoolSize */ 5,
+    /* keepAliveTime */ 60, TimeUnit.SECONDS,
+    /* workQueue     */ new ArrayBlockingQueue&lt;&gt;(3),   // BOUNDED
+    /* threadFactory */ Executors.defaultThreadFactory(),
+    /* handler       */ new ThreadPoolExecutor.AbortPolicy()
+);
+
+// Submit 10 tasks, each sleeps 5 sec.
+for (int i = 0; i &lt; 10; i++) {
+    int taskId = i;
+    try {
+        pool.execute(() -&gt; {
+            System.out.println(&quot;Task &quot; + taskId + &quot; on &quot; + Thread.currentThread().getName());
+            try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+        });
+    } catch (RejectedExecutionException e) {
+        System.out.println(&quot;Task &quot; + taskId + &quot; REJECTED&quot;);
+    }
+}
+```
+
+**Step-by-step trace**:
+
+| Task | What happens |
+|---|---|
+| 0 | &lt; corePoolSize threads exist → **create thread 1**, run task 0 |
+| 1 | &lt; corePoolSize → **create thread 2**, run task 1 |
+| 2 | corePool full → **enqueue** in workQueue (size 1) |
+| 3 | enqueue (queue size 2) |
+| 4 | enqueue (queue size 3 — queue full) |
+| 5 | queue full → &lt; maximumPoolSize → **create thread 3**, run task 5 |
+| 6 | create thread 4 |
+| 7 | create thread 5 (now at maximumPoolSize) |
+| 8 | queue full + at maximumPoolSize → **RejectedExecutionException** |
+| 9 | rejected |
+
+**Probe**: &quot;What if I use `LinkedBlockingQueue` with default constructor?&quot; → Default `LinkedBlockingQueue` capacity = `Integer.MAX_VALUE`. Queue never fills → pool never grows beyond `corePoolSize` → `maximumPoolSize` is meaningless.
+
+**Probe**: &quot;Best `RejectedExecutionHandler`?&quot; → Depends. `AbortPolicy` (default) throws; `CallerRunsPolicy` runs on caller thread (back-pressure!); `DiscardPolicy` silently drops; `DiscardOldestPolicy` evicts queue head. For most prod: `CallerRunsPolicy` provides natural back-pressure.
+
+### 2. CompletableFuture composition — real-world chain
+
+```java
+public class OrderProcessor {
+    private final UserService users;
+    private final InventoryService inventory;
+    private final PaymentService payments;
+    private final EmailService email;
+    private final Executor executor;       // bounded pool, NOT common ForkJoinPool
+
+    public CompletableFuture&lt;OrderResult&gt; placeOrder(Long orderId) {
+        return CompletableFuture.supplyAsync(() -&gt; users.fetch(orderId), executor)
+            .thenCombine(
+                CompletableFuture.supplyAsync(() -&gt; inventory.reserve(orderId), executor),
+                (user, reservation) -&gt; new ValidatedOrder(user, reservation))
+            .thenCompose(validated -&gt; CompletableFuture
+                .supplyAsync(() -&gt; payments.charge(validated), executor)
+                .thenApply(payment -&gt; new ChargedOrder(validated, payment)))
+            .thenCompose(charged -&gt; CompletableFuture
+                .runAsync(() -&gt; email.sendConfirmation(charged), executor)
+                .thenApply(v -&gt; new OrderResult(charged.id(), &quot;OK&quot;)))
+            .orTimeout(5, TimeUnit.SECONDS)
+            .exceptionally(ex -&gt; {
+                log.error(&quot;Order {} failed&quot;, orderId, ex);
+                return new OrderResult(orderId, &quot;FAILED: &quot; + ex.getMessage());
+            });
+    }
+}
+```
+
+**Pattern recap**:
+- `supplyAsync(supplier, executor)` — async fetch returning a value.
+- `thenCombine(otherFuture, biFn)` — parallel; waits for both; combines.
+- `thenCompose(fn returning CF)` — sequential async chain; flattens nested futures.
+- `thenApply(fn returning value)` — sync transform.
+- `runAsync(runnable, executor)` — async side-effect, returns `CF&lt;Void&gt;`.
+- `orTimeout(time, unit)` — bound execution; completes exceptionally with `TimeoutException` if exceeded (Java 9+).
+- `exceptionally(fn)` — fallback on any upstream error.
+
+**Probe**: &quot;Why pass `executor`?&quot; → Without it, async ops use the default common ForkJoinPool, shared with everything else (parallel streams, async tasks across the JVM). Heavy work starves other consumers. Always specify your own bounded pool.
+
+**Probe**: &quot;Why `thenCompose` instead of nested `thenApply`?&quot; → `thenApply(x -&gt; someAsync(x))` returns `CF&lt;CF&lt;U&gt;&gt;` — nested future. `thenCompose` flattens to `CF&lt;U&gt;`.
+
+### 3. Virtual thread pinning demo
+
+```java
+public class PinningDemo {
+    private final Lock lock = new ReentrantLock();     // Loom-friendly
+
+    public void goodMethod() {
+        lock.lock();
+        try {
+            // blocking IO here is FINE — virtual thread unmounts cleanly
+            sleep(Duration.ofSeconds(1));
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private final Object monitor = new Object();
+
+    public void badMethod() {
+        synchronized (monitor) {        // PINS virtual thread
+            // blocking IO here pins to carrier; starves other vthreads
+            sleep(Duration.ofSeconds(1));
+        }
+    }
+}
+
+// Demonstrate:
+public static void main(String[] args) {
+    var demo = new PinningDemo();
+    var exec = Executors.newVirtualThreadPerTaskExecutor();
+    long start = System.currentTimeMillis();
+    var futures = IntStream.range(0, 100)
+        .mapToObj(i -&gt; CompletableFuture.runAsync(demo::badMethod, exec))   // try goodMethod for contrast
+        .toList();
+    futures.forEach(CompletableFuture::join);
+    System.out.printf(&quot;Elapsed: %d ms%n&quot;, System.currentTimeMillis() - start);
+}
+```
+
+Run with `-Djdk.tracePinnedThreads=full` — JVM logs every pinning event with stack trace.
+
+**With `synchronized`**: pinning serialises virtual threads onto carriers; 100 tasks on default ~CPU-count carriers takes seconds-per-batch. **With `ReentrantLock`**: virtual thread unmounts cleanly; all 100 tasks complete in ~1 sec total.
+
+**Probe**: &quot;What else causes pinning?&quot; → JNI frames on the stack; some pre-Loom legacy code paths. **Probe**: &quot;Why was `synchronized` not made Loom-friendly?&quot; → Performance + JVM-spec implications; refactor to `ReentrantLock` instead.
+
+### 4. Structured concurrency — replacing CompletableFuture mess
+
+```java
+public OrderResult placeOrderStructured(Long orderId) throws InterruptedException {
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        Subtask&lt;User&gt; userTask = scope.fork(() -&gt; users.fetch(orderId));
+        Subtask&lt;Reservation&gt; resTask = scope.fork(() -&gt; inventory.reserve(orderId));
+
+        scope.join().throwIfFailed();      // wait + propagate first failure (cancels rest)
+
+        var validated = new ValidatedOrder(userTask.get(), resTask.get());
+
+        // Sequential dependent step.
+        var payment = payments.charge(validated);
+        email.sendConfirmation(new ChargedOrder(validated, payment));
+
+        return new OrderResult(orderId, &quot;OK&quot;);
+    } catch (StructuredTaskScope.FailedException e) {
+        return new OrderResult(orderId, &quot;FAILED: &quot; + e.getCause().getMessage());
+    }
+}
+```
+
+Why this beats nested `CompletableFuture`:
+- **Failure cancellation propagates** automatically — if `users.fetch` throws, `inventory.reserve` is cancelled.
+- **Lifecycle is lexical** — try-with-resources ensures cleanup.
+- **Imperative reading** — easier than chained `thenCompose`.
+- **Loom-native** — built on virtual threads.
+
+**Probe**: &quot;When use raw `CompletableFuture` instead?&quot; → When you need fine-grained timeout per step + complex composition graphs (DAG, not tree). Structured concurrency is simpler but more restrictive.
+
+### 5. GC tuning — concrete flags + tracing
+
+```bash
+# G1 (default since Java 9) — tune pause target:
+java -Xms8G -Xmx8G \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=200 \
+     -XX:G1HeapRegionSize=16M \
+     -Xlog:gc*:gc.log:time,uptime,level,tags \
+     -jar app.jar
+
+# ZGC — sub-ms pauses, large heap (Java 17+, generational since Java 21):
+java -Xms32G -Xmx32G \
+     -XX:+UseZGC \
+     -XX:+ZGenerational \                  # generational mode (default in Java 23+)
+     -Xlog:gc*:gc.log \
+     -jar app.jar
+
+# Container-aware (Java 17+):
+java -XX:MaxRAMPercentage=75 \             # use 75% of container memory limit
+     -XX:InitialRAMPercentage=50 \
+     -jar app.jar
+```
+
+**Reading the GC log** (key fields):
+
+```text
+[2.345s][info][gc] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 248M-&gt;180M(1024M) 18.245ms
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                                |
+                                                                                pause time
+```
+
+Look for:
+- Pause times &gt; target (200ms): G1 isn&#x27;t keeping up.
+- Increasing pause times over time: heap fragmentation; consider ZGC.
+- &quot;Concurrent Mark Cycle&quot; frequency: too frequent = old-gen pressure.
+- Full GC: G1 fell back to single-threaded stop-the-world — bad; means OOM is imminent.
+
+**Probe**: &quot;Diagnosing high p99 latency: GC?&quot; → Enable `-Xlog:gc*` + correlate pause times with request latencies. If p99 spikes align with GC pauses → tune. Else look elsewhere.
+
+### 6. JFR (Java Flight Recorder) workflow
+
+```bash
+# Start continuous recording on a running JVM (Java 11+):
+jcmd &lt;pid&gt; JFR.start duration=60s filename=profile.jfr
+
+# Check status:
+jcmd &lt;pid&gt; JFR.check
+
+# Dump current data:
+jcmd &lt;pid&gt; JFR.dump filename=now.jfr
+
+# Stop the recording:
+jcmd &lt;pid&gt; JFR.stop name=1
+
+# Open in JMC (download from https://www.oracle.com/java/technologies/jdk-mission-control.html):
+jmc profile.jfr
+```
+
+**What to look for**:
+- **CPU profile** — top methods by CPU; flame graph view.
+- **Allocation profile** — top methods allocating; helps find GC pressure source.
+- **Lock contention** — `synchronized` blocks + `Lock` waits; ThreadLocal hotspots.
+- **GC events** — pause times, allocation rates, promotion failures.
+- **Compilations** — JIT activity; deopt events.
+
+**Async-profiler alternative** — lower overhead, flame graphs out of the box:
+
+```bash
+java -jar -agentpath:/path/to/libasyncProfiler.so=start,event=cpu,file=cpu.html app.jar
+```
+
+Output is interactive SVG flame graph; click to drill down.
+
+### 7. Memory leak diagnosis
+
+```java
+// Common leak: static collection grows unbounded.
+public class CacheService {
+    private static final Map&lt;String, byte[]&gt; CACHE = new HashMap&lt;&gt;();    // NEVER evicts
+
+    public byte[] get(String key) {
+        return CACHE.computeIfAbsent(key, this::loadFromDisk);
+    }
+    private byte[] loadFromDisk(String key) { /* read large blob */ }
+}
+```
+
+**Detection workflow**:
+
+1. Heap usage trends up over time (Grafana JVM dashboard).
+2. Take heap dump: `jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof`.
+3. Open in **Eclipse MAT**.
+4. Click &quot;Leak Suspects Report&quot;.
+5. **Dominator Tree** view — sort by retained size; top entry is usually the leak.
+6. **Path to GC Root** — see what&#x27;s holding the reference.
+
+For the CacheService above, dominator tree would show `CacheService.CACHE` HashMap as the top dominator; path to GC root → static field of `CacheService`.
+
+**Fix**: replace with bounded cache (Caffeine) + TTL + max size.
+
+### 8. False sharing demonstration + `@Contended`
+
+```java
+public class FalseSharing {
+    // BAD: a + b will share a cache line; concurrent updates from different threads invalidate.
+    static class SharedFields {
+        long a;
+        long b;
+    }
+
+    // FIXED: @Contended pads each field to its own cache line (Java 8+).
+    static class PaddedFields {
+        @jdk.internal.vm.annotation.Contended  // requires -XX:-RestrictContended
+        long a;
+        @jdk.internal.vm.annotation.Contended
+        long b;
+    }
+}
+```
+
+**Benchmark** (JMH-style): two threads updating `a` and `b` concurrently. `SharedFields` ~5× slower than `PaddedFields` due to cache-coherence ping-pong.
+
+`LongAdder` uses `@Contended` internally for its stripes — that&#x27;s why it scales better than `AtomicLong` under contention.
+
+**Probe**: &quot;Why isn&#x27;t `@Contended` enabled by default?&quot; → It wastes memory (per-field padding). Used only where measurement shows benefit.
+
+## Sources &amp; Further Reading
+
+- [Java Concurrency in Practice — Brian Goetz](https://jcip.net/)
+- [Optimizing Java — Benjamin Evans](https://www.oreilly.com/library/view/optimizing-java/9781492025788/)
+- [JVM Specification](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)
+- [Inside Java (Oracle official blog)](https://inside.java/)
+- [JEP Index — Java Enhancement Proposals](https://openjdk.org/jeps/0)
+- [Async Profiler](https://github.com/async-profiler/async-profiler)
+- [JFR + JMC](https://www.oracle.com/java/technologies/jdk-mission-control.html)
+
+## Recap
+
+You should now be able to answer **70+ questions** spanning thread fundamentals, JMM happens-before, synchronisation primitives, virtual threads + structured concurrency, JVM data areas, class loaders, GC algorithms (G1 / ZGC / Shenandoah), JIT internals, profiling tools, memory-leak diagnosis, container-aware JVM. These are the topics that decide banking, Goldman, Amazon SDE-II/III, Microsoft 62/63 loops.
+
+## Next
+
+Continue to [Collections &amp; Data Structures — Q&amp;A Bank](./T03-collections-and-data-structures-q-and-a-bank.md).
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l6/c06-t01-java-language-and-core-q-and-a-bank.html"><div class="lbl">← Previous</div><div class="ttl">T01-java-language-and-core-q-and-a-bank</div><div class="sub">Java Language &amp; Core — Q&amp;A Bank (Staff Level)</div></a><a class="next" href="../l6/c06-t03-collections-and-data-structures-q-and-a-bank.html"><div class="lbl">Next →</div><div class="ttl">T03-collections-and-data-structures-q-and-a-bank</div><div class="sub">Collections &amp; Data Structures — Q&amp;A Bank (Staff Level)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#threading-fundamentals" data-toc-link>Threading Fundamentals</a></li><li class="lvl-3"><a href="#q-what-does-threadstart-do-that-threadrun-doesnt" data-toc-link>Q: What does Thread.start() do that Thread.run() doesn&#x27;t?</a></li><li class="lvl-3"><a href="#q-difference-between-runnable-callable-and-supplier" data-toc-link>Q: Difference between Runnable, Callable, and Supplier?</a></li><li class="lvl-3"><a href="#q-explain-executorservices-submit-vs-execute" data-toc-link>Q: Explain ExecutorService&#x27;s submit vs execute.</a></li><li class="lvl-3"><a href="#q-walk-through-what-happens-when-you-submit-task-n-to-a-threadpoolexecutor" data-toc-link>Q: Walk through what happens when you submit task #N to a ThreadPoolExecutor.</a></li><li class="lvl-3"><a href="#q-why-is-executorsnewcachedthreadpool-dangerous-in-production" data-toc-link>Q: Why is Executors.newCachedThreadPool dangerous in production?</a></li><li class="lvl-3"><a href="#q-executorsnewfixedthreadpool-whats-its-hidden-danger" data-toc-link>Q: Executors.newFixedThreadPool — what&#x27;s its hidden danger?</a></li><li class="lvl-3"><a href="#q-forkjoinpool-vs-threadpoolexecutor-when-each" data-toc-link>Q: ForkJoinPool vs ThreadPoolExecutor — when each?</a></li><li class="lvl-3"><a href="#q-explain-completablefuture-composition-thenapply-vs-thencompose" data-toc-link>Q: Explain CompletableFuture composition — thenApply vs thenCompose.</a></li><li class="lvl-3"><a href="#q-how-do-you-set-a-timeout-on-a-completablefuture" data-toc-link>Q: How do you set a timeout on a CompletableFuture?</a></li><li class="lvl-3"><a href="#q-whats-the-difference-between-reentrantlock-and-synchronized" data-toc-link>Q: What&#x27;s the difference between ReentrantLock and synchronized?</a></li><li class="lvl-3"><a href="#q-explain-readwritelock-and-stampedlock" data-toc-link>Q: Explain ReadWriteLock and StampedLock.</a></li><li class="lvl-3"><a href="#q-difference-between-countdownlatch-cyclicbarrier-phaser-and-semaphore" data-toc-link>Q: Difference between CountDownLatch, CyclicBarrier, Phaser, and Semaphore?</a></li><li class="lvl-3"><a href="#q-explain-atomicxxx-and-cas" data-toc-link>Q: Explain AtomicXxx and CAS.</a></li><li class="lvl-3"><a href="#q-whats-the-aba-problem-and-how-do-you-avoid-it" data-toc-link>Q: What&#x27;s the ABA problem and how do you avoid it?</a></li><li class="lvl-3"><a href="#q-longadder-vs-atomiclong-when-each" data-toc-link>Q: LongAdder vs AtomicLong — when each?</a></li><li class="lvl-3"><a href="#q-explain-threadlocal-and-the-memory-leak-risk" data-toc-link>Q: Explain ThreadLocal and the memory-leak risk.</a></li><li class="lvl-3"><a href="#q-whats-scopedvalue-java-21-and-why" data-toc-link>Q: What&#x27;s ScopedValue (Java 21+) and why?</a></li><li class="lvl-2"><a href="#java-memory-model" data-toc-link>Java Memory Model</a></li><li class="lvl-3"><a href="#q-explain-happens-before-edges" data-toc-link>Q: Explain happens-before edges.</a></li><li class="lvl-3"><a href="#q-why-does-double-checked-locking-need-volatile" data-toc-link>Q: Why does double-checked locking need volatile?</a></li><li class="lvl-3"><a href="#q-whats-safe-publication" data-toc-link>Q: What&#x27;s safe publication?</a></li><li class="lvl-3"><a href="#q-why-is-volatile-array-element-not-really-volatile" data-toc-link>Q: Why is volatile array element not really volatile?</a></li><li class="lvl-3"><a href="#q-what-is-false-sharing" data-toc-link>Q: What is false sharing?</a></li><li class="lvl-2"><a href="#deadlock-liveness" data-toc-link>Deadlock + Liveness</a></li><li class="lvl-3"><a href="#q-how-do-you-reproduce-a-deadlock-with-2-threads-2-locks" data-toc-link>Q: How do you reproduce a deadlock with 2 threads + 2 locks?</a></li><li class="lvl-3"><a href="#q-how-do-you-detect-a-deadlock-in-production" data-toc-link>Q: How do you detect a deadlock in production?</a></li><li class="lvl-3"><a href="#q-whats-livelock-vs-starvation" data-toc-link>Q: What&#x27;s livelock vs starvation?</a></li><li class="lvl-2"><a href="#virtual-threads-project-loom" data-toc-link>Virtual Threads (Project Loom)</a></li><li class="lvl-3"><a href="#q-what-are-virtual-threads-java-21" data-toc-link>Q: What are virtual threads (Java 21+)?</a></li><li class="lvl-3"><a href="#q-whats-thread-pinning-and-when-does-it-happen" data-toc-link>Q: What&#x27;s thread pinning and when does it happen?</a></li><li class="lvl-3"><a href="#q-when-would-virtual-threads-not-help" data-toc-link>Q: When would virtual threads NOT help?</a></li><li class="lvl-3"><a href="#q-structured-concurrency-what-problem-does-it-solve" data-toc-link>Q: Structured concurrency — what problem does it solve?</a></li><li class="lvl-2"><a href="#producer-consumer" data-toc-link>Producer-Consumer</a></li><li class="lvl-3"><a href="#q-implement-a-bounded-buffer-with-waitnotify" data-toc-link>Q: Implement a bounded buffer with wait/notify.</a></li><li class="lvl-3"><a href="#q-when-to-use-blockingqueue-types" data-toc-link>Q: When to use BlockingQueue types?</a></li><li class="lvl-3"><a href="#q-whats-the-difference-between-threadsleep-objectwait-and-locksupportpark" data-toc-link>Q: What&#x27;s the difference between Thread.sleep, Object.wait, and LockSupport.park?</a></li><li class="lvl-3"><a href="#q-cooperative-cancellation-handling-interruptedexception" data-toc-link>Q: Cooperative cancellation — handling InterruptedException.</a></li><li class="lvl-2"><a href="#jvm-internals" data-toc-link>JVM Internals</a></li><li class="lvl-3"><a href="#q-walk-through-the-jvm-runtime-data-areas" data-toc-link>Q: Walk through the JVM runtime data areas.</a></li><li class="lvl-3"><a href="#q-why-was-permgen-replaced-with-metaspace" data-toc-link>Q: Why was PermGen replaced with Metaspace?</a></li><li class="lvl-3"><a href="#q-explain-class-loaders-parent-first-delegation" data-toc-link>Q: Explain class loaders + parent-first delegation.</a></li><li class="lvl-3"><a href="#q-difference-between-classnotfoundexception-and-noclassdeffounderror" data-toc-link>Q: Difference between ClassNotFoundException and NoClassDefFoundError?</a></li><li class="lvl-3"><a href="#q-whats-the-object-header-and-how-big-is-it" data-toc-link>Q: What&#x27;s the object header and how big is it?</a></li><li class="lvl-3"><a href="#q-what-are-compressed-oops" data-toc-link>Q: What are compressed oops?</a></li><li class="lvl-3"><a href="#q-tlab-what-and-why" data-toc-link>Q: TLAB — what and why?</a></li><li class="lvl-3"><a href="#q-whats-escape-analysis-and-scalar-replacement" data-toc-link>Q: What&#x27;s escape analysis and scalar replacement?</a></li><li class="lvl-2"><a href="#garbage-collection" data-toc-link>Garbage Collection</a></li><li class="lvl-3"><a href="#q-generational-hypothesis-what-is-it" data-toc-link>Q: Generational hypothesis — what is it?</a></li><li class="lvl-3"><a href="#q-g1-how-does-it-work" data-toc-link>Q: G1 — how does it work?</a></li><li class="lvl-3"><a href="#q-zgc-vs-shenandoah-vs-g1-when-each" data-toc-link>Q: ZGC vs Shenandoah vs G1 — when each?</a></li><li class="lvl-3"><a href="#q-whats-generational-zgc" data-toc-link>Q: What&#x27;s generational ZGC?</a></li><li class="lvl-3"><a href="#q-when-does-full-gc-happen-with-g1" data-toc-link>Q: When does Full GC happen with G1?</a></li><li class="lvl-3"><a href="#q-how-do-you-read-gc-logs" data-toc-link>Q: How do you read GC logs?</a></li><li class="lvl-3"><a href="#q-what-is-string-deduplication" data-toc-link>Q: What is string deduplication?</a></li><li class="lvl-2"><a href="#jit-performance" data-toc-link>JIT + Performance</a></li><li class="lvl-3"><a href="#q-tiered-compilation-what-are-the-tiers" data-toc-link>Q: Tiered compilation — what are the tiers?</a></li><li class="lvl-3"><a href="#q-what-is-deoptimisation" data-toc-link>Q: What is deoptimisation?</a></li><li class="lvl-3"><a href="#q-osr-what-is-on-stack-replacement" data-toc-link>Q: OSR — what is on-stack replacement?</a></li><li class="lvl-3"><a href="#q-what-is-graal-jit" data-toc-link>Q: What is Graal JIT?</a></li><li class="lvl-3"><a href="#q-graalvm-native-image-what-does-it-cost" data-toc-link>Q: GraalVM native-image — what does it cost?</a></li><li class="lvl-3"><a href="#q-whats-crac" data-toc-link>Q: What&#x27;s CRaC?</a></li><li class="lvl-2"><a href="#profiling-memory-leaks" data-toc-link>Profiling + Memory Leaks</a></li><li class="lvl-3"><a href="#q-how-do-you-profile-a-java-service-in-production-with-minimal-overhead" data-toc-link>Q: How do you profile a Java service in production with minimal overhead?</a></li><li class="lvl-3"><a href="#q-how-do-you-diagnose-a-memory-leak" data-toc-link>Q: How do you diagnose a memory leak?</a></li><li class="lvl-3"><a href="#q-whats-a-threadlocal-leak-in-app-servers" data-toc-link>Q: What&#x27;s a ThreadLocal leak in app servers?</a></li><li class="lvl-3"><a href="#q-what-is-jmh-and-why-use-it" data-toc-link>Q: What is JMH and why use it?</a></li><li class="lvl-3"><a href="#q-why-does-systemgc-not-always-trigger-a-gc" data-toc-link>Q: Why does System.gc() not always trigger a GC?</a></li><li class="lvl-2"><a href="#container-aware-jvm" data-toc-link>Container-Aware JVM</a></li><li class="lvl-3"><a href="#q-why-was-old-java-8-oomkilled-in-kubernetes" data-toc-link>Q: Why was old Java 8 OOMKilled in Kubernetes?</a></li><li class="lvl-3"><a href="#q-how-do-you-size-jvm-heap-for-a-kubernetes-pod" data-toc-link>Q: How do you size JVM heap for a Kubernetes pod?</a></li><li class="lvl-2"><a href="#tooling" data-toc-link>Tooling</a></li><li class="lvl-3"><a href="#q-whats-jstack-jmap-jcmd" data-toc-link>Q: What&#x27;s jstack, jmap, jcmd?</a></li><li class="lvl-3"><a href="#q-whats-the-difference-between-jstack-thread-dump-and-a-jfr" data-toc-link>Q: What&#x27;s the difference between jstack thread dump and a JFR?</a></li><li class="lvl-2"><a href="#deeper-dive-code-backed-walkthroughs" data-toc-link>Deeper Dive — Code-Backed Walkthroughs</a></li><li class="lvl-3"><a href="#1-threadpoolexecutor-what-happens-when-task-n-is-submitted" data-toc-link>1. ThreadPoolExecutor — what happens when task N is submitted</a></li><li class="lvl-3"><a href="#2-completablefuture-composition-real-world-chain" data-toc-link>2. CompletableFuture composition — real-world chain</a></li><li class="lvl-3"><a href="#3-virtual-thread-pinning-demo" data-toc-link>3. Virtual thread pinning demo</a></li><li class="lvl-3"><a href="#4-structured-concurrency-replacing-completablefuture-mess" data-toc-link>4. Structured concurrency — replacing CompletableFuture mess</a></li><li class="lvl-3"><a href="#5-gc-tuning-concrete-flags-tracing" data-toc-link>5. GC tuning — concrete flags + tracing</a></li><li class="lvl-3"><a href="#6-jfr-java-flight-recorder-workflow" data-toc-link>6. JFR (Java Flight Recorder) workflow</a></li><li class="lvl-3"><a href="#7-memory-leak-diagnosis" data-toc-link>7. Memory leak diagnosis</a></li><li class="lvl-3"><a href="#8-false-sharing-demonstration-contended" data-toc-link>8. False sharing demonstration + @Contended</a></li><li class="lvl-2"><a href="#sources-further-reading" data-toc-link>Sources &amp;amp; Further Reading</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

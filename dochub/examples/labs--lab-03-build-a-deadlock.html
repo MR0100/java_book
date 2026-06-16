@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 03 — Build a Deadlock (then observe it, then fix it) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="active" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span></div>
+        <h1>Lab 03 — Build a Deadlock (then observe it, then fix it)</h1>
+        <div><span class="source-path">examples/labs/lab-03-build-a-deadlock</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><blockquote>
+<p><strong>Backs:</strong> L3 concurrency + L6/C14/T06 Banking JVM-Deep (deadlock).</p>
+</blockquote>
+<p>A hands-on concurrency lab. You will <strong>deliberately create a deadlock</strong>, watch
+it happen, <strong>capture and read a thread dump</strong> to diagnose it, then <strong>fix it</strong>
+two different ways. Plain Java 21 — no Spring, no frameworks.</p>
+<p>The whole point: deadlocks are invisible in source review until you can <em>read a
+thread dump</em>. This lab makes the JVM print "Found one Java-level deadlock" with
+your own eyes, then shows the standard fixes.</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>JDK 21+</strong> (the code targets Java 21 bytecode; any JDK 21 or newer can build
+  and run it). Verify with <code>java -version</code>.</li>
+<li><strong>Maven 3.9+</strong> (<code>mvn -version</code>).</li>
+<li>A JDK that ships <code>jstack</code>/<code>jcmd</code>/<code>jps</code> — every standard <code>bin/</code> directory has
+  them. (Some minimal JREs omit them; use a full JDK.)</li>
+</ul>
+<blockquote>
+<p>If your <code>mvn</code> runs on a newer JDK (e.g. 25), that's fine — the build uses
+<code>maven.compiler.release=21</code>, so it always produces Java 21 bytecode.</p>
+</blockquote>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<p>Read them in this order:</p>
+<ol>
+<li><strong><code>src/main/java/.../deadlock/DeadlockDemo.java</code></strong> — the headline
+   lock-ordering deadlock. Two threads, two locks, opposite order. <em>This is the
+   one to run first.</em></li>
+<li><strong><code>src/main/java/.../deadlock/PoolStarvationDeadlockDemo.java</code></strong> — a second,
+   subtler flavor: thread-pool starvation. No lock cycle, so
+   <code>findDeadlockedThreads()</code> can't see it — you must read the dump.</li>
+<li><strong><code>src/main/java/.../deadlock/fixed/OrderedLockTransfer.java</code></strong> — Fix #1:
+   global lock ordering.</li>
+<li><strong><code>src/main/java/.../deadlock/fixed/TryLockTransfer.java</code></strong> — Fix #2:
+   <code>tryLock</code> with timeout + backoff.</li>
+<li><strong><code>src/test/java/.../deadlock/FixedTransferTest.java</code></strong> — proves the fixes
+   don't deadlock under contention (preemptive timeouts).</li>
+<li><strong><code>src/test/java/.../deadlock/DeadlockDetectionTest.java</code></strong> — detects a
+   controlled deadlock programmatically with <code>ThreadMXBean</code>.</li>
+</ol>
+<hr>
+<h2 id="run-the-tests-the-fixes-are-green-and-never-hang">Run the tests (the fixes are GREEN, and never hang)<a class="anchor" href="#run-the-tests-the-fixes-are-green-and-never-hang" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn test
+</code></pre></div>
+<p>Expected:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+</code></pre></div>
+<p>Every test uses JUnit 5's <code>assertTimeoutPreemptively(...)</code>. If a regression ever
+reintroduced a deadlock, the test would <strong>fail fast</strong> instead of hanging CI. The
+deadlocking <code>main</code> classes are <em>never</em> run from tests.</p>
+<hr>
+<h2 id="part-1-make-it-deadlock-the-headline">Part 1 — Make it deadlock (the headline)<a class="anchor" href="#part-1-make-it-deadlock-the-headline" aria-hidden="true">#</a></h2>
+<p><code>DeadlockDemo</code> starts two threads:</p>
+<ul>
+<li><code>deadlock-thread-AB</code>: locks <strong>A</strong>, sleeps, then wants <strong>B</strong>.</li>
+<li><code>deadlock-thread-BA</code>: locks <strong>B</strong>, sleeps, then wants <strong>A</strong>.</li>
+</ul>
+<p>The <code>sleep</code> between the two <code>synchronized</code> blocks <em>forces</em> the bad interleaving,
+so the deadlock is <strong>deterministic</strong>, not a once-in-a-million race.</p>
+<p>Compile and run it:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q compile
+java -cp target/classes com.javamastery.examples.deadlock.DeadlockDemo
+</code></pre></div>
+<p>You'll see something like:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Both threads started. This program is now DEADLOCKED and will hang.
+deadlock-thread-AB: holding lockA, want lockB
+deadlock-thread-BA: holding lockB, want lockA
+PID = 22577
+Capture a thread dump now:  jstack 22577
+</code></pre></div>
+<p>…and then it <strong>hangs forever</strong>. Leave it running and open a second terminal.</p>
+<hr>
+<h2 id="part-2-capture-a-thread-dump">Part 2 — Capture a thread dump<a class="anchor" href="#part-2-capture-a-thread-dump" aria-hidden="true">#</a></h2>
+<p>You have three equivalent ways to grab a dump. Use whichever you like.</p>
+<p>First, find the PID (the program prints it; or use <code>jps</code>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jps -l        # lists running JVMs with their main class; copy the PID
+</code></pre></div>
+<p>Then dump, picking ONE:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># (a) jstack — the classic
+jstack &lt;pid&gt;
+
+# (b) jcmd — the modern, preferred entry point
+jcmd &lt;pid&gt; Thread.print
+
+# (c) signal the JVM — prints the dump to the program's OWN stdout/console
+kill -3 &lt;pid&gt;          # macOS/Linux; SIGQUIT
+#   on Windows: press Ctrl-Break in the console running the program
+</code></pre></div>
+<p>When you're done observing, kill the hung program: <code>Ctrl-C</code> in its terminal, or
+<code>kill -9 &lt;pid&gt;</code>.</p>
+<hr>
+<h2 id="part-3-read-the-thread-dump">Part 3 — Read the thread dump<a class="anchor" href="#part-3-read-the-thread-dump" aria-hidden="true">#</a></h2>
+<p>The JVM does the hard part for you and prints a dedicated deadlock section at
+the <strong>bottom</strong> of the dump:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Found one Java-level deadlock:
+=============================
+&quot;deadlock-thread-AB&quot;:
+  waiting to lock monitor 0x...e0 (object 0x...cf8, a ...DeadlockDemo$LockB),
+  which is held by &quot;deadlock-thread-BA&quot;
+
+&quot;deadlock-thread-BA&quot;:
+  waiting to lock monitor 0x...00 (object 0x...fe8, a ...DeadlockDemo$LockA),
+  which is held by &quot;deadlock-thread-AB&quot;
+
+Java stack information for the threads listed above:
+===================================================
+&quot;deadlock-thread-AB&quot;:
+        at ...DeadlockDemo.workAB(DeadlockDemo.java:49)
+        - waiting to lock &lt;0x...cf8&gt; (a ...DeadlockDemo$LockB)
+        - locked &lt;0x...fe8&gt; (a ...DeadlockDemo$LockA)
+&quot;deadlock-thread-BA&quot;:
+        at ...DeadlockDemo.workBA(DeadlockDemo.java:60)
+        - waiting to lock &lt;0x...fe8&gt; (a ...DeadlockDemo$LockA)
+        - locked &lt;0x...cf8&gt; (a ...DeadlockDemo$LockB)
+
+Found 1 deadlock.
+</code></pre></div>
+<p>How to read it:</p>
+<ul>
+<li><strong>Thread state <code>BLOCKED</code></strong> — in the per-thread section above the summary,
+  both worker threads show state <code>BLOCKED (on object monitor)</code>. Threads BLOCKED
+  on a monitor are the prime suspects.</li>
+<li><strong><code>locked &lt;0x...&gt;</code></strong> — a monitor this thread <em>already holds</em>.</li>
+<li><strong><code>waiting to lock &lt;0x...&gt;</code></strong> — a monitor this thread <em>wants</em> but can't get
+  because someone else holds it.</li>
+<li><strong>The cycle</strong> — follow the <code>which is held by</code> chain: AB waits for B (held by
+  BA); BA waits for A (held by AB). That loop <strong>is</strong> the deadlock. The hex
+  object ids (<code>0x...cf8</code>, <code>0x...fe8</code>) are how you match "who holds what" — note
+  that <code>LockA</code> and <code>LockB</code> are distinct named classes precisely so they're easy
+  to spot in the dump.</li>
+</ul>
+<blockquote>
+<p>Naming the lock objects with dedicated types (<code>LockA</code>, <code>LockB</code>) is a real
+diagnostic technique: a dump full of <code>a java.lang.Object</code> monitors is far
+harder to read.</p>
+</blockquote>
+<hr>
+<h2 id="part-4-the-pool-starvation-deadlock-no-lock-cycle">Part 4 — The pool-starvation deadlock (no lock cycle)<a class="anchor" href="#part-4-the-pool-starvation-deadlock-no-lock-cycle" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -cp target/classes com.javamastery.examples.deadlock.PoolStarvationDeadlockDemo
+</code></pre></div>
+<p>A task on a <strong>1-thread pool</strong> submits a sub-task to the <strong>same pool</strong> and blocks
+on its result. The single worker is stuck in <code>Future.get()</code>; the sub-task sits
+in the queue with no thread to run it. It hangs.</p>
+<p>Dump it (<code>jstack &lt;pid&gt;</code>) and notice the difference:</p>
+<ul>
+<li>There is <strong>no</strong> "Found N deadlocks" line — <code>findDeadlockedThreads()</code> only
+  catches <em>monitor / lock cycles</em>, and this is none. The worker is merely
+  <code>WAITING</code>.</li>
+<li>You diagnose it by reading the stack: a <code>pool-1-thread-1</code> parked in
+  <code>java.util.concurrent.FutureTask.awaitDone</code> / <code>Future.get</code>, while the pool's
+  queue holds work that depends on a free thread.</li>
+</ul>
+<p><strong>Lesson:</strong> not every deadlock is a lock cycle the JVM can flag for you. Pool
+starvation, nested <code>Future.get</code>, and reentrancy-on-the-wrong-thread all hang
+without tripping the automatic detector.</p>
+<hr>
+<h2 id="the-four-coffman-conditions">The four Coffman conditions<a class="anchor" href="#the-four-coffman-conditions" aria-hidden="true">#</a></h2>
+<p>A deadlock requires <strong>all four</strong> to hold simultaneously. Break <strong>any one</strong> and
+deadlock is impossible:</p>
+<ol>
+<li><strong>Mutual exclusion</strong> — a resource (lock) is held by at most one thread.</li>
+<li><strong>Hold and wait</strong> — a thread holds one resource while waiting for another.</li>
+<li><strong>No preemption</strong> — a resource can't be forcibly taken; only the holder
+   releases it.</li>
+<li><strong>Circular wait</strong> — a cycle of threads each waiting on the next's resource.</li>
+</ol>
+<p>Map the fixes to the conditions:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Fix</th>
+<th>Condition it breaks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Global lock ordering</strong> (<code>OrderedLockTransfer</code>)</td>
+<td><strong>Circular wait</strong> — a total order on locks makes a cycle impossible.</td>
+</tr>
+<tr>
+<td><strong><code>tryLock</code> + timeout + backoff</strong> (<code>TryLockTransfer</code>)</td>
+<td><strong>Hold and wait / no preemption</strong> — a thread releases what it holds and retries instead of waiting forever.</td>
+</tr>
+<tr>
+<td><strong>Reduce lock scope / one lock</strong></td>
+<td><strong>Hold and wait</strong> — don't hold two locks at once.</td>
+</tr>
+<tr>
+<td><strong>Lock-free</strong> (atomics, <code>compareAndSet</code>, immutable data)</td>
+<td><strong>Mutual exclusion</strong> — no locks, no lock-deadlock.</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="part-5-the-fixes">Part 5 — The fixes<a class="anchor" href="#part-5-the-fixes" aria-hidden="true">#</a></h2>
+<h3 id="fix-1-global-lock-ordering-fixedorderedlocktransferjava">Fix #1 — Global lock ordering (<code>fixed/OrderedLockTransfer.java</code>)<a class="anchor" href="#fix-1-global-lock-ordering-fixedorderedlocktransferjava" aria-hidden="true">#</a></h3>
+<p>Always acquire any pair of locks in one consistent global order. Here we lock
+the account with the <strong>lower <code>id</code> first</strong>, regardless of transfer direction, so
+<code>transfer(A, B)</code> and <code>transfer(B, A)</code> always lock in the same order → no cycle.</p>
+<p>When you have a natural unique key (an <code>id</code>), rank by it. When you <strong>don't</strong>,
+the common trick is <code>System.identityHashCode(obj)</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int rankFrom = System.identityHashCode(from);
+int rankTo   = System.identityHashCode(to);
+if (rankFrom &lt; rankTo) {      lock(from); lock(to); }
+else if (rankFrom &gt; rankTo) { lock(to);   lock(from); }
+else {                        // rare hash collision: use a shared tie-breaker lock
+    synchronized (TIE_BREAKER) { lock(from); lock(to); }
+}
+</code></pre></div>
+<p>The tie-breaker handles the (rare) case where two distinct objects share an
+identity hash code — without it, a collision could reintroduce inconsistent
+ordering. Ranking by a guaranteed-unique <code>id</code> (as this lab does) sidesteps the
+collision case entirely.</p>
+<h3 id="fix-2-trylock-timeout-backoff-fixedtrylocktransferjava">Fix #2 — <code>tryLock</code> + timeout + backoff (<code>fixed/TryLockTransfer.java</code>)<a class="anchor" href="#fix-2-trylock-timeout-backoff-fixedtrylocktransferjava" aria-hidden="true">#</a></h3>
+<p>Use <code>ReentrantLock.tryLock(timeout, unit)</code>. A thread tries to grab <strong>both</strong>
+locks within a timeout; if it can't get the second, it <strong>releases the first</strong>,
+backs off a random interval, and retries. Nobody waits forever, so the system
+always makes progress. (Theoretically this allows <em>livelock</em> — both sides
+retrying in lockstep — but randomized backoff makes that negligible.)</p>
+<p>Use this when a clean global order is impractical (locks discovered at runtime,
+third-party objects, etc.).</p>
+<h3 id="other-fixes-worth-knowing">Other fixes worth knowing<a class="anchor" href="#other-fixes-worth-knowing" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Reduce lock scope</strong> — hold the smallest critical section possible; never
+  call out to unknown code while holding a lock; never acquire a second lock if
+  you can avoid it.</li>
+<li><strong>One coarse lock</strong> — if two locks are always taken together, just use one.</li>
+<li><strong>Lock-free</strong> — <code>AtomicLong</code>/<code>AtomicReference</code> + <code>compareAndSet</code>, immutable
+  objects, <code>java.util.concurrent</code> collections. No locks → no lock deadlock.</li>
+</ul>
+<hr>
+<h2 id="quick-command-reference">Quick command reference<a class="anchor" href="#quick-command-reference" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn test                                   # run the fixes' tests (green, ~1s, never hangs)
+mvn -q compile                             # compile only
+
+# Reproduce the headline deadlock, then dump it from another terminal:
+java -cp target/classes com.javamastery.examples.deadlock.DeadlockDemo
+java -cp target/classes com.javamastery.examples.deadlock.PoolStarvationDeadlockDemo
+
+jps -l                                     # find the PID
+jstack &lt;pid&gt;                               # thread dump (look for &quot;Found 1 deadlock&quot;)
+jcmd &lt;pid&gt; Thread.print                    # modern equivalent
+kill -3 &lt;pid&gt;                              # SIGQUIT: dump to the program's own console
+kill -9 &lt;pid&gt;                              # kill the hung process when done
+</code></pre></div>
+<h2 id="source-files">Source files<a class="anchor" href="#source-files" aria-hidden="true">#</a></h2>
+<p><em>7 key file(s) from <code>examples/labs/lab-03-build-a-deadlock/</code>. Truncated files are marked; see the repo for the full source.</em></p>
+<h3 id="pomxml"><code>pom.xml</code><a class="anchor" href="#pomxml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;lab-03-build-a-deadlock&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+
+    &lt;name&gt;lab-03-build-a-deadlock&lt;/name&gt;
+    &lt;description&gt;
+        Concurrency lab: deliberately build a deadlock, observe it with a thread
+        dump, then fix it with global lock ordering and tryLock+timeout.
+        Backs L3 concurrency and L6/C14/T06 Banking JVM-Deep (deadlock).
+    &lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;!-- Java 21. We use maven.compiler.release so the build is correct even
+             when run on a newer JDK (e.g. JDK 25): the compiler targets the
+             Java 21 API and bytecode level exactly. --&gt;
+        &lt;maven.compiler.release&gt;21&lt;/maven.compiler.release&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+
+        &lt;junit.version&gt;5.10.2&lt;/junit.version&gt;
+        &lt;surefire.version&gt;3.2.5&lt;/surefire.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- JUnit 5 (aggregator pulls in api + engine + params). Test scope only. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+            &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;
+            &lt;version&gt;${junit.version}&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.13.0&lt;/version&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;!-- Surefire runs the JUnit 5 tests. --&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${surefire.version}&lt;/version&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesdeadlockdeadlockdemojava"><code>src/main/java/com/javamastery/examples/deadlock/DeadlockDemo.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesdeadlockdeadlockdemojava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock;
+
+/**
+ * THE HEADLINE DEADLOCK: a classic lock-ordering deadlock.
+ *
+ * &lt;p&gt;Two threads each grab two {@code synchronized} monitors, but in OPPOSITE
+ * order:
+ * &lt;ul&gt;
+ *   &lt;li&gt;Thread-1 locks {@code lockA}, then tries to lock {@code lockB}.&lt;/li&gt;
+ *   &lt;li&gt;Thread-2 locks {@code lockB}, then tries to lock {@code lockA}.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;If the interleaving lands so that each thread holds its first lock before
+ * either reaches its second {@code synchronized} block, they wait on each other
+ * forever. We force exactly that interleaving with a small {@code sleep} after
+ * each thread grabs its first lock, so the deadlock is deterministic rather
+ * than a rare race.
+ *
+ * &lt;p&gt;This {@code main} INTENTIONALLY HANGS. That is the point of the lab: run it,
+ * capture a thread dump, and read the cycle. It is never invoked from tests.
+ *
+ * &lt;p&gt;How to observe (see README for full detail):
+ * &lt;pre&gt;{@code
+ *   mvn -q compile
+ *   mvn -q exec:java ...   # or: java -cp target/classes com.javamastery.examples.deadlock.DeadlockDemo
+ *   # in another terminal:
+ *   jps                    # find the PID
+ *   jstack &lt;pid&gt;           # or: jcmd &lt;pid&gt; Thread.print   (look for &quot;Found 1 deadlock&quot;)
+ *   # then Ctrl-C / kill the hung process
+ * }&lt;/pre&gt;
+ */
+public final class DeadlockDemo {
+
+    /** First lock. We name it via a dedicated class so it shows up clearly in a thread dump. */
+    static final class LockA { }
+
+    /** Second lock. Distinct type so the monitor is easy to spot in the dump. */
+    static final class LockB { }
+
+    private final Object lockA = new LockA();
+    private final Object lockB = new LockB();
+
+    /** Acquires A then B. Sleeps in between to widen the deadlock window. */
+    void workAB() {
+        synchronized (lockA) {
+            System.out.println(Thread.currentThread().getName() + &quot;: holding lockA, want lockB&quot;);
+            sleep(200); // force the interleaving: let the other thread grab lockB first
+            synchronized (lockB) {
+                System.out.println(Thread.currentThread().getName() + &quot;: got BOTH locks (A then B)&quot;);
+            }
+        }
+    }
+
+    /** Acquires B then A — the OPPOSITE order. This inconsistency is the bug. */
+    void workBA() {
+        synchronized (lockB) {
+            System.out.println(Thread.currentThread().getName() + &quot;: holding lockB, want lockA&quot;);
+            sleep(200); // force the interleaving: let the other thread grab lockA first
+            synchronized (lockA) {
+                System.out.println(Thread.currentThread().getName() + &quot;: got BOTH locks (B then A)&quot;);
+            }
+        }
+    }
+
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        DeadlockDemo demo = new DeadlockDemo();
+
+        Thread t1 = new Thread(demo::workAB, &quot;deadlock-thread-AB&quot;);
+        Thread t2 = new Thread(demo::workBA, &quot;deadlock-thread-BA&quot;);
+
+        t1.start();
+        t2.start();
+
+        System.out.println();
+        System.out.println(&quot;Both threads started. This program is now DEADLOCKED and will hang.&quot;);
+        System.out.println(&quot;PID = &quot; + ProcessHandle.current().pid());
+        System.out.println(&quot;Capture a thread dump now:  jstack &quot; + ProcessHandle.current().pid());
+        System.out.println(&quot;(or: jcmd &quot; + ProcessHandle.current().pid() + &quot; Thread.print). Then Ctrl-C to kill it.&quot;);
+        System.out.println();
+
+        // join() never returns: both worker threads are blocked forever.
+        t1.join();
+        t2.join();
+
+        // Unreachable in practice. Present only so the structure is obvious.
+        System.out.println(&quot;If you ever see this line, the deadlock did not happen.&quot;);
+    }
+
+    private DeadlockDemo() {
+        // package-private constructor used by main; keep instances internal.
+    }
+
+    // Re-expose a public factory only for the JUnit deadlock-detection test,
+    // which builds a SHORT-LIVED controlled scenario with a hard timeout.
+    static DeadlockDemo newInstance() {
+        return new DeadlockDemo();
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesdeadlockpoolstarvationdeadlockdemojava"><code>src/main/java/com/javamastery/examples/deadlock/PoolStarvationDeadlockDemo.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesdeadlockpoolstarvationdeadlockdemojava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+/**
+ * SECOND DEADLOCK FLAVOR: thread-pool starvation (a &quot;liveness&quot; deadlock).
+ *
+ * &lt;p&gt;This one does NOT involve two locks. It is subtler and very common in
+ * real systems: a task running on a bounded thread pool submits a SUB-task to
+ * the SAME pool and then blocks waiting for that sub-task's result. If every
+ * worker thread is simultaneously parked waiting on a sub-task that can never
+ * be scheduled (because all workers are busy waiting), the pool starves.
+ *
+ * &lt;p&gt;With a single-thread pool it deadlocks on the very first task: the one
+ * worker is blocked in {@code future.get()} on a sub-task that is stuck in the
+ * queue with no thread to run it.
+ *
+ * &lt;p&gt;Note: {@code findDeadlockedThreads()} will NOT report this — there is no
+ * monitor/ownable-synchronizer cycle. The worker is simply WAITING. That is an
+ * important lesson: not every deadlock is a lock cycle the JVM can detect for
+ * you. You diagnose this one by reading the dump and seeing a pool thread
+ * parked in {@code Future.get()} while the queue holds work it depends on.
+ *
+ * &lt;p&gt;This {@code main} INTENTIONALLY HANGS. It is never invoked from tests.
+ */
+public final class PoolStarvationDeadlockDemo {
+
+    private PoolStarvationDeadlockDemo() {
+    }
+
+    public static void main(String[] args) throws Exception {
+        // A bounded pool with exactly ONE worker thread.
+        ExecutorService pool = Executors.newFixedThreadPool(1);
+
+        System.out.println(&quot;Submitting outer task to a 1-thread pool...&quot;);
+
+        Future&lt;String&gt; outer = pool.submit(() -&gt; {
+            System.out.println(Thread.currentThread().getName()
+                    + &quot;: outer task running; submitting INNER task to the same pool&quot;);
+
+            // The inner task needs a worker thread, but the only worker is THIS
+            // thread, and it is about to block on future.get() below. Starvation.
+            Future&lt;String&gt; inner = pool.submit(() -&gt; {
+                System.out.println(Thread.currentThread().getName() + &quot;: inner task running&quot;);
+                return &quot;inner-done&quot;;
+            });
+
+            // Blocks forever: no thread is free to run `inner`.
+            return inner.get();
+        });
+
+        System.out.println(&quot;Outer task submitted. The pool is now STARVED and will hang.&quot;);
+        System.out.println(&quot;PID = &quot; + ProcessHandle.current().pid()
+                + &quot;   -&gt;  jstack &quot; + ProcessHandle.current().pid());
+        System.out.println(&quot;Look for a pool-thread WAITING in Future.get(); the inner task is stuck in the queue.&quot;);
+
+        // Never returns.
+        System.out.println(outer.get());
+        pool.shutdown();
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesdeadlockfixedorderedlocktransferjava"><code>src/main/java/com/javamastery/examples/deadlock/fixed/OrderedLockTransfer.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesdeadlockfixedorderedlocktransferjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock.fixed;
+
+/**
+ * FIX #1: GLOBAL LOCK ORDERING.
+ *
+ * &lt;p&gt;The root cause of the headline deadlock is that two threads acquired the
+ * same pair of locks in opposite orders. The simplest robust fix is to impose a
+ * single, consistent GLOBAL order in which any two locks are always acquired —
+ * then no cycle can form (you break the Coffman &quot;circular wait&quot; condition).
+ *
+ * &lt;p&gt;This class models the textbook bank-transfer problem: every transfer locks
+ * both the {@code from} and {@code to} account. Done naively (lock {@code from}
+ * then {@code to}), {@code transfer(X, Y)} on one thread and {@code transfer(Y, X)}
+ * on another deadlock. We avoid that by always locking the account with the
+ * lower {@code id} FIRST, regardless of transfer direction.
+ *
+ * &lt;p&gt;We rank by a stable, unique {@code id} field rather than by
+ * {@link System#identityHashCode(Object)} because identity hash codes can
+ * collide. The README explains the identityHashCode approach (plus a tie-breaker
+ * lock) for cases where you have no natural unique key.
+ */
+public final class OrderedLockTransfer {
+
+    /** A bank account with a unique, immutable id used to rank lock order. */
+    public static final class Account {
+        private final long id;
+        private long balance;
+
+        public Account(long id, long initialBalance) {
+            this.id = id;
+            this.balance = initialBalance;
+        }
+
+        public long id() {
+            return id;
+        }
+
+        public long balance() {
+            return balance;
+        }
+    }
+
+    /**
+     * Transfers {@code amount} from {@code from} to {@code to}, locking both
+     * accounts in a GLOBAL order (lower id first) so no deadlock can occur even
+     * under symmetric, opposite-direction concurrent transfers.
+     *
+     * @throws IllegalArgumentException if the two accounts share an id (would
+     *                                  otherwise self-deadlock by re-locking).
+     */
+    public void transfer(Account from, Account to, long amount) {
+        if (from.id() == to.id()) {
+            throw new IllegalArgumentException(&quot;from and to must be different accounts&quot;);
+        }
+
+        // Pick a consistent order: always lock the lower-id account first.
+        Account first = from.id() &lt; to.id() ? from : to;
+        Account second = from.id() &lt; to.id() ? to : from;
+
+        synchronized (first) {
+            synchronized (second) {
+                from.balance -= amount;
+                to.balance += amount;
+            }
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesdeadlockfixedtrylocktransferjava"><code>src/main/java/com/javamastery/examples/deadlock/fixed/TryLockTransfer.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesdeadlockfixedtrylocktransferjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock.fixed;
+
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * FIX #2: tryLock WITH TIMEOUT + BACKOFF.
+ *
+ * &lt;p&gt;Sometimes you cannot define a clean global lock order (locks discovered
+ * dynamically, third-party code, etc.). The alternative is to use
+ * {@link ReentrantLock#tryLock(long, TimeUnit)} so a thread never blocks
+ * indefinitely: it attempts to acquire BOTH locks within a timeout, and if it
+ * cannot get the second one it RELEASES the first, backs off a random amount,
+ * and retries. This breaks the Coffman &quot;no preemption&quot; condition — a thread
+ * voluntarily gives up the lock it holds rather than waiting forever.
+ *
+ * &lt;p&gt;Even when two threads acquire in opposite orders, neither blocks forever:
+ * the loser of a contention round releases and retries, so the system always
+ * makes progress (it is deadlock-free, though theoretically livelock is
+ * possible — randomized backoff makes that vanishingly unlikely).
+ *
+ * &lt;p&gt;This is the same bank-transfer model as {@link OrderedLockTransfer}, but
+ * here each account carries its own {@link ReentrantLock} and transfers may use
+ * inconsistent ordering on purpose to prove the tryLock approach is robust.
+ */
+public final class TryLockTransfer {
+
+    /** An account whose lock is an explicit {@link ReentrantLock}. */
+    public static final class Account {
+        private final long id;
+        private final ReentrantLock lock = new ReentrantLock();
+        private long balance;
+
+        public Account(long id, long initialBalance) {
+            this.id = id;
+            this.balance = initialBalance;
+        }
+
+        public long id() {
+            return id;
+        }
+
+        public long balance() {
+            return balance;
+        }
+
+        ReentrantLock lock() {
+            return lock;
+        }
+    }
+
+    private final long lockTimeoutMillis;
+    private final long maxBackoffMillis;
+
+    public TryLockTransfer() {
+        this(50, 10);
+    }
+
+    public TryLockTransfer(long lockTimeoutMillis, long maxBackoffMillis) {
+        this.lockTimeoutMillis = lockTimeoutMillis;
+        this.maxBackoffMillis = maxBackoffMillis;
+    }
+
+    /**
+     * Transfers {@code amount} from {@code from} to {@code to}. Acquires both
+     * account locks with a bounded {@code tryLock}; if it cannot grab both, it
+     * releases everything, backs off randomly, and retries until it succeeds.
+     *
+     * @throws InterruptedException if the thread is interrupted while waiting.
+     */
+    public void transfer(Account from, Account to, long amount) throws InterruptedException {
+        if (from.id() == to.id()) {
+            throw new IllegalArgumentException(&quot;from and to must be different accounts&quot;);
+        }
+
+        while (true) {
+            boolean gotFrom = false;
+            boolean gotTo = false;
+            try {
+                gotFrom = from.lock().tryLock(lockTimeoutMillis, TimeUnit.MILLISECONDS);
+                if (gotFrom) {
+                    gotTo = to.lock().tryLock(lockTimeoutMillis, TimeUnit.MILLISECONDS);
+                }
+
+                if (gotFrom &amp;&amp; gotTo) {
+                    from.balance -= amount;
+                    to.balance += amount;
+                    return; // success
+                }
+            } finally {
+                // Always release whatever we managed to grab, in reverse order.
+                if (gotTo) {
+                    to.lock().unlock();
+                }
+                if (gotFrom) {
+                    from.lock().unlock();
+                }
+            }
+
+            // Couldn't get both this round: back off a random interval, then retry.
+            long backoff = ThreadLocalRandom.current().nextLong(maxBackoffMillis + 1);
+            if (backoff &gt; 0) {
+                Thread.sleep(backoff);
+            }
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesdeadlockdeadlockdetectiontestjava"><code>src/test/java/com/javamastery/examples/deadlock/DeadlockDetectionTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesdeadlockdeadlockdetectiontestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Demonstrates how to detect a deadlock PROGRAMMATICALLY with
+ * {@link ThreadMXBean#findDeadlockedThreads()} — the same machinery a thread
+ * dump uses to print &quot;Found 1 deadlock&quot;.
+ *
+ * &lt;p&gt;This builds a SHORT-LIVED, controlled lock-ordering deadlock using
+ * interruptible {@link ReentrantLock#lockInterruptibly()} locks so the test can
+ * cleanly tear the deadlock down afterward (you cannot interrupt a thread out
+ * of a plain {@code synchronized} block — which is exactly why we don't deadlock
+ * on intrinsic monitors in a test). The whole test runs under a hard preemptive
+ * timeout, so even if detection or teardown misbehaved, CI would fail fast
+ * rather than hang.
+ *
+ * &lt;p&gt;Lesson for the learner: this is how a watchdog/health-check in production
+ * can self-detect a lock-cycle deadlock and alert (or dump and restart).
+ */
+class DeadlockDetectionTest {
+
+    @Test
+    @DisplayName(&quot;ThreadMXBean.findDeadlockedThreads() detects a controlled lock-cycle deadlock&quot;)
+    void detectsControlledDeadlock() {
+        assertTimeoutPreemptively(Duration.ofSeconds(15), () -&gt; {
+            ReentrantLock lockA = new ReentrantLock();
+            ReentrantLock lockB = new ReentrantLock();
+
+            // Each thread reports when it holds its FIRST lock, so we only try to
+            // detect the deadlock once both threads are committed to the cycle.
+            CountDownLatch bothHoldFirstLock = new CountDownLatch(2);
+
+            Thread t1 = new Thread(() -&gt; lockInOrder(lockA, lockB, bothHoldFirstLock), &quot;detect-thread-AB&quot;);
+            Thread t2 = new Thread(() -&gt; lockInOrder(lockB, lockA, bothHoldFirstLock), &quot;detect-thread-BA&quot;);
+
+            t1.start();
+            t2.start();
+
+            // Wait until both threads hold their first lock (the cycle is now armed).
+            assertTrue(bothHoldFirstLock.await(5, TimeUnit.SECONDS),
+                    &quot;both threads should have grabbed their first lock&quot;);
+
+            // Poll for the deadlock. ReentrantLocks are &quot;ownable synchronizers&quot;,
+            // which findDeadlockedThreads() understands (findMonitorDeadlockedThreads
+            // would only see intrinsic monitors).
+            ThreadMXBean mx = ManagementFactory.getThreadMXBean();
+            long[] deadlocked = null;
+            for (int attempt = 0; attempt &lt; 50 &amp;&amp; deadlocked == null; attempt++) {
+                deadlocked = mx.findDeadlockedThreads();
+                if (deadlocked == null) {
+                    Thread.sleep(100);
+                }
+            }
+
+            assertNotNull(deadlocked, &quot;expected findDeadlockedThreads() to report a deadlock&quot;);
+            assertTrue(deadlocked.length &gt;= 2,
+                    &quot;a lock-ordering deadlock involves at least two threads, got &quot; + deadlocked.length);
+
+            // Sanity-check the reported threads are our two workers.
+            ThreadInfo[] infos = mx.getThreadInfo(deadlocked);
+            boolean sawAB = false;
+            boolean sawBA = false;
+            for (ThreadInfo info : infos) {
+                if (info == null) {
+                    continue;
+                }
+                if (&quot;detect-thread-AB&quot;.equals(info.getThreadName())) {
+                    sawAB = true;
+                }
+                if (&quot;detect-thread-BA&quot;.equals(info.getThreadName())) {
+                    sawBA = true;
+                }
+            }
+            assertTrue(sawAB &amp;&amp; sawBA,
+                    &quot;deadlock should involve both worker threads; reported=&quot;
+                            + Arrays.toString(Arrays.stream(infos)
+                                    .map(i -&gt; i == null ? &quot;null&quot; : i.getThreadName())
+                                    .toArray()));
+
+            // TEARDOWN: interrupt both threads to break the deadlock so the test
+            // and the JVM's worker threads exit cleanly. lockInterruptibly() lets
+            // them bail out of waiting.
+            t1.interrupt();
+            t2.interrupt();
+            t1.join(2000);
+            t2.join(2000);
+        });
+    }
+
+    /**
+     * Acquires {@code first} then {@code second} using interruptible locks,
+     * counting down once {@code first} is held. Releases everything on exit so a
+     * successful (non-deadlocked) interleaving also terminates cleanly.
+     */
+    private static void lockInOrder(ReentrantLock first, ReentrantLock second, CountDownLatch heldFirst) {
+        try {
+            first.lockInterruptibly();
+            try {
+                heldFirst.countDown();
+                // Give the other thread time to grab its own first lock, arming the cycle.
+                Thread.sleep(150);
+                second.lockInterruptibly();
+                try {
+                    // Would only reach here if no deadlock formed.
+                    Thread.sleep(10);
+                } finally {
+                    second.unlock();
+                }
+            } finally {
+                first.unlock();
+            }
+        } catch (InterruptedException e) {
+            // Expected during teardown: we were interrupted out of the deadlock.
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesdeadlockfixedtransfertestjava"><code>src/test/java/com/javamastery/examples/deadlock/FixedTransferTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesdeadlockfixedtransfertestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.deadlock;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+
+import com.javamastery.examples.deadlock.fixed.OrderedLockTransfer;
+import com.javamastery.examples.deadlock.fixed.TryLockTransfer;
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Proves both FIXED implementations complete under heavy, opposite-direction
+ * contention WITHOUT deadlocking.
+ *
+ * &lt;p&gt;Every test uses {@link org.junit.jupiter.api.Assertions#assertTimeoutPreemptively}
+ * so that if a regression reintroduced a deadlock, the test FAILS fast instead
+ * of hanging CI forever. We never run the deadlocking {@code main} classes here.
+ *
+ * &lt;p&gt;The contention pattern is the canonical deadlock trigger: thread 1 keeps
+ * transferring A -&gt; B while thread 2 keeps transferring B -&gt; A. With a naive
+ * lock-both-in-argument-order implementation this deadlocks almost immediately.
+ */
+class FixedTransferTest {
+
+    private static final int ITERATIONS = 20_000;
+    private static final long STARTING_BALANCE = 1_000_000L;
+    private static final long AMOUNT = 1L;
+
+    @Test
+    @DisplayName(&quot;Global lock ordering: opposite-direction transfers never deadlock and conserve money&quot;)
+    void orderedLockingCompletesUnderContention() {
+        assertTimeoutPreemptively(Duration.ofSeconds(10), () -&gt; {
+            OrderedLockTransfer bank = new OrderedLockTransfer();
+            OrderedLockTransfer.Account a = new OrderedLockTransfer.Account(1, STARTING_BALANCE);
+            OrderedLockTransfer.Account b = new OrderedLockTransfer.Account(2, STARTING_BALANCE);
+
+            CountDownLatch start = new CountDownLatch(1);
+            AtomicReference&lt;Throwable&gt; failure = new AtomicReference&lt;&gt;();
+
+            Thread t1 = new Thread(() -&gt; {
+                awaitQuietly(start);
+                for (int i = 0; i &lt; ITERATIONS; i++) {
+                    bank.transfer(a, b, AMOUNT);
+                }
+            }, &quot;ordered-A-to-B&quot;);
+
+            Thread t2 = new Thread(() -&gt; {
+                awaitQuietly(start);
+                for (int i = 0; i &lt; ITERATIONS; i++) {
+                    bank.transfer(b, a, AMOUNT);
+                }
+            }, &quot;ordered-B-to-A&quot;);
+
+            t1.setUncaughtExceptionHandler((t, e) -&gt; failure.compareAndSet(null, e));
+            t2.setUncaughtExceptionHandler((t, e) -&gt; failure.compareAndSet(null, e));
+
+            t1.start();
+            t2.start();
+            start.countDown();
+            t1.join();
+            t2.join();
+
+            if (failure.get() != null) {
+                throw new AssertionError(&quot;worker thread failed&quot;, failure.get());
+            }
+
+            // Symmetric transfers net to zero; total money is conserved.
+            assertEquals(STARTING_BALANCE, a.balance(), &quot;account A balance after symmetric transfers&quot;);
+            assertEquals(STARTING_BALANCE, b.balance(), &quot;account B balance after symmetric transfers&quot;);
+            assertEquals(2 * STARTING_BALANCE, a.balance() + b.balance(), &quot;total money must be conserved&quot;);
+        });
+    }
+
+    @Test
+    @DisplayName(&quot;tryLock + timeout + backoff: opposite-direction transfers never deadlock and conserve money&quot;)
+    void tryLockCompletesUnderContention() {
+        assertTimeoutPreemptively(Duration.ofSeconds(20), () -&gt; {
+            // Short timeout + small backoff so the test is quick but still robust.
+            TryLockTransfer bank = new TryLockTransfer(20, 5);
+            TryLockTransfer.Account a = new TryLockTransfer.Account(1, STARTING_BALANCE);
+            TryLockTransfer.Account b = new TryLockTransfer.Account(2, STARTING_BALANCE);
+
+            // Fewer iterations than the ordered case: tryLock retries cost time.
+            final int iterations = 5_000;
+
+            CountDownLatch start = new CountDownLatch(1);
+            AtomicReference&lt;Throwable&gt; failure = new AtomicReference&lt;&gt;();
+
+            Thread t1 = new Thread(() -&gt; {
+                awaitQuietly(start);
+                try {
+                    for (int i = 0; i &lt; iterations; i++) {
+                        bank.transfer(a, b, AMOUNT);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }, &quot;trylock-A-to-B&quot;);
+
+            Thread t2 = new Thread(() -&gt; {
+                awaitQuietly(start);
+                try {
+                    for (int i = 0; i &lt; iterations; i++) {
+                        bank.transfer(b, a, AMOUNT);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }, &quot;trylock-B-to-A&quot;);
+
+            t1.setUncaughtExceptionHandler((t, e) -&gt; failure.compareAndSet(null, e));
+            t2.setUncaughtExceptionHandler((t, e) -&gt; failure.compareAndSet(null, e));
+
+            t1.start();
+            t2.start();
+            start.countDown();
+            t1.join();
+            t2.join();
+
+            if (failure.get() != null) {
+                throw new AssertionError(&quot;worker thread failed&quot;, failure.get());
+            }
+
+            assertEquals(STARTING_BALANCE, a.balance(), &quot;account A balance after symmetric transfers&quot;);
+            assertEquals(STARTING_BALANCE, b.balance(), &quot;account B balance after symmetric transfers&quot;);
+            assertEquals(2 * STARTING_BALANCE, a.balance() + b.balance(), &quot;total money must be conserved&quot;);
+        });
+    }
+
+    private static void awaitQuietly(CountDownLatch latch) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># Lab 03 — Build a Deadlock (then observe it, then fix it)
+
+&gt; **Backs:** L3 concurrency + L6/C14/T06 Banking JVM-Deep (deadlock).
+
+A hands-on concurrency lab. You will **deliberately create a deadlock**, watch
+it happen, **capture and read a thread dump** to diagnose it, then **fix it**
+two different ways. Plain Java 21 — no Spring, no frameworks.
+
+The whole point: deadlocks are invisible in source review until you can *read a
+thread dump*. This lab makes the JVM print &quot;Found one Java-level deadlock&quot; with
+your own eyes, then shows the standard fixes.
+
+---
+
+## Prerequisites
+
+- **JDK 21+** (the code targets Java 21 bytecode; any JDK 21 or newer can build
+  and run it). Verify with `java -version`.
+- **Maven 3.9+** (`mvn -version`).
+- A JDK that ships `jstack`/`jcmd`/`jps` — every standard `bin/` directory has
+  them. (Some minimal JREs omit them; use a full JDK.)
+
+&gt; If your `mvn` runs on a newer JDK (e.g. 25), that&#x27;s fine — the build uses
+&gt; `maven.compiler.release=21`, so it always produces Java 21 bytecode.
+
+---
+
+## Files to read first
+
+Read them in this order:
+
+1. **`src/main/java/.../deadlock/DeadlockDemo.java`** — the headline
+   lock-ordering deadlock. Two threads, two locks, opposite order. *This is the
+   one to run first.*
+2. **`src/main/java/.../deadlock/PoolStarvationDeadlockDemo.java`** — a second,
+   subtler flavor: thread-pool starvation. No lock cycle, so
+   `findDeadlockedThreads()` can&#x27;t see it — you must read the dump.
+3. **`src/main/java/.../deadlock/fixed/OrderedLockTransfer.java`** — Fix #1:
+   global lock ordering.
+4. **`src/main/java/.../deadlock/fixed/TryLockTransfer.java`** — Fix #2:
+   `tryLock` with timeout + backoff.
+5. **`src/test/java/.../deadlock/FixedTransferTest.java`** — proves the fixes
+   don&#x27;t deadlock under contention (preemptive timeouts).
+6. **`src/test/java/.../deadlock/DeadlockDetectionTest.java`** — detects a
+   controlled deadlock programmatically with `ThreadMXBean`.
+
+---
+
+## Run the tests (the fixes are GREEN, and never hang)
+
+```bash
+mvn test
+```
+
+Expected:
+
+```
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+Every test uses JUnit 5&#x27;s `assertTimeoutPreemptively(...)`. If a regression ever
+reintroduced a deadlock, the test would **fail fast** instead of hanging CI. The
+deadlocking `main` classes are *never* run from tests.
+
+---
+
+## Part 1 — Make it deadlock (the headline)
+
+`DeadlockDemo` starts two threads:
+
+- `deadlock-thread-AB`: locks **A**, sleeps, then wants **B**.
+- `deadlock-thread-BA`: locks **B**, sleeps, then wants **A**.
+
+The `sleep` between the two `synchronized` blocks *forces* the bad interleaving,
+so the deadlock is **deterministic**, not a once-in-a-million race.
+
+Compile and run it:
+
+```bash
+mvn -q compile
+java -cp target/classes com.javamastery.examples.deadlock.DeadlockDemo
+```
+
+You&#x27;ll see something like:
+
+```
+Both threads started. This program is now DEADLOCKED and will hang.
+deadlock-thread-AB: holding lockA, want lockB
+deadlock-thread-BA: holding lockB, want lockA
+PID = 22577
+Capture a thread dump now:  jstack 22577
+```
+
+…and then it **hangs forever**. Leave it running and open a second terminal.
+
+---
+
+## Part 2 — Capture a thread dump
+
+You have three equivalent ways to grab a dump. Use whichever you like.
+
+First, find the PID (the program prints it; or use `jps`):
+
+```bash
+jps -l        # lists running JVMs with their main class; copy the PID
+```
+
+Then dump, picking ONE:
+
+```bash
+# (a) jstack — the classic
+jstack &lt;pid&gt;
+
+# (b) jcmd — the modern, preferred entry point
+jcmd &lt;pid&gt; Thread.print
+
+# (c) signal the JVM — prints the dump to the program&#x27;s OWN stdout/console
+kill -3 &lt;pid&gt;          # macOS/Linux; SIGQUIT
+#   on Windows: press Ctrl-Break in the console running the program
+```
+
+When you&#x27;re done observing, kill the hung program: `Ctrl-C` in its terminal, or
+`kill -9 &lt;pid&gt;`.
+
+---
+
+## Part 3 — Read the thread dump
+
+The JVM does the hard part for you and prints a dedicated deadlock section at
+the **bottom** of the dump:
+
+```
+Found one Java-level deadlock:
+=============================
+&quot;deadlock-thread-AB&quot;:
+  waiting to lock monitor 0x...e0 (object 0x...cf8, a ...DeadlockDemo$LockB),
+  which is held by &quot;deadlock-thread-BA&quot;
+
+&quot;deadlock-thread-BA&quot;:
+  waiting to lock monitor 0x...00 (object 0x...fe8, a ...DeadlockDemo$LockA),
+  which is held by &quot;deadlock-thread-AB&quot;
+
+Java stack information for the threads listed above:
+===================================================
+&quot;deadlock-thread-AB&quot;:
+        at ...DeadlockDemo.workAB(DeadlockDemo.java:49)
+        - waiting to lock &lt;0x...cf8&gt; (a ...DeadlockDemo$LockB)
+        - locked &lt;0x...fe8&gt; (a ...DeadlockDemo$LockA)
+&quot;deadlock-thread-BA&quot;:
+        at ...DeadlockDemo.workBA(DeadlockDemo.java:60)
+        - waiting to lock &lt;0x...fe8&gt; (a ...DeadlockDemo$LockA)
+        - locked &lt;0x...cf8&gt; (a ...DeadlockDemo$LockB)
+
+Found 1 deadlock.
+```
+
+How to read it:
+
+- **Thread state `BLOCKED`** — in the per-thread section above the summary,
+  both worker threads show state `BLOCKED (on object monitor)`. Threads BLOCKED
+  on a monitor are the prime suspects.
+- **`locked &lt;0x...&gt;`** — a monitor this thread *already holds*.
+- **`waiting to lock &lt;0x...&gt;`** — a monitor this thread *wants* but can&#x27;t get
+  because someone else holds it.
+- **The cycle** — follow the `which is held by` chain: AB waits for B (held by
+  BA); BA waits for A (held by AB). That loop **is** the deadlock. The hex
+  object ids (`0x...cf8`, `0x...fe8`) are how you match &quot;who holds what&quot; — note
+  that `LockA` and `LockB` are distinct named classes precisely so they&#x27;re easy
+  to spot in the dump.
+
+&gt; Naming the lock objects with dedicated types (`LockA`, `LockB`) is a real
+&gt; diagnostic technique: a dump full of `a java.lang.Object` monitors is far
+&gt; harder to read.
+
+---
+
+## Part 4 — The pool-starvation deadlock (no lock cycle)
+
+```bash
+java -cp target/classes com.javamastery.examples.deadlock.PoolStarvationDeadlockDemo
+```
+
+A task on a **1-thread pool** submits a sub-task to the **same pool** and blocks
+on its result. The single worker is stuck in `Future.get()`; the sub-task sits
+in the queue with no thread to run it. It hangs.
+
+Dump it (`jstack &lt;pid&gt;`) and notice the difference:
+
+- There is **no** &quot;Found N deadlocks&quot; line — `findDeadlockedThreads()` only
+  catches *monitor / lock cycles*, and this is none. The worker is merely
+  `WAITING`.
+- You diagnose it by reading the stack: a `pool-1-thread-1` parked in
+  `java.util.concurrent.FutureTask.awaitDone` / `Future.get`, while the pool&#x27;s
+  queue holds work that depends on a free thread.
+
+**Lesson:** not every deadlock is a lock cycle the JVM can flag for you. Pool
+starvation, nested `Future.get`, and reentrancy-on-the-wrong-thread all hang
+without tripping the automatic detector.
+
+---
+
+## The four Coffman conditions
+
+A deadlock requires **all four** to hold simultaneously. Break **any one** and
+deadlock is impossible:
+
+1. **Mutual exclusion** — a resource (lock) is held by at most one thread.
+2. **Hold and wait** — a thread holds one resource while waiting for another.
+3. **No preemption** — a resource can&#x27;t be forcibly taken; only the holder
+   releases it.
+4. **Circular wait** — a cycle of threads each waiting on the next&#x27;s resource.
+
+Map the fixes to the conditions:
+
+| Fix | Condition it breaks |
+|-----|---------------------|
+| **Global lock ordering** (`OrderedLockTransfer`) | **Circular wait** — a total order on locks makes a cycle impossible. |
+| **`tryLock` + timeout + backoff** (`TryLockTransfer`) | **Hold and wait / no preemption** — a thread releases what it holds and retries instead of waiting forever. |
+| **Reduce lock scope / one lock** | **Hold and wait** — don&#x27;t hold two locks at once. |
+| **Lock-free** (atomics, `compareAndSet`, immutable data) | **Mutual exclusion** — no locks, no lock-deadlock. |
+
+---
+
+## Part 5 — The fixes
+
+### Fix #1 — Global lock ordering (`fixed/OrderedLockTransfer.java`)
+
+Always acquire any pair of locks in one consistent global order. Here we lock
+the account with the **lower `id` first**, regardless of transfer direction, so
+`transfer(A, B)` and `transfer(B, A)` always lock in the same order → no cycle.
+
+When you have a natural unique key (an `id`), rank by it. When you **don&#x27;t**,
+the common trick is `System.identityHashCode(obj)`:
+
+```java
+int rankFrom = System.identityHashCode(from);
+int rankTo   = System.identityHashCode(to);
+if (rankFrom &lt; rankTo) {      lock(from); lock(to); }
+else if (rankFrom &gt; rankTo) { lock(to);   lock(from); }
+else {                        // rare hash collision: use a shared tie-breaker lock
+    synchronized (TIE_BREAKER) { lock(from); lock(to); }
+}
+```
+
+The tie-breaker handles the (rare) case where two distinct objects share an
+identity hash code — without it, a collision could reintroduce inconsistent
+ordering. Ranking by a guaranteed-unique `id` (as this lab does) sidesteps the
+collision case entirely.
+
+### Fix #2 — `tryLock` + timeout + backoff (`fixed/TryLockTransfer.java`)
+
+Use `ReentrantLock.tryLock(timeout, unit)`. A thread tries to grab **both**
+locks within a timeout; if it can&#x27;t get the second, it **releases the first**,
+backs off a random interval, and retries. Nobody waits forever, so the system
+always makes progress. (Theoretically this allows *livelock* — both sides
+retrying in lockstep — but randomized backoff makes that negligible.)
+
+Use this when a clean global order is impractical (locks discovered at runtime,
+third-party objects, etc.).
+
+### Other fixes worth knowing
+
+- **Reduce lock scope** — hold the smallest critical section possible; never
+  call out to unknown code while holding a lock; never acquire a second lock if
+  you can avoid it.
+- **One coarse lock** — if two locks are always taken together, just use one.
+- **Lock-free** — `AtomicLong`/`AtomicReference` + `compareAndSet`, immutable
+  objects, `java.util.concurrent` collections. No locks → no lock deadlock.
+
+---
+
+## Quick command reference
+
+```bash
+mvn test                                   # run the fixes&#x27; tests (green, ~1s, never hangs)
+mvn -q compile                             # compile only
+
+# Reproduce the headline deadlock, then dump it from another terminal:
+java -cp target/classes com.javamastery.examples.deadlock.DeadlockDemo
+java -cp target/classes com.javamastery.examples.deadlock.PoolStarvationDeadlockDemo
+
+jps -l                                     # find the PID
+jstack &lt;pid&gt;                               # thread dump (look for &quot;Found 1 deadlock&quot;)
+jcmd &lt;pid&gt; Thread.print                    # modern equivalent
+kill -3 &lt;pid&gt;                              # SIGQUIT: dump to the program&#x27;s own console
+kill -9 &lt;pid&gt;                              # kill the hung process when done
+```
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/labs--lab-02-build-a-memory-leak.html"><div class="lbl">← Previous</div><div class="ttl">lab-02-build-a-memory-leak</div><div class="sub">Lab 02 — Build a Memory Leak (then fix it)</div></a><a class="next" href="../examples/labs--lab-04-jmh-microbenchmark.html"><div class="lbl">Next →</div><div class="ttl">lab-04-jmh-microbenchmark</div><div class="sub">Lab 04 — JMH Microbenchmarking</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-2"><a href="#run-the-tests-the-fixes-are-green-and-never-hang" data-toc-link>Run the tests (the fixes are GREEN, and never hang)</a></li><li class="lvl-2"><a href="#part-1-make-it-deadlock-the-headline" data-toc-link>Part 1 — Make it deadlock (the headline)</a></li><li class="lvl-2"><a href="#part-2-capture-a-thread-dump" data-toc-link>Part 2 — Capture a thread dump</a></li><li class="lvl-2"><a href="#part-3-read-the-thread-dump" data-toc-link>Part 3 — Read the thread dump</a></li><li class="lvl-2"><a href="#part-4-the-pool-starvation-deadlock-no-lock-cycle" data-toc-link>Part 4 — The pool-starvation deadlock (no lock cycle)</a></li><li class="lvl-2"><a href="#the-four-coffman-conditions" data-toc-link>The four Coffman conditions</a></li><li class="lvl-2"><a href="#part-5-the-fixes" data-toc-link>Part 5 — The fixes</a></li><li class="lvl-3"><a href="#fix-1-global-lock-ordering-fixedorderedlocktransferjava" data-toc-link>Fix #1 — Global lock ordering (fixed/OrderedLockTransfer.java)</a></li><li class="lvl-3"><a href="#fix-2-trylock-timeout-backoff-fixedtrylocktransferjava" data-toc-link>Fix #2 — tryLock + timeout + backoff (fixed/TryLockTransfer.java)</a></li><li class="lvl-3"><a href="#other-fixes-worth-knowing" data-toc-link>Other fixes worth knowing</a></li><li class="lvl-2"><a href="#quick-command-reference" data-toc-link>Quick command reference</a></li><li class="lvl-2"><a href="#source-files" data-toc-link>Source files</a></li><li class="lvl-3"><a href="#pomxml" data-toc-link>pom.xml</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesdeadlockdeadlockdemojava" data-toc-link>src/main/java/com/javamastery/examples/deadlock/DeadlockDemo.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesdeadlockpoolstarvationdeadlockdemojava" data-toc-link>src/main/java/com/javamastery/examples/deadlock/PoolStarvationDeadlockDemo.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesdeadlockfixedorderedlocktransferjava" data-toc-link>src/main/java/com/javamastery/examples/deadlock/fixed/OrderedLockTransfer.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesdeadlockfixedtrylocktransferjava" data-toc-link>src/main/java/com/javamastery/examples/deadlock/fixed/TryLockTransfer.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesdeadlockdeadlockdetectiontestjava" data-toc-link>src/test/java/com/javamastery/examples/deadlock/DeadlockDetectionTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesdeadlockfixedtransfertestjava" data-toc-link>src/test/java/com/javamastery/examples/deadlock/FixedTransferTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

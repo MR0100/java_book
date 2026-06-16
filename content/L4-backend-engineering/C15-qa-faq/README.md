@@ -22,4 +22,4 @@ Quick question to answer reference for this module.
 
 - [L4 Q&A and FAQ](T01-l4-qa.md)
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

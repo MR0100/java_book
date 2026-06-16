@@ -22,4 +22,4 @@ Tooling and environment setup relevant to this level.
 
 - [Tools for Backend Engineering](T01-tools-for-backend-engineering.md)
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

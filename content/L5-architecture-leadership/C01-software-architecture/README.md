@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Architecture & Engineering Leadership — Software Architecture
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -35,4 +35,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 13 | Anti-corruption layer | `T13-anti-corruption-layer.md` | planned |
 | 14 | Architecture trade-off analysis | `T14-architecture-trade-off-analysis.md` | planned |
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Advanced Java & the JVM — JVM Internals & Performance
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -44,4 +44,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 > JFR/JMC deep dive + flame graphs), and T12 (step-by-step JMH + microbenchmark pitfalls).
 > Hand-maintained (generator predates these); per-topic frontmatter `status` is the source of truth.
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

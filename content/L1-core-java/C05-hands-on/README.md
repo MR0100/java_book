@@ -20,4 +20,4 @@ Exercises plus this module's end-of-level project.
 
 **Level project.** Model a small domain (library, bank, or inventory) using classes, encapsulation, inheritance, collections, and exceptions — with unit tests.
 
-[Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L1 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

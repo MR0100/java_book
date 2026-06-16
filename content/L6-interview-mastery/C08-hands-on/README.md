@@ -20,4 +20,4 @@ A graduated practice plan plus the module's mock-interview gauntlet project.
 
 **Level project.** A self-graded mock-interview gauntlet: one coding round, one design round (LLD or HLD by target level), one behavioral round, plus a resume rewrite — each with a rubric to score yourself against.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

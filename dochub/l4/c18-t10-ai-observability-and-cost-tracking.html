@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link active" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🏗</span><span>Ch. 6 · L4 — Backend Engineering</span></div><div class="chapter-path">content/L4-backend-engineering/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l4/overview.html" data-q="l4 — backend engineering content/l4-backend-engineering/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · spring framework content/l4-backend-engineering/c01-spring-framework/readme.md content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><summary><span class="caret">▶</span><span>C01 · Spring Framework</span></summary><ul class="pages"><li data-q="backend engineering — spring framework &amp; ecosystem content/l4-backend-engineering/c01-spring-framework/readme.md"><a class="" href="../l4/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="spring core: ioc container &amp; beans content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md"><a class="" href="../l4/c01-t01-spring-core-ioc-container-and-beans.html"><span>Spring Core: IoC Container &amp; Beans</span><span class="kind-pill "></span></a></li><li data-q="dependency injection (constructor / field / setter) content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md"><a class="" href="../l4/c01-t02-dependency-injection-constructor-field-setter.html"><span>Dependency Injection (constructor / field / setter)</span><span class="kind-pill "></span></a></li><li data-q="bean scopes &amp; lifecycle content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md"><a class="" href="../l4/c01-t03-bean-scopes-and-lifecycle.html"><span>Bean Scopes &amp; Lifecycle</span><span class="kind-pill "></span></a></li><li data-q="spring configuration (java / annotation / xml) content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md"><a class="" href="../l4/c01-t04-spring-configuration-java-annotation-xml.html"><span>Spring Configuration (Java / Annotation / XML)</span><span class="kind-pill "></span></a></li><li data-q="spring aop content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md"><a class="" href="../l4/c01-t05-spring-aop.html"><span>Spring AOP</span><span class="kind-pill "></span></a></li><li data-q="spring expression language (spel) content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md"><a class="" href="../l4/c01-t06-spring-expression-language-spel.html"><span>Spring Expression Language (SpEL)</span><span class="kind-pill "></span></a></li><li data-q="spring boot auto-configuration &amp; starters content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md"><a class="" href="../l4/c01-t07-spring-boot-auto-configuration-and-starters.html"><span>Spring Boot Auto-Configuration &amp; Starters</span><span class="kind-pill "></span></a></li><li data-q="spring boot properties &amp; profiles content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md"><a class="" href="../l4/c01-t08-spring-boot-properties-and-profiles.html"><span>Spring Boot Properties &amp; Profiles</span><span class="kind-pill "></span></a></li><li data-q="spring boot actuator content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md"><a class="" href="../l4/c01-t09-spring-boot-actuator.html"><span>Spring Boot Actuator</span><span class="kind-pill "></span></a></li><li data-q="spring mvc (rest controllers) content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md"><a class="" href="../l4/c01-t10-spring-mvc-rest-controllers.html"><span>Spring MVC (REST Controllers)</span><span class="kind-pill "></span></a></li><li data-q="validation (@valid, bean validation) content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md"><a class="" href="../l4/c01-t11-validation-valid-bean-validation.html"><span>Validation (@Valid, Bean Validation)</span><span class="kind-pill "></span></a></li><li data-q="exception handling (@controlleradvice) content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md"><a class="" href="../l4/c01-t12-exception-handling-controlleradvice.html"><span>Exception Handling (@ControllerAdvice)</span><span class="kind-pill "></span></a></li><li data-q="spring data content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md"><a class="" href="../l4/c01-t13-spring-data.html"><span>Spring Data</span><span class="kind-pill "></span></a></li><li data-q="spring security (authentication &amp; authorization) content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md"><a class="" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><span>Spring Security (authentication &amp; authorization)</span><span class="kind-pill "></span></a></li><li data-q="oauth2 / openid connect / jwt with spring security content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md"><a class="" href="../l4/c01-t15-oauth2-openid-connect-jwt-with-spring-security.html"><span>OAuth2 / OpenID Connect / JWT with Spring Security</span><span class="kind-pill "></span></a></li><li data-q="method-level security content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md"><a class="" href="../l4/c01-t16-method-level-security.html"><span>Method-Level Security</span><span class="kind-pill "></span></a></li><li data-q="spring webflux (reactive) content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md"><a class="" href="../l4/c01-t17-spring-webflux-reactive.html"><span>Spring WebFlux (reactive)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud (config, gateway, eureka, openfeign) content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md"><a class="" href="../l4/c01-t18-spring-cloud-config-gateway-eureka-openfeign.html"><span>Spring Cloud (Config, Gateway, Eureka, OpenFeign)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud resilience (resilience4j) content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md"><a class="" href="../l4/c01-t19-spring-cloud-resilience-resilience4j.html"><span>Spring Cloud Resilience (Resilience4j)</span><span class="kind-pill "></span></a></li><li data-q="spring batch content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md"><a class="" href="../l4/c01-t20-spring-batch.html"><span>Spring Batch</span><span class="kind-pill "></span></a></li><li data-q="spring integration content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md"><a class="" href="../l4/c01-t21-spring-integration.html"><span>Spring Integration</span><span class="kind-pill "></span></a></li><li data-q="spring for kafka / amqp content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md"><a class="" href="../l4/c01-t22-spring-for-kafka-amqp.html"><span>Spring for Kafka / AMQP</span><span class="kind-pill "></span></a></li><li data-q="spring session content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md"><a class="" href="../l4/c01-t23-spring-session.html"><span>Spring Session</span><span class="kind-pill "></span></a></li><li data-q="spring testing content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md"><a class="" href="../l4/c01-t24-spring-testing.html"><span>Spring Testing</span><span class="kind-pill "></span></a></li><li data-q="spring native / graalvm content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md"><a class="" href="../l4/c01-t25-spring-native-graalvm.html"><span>Spring Native / GraalVM</span><span class="kind-pill "></span></a></li><li data-q="spring boot 4 &amp; spring framework 7 content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><a class="" href="../l4/c01-t26-spring-boot-4-and-spring-framework-7.html"><span>Spring Boot 4 &amp; Spring Framework 7</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · persistence jpa hibernate content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><summary><span class="caret">▶</span><span>C02 · Persistence JPA Hibernate</span></summary><ul class="pages"><li data-q="backend engineering — persistence — jpa / hibernate / orm content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md"><a class="" href="../l4/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="orm concepts &amp; the impedance mismatch content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md"><a class="" href="../l4/c02-t01-orm-concepts-and-the-impedance-mismatch.html"><span>ORM concepts &amp; the impedance mismatch</span><span class="kind-pill "></span></a></li><li data-q="jpa fundamentals (entities, entitymanager) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md"><a class="" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><span>JPA fundamentals (entities, EntityManager)</span><span class="kind-pill "></span></a></li><li data-q="entity mappings &amp; relationships (@onetomany, etc.) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md"><a class="" href="../l4/c02-t03-entity-mappings-and-relationships-onetomany-etc.html"><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span><span class="kind-pill "></span></a></li><li data-q="hibernate architecture content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md"><a class="" href="../l4/c02-t04-hibernate-architecture.html"><span>Hibernate architecture</span><span class="kind-pill "></span></a></li><li data-q="persistence context &amp; entity lifecycle content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md"><a class="" href="../l4/c02-t05-persistence-context-and-entity-lifecycle.html"><span>Persistence context &amp; entity lifecycle</span><span class="kind-pill "></span></a></li><li data-q="lazy vs eager loading content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md"><a class="" href="../l4/c02-t06-lazy-vs-eager-loading.html"><span>Lazy vs eager loading</span><span class="kind-pill "></span></a></li><li data-q="the n+1 problem &amp; fixes content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md"><a class="" href="../l4/c02-t07-the-n-plus-1-problem-and-fixes.html"><span>The N+1 problem &amp; fixes</span><span class="kind-pill "></span></a></li><li data-q="jpql &amp; criteria api content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md"><a class="" href="../l4/c02-t08-jpql-and-criteria-api.html"><span>JPQL &amp; Criteria API</span><span class="kind-pill "></span></a></li><li data-q="querydsl content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md"><a class="" href="../l4/c02-t09-querydsl.html"><span>QueryDSL</span><span class="kind-pill "></span></a></li><li data-q="native queries content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md"><a class="" href="../l4/c02-t10-native-queries.html"><span>Native queries</span><span class="kind-pill "></span></a></li><li data-q="caching (first/second level) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md"><a class="" href="../l4/c02-t11-caching-first-second-level.html"><span>Caching (first/second level)</span><span class="kind-pill "></span></a></li><li data-q="transactions with jpa content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md"><a class="" href="../l4/c02-t12-transactions-with-jpa.html"><span>Transactions with JPA</span><span class="kind-pill "></span></a></li><li data-q="optimistic vs pessimistic locking content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md"><a class="" href="../l4/c02-t13-optimistic-vs-pessimistic-locking.html"><span>Optimistic vs pessimistic locking</span><span class="kind-pill "></span></a></li><li data-q="spring data jpa repositories content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md"><a class="" href="../l4/c02-t14-spring-data-jpa-repositories.html"><span>Spring Data JPA repositories</span><span class="kind-pill "></span></a></li><li data-q="projections &amp; dto mapping content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md"><a class="" href="../l4/c02-t15-projections-and-dto-mapping.html"><span>Projections &amp; DTO mapping</span><span class="kind-pill "></span></a></li><li data-q="auditing content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><a class="" href="../l4/c02-t16-auditing.html"><span>Auditing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · databases advanced content/l4-backend-engineering/c03-databases-advanced/readme.md content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><summary><span class="caret">▶</span><span>C03 · Databases Advanced</span></summary><ul class="pages"><li data-q="backend engineering — databases — advanced content/l4-backend-engineering/c03-databases-advanced/readme.md"><a class="" href="../l4/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="indexing &amp; index types content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md"><a class="" href="../l4/c03-t01-indexing-and-index-types.html"><span>Indexing &amp; index types</span><span class="kind-pill "></span></a></li><li data-q="query optimization &amp; execution plans content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md"><a class="" href="../l4/c03-t02-query-optimization-and-execution-plans.html"><span>Query optimization &amp; execution plans</span><span class="kind-pill "></span></a></li><li data-q="database migrations (flyway, liquibase) content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md"><a class="" href="../l4/c03-t03-database-migrations-flyway-liquibase.html"><span>Database migrations (Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="replication &amp; read replicas content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md"><a class="" href="../l4/c03-t04-replication-and-read-replicas.html"><span>Replication &amp; read replicas</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; sharding content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md"><a class="" href="../l4/c03-t05-partitioning-and-sharding.html"><span>Partitioning &amp; sharding</span><span class="kind-pill "></span></a></li><li data-q="change data capture (debezium) content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><a class="" href="../l4/c03-t06-change-data-capture-debezium.html"><span>Change Data Capture (Debezium)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · nosql and caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><summary><span class="caret">▶</span><span>C04 · Nosql And Caching</span></summary><ul class="pages"><li data-q="backend engineering — nosql &amp; caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md"><a class="" href="../l4/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use nosql vs sql content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md"><a class="" href="../l4/c04-t01-when-to-use-nosql-vs-sql.html"><span>When to use NoSQL vs SQL</span><span class="kind-pill "></span></a></li><li data-q="document stores (mongodb) content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md"><a class="" href="../l4/c04-t02-document-stores-mongodb.html"><span>Document stores (MongoDB)</span><span class="kind-pill "></span></a></li><li data-q="key-value stores (redis) content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md"><a class="" href="../l4/c04-t03-key-value-stores-redis.html"><span>Key-value stores (Redis)</span><span class="kind-pill "></span></a></li><li data-q="wide-column stores (cassandra) content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md"><a class="" href="../l4/c04-t04-wide-column-stores-cassandra.html"><span>Wide-column stores (Cassandra)</span><span class="kind-pill "></span></a></li><li data-q="search engines (elasticsearch / opensearch) content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md"><a class="" href="../l4/c04-t05-search-engines-elasticsearch-opensearch.html"><span>Search engines (Elasticsearch / OpenSearch)</span><span class="kind-pill "></span></a></li><li data-q="graph databases (intro) content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md"><a class="" href="../l4/c04-t06-graph-databases-intro.html"><span>Graph databases (intro)</span><span class="kind-pill "></span></a></li><li data-q="spring data for nosql content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md"><a class="" href="../l4/c04-t07-spring-data-for-nosql.html"><span>Spring Data for NoSQL</span><span class="kind-pill "></span></a></li><li data-q="caching concepts (cache-aside, write-through, write-behind) content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md"><a class="" href="../l4/c04-t08-caching-concepts-cache-aside-write-through-write-behind.html"><span>Caching concepts (cache-aside, write-through, write-behind)</span><span class="kind-pill "></span></a></li><li data-q="local caching (caffeine) content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md"><a class="" href="../l4/c04-t09-local-caching-caffeine.html"><span>Local caching (Caffeine)</span><span class="kind-pill "></span></a></li><li data-q="distributed caching (redis) content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md"><a class="" href="../l4/c04-t10-distributed-caching-redis.html"><span>Distributed caching (Redis)</span><span class="kind-pill "></span></a></li><li data-q="cache invalidation &amp; ttls content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md"><a class="" href="../l4/c04-t11-cache-invalidation-and-ttls.html"><span>Cache invalidation &amp; TTLs</span><span class="kind-pill "></span></a></li><li data-q="cdn caching content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><a class="" href="../l4/c04-t12-cdn-caching.html"><span>CDN caching</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · apis advanced content/l4-backend-engineering/c05-apis-advanced/readme.md content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><summary><span class="caret">▶</span><span>C05 · APIs Advanced</span></summary><ul class="pages"><li data-q="backend engineering — apis — advanced content/l4-backend-engineering/c05-apis-advanced/readme.md"><a class="" href="../l4/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http/2 &amp; http/3 content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md"><a class="" href="../l4/c05-t01-http-2-and-http-3.html"><span>HTTP/2 &amp; HTTP/3</span><span class="kind-pill "></span></a></li><li data-q="richardson maturity model &amp; hateoas content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md"><a class="" href="../l4/c05-t02-richardson-maturity-model-and-hateoas.html"><span>Richardson Maturity Model &amp; HATEOAS</span><span class="kind-pill "></span></a></li><li data-q="idempotency in apis content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md"><a class="" href="../l4/c05-t03-idempotency-in-apis.html"><span>Idempotency in APIs</span><span class="kind-pill "></span></a></li><li data-q="openapi / swagger documentation content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md"><a class="" href="../l4/c05-t04-openapi-swagger-documentation.html"><span>OpenAPI / Swagger documentation</span><span class="kind-pill "></span></a></li><li data-q="graphql content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md"><a class="" href="../l4/c05-t05-graphql.html"><span>GraphQL</span><span class="kind-pill "></span></a></li><li data-q="grpc &amp; protocol buffers content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md"><a class="" href="../l4/c05-t06-grpc-and-protocol-buffers.html"><span>gRPC &amp; Protocol Buffers</span><span class="kind-pill "></span></a></li><li data-q="websockets content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md"><a class="" href="../l4/c05-t07-websockets.html"><span>WebSockets</span><span class="kind-pill "></span></a></li><li data-q="server-sent events (sse) content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md"><a class="" href="../l4/c05-t08-server-sent-events-sse.html"><span>Server-Sent Events (SSE)</span><span class="kind-pill "></span></a></li><li data-q="webhooks content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md"><a class="" href="../l4/c05-t09-webhooks.html"><span>Webhooks</span><span class="kind-pill "></span></a></li><li data-q="rate limiting &amp; throttling content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md"><a class="" href="../l4/c05-t10-rate-limiting-and-throttling.html"><span>Rate limiting &amp; throttling</span><span class="kind-pill "></span></a></li><li data-q="bff (backend for frontend) content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><a class="" href="../l4/c05-t11-bff-backend-for-frontend.html"><span>BFF (Backend for Frontend)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><summary><span class="caret">▶</span><span>C06 · Reactive Programming</span></summary><ul class="pages"><li data-q="backend engineering — reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md"><a class="" href="../l4/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="reactive principles &amp; the reactive streams spec content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md"><a class="" href="../l4/c06-t01-reactive-principles-and-the-reactive-streams-spec.html"><span>Reactive principles &amp; the Reactive Streams spec</span><span class="kind-pill "></span></a></li><li data-q="project reactor (mono / flux) content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md"><a class="" href="../l4/c06-t02-project-reactor-mono-flux.html"><span>Project Reactor (Mono / Flux)</span><span class="kind-pill "></span></a></li><li data-q="rxjava (alternative) content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md"><a class="" href="../l4/c06-t03-rxjava-alternative.html"><span>RxJava (alternative)</span><span class="kind-pill "></span></a></li><li data-q="backpressure content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md"><a class="" href="../l4/c06-t04-backpressure.html"><span>Backpressure</span><span class="kind-pill "></span></a></li><li data-q="spring webflux content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md"><a class="" href="../l4/c06-t05-spring-webflux.html"><span>Spring WebFlux</span><span class="kind-pill "></span></a></li><li data-q="r2dbc (reactive database access) content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md"><a class="" href="../l4/c06-t06-r2dbc-reactive-database-access.html"><span>R2DBC (reactive database access)</span><span class="kind-pill "></span></a></li><li data-q="reactive vs virtual threads (trade-offs) content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><a class="" href="../l4/c06-t07-reactive-vs-virtual-threads-trade-offs.html"><span>Reactive vs virtual threads (trade-offs)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · messaging and streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><summary><span class="caret">▶</span><span>C07 · Messaging And Streaming</span></summary><ul class="pages"><li data-q="backend engineering — messaging &amp; event streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md"><a class="" href="../l4/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="messaging concepts (queues, topics, pub/sub) content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md"><a class="" href="../l4/c07-t01-messaging-concepts-queues-topics-pub-sub.html"><span>Messaging concepts (queues, topics, pub/sub)</span><span class="kind-pill "></span></a></li><li data-q="jms &amp; activemq content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md"><a class="" href="../l4/c07-t02-jms-and-activemq.html"><span>JMS &amp; ActiveMQ</span><span class="kind-pill "></span></a></li><li data-q="rabbitmq (amqp) content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md"><a class="" href="../l4/c07-t03-rabbitmq-amqp.html"><span>RabbitMQ (AMQP)</span><span class="kind-pill "></span></a></li><li data-q="apache kafka fundamentals content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md"><a class="" href="../l4/c07-t04-apache-kafka-fundamentals.html"><span>Apache Kafka fundamentals</span><span class="kind-pill "></span></a></li><li data-q="kafka deep (partitions, consumer groups, offsets) content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md"><a class="" href="../l4/c07-t05-kafka-deep-partitions-consumer-groups-offsets.html"><span>Kafka deep (partitions, consumer groups, offsets)</span><span class="kind-pill "></span></a></li><li data-q="kafka streams content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md"><a class="" href="../l4/c07-t06-kafka-streams.html"><span>Kafka Streams</span><span class="kind-pill "></span></a></li><li data-q="event-driven architecture content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md"><a class="" href="../l4/c07-t07-event-driven-architecture.html"><span>Event-driven architecture</span><span class="kind-pill "></span></a></li><li data-q="async processing patterns content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md"><a class="" href="../l4/c07-t08-async-processing-patterns.html"><span>Async processing patterns</span><span class="kind-pill "></span></a></li><li data-q="outbox pattern &amp; exactly-once content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md"><a class="" href="../l4/c07-t09-outbox-pattern-and-exactly-once.html"><span>Outbox pattern &amp; exactly-once</span><span class="kind-pill "></span></a></li><li data-q="dead-letter queues &amp; retries content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md"><a class="" href="../l4/c07-t10-dead-letter-queues-and-retries.html"><span>Dead-letter queues &amp; retries</span><span class="kind-pill "></span></a></li><li data-q="stream processing (flink, intro) content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><a class="" href="../l4/c07-t11-stream-processing-flink-intro.html"><span>Stream processing (Flink, intro)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · security content/l4-backend-engineering/c08-security/readme.md content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md content/l4-backend-engineering/c08-security/t06-owasp-top-10.md content/l4-backend-engineering/c08-security/t07-sql-injection.md content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md content/l4-backend-engineering/c08-security/t11-tls-in-practice.md content/l4-backend-engineering/c08-security/t12-secrets-management.md content/l4-backend-engineering/c08-security/t13-security-headers.md content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><summary><span class="caret">▶</span><span>C08 · Security</span></summary><ul class="pages"><li data-q="backend engineering — security content/l4-backend-engineering/c08-security/readme.md"><a class="" href="../l4/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="authentication vs authorization content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md"><a class="" href="../l4/c08-t01-authentication-vs-authorization.html"><span>Authentication vs authorization</span><span class="kind-pill "></span></a></li><li data-q="sessions vs tokens content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md"><a class="" href="../l4/c08-t02-sessions-vs-tokens.html"><span>Sessions vs tokens</span><span class="kind-pill "></span></a></li><li data-q="oauth2 &amp; openid connect content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md"><a class="" href="../l4/c08-t03-oauth2-and-openid-connect.html"><span>OAuth2 &amp; OpenID Connect</span><span class="kind-pill "></span></a></li><li data-q="jwt (structure, validation, pitfalls) content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md"><a class="" href="../l4/c08-t04-jwt-structure-validation-pitfalls.html"><span>JWT (structure, validation, pitfalls)</span><span class="kind-pill "></span></a></li><li data-q="password storage (bcrypt, argon2) content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md"><a class="" href="../l4/c08-t05-password-storage-bcrypt-argon2.html"><span>Password storage (bcrypt, Argon2)</span><span class="kind-pill "></span></a></li><li data-q="owasp top 10 content/l4-backend-engineering/c08-security/t06-owasp-top-10.md"><a class="" href="../l4/c08-t06-owasp-top-10.html"><span>OWASP Top 10</span><span class="kind-pill "></span></a></li><li data-q="sql injection content/l4-backend-engineering/c08-security/t07-sql-injection.md"><a class="" href="../l4/c08-t07-sql-injection.html"><span>SQL injection</span><span class="kind-pill "></span></a></li><li data-q="xss &amp; csrf content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md"><a class="" href="../l4/c08-t08-xss-and-csrf.html"><span>XSS &amp; CSRF</span><span class="kind-pill "></span></a></li><li data-q="cors &amp; cross-origin requests content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md"><a class="" href="../l4/c08-t09-cors-and-cross-origin-requests.html"><span>CORS &amp; cross-origin requests</span><span class="kind-pill "></span></a></li><li data-q="encryption (symmetric/asymmetric, hashing) content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md"><a class="" href="../l4/c08-t10-encryption-symmetric-asymmetric-hashing.html"><span>Encryption (symmetric/asymmetric, hashing)</span><span class="kind-pill "></span></a></li><li data-q="tls in practice content/l4-backend-engineering/c08-security/t11-tls-in-practice.md"><a class="" href="../l4/c08-t11-tls-in-practice.html"><span>TLS in practice</span><span class="kind-pill "></span></a></li><li data-q="secrets management content/l4-backend-engineering/c08-security/t12-secrets-management.md"><a class="" href="../l4/c08-t12-secrets-management.html"><span>Secrets management</span><span class="kind-pill "></span></a></li><li data-q="security headers content/l4-backend-engineering/c08-security/t13-security-headers.md"><a class="" href="../l4/c08-t13-security-headers.html"><span>Security headers</span><span class="kind-pill "></span></a></li><li data-q="api security best practices content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md"><a class="" href="../l4/c08-t14-api-security-best-practices.html"><span>API security best practices</span><span class="kind-pill "></span></a></li><li data-q="dependency &amp; supply-chain security content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md"><a class="" href="../l4/c08-t15-dependency-and-supply-chain-security.html"><span>Dependency &amp; supply-chain security</span><span class="kind-pill "></span></a></li><li data-q="security architecture &amp; zero trust (intro) content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md"><a class="" href="../l4/c08-t16-security-architecture-and-zero-trust-intro.html"><span>Security architecture &amp; zero trust (intro)</span><span class="kind-pill "></span></a></li><li data-q="jvm-specific cves: log4shell, spring4shell &amp; the anatomy of java vulnerabilities content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md"><a class="" href="../l4/c08-t17-jvm-specific-cves-log4shell-spring4shell.html"><span>JVM-Specific CVEs: Log4Shell, Spring4Shell &amp; the Anatomy of Java Vulnerabilities</span><span class="kind-pill "></span></a></li><li data-q="modern authentication: oauth 2.1, fido2, webauthn &amp; passkeys content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md"><a class="" href="../l4/c08-t18-modern-auth-oauth21-fido2-webauthn-passkeys.html"><span>Modern Authentication: OAuth 2.1, FIDO2, WebAuthn &amp; Passkeys</span><span class="kind-pill "></span></a></li><li data-q="container security: distroless, wolfi, image signing &amp; runtime hardening content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><a class="" href="../l4/c08-t19-container-security-distroless-wolfi-image-signing.html"><span>Container Security: Distroless, Wolfi, Image Signing &amp; Runtime Hardening</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · testing advanced content/l4-backend-engineering/c09-testing-advanced/readme.md content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><summary><span class="caret">▶</span><span>C09 · Testing Advanced</span></summary><ul class="pages"><li data-q="backend engineering — testing — advanced content/l4-backend-engineering/c09-testing-advanced/readme.md"><a class="" href="../l4/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="integration testing content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md"><a class="" href="../l4/c09-t01-integration-testing.html"><span>Integration testing</span><span class="kind-pill "></span></a></li><li data-q="spring boot test slices content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md"><a class="" href="../l4/c09-t02-spring-boot-test-slices.html"><span>Spring Boot test slices</span><span class="kind-pill "></span></a></li><li data-q="testcontainers content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md"><a class="" href="../l4/c09-t03-testcontainers.html"><span>Testcontainers</span><span class="kind-pill "></span></a></li><li data-q="behavior-driven development (bdd, cucumber) content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md"><a class="" href="../l4/c09-t04-behavior-driven-development-bdd-cucumber.html"><span>Behavior-Driven Development (BDD, Cucumber)</span><span class="kind-pill "></span></a></li><li data-q="contract testing (spring cloud contract, pact) content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md"><a class="" href="../l4/c09-t05-contract-testing-spring-cloud-contract-pact.html"><span>Contract testing (Spring Cloud Contract, Pact)</span><span class="kind-pill "></span></a></li><li data-q="mutation testing (pit) content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md"><a class="" href="../l4/c09-t06-mutation-testing-pit.html"><span>Mutation testing (PIT)</span><span class="kind-pill "></span></a></li><li data-q="load &amp; performance testing (jmeter, gatling) content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md"><a class="" href="../l4/c09-t07-load-and-performance-testing-jmeter-gatling.html"><span>Load &amp; performance testing (JMeter, Gatling)</span><span class="kind-pill "></span></a></li><li data-q="the test pyramid &amp; testing strategy content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><a class="" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><span>The test pyramid &amp; testing strategy</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · devops and observability content/l4-backend-engineering/c10-devops-and-observability/readme.md content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><summary><span class="caret">▶</span><span>C10 · Devops And Observability</span></summary><ul class="pages"><li data-q="backend engineering — devops, cloud &amp; observability content/l4-backend-engineering/c10-devops-and-observability/readme.md"><a class="" href="../l4/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="docker &amp; containerization for java content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md"><a class="" href="../l4/c10-t01-docker-and-containerization-for-java.html"><span>Docker &amp; containerization for Java</span><span class="kind-pill "></span></a></li><li data-q="dockerfile best practices for java apps content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md"><a class="" href="../l4/c10-t02-dockerfile-best-practices-for-java-apps.html"><span>Dockerfile best practices for Java apps</span><span class="kind-pill "></span></a></li><li data-q="kubernetes basics content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md"><a class="" href="../l4/c10-t03-kubernetes-basics.html"><span>Kubernetes basics</span><span class="kind-pill "></span></a></li><li data-q="ci/cd concepts content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md"><a class="" href="../l4/c10-t04-ci-cd-concepts.html"><span>CI/CD concepts</span><span class="kind-pill "></span></a></li><li data-q="ci/cd tools (github actions, jenkins, gitlab ci) content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md"><a class="" href="../l4/c10-t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.html"><span>CI/CD tools (GitHub Actions, Jenkins, GitLab CI)</span><span class="kind-pill "></span></a></li><li data-q="deployment strategies (blue-green, canary, rolling) content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md"><a class="" href="../l4/c10-t06-deployment-strategies-blue-green-canary-rolling.html"><span>Deployment strategies (blue-green, canary, rolling)</span><span class="kind-pill "></span></a></li><li data-q="cloud basics for java devs (aws/gcp/azure) content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md"><a class="" href="../l4/c10-t07-cloud-basics-for-java-devs-aws-gcp-azure.html"><span>Cloud basics for Java devs (AWS/GCP/Azure)</span><span class="kind-pill "></span></a></li><li data-q="infrastructure as code (terraform, intro) content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md"><a class="" href="../l4/c10-t08-infrastructure-as-code-terraform-intro.html"><span>Infrastructure as Code (Terraform, intro)</span><span class="kind-pill "></span></a></li><li data-q="configuration and secrets management content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md"><a class="" href="../l4/c10-t09-configuration-and-secrets-management.html"><span>Configuration and secrets management</span><span class="kind-pill "></span></a></li><li data-q="feature flags content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md"><a class="" href="../l4/c10-t10-feature-flags.html"><span>Feature flags</span><span class="kind-pill "></span></a></li><li data-q="logging (slf4j, logback, log4j2, elk) content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md"><a class="" href="../l4/c10-t11-logging-slf4j-logback-log4j2-elk.html"><span>Logging (SLF4J, Logback, Log4j2, ELK)</span><span class="kind-pill "></span></a></li><li data-q="metrics (micrometer, prometheus, grafana) content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md"><a class="" href="../l4/c10-t12-metrics-micrometer-prometheus-grafana.html"><span>Metrics (Micrometer, Prometheus, Grafana)</span><span class="kind-pill "></span></a></li><li data-q="distributed tracing (opentelemetry, jaeger, zipkin) content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md"><a class="" href="../l4/c10-t13-distributed-tracing-opentelemetry-jaeger-zipkin.html"><span>Distributed tracing (OpenTelemetry, Jaeger, Zipkin)</span><span class="kind-pill "></span></a></li><li data-q="health checks and readiness/liveness probes content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md"><a class="" href="../l4/c10-t14-health-checks-and-readiness-liveness-probes.html"><span>Health checks and readiness/liveness probes</span><span class="kind-pill "></span></a></li><li data-q="monitoring and alerting content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md"><a class="" href="../l4/c10-t15-monitoring-and-alerting.html"><span>Monitoring and alerting</span><span class="kind-pill "></span></a></li><li data-q="sre concepts (error budgets, toil) content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md"><a class="" href="../l4/c10-t16-sre-concepts-error-budgets-toil.html"><span>SRE concepts (error budgets, toil)</span><span class="kind-pill "></span></a></li><li data-q="serverless java: aws lambda, snapstart &amp; cold starts content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md"><a class="" href="../l4/c10-t17-serverless-java-lambda-snapstart.html"><span>Serverless Java: AWS Lambda, SnapStart &amp; Cold Starts</span><span class="kind-pill "></span></a></li><li data-q="edge computing with java: workers, lambda@edge &amp; the network edge content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md"><a class="" href="../l4/c10-t18-edge-computing-java.html"><span>Edge Computing with Java: Workers, Lambda@Edge &amp; the Network Edge</span><span class="kind-pill "></span></a></li><li data-q="multi-runtime microservices with dapr content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md"><a class="" href="../l4/c10-t19-multi-runtime-dapr.html"><span>Multi-Runtime Microservices with Dapr</span><span class="kind-pill "></span></a></li><li data-q="ebpf &amp; continuous production profiling content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><a class="" href="../l4/c10-t20-ebpf-and-continuous-production-profiling.html"><span>eBPF &amp; Continuous Production Profiling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · tools and environment content/l4-backend-engineering/c11-tools-and-environment/readme.md content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><summary><span class="caret">▶</span><span>C11 · Tools And Environment</span></summary><ul class="pages"><li data-q="backend engineering — tools &amp; environment content/l4-backend-engineering/c11-tools-and-environment/readme.md"><a class="" href="../l4/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for backend engineering content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><a class="" href="../l4/c11-t01-tools-for-backend-engineering.html"><span>Tools for Backend Engineering</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · hands on content/l4-backend-engineering/c12-hands-on/readme.md content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><summary><span class="caret">▶</span><span>C12 · Hands On</span></summary><ul class="pages"><li data-q="backend engineering — hands-on content/l4-backend-engineering/c12-hands-on/readme.md"><a class="" href="../l4/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 level project: production-grade rest service content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><a class="" href="../l4/c12-t01-level-project-production-grade-rest-service.html"><span>L4 Level Project: Production-Grade REST Service</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · best practices content/l4-backend-engineering/c13-best-practices/readme.md content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><summary><span class="caret">▶</span><span>C13 · Best Practices</span></summary><ul class="pages"><li data-q="backend engineering — best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/readme.md"><a class="" href="../l4/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><a class="" href="../l4/c13-t01-best-practices-and-pitfalls-l4.html"><span>L4 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · interview prep content/l4-backend-engineering/c14-interview-prep/readme.md content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><summary><span class="caret">▶</span><span>C14 · Interview Prep</span></summary><ul class="pages"><li data-q="backend engineering — interview prep content/l4-backend-engineering/c14-interview-prep/readme.md"><a class="" href="../l4/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: senior backend engineer content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><a class="" href="../l4/c14-t01-interview-prep-senior-backend.html"><span>Interview Prep: Senior Backend Engineer</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c15 · qa faq content/l4-backend-engineering/c15-qa-faq/readme.md content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><summary><span class="caret">▶</span><span>C15 · QA FAQ</span></summary><ul class="pages"><li data-q="backend engineering — q&amp;a / faq content/l4-backend-engineering/c15-qa-faq/readme.md"><a class="" href="../l4/c15-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 q&amp;a and faq content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><a class="" href="../l4/c15-t01-l4-qa.html"><span>L4 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c16 · cheatsheets content/l4-backend-engineering/c16-cheatsheets/readme.md content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><summary><span class="caret">▶</span><span>C16 · Cheatsheets</span></summary><ul class="pages"><li data-q="backend engineering — cheatsheets &amp; reference content/l4-backend-engineering/c16-cheatsheets/readme.md"><a class="" href="../l4/c16-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 cheatsheets content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><a class="" href="../l4/c16-t01-l4-cheatsheets.html"><span>L4 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c17 · resources content/l4-backend-engineering/c17-resources/readme.md content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><summary><span class="caret">▶</span><span>C17 · Resources</span></summary><ul class="pages"><li data-q="backend engineering — resources content/l4-backend-engineering/c17-resources/readme.md"><a class="" href="../l4/c17-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 resources content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><a class="" href="../l4/c17-t01-l4-resources.html"><span>L4 Resources</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c18 · ai llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><summary><span class="caret">▶</span><span>C18 · Ai Llm Integration</span></summary><ul class="pages"><li data-q="ai/llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md"><a class="" href="../l4/c18-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="llm api fundamentals — openai, anthropic, local models content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md"><a class="" href="../l4/c18-t01-llm-api-fundamentals.html"><span>LLM API Fundamentals — OpenAI, Anthropic, Local Models</span><span class="kind-pill "></span></a></li><li data-q="langchain4j framework — java&#x27;s leading llm framework content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md"><a class="" href="../l4/c18-t02-langchain4j-framework.html"><span>LangChain4j Framework — Java&#x27;s Leading LLM Framework</span><span class="kind-pill "></span></a></li><li data-q="spring ai framework — spring&#x27;s official llm abstraction content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md"><a class="" href="../l4/c18-t03-spring-ai-framework.html"><span>Spring AI Framework — Spring&#x27;s Official LLM Abstraction</span><span class="kind-pill "></span></a></li><li data-q="prompt engineering for backend engineers — practical patterns content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md"><a class="" href="../l4/c18-t04-prompt-engineering-for-backend-engineers.html"><span>Prompt Engineering for Backend Engineers — Practical Patterns</span><span class="kind-pill "></span></a></li><li data-q="rag patterns — retrieval-augmented generation content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md"><a class="" href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html"><span>RAG Patterns — Retrieval-Augmented Generation</span><span class="kind-pill "></span></a></li><li data-q="vector databases — pinecone, weaviate, pgvector, qdrant content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md"><a class="" href="../l4/c18-t06-vector-databases-pinecone-weaviate-pgvector-qdrant.html"><span>Vector Databases — Pinecone, Weaviate, pgvector, Qdrant</span><span class="kind-pill "></span></a></li><li data-q="embedding generation &amp; storage — production pipelines content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md"><a class="" href="../l4/c18-t07-embedding-generation-and-storage.html"><span>Embedding Generation &amp; Storage — Production Pipelines</span><span class="kind-pill "></span></a></li><li data-q="ai agents with tools / function calling — multi-step workflows content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md"><a class="" href="../l4/c18-t08-ai-agents-with-tools-function-calling.html"><span>AI Agents with Tools / Function Calling — Multi-Step Workflows</span><span class="kind-pill "></span></a></li><li data-q="streaming llm responses — sse and websocket content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md"><a class="" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><span>Streaming LLM Responses — SSE and WebSocket</span><span class="kind-pill "></span></a></li><li data-q="ai observability &amp; cost tracking — opentelemetry, token accounting content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><a class="active" href="../l4/c18-t10-ai-observability-and-cost-tracking.html"><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l4/index.html">L4 — Backend Engineering</a><span class="sep">/</span><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span></div>
+        <h1>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</h1>
+        <div><span class="source-path">content/L4-backend-engineering/C18-ai-llm-integration/T10-ai-observability-and-cost-tracking.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~50 min</span><span class="meta-pill date">updated 2026-06-10</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting"
+slug: ai-observability-and-cost-tracking
+level: L4
+module: "Backend Engineering"
+section: "AI/LLM Integration"
+type: concept
+difficulty: advanced
+order: 10
+tags: [observability, opentelemetry, tracing, metrics, micrometer, cost-tracking, token-accounting, prompt-logging, slo, evaluation, langsmith, langfuse, hallucination-detection]
+prerequisites: [llm-api-fundamentals, langchain4j-framework, spring-ai-framework, observability-basics]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-10</p>
+<hr>
+<h1 id="ai-observability-cost-tracking-opentelemetry-token-accounting">AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</h1>
+<p>LLM features are uniquely expensive (per-request costs 100-1000× a DB query), uniquely variable (same input can take 500ms or 30s), uniquely non-deterministic (same input can give different outputs), and uniquely security-sensitive (prompt injection, PII leaks). Traditional observability — request rate, error rate, latency — misses everything that makes LLM systems different.</p>
+<p>This topic covers the observability stack for production AI: token-level cost tracking, per-prompt quality metrics, hallucination detection, latency decomposition (TTFT, inter-token, retrieval), trace propagation across the LLM/vector store/retriever boundary, prompt logging with PII redaction, and the SLOs that catch problems early.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c18-t01-llm-api-fundamentals.html">LLM API Fundamentals</a>, <a href="c18-t02-langchain4j-framework.html">LangChain4j</a> or <a href="c18-t03-spring-ai-framework.html">Spring AI</a>, familiarity with Micrometer/OpenTelemetry.</p></div></div>
+<h2 id="what-makes-llm-observability-different">What Makes LLM Observability Different<a class="anchor" href="#what-makes-llm-observability-different" aria-hidden="true">#</a></h2>
+<p>Traditional observability asks: is the service up, fast, and not erroring? LLM observability adds:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Why It's Different</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What did it cost?</td>
+<td>Per-request cost can vary 100× based on prompt/output size</td>
+</tr>
+<tr>
+<td>Was the output correct?</td>
+<td>No HTTP 500 for "the LLM lied"</td>
+</tr>
+<tr>
+<td>Did it use the right context?</td>
+<td>RAG can retrieve and ignore relevant chunks</td>
+</tr>
+<tr>
+<td>Was the user satisfied?</td>
+<td>Implicit feedback (re-asks, abandons) matters more than 200 OK</td>
+</tr>
+<tr>
+<td>What did the LLM see?</td>
+<td>Prompt logging for debugging is essential</td>
+</tr>
+<tr>
+<td>Is the model drifting?</td>
+<td>Same prompt today vs 3 months ago may behave differently</td>
+</tr>
+</tbody>
+</table></div>
+<p>You need at least these signals: cost, quality, latency, error, prompt traces. Without them you're flying blind.</p>
+<h2 id="the-metrics-layer">The Metrics Layer<a class="anchor" href="#the-metrics-layer" aria-hidden="true">#</a></h2>
+<h3 id="token-counters">Token Counters<a class="anchor" href="#token-counters" aria-hidden="true">#</a></h3>
+<p>Every LLM call should emit:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class LlmMetrics {
+
+    private final MeterRegistry meter;
+
+    public void recordCall(LlmCallContext ctx) {
+        var tags = Tags.of(
+            &quot;model&quot;, ctx.model(),
+            &quot;provider&quot;, ctx.provider(),
+            &quot;feature&quot;, ctx.feature(),     // which user feature triggered this
+            &quot;tenant&quot;, ctx.tenantId());
+
+        meter.counter(&quot;llm.requests&quot;, tags).increment();
+        meter.counter(&quot;llm.tokens.prompt&quot;, tags).increment(ctx.promptTokens());
+        meter.counter(&quot;llm.tokens.completion&quot;, tags).increment(ctx.completionTokens());
+        meter.counter(&quot;llm.cost.usd&quot;, tags).increment(ctx.costUsd());
+        meter.timer(&quot;llm.latency&quot;, tags).record(ctx.duration());
+        meter.timer(&quot;llm.latency.ttft&quot;, tags).record(ctx.timeToFirstToken());
+    }
+}
+</code></pre></div>
+<p>Tagging by feature/tenant is critical — without it you can't answer "which feature exploded our bill?"</p>
+<h3 id="cost-calculation-get-the-rates-right">Cost Calculation — Get the Rates Right<a class="anchor" href="#cost-calculation-get-the-rates-right" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class TokenCostCalculator {
+
+    // 2026 rates per 1M tokens (verify with provider; subject to change)
+    private static final Map&lt;String, double[]&gt; RATES = Map.ofEntries(
+        // model, [inputRate, outputRate, cachedInputRate?]
+        Map.entry(&quot;gpt-4o&quot;,          new double[]{2.50, 10.00, 1.25}),
+        Map.entry(&quot;gpt-4o-mini&quot;,     new double[]{0.15,  0.60, 0.075}),
+        Map.entry(&quot;o1&quot;,              new double[]{15.0, 60.00, 7.50}),
+        Map.entry(&quot;o3-mini&quot;,         new double[]{1.10,  4.40, 0.55}),
+        Map.entry(&quot;claude-3-5-sonnet&quot;, new double[]{3.00, 15.00, 0.30}),
+        Map.entry(&quot;claude-3-opus&quot;,   new double[]{15.0, 75.00, 1.50}),
+        Map.entry(&quot;claude-3-haiku&quot;,  new double[]{0.25,  1.25, 0.025}),
+        Map.entry(&quot;text-embedding-3-small&quot;, new double[]{0.02, 0, 0}),
+        Map.entry(&quot;text-embedding-3-large&quot;, new double[]{0.13, 0, 0})
+    );
+
+    public double calculate(String model, int promptTokens, int completionTokens, int cachedTokens) {
+        double[] rates = RATES.getOrDefault(model, new double[]{0, 0, 0});
+        return (promptTokens * rates[0] + completionTokens * rates[1] + cachedTokens * rates[2]) / 1_000_000;
+    }
+}
+</code></pre></div>
+<p>Keep rates in config so updates don't require redeploy:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">llm:
+  rates:
+    gpt-4o:
+      input-per-million: 2.50
+      output-per-million: 10.00
+      cached-input-per-million: 1.25
+</code></pre></div>
+<h3 id="spring-ai-integration-via-observation-api">Spring AI Integration via Observation API<a class="anchor" href="#spring-ai-integration-via-observation-api" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public ObservationHandler&lt;ChatModelObservationContext&gt; chatModelObservationHandler(
+        MeterRegistry meter, TokenCostCalculator costCalc) {
+
+    return new ObservationHandler&lt;&gt;() {
+        @Override
+        public void onStop(ChatModelObservationContext ctx) {
+            var usage = ctx.getResponse().getMetadata().getUsage();
+            String model = ctx.getRequestOptions().getModel();
+            double cost = costCalc.calculate(model,
+                usage.getPromptTokens().intValue(),
+                usage.getGenerationTokens().intValue(),
+                0);
+
+            var tags = Tags.of(&quot;model&quot;, model);
+            meter.counter(&quot;llm.cost.usd&quot;, tags).increment(cost);
+            meter.counter(&quot;llm.tokens.in&quot;, tags).increment(usage.getPromptTokens());
+            meter.counter(&quot;llm.tokens.out&quot;, tags).increment(usage.getGenerationTokens());
+        }
+
+        @Override
+        public boolean supportsContext(Observation.Context c) {
+            return c instanceof ChatModelObservationContext;
+        }
+    };
+}
+</code></pre></div>
+<p>Spring AI emits Observations for every chat, embedding, and vector store call. Hook them up to your metrics backend and you're 80% done.</p>
+<h3 id="langchain4j-chatmodellistener">LangChain4j ChatModelListener<a class="anchor" href="#langchain4j-chatmodellistener" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ChatModelListener listener = new ChatModelListener() {
+    @Override
+    public void onResponse(ChatModelResponseContext ctx) {
+        TokenUsage usage = ctx.response().tokenUsage();
+        String model = ctx.request().modelName();
+
+        meter.counter(&quot;llm.tokens.in&quot;, &quot;model&quot;, model)
+            .increment(usage.inputTokenCount());
+        meter.counter(&quot;llm.tokens.out&quot;, &quot;model&quot;, model)
+            .increment(usage.outputTokenCount());
+        meter.counter(&quot;llm.cost.usd&quot;, &quot;model&quot;, model)
+            .increment(costCalc.calculate(model, usage.inputTokenCount(), usage.outputTokenCount(), 0));
+    }
+
+    @Override
+    public void onError(ChatModelErrorContext ctx) {
+        meter.counter(&quot;llm.errors&quot;, &quot;model&quot;, ctx.request().modelName(),
+                     &quot;error_type&quot;, ctx.error().getClass().getSimpleName())
+            .increment();
+    }
+};
+
+ChatLanguageModel model = OpenAiChatModel.builder()
+    .listeners(List.of(listener))
+    .build();
+</code></pre></div>
+<h2 id="distributed-tracing">Distributed Tracing<a class="anchor" href="#distributed-tracing" aria-hidden="true">#</a></h2>
+<p>LLM systems have many moving parts — without traces, debugging "this one slow request" is impossible.</p>
+<h3 id="the-trace-tree-you-want">The Trace Tree You Want<a class="anchor" href="#the-trace-tree-you-want" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>trace: chat-request (5.2s)
+├─ span: auth-check (5ms)
+├─ span: retrieve-from-cache (10ms) [miss]
+├─ span: embed-query (180ms) — model=text-embedding-3-small, tokens=12, cost=$0.00002
+├─ span: vector-search (45ms) — store=qdrant, top_k=20, results=20
+├─ span: rerank (320ms) — model=cohere-rerank-3, candidates=20, kept=5
+├─ span: llm-chat (4.5s) — model=gpt-4o, prompt_tokens=2340, output_tokens=450, cost=$0.011
+│  ├─ event: ttft (1.2s)
+│  └─ event: tool_call: get_ticket (200ms)
+└─ span: write-history (15ms)
+</code></pre></div>
+<h3 id="spring-ai-opentelemetry-setup">Spring AI OpenTelemetry Setup<a class="anchor" href="#spring-ai-opentelemetry-setup" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4317
+
+spring:
+  ai:
+    chat:
+      observations:
+        log-prompt: false  # PII risk — careful in prod
+        log-completion: false
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public TracerProvider tracerProvider() {
+    return SdkTracerProvider.builder()
+        .addSpanProcessor(BatchSpanProcessor.builder(
+            OtlpGrpcSpanExporter.builder()
+                .setEndpoint(&quot;http://otel-collector:4317&quot;)
+                .build()).build())
+        .build();
+}
+</code></pre></div>
+<p>Spring AI auto-instruments with these patterns:
+- <code>spring.ai.chat.client</code> — top-level ChatClient call
+- <code>spring.ai.chat.model</code> — model invocation
+- <code>spring.ai.embedding.model</code> — embedding call
+- <code>spring.ai.vector.store</code> — vector search</p>
+<h3 id="manual-spans-for-custom-pipelines">Manual Spans for Custom Pipelines<a class="anchor" href="#manual-spans-for-custom-pipelines" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class RagService {
+
+    private final Tracer tracer;
+
+    public String answer(String query) {
+        Span pipelineSpan = tracer.spanBuilder(&quot;rag.pipeline&quot;).startSpan();
+        try (Scope s = pipelineSpan.makeCurrent()) {
+            pipelineSpan.setAttribute(&quot;user.query.length&quot;, query.length());
+
+            float[] queryEmbedding = embed(query);
+            List&lt;Document&gt; retrieved = retrieve(queryEmbedding);
+            List&lt;Document&gt; reranked = rerank(query, retrieved);
+            String answer = generate(query, reranked);
+
+            pipelineSpan.setAttribute(&quot;retrieval.count&quot;, retrieved.size());
+            pipelineSpan.setAttribute(&quot;rerank.count&quot;, reranked.size());
+            return answer;
+        } finally {
+            pipelineSpan.end();
+        }
+    }
+
+    private List&lt;Document&gt; retrieve(float[] embedding) {
+        Span s = tracer.spanBuilder(&quot;rag.retrieve&quot;).startSpan();
+        try (Scope sc = s.makeCurrent()) {
+            return vectorStore.similaritySearch(embedding, 20);
+        } finally {
+            s.end();
+        }
+    }
+}
+</code></pre></div>
+<h3 id="trace-context-propagation-across-llm-calls">Trace Context Propagation Across LLM Calls<a class="anchor" href="#trace-context-propagation-across-llm-calls" aria-hidden="true">#</a></h3>
+<p>When your service calls OpenAI's API, the trace context (W3C Trace Context header) doesn't get propagated to OpenAI — but you should still capture the upstream HTTP call as a child span:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public WebClient.Builder llmWebClientBuilder(ObservationRegistry obs) {
+    return WebClient.builder()
+        .observationRegistry(obs)  // auto-instruments HTTP calls
+        .build();
+}
+</code></pre></div>
+<p>Now every <code>WebClient</code> call gets a span. Combined with Spring AI's chat span, you see the full path.</p>
+<h2 id="prompt-and-response-logging">Prompt and Response Logging<a class="anchor" href="#prompt-and-response-logging" aria-hidden="true">#</a></h2>
+<p>For debugging, you need to know what the LLM saw and what it said. But raw logging risks PII leaks and log volume explosions.</p>
+<h3 id="structured-prompt-logs">Structured Prompt Logs<a class="anchor" href="#structured-prompt-logs" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class PromptLogger {
+
+    private final ObjectMapper mapper;
+    private final PiiRedactor redactor;
+
+    public void logPrompt(String userId, String feature, ChatRequest request, ChatResponse response,
+                         Map&lt;String, Object&gt; metadata) {
+        var entry = Map.of(
+            &quot;timestamp&quot;, Instant.now().toString(),
+            &quot;user_id&quot;, redactor.maskUserId(userId),  // hashed/pseudonymous
+            &quot;feature&quot;, feature,
+            &quot;model&quot;, request.getModel(),
+            &quot;messages&quot;, redactor.redactMessages(request.getMessages()),
+            &quot;response_content&quot;, redactor.redactText(response.getContent()),
+            &quot;tokens_in&quot;, response.getUsage().getPromptTokens(),
+            &quot;tokens_out&quot;, response.getUsage().getCompletionTokens(),
+            &quot;cost_usd&quot;, calculateCost(response),
+            &quot;latency_ms&quot;, metadata.get(&quot;latency_ms&quot;),
+            &quot;finish_reason&quot;, response.getFinishReason()
+        );
+
+        promptLogStream.send(entry);  // → Kafka → ClickHouse / S3 / specialized tool
+    }
+}
+</code></pre></div>
+<p>Log to a separate stream from application logs (<code>prompt-log</code> topic in Kafka, separate retention). Volume is high — terabytes per day at scale.</p>
+<h3 id="pii-redaction">PII Redaction<a class="anchor" href="#pii-redaction" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class PiiRedactor {
+
+    private static final Pattern EMAIL = Pattern.compile(
+        &quot;[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}&quot;);
+    private static final Pattern CREDIT_CARD = Pattern.compile(
+        &quot;\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b&quot;);
+    private static final Pattern PHONE = Pattern.compile(
+        &quot;\\b\\+?\\d{1,3}?[- ]?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}\\b&quot;);
+    private static final Pattern SSN = Pattern.compile(
+        &quot;\\b\\d{3}-\\d{2}-\\d{4}\\b&quot;);
+
+    public String redactText(String text) {
+        return text == null ? null :
+            SSN.matcher(
+                PHONE.matcher(
+                    CREDIT_CARD.matcher(
+                        EMAIL.matcher(text).replaceAll(&quot;[EMAIL]&quot;)
+                    ).replaceAll(&quot;[CARD]&quot;)
+                ).replaceAll(&quot;[PHONE]&quot;)
+            ).replaceAll(&quot;[SSN]&quot;);
+    }
+
+    public String maskUserId(String userId) {
+        return DigestUtils.sha256Hex(userId + &quot;_salt&quot;).substring(0, 12);
+    }
+}
+</code></pre></div>
+<p>Better: use a tested library (Presidio, AWS Comprehend) for production redaction.</p>
+<h3 id="sampling-for-high-volume">Sampling for High Volume<a class="anchor" href="#sampling-for-high-volume" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bean
+public BiPredicate&lt;String, ChatRequest&gt; promptLogSampler() {
+    return (feature, request) -&gt; {
+        // Always log errors and slow requests
+        if (request.getMetadata().get(&quot;error&quot;) != null) return true;
+        if (request.getMetadata().get(&quot;latency_ms&quot;).asLong() &gt; 5000) return true;
+        // Sample 1% of normal requests
+        return Math.random() &lt; 0.01;
+    };
+}
+</code></pre></div>
+<h2 id="specialized-llm-observability-tools">Specialized LLM Observability Tools<a class="anchor" href="#specialized-llm-observability-tools" aria-hidden="true">#</a></h2>
+<p>By 2026 a category of LLM-specific observability tools has emerged. They specialize in prompt traces, dataset management, eval orchestration:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Open Source</th>
+<th>Strength</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LangSmith</td>
+<td>No</td>
+<td>LangChain ecosystem integration</td>
+</tr>
+<tr>
+<td>Langfuse</td>
+<td>Yes (MIT)</td>
+<td>Self-host friendly, comprehensive</td>
+</tr>
+<tr>
+<td>Helicone</td>
+<td>Yes</td>
+<td>API proxy approach, easy install</td>
+</tr>
+<tr>
+<td>Phoenix (Arize)</td>
+<td>Yes</td>
+<td>LLM eval focus</td>
+</tr>
+<tr>
+<td>Datadog LLM Observability</td>
+<td>No</td>
+<td>Datadog ecosystem</td>
+</tr>
+<tr>
+<td>OpenLLMetry</td>
+<td>Yes (Apache 2)</td>
+<td>OpenTelemetry-based standard</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="langfuse-with-spring-boot">Langfuse with Spring Boot<a class="anchor" href="#langfuse-with-spring-boot" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class LangfuseTracer {
+
+    private final LangfuseClient client;
+
+    public void trace(String feature, ChatRequest req, ChatResponse resp, Duration duration) {
+        client.createGeneration(GenerationParams.builder()
+            .name(feature)
+            .model(req.getModel())
+            .input(req.getMessages())
+            .output(resp.getContent())
+            .usage(new Usage(resp.getUsage().getPromptTokens(),
+                            resp.getUsage().getCompletionTokens()))
+            .latency(duration.toMillis())
+            .metadata(Map.of(
+                &quot;user_id&quot;, currentUserId(),
+                &quot;session_id&quot;, currentSessionId()))
+            .build());
+    }
+}
+</code></pre></div>
+<p>Langfuse gives you a UI that shows every LLM call, costs by feature/user, latency distributions, and lets you tag good/bad responses for dataset building.</p>
+<h3 id="openllmetry-the-standard">OpenLLMetry — The Standard<a class="anchor" href="#openllmetry-the-standard" aria-hidden="true">#</a></h3>
+<p>OpenLLMetry is an OpenTelemetry semantic-conventions extension specifically for LLMs. Standardized span attributes:
+- <code>gen_ai.system</code> (openai, anthropic, etc.)
+- <code>gen_ai.request.model</code>
+- <code>gen_ai.response.model</code>
+- <code>gen_ai.usage.prompt_tokens</code>
+- <code>gen_ai.usage.completion_tokens</code>
+- <code>gen_ai.prompt</code> (sampled)
+- <code>gen_ai.completion</code> (sampled)</p>
+<p>Future-proof your tracing by following these conventions.</p>
+<h2 id="slos-for-llm-features">SLOs for LLM Features<a class="anchor" href="#slos-for-llm-features" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>SLO</th>
+<th>Target</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TTFT p95</td>
+<td>&lt; 1.5s</td>
+<td>Perceived latency in chat</td>
+</tr>
+<tr>
+<td>Total latency p95</td>
+<td>&lt; 8s</td>
+<td>Total response time</td>
+</tr>
+<tr>
+<td>Error rate</td>
+<td>&lt; 0.5%</td>
+<td>Reliability</td>
+</tr>
+<tr>
+<td>Cost per request p95</td>
+<td>&lt; $0.05 (varies)</td>
+<td>Per-feature budget</td>
+</tr>
+<tr>
+<td>Hallucination rate</td>
+<td>&lt; 5%</td>
+<td>Quality</td>
+</tr>
+<tr>
+<td>Retrieval relevance</td>
+<td>&gt; 0.7</td>
+<td>RAG specifically</td>
+</tr>
+<tr>
+<td>Tool call success rate</td>
+<td>&gt; 95%</td>
+<td>Agent reliability</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="error-budget-math">Error Budget Math<a class="anchor" href="#error-budget-math" aria-hidden="true">#</a></h3>
+<p>If your SLO is 99.5% success over 30 days, and you serve 1M requests/day, error budget = 30M × 0.005 = 150K errors / month. Track burn rate; alert when consuming budget faster than time elapses.</p>
+<h2 id="quality-and-hallucination-detection">Quality and Hallucination Detection<a class="anchor" href="#quality-and-hallucination-detection" aria-hidden="true">#</a></h2>
+<p>This is the hardest observability dimension because there's no ground truth for free-form responses.</p>
+<h3 id="implicit-quality-signals">Implicit Quality Signals<a class="anchor" href="#implicit-quality-signals" aria-hidden="true">#</a></h3>
+<p>Track behavioral signals as proxies:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class QualitySignalTracker {
+
+    public void recordImplicit(String userId, String responseId) {
+        // Did user re-ask immediately?
+        userTimer.scheduleCheck(userId, 60, () -&gt; {
+            if (sameTopicQuery(userId, 60)) {
+                meter.counter(&quot;llm.implicit.reask&quot;).increment();
+            }
+        });
+
+        // Did user copy response? (UI signal)
+        // Did user thumbs-up/down?
+        // Did session continue (good) or abandon (bad)?
+    }
+}
+</code></pre></div>
+<h3 id="explicit-feedback">Explicit Feedback<a class="anchor" href="#explicit-feedback" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@PostMapping(&quot;/feedback&quot;)
+public void recordFeedback(@RequestBody Feedback fb) {
+    meter.counter(&quot;llm.feedback&quot;, &quot;type&quot;, fb.type(), &quot;feature&quot;, fb.feature())
+        .increment();
+    feedbackStore.save(fb);
+}
+
+record Feedback(String responseId, String type /*UP/DOWN*/, String reason, String feature) {}
+</code></pre></div>
+<p>A "thumbs down" rate trending up is your earliest signal of quality regression.</p>
+<h3 id="llm-as-judge-quality-sampling">LLM-as-Judge Quality Sampling<a class="anchor" href="#llm-as-judge-quality-sampling" aria-hidden="true">#</a></h3>
+<p>Periodically grade a sample of responses:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Scheduled(fixedRate = 3600_000)  // hourly
+public void sampleAndGrade() {
+    List&lt;PromptLogEntry&gt; samples = promptLogStore.recentSample(100);
+
+    for (PromptLogEntry e : samples) {
+        String grade = chatClient.prompt()
+            .system(&quot;Grade this response. Reply with one of: GOOD, MEDIUM, BAD&quot;)
+            .user(&quot;Question: %s\nAnswer: %s&quot;.formatted(e.getQuestion(), e.getAnswer()))
+            .call().content();
+
+        meter.counter(&quot;llm.judge.grade&quot;, &quot;grade&quot;, grade, &quot;feature&quot;, e.getFeature())
+            .increment();
+    }
+}
+</code></pre></div>
+<p>Tracking <code>llm.judge.grade{grade="BAD"}</code> / total gives a quality time series.</p>
+<h3 id="hallucination-detection-via-context-grounding">Hallucination Detection via Context Grounding<a class="anchor" href="#hallucination-detection-via-context-grounding" aria-hidden="true">#</a></h3>
+<p>For RAG, check if claims in the answer are supported by retrieved context:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public double faithfulnessScore(String answer, List&lt;String&gt; retrievedContext) {
+    Faithfulness result = chatClient.prompt()
+        .system(&quot;How many distinct factual claims? How many supported by context? JSON.&quot;)
+        .user(&quot;Answer: %s\nContext: %s&quot;.formatted(answer, String.join(&quot;\n&quot;, retrievedContext)))
+        .call().entity(Faithfulness.class);
+    return result.supported() / (double) Math.max(1, result.total());
+}
+
+record Faithfulness(int total, int supported) {}
+</code></pre></div>
+<p>Track <code>faithfulness</code> percentile distribution over time.</p>
+<h2 id="model-drift-detection">Model Drift Detection<a class="anchor" href="#model-drift-detection" aria-hidden="true">#</a></h2>
+<p>Same prompt today vs 3 months ago may give different responses. Detect drift:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Scheduled(cron = &quot;0 0 6 * * *&quot;)  // daily 6 AM
+public void runCanarySuite() {
+    List&lt;CanaryCase&gt; canaries = canaryStore.all();
+
+    for (CanaryCase c : canaries) {
+        String response = chatClient.prompt().user(c.input()).call().content();
+
+        double similarity = embeddingSim(c.referenceAnswer(), response);
+        meter.gauge(&quot;llm.canary.similarity&quot;,
+            Tags.of(&quot;case&quot;, c.id()), similarity);
+
+        if (similarity &lt; 0.6) {
+            alerter.alert(&quot;Canary drift: &quot; + c.id());
+        }
+    }
+}
+</code></pre></div>
+<p>Pin ~50 representative inputs, store the original "correct" response, run nightly, alert on drift.</p>
+<h2 id="cost-anomaly-detection">Cost Anomaly Detection<a class="anchor" href="#cost-anomaly-detection" aria-hidden="true">#</a></h2>
+<p>LLM cost spikes can be subtle. Auto-detect:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Scheduled(fixedRate = 60_000)
+public void checkCostAnomaly() {
+    double currentHourSpend = costRepository.spendInLastHour();
+    double rollingAvg = costRepository.avgSpendLastWeek();
+
+    if (currentHourSpend &gt; rollingAvg * 3) {
+        alerter.urgent(&quot;Cost anomaly: $%.2f vs avg $%.2f&quot;
+            .formatted(currentHourSpend, rollingAvg));
+    }
+}
+</code></pre></div>
+<p>Better: build budget alerts in Grafana / Datadog directly off <code>llm.cost.usd</code> metric.</p>
+<h2 id="a-complete-production-observability-stack">A Complete Production Observability Stack<a class="anchor" href="#a-complete-production-observability-stack" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>                       Production Stack
+┌─────────────────┐   ┌──────────────┐   ┌──────────────┐
+│ Spring Boot     │──▶│ OpenTelemetry │──▶│ Tempo/Jaeger │
+│ Application     │   │ Collector    │   │ (traces)     │
+│  - Spring AI    │   └──────────────┘   └──────────────┘
+│  - Listeners    │           │
+│  - Custom spans │           ├──────▶ Prometheus (metrics) ──▶ Grafana
+└─────────────────┘           │
+        │                     └──────▶ Loki/ELK (logs)
+        │
+        ▼
+┌─────────────────┐
+│ Prompt Log      │──▶ Kafka ──▶ ClickHouse ──▶ Langfuse UI
+│ Stream          │
+└─────────────────┘
+</code></pre></div>
+<p>This is the stack a serious AI product runs in 2026. Each piece has a job:</p>
+<ul>
+<li><strong>OTel Collector</strong>: routing/transformation/sampling for traces</li>
+<li><strong>Prometheus</strong>: metrics for SLOs, cost, error rates</li>
+<li><strong>Loki/ELK</strong>: app logs (not prompt logs)</li>
+<li><strong>Kafka + ClickHouse</strong>: high-volume prompt log with cheap analytics</li>
+<li><strong>Langfuse</strong>: LLM-specific UI for trace exploration, eval orchestration, datasets</li>
+</ul>
+<h2 id="common-pitfalls">Common Pitfalls<a class="anchor" href="#common-pitfalls" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>No cost tag per feature.</strong> "Our LLM bill went up" → can't tell which feature. Tag from day one.</p><p>[!WARNING]
+<strong>Logging prompts to app logs.</strong> Volume explosion, PII risk, log retention costs. Separate stream.</p>
+<p>[!WARNING]
+<strong>Not capturing TTFT separately.</strong> "p95 latency 8s" hides if it's a slow start or slow stream. Both matter.</p>
+<p>[!WARNING]
+<strong>No quality metric.</strong> You'll catch outages; you won't catch silent quality regressions.</p>
+<p>[!WARNING]
+<strong>Tracing only the LLM call.</strong> The vector store query and re-ranker matter equally. Trace everything.</p>
+<p>[!WARNING]
+<strong>Sampling away expensive requests.</strong> Naive head-based sampling drops most spans. Tail-sample expensive ones.</p>
+<p>[!WARNING]
+<strong>No PII redaction in logs.</strong> Compliance landmine.</p>
+<p>[!WARNING]
+<strong>No model name in metrics.</strong> When you upgrade GPT-4 → GPT-4o, you can't compare. Tag from day one.</p>
+<p>[!WARNING]
+<strong>Token counters off by one.</strong> Spring AI reports <code>prompt_tokens</code>, OpenAI calls it <code>prompt_tokens</code>, Anthropic calls it <code>input_tokens</code>. Pin and verify.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Set up the basic stack.</strong> Spring Boot + Spring AI + OTel → Tempo + Prometheus + Grafana. Build a dashboard with QPS, error rate, p95 latency.</li>
+<li><strong>Add token metrics.</strong> Counters for prompt/completion tokens per model. Verify against your provider's billing.</li>
+<li><strong>Build a cost dashboard.</strong> Daily cost by feature, model, tenant. Set per-feature budget alerts.</li>
+<li><strong>Add tracing.</strong> Instrument a full RAG pipeline (embed → retrieve → rerank → generate). View in Jaeger.</li>
+<li><strong>Set up prompt logging.</strong> Stream to Kafka, store in ClickHouse, redact PII. Query: "all prompts to feature X with cost &gt; $0.10."</li>
+<li><strong>Deploy Langfuse self-hosted.</strong> Configure your app to send traces. Build a dataset from production logs.</li>
+<li><strong>Implement quality canaries.</strong> 50 pinned inputs, daily run, alert on drift.</li>
+<li><strong>Add user feedback endpoint.</strong> Thumbs up/down. Track ratio per feature.</li>
+<li><strong>Implement LLM-as-judge sampling.</strong> Hourly grade 100 responses; trend by feature.</li>
+<li><strong>Cost anomaly detection.</strong> Alert when hourly spend exceeds 3× rolling average.</li>
+<li><strong>SLO definition.</strong> Write SLOs for TTFT, error rate, cost/request. Set alerts at 50% / 95% burn.</li>
+<li><strong>The skeptic conversation.</strong> A teammate says "OTel is enough, we don't need Langfuse." Write a 200-word case for LLM-specific observability.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Instrument LLM calls with token, latency, error, and cost metrics tagged by model/feature/tenant</li>
+<li>Wire Spring AI Observation handlers or LangChain4j listeners for automatic capture</li>
+<li>Build OpenTelemetry trace trees that show the full pipeline (embed → retrieve → rerank → LLM → tools)</li>
+<li>Stream prompt/response logs with PII redaction to a separate analytics store</li>
+<li>Deploy LLM-specific observability tools (Langfuse, OpenLLMetry conventions)</li>
+<li>Define SLOs for TTFT, total latency, error rate, cost per request, hallucination rate</li>
+<li>Detect quality regressions with implicit signals, explicit feedback, LLM-as-judge sampling</li>
+<li>Catch model drift with daily canary runs</li>
+<li>Detect cost anomalies before bills explode</li>
+<li>Build the complete production observability stack (Prometheus + OTel + Langfuse + ClickHouse)</li>
+</ul>
+<p>LLM observability isn't optional for production — without it you can't answer "why is the bill 5× last month?", "which feature is hallucinating?", or "did the model upgrade hurt quality?" The patterns here are the difference between operating an AI product and hoping it works.</p>
+<h2 id="chapter-recap">Chapter Recap<a class="anchor" href="#chapter-recap" aria-hidden="true">#</a></h2>
+<p>This concludes the L4/C18 AI/LLM Integration chapter. Together the 10 topics form the implementation playbook:</p>
+<ul>
+<li><strong>T01 Fundamentals</strong> → raw HTTP to providers</li>
+<li><strong>T02-T03 Frameworks</strong> → LangChain4j and Spring AI</li>
+<li><strong>T04 Prompts</strong> → prompts as versioned, tested code</li>
+<li><strong>T05 RAG</strong> → grounding responses in your data</li>
+<li><strong>T06-T07 Vector + Embeddings</strong> → the storage and pipeline layer</li>
+<li><strong>T08 Agents</strong> → LLMs that take actions</li>
+<li><strong>T09 Streaming</strong> → real-time UX</li>
+<li><strong>T10 Observability</strong> → seeing what's happening</li>
+</ul>
+<p>For the architecture-level decisions (when to use LLMs, how to design AI gateways, scaling RAG, AI safety), continue to <a href="../l5/c11-readme.html">L5/C11 AI System Architecture</a>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting&quot;
+slug: ai-observability-and-cost-tracking
+level: L4
+module: &quot;Backend Engineering&quot;
+section: &quot;AI/LLM Integration&quot;
+type: concept
+difficulty: advanced
+order: 10
+tags: [observability, opentelemetry, tracing, metrics, micrometer, cost-tracking, token-accounting, prompt-logging, slo, evaluation, langsmith, langfuse, hallucination-detection]
+prerequisites: [llm-api-fundamentals, langchain4j-framework, spring-ai-framework, observability-basics]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-10
+---
+
+# AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting
+
+LLM features are uniquely expensive (per-request costs 100-1000× a DB query), uniquely variable (same input can take 500ms or 30s), uniquely non-deterministic (same input can give different outputs), and uniquely security-sensitive (prompt injection, PII leaks). Traditional observability — request rate, error rate, latency — misses everything that makes LLM systems different.
+
+This topic covers the observability stack for production AI: token-level cost tracking, per-prompt quality metrics, hallucination detection, latency decomposition (TTFT, inter-token, retrieval), trace propagation across the LLM/vector store/retriever boundary, prompt logging with PII redaction, and the SLOs that catch problems early.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [LLM API Fundamentals](T01-llm-api-fundamentals.md), [LangChain4j](T02-langchain4j-framework.md) or [Spring AI](T03-spring-ai-framework.md), familiarity with Micrometer/OpenTelemetry.
+
+## What Makes LLM Observability Different
+
+Traditional observability asks: is the service up, fast, and not erroring? LLM observability adds:
+
+| Question | Why It&#x27;s Different |
+|---|---|
+| What did it cost? | Per-request cost can vary 100× based on prompt/output size |
+| Was the output correct? | No HTTP 500 for &quot;the LLM lied&quot; |
+| Did it use the right context? | RAG can retrieve and ignore relevant chunks |
+| Was the user satisfied? | Implicit feedback (re-asks, abandons) matters more than 200 OK |
+| What did the LLM see? | Prompt logging for debugging is essential |
+| Is the model drifting? | Same prompt today vs 3 months ago may behave differently |
+
+You need at least these signals: cost, quality, latency, error, prompt traces. Without them you&#x27;re flying blind.
+
+## The Metrics Layer
+
+### Token Counters
+
+Every LLM call should emit:
+
+```java
+@Component
+public class LlmMetrics {
+
+    private final MeterRegistry meter;
+
+    public void recordCall(LlmCallContext ctx) {
+        var tags = Tags.of(
+            &quot;model&quot;, ctx.model(),
+            &quot;provider&quot;, ctx.provider(),
+            &quot;feature&quot;, ctx.feature(),     // which user feature triggered this
+            &quot;tenant&quot;, ctx.tenantId());
+
+        meter.counter(&quot;llm.requests&quot;, tags).increment();
+        meter.counter(&quot;llm.tokens.prompt&quot;, tags).increment(ctx.promptTokens());
+        meter.counter(&quot;llm.tokens.completion&quot;, tags).increment(ctx.completionTokens());
+        meter.counter(&quot;llm.cost.usd&quot;, tags).increment(ctx.costUsd());
+        meter.timer(&quot;llm.latency&quot;, tags).record(ctx.duration());
+        meter.timer(&quot;llm.latency.ttft&quot;, tags).record(ctx.timeToFirstToken());
+    }
+}
+```
+
+Tagging by feature/tenant is critical — without it you can&#x27;t answer &quot;which feature exploded our bill?&quot;
+
+### Cost Calculation — Get the Rates Right
+
+```java
+@Component
+public class TokenCostCalculator {
+
+    // 2026 rates per 1M tokens (verify with provider; subject to change)
+    private static final Map&lt;String, double[]&gt; RATES = Map.ofEntries(
+        // model, [inputRate, outputRate, cachedInputRate?]
+        Map.entry(&quot;gpt-4o&quot;,          new double[]{2.50, 10.00, 1.25}),
+        Map.entry(&quot;gpt-4o-mini&quot;,     new double[]{0.15,  0.60, 0.075}),
+        Map.entry(&quot;o1&quot;,              new double[]{15.0, 60.00, 7.50}),
+        Map.entry(&quot;o3-mini&quot;,         new double[]{1.10,  4.40, 0.55}),
+        Map.entry(&quot;claude-3-5-sonnet&quot;, new double[]{3.00, 15.00, 0.30}),
+        Map.entry(&quot;claude-3-opus&quot;,   new double[]{15.0, 75.00, 1.50}),
+        Map.entry(&quot;claude-3-haiku&quot;,  new double[]{0.25,  1.25, 0.025}),
+        Map.entry(&quot;text-embedding-3-small&quot;, new double[]{0.02, 0, 0}),
+        Map.entry(&quot;text-embedding-3-large&quot;, new double[]{0.13, 0, 0})
+    );
+
+    public double calculate(String model, int promptTokens, int completionTokens, int cachedTokens) {
+        double[] rates = RATES.getOrDefault(model, new double[]{0, 0, 0});
+        return (promptTokens * rates[0] + completionTokens * rates[1] + cachedTokens * rates[2]) / 1_000_000;
+    }
+}
+```
+
+Keep rates in config so updates don&#x27;t require redeploy:
+
+```yaml
+llm:
+  rates:
+    gpt-4o:
+      input-per-million: 2.50
+      output-per-million: 10.00
+      cached-input-per-million: 1.25
+```
+
+### Spring AI Integration via Observation API
+
+```java
+@Bean
+public ObservationHandler&lt;ChatModelObservationContext&gt; chatModelObservationHandler(
+        MeterRegistry meter, TokenCostCalculator costCalc) {
+
+    return new ObservationHandler&lt;&gt;() {
+        @Override
+        public void onStop(ChatModelObservationContext ctx) {
+            var usage = ctx.getResponse().getMetadata().getUsage();
+            String model = ctx.getRequestOptions().getModel();
+            double cost = costCalc.calculate(model,
+                usage.getPromptTokens().intValue(),
+                usage.getGenerationTokens().intValue(),
+                0);
+
+            var tags = Tags.of(&quot;model&quot;, model);
+            meter.counter(&quot;llm.cost.usd&quot;, tags).increment(cost);
+            meter.counter(&quot;llm.tokens.in&quot;, tags).increment(usage.getPromptTokens());
+            meter.counter(&quot;llm.tokens.out&quot;, tags).increment(usage.getGenerationTokens());
+        }
+
+        @Override
+        public boolean supportsContext(Observation.Context c) {
+            return c instanceof ChatModelObservationContext;
+        }
+    };
+}
+```
+
+Spring AI emits Observations for every chat, embedding, and vector store call. Hook them up to your metrics backend and you&#x27;re 80% done.
+
+### LangChain4j ChatModelListener
+
+```java
+ChatModelListener listener = new ChatModelListener() {
+    @Override
+    public void onResponse(ChatModelResponseContext ctx) {
+        TokenUsage usage = ctx.response().tokenUsage();
+        String model = ctx.request().modelName();
+
+        meter.counter(&quot;llm.tokens.in&quot;, &quot;model&quot;, model)
+            .increment(usage.inputTokenCount());
+        meter.counter(&quot;llm.tokens.out&quot;, &quot;model&quot;, model)
+            .increment(usage.outputTokenCount());
+        meter.counter(&quot;llm.cost.usd&quot;, &quot;model&quot;, model)
+            .increment(costCalc.calculate(model, usage.inputTokenCount(), usage.outputTokenCount(), 0));
+    }
+
+    @Override
+    public void onError(ChatModelErrorContext ctx) {
+        meter.counter(&quot;llm.errors&quot;, &quot;model&quot;, ctx.request().modelName(),
+                     &quot;error_type&quot;, ctx.error().getClass().getSimpleName())
+            .increment();
+    }
+};
+
+ChatLanguageModel model = OpenAiChatModel.builder()
+    .listeners(List.of(listener))
+    .build();
+```
+
+## Distributed Tracing
+
+LLM systems have many moving parts — without traces, debugging &quot;this one slow request&quot; is impossible.
+
+### The Trace Tree You Want
+
+```
+trace: chat-request (5.2s)
+├─ span: auth-check (5ms)
+├─ span: retrieve-from-cache (10ms) [miss]
+├─ span: embed-query (180ms) — model=text-embedding-3-small, tokens=12, cost=$0.00002
+├─ span: vector-search (45ms) — store=qdrant, top_k=20, results=20
+├─ span: rerank (320ms) — model=cohere-rerank-3, candidates=20, kept=5
+├─ span: llm-chat (4.5s) — model=gpt-4o, prompt_tokens=2340, output_tokens=450, cost=$0.011
+│  ├─ event: ttft (1.2s)
+│  └─ event: tool_call: get_ticket (200ms)
+└─ span: write-history (15ms)
+```
+
+### Spring AI OpenTelemetry Setup
+
+```yaml
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4317
+
+spring:
+  ai:
+    chat:
+      observations:
+        log-prompt: false  # PII risk — careful in prod
+        log-completion: false
+```
+
+```java
+@Bean
+public TracerProvider tracerProvider() {
+    return SdkTracerProvider.builder()
+        .addSpanProcessor(BatchSpanProcessor.builder(
+            OtlpGrpcSpanExporter.builder()
+                .setEndpoint(&quot;http://otel-collector:4317&quot;)
+                .build()).build())
+        .build();
+}
+```
+
+Spring AI auto-instruments with these patterns:
+- `spring.ai.chat.client` — top-level ChatClient call
+- `spring.ai.chat.model` — model invocation
+- `spring.ai.embedding.model` — embedding call
+- `spring.ai.vector.store` — vector search
+
+### Manual Spans for Custom Pipelines
+
+```java
+@Service
+public class RagService {
+
+    private final Tracer tracer;
+
+    public String answer(String query) {
+        Span pipelineSpan = tracer.spanBuilder(&quot;rag.pipeline&quot;).startSpan();
+        try (Scope s = pipelineSpan.makeCurrent()) {
+            pipelineSpan.setAttribute(&quot;user.query.length&quot;, query.length());
+
+            float[] queryEmbedding = embed(query);
+            List&lt;Document&gt; retrieved = retrieve(queryEmbedding);
+            List&lt;Document&gt; reranked = rerank(query, retrieved);
+            String answer = generate(query, reranked);
+
+            pipelineSpan.setAttribute(&quot;retrieval.count&quot;, retrieved.size());
+            pipelineSpan.setAttribute(&quot;rerank.count&quot;, reranked.size());
+            return answer;
+        } finally {
+            pipelineSpan.end();
+        }
+    }
+
+    private List&lt;Document&gt; retrieve(float[] embedding) {
+        Span s = tracer.spanBuilder(&quot;rag.retrieve&quot;).startSpan();
+        try (Scope sc = s.makeCurrent()) {
+            return vectorStore.similaritySearch(embedding, 20);
+        } finally {
+            s.end();
+        }
+    }
+}
+```
+
+### Trace Context Propagation Across LLM Calls
+
+When your service calls OpenAI&#x27;s API, the trace context (W3C Trace Context header) doesn&#x27;t get propagated to OpenAI — but you should still capture the upstream HTTP call as a child span:
+
+```java
+@Bean
+public WebClient.Builder llmWebClientBuilder(ObservationRegistry obs) {
+    return WebClient.builder()
+        .observationRegistry(obs)  // auto-instruments HTTP calls
+        .build();
+}
+```
+
+Now every `WebClient` call gets a span. Combined with Spring AI&#x27;s chat span, you see the full path.
+
+## Prompt and Response Logging
+
+For debugging, you need to know what the LLM saw and what it said. But raw logging risks PII leaks and log volume explosions.
+
+### Structured Prompt Logs
+
+```java
+public class PromptLogger {
+
+    private final ObjectMapper mapper;
+    private final PiiRedactor redactor;
+
+    public void logPrompt(String userId, String feature, ChatRequest request, ChatResponse response,
+                         Map&lt;String, Object&gt; metadata) {
+        var entry = Map.of(
+            &quot;timestamp&quot;, Instant.now().toString(),
+            &quot;user_id&quot;, redactor.maskUserId(userId),  // hashed/pseudonymous
+            &quot;feature&quot;, feature,
+            &quot;model&quot;, request.getModel(),
+            &quot;messages&quot;, redactor.redactMessages(request.getMessages()),
+            &quot;response_content&quot;, redactor.redactText(response.getContent()),
+            &quot;tokens_in&quot;, response.getUsage().getPromptTokens(),
+            &quot;tokens_out&quot;, response.getUsage().getCompletionTokens(),
+            &quot;cost_usd&quot;, calculateCost(response),
+            &quot;latency_ms&quot;, metadata.get(&quot;latency_ms&quot;),
+            &quot;finish_reason&quot;, response.getFinishReason()
+        );
+
+        promptLogStream.send(entry);  // → Kafka → ClickHouse / S3 / specialized tool
+    }
+}
+```
+
+Log to a separate stream from application logs (`prompt-log` topic in Kafka, separate retention). Volume is high — terabytes per day at scale.
+
+### PII Redaction
+
+```java
+@Component
+public class PiiRedactor {
+
+    private static final Pattern EMAIL = Pattern.compile(
+        &quot;[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}&quot;);
+    private static final Pattern CREDIT_CARD = Pattern.compile(
+        &quot;\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b&quot;);
+    private static final Pattern PHONE = Pattern.compile(
+        &quot;\\b\\+?\\d{1,3}?[- ]?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}\\b&quot;);
+    private static final Pattern SSN = Pattern.compile(
+        &quot;\\b\\d{3}-\\d{2}-\\d{4}\\b&quot;);
+
+    public String redactText(String text) {
+        return text == null ? null :
+            SSN.matcher(
+                PHONE.matcher(
+                    CREDIT_CARD.matcher(
+                        EMAIL.matcher(text).replaceAll(&quot;[EMAIL]&quot;)
+                    ).replaceAll(&quot;[CARD]&quot;)
+                ).replaceAll(&quot;[PHONE]&quot;)
+            ).replaceAll(&quot;[SSN]&quot;);
+    }
+
+    public String maskUserId(String userId) {
+        return DigestUtils.sha256Hex(userId + &quot;_salt&quot;).substring(0, 12);
+    }
+}
+```
+
+Better: use a tested library (Presidio, AWS Comprehend) for production redaction.
+
+### Sampling for High Volume
+
+```java
+@Bean
+public BiPredicate&lt;String, ChatRequest&gt; promptLogSampler() {
+    return (feature, request) -&gt; {
+        // Always log errors and slow requests
+        if (request.getMetadata().get(&quot;error&quot;) != null) return true;
+        if (request.getMetadata().get(&quot;latency_ms&quot;).asLong() &gt; 5000) return true;
+        // Sample 1% of normal requests
+        return Math.random() &lt; 0.01;
+    };
+}
+```
+
+## Specialized LLM Observability Tools
+
+By 2026 a category of LLM-specific observability tools has emerged. They specialize in prompt traces, dataset management, eval orchestration:
+
+| Tool | Open Source | Strength |
+|---|---|---|
+| LangSmith | No | LangChain ecosystem integration |
+| Langfuse | Yes (MIT) | Self-host friendly, comprehensive |
+| Helicone | Yes | API proxy approach, easy install |
+| Phoenix (Arize) | Yes | LLM eval focus |
+| Datadog LLM Observability | No | Datadog ecosystem |
+| OpenLLMetry | Yes (Apache 2) | OpenTelemetry-based standard |
+
+### Langfuse with Spring Boot
+
+```java
+@Component
+public class LangfuseTracer {
+
+    private final LangfuseClient client;
+
+    public void trace(String feature, ChatRequest req, ChatResponse resp, Duration duration) {
+        client.createGeneration(GenerationParams.builder()
+            .name(feature)
+            .model(req.getModel())
+            .input(req.getMessages())
+            .output(resp.getContent())
+            .usage(new Usage(resp.getUsage().getPromptTokens(),
+                            resp.getUsage().getCompletionTokens()))
+            .latency(duration.toMillis())
+            .metadata(Map.of(
+                &quot;user_id&quot;, currentUserId(),
+                &quot;session_id&quot;, currentSessionId()))
+            .build());
+    }
+}
+```
+
+Langfuse gives you a UI that shows every LLM call, costs by feature/user, latency distributions, and lets you tag good/bad responses for dataset building.
+
+### OpenLLMetry — The Standard
+
+OpenLLMetry is an OpenTelemetry semantic-conventions extension specifically for LLMs. Standardized span attributes:
+- `gen_ai.system` (openai, anthropic, etc.)
+- `gen_ai.request.model`
+- `gen_ai.response.model`
+- `gen_ai.usage.prompt_tokens`
+- `gen_ai.usage.completion_tokens`
+- `gen_ai.prompt` (sampled)
+- `gen_ai.completion` (sampled)
+
+Future-proof your tracing by following these conventions.
+
+## SLOs for LLM Features
+
+| SLO | Target | Why |
+|---|---|---|
+| TTFT p95 | &lt; 1.5s | Perceived latency in chat |
+| Total latency p95 | &lt; 8s | Total response time |
+| Error rate | &lt; 0.5% | Reliability |
+| Cost per request p95 | &lt; $0.05 (varies) | Per-feature budget |
+| Hallucination rate | &lt; 5% | Quality |
+| Retrieval relevance | &gt; 0.7 | RAG specifically |
+| Tool call success rate | &gt; 95% | Agent reliability |
+
+### Error Budget Math
+
+If your SLO is 99.5% success over 30 days, and you serve 1M requests/day, error budget = 30M × 0.005 = 150K errors / month. Track burn rate; alert when consuming budget faster than time elapses.
+
+## Quality and Hallucination Detection
+
+This is the hardest observability dimension because there&#x27;s no ground truth for free-form responses.
+
+### Implicit Quality Signals
+
+Track behavioral signals as proxies:
+
+```java
+public class QualitySignalTracker {
+
+    public void recordImplicit(String userId, String responseId) {
+        // Did user re-ask immediately?
+        userTimer.scheduleCheck(userId, 60, () -&gt; {
+            if (sameTopicQuery(userId, 60)) {
+                meter.counter(&quot;llm.implicit.reask&quot;).increment();
+            }
+        });
+
+        // Did user copy response? (UI signal)
+        // Did user thumbs-up/down?
+        // Did session continue (good) or abandon (bad)?
+    }
+}
+```
+
+### Explicit Feedback
+
+```java
+@PostMapping(&quot;/feedback&quot;)
+public void recordFeedback(@RequestBody Feedback fb) {
+    meter.counter(&quot;llm.feedback&quot;, &quot;type&quot;, fb.type(), &quot;feature&quot;, fb.feature())
+        .increment();
+    feedbackStore.save(fb);
+}
+
+record Feedback(String responseId, String type /*UP/DOWN*/, String reason, String feature) {}
+```
+
+A &quot;thumbs down&quot; rate trending up is your earliest signal of quality regression.
+
+### LLM-as-Judge Quality Sampling
+
+Periodically grade a sample of responses:
+
+```java
+@Scheduled(fixedRate = 3600_000)  // hourly
+public void sampleAndGrade() {
+    List&lt;PromptLogEntry&gt; samples = promptLogStore.recentSample(100);
+
+    for (PromptLogEntry e : samples) {
+        String grade = chatClient.prompt()
+            .system(&quot;Grade this response. Reply with one of: GOOD, MEDIUM, BAD&quot;)
+            .user(&quot;Question: %s\nAnswer: %s&quot;.formatted(e.getQuestion(), e.getAnswer()))
+            .call().content();
+
+        meter.counter(&quot;llm.judge.grade&quot;, &quot;grade&quot;, grade, &quot;feature&quot;, e.getFeature())
+            .increment();
+    }
+}
+```
+
+Tracking `llm.judge.grade{grade=&quot;BAD&quot;}` / total gives a quality time series.
+
+### Hallucination Detection via Context Grounding
+
+For RAG, check if claims in the answer are supported by retrieved context:
+
+```java
+public double faithfulnessScore(String answer, List&lt;String&gt; retrievedContext) {
+    Faithfulness result = chatClient.prompt()
+        .system(&quot;How many distinct factual claims? How many supported by context? JSON.&quot;)
+        .user(&quot;Answer: %s\nContext: %s&quot;.formatted(answer, String.join(&quot;\n&quot;, retrievedContext)))
+        .call().entity(Faithfulness.class);
+    return result.supported() / (double) Math.max(1, result.total());
+}
+
+record Faithfulness(int total, int supported) {}
+```
+
+Track `faithfulness` percentile distribution over time.
+
+## Model Drift Detection
+
+Same prompt today vs 3 months ago may give different responses. Detect drift:
+
+```java
+@Scheduled(cron = &quot;0 0 6 * * *&quot;)  // daily 6 AM
+public void runCanarySuite() {
+    List&lt;CanaryCase&gt; canaries = canaryStore.all();
+
+    for (CanaryCase c : canaries) {
+        String response = chatClient.prompt().user(c.input()).call().content();
+
+        double similarity = embeddingSim(c.referenceAnswer(), response);
+        meter.gauge(&quot;llm.canary.similarity&quot;,
+            Tags.of(&quot;case&quot;, c.id()), similarity);
+
+        if (similarity &lt; 0.6) {
+            alerter.alert(&quot;Canary drift: &quot; + c.id());
+        }
+    }
+}
+```
+
+Pin ~50 representative inputs, store the original &quot;correct&quot; response, run nightly, alert on drift.
+
+## Cost Anomaly Detection
+
+LLM cost spikes can be subtle. Auto-detect:
+
+```java
+@Scheduled(fixedRate = 60_000)
+public void checkCostAnomaly() {
+    double currentHourSpend = costRepository.spendInLastHour();
+    double rollingAvg = costRepository.avgSpendLastWeek();
+
+    if (currentHourSpend &gt; rollingAvg * 3) {
+        alerter.urgent(&quot;Cost anomaly: $%.2f vs avg $%.2f&quot;
+            .formatted(currentHourSpend, rollingAvg));
+    }
+}
+```
+
+Better: build budget alerts in Grafana / Datadog directly off `llm.cost.usd` metric.
+
+## A Complete Production Observability Stack
+
+```
+                       Production Stack
+┌─────────────────┐   ┌──────────────┐   ┌──────────────┐
+│ Spring Boot     │──▶│ OpenTelemetry │──▶│ Tempo/Jaeger │
+│ Application     │   │ Collector    │   │ (traces)     │
+│  - Spring AI    │   └──────────────┘   └──────────────┘
+│  - Listeners    │           │
+│  - Custom spans │           ├──────▶ Prometheus (metrics) ──▶ Grafana
+└─────────────────┘           │
+        │                     └──────▶ Loki/ELK (logs)
+        │
+        ▼
+┌─────────────────┐
+│ Prompt Log      │──▶ Kafka ──▶ ClickHouse ──▶ Langfuse UI
+│ Stream          │
+└─────────────────┘
+```
+
+This is the stack a serious AI product runs in 2026. Each piece has a job:
+
+- **OTel Collector**: routing/transformation/sampling for traces
+- **Prometheus**: metrics for SLOs, cost, error rates
+- **Loki/ELK**: app logs (not prompt logs)
+- **Kafka + ClickHouse**: high-volume prompt log with cheap analytics
+- **Langfuse**: LLM-specific UI for trace exploration, eval orchestration, datasets
+
+## Common Pitfalls
+
+&gt; [!WARNING]
+&gt; **No cost tag per feature.** &quot;Our LLM bill went up&quot; → can&#x27;t tell which feature. Tag from day one.
+
+&gt; [!WARNING]
+&gt; **Logging prompts to app logs.** Volume explosion, PII risk, log retention costs. Separate stream.
+
+&gt; [!WARNING]
+&gt; **Not capturing TTFT separately.** &quot;p95 latency 8s&quot; hides if it&#x27;s a slow start or slow stream. Both matter.
+
+&gt; [!WARNING]
+&gt; **No quality metric.** You&#x27;ll catch outages; you won&#x27;t catch silent quality regressions.
+
+&gt; [!WARNING]
+&gt; **Tracing only the LLM call.** The vector store query and re-ranker matter equally. Trace everything.
+
+&gt; [!WARNING]
+&gt; **Sampling away expensive requests.** Naive head-based sampling drops most spans. Tail-sample expensive ones.
+
+&gt; [!WARNING]
+&gt; **No PII redaction in logs.** Compliance landmine.
+
+&gt; [!WARNING]
+&gt; **No model name in metrics.** When you upgrade GPT-4 → GPT-4o, you can&#x27;t compare. Tag from day one.
+
+&gt; [!WARNING]
+&gt; **Token counters off by one.** Spring AI reports `prompt_tokens`, OpenAI calls it `prompt_tokens`, Anthropic calls it `input_tokens`. Pin and verify.
+
+## Practice
+
+1. **Set up the basic stack.** Spring Boot + Spring AI + OTel → Tempo + Prometheus + Grafana. Build a dashboard with QPS, error rate, p95 latency.
+2. **Add token metrics.** Counters for prompt/completion tokens per model. Verify against your provider&#x27;s billing.
+3. **Build a cost dashboard.** Daily cost by feature, model, tenant. Set per-feature budget alerts.
+4. **Add tracing.** Instrument a full RAG pipeline (embed → retrieve → rerank → generate). View in Jaeger.
+5. **Set up prompt logging.** Stream to Kafka, store in ClickHouse, redact PII. Query: &quot;all prompts to feature X with cost &gt; $0.10.&quot;
+6. **Deploy Langfuse self-hosted.** Configure your app to send traces. Build a dataset from production logs.
+7. **Implement quality canaries.** 50 pinned inputs, daily run, alert on drift.
+8. **Add user feedback endpoint.** Thumbs up/down. Track ratio per feature.
+9. **Implement LLM-as-judge sampling.** Hourly grade 100 responses; trend by feature.
+10. **Cost anomaly detection.** Alert when hourly spend exceeds 3× rolling average.
+11. **SLO definition.** Write SLOs for TTFT, error rate, cost/request. Set alerts at 50% / 95% burn.
+12. **The skeptic conversation.** A teammate says &quot;OTel is enough, we don&#x27;t need Langfuse.&quot; Write a 200-word case for LLM-specific observability.
+
+## Recap
+
+You should now be able to:
+
+- Instrument LLM calls with token, latency, error, and cost metrics tagged by model/feature/tenant
+- Wire Spring AI Observation handlers or LangChain4j listeners for automatic capture
+- Build OpenTelemetry trace trees that show the full pipeline (embed → retrieve → rerank → LLM → tools)
+- Stream prompt/response logs with PII redaction to a separate analytics store
+- Deploy LLM-specific observability tools (Langfuse, OpenLLMetry conventions)
+- Define SLOs for TTFT, total latency, error rate, cost per request, hallucination rate
+- Detect quality regressions with implicit signals, explicit feedback, LLM-as-judge sampling
+- Catch model drift with daily canary runs
+- Detect cost anomalies before bills explode
+- Build the complete production observability stack (Prometheus + OTel + Langfuse + ClickHouse)
+
+LLM observability isn&#x27;t optional for production — without it you can&#x27;t answer &quot;why is the bill 5× last month?&quot;, &quot;which feature is hallucinating?&quot;, or &quot;did the model upgrade hurt quality?&quot; The patterns here are the difference between operating an AI product and hoping it works.
+
+## Chapter Recap
+
+This concludes the L4/C18 AI/LLM Integration chapter. Together the 10 topics form the implementation playbook:
+
+- **T01 Fundamentals** → raw HTTP to providers
+- **T02-T03 Frameworks** → LangChain4j and Spring AI
+- **T04 Prompts** → prompts as versioned, tested code
+- **T05 RAG** → grounding responses in your data
+- **T06-T07 Vector + Embeddings** → the storage and pipeline layer
+- **T08 Agents** → LLMs that take actions
+- **T09 Streaming** → real-time UX
+- **T10 Observability** → seeing what&#x27;s happening
+
+For the architecture-level decisions (when to use LLMs, how to design AI gateways, scaling RAG, AI safety), continue to [L5/C11 AI System Architecture](../../L5-architecture-leadership/C11-ai-system-architecture/README.md).
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><div class="lbl">← Previous</div><div class="ttl">T09-streaming-llm-responses-sse-websocket</div><div class="sub">Streaming LLM Responses — SSE and WebSocket</div></a><span></span></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-makes-llm-observability-different" data-toc-link>What Makes LLM Observability Different</a></li><li class="lvl-2"><a href="#the-metrics-layer" data-toc-link>The Metrics Layer</a></li><li class="lvl-3"><a href="#token-counters" data-toc-link>Token Counters</a></li><li class="lvl-3"><a href="#cost-calculation-get-the-rates-right" data-toc-link>Cost Calculation — Get the Rates Right</a></li><li class="lvl-3"><a href="#spring-ai-integration-via-observation-api" data-toc-link>Spring AI Integration via Observation API</a></li><li class="lvl-3"><a href="#langchain4j-chatmodellistener" data-toc-link>LangChain4j ChatModelListener</a></li><li class="lvl-2"><a href="#distributed-tracing" data-toc-link>Distributed Tracing</a></li><li class="lvl-3"><a href="#the-trace-tree-you-want" data-toc-link>The Trace Tree You Want</a></li><li class="lvl-3"><a href="#spring-ai-opentelemetry-setup" data-toc-link>Spring AI OpenTelemetry Setup</a></li><li class="lvl-3"><a href="#manual-spans-for-custom-pipelines" data-toc-link>Manual Spans for Custom Pipelines</a></li><li class="lvl-3"><a href="#trace-context-propagation-across-llm-calls" data-toc-link>Trace Context Propagation Across LLM Calls</a></li><li class="lvl-2"><a href="#prompt-and-response-logging" data-toc-link>Prompt and Response Logging</a></li><li class="lvl-3"><a href="#structured-prompt-logs" data-toc-link>Structured Prompt Logs</a></li><li class="lvl-3"><a href="#pii-redaction" data-toc-link>PII Redaction</a></li><li class="lvl-3"><a href="#sampling-for-high-volume" data-toc-link>Sampling for High Volume</a></li><li class="lvl-2"><a href="#specialized-llm-observability-tools" data-toc-link>Specialized LLM Observability Tools</a></li><li class="lvl-3"><a href="#langfuse-with-spring-boot" data-toc-link>Langfuse with Spring Boot</a></li><li class="lvl-3"><a href="#openllmetry-the-standard" data-toc-link>OpenLLMetry — The Standard</a></li><li class="lvl-2"><a href="#slos-for-llm-features" data-toc-link>SLOs for LLM Features</a></li><li class="lvl-3"><a href="#error-budget-math" data-toc-link>Error Budget Math</a></li><li class="lvl-2"><a href="#quality-and-hallucination-detection" data-toc-link>Quality and Hallucination Detection</a></li><li class="lvl-3"><a href="#implicit-quality-signals" data-toc-link>Implicit Quality Signals</a></li><li class="lvl-3"><a href="#explicit-feedback" data-toc-link>Explicit Feedback</a></li><li class="lvl-3"><a href="#llm-as-judge-quality-sampling" data-toc-link>LLM-as-Judge Quality Sampling</a></li><li class="lvl-3"><a href="#hallucination-detection-via-context-grounding" data-toc-link>Hallucination Detection via Context Grounding</a></li><li class="lvl-2"><a href="#model-drift-detection" data-toc-link>Model Drift Detection</a></li><li class="lvl-2"><a href="#cost-anomaly-detection" data-toc-link>Cost Anomaly Detection</a></li><li class="lvl-2"><a href="#a-complete-production-observability-stack" data-toc-link>A Complete Production Observability Stack</a></li><li class="lvl-2"><a href="#common-pitfalls" data-toc-link>Common Pitfalls</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#chapter-recap" data-toc-link>Chapter Recap</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

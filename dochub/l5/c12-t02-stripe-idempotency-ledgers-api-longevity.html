@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stripe — Idempotency, Ledgers &amp; API Longevity — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="active" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span></div>
+        <h1>Stripe — Idempotency, Ledgers &amp; API Longevity</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C12-real-world-case-studies/T02-stripe-idempotency-ledgers-api-longevity.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~55 min</span><span class="meta-pill date">updated 2026-06-15</span></div>
+        <div class="example-links"><a class="example-link" href="../examples/system-designs--event-sourced-wallet.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="example-link-sub">System Designs · event-sourced-wallet</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a></div>
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Stripe — Idempotency, Ledgers &amp; API Longevity"
+slug: stripe-idempotency-ledgers-api-longevity
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Real-World Case Studies"
+type: concept
+difficulty: lead
+order: 2
+tags: [stripe, idempotency, idempotency-key, exactly-once, at-least-once, double-entry-ledger, accounting, money-representation, minor-units, api-versioning, backward-compatibility, reconciliation, state-machine, payments, correctness, distributed-systems, retries]
+prerequisites: [idempotency-and-deduplication, distributed-transactions-2pc-saga]
+status: complete
+estimated_minutes: 55
+last_updated: 2026-06-15</p>
+<hr>
+<h1 id="stripe-idempotency-ledgers-api-longevity">Stripe — Idempotency, Ledgers &amp; API Longevity</h1>
+<p>Stripe is the canonical engineering case study for a single, ruthless idea: <strong>in a payments system, correctness is existential.</strong> A web app that drops a search result loses a result; a payments API that double-charges a customer, or loses a charge it told the merchant succeeded, loses real money — and trust, and possibly its banking partnerships. Because every operation moves money that someone will eventually reconcile against a bank statement, Stripe's architecture is organized around a value most product companies only pay lip service to: <em>correctness over speed.</em> This case study unpacks the four mechanisms that make that value real in code — <strong>idempotency keys</strong>, <strong>integer money + immutable double-entry ledgers</strong>, <strong>foreign state machines + reconciliation</strong>, and <strong>decade-long API longevity through versioned transformation</strong> — and maps each one to concrete Java/Spring practice you can apply tomorrow.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p><strong>Prerequisites.</strong> This topic assumes you understand <a href="c02-t07-idempotency-and-deduplication.html">idempotency and deduplication</a> (idempotent operations, dedup windows, request fingerprints) and <a href="c02-t06-distributed-transactions-2pc-saga.html">distributed transactions, 2PC and saga</a> (why a single ACID transaction can't span services or external banks). Stripe's design is essentially "how do you get correctness when 2PC across a bank is impossible?"</p></div></div>
+<h2 id="context-why-correctness-is-the-product">Context: Why Correctness Is The Product<a class="anchor" href="#context-why-correctness-is-the-product" aria-hidden="true">#</a></h2>
+<p>Stripe sells an API. The differentiator was never raw payment processing — banks already did that — it was a <em>developer-facing API so clean and reliable that a startup could accept money in an afternoon.</em> That framing has two architectural consequences that drive everything below:</p>
+<ol>
+<li><strong>The API contract is the product.</strong> If you break it, you break thousands of merchants' checkout flows simultaneously. So the external contract must be near-immortal (see API longevity).</li>
+<li><strong>Money is the data.</strong> Every record is auditable and must net to zero against external reality. So the data model is an accounting ledger, not a CRUD table, and every state-changing call must be safe to retry.</li>
+</ol>
+<div class="mermaid">flowchart LR
+  Dev["Merchant developer"] -->|"POST /v1/charges<br/>over the public internet"| API["Stripe API edge"]
+  API --> Core["Core money-movement<br/>services"]
+  Core --> Ledger["Immutable<br/>double-entry ledger"]
+  Core --> Bank["External processors /<br/>card networks / banks"]
+  Bank -.->|"async, hours later"| Recon["Reconciliation loop"]
+  Ledger --> Recon
+  classDef ext fill:#fde,stroke:#a33;
+  class Bank,Dev ext;
+</div>
+<p>The recurring theme: Stripe controls its own database but <strong>does not control the network to the merchant</strong> (left edge) nor <strong>the banks</strong> (right edge). Both edges are unreliable and asynchronous. Idempotency tames the left edge; reconciliation tames the right edge; the ledger is the source of truth in the middle.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p><strong>A way to feel the stakes.</strong> Imagine your bank's app shows your account balance off by one cent after a transfer. You would not shrug — you would call the bank, because money you can't trust is money you don't have. Now multiply that one customer by every merchant on the platform and every one of <em>their</em> customers. A search engine that returns slightly-wrong results gets a shrug and a refresh; a payments platform that returns slightly-wrong <em>balances</em> gets lawsuits, churn, and a regulator's attention. That asymmetry — "wrong" costs almost nothing for a content app and almost everything for a money app — is the single fact that explains every design choice in this case study. When you read "correctness over speed" below, picture that phone call.</p><p>[!TIP]
+<strong>How to read this case study.</strong> Each of the four mechanisms answers a different "what could go wrong?" question, and it helps to hold the question in mind as you read:
+- <em>"What if the customer's request arrives twice?"</em> → <strong>idempotency keys</strong>.
+- <em>"What if my arithmetic is off by a fraction of a cent?"</em> → <strong>integer money + double-entry ledgers</strong>.
+- <em>"What if the bank and I disagree about what happened?"</em> → <strong>foreign state machines + reconciliation</strong>.
+- <em>"What if I need to change my API but ten thousand merchants depend on the old shape?"</em> → <strong>versioned transformation</strong>.
+Every analogy, war story, and code sample in this topic hangs off one of these four questions.</p></div></div>
+<h2 id="idempotency-keys-the-signature-pattern">Idempotency Keys: The Signature Pattern<a class="anchor" href="#idempotency-keys-the-signature-pattern" aria-hidden="true">#</a></h2>
+<p>The network problem is fundamental and worth stating precisely, because the whole pattern exists to solve exactly one ambiguity:</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>When a client sends <code>POST /v1/charges</code> and the connection dies before a response arrives, <strong>the client cannot distinguish "my request never reached the server" from "the server processed it but the response was lost."</strong> A naive retry risks charging twice. Not retrying risks never charging at all. There is no client-only solution — the server must help.</p><p>[!TIP]
+<strong>The coat-check analogy.</strong> Think of an idempotency key as a <strong>coat-check ticket</strong>. You hand your coat to the attendant and get a numbered ticket. If you walk up to the counter and present that ticket twice — maybe you forgot you'd already collected your coat, maybe the line was confusing — you still get the <em>one</em> coat back, not two. The ticket <em>identifies a specific coat</em>, not "give me a coat." An idempotency key works exactly the same way: it identifies one specific logical operation ("charge <em>this</em> $20"), so presenting it twice returns the result of that one operation, never a second charge. And just as a coat-check counter would (rightly) refuse a ticket that doesn't match any coat it's holding, the server rejects a key whose request parameters don't match what it remembers. Hold this image — it makes every rule below obvious.</p></div></div>
+<p>Stripe's answer is the <strong>idempotency key</strong>: the client generates a unique key (a UUID is typical) and sends it as an HTTP header on the mutating request:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">http</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-http">POST /v1/charges HTTP/1.1
+Idempotency-Key: 8f1d3c2a-7b4e-4c19-9a2f-2e6b1d0c5a44
+Content-Type: application/x-www-form-urlencoded
+
+amount=2000&amp;currency=usd&amp;source=tok_visa
+</code></pre></div>
+<p>The contract: <strong>a request with a given idempotency key is executed at most once.</strong> Retries with the same key return the <em>same saved response</em> — same status, same body, same charge ID — without re-running the side effect.</p>
+<h3 id="the-mechanism-in-detail">The Mechanism In Detail<a class="anchor" href="#the-mechanism-in-detail" aria-hidden="true">#</a></h3>
+<p>What makes this real (and what interviewers probe) is the storage, locking, and fingerprinting. Stripe persists, keyed by <code>(account_id, idempotency_key)</code>:</p>
+<ul>
+<li>the <strong>request fingerprint</strong> — a hash of the route + relevant parameters,</li>
+<li>a <strong>status / lock</strong> indicating in-progress vs. completed,</li>
+<li>the <strong>saved response</strong> (status code + body) once the operation finishes,</li>
+<li>a <strong>created-at timestamp</strong> for TTL expiry (idempotency keys are remembered for roughly <strong>24 hours</strong>; after that the key is forgotten and a fresh request with the same key would execute again).</li>
+</ul>
+<p>Three subtle rules fall out:</p>
+<ol>
+<li><strong>Same key, same params → return the stored response.</strong> This is the happy path of a retry.</li>
+<li><strong>Same key, <em>different</em> params → reject with an error.</strong> The fingerprint hash won't match the stored one, which means the client is reusing a key for a logically different request — almost always a client bug. Returning the <em>old</em> response would be silently wrong; Stripe returns an error instead.</li>
+<li><strong>Two concurrent requests, same key → one wins, the other waits or is rejected.</strong> This is the race that naive implementations miss. Stripe uses a lock (conceptually a row lock / unique constraint on the key) so the second concurrent request does not also execute the charge. It either blocks until the first completes and then returns that result, or returns a "request currently in progress" error.</li>
+</ol>
+<div class="mermaid">sequenceDiagram
+  participant C as Client
+  participant S as Stripe API
+  participant DB as Idempotency store
+  participant Bank as Card network
+
+  Note over C,Bank: First attempt
+  C->>S: POST /charges (Key=K, amount=2000)
+  S->>DB: INSERT key=K (lock, fingerprint=H)
+  DB-->>S: lock acquired
+  S->>Bank: charge $20
+  Bank-->>S: success, charge ch_1
+  S->>DB: store response (200, ch_1), unlock
+  S--xC: 200 OK  ❌ response lost (timeout)
+
+  Note over C,Bank: Client retries — same Key K
+  C->>S: POST /charges (Key=K, amount=2000)
+  S->>DB: lookup key=K
+  DB-->>S: found, fingerprint matches, response=(200, ch_1)
+  S-->>C: 200 OK (ch_1)  ✅ no second charge
+</div>
+<p>The diagram shows the core win: the card was charged <strong>once</strong>, the client got the <strong>same <code>ch_1</code></strong> on retry, and the second attempt never reached the bank. The merchant's idempotent retry loop is now <em>safe</em> — they can blindly retry on timeout.</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>War story: the double-charged customer.</strong> A real and extremely common failure looks like this. A mobile app fires <code>POST /charges</code> over a flaky cellular connection. The charge <em>succeeds</em> at the server, but the customer is in an elevator and the response never makes it back to the phone. The app's networking library sees a timeout and — following its own perfectly reasonable retry policy — fires the request again. With <strong>no idempotency key</strong>, the server has no way to know this is the same logical purchase, so it charges the card a <em>second</em> time. The customer sees two <code>$49.99</code> line items on their statement, opens a dispute, leaves a one-star review, and tells the support team "your app charged me twice." Engineering spends a day reading logs to confirm what the customer already knew. The fix is one HTTP header: had the retry carried the same <code>Idempotency-Key</code>, the second attempt would have returned the <em>first</em> charge's response and the card would never have been touched again. This is why the rule is "<strong>every retried mutation carries a key</strong>" — not "keys are nice to have." The cost of forgetting is a double charge in production.</p><p>[!NOTE]
+<strong>In Practice — where to generate the key.</strong> A subtle real-world point: the <em>client</em> must generate the key, and it must generate it <strong>once per logical operation, then reuse it across retries.</strong> A frequent bug is generating a fresh UUID inside the retry loop — now every attempt has a different key and the whole mechanism does nothing. In a mobile or web client, generate the key when the user taps "Pay," store it with the pending request, and attach that <em>same</em> key to every retry of that request until you get a definitive success or failure. Treat the key like the coat-check ticket you put in your pocket: you keep handing over the <em>same</em> ticket, not a new one each time you approach the counter.</p>
+<p>[!TIP]
+Idempotency keys only protect <strong>mutating</strong> requests (<code>POST</code>, sometimes <code>DELETE</code>). <code>GET</code> is already idempotent by HTTP semantics. Scope the key per account so two merchants who happen to generate the same UUID never collide, and make the client — not the server — generate the key, because only the client knows that two transmissions are "the same logical request."</p></div></div>
+<p>See <a href="c02-t07-idempotency-and-deduplication.html">idempotency and deduplication</a> for the general theory (dedup windows, the difference between idempotent <em>operations</em> and idempotent <em>delivery</em>, and natural idempotency keys derived from business identifiers).</p>
+<h3 id="when-you-need-idempotency-and-when-you-dont">When You Need Idempotency (And When You Don't)<a class="anchor" href="#when-you-need-idempotency-and-when-you-dont" aria-hidden="true">#</a></h3>
+<p>The instinct to reach for idempotency keys <em>everywhere</em> is as wrong as forgetting them. The deciding question is simple: <strong>"if this operation runs twice, does something bad happen that the user can observe or that costs money?"</strong> If yes, you need idempotency. If no, you're adding machinery for nothing.</p>
+<p><strong>You need it for any retried mutation with a real side effect:</strong></p>
+<ul>
+<li><strong>Charging a card / moving money.</strong> The canonical case — a double charge is real money lost.</li>
+<li><strong>Sending an email, SMS, or push notification.</strong> Retried without a key, a "your order shipped" email goes out three times; a "reset your password" SMS triple-fires and looks like an attack. The dedup key here is often a natural business identifier (<code>order_id + "shipped"</code>) rather than a random UUID.</li>
+<li><strong>Creating an order / booking / reservation.</strong> A retried "place order" can create three orders for one cart; a retried "book seat 14C" can oversell the flight.</li>
+<li><strong>Provisioning a resource.</strong> "Create a VM," "issue an API token," "open a bank account" — each duplicate costs money or creates a dangling resource.</li>
+<li><strong>Decrementing inventory or credits.</strong> A retried "spend 100 credits" can charge the user 300.</li>
+</ul>
+<p><strong>You usually don't need it for:</strong></p>
+<ul>
+<li><strong>Reads (<code>GET</code>).</strong> Already idempotent by HTTP semantics — running a query twice changes nothing.</li>
+<li><strong>Naturally idempotent writes.</strong> <code>PUT /users/42 {name: "Ana"}</code> sets a field to a value; running it twice leaves the same value. Setting a flag to <code>true</code> twice is harmless. The operation's <em>meaning</em> is already "make the world be in this state," so duplicates converge.</li>
+<li><strong>Operations keyed by a unique business constraint that already rejects duplicates.</strong> If <code>username</code> is <code>UNIQUE</code>, a retried "register username <code>ana</code>" fails the second time on its own — though you may still want a key so the retry returns the <em>original success</em> rather than a confusing "already taken" error.</li>
+</ul>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p><strong>A quick litmus test.</strong> Ask: <em>"Is this operation a counter increment or a value assignment?"</em> Counter-style operations ("add a charge," "send another email," "create another order") are <strong>not</strong> naturally idempotent and need a key. Assignment-style operations ("set name to X," "mark as read") usually are. When in doubt for anything touching money, add the key — the cost is a few bytes and a lookup; the cost of being wrong is a customer's bank statement.</p></div></div>
+<h3 id="choosing-the-dedup-store-redis-vs-a-database-unique-constraint">Choosing The Dedup Store: Redis vs. A Database Unique Constraint<a class="anchor" href="#choosing-the-dedup-store-redis-vs-a-database-unique-constraint" aria-hidden="true">#</a></h3>
+<p>Once you've decided you need idempotency, <em>where</em> you store the keys is a real architectural choice with trade-offs. There is no universally right answer — there is a right answer <strong>for your durability requirement.</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Redis (<code>SET NX EX</code>)</th>
+<th>DB <code>UNIQUE</code> constraint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Speed</strong></td>
+<td>Microsecond in-memory lookups; great for very high throughput.</td>
+<td>A DB round-trip + index check; still fast, but slower than Redis.</td>
+</tr>
+<tr>
+<td><strong>Durability</strong></td>
+<td>Depends on persistence config; a crash between write and fsync <em>can</em> lose recent keys. Risky for money if misconfigured.</td>
+<td>As durable as the rest of your data — the key is committed in the same WAL as everything else.</td>
+</tr>
+<tr>
+<td><strong>Atomicity with the side effect</strong></td>
+<td>The key lives in a <em>different</em> system from your business data, so "store key" and "write the charge" can't share one transaction → a window where they disagree.</td>
+<td>You can <code>INSERT</code> the key <strong>in the same DB transaction</strong> as the ledger entry, so they commit or roll back together. This is the killer feature for correctness-critical paths.</td>
+</tr>
+<tr>
+<td><strong>TTL / expiry</strong></td>
+<td>Built in (<code>EX 86400</code>) — Redis evicts the key for you.</td>
+<td>You add a <code>created_at</code> and a background sweep job, or filter on read. More code.</td>
+</tr>
+<tr>
+<td><strong>Operational cost</strong></td>
+<td>Another stateful service to run, monitor, and capacity-plan.</td>
+<td>Reuses the database you already operate.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>The decision rule.</strong> If the idempotent operation's side effect <em>is a database write you control</em> (creating an order, posting a ledger entry), prefer the <strong>DB unique constraint</strong>, because you can make the key and the side effect commit atomically in one transaction — there's no window where the key exists but the charge doesn't, or vice versa. Reach for <strong>Redis</strong> when you need extreme throughput, when the side effect is <em>external</em> (calling a third-party API, where atomicity with your DB is impossible anyway), or when the keyspace is huge and short-lived and you don't want it bloating your primary database. Many mature systems use both: Redis as a fast first-line guard to shed obvious duplicates, with a DB unique constraint as the durable backstop that actually guarantees correctness.</p></div></div>
+<h2 id="at-least-once-idempotency-effectively-once">At-Least-Once + Idempotency = Effectively-Once<a class="anchor" href="#at-least-once-idempotency-effectively-once" aria-hidden="true">#</a></h2>
+<p>A frequent confusion is the dream of "exactly-once delivery." Over an unreliable network, <strong>true exactly-once delivery is impossible</strong> — the FLP/Two Generals intuition applies: the sender can never be certain a message arrived, so to guarantee delivery it must be willing to resend, which means messages can arrive more than once. You get to pick:</p>
+<ul>
+<li><strong>At-most-once:</strong> never retry → may lose messages (unacceptable for a charge).</li>
+<li><strong>At-least-once:</strong> always retry until acknowledged → may <em>duplicate</em> messages.</li>
+</ul>
+<p>Stripe chooses <strong>at-least-once delivery</strong> and then makes duplicate <em>processing</em> harmless with idempotent handlers. The combination yields <strong>effectively-once</strong> (a.k.a. "exactly-once <em>processing</em>") semantics — the observable outcome is as if the operation ran exactly once, even though the message may have been delivered several times.</p>
+<div class="mermaid">flowchart TB
+  subgraph Network["Unreliable network — duplicates happen"]
+    Send["Sender retries until ACK<br/>(at-least-once delivery)"]
+  end
+  Send -->|"msg (maybe twice)"| Gate{"Idempotency check:<br/>seen this key before?"}
+  Gate -->|"new key"| Exec["Execute side effect once<br/>+ record key"]
+  Gate -->|"duplicate key"| Skip["Return prior result<br/>(no second side effect)"]
+  Exec --> Out["Effectively-once outcome"]
+  Skip --> Out
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>The slogan to remember: <strong>you cannot make the network exactly-once, so you make the <em>processing</em> idempotent.</strong> This same pattern reappears everywhere in backend work — Kafka consumers (<code>enable.idempotence</code>, dedup on a message key), webhook receivers (dedupe on event ID), and outbox-pattern publishers all rely on at-least-once delivery + idempotent application.</p></div></div>
+<h2 id="money-representation-integers-never-floats">Money Representation: Integers, Never Floats<a class="anchor" href="#money-representation-integers-never-floats" aria-hidden="true">#</a></h2>
+<p>Before a ledger can be correct, the <em>numbers</em> must be correct. Stripe represents amounts as <strong>integers in the smallest currency unit</strong> ("minor units"): <code>2000</code> means <strong>$20.00 USD</strong> (2000 cents), <code>500</code> means ¥500 (the yen has no minor unit, so the smallest unit <em>is</em> the yen). The amount is always an integer count of the smallest unit plus a currency code.</p>
+<p>Why never floating point? Because IEEE-754 binary floating point <strong>cannot exactly represent most decimal fractions</strong>, including 0.10. The textbook demonstration:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// WRONG — money as double
+double a = 0.1, b = 0.2;
+System.out.println(a + b);          // 0.30000000000000004  ❌
+System.out.println(a + b == 0.3);   // false                ❌
+
+// A 10-cent item summed 1000 times drifts off the true $100.00:
+double total = 0.0;
+for (int i = 0; i &lt; 1000; i++) total += 0.10;
+System.out.println(total);          // 100.00000000000007   ❌
+</code></pre></div>
+<p>Those tiny errors accumulate, and in money a sub-cent drift across millions of transactions is both an accounting failure and, sometimes, a fraud/compliance problem. The fixes in Java:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// RIGHT (Stripe-style): integer minor units. Exact, fast, compact.
+long amountMinor = 2000L;           // $20.00 as cents
+long currencyCode;                  // store ISO-4217 &quot;usd&quot; separately
+// $20.00 + $0.30 fee:
+long net = 2000L + 30L;             // = 2030, exact
+
+// RIGHT (when you need decimal math, e.g. tax/interest): BigDecimal.
+BigDecimal price = new BigDecimal(&quot;19.99&quot;);   // string ctor, NOT new BigDecimal(19.99)
+BigDecimal tax   = price.multiply(new BigDecimal(&quot;0.0825&quot;))
+                        .setScale(2, RoundingMode.HALF_EVEN);   // explicit rounding
+</code></pre></div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p>Two classic Java traps. (1) <code>new BigDecimal(0.1)</code> takes a <code>double</code> and faithfully copies its <em>binary</em> imprecision — <code>0.1000000000000000055...</code>. Always use the <strong><code>String</code> constructor</strong>: <code>new BigDecimal("0.1")</code>. (2) <code>BigDecimal.equals</code> compares scale too, so <code>new BigDecimal("2.0").equals(new BigDecimal("2.00"))</code> is <code>false</code> — use <code>compareTo() == 0</code> for value equality. For most payment code, prefer storing a <code>long</code> of minor units and only reach for <code>BigDecimal</code> where genuine decimal arithmetic (percentages, currency conversion, rounding rules) is required.</p><p>[!WARNING]
+<strong>War story: the float that broke reconciliation.</strong> A team stored line-item prices as <code>double</code> "because it was easier." Each invoice summed dozens of items, and the per-invoice rounding error was sub-cent — invisible in the UI, which displayed two decimals. But the payment processor computed the <em>same</em> invoice total using exact decimal arithmetic, so its number and the team's number differed by a penny here and there. At the end of the month the <strong>reconciliation loop</strong> (see below) compared the team's ledger to the processor's settlement file and found <em>thousands</em> of one-cent mismatches. None of them was individually a bug anyone could point at — they were the accumulated residue of <code>0.1 + 0.2 != 0.3</code> repeated across millions of line items. The cleanup took weeks: every historical invoice had to be recomputed in integer cents and re-reconciled. The lesson is brutal and simple: <strong>a money bug doesn't announce itself as a crash. It announces itself as a reconciliation mismatch weeks later, by which point it's everywhere.</strong> Storing <code>long</code> cents from day one would have made the entire class of bug impossible — the arithmetic is exact, so the team's total and the processor's total can never silently drift.</p>
+<p>[!TIP]
+<strong>The penny-jar analogy.</strong> Integer minor units are like counting a jar of physical coins: there is no such thing as "0.7 of a penny" in the jar, so you can never lose or invent a fraction — every count is exact and repeatable. Floating-point money is like estimating the jar's value by weighing it: fast, <em>approximately</em> right, and guaranteed to disagree with an actual coin count by a little. For money you always do the coin count, never the weigh-in.</p></div></div>
+<h2 id="the-double-entry-ledger">The Double-Entry Ledger<a class="anchor" href="#the-double-entry-ledger" aria-hidden="true">#</a></h2>
+<p>Stripe's source of truth for money is an <strong>immutable, append-only, double-entry ledger</strong> — the same model invented for accounting centuries ago, because it is <em>self-checking</em>. Every monetary event records balanced <strong>debits</strong> and <strong>credits</strong> across accounts, and the system maintains one inviolable invariant:</p>
+<blockquote>
+<p><strong>For every transaction, the sum of debits equals the sum of credits. The whole ledger always nets to zero.</strong></p>
+<p>[!TIP]
+<strong>The checkbook analogy.</strong> Double-entry bookkeeping is like keeping a checkbook where <strong>every entry must balance or you know you made a mistake.</strong> When you write a check, you don't just scribble "money left" — you record where it came <em>from</em> and where it went <em>to</em>, and the two sides must agree. If you sit down to balance the checkbook against the bank statement and the numbers don't line up, that disagreement is itself the alarm: it tells you, precisely, that an entry is wrong <em>somewhere</em>, before the error can compound. The genius of the centuries-old technique is that it's <strong>self-checking</strong> — correctness isn't something you hope for, it's something the structure forces. A single-entry system (just a running balance you increment and decrement) has no such alarm: if you fat-finger a number, nothing complains, and the error silently lives in your balance forever. The whole reason payment systems use double-entry is to get that built-in alarm on every single money movement.</p>
+</blockquote>
+<p>If a bug ever posts an unbalanced entry, the invariant breaks loudly and immediately — you cannot silently lose or conjure money. Consider a $20.00 charge with a $0.59 + 2.9% fee:</p>
+<div class="mermaid">flowchart LR
+  subgraph T["Transaction: charge ch_1 ($20.00, fee $1.17)"]
+    direction TB
+    D1["DEBIT  Customer/Card  $20.00<br/>(money comes in)"]
+    C1["CREDIT Stripe Fee     $1.17"]
+    C2["CREDIT Merchant Net   $18.83"]
+  end
+  D1 --- Inv{{"invariant:<br/>debits 20.00 == credits 1.17 + 18.83"}}
+  C1 --- Inv
+  C2 --- Inv
+</div>
+<p>The two properties that make this powerful:</p>
+<ul>
+<li><strong>Immutability / append-only.</strong> You never <code>UPDATE</code> or <code>DELETE</code> a posted entry. A correction is a <em>new</em> compensating entry (a reversal), so the full history is preserved. This is what gives you <strong>auditability</strong> — you can replay the ledger from the beginning to reconstruct any balance at any point in time, and an auditor can verify nothing was tampered with.</li>
+<li><strong>Double-entry.</strong> Because every movement touches at least two accounts and must balance, the ledger is <em>internally consistent by construction</em>. This is precisely what makes <strong>reconciliation</strong> tractable: you can sum an account's entries and compare to external truth.</li>
+</ul>
+<p>A balance is therefore never a stored mutable number you increment (that would be lossy and race-prone). It is a <strong>derived value</strong>: <code>balance(account) = Σ credits − Σ debits</code> over the immutable entries. In practice high-volume ledgers keep periodic <em>snapshots/checkpoints</em> so you don't re-sum all of history on every read, but the snapshot is always reproducible from the entries.</p>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p>This connects directly to <strong>event sourcing</strong>: the ledger <em>is</em> an event log, and the balance is a projection. The same discipline — never mutate history, derive state by folding events — gives you time-travel debugging, audit trails, and correctness-by-replay for free.</p></div></div>
+<h3 id="a-worked-double-entry-posting-with-numbers">A Worked Double-Entry Posting (With Numbers)<a class="anchor" href="#a-worked-double-entry-posting-with-numbers" aria-hidden="true">#</a></h3>
+<p>Diagrams are abstract; let's post a real charge and a real refund as concrete table rows so you can see the invariant hold and the balance get <em>derived</em> rather than stored. We model three internal accounts: <code>cash</code> (money Stripe is holding), <code>stripe_fee</code> (Stripe's revenue), and <code>merchant_payable</code> (what Stripe owes the merchant). A customer pays <strong>$20.00</strong>; Stripe's fee is <strong>$1.17</strong>; the merchant is owed the <strong>$18.83</strong> remainder.</p>
+<p><strong>Transaction <code>txn_A</code> — capture a $20.00 charge:</strong></p>
+<p>| entry | txn_id | account | direction | amount_minor | running meaning |
+| --- | --- | --- | --- | --- |
+| 1 | <code>txn_A</code> | <code>cash</code> | <strong>D</strong> (debit) | <code>2000</code> | Stripe now holds $20.00 in cash |
+| 2 | <code>txn_A</code> | <code>stripe_fee</code> | <strong>C</strong> (credit) | <code>117</code> | Stripe earned $1.17 in fees |
+| 3 | <code>txn_A</code> | <code>merchant_payable</code> | <strong>C</strong> (credit) | <code>1883</code> | Stripe owes the merchant $18.83 |</p>
+<p>Check the invariant: debits <code>= 2000</code>; credits <code>= 117 + 1883 = 2000</code>. <strong>Balanced.</strong> ✅ Notice every number is an integer count of cents — no float anywhere.</p>
+<p>Now the merchant balance is <em>derived</em>, not stored. Using the convention "credits add, debits subtract" for a payable (liability) account:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">balance(merchant_payable) = Σ credits − Σ debits
+                          = 1883 − 0
+                          = 1883  → $18.83 owed to the merchant
+</code></pre></div>
+<p><strong>Transaction <code>txn_B</code> — the customer requests a full refund.</strong> We do <strong>not</strong> edit or delete <code>txn_A</code>. We post a <em>new, compensating</em> transaction that reverses the money movement. (Assume the fee is returned too, for simplicity.)</p>
+<p>| entry | txn_id | account | direction | amount_minor | running meaning |
+| --- | --- | --- | --- | --- |
+| 4 | <code>txn_B</code> | <code>cash</code> | <strong>C</strong> (credit) | <code>2000</code> | $20.00 leaves Stripe's cash (back to the customer) |
+| 5 | <code>txn_B</code> | <code>stripe_fee</code> | <strong>D</strong> (debit) | <code>117</code> | the $1.17 fee is reversed |
+| 6 | <code>txn_B</code> | <code>merchant_payable</code> | <strong>D</strong> (debit) | <code>1883</code> | Stripe no longer owes the merchant the $18.83 |</p>
+<p>Invariant for <code>txn_B</code>: credits <code>= 2000</code>; debits <code>= 117 + 1883 = 2000</code>. <strong>Balanced.</strong> ✅ Re-derive the merchant balance over <em>all</em> entries:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">balance(merchant_payable) = Σ credits − Σ debits
+                          = 1883 − 1883
+                          = 0   → the merchant is owed nothing; fully refunded
+</code></pre></div>
+<p>The full history is intact: an auditor can see exactly that a charge happened <em>and then</em> a refund happened. Nothing was overwritten. This is the entire ledger philosophy in six rows — <strong>append a balanced set, never mutate, derive the balance.</strong></p>
+<div class="mermaid">flowchart TB
+  subgraph A["txn_A: capture $20.00"]
+    direction LR
+    A1["D cash 2000"]
+    A2["C stripe_fee 117"]
+    A3["C merchant_payable 1883"]
+  end
+  subgraph B["txn_B: refund (compensating)"]
+    direction LR
+    B1["C cash 2000"]
+    B2["D stripe_fee 117"]
+    B3["D merchant_payable 1883"]
+  end
+  A --> Bal["derive: merchant_payable<br/>= 1883 (after A)<br/>= 0 (after B)"]
+  B --> Bal
+</div>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p><strong>In Practice — why a refund is a new transaction, not an <code>UPDATE</code>.</strong> A junior instinct is to "undo" the charge by flipping its status column to <code>refunded</code> or deleting the rows. That destroys the audit trail and, worse, makes concurrent reads race-prone and historical reports wrong. The mature move — and the one every real ledger uses — is to leave the original entries frozen and post a <em>compensating</em> transaction that nets them out. The balance falls to zero not because you erased the charge, but because the refund offsets it. Same reason accountants never erase ink: they draw a new line.</p></div></div>
+<h2 id="foreign-state-machines-reconciliation">Foreign State Machines &amp; Reconciliation<a class="anchor" href="#foreign-state-machines-reconciliation" aria-hidden="true">#</a></h2>
+<p>A charge is not instantaneous and Stripe does not own the money's whole journey. A card charge moves through a <strong>lifecycle (a state machine)</strong>, and part of that state lives at <strong>external processors and banks Stripe cannot control or directly transact with.</strong> Stripe must <em>track</em> foreign state it can only observe asynchronously.</p>
+<div class="mermaid">stateDiagram-v2
+  [*] --> Pending: charge created
+  Pending --> Authorized: bank authorizes hold
+  Authorized --> Succeeded: captured / settled
+  Authorized --> Failed: declined / expired
+  Pending --> Failed: declined
+  Succeeded --> Refunded: refund issued
+  Succeeded --> Disputed: chargeback raised
+  Disputed --> Refunded: dispute lost
+  Disputed --> Succeeded: dispute won
+  Failed --> [*]
+  Refunded --> [*]
+  Succeeded --> [*]
+</div>
+<p>The hard part: the transition from <code>Authorized</code> to <code>Succeeded</code> (settlement) and events like <code>Disputed</code> (chargebacks, which can arrive <strong>weeks later</strong>) are driven by the bank, not by Stripe. Stripe's internal record is a <em>belief</em> about external reality that can drift. Closing that gap is the job of the <strong>reconciliation loop</strong>: a continuous, idempotent batch process that compares Stripe's ledger against the authoritative external records (bank settlement files, processor reports) and flags or auto-corrects any divergence.</p>
+<div class="mermaid">flowchart LR
+  Internal["Internal ledger<br/>(what Stripe believes)"] --> Diff{"Compare<br/>line by line"}
+  External["Bank / processor<br/>settlement files<br/>(external truth)"] --> Diff
+  Diff -->|"match"| OK["✓ reconciled"]
+  Diff -->|"mismatch"| Action["Post compensating entry,<br/>open exception, or alert<br/>(no destructive edits)"]
+  Action --> Internal
+  loop["runs continuously / on each settlement batch"] -.-> Diff
+</div>
+<p>Notice the design choices echo earlier sections: corrections are <strong>compensating entries</strong> (append-only, never destructive), and the loop is <strong>idempotent</strong> so re-running it over the same settlement file is safe. Because 2PC across a bank is impossible (you can't hold a lock inside someone else's bank — see <a href="c02-t06-distributed-transactions-2pc-saga.html">distributed transactions, 2PC and saga</a>), reconciliation is the <em>eventually-consistent</em> substitute: detect divergence after the fact and converge via compensation. This is a saga-shaped pattern: forward steps plus compensating actions, with the ledger recording every step.</p>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p><strong>The two-friends-splitting-a-bill analogy.</strong> Reconciliation is what happens when two friends each keep their own running tally of who owes whom after a weekend trip. Neither tally is automatically authoritative; they only find out they disagree when they sit down at the end and compare line by line — "wait, I have you paying for dinner Friday, but you don't." The <em>act of comparing</em> is what surfaces the discrepancy, and then they resolve it with a single corrective payment rather than tearing up the whole weekend's records. Stripe and the bank are those two friends, the settlement file is the bank's tally, the ledger is Stripe's, and the reconciliation loop is the sit-down. The crucial discipline: when they disagree, you <strong>add a correcting entry</strong>, you don't rewrite history to pretend the disagreement never happened.</p><p>[!WARNING]
+<strong>War story: when the processor and your ledger disagree.</strong> Here's a divergence that actually happens. Stripe authorizes a charge and records it as <code>Succeeded</code> in its ledger — its <em>belief</em> is "this $50 settled." But at the bank, the cardholder's account had insufficient funds at settlement time, so the bank silently <em>reverses</em> it in the nightly settlement file. Now the two records disagree: Stripe's ledger says <code>+$50</code>, the bank's file says <code>$0</code>. Nobody threw an exception; no API call failed; the disagreement is pure data drift discovered hours later. The reconciliation loop reads the settlement file, compares it line-by-line to the ledger, and finds the mismatch. Its response is <em>not</em> to silently flip the original entry — it posts a <strong>compensating</strong> transaction (a reversal) that brings the ledger back into agreement with the bank, and opens an exception ticket so a human can see what happened. The merchant, who was <em>not</em> told the money had settled (because the system exposes the honest state machine, not the optimistic belief), is never paid out for a charge that didn't really clear. This is the entire reason the loop exists: <strong>your database's belief about money held at a bank is a hypothesis, and reconciliation is the experiment that confirms or refutes it — continuously, idempotently, and non-destructively.</strong></p>
+<p>[!WARNING]
+"Eventually consistent with external reality" means <strong>your database can be temporarily wrong</strong> and you must design for it: never tell a merchant money has <em>settled</em> based only on your internal <code>pending</code> belief; expose the state machine honestly; and make every step reversible via compensation rather than in-place edits.</p></div></div>
+<h2 id="api-longevity-never-break-the-contract">API Longevity: Never Break The Contract<a class="anchor" href="#api-longevity-never-break-the-contract" aria-hidden="true">#</a></h2>
+<p>Stripe is famous for an extreme commitment: <strong>old API integrations keep working for years, untouched.</strong> A merchant who integrated in 2015 can, in principle, still run that exact code. This is not laziness about deprecation — it is a deliberate strategy that <em>decouples the internal model from the external contract.</em></p>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p><strong>The wall-sockets analogy.</strong> Date-based API versioning is like <strong>keeping the old wall sockets working so you never have to rewire every customer's house.</strong> When a country introduces a new electrical standard, it does <em>not</em> march into every home and rip out the existing outlets — that would break every appliance everyone owns, all at once. Instead the old sockets keep delivering power exactly as they always did, while new construction uses the new standard, and homeowners upgrade on <em>their</em> schedule, if ever. Stripe's API is the wall socket and merchants' integrations are the appliances plugged into it. Stripe is free to renovate everything <em>behind the wall</em> — rewire the whole house's internals — as long as the socket on the surface keeps delivering the same shape of response to the appliance that was built against it. The merchant who "plugged in" in 2015 never has to touch their wiring; their code keeps getting power. That promise — <em>we change our internals, never your socket</em> — is the whole product strategy in one image.</p></div></div>
+<p>The mechanism is <strong>date-based API versioning pinned per account.</strong> Versions look like <code>2020-08-27</code>. When an account first makes a request, it is <strong>pinned</strong> to the then-current version; that pin is sticky. Stripe can evolve its internal data model freely, ship new versions with breaking changes, and <em>every old account keeps receiving responses shaped exactly as its pinned version expects</em> — until the merchant explicitly upgrades.</p>
+<p>How does one codebase serve dozens of historical contracts without drowning in <code>if (version &lt; X)</code> branches everywhere? Through a <strong>chain of versioned transformation shims</strong>:</p>
+<div class="mermaid">flowchart LR
+  Req["Incoming request<br/>(account pinned to 2018-05-21)"] --> UpIn["Upgrade shims:<br/>2018 → 2019 → ... → current"]
+  UpIn --> Core["Core logic runs ONCE<br/>against the current internal model"]
+  Core --> Ledger["Ledger / money movement"]
+  Core --> DownOut["Downgrade shims:<br/>current → ... → 2019 → 2018"]
+  DownOut --> Resp["Response shaped as<br/>2018-05-21 expects"]
+  classDef hot fill:#dfe,stroke:#363;
+  class Core hot;
+</div>
+<p>The key ideas:</p>
+<ol>
+<li><strong>One internal representation.</strong> Core business logic is written <em>once</em> against the latest model. It does not know or care which API version the caller uses.</li>
+<li><strong>Upgrade on the way in, downgrade on the way out.</strong> A request arriving in an old shape is passed through a <em>chain</em> of small, independent <strong>version-change</strong> transformations, each of which knows how to convert <em>one</em> version forward to the next. The output is downgraded back through the inverse chain.</li>
+<li><strong>Each version change is a tiny, isolated, well-tested unit.</strong> Adding a new version means writing one more forward/backward transformer, not editing the core. Old transformers, once written, almost never change — which is exactly why decade-old integrations keep working.</li>
+</ol>
+<p>The transferable lesson — and one of the highest-leverage ideas in this whole book — is:</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Decouple your internal model from your external contract.</strong> Your database schema, domain objects, and service internals should be free to evolve. The public API is a <em>stable projection</em> of them, maintained by an explicit translation layer. Never let an internal refactor leak into a breaking API change. Additive changes (new optional fields) are safe; removals and renames are not — version them instead.</p><p>[!WARNING]
+<strong>War story: the rename that would have broken thousands of integrations.</strong> A team decided to rename a field in their JSON response from <code>card</code> to <code>payment_method</code> because the company now supported bank transfers and wallets, not just cards, and <code>card</code> was misleading. Internally this was the <em>right</em> model change. Shipped naively, it would have been a catastrophe: every merchant whose code read <code>response.card.last4</code> would suddenly read <code>undefined</code>, and checkout pages across thousands of integrations would break the moment the deploy went out — with no warning, because the merchants did nothing wrong. The team caught it in review and instead shipped it as a <strong>new API version</strong> with a <code>downgrade</code> shim: clients pinned to old versions keep seeing the field as <code>card</code>, clients on the new version see <code>payment_method</code>, and the internal model uses the new name everywhere. <em>Zero</em> integrations broke. The renovation happened behind the wall; every old socket kept delivering <code>card</code>. This is the difference between a versioned platform and a fragile one: in a fragile API, "we improved our internal naming" silently becomes "we broke your checkout"; in a versioned one, the two events are completely decoupled.</p>
+<p>[!NOTE]
+<strong>In Practice — additive is free, breaking is expensive.</strong> A practical rule you can apply today, even without Stripe's full version-chain machinery: <strong>adding a new optional field is always safe</strong> — old clients ignore what they don't read. <strong>Removing or renaming a field, or changing its type or meaning, is a breaking change</strong> — old clients will misread or crash. So evolve by <em>adding</em> whenever you can (introduce <code>payment_method</code> alongside <code>card</code>, keep both populated for a deprecation window), and only when you genuinely must remove the old shape do you reach for per-version transformation. Most "API changes" turn out to be additive if you're disciplined, which is why most teams never need the full shim chain — but knowing the pattern exists is what lets you promise longevity when you <em>do</em> need it.</p></div></div>
+<h2 id="reliability-culture-briefly">Reliability Culture (Briefly)<a class="anchor" href="#reliability-culture-briefly" aria-hidden="true">#</a></h2>
+<p>None of the above survives contact with reality without an engineering culture to match. Stripe's practices reinforce the architecture: <strong>heavy automated testing</strong> (so refactors of the internal model don't break old API versions), <strong>rigorous code review</strong> for money-touching code, and a systemic insistence that <strong>everything be safe to retry</strong> — which is only possible <em>because</em> idempotency and append-only ledgers are baked in at the foundation. The culture and the architecture are the same decision viewed from two angles: correctness is a property you design in, not a thing you test in afterward.</p>
+<h2 id="java-spring-how-to-build-this-yourself">Java / Spring: How To Build This Yourself<a class="anchor" href="#java-spring-how-to-build-this-yourself" aria-hidden="true">#</a></h2>
+<p>These patterns are not Stripe-exclusive. Here is how a Java backend engineer implements each one.</p>
+<h3 id="1-an-idempotency-filter-interceptor">1. An Idempotency Filter / Interceptor<a class="anchor" href="#1-an-idempotency-filter-interceptor" aria-hidden="true">#</a></h3>
+<p>Read the <code>Idempotency-Key</code> header, look it up in a fast store (Redis or a DB table with a <code>UNIQUE</code> constraint), and either replay the stored response or proceed and store it. A <code>HandlerInterceptor</code> (or servlet <code>Filter</code>) is the natural seam:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+
+  private final IdempotencyStore store;   // backed by Redis or JDBC
+
+  @Override
+  public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler)
+      throws Exception {
+    if (!&quot;POST&quot;.equals(req.getMethod())) return true;          // only guard mutations
+    String key = req.getHeader(&quot;Idempotency-Key&quot;);
+    if (key == null) return true;                              // or reject, per policy
+
+    String fingerprint = sha256(req.getRequestURI() + &quot;|&quot; + cachedBody(req));
+    var existing = store.lookup(accountId(req), key);
+
+    if (existing != null) {
+      if (!existing.fingerprint().equals(fingerprint)) {       // rule 2: same key, diff params
+        res.sendError(422, &quot;Idempotency-Key reused with different parameters&quot;);
+        return false;
+      }
+      replay(res, existing.savedResponse());                  // rule 1: return stored response
+      return false;                                            // short-circuit the handler
+    }
+    // rule 3: claim the key atomically; loser of the race gets 409
+    if (!store.tryClaim(accountId(req), key, fingerprint)) {
+      res.sendError(409, &quot;A request with this Idempotency-Key is already in progress&quot;);
+      return false;
+    }
+    return true;   // proceed; afterCompletion stores the response under this key
+  }
+  // ... afterCompletion(...) persists (status, body) and releases the lock ...
+}
+</code></pre></div>
+<p>The atomic claim is the crux. With Redis, use <code>SET key value NX EX 86400</code> (set-if-absent with a 24h TTL). With a relational DB, lean on a <code>UNIQUE</code> constraint:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">CREATE TABLE idempotency_key (
+  account_id     BIGINT       NOT NULL,
+  idem_key       VARCHAR(255) NOT NULL,
+  fingerprint    CHAR(64)     NOT NULL,
+  response_code  INT,
+  response_body  TEXT,
+  status         VARCHAR(16)  NOT NULL DEFAULT 'IN_PROGRESS',
+  created_at     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  PRIMARY KEY (account_id, idem_key)        -- INSERT fails for a concurrent duplicate
+);
+-- a background job (or a WHERE created_at &gt; now() - 24h read) enforces the TTL
+</code></pre></div>
+<p>The first <code>INSERT</code> wins; the concurrent duplicate gets a constraint violation, which the code maps to "in progress." This is the database doing your concurrency control for free.</p>
+<p>The <code>preHandle</code> above only does half the job — it <em>claims</em> the key. The other half is <strong>storing the response after the handler runs</strong> so future retries can replay it. That's <code>afterCompletion</code>, plus the small store contract both halves share. Here is the fuller picture, end to end:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+
+  private final IdempotencyStore store;
+
+  // ... preHandle from above: claim key, replay stored response, or 409 ...
+
+  @Override
+  public void afterCompletion(HttpServletRequest req, HttpServletResponse res,
+                              Object handler, Exception ex) {
+    if (!&quot;POST&quot;.equals(req.getMethod())) return;
+    String key = req.getHeader(&quot;Idempotency-Key&quot;);
+    if (key == null) return;
+
+    int status = res.getStatus();
+    if (ex != null || status &gt;= 500) {
+      // transient server error: RELEASE the claim so the client's retry can try again.
+      // (Do NOT store a 500 — a retry should get a real attempt, not a cached failure.)
+      store.release(accountId(req), key);
+      return;
+    }
+    // success (or a deterministic 4xx): freeze the response so retries replay it verbatim.
+    store.complete(accountId(req), key, status, capturedBody(res));
+  }
+}
+
+/** The store contract both halves rely on. */
+interface IdempotencyStore {
+  /** Atomically claim the key. Returns false if someone else already holds it. */
+  boolean tryClaim(long accountId, String key, String fingerprint);
+  /** Look up a prior record (fingerprint + saved response), or null if unseen. */
+  Record lookup(long accountId, String key);
+  /** Persist the final (status, body) under the key and mark it COMPLETED. */
+  void complete(long accountId, String key, int status, byte[] body);
+  /** Release an IN_PROGRESS claim so a retry can re-attempt (used on transient failure). */
+  void release(long accountId, String key);
+
+  record Record(String fingerprint, Integer status, byte[] body, Status state) {}
+  enum Status { IN_PROGRESS, COMPLETED }
+}
+</code></pre></div>
+<p>Two production-grade subtleties this fuller version surfaces:</p>
+<ol>
+<li><strong>Don't cache transient failures.</strong> If the handler blew up with a 500 or threw, you must <em>release</em> the claim (or mark it failed), not store the error. Otherwise the client's perfectly valid retry would replay a stale 500 forever. Only freeze <em>deterministic</em> outcomes — successes, and 4xx errors that will happen identically on retry (like "amount must be positive").</li>
+<li><strong>Capturing the response body</strong> requires wrapping the response in a <code>ContentCachingResponseWrapper</code> (Spring provides one) so you can read the bytes the handler wrote <em>and</em> still flush them to the client. The same trick (<code>ContentCachingRequestWrapper</code>) lets <code>preHandle</code> read the request body for the fingerprint without consuming the stream the handler needs.</li>
+</ol>
+<div class="mermaid">sequenceDiagram
+  participant C as Client
+  participant I as IdempotencyInterceptor
+  participant DB as Idempotency store
+  participant H as Charge handler
+
+  C->>I: POST /charges (Key=K)
+  I->>DB: lookup(K)
+  alt key already COMPLETED
+    DB-->>I: saved (200, ch_1)
+    I-->>C: 200 (ch_1)   [replay, handler skipped]
+  else key IN_PROGRESS (concurrent)
+    DB-->>I: locked by someone else
+    I-->>C: 409 in progress
+  else new key
+    DB-->>I: not found
+    I->>DB: tryClaim(K, fingerprint)
+    DB-->>I: claimed
+    I->>H: preHandle returns true → run handler
+    H-->>I: 200 (ch_1)
+    I->>DB: complete(K, 200, body)   [afterCompletion]
+    I-->>C: 200 (ch_1)
+  end
+</div>
+<p>This is the same three-rule machine from the conceptual section — replay on match, 409 on concurrent duplicate, execute-then-store on a fresh key — now wired through Spring's interceptor lifecycle.</p>
+<h3 id="2-money-as-long-minor-units-or-bigdecimal">2. Money As <code>long</code> Minor Units (or <code>BigDecimal</code>)<a class="anchor" href="#2-money-as-long-minor-units-or-bigdecimal" aria-hidden="true">#</a></h3>
+<p>Make illegal states unrepresentable with a small value type, and never expose a raw <code>double</code> for money anywhere in the codebase:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public record Money(long minorUnits, Currency currency) {
+  public Money plus(Money other) {
+    if (!currency.equals(other.currency))
+      throw new IllegalArgumentException(&quot;currency mismatch&quot;);
+    return new Money(Math.addExact(minorUnits, other.minorUnits), currency);  // overflow-checked
+  }
+  public static Money usd(long cents) { return new Money(cents, Currency.getInstance(&quot;USD&quot;)); }
+}
+</code></pre></div>
+<p>Persist it as a <code>BIGINT</code> column (<code>amount_minor</code>) plus a <code>currency</code> column — never a <code>FLOAT</code>/<code>DOUBLE</code>. Reserve <code>BigDecimal</code> (with an explicit <code>RoundingMode</code>) for tax, interest, and FX conversion.</p>
+<p>A fuller <code>Money</code> type guards more illegal states and shows exactly where <code>BigDecimal</code> is and isn't appropriate:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public record Money(long minorUnits, Currency currency) {
+
+  public Money {                                   // compact constructor: validate on creation
+    Objects.requireNonNull(currency, &quot;currency&quot;);
+  }
+
+  public Money plus(Money o)  { requireSameCurrency(o); return new Money(Math.addExact(minorUnits, o.minorUnits), currency); }
+  public Money minus(Money o) { requireSameCurrency(o); return new Money(Math.subtractExact(minorUnits, o.minorUnits), currency); }
+
+  /** Percentage math (tax, fee). HERE BigDecimal is correct — we need a fractional rate. */
+  public Money percentage(BigDecimal rate, RoundingMode rounding) {
+    BigDecimal result = BigDecimal.valueOf(minorUnits)
+                                  .multiply(rate)
+                                  .setScale(0, rounding);     // back to whole minor units
+    return new Money(result.longValueExact(), currency);
+  }
+
+  private void requireSameCurrency(Money o) {
+    if (!currency.equals(o.currency))
+      throw new IllegalArgumentException(&quot;currency mismatch: &quot; + currency + &quot; vs &quot; + o.currency);
+  }
+
+  public static Money usd(long cents) { return new Money(cents, Currency.getInstance(&quot;USD&quot;)); }
+}
+</code></pre></div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>The <code>BigDecimal</code> pitfalls, collected.</strong> When you <em>do</em> reach for <code>BigDecimal</code>, four traps bite repeatedly: <strong>(1)</strong> <code>new BigDecimal(0.1)</code> (the <code>double</code> constructor) copies binary imprecision — always pass a <code>String</code>: <code>new BigDecimal("0.1")</code>, or <code>BigDecimal.valueOf(longOrDouble)</code> which routes through <code>Double.toString</code>. <strong>(2)</strong> <code>equals</code> is scale-sensitive — <code>new BigDecimal("2.0").equals(new BigDecimal("2.00"))</code> is <code>false</code>; use <code>compareTo(...) == 0</code> for value equality, and beware that this also breaks <code>HashSet</code>/<code>HashMap</code> membership. <strong>(3)</strong> <code>divide</code> with a non-terminating result (e.g. <code>1/3</code>) throws <code>ArithmeticException</code> unless you supply a scale and <code>RoundingMode</code> — <em>always</em> pass both. <strong>(4)</strong> Rounding is a <em>business</em> decision, not a default: pick <code>RoundingMode.HALF_EVEN</code> ("banker's rounding," which avoids the upward bias of <code>HALF_UP</code> over many operations) unless a regulation says otherwise, and apply it explicitly with <code>setScale</code>. The meta-lesson: <code>BigDecimal</code> is <em>exact</em> but <em>fussy</em>; it removes the float-imprecision class of bug only if you use the <code>String</code>/<code>valueOf</code> constructors and never let a rounding mode default.</p><p>[!TIP]
+<strong>In Practice — the <code>long</code> cents vs. <code>BigDecimal</code> decision.</strong> Default to <strong><code>long</code> minor units</strong> for stored amounts and additive money movement (charges, fees, balances) — it's exact, compact (8 bytes), overflow-checkable with <code>Math.addExact</code>, and trivially indexable in the database. Switch to <strong><code>BigDecimal</code></strong> only at the moments you genuinely do fractional arithmetic — applying a tax rate, computing interest, converting currencies at an FX rate — and the instant you're done, round back to whole minor units and store the <code>long</code>. In other words: <code>long</code> for <em>holding and moving</em> money, <code>BigDecimal</code> for the brief <em>calculation</em> that produces a new whole-cent amount. Never let a <code>double</code> near any of it.</p></div></div>
+<h3 id="3-an-append-only-ledger-table">3. An Append-Only Ledger Table<a class="anchor" href="#3-an-append-only-ledger-table" aria-hidden="true">#</a></h3>
+<p>Model entries, not balances. Each transaction inserts a <em>balanced set</em> of rows in one DB transaction:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">CREATE TABLE ledger_entry (
+  id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  txn_id       UUID         NOT NULL,        -- groups the balanced set
+  account      VARCHAR(64)  NOT NULL,        -- e.g. 'merchant_net', 'stripe_fee'
+  direction    CHAR(1)      NOT NULL CHECK (direction IN ('D','C')),  -- Debit / Credit
+  amount_minor BIGINT       NOT NULL CHECK (amount_minor &gt; 0),
+  currency     CHAR(3)      NOT NULL,
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT now()
+  -- NO update/delete: corrections are new compensating txns
+);
+</code></pre></div>
+<p>Enforce the invariant before commit (in app code or a deferred constraint): <code>Σ(debits) == Σ(credits)</code> for each <code>txn_id</code>. Compute balances with a query (<code>SUM(CASE WHEN direction='C' THEN amount_minor ELSE -amount_minor END)</code>), optionally snapshotting periodically. Revoke <code>UPDATE</code>/<code>DELETE</code> on the table at the DB-grant level so immutability is enforced by the database, not by convention.</p>
+<h3 id="4-an-api-versioning-transformation-layer">4. An API-Versioning Transformation Layer<a class="anchor" href="#4-an-api-versioning-transformation-layer" aria-hidden="true">#</a></h3>
+<p>Pin each client to a version, keep core logic version-agnostic, and chain small transformers:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">interface VersionChange {
+  ApiVersion from();                         // e.g. 2019_10_17
+  ApiVersion to();                           // e.g. 2020_03_02
+  ObjectNode upgrade(ObjectNode req);        // forward: old shape -&gt; newer shape
+  ObjectNode downgrade(ObjectNode res);      // backward: newer shape -&gt; old shape
+}
+
+ObjectNode handle(ApiVersion clientVersion, ObjectNode rawRequest) {
+  ObjectNode req = rawRequest;
+  for (var change : changesFrom(clientVersion))   // upgrade IN, in order
+      req = change.upgrade(req);
+  ObjectNode res = core.process(req);             // core runs once, current model only
+  for (var change : reversed(changesFrom(clientVersion)))  // downgrade OUT, reverse order
+      res = change.downgrade(res);
+  return res;                                     // shaped exactly as the client expects
+}
+</code></pre></div>
+<p>Each <code>VersionChange</code> is independently unit-tested and, once shipped, frozen. Adding a version means appending one transformer — never touching <code>core</code>.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p><strong>"A client calls your payment endpoint, gets a timeout, and retries. How do you guarantee they aren't charged twice?"</strong> Strong answer: require a client-generated <code>Idempotency-Key</code> header. On the server, atomically claim the key (Redis <code>SET NX</code> or a DB <code>UNIQUE</code>-constrained insert) <em>before</em> doing the side effect; store the response keyed by it. A retry with the same key returns the stored response without re-executing; a concurrent duplicate loses the race and gets a 409. Add a request <strong>fingerprint</strong> so the <em>same key with different params</em> is rejected rather than silently returning a stale result, and a ~24h TTL. Then make the senior point: you cannot get exactly-once <em>delivery</em> over a network — you get at-least-once delivery + idempotent processing = effectively-once. Bonus depth: store money as integer minor units, record the charge in an append-only double-entry ledger so the operation is auditable and reconcilable, and note that the external bank settlement is reconciled asynchronously because you can't 2PC across a bank.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Trace the ambiguity.</strong> In one paragraph, explain why a client that receives a network timeout on <code>POST /charges</code> <em>cannot</em> know whether the charge succeeded, and why this makes server-side idempotency mandatory rather than a client-only retry-with-backoff.</li>
+<li><strong>Implement the race.</strong> Write an idempotency store backed by Redis <code>SET key val NX EX 86400</code>. Fire two threads with the same key simultaneously and assert that exactly one executes the side effect and the other receives the first one's stored response (or a 409).</li>
+<li><strong>Break the float.</strong> In a JUnit test, sum <code>0.10</code> a thousand times as a <code>double</code> and assert it is <em>not</em> exactly <code>100.00</code>; then redo it with <code>long</code> cents and <code>BigDecimal("0.10")</code> and assert exactness. Explain why <code>new BigDecimal(0.1)</code> (double ctor) still fails.</li>
+<li><strong>Build the ledger.</strong> Create the <code>ledger_entry</code> table, post a <code>$20.00</code> charge as a balanced debit/credit set (net + fee), and write a query that derives the merchant balance. Then issue a refund as a <em>compensating</em> transaction (no <code>UPDATE</code>) and re-derive the balance.</li>
+<li><strong>Version a field.</strong> You renamed <code>card</code> to <code>payment_method</code> internally. Write a <code>VersionChange</code> whose <code>downgrade</code> re-emits the old <code>card</code> field for clients pinned to the older version, and a unit test proving an old client's response is unchanged.</li>
+<li><strong>Reconciliation drill.</strong> Sketch (in pseudocode) an idempotent reconciliation loop that reads a settlement file, compares each line to the ledger, and posts a compensating entry on mismatch — and argue why re-running it on the same file is safe.</li>
+<li><strong>Choose the store.</strong> For each operation, decide whether you'd dedup with Redis <code>SET NX</code> or a DB <code>UNIQUE</code> constraint, and justify in one sentence: (a) posting a ledger entry you control, (b) calling an external SMS provider, (c) a 50k-requests/second "mark notification read" endpoint. Tie each answer back to durability and same-transaction atomicity.</li>
+<li><strong>Classify the operations.</strong> Label each as <em>needs an idempotency key</em> or <em>naturally idempotent</em>: <code>POST /charges</code>, <code>PUT /users/42 {name}</code>, <code>POST /emails/order-shipped</code>, <code>GET /balance</code>, <code>POST /orders</code>, "set account status to <code>closed</code>." For the ones that need a key, say whether a random UUID or a natural business identifier is the better key.</li>
+<li><strong>Round like a bank.</strong> Compute 8.25% tax on <code>$19.99</code> two ways — once with <code>RoundingMode.HALF_UP</code> and once with <code>HALF_EVEN</code> — across a list of prices, and show a case where the two disagree by a cent. Explain why <code>HALF_EVEN</code> is the safer default for high-volume money math.</li>
+<li><strong>Refund without <code>UPDATE</code>.</strong> Take the worked <code>txn_A</code>/<code>txn_B</code> posting from the ledger section, implement it as real <code>INSERT</code>s, and write the single <code>SUM(CASE ...)</code> query that derives <code>merchant_payable</code>. Confirm it reads <code>1883</code> after <code>txn_A</code> and <code>0</code> after <code>txn_B</code> — without ever mutating a row.</li>
+<li><strong>Avoid the breaking rename.</strong> You must rename <code>card</code> to <code>payment_method</code> in your responses. Write the additive-first migration plan (introduce the new field, dual-write for a deprecation window, version the removal) and contrast it with the naive "just rename it" deploy, naming exactly what breaks for old clients and when.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Correctness is existential at Stripe</strong> because the data <em>is</em> money; the architecture optimizes for correctness over speed, with unreliable edges on both sides (the network to merchants, the banks behind settlement).</li>
+<li><strong>Idempotency keys</strong> make mutating requests safe to retry: client-generated key → server stores fingerprint + locked status + saved response, ~24h TTL; same key+params replays the response, same key+different params errors, concurrent duplicates are serialized by a lock / <code>UNIQUE</code> constraint.</li>
+<li><strong>Exactly-once delivery is impossible</strong>; Stripe uses <strong>at-least-once delivery + idempotent processing = effectively-once</strong>.</li>
+<li><strong>Money is integer minor units</strong> (or <code>BigDecimal</code> with explicit rounding), <strong>never <code>double</code></strong>, because binary floats can't represent decimal fractions exactly.</li>
+<li><strong>An immutable, append-only double-entry ledger</strong> keeps debits == credits as an always-checkable invariant, gives auditability, derives balances rather than mutating them, and makes reconciliation possible.</li>
+<li><strong>Foreign state machines + reconciliation</strong> track money held at external banks Stripe can't control; corrections are compensating entries, the loop is idempotent, and convergence is eventual because 2PC across a bank is impossible.</li>
+<li><strong>API longevity</strong> comes from per-account, date-based version pinning plus a chain of upgrade/downgrade transformation shims around version-agnostic core logic — the embodiment of <em>decouple the internal model from the external contract.</em></li>
+<li><strong>In Java/Spring:</strong> a <code>HandlerInterceptor</code>/<code>Filter</code> + Redis <code>SET NX</code> or a <code>UNIQUE</code>-constrained table for idempotency; a <code>Money</code> value type over <code>long</code> minor units; an append-only <code>ledger_entry</code> table with debit/credit balancing; and a <code>VersionChange</code> chain for API versioning.</li>
+<li><strong>Mental models to keep:</strong> an idempotency key is a <strong>coat-check ticket</strong> (same ticket → one coat, never two); double-entry bookkeeping is a <strong>self-checking checkbook</strong> (entries must balance or you know you erred); integer cents are a <strong>penny jar</strong> (exact count, no fractions to lose); reconciliation is <strong>two friends comparing tallies</strong> and settling the difference; and date-based API versioning is <strong>keeping the old wall sockets live</strong> so you never rewire every customer's house.</li>
+<li><strong>When idempotency is required vs. not:</strong> required for any <em>counter-style</em> retried mutation with a real side effect — charges, emails/SMS, order/booking/resource creation, inventory or credit decrements; usually unnecessary for reads and <em>assignment-style</em> writes (<code>PUT name=X</code>, set-a-flag) that converge on retry. For money, when in doubt, add the key.</li>
+<li><strong>Choosing the dedup store:</strong> prefer a <strong>DB <code>UNIQUE</code> constraint</strong> when the side effect is a DB write you control, because the key and the side effect can commit in <strong>one atomic transaction</strong>; reach for <strong>Redis <code>SET NX</code></strong> for extreme throughput, external side effects, or huge short-lived keyspaces — many systems use Redis as a fast guard <em>plus</em> a DB constraint as the durable backstop.</li>
+<li><strong>The war stories distilled:</strong> a missing idempotency key double-charges a customer whose mobile client retried a timed-out POST; <code>double</code> money silently drifts (<code>0.1 + 0.2 != 0.3</code>) until reconciliation surfaces thousands of penny mismatches weeks later; a bank reversal makes the processor and your ledger disagree, caught by the reconciliation loop and fixed with a compensating entry; and a naive <code>card</code> → <code>payment_method</code> rename would break thousands of integrations unless shipped as a new, downgrade-shimmed API version.</li>
+<li><strong>Additive-first API evolution:</strong> adding a new optional field is always safe (old clients ignore it); removing/renaming/retyping a field is breaking — dual-write through a deprecation window and version the removal. Most "API changes" are additive if you're disciplined, so most teams rarely need the full transformation chain — but knowing it exists is what lets you promise decade-long longevity.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c12-t03-discord-storage-evolution-cassandra-scylladb.html">Discord — Storage Evolution (Cassandra to ScyllaDB)</a>, where the existential constraint shifts from <em>correctness</em> to <em>scale</em>: how Discord migrated trillions of messages across storage engines without downtime, and the data-modeling and operational lessons that transfer to any high-volume Java backend.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Stripe — Idempotency, Ledgers &amp; API Longevity&quot;
+slug: stripe-idempotency-ledgers-api-longevity
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Real-World Case Studies&quot;
+type: concept
+difficulty: lead
+order: 2
+tags: [stripe, idempotency, idempotency-key, exactly-once, at-least-once, double-entry-ledger, accounting, money-representation, minor-units, api-versioning, backward-compatibility, reconciliation, state-machine, payments, correctness, distributed-systems, retries]
+prerequisites: [idempotency-and-deduplication, distributed-transactions-2pc-saga]
+status: complete
+estimated_minutes: 55
+last_updated: 2026-06-15
+---
+
+# Stripe — Idempotency, Ledgers &amp; API Longevity
+
+Stripe is the canonical engineering case study for a single, ruthless idea: **in a payments system, correctness is existential.** A web app that drops a search result loses a result; a payments API that double-charges a customer, or loses a charge it told the merchant succeeded, loses real money — and trust, and possibly its banking partnerships. Because every operation moves money that someone will eventually reconcile against a bank statement, Stripe&#x27;s architecture is organized around a value most product companies only pay lip service to: *correctness over speed.* This case study unpacks the four mechanisms that make that value real in code — **idempotency keys**, **integer money + immutable double-entry ledgers**, **foreign state machines + reconciliation**, and **decade-long API longevity through versioned transformation** — and maps each one to concrete Java/Spring practice you can apply tomorrow.
+
+&gt; [!NOTE]
+&gt; **Prerequisites.** This topic assumes you understand [idempotency and deduplication](../C02-distributed-systems-and-system-design/T07-idempotency-and-deduplication.md) (idempotent operations, dedup windows, request fingerprints) and [distributed transactions, 2PC and saga](../C02-distributed-systems-and-system-design/T06-distributed-transactions-2pc-saga.md) (why a single ACID transaction can&#x27;t span services or external banks). Stripe&#x27;s design is essentially &quot;how do you get correctness when 2PC across a bank is impossible?&quot;
+
+## Context: Why Correctness Is The Product
+
+Stripe sells an API. The differentiator was never raw payment processing — banks already did that — it was a *developer-facing API so clean and reliable that a startup could accept money in an afternoon.* That framing has two architectural consequences that drive everything below:
+
+1. **The API contract is the product.** If you break it, you break thousands of merchants&#x27; checkout flows simultaneously. So the external contract must be near-immortal (see API longevity).
+2. **Money is the data.** Every record is auditable and must net to zero against external reality. So the data model is an accounting ledger, not a CRUD table, and every state-changing call must be safe to retry.
+
+```mermaid
+flowchart LR
+  Dev[&quot;Merchant developer&quot;] --&gt;|&quot;POST /v1/charges&lt;br/&gt;over the public internet&quot;| API[&quot;Stripe API edge&quot;]
+  API --&gt; Core[&quot;Core money-movement&lt;br/&gt;services&quot;]
+  Core --&gt; Ledger[&quot;Immutable&lt;br/&gt;double-entry ledger&quot;]
+  Core --&gt; Bank[&quot;External processors /&lt;br/&gt;card networks / banks&quot;]
+  Bank -.-&gt;|&quot;async, hours later&quot;| Recon[&quot;Reconciliation loop&quot;]
+  Ledger --&gt; Recon
+  classDef ext fill:#fde,stroke:#a33;
+  class Bank,Dev ext;
+```
+
+The recurring theme: Stripe controls its own database but **does not control the network to the merchant** (left edge) nor **the banks** (right edge). Both edges are unreliable and asynchronous. Idempotency tames the left edge; reconciliation tames the right edge; the ledger is the source of truth in the middle.
+
+&gt; [!NOTE]
+&gt; **A way to feel the stakes.** Imagine your bank&#x27;s app shows your account balance off by one cent after a transfer. You would not shrug — you would call the bank, because money you can&#x27;t trust is money you don&#x27;t have. Now multiply that one customer by every merchant on the platform and every one of *their* customers. A search engine that returns slightly-wrong results gets a shrug and a refresh; a payments platform that returns slightly-wrong *balances* gets lawsuits, churn, and a regulator&#x27;s attention. That asymmetry — &quot;wrong&quot; costs almost nothing for a content app and almost everything for a money app — is the single fact that explains every design choice in this case study. When you read &quot;correctness over speed&quot; below, picture that phone call.
+
+&gt; [!TIP]
+&gt; **How to read this case study.** Each of the four mechanisms answers a different &quot;what could go wrong?&quot; question, and it helps to hold the question in mind as you read:
+&gt; - *&quot;What if the customer&#x27;s request arrives twice?&quot;* → **idempotency keys**.
+&gt; - *&quot;What if my arithmetic is off by a fraction of a cent?&quot;* → **integer money + double-entry ledgers**.
+&gt; - *&quot;What if the bank and I disagree about what happened?&quot;* → **foreign state machines + reconciliation**.
+&gt; - *&quot;What if I need to change my API but ten thousand merchants depend on the old shape?&quot;* → **versioned transformation**.
+&gt; Every analogy, war story, and code sample in this topic hangs off one of these four questions.
+
+## Idempotency Keys: The Signature Pattern
+
+The network problem is fundamental and worth stating precisely, because the whole pattern exists to solve exactly one ambiguity:
+
+&gt; [!IMPORTANT]
+&gt; When a client sends `POST /v1/charges` and the connection dies before a response arrives, **the client cannot distinguish &quot;my request never reached the server&quot; from &quot;the server processed it but the response was lost.&quot;** A naive retry risks charging twice. Not retrying risks never charging at all. There is no client-only solution — the server must help.
+
+&gt; [!TIP]
+&gt; **The coat-check analogy.** Think of an idempotency key as a **coat-check ticket**. You hand your coat to the attendant and get a numbered ticket. If you walk up to the counter and present that ticket twice — maybe you forgot you&#x27;d already collected your coat, maybe the line was confusing — you still get the *one* coat back, not two. The ticket *identifies a specific coat*, not &quot;give me a coat.&quot; An idempotency key works exactly the same way: it identifies one specific logical operation (&quot;charge *this* $20&quot;), so presenting it twice returns the result of that one operation, never a second charge. And just as a coat-check counter would (rightly) refuse a ticket that doesn&#x27;t match any coat it&#x27;s holding, the server rejects a key whose request parameters don&#x27;t match what it remembers. Hold this image — it makes every rule below obvious.
+
+Stripe&#x27;s answer is the **idempotency key**: the client generates a unique key (a UUID is typical) and sends it as an HTTP header on the mutating request:
+
+```http
+POST /v1/charges HTTP/1.1
+Idempotency-Key: 8f1d3c2a-7b4e-4c19-9a2f-2e6b1d0c5a44
+Content-Type: application/x-www-form-urlencoded
+
+amount=2000&amp;currency=usd&amp;source=tok_visa
+```
+
+The contract: **a request with a given idempotency key is executed at most once.** Retries with the same key return the *same saved response* — same status, same body, same charge ID — without re-running the side effect.
+
+### The Mechanism In Detail
+
+What makes this real (and what interviewers probe) is the storage, locking, and fingerprinting. Stripe persists, keyed by `(account_id, idempotency_key)`:
+
+- the **request fingerprint** — a hash of the route + relevant parameters,
+- a **status / lock** indicating in-progress vs. completed,
+- the **saved response** (status code + body) once the operation finishes,
+- a **created-at timestamp** for TTL expiry (idempotency keys are remembered for roughly **24 hours**; after that the key is forgotten and a fresh request with the same key would execute again).
+
+Three subtle rules fall out:
+
+1. **Same key, same params → return the stored response.** This is the happy path of a retry.
+2. **Same key, *different* params → reject with an error.** The fingerprint hash won&#x27;t match the stored one, which means the client is reusing a key for a logically different request — almost always a client bug. Returning the *old* response would be silently wrong; Stripe returns an error instead.
+3. **Two concurrent requests, same key → one wins, the other waits or is rejected.** This is the race that naive implementations miss. Stripe uses a lock (conceptually a row lock / unique constraint on the key) so the second concurrent request does not also execute the charge. It either blocks until the first completes and then returns that result, or returns a &quot;request currently in progress&quot; error.
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant S as Stripe API
+  participant DB as Idempotency store
+  participant Bank as Card network
+
+  Note over C,Bank: First attempt
+  C-&gt;&gt;S: POST /charges (Key=K, amount=2000)
+  S-&gt;&gt;DB: INSERT key=K (lock, fingerprint=H)
+  DB--&gt;&gt;S: lock acquired
+  S-&gt;&gt;Bank: charge $20
+  Bank--&gt;&gt;S: success, charge ch_1
+  S-&gt;&gt;DB: store response (200, ch_1), unlock
+  S--xC: 200 OK  ❌ response lost (timeout)
+
+  Note over C,Bank: Client retries — same Key K
+  C-&gt;&gt;S: POST /charges (Key=K, amount=2000)
+  S-&gt;&gt;DB: lookup key=K
+  DB--&gt;&gt;S: found, fingerprint matches, response=(200, ch_1)
+  S--&gt;&gt;C: 200 OK (ch_1)  ✅ no second charge
+```
+
+The diagram shows the core win: the card was charged **once**, the client got the **same `ch_1`** on retry, and the second attempt never reached the bank. The merchant&#x27;s idempotent retry loop is now *safe* — they can blindly retry on timeout.
+
+&gt; [!WARNING]
+&gt; **War story: the double-charged customer.** A real and extremely common failure looks like this. A mobile app fires `POST /charges` over a flaky cellular connection. The charge *succeeds* at the server, but the customer is in an elevator and the response never makes it back to the phone. The app&#x27;s networking library sees a timeout and — following its own perfectly reasonable retry policy — fires the request again. With **no idempotency key**, the server has no way to know this is the same logical purchase, so it charges the card a *second* time. The customer sees two `$49.99` line items on their statement, opens a dispute, leaves a one-star review, and tells the support team &quot;your app charged me twice.&quot; Engineering spends a day reading logs to confirm what the customer already knew. The fix is one HTTP header: had the retry carried the same `Idempotency-Key`, the second attempt would have returned the *first* charge&#x27;s response and the card would never have been touched again. This is why the rule is &quot;**every retried mutation carries a key**&quot; — not &quot;keys are nice to have.&quot; The cost of forgetting is a double charge in production.
+
+&gt; [!NOTE]
+&gt; **In Practice — where to generate the key.** A subtle real-world point: the *client* must generate the key, and it must generate it **once per logical operation, then reuse it across retries.** A frequent bug is generating a fresh UUID inside the retry loop — now every attempt has a different key and the whole mechanism does nothing. In a mobile or web client, generate the key when the user taps &quot;Pay,&quot; store it with the pending request, and attach that *same* key to every retry of that request until you get a definitive success or failure. Treat the key like the coat-check ticket you put in your pocket: you keep handing over the *same* ticket, not a new one each time you approach the counter.
+
+&gt; [!TIP]
+&gt; Idempotency keys only protect **mutating** requests (`POST`, sometimes `DELETE`). `GET` is already idempotent by HTTP semantics. Scope the key per account so two merchants who happen to generate the same UUID never collide, and make the client — not the server — generate the key, because only the client knows that two transmissions are &quot;the same logical request.&quot;
+
+See [idempotency and deduplication](../C02-distributed-systems-and-system-design/T07-idempotency-and-deduplication.md) for the general theory (dedup windows, the difference between idempotent *operations* and idempotent *delivery*, and natural idempotency keys derived from business identifiers).
+
+### When You Need Idempotency (And When You Don&#x27;t)
+
+The instinct to reach for idempotency keys *everywhere* is as wrong as forgetting them. The deciding question is simple: **&quot;if this operation runs twice, does something bad happen that the user can observe or that costs money?&quot;** If yes, you need idempotency. If no, you&#x27;re adding machinery for nothing.
+
+**You need it for any retried mutation with a real side effect:**
+
+- **Charging a card / moving money.** The canonical case — a double charge is real money lost.
+- **Sending an email, SMS, or push notification.** Retried without a key, a &quot;your order shipped&quot; email goes out three times; a &quot;reset your password&quot; SMS triple-fires and looks like an attack. The dedup key here is often a natural business identifier (`order_id + &quot;shipped&quot;`) rather than a random UUID.
+- **Creating an order / booking / reservation.** A retried &quot;place order&quot; can create three orders for one cart; a retried &quot;book seat 14C&quot; can oversell the flight.
+- **Provisioning a resource.** &quot;Create a VM,&quot; &quot;issue an API token,&quot; &quot;open a bank account&quot; — each duplicate costs money or creates a dangling resource.
+- **Decrementing inventory or credits.** A retried &quot;spend 100 credits&quot; can charge the user 300.
+
+**You usually don&#x27;t need it for:**
+
+- **Reads (`GET`).** Already idempotent by HTTP semantics — running a query twice changes nothing.
+- **Naturally idempotent writes.** `PUT /users/42 {name: &quot;Ana&quot;}` sets a field to a value; running it twice leaves the same value. Setting a flag to `true` twice is harmless. The operation&#x27;s *meaning* is already &quot;make the world be in this state,&quot; so duplicates converge.
+- **Operations keyed by a unique business constraint that already rejects duplicates.** If `username` is `UNIQUE`, a retried &quot;register username `ana`&quot; fails the second time on its own — though you may still want a key so the retry returns the *original success* rather than a confusing &quot;already taken&quot; error.
+
+&gt; [!TIP]
+&gt; **A quick litmus test.** Ask: *&quot;Is this operation a counter increment or a value assignment?&quot;* Counter-style operations (&quot;add a charge,&quot; &quot;send another email,&quot; &quot;create another order&quot;) are **not** naturally idempotent and need a key. Assignment-style operations (&quot;set name to X,&quot; &quot;mark as read&quot;) usually are. When in doubt for anything touching money, add the key — the cost is a few bytes and a lookup; the cost of being wrong is a customer&#x27;s bank statement.
+
+### Choosing The Dedup Store: Redis vs. A Database Unique Constraint
+
+Once you&#x27;ve decided you need idempotency, *where* you store the keys is a real architectural choice with trade-offs. There is no universally right answer — there is a right answer **for your durability requirement.**
+
+| Concern | Redis (`SET NX EX`) | DB `UNIQUE` constraint |
+| --- | --- | --- |
+| **Speed** | Microsecond in-memory lookups; great for very high throughput. | A DB round-trip + index check; still fast, but slower than Redis. |
+| **Durability** | Depends on persistence config; a crash between write and fsync *can* lose recent keys. Risky for money if misconfigured. | As durable as the rest of your data — the key is committed in the same WAL as everything else. |
+| **Atomicity with the side effect** | The key lives in a *different* system from your business data, so &quot;store key&quot; and &quot;write the charge&quot; can&#x27;t share one transaction → a window where they disagree. | You can `INSERT` the key **in the same DB transaction** as the ledger entry, so they commit or roll back together. This is the killer feature for correctness-critical paths. |
+| **TTL / expiry** | Built in (`EX 86400`) — Redis evicts the key for you. | You add a `created_at` and a background sweep job, or filter on read. More code. |
+| **Operational cost** | Another stateful service to run, monitor, and capacity-plan. | Reuses the database you already operate. |
+
+&gt; [!IMPORTANT]
+&gt; **The decision rule.** If the idempotent operation&#x27;s side effect *is a database write you control* (creating an order, posting a ledger entry), prefer the **DB unique constraint**, because you can make the key and the side effect commit atomically in one transaction — there&#x27;s no window where the key exists but the charge doesn&#x27;t, or vice versa. Reach for **Redis** when you need extreme throughput, when the side effect is *external* (calling a third-party API, where atomicity with your DB is impossible anyway), or when the keyspace is huge and short-lived and you don&#x27;t want it bloating your primary database. Many mature systems use both: Redis as a fast first-line guard to shed obvious duplicates, with a DB unique constraint as the durable backstop that actually guarantees correctness.
+
+## At-Least-Once + Idempotency = Effectively-Once
+
+A frequent confusion is the dream of &quot;exactly-once delivery.&quot; Over an unreliable network, **true exactly-once delivery is impossible** — the FLP/Two Generals intuition applies: the sender can never be certain a message arrived, so to guarantee delivery it must be willing to resend, which means messages can arrive more than once. You get to pick:
+
+- **At-most-once:** never retry → may lose messages (unacceptable for a charge).
+- **At-least-once:** always retry until acknowledged → may *duplicate* messages.
+
+Stripe chooses **at-least-once delivery** and then makes duplicate *processing* harmless with idempotent handlers. The combination yields **effectively-once** (a.k.a. &quot;exactly-once *processing*&quot;) semantics — the observable outcome is as if the operation ran exactly once, even though the message may have been delivered several times.
+
+```mermaid
+flowchart TB
+  subgraph Network[&quot;Unreliable network — duplicates happen&quot;]
+    Send[&quot;Sender retries until ACK&lt;br/&gt;(at-least-once delivery)&quot;]
+  end
+  Send --&gt;|&quot;msg (maybe twice)&quot;| Gate{&quot;Idempotency check:&lt;br/&gt;seen this key before?&quot;}
+  Gate --&gt;|&quot;new key&quot;| Exec[&quot;Execute side effect once&lt;br/&gt;+ record key&quot;]
+  Gate --&gt;|&quot;duplicate key&quot;| Skip[&quot;Return prior result&lt;br/&gt;(no second side effect)&quot;]
+  Exec --&gt; Out[&quot;Effectively-once outcome&quot;]
+  Skip --&gt; Out
+```
+
+&gt; [!IMPORTANT]
+&gt; The slogan to remember: **you cannot make the network exactly-once, so you make the *processing* idempotent.** This same pattern reappears everywhere in backend work — Kafka consumers (`enable.idempotence`, dedup on a message key), webhook receivers (dedupe on event ID), and outbox-pattern publishers all rely on at-least-once delivery + idempotent application.
+
+## Money Representation: Integers, Never Floats
+
+Before a ledger can be correct, the *numbers* must be correct. Stripe represents amounts as **integers in the smallest currency unit** (&quot;minor units&quot;): `2000` means **$20.00 USD** (2000 cents), `500` means ¥500 (the yen has no minor unit, so the smallest unit *is* the yen). The amount is always an integer count of the smallest unit plus a currency code.
+
+Why never floating point? Because IEEE-754 binary floating point **cannot exactly represent most decimal fractions**, including 0.10. The textbook demonstration:
+
+```java
+// WRONG — money as double
+double a = 0.1, b = 0.2;
+System.out.println(a + b);          // 0.30000000000000004  ❌
+System.out.println(a + b == 0.3);   // false                ❌
+
+// A 10-cent item summed 1000 times drifts off the true $100.00:
+double total = 0.0;
+for (int i = 0; i &lt; 1000; i++) total += 0.10;
+System.out.println(total);          // 100.00000000000007   ❌
+```
+
+Those tiny errors accumulate, and in money a sub-cent drift across millions of transactions is both an accounting failure and, sometimes, a fraud/compliance problem. The fixes in Java:
+
+```java
+// RIGHT (Stripe-style): integer minor units. Exact, fast, compact.
+long amountMinor = 2000L;           // $20.00 as cents
+long currencyCode;                  // store ISO-4217 &quot;usd&quot; separately
+// $20.00 + $0.30 fee:
+long net = 2000L + 30L;             // = 2030, exact
+
+// RIGHT (when you need decimal math, e.g. tax/interest): BigDecimal.
+BigDecimal price = new BigDecimal(&quot;19.99&quot;);   // string ctor, NOT new BigDecimal(19.99)
+BigDecimal tax   = price.multiply(new BigDecimal(&quot;0.0825&quot;))
+                        .setScale(2, RoundingMode.HALF_EVEN);   // explicit rounding
+```
+
+&gt; [!WARNING]
+&gt; Two classic Java traps. (1) `new BigDecimal(0.1)` takes a `double` and faithfully copies its *binary* imprecision — `0.1000000000000000055...`. Always use the **`String` constructor**: `new BigDecimal(&quot;0.1&quot;)`. (2) `BigDecimal.equals` compares scale too, so `new BigDecimal(&quot;2.0&quot;).equals(new BigDecimal(&quot;2.00&quot;))` is `false` — use `compareTo() == 0` for value equality. For most payment code, prefer storing a `long` of minor units and only reach for `BigDecimal` where genuine decimal arithmetic (percentages, currency conversion, rounding rules) is required.
+
+&gt; [!WARNING]
+&gt; **War story: the float that broke reconciliation.** A team stored line-item prices as `double` &quot;because it was easier.&quot; Each invoice summed dozens of items, and the per-invoice rounding error was sub-cent — invisible in the UI, which displayed two decimals. But the payment processor computed the *same* invoice total using exact decimal arithmetic, so its number and the team&#x27;s number differed by a penny here and there. At the end of the month the **reconciliation loop** (see below) compared the team&#x27;s ledger to the processor&#x27;s settlement file and found *thousands* of one-cent mismatches. None of them was individually a bug anyone could point at — they were the accumulated residue of `0.1 + 0.2 != 0.3` repeated across millions of line items. The cleanup took weeks: every historical invoice had to be recomputed in integer cents and re-reconciled. The lesson is brutal and simple: **a money bug doesn&#x27;t announce itself as a crash. It announces itself as a reconciliation mismatch weeks later, by which point it&#x27;s everywhere.** Storing `long` cents from day one would have made the entire class of bug impossible — the arithmetic is exact, so the team&#x27;s total and the processor&#x27;s total can never silently drift.
+
+&gt; [!TIP]
+&gt; **The penny-jar analogy.** Integer minor units are like counting a jar of physical coins: there is no such thing as &quot;0.7 of a penny&quot; in the jar, so you can never lose or invent a fraction — every count is exact and repeatable. Floating-point money is like estimating the jar&#x27;s value by weighing it: fast, *approximately* right, and guaranteed to disagree with an actual coin count by a little. For money you always do the coin count, never the weigh-in.
+
+## The Double-Entry Ledger
+
+Stripe&#x27;s source of truth for money is an **immutable, append-only, double-entry ledger** — the same model invented for accounting centuries ago, because it is *self-checking*. Every monetary event records balanced **debits** and **credits** across accounts, and the system maintains one inviolable invariant:
+
+&gt; **For every transaction, the sum of debits equals the sum of credits. The whole ledger always nets to zero.**
+
+&gt; [!TIP]
+&gt; **The checkbook analogy.** Double-entry bookkeeping is like keeping a checkbook where **every entry must balance or you know you made a mistake.** When you write a check, you don&#x27;t just scribble &quot;money left&quot; — you record where it came *from* and where it went *to*, and the two sides must agree. If you sit down to balance the checkbook against the bank statement and the numbers don&#x27;t line up, that disagreement is itself the alarm: it tells you, precisely, that an entry is wrong *somewhere*, before the error can compound. The genius of the centuries-old technique is that it&#x27;s **self-checking** — correctness isn&#x27;t something you hope for, it&#x27;s something the structure forces. A single-entry system (just a running balance you increment and decrement) has no such alarm: if you fat-finger a number, nothing complains, and the error silently lives in your balance forever. The whole reason payment systems use double-entry is to get that built-in alarm on every single money movement.
+
+If a bug ever posts an unbalanced entry, the invariant breaks loudly and immediately — you cannot silently lose or conjure money. Consider a $20.00 charge with a $0.59 + 2.9% fee:
+
+```mermaid
+flowchart LR
+  subgraph T[&quot;Transaction: charge ch_1 ($20.00, fee $1.17)&quot;]
+    direction TB
+    D1[&quot;DEBIT  Customer/Card  $20.00&lt;br/&gt;(money comes in)&quot;]
+    C1[&quot;CREDIT Stripe Fee     $1.17&quot;]
+    C2[&quot;CREDIT Merchant Net   $18.83&quot;]
+  end
+  D1 --- Inv{{&quot;invariant:&lt;br/&gt;debits 20.00 == credits 1.17 + 18.83&quot;}}
+  C1 --- Inv
+  C2 --- Inv
+```
+
+The two properties that make this powerful:
+
+- **Immutability / append-only.** You never `UPDATE` or `DELETE` a posted entry. A correction is a *new* compensating entry (a reversal), so the full history is preserved. This is what gives you **auditability** — you can replay the ledger from the beginning to reconstruct any balance at any point in time, and an auditor can verify nothing was tampered with.
+- **Double-entry.** Because every movement touches at least two accounts and must balance, the ledger is *internally consistent by construction*. This is precisely what makes **reconciliation** tractable: you can sum an account&#x27;s entries and compare to external truth.
+
+A balance is therefore never a stored mutable number you increment (that would be lossy and race-prone). It is a **derived value**: `balance(account) = Σ credits − Σ debits` over the immutable entries. In practice high-volume ledgers keep periodic *snapshots/checkpoints* so you don&#x27;t re-sum all of history on every read, but the snapshot is always reproducible from the entries.
+
+&gt; [!TIP]
+&gt; This connects directly to **event sourcing**: the ledger *is* an event log, and the balance is a projection. The same discipline — never mutate history, derive state by folding events — gives you time-travel debugging, audit trails, and correctness-by-replay for free.
+
+### A Worked Double-Entry Posting (With Numbers)
+
+Diagrams are abstract; let&#x27;s post a real charge and a real refund as concrete table rows so you can see the invariant hold and the balance get *derived* rather than stored. We model three internal accounts: `cash` (money Stripe is holding), `stripe_fee` (Stripe&#x27;s revenue), and `merchant_payable` (what Stripe owes the merchant). A customer pays **$20.00**; Stripe&#x27;s fee is **$1.17**; the merchant is owed the **$18.83** remainder.
+
+**Transaction `txn_A` — capture a $20.00 charge:**
+
+| entry | txn_id | account | direction | amount_minor | running meaning |
+| --- | --- | --- | --- | --- |
+| 1 | `txn_A` | `cash` | **D** (debit) | `2000` | Stripe now holds $20.00 in cash |
+| 2 | `txn_A` | `stripe_fee` | **C** (credit) | `117` | Stripe earned $1.17 in fees |
+| 3 | `txn_A` | `merchant_payable` | **C** (credit) | `1883` | Stripe owes the merchant $18.83 |
+
+Check the invariant: debits `= 2000`; credits `= 117 + 1883 = 2000`. **Balanced.** ✅ Notice every number is an integer count of cents — no float anywhere.
+
+Now the merchant balance is *derived*, not stored. Using the convention &quot;credits add, debits subtract&quot; for a payable (liability) account:
+
+```text
+balance(merchant_payable) = Σ credits − Σ debits
+                          = 1883 − 0
+                          = 1883  → $18.83 owed to the merchant
+```
+
+**Transaction `txn_B` — the customer requests a full refund.** We do **not** edit or delete `txn_A`. We post a *new, compensating* transaction that reverses the money movement. (Assume the fee is returned too, for simplicity.)
+
+| entry | txn_id | account | direction | amount_minor | running meaning |
+| --- | --- | --- | --- | --- |
+| 4 | `txn_B` | `cash` | **C** (credit) | `2000` | $20.00 leaves Stripe&#x27;s cash (back to the customer) |
+| 5 | `txn_B` | `stripe_fee` | **D** (debit) | `117` | the $1.17 fee is reversed |
+| 6 | `txn_B` | `merchant_payable` | **D** (debit) | `1883` | Stripe no longer owes the merchant the $18.83 |
+
+Invariant for `txn_B`: credits `= 2000`; debits `= 117 + 1883 = 2000`. **Balanced.** ✅ Re-derive the merchant balance over *all* entries:
+
+```text
+balance(merchant_payable) = Σ credits − Σ debits
+                          = 1883 − 1883
+                          = 0   → the merchant is owed nothing; fully refunded
+```
+
+The full history is intact: an auditor can see exactly that a charge happened *and then* a refund happened. Nothing was overwritten. This is the entire ledger philosophy in six rows — **append a balanced set, never mutate, derive the balance.**
+
+```mermaid
+flowchart TB
+  subgraph A[&quot;txn_A: capture $20.00&quot;]
+    direction LR
+    A1[&quot;D cash 2000&quot;]
+    A2[&quot;C stripe_fee 117&quot;]
+    A3[&quot;C merchant_payable 1883&quot;]
+  end
+  subgraph B[&quot;txn_B: refund (compensating)&quot;]
+    direction LR
+    B1[&quot;C cash 2000&quot;]
+    B2[&quot;D stripe_fee 117&quot;]
+    B3[&quot;D merchant_payable 1883&quot;]
+  end
+  A --&gt; Bal[&quot;derive: merchant_payable&lt;br/&gt;= 1883 (after A)&lt;br/&gt;= 0 (after B)&quot;]
+  B --&gt; Bal
+```
+
+&gt; [!NOTE]
+&gt; **In Practice — why a refund is a new transaction, not an `UPDATE`.** A junior instinct is to &quot;undo&quot; the charge by flipping its status column to `refunded` or deleting the rows. That destroys the audit trail and, worse, makes concurrent reads race-prone and historical reports wrong. The mature move — and the one every real ledger uses — is to leave the original entries frozen and post a *compensating* transaction that nets them out. The balance falls to zero not because you erased the charge, but because the refund offsets it. Same reason accountants never erase ink: they draw a new line.
+
+## Foreign State Machines &amp; Reconciliation
+
+A charge is not instantaneous and Stripe does not own the money&#x27;s whole journey. A card charge moves through a **lifecycle (a state machine)**, and part of that state lives at **external processors and banks Stripe cannot control or directly transact with.** Stripe must *track* foreign state it can only observe asynchronously.
+
+```mermaid
+stateDiagram-v2
+  [*] --&gt; Pending: charge created
+  Pending --&gt; Authorized: bank authorizes hold
+  Authorized --&gt; Succeeded: captured / settled
+  Authorized --&gt; Failed: declined / expired
+  Pending --&gt; Failed: declined
+  Succeeded --&gt; Refunded: refund issued
+  Succeeded --&gt; Disputed: chargeback raised
+  Disputed --&gt; Refunded: dispute lost
+  Disputed --&gt; Succeeded: dispute won
+  Failed --&gt; [*]
+  Refunded --&gt; [*]
+  Succeeded --&gt; [*]
+```
+
+The hard part: the transition from `Authorized` to `Succeeded` (settlement) and events like `Disputed` (chargebacks, which can arrive **weeks later**) are driven by the bank, not by Stripe. Stripe&#x27;s internal record is a *belief* about external reality that can drift. Closing that gap is the job of the **reconciliation loop**: a continuous, idempotent batch process that compares Stripe&#x27;s ledger against the authoritative external records (bank settlement files, processor reports) and flags or auto-corrects any divergence.
+
+```mermaid
+flowchart LR
+  Internal[&quot;Internal ledger&lt;br/&gt;(what Stripe believes)&quot;] --&gt; Diff{&quot;Compare&lt;br/&gt;line by line&quot;}
+  External[&quot;Bank / processor&lt;br/&gt;settlement files&lt;br/&gt;(external truth)&quot;] --&gt; Diff
+  Diff --&gt;|&quot;match&quot;| OK[&quot;✓ reconciled&quot;]
+  Diff --&gt;|&quot;mismatch&quot;| Action[&quot;Post compensating entry,&lt;br/&gt;open exception, or alert&lt;br/&gt;(no destructive edits)&quot;]
+  Action --&gt; Internal
+  loop[&quot;runs continuously / on each settlement batch&quot;] -.-&gt; Diff
+```
+
+Notice the design choices echo earlier sections: corrections are **compensating entries** (append-only, never destructive), and the loop is **idempotent** so re-running it over the same settlement file is safe. Because 2PC across a bank is impossible (you can&#x27;t hold a lock inside someone else&#x27;s bank — see [distributed transactions, 2PC and saga](../C02-distributed-systems-and-system-design/T06-distributed-transactions-2pc-saga.md)), reconciliation is the *eventually-consistent* substitute: detect divergence after the fact and converge via compensation. This is a saga-shaped pattern: forward steps plus compensating actions, with the ledger recording every step.
+
+&gt; [!TIP]
+&gt; **The two-friends-splitting-a-bill analogy.** Reconciliation is what happens when two friends each keep their own running tally of who owes whom after a weekend trip. Neither tally is automatically authoritative; they only find out they disagree when they sit down at the end and compare line by line — &quot;wait, I have you paying for dinner Friday, but you don&#x27;t.&quot; The *act of comparing* is what surfaces the discrepancy, and then they resolve it with a single corrective payment rather than tearing up the whole weekend&#x27;s records. Stripe and the bank are those two friends, the settlement file is the bank&#x27;s tally, the ledger is Stripe&#x27;s, and the reconciliation loop is the sit-down. The crucial discipline: when they disagree, you **add a correcting entry**, you don&#x27;t rewrite history to pretend the disagreement never happened.
+
+&gt; [!WARNING]
+&gt; **War story: when the processor and your ledger disagree.** Here&#x27;s a divergence that actually happens. Stripe authorizes a charge and records it as `Succeeded` in its ledger — its *belief* is &quot;this $50 settled.&quot; But at the bank, the cardholder&#x27;s account had insufficient funds at settlement time, so the bank silently *reverses* it in the nightly settlement file. Now the two records disagree: Stripe&#x27;s ledger says `+$50`, the bank&#x27;s file says `$0`. Nobody threw an exception; no API call failed; the disagreement is pure data drift discovered hours later. The reconciliation loop reads the settlement file, compares it line-by-line to the ledger, and finds the mismatch. Its response is *not* to silently flip the original entry — it posts a **compensating** transaction (a reversal) that brings the ledger back into agreement with the bank, and opens an exception ticket so a human can see what happened. The merchant, who was *not* told the money had settled (because the system exposes the honest state machine, not the optimistic belief), is never paid out for a charge that didn&#x27;t really clear. This is the entire reason the loop exists: **your database&#x27;s belief about money held at a bank is a hypothesis, and reconciliation is the experiment that confirms or refutes it — continuously, idempotently, and non-destructively.**
+
+&gt; [!WARNING]
+&gt; &quot;Eventually consistent with external reality&quot; means **your database can be temporarily wrong** and you must design for it: never tell a merchant money has *settled* based only on your internal `pending` belief; expose the state machine honestly; and make every step reversible via compensation rather than in-place edits.
+
+## API Longevity: Never Break The Contract
+
+Stripe is famous for an extreme commitment: **old API integrations keep working for years, untouched.** A merchant who integrated in 2015 can, in principle, still run that exact code. This is not laziness about deprecation — it is a deliberate strategy that *decouples the internal model from the external contract.*
+
+&gt; [!TIP]
+&gt; **The wall-sockets analogy.** Date-based API versioning is like **keeping the old wall sockets working so you never have to rewire every customer&#x27;s house.** When a country introduces a new electrical standard, it does *not* march into every home and rip out the existing outlets — that would break every appliance everyone owns, all at once. Instead the old sockets keep delivering power exactly as they always did, while new construction uses the new standard, and homeowners upgrade on *their* schedule, if ever. Stripe&#x27;s API is the wall socket and merchants&#x27; integrations are the appliances plugged into it. Stripe is free to renovate everything *behind the wall* — rewire the whole house&#x27;s internals — as long as the socket on the surface keeps delivering the same shape of response to the appliance that was built against it. The merchant who &quot;plugged in&quot; in 2015 never has to touch their wiring; their code keeps getting power. That promise — *we change our internals, never your socket* — is the whole product strategy in one image.
+
+The mechanism is **date-based API versioning pinned per account.** Versions look like `2020-08-27`. When an account first makes a request, it is **pinned** to the then-current version; that pin is sticky. Stripe can evolve its internal data model freely, ship new versions with breaking changes, and *every old account keeps receiving responses shaped exactly as its pinned version expects* — until the merchant explicitly upgrades.
+
+How does one codebase serve dozens of historical contracts without drowning in `if (version &lt; X)` branches everywhere? Through a **chain of versioned transformation shims**:
+
+```mermaid
+flowchart LR
+  Req[&quot;Incoming request&lt;br/&gt;(account pinned to 2018-05-21)&quot;] --&gt; UpIn[&quot;Upgrade shims:&lt;br/&gt;2018 → 2019 → ... → current&quot;]
+  UpIn --&gt; Core[&quot;Core logic runs ONCE&lt;br/&gt;against the current internal model&quot;]
+  Core --&gt; Ledger[&quot;Ledger / money movement&quot;]
+  Core --&gt; DownOut[&quot;Downgrade shims:&lt;br/&gt;current → ... → 2019 → 2018&quot;]
+  DownOut --&gt; Resp[&quot;Response shaped as&lt;br/&gt;2018-05-21 expects&quot;]
+  classDef hot fill:#dfe,stroke:#363;
+  class Core hot;
+```
+
+The key ideas:
+
+1. **One internal representation.** Core business logic is written *once* against the latest model. It does not know or care which API version the caller uses.
+2. **Upgrade on the way in, downgrade on the way out.** A request arriving in an old shape is passed through a *chain* of small, independent **version-change** transformations, each of which knows how to convert *one* version forward to the next. The output is downgraded back through the inverse chain.
+3. **Each version change is a tiny, isolated, well-tested unit.** Adding a new version means writing one more forward/backward transformer, not editing the core. Old transformers, once written, almost never change — which is exactly why decade-old integrations keep working.
+
+The transferable lesson — and one of the highest-leverage ideas in this whole book — is:
+
+&gt; [!IMPORTANT]
+&gt; **Decouple your internal model from your external contract.** Your database schema, domain objects, and service internals should be free to evolve. The public API is a *stable projection* of them, maintained by an explicit translation layer. Never let an internal refactor leak into a breaking API change. Additive changes (new optional fields) are safe; removals and renames are not — version them instead.
+
+&gt; [!WARNING]
+&gt; **War story: the rename that would have broken thousands of integrations.** A team decided to rename a field in their JSON response from `card` to `payment_method` because the company now supported bank transfers and wallets, not just cards, and `card` was misleading. Internally this was the *right* model change. Shipped naively, it would have been a catastrophe: every merchant whose code read `response.card.last4` would suddenly read `undefined`, and checkout pages across thousands of integrations would break the moment the deploy went out — with no warning, because the merchants did nothing wrong. The team caught it in review and instead shipped it as a **new API version** with a `downgrade` shim: clients pinned to old versions keep seeing the field as `card`, clients on the new version see `payment_method`, and the internal model uses the new name everywhere. *Zero* integrations broke. The renovation happened behind the wall; every old socket kept delivering `card`. This is the difference between a versioned platform and a fragile one: in a fragile API, &quot;we improved our internal naming&quot; silently becomes &quot;we broke your checkout&quot;; in a versioned one, the two events are completely decoupled.
+
+&gt; [!NOTE]
+&gt; **In Practice — additive is free, breaking is expensive.** A practical rule you can apply today, even without Stripe&#x27;s full version-chain machinery: **adding a new optional field is always safe** — old clients ignore what they don&#x27;t read. **Removing or renaming a field, or changing its type or meaning, is a breaking change** — old clients will misread or crash. So evolve by *adding* whenever you can (introduce `payment_method` alongside `card`, keep both populated for a deprecation window), and only when you genuinely must remove the old shape do you reach for per-version transformation. Most &quot;API changes&quot; turn out to be additive if you&#x27;re disciplined, which is why most teams never need the full shim chain — but knowing the pattern exists is what lets you promise longevity when you *do* need it.
+
+## Reliability Culture (Briefly)
+
+None of the above survives contact with reality without an engineering culture to match. Stripe&#x27;s practices reinforce the architecture: **heavy automated testing** (so refactors of the internal model don&#x27;t break old API versions), **rigorous code review** for money-touching code, and a systemic insistence that **everything be safe to retry** — which is only possible *because* idempotency and append-only ledgers are baked in at the foundation. The culture and the architecture are the same decision viewed from two angles: correctness is a property you design in, not a thing you test in afterward.
+
+## Java / Spring: How To Build This Yourself
+
+These patterns are not Stripe-exclusive. Here is how a Java backend engineer implements each one.
+
+### 1. An Idempotency Filter / Interceptor
+
+Read the `Idempotency-Key` header, look it up in a fast store (Redis or a DB table with a `UNIQUE` constraint), and either replay the stored response or proceed and store it. A `HandlerInterceptor` (or servlet `Filter`) is the natural seam:
+
+```java
+@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+
+  private final IdempotencyStore store;   // backed by Redis or JDBC
+
+  @Override
+  public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler)
+      throws Exception {
+    if (!&quot;POST&quot;.equals(req.getMethod())) return true;          // only guard mutations
+    String key = req.getHeader(&quot;Idempotency-Key&quot;);
+    if (key == null) return true;                              // or reject, per policy
+
+    String fingerprint = sha256(req.getRequestURI() + &quot;|&quot; + cachedBody(req));
+    var existing = store.lookup(accountId(req), key);
+
+    if (existing != null) {
+      if (!existing.fingerprint().equals(fingerprint)) {       // rule 2: same key, diff params
+        res.sendError(422, &quot;Idempotency-Key reused with different parameters&quot;);
+        return false;
+      }
+      replay(res, existing.savedResponse());                  // rule 1: return stored response
+      return false;                                            // short-circuit the handler
+    }
+    // rule 3: claim the key atomically; loser of the race gets 409
+    if (!store.tryClaim(accountId(req), key, fingerprint)) {
+      res.sendError(409, &quot;A request with this Idempotency-Key is already in progress&quot;);
+      return false;
+    }
+    return true;   // proceed; afterCompletion stores the response under this key
+  }
+  // ... afterCompletion(...) persists (status, body) and releases the lock ...
+}
+```
+
+The atomic claim is the crux. With Redis, use `SET key value NX EX 86400` (set-if-absent with a 24h TTL). With a relational DB, lean on a `UNIQUE` constraint:
+
+```sql
+CREATE TABLE idempotency_key (
+  account_id     BIGINT       NOT NULL,
+  idem_key       VARCHAR(255) NOT NULL,
+  fingerprint    CHAR(64)     NOT NULL,
+  response_code  INT,
+  response_body  TEXT,
+  status         VARCHAR(16)  NOT NULL DEFAULT &#x27;IN_PROGRESS&#x27;,
+  created_at     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  PRIMARY KEY (account_id, idem_key)        -- INSERT fails for a concurrent duplicate
+);
+-- a background job (or a WHERE created_at &gt; now() - 24h read) enforces the TTL
+```
+
+The first `INSERT` wins; the concurrent duplicate gets a constraint violation, which the code maps to &quot;in progress.&quot; This is the database doing your concurrency control for free.
+
+The `preHandle` above only does half the job — it *claims* the key. The other half is **storing the response after the handler runs** so future retries can replay it. That&#x27;s `afterCompletion`, plus the small store contract both halves share. Here is the fuller picture, end to end:
+
+```java
+@Component
+public class IdempotencyInterceptor implements HandlerInterceptor {
+
+  private final IdempotencyStore store;
+
+  // ... preHandle from above: claim key, replay stored response, or 409 ...
+
+  @Override
+  public void afterCompletion(HttpServletRequest req, HttpServletResponse res,
+                              Object handler, Exception ex) {
+    if (!&quot;POST&quot;.equals(req.getMethod())) return;
+    String key = req.getHeader(&quot;Idempotency-Key&quot;);
+    if (key == null) return;
+
+    int status = res.getStatus();
+    if (ex != null || status &gt;= 500) {
+      // transient server error: RELEASE the claim so the client&#x27;s retry can try again.
+      // (Do NOT store a 500 — a retry should get a real attempt, not a cached failure.)
+      store.release(accountId(req), key);
+      return;
+    }
+    // success (or a deterministic 4xx): freeze the response so retries replay it verbatim.
+    store.complete(accountId(req), key, status, capturedBody(res));
+  }
+}
+
+/** The store contract both halves rely on. */
+interface IdempotencyStore {
+  /** Atomically claim the key. Returns false if someone else already holds it. */
+  boolean tryClaim(long accountId, String key, String fingerprint);
+  /** Look up a prior record (fingerprint + saved response), or null if unseen. */
+  Record lookup(long accountId, String key);
+  /** Persist the final (status, body) under the key and mark it COMPLETED. */
+  void complete(long accountId, String key, int status, byte[] body);
+  /** Release an IN_PROGRESS claim so a retry can re-attempt (used on transient failure). */
+  void release(long accountId, String key);
+
+  record Record(String fingerprint, Integer status, byte[] body, Status state) {}
+  enum Status { IN_PROGRESS, COMPLETED }
+}
+```
+
+Two production-grade subtleties this fuller version surfaces:
+
+1. **Don&#x27;t cache transient failures.** If the handler blew up with a 500 or threw, you must *release* the claim (or mark it failed), not store the error. Otherwise the client&#x27;s perfectly valid retry would replay a stale 500 forever. Only freeze *deterministic* outcomes — successes, and 4xx errors that will happen identically on retry (like &quot;amount must be positive&quot;).
+2. **Capturing the response body** requires wrapping the response in a `ContentCachingResponseWrapper` (Spring provides one) so you can read the bytes the handler wrote *and* still flush them to the client. The same trick (`ContentCachingRequestWrapper`) lets `preHandle` read the request body for the fingerprint without consuming the stream the handler needs.
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant I as IdempotencyInterceptor
+  participant DB as Idempotency store
+  participant H as Charge handler
+
+  C-&gt;&gt;I: POST /charges (Key=K)
+  I-&gt;&gt;DB: lookup(K)
+  alt key already COMPLETED
+    DB--&gt;&gt;I: saved (200, ch_1)
+    I--&gt;&gt;C: 200 (ch_1)   [replay, handler skipped]
+  else key IN_PROGRESS (concurrent)
+    DB--&gt;&gt;I: locked by someone else
+    I--&gt;&gt;C: 409 in progress
+  else new key
+    DB--&gt;&gt;I: not found
+    I-&gt;&gt;DB: tryClaim(K, fingerprint)
+    DB--&gt;&gt;I: claimed
+    I-&gt;&gt;H: preHandle returns true → run handler
+    H--&gt;&gt;I: 200 (ch_1)
+    I-&gt;&gt;DB: complete(K, 200, body)   [afterCompletion]
+    I--&gt;&gt;C: 200 (ch_1)
+  end
+```
+
+This is the same three-rule machine from the conceptual section — replay on match, 409 on concurrent duplicate, execute-then-store on a fresh key — now wired through Spring&#x27;s interceptor lifecycle.
+
+### 2. Money As `long` Minor Units (or `BigDecimal`)
+
+Make illegal states unrepresentable with a small value type, and never expose a raw `double` for money anywhere in the codebase:
+
+```java
+public record Money(long minorUnits, Currency currency) {
+  public Money plus(Money other) {
+    if (!currency.equals(other.currency))
+      throw new IllegalArgumentException(&quot;currency mismatch&quot;);
+    return new Money(Math.addExact(minorUnits, other.minorUnits), currency);  // overflow-checked
+  }
+  public static Money usd(long cents) { return new Money(cents, Currency.getInstance(&quot;USD&quot;)); }
+}
+```
+
+Persist it as a `BIGINT` column (`amount_minor`) plus a `currency` column — never a `FLOAT`/`DOUBLE`. Reserve `BigDecimal` (with an explicit `RoundingMode`) for tax, interest, and FX conversion.
+
+A fuller `Money` type guards more illegal states and shows exactly where `BigDecimal` is and isn&#x27;t appropriate:
+
+```java
+public record Money(long minorUnits, Currency currency) {
+
+  public Money {                                   // compact constructor: validate on creation
+    Objects.requireNonNull(currency, &quot;currency&quot;);
+  }
+
+  public Money plus(Money o)  { requireSameCurrency(o); return new Money(Math.addExact(minorUnits, o.minorUnits), currency); }
+  public Money minus(Money o) { requireSameCurrency(o); return new Money(Math.subtractExact(minorUnits, o.minorUnits), currency); }
+
+  /** Percentage math (tax, fee). HERE BigDecimal is correct — we need a fractional rate. */
+  public Money percentage(BigDecimal rate, RoundingMode rounding) {
+    BigDecimal result = BigDecimal.valueOf(minorUnits)
+                                  .multiply(rate)
+                                  .setScale(0, rounding);     // back to whole minor units
+    return new Money(result.longValueExact(), currency);
+  }
+
+  private void requireSameCurrency(Money o) {
+    if (!currency.equals(o.currency))
+      throw new IllegalArgumentException(&quot;currency mismatch: &quot; + currency + &quot; vs &quot; + o.currency);
+  }
+
+  public static Money usd(long cents) { return new Money(cents, Currency.getInstance(&quot;USD&quot;)); }
+}
+```
+
+&gt; [!WARNING]
+&gt; **The `BigDecimal` pitfalls, collected.** When you *do* reach for `BigDecimal`, four traps bite repeatedly: **(1)** `new BigDecimal(0.1)` (the `double` constructor) copies binary imprecision — always pass a `String`: `new BigDecimal(&quot;0.1&quot;)`, or `BigDecimal.valueOf(longOrDouble)` which routes through `Double.toString`. **(2)** `equals` is scale-sensitive — `new BigDecimal(&quot;2.0&quot;).equals(new BigDecimal(&quot;2.00&quot;))` is `false`; use `compareTo(...) == 0` for value equality, and beware that this also breaks `HashSet`/`HashMap` membership. **(3)** `divide` with a non-terminating result (e.g. `1/3`) throws `ArithmeticException` unless you supply a scale and `RoundingMode` — *always* pass both. **(4)** Rounding is a *business* decision, not a default: pick `RoundingMode.HALF_EVEN` (&quot;banker&#x27;s rounding,&quot; which avoids the upward bias of `HALF_UP` over many operations) unless a regulation says otherwise, and apply it explicitly with `setScale`. The meta-lesson: `BigDecimal` is *exact* but *fussy*; it removes the float-imprecision class of bug only if you use the `String`/`valueOf` constructors and never let a rounding mode default.
+
+&gt; [!TIP]
+&gt; **In Practice — the `long` cents vs. `BigDecimal` decision.** Default to **`long` minor units** for stored amounts and additive money movement (charges, fees, balances) — it&#x27;s exact, compact (8 bytes), overflow-checkable with `Math.addExact`, and trivially indexable in the database. Switch to **`BigDecimal`** only at the moments you genuinely do fractional arithmetic — applying a tax rate, computing interest, converting currencies at an FX rate — and the instant you&#x27;re done, round back to whole minor units and store the `long`. In other words: `long` for *holding and moving* money, `BigDecimal` for the brief *calculation* that produces a new whole-cent amount. Never let a `double` near any of it.
+
+### 3. An Append-Only Ledger Table
+
+Model entries, not balances. Each transaction inserts a *balanced set* of rows in one DB transaction:
+
+```sql
+CREATE TABLE ledger_entry (
+  id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  txn_id       UUID         NOT NULL,        -- groups the balanced set
+  account      VARCHAR(64)  NOT NULL,        -- e.g. &#x27;merchant_net&#x27;, &#x27;stripe_fee&#x27;
+  direction    CHAR(1)      NOT NULL CHECK (direction IN (&#x27;D&#x27;,&#x27;C&#x27;)),  -- Debit / Credit
+  amount_minor BIGINT       NOT NULL CHECK (amount_minor &gt; 0),
+  currency     CHAR(3)      NOT NULL,
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT now()
+  -- NO update/delete: corrections are new compensating txns
+);
+```
+
+Enforce the invariant before commit (in app code or a deferred constraint): `Σ(debits) == Σ(credits)` for each `txn_id`. Compute balances with a query (`SUM(CASE WHEN direction=&#x27;C&#x27; THEN amount_minor ELSE -amount_minor END)`), optionally snapshotting periodically. Revoke `UPDATE`/`DELETE` on the table at the DB-grant level so immutability is enforced by the database, not by convention.
+
+### 4. An API-Versioning Transformation Layer
+
+Pin each client to a version, keep core logic version-agnostic, and chain small transformers:
+
+```java
+interface VersionChange {
+  ApiVersion from();                         // e.g. 2019_10_17
+  ApiVersion to();                           // e.g. 2020_03_02
+  ObjectNode upgrade(ObjectNode req);        // forward: old shape -&gt; newer shape
+  ObjectNode downgrade(ObjectNode res);      // backward: newer shape -&gt; old shape
+}
+
+ObjectNode handle(ApiVersion clientVersion, ObjectNode rawRequest) {
+  ObjectNode req = rawRequest;
+  for (var change : changesFrom(clientVersion))   // upgrade IN, in order
+      req = change.upgrade(req);
+  ObjectNode res = core.process(req);             // core runs once, current model only
+  for (var change : reversed(changesFrom(clientVersion)))  // downgrade OUT, reverse order
+      res = change.downgrade(res);
+  return res;                                     // shaped exactly as the client expects
+}
+```
+
+Each `VersionChange` is independently unit-tested and, once shipped, frozen. Adding a version means appending one transformer — never touching `core`.
+
+&gt; [!INTERVIEW]
+&gt; **&quot;A client calls your payment endpoint, gets a timeout, and retries. How do you guarantee they aren&#x27;t charged twice?&quot;** Strong answer: require a client-generated `Idempotency-Key` header. On the server, atomically claim the key (Redis `SET NX` or a DB `UNIQUE`-constrained insert) *before* doing the side effect; store the response keyed by it. A retry with the same key returns the stored response without re-executing; a concurrent duplicate loses the race and gets a 409. Add a request **fingerprint** so the *same key with different params* is rejected rather than silently returning a stale result, and a ~24h TTL. Then make the senior point: you cannot get exactly-once *delivery* over a network — you get at-least-once delivery + idempotent processing = effectively-once. Bonus depth: store money as integer minor units, record the charge in an append-only double-entry ledger so the operation is auditable and reconcilable, and note that the external bank settlement is reconciled asynchronously because you can&#x27;t 2PC across a bank.
+
+## Practice
+
+1. **Trace the ambiguity.** In one paragraph, explain why a client that receives a network timeout on `POST /charges` *cannot* know whether the charge succeeded, and why this makes server-side idempotency mandatory rather than a client-only retry-with-backoff.
+2. **Implement the race.** Write an idempotency store backed by Redis `SET key val NX EX 86400`. Fire two threads with the same key simultaneously and assert that exactly one executes the side effect and the other receives the first one&#x27;s stored response (or a 409).
+3. **Break the float.** In a JUnit test, sum `0.10` a thousand times as a `double` and assert it is *not* exactly `100.00`; then redo it with `long` cents and `BigDecimal(&quot;0.10&quot;)` and assert exactness. Explain why `new BigDecimal(0.1)` (double ctor) still fails.
+4. **Build the ledger.** Create the `ledger_entry` table, post a `$20.00` charge as a balanced debit/credit set (net + fee), and write a query that derives the merchant balance. Then issue a refund as a *compensating* transaction (no `UPDATE`) and re-derive the balance.
+5. **Version a field.** You renamed `card` to `payment_method` internally. Write a `VersionChange` whose `downgrade` re-emits the old `card` field for clients pinned to the older version, and a unit test proving an old client&#x27;s response is unchanged.
+6. **Reconciliation drill.** Sketch (in pseudocode) an idempotent reconciliation loop that reads a settlement file, compares each line to the ledger, and posts a compensating entry on mismatch — and argue why re-running it on the same file is safe.
+7. **Choose the store.** For each operation, decide whether you&#x27;d dedup with Redis `SET NX` or a DB `UNIQUE` constraint, and justify in one sentence: (a) posting a ledger entry you control, (b) calling an external SMS provider, (c) a 50k-requests/second &quot;mark notification read&quot; endpoint. Tie each answer back to durability and same-transaction atomicity.
+8. **Classify the operations.** Label each as *needs an idempotency key* or *naturally idempotent*: `POST /charges`, `PUT /users/42 {name}`, `POST /emails/order-shipped`, `GET /balance`, `POST /orders`, &quot;set account status to `closed`.&quot; For the ones that need a key, say whether a random UUID or a natural business identifier is the better key.
+9. **Round like a bank.** Compute 8.25% tax on `$19.99` two ways — once with `RoundingMode.HALF_UP` and once with `HALF_EVEN` — across a list of prices, and show a case where the two disagree by a cent. Explain why `HALF_EVEN` is the safer default for high-volume money math.
+10. **Refund without `UPDATE`.** Take the worked `txn_A`/`txn_B` posting from the ledger section, implement it as real `INSERT`s, and write the single `SUM(CASE ...)` query that derives `merchant_payable`. Confirm it reads `1883` after `txn_A` and `0` after `txn_B` — without ever mutating a row.
+11. **Avoid the breaking rename.** You must rename `card` to `payment_method` in your responses. Write the additive-first migration plan (introduce the new field, dual-write for a deprecation window, version the removal) and contrast it with the naive &quot;just rename it&quot; deploy, naming exactly what breaks for old clients and when.
+
+## Recap
+
+- **Correctness is existential at Stripe** because the data *is* money; the architecture optimizes for correctness over speed, with unreliable edges on both sides (the network to merchants, the banks behind settlement).
+- **Idempotency keys** make mutating requests safe to retry: client-generated key → server stores fingerprint + locked status + saved response, ~24h TTL; same key+params replays the response, same key+different params errors, concurrent duplicates are serialized by a lock / `UNIQUE` constraint.
+- **Exactly-once delivery is impossible**; Stripe uses **at-least-once delivery + idempotent processing = effectively-once**.
+- **Money is integer minor units** (or `BigDecimal` with explicit rounding), **never `double`**, because binary floats can&#x27;t represent decimal fractions exactly.
+- **An immutable, append-only double-entry ledger** keeps debits == credits as an always-checkable invariant, gives auditability, derives balances rather than mutating them, and makes reconciliation possible.
+- **Foreign state machines + reconciliation** track money held at external banks Stripe can&#x27;t control; corrections are compensating entries, the loop is idempotent, and convergence is eventual because 2PC across a bank is impossible.
+- **API longevity** comes from per-account, date-based version pinning plus a chain of upgrade/downgrade transformation shims around version-agnostic core logic — the embodiment of *decouple the internal model from the external contract.*
+- **In Java/Spring:** a `HandlerInterceptor`/`Filter` + Redis `SET NX` or a `UNIQUE`-constrained table for idempotency; a `Money` value type over `long` minor units; an append-only `ledger_entry` table with debit/credit balancing; and a `VersionChange` chain for API versioning.
+- **Mental models to keep:** an idempotency key is a **coat-check ticket** (same ticket → one coat, never two); double-entry bookkeeping is a **self-checking checkbook** (entries must balance or you know you erred); integer cents are a **penny jar** (exact count, no fractions to lose); reconciliation is **two friends comparing tallies** and settling the difference; and date-based API versioning is **keeping the old wall sockets live** so you never rewire every customer&#x27;s house.
+- **When idempotency is required vs. not:** required for any *counter-style* retried mutation with a real side effect — charges, emails/SMS, order/booking/resource creation, inventory or credit decrements; usually unnecessary for reads and *assignment-style* writes (`PUT name=X`, set-a-flag) that converge on retry. For money, when in doubt, add the key.
+- **Choosing the dedup store:** prefer a **DB `UNIQUE` constraint** when the side effect is a DB write you control, because the key and the side effect can commit in **one atomic transaction**; reach for **Redis `SET NX`** for extreme throughput, external side effects, or huge short-lived keyspaces — many systems use Redis as a fast guard *plus* a DB constraint as the durable backstop.
+- **The war stories distilled:** a missing idempotency key double-charges a customer whose mobile client retried a timed-out POST; `double` money silently drifts (`0.1 + 0.2 != 0.3`) until reconciliation surfaces thousands of penny mismatches weeks later; a bank reversal makes the processor and your ledger disagree, caught by the reconciliation loop and fixed with a compensating entry; and a naive `card` → `payment_method` rename would break thousands of integrations unless shipped as a new, downgrade-shimmed API version.
+- **Additive-first API evolution:** adding a new optional field is always safe (old clients ignore it); removing/renaming/retyping a field is breaking — dual-write through a deprecation window and version the removal. Most &quot;API changes&quot; are additive if you&#x27;re disciplined, so most teams rarely need the full transformation chain — but knowing it exists is what lets you promise decade-long longevity.
+
+## Next
+
+Continue to [Discord — Storage Evolution (Cassandra to ScyllaDB)](./T03-discord-storage-evolution-cassandra-scylladb.md), where the existential constraint shifts from *correctness* to *scale*: how Discord migrated trillions of messages across storage engines without downtime, and the data-modeling and operational lessons that transfer to any high-volume Java backend.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><div class="lbl">← Previous</div><div class="ttl">T01-netflix-resilience-and-microservices</div><div class="sub">Netflix — Resilience &amp; Microservices at Scale</div></a><a class="next" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><div class="lbl">Next →</div><div class="ttl">T03-discord-storage-evolution-cassandra-scylladb</div><div class="sub">Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#context-why-correctness-is-the-product" data-toc-link>Context: Why Correctness Is The Product</a></li><li class="lvl-2"><a href="#idempotency-keys-the-signature-pattern" data-toc-link>Idempotency Keys: The Signature Pattern</a></li><li class="lvl-3"><a href="#the-mechanism-in-detail" data-toc-link>The Mechanism In Detail</a></li><li class="lvl-3"><a href="#when-you-need-idempotency-and-when-you-dont" data-toc-link>When You Need Idempotency (And When You Don&#x27;t)</a></li><li class="lvl-3"><a href="#choosing-the-dedup-store-redis-vs-a-database-unique-constraint" data-toc-link>Choosing The Dedup Store: Redis vs. A Database Unique Constraint</a></li><li class="lvl-2"><a href="#at-least-once-idempotency-effectively-once" data-toc-link>At-Least-Once + Idempotency = Effectively-Once</a></li><li class="lvl-2"><a href="#money-representation-integers-never-floats" data-toc-link>Money Representation: Integers, Never Floats</a></li><li class="lvl-2"><a href="#the-double-entry-ledger" data-toc-link>The Double-Entry Ledger</a></li><li class="lvl-3"><a href="#a-worked-double-entry-posting-with-numbers" data-toc-link>A Worked Double-Entry Posting (With Numbers)</a></li><li class="lvl-2"><a href="#foreign-state-machines-reconciliation" data-toc-link>Foreign State Machines &amp;amp; Reconciliation</a></li><li class="lvl-2"><a href="#api-longevity-never-break-the-contract" data-toc-link>API Longevity: Never Break The Contract</a></li><li class="lvl-2"><a href="#reliability-culture-briefly" data-toc-link>Reliability Culture (Briefly)</a></li><li class="lvl-2"><a href="#java-spring-how-to-build-this-yourself" data-toc-link>Java / Spring: How To Build This Yourself</a></li><li class="lvl-3"><a href="#1-an-idempotency-filter-interceptor" data-toc-link>1. An Idempotency Filter / Interceptor</a></li><li class="lvl-3"><a href="#2-money-as-long-minor-units-or-bigdecimal" data-toc-link>2. Money As long Minor Units (or BigDecimal)</a></li><li class="lvl-3"><a href="#3-an-append-only-ledger-table" data-toc-link>3. An Append-Only Ledger Table</a></li><li class="lvl-3"><a href="#4-an-api-versioning-transformation-layer" data-toc-link>4. An API-Versioning Transformation Layer</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

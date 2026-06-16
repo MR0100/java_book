@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Books, courses, blogs, YouTube channels, podcasts, and leveling-data sources for interview prep.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

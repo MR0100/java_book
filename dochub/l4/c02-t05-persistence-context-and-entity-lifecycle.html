@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Persistence context &amp; entity lifecycle — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link active" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🏗</span><span>Ch. 6 · L4 — Backend Engineering</span></div><div class="chapter-path">content/L4-backend-engineering/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l4/overview.html" data-q="l4 — backend engineering content/l4-backend-engineering/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · spring framework content/l4-backend-engineering/c01-spring-framework/readme.md content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><summary><span class="caret">▶</span><span>C01 · Spring Framework</span></summary><ul class="pages"><li data-q="backend engineering — spring framework &amp; ecosystem content/l4-backend-engineering/c01-spring-framework/readme.md"><a class="" href="../l4/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="spring core: ioc container &amp; beans content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md"><a class="" href="../l4/c01-t01-spring-core-ioc-container-and-beans.html"><span>Spring Core: IoC Container &amp; Beans</span><span class="kind-pill "></span></a></li><li data-q="dependency injection (constructor / field / setter) content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md"><a class="" href="../l4/c01-t02-dependency-injection-constructor-field-setter.html"><span>Dependency Injection (constructor / field / setter)</span><span class="kind-pill "></span></a></li><li data-q="bean scopes &amp; lifecycle content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md"><a class="" href="../l4/c01-t03-bean-scopes-and-lifecycle.html"><span>Bean Scopes &amp; Lifecycle</span><span class="kind-pill "></span></a></li><li data-q="spring configuration (java / annotation / xml) content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md"><a class="" href="../l4/c01-t04-spring-configuration-java-annotation-xml.html"><span>Spring Configuration (Java / Annotation / XML)</span><span class="kind-pill "></span></a></li><li data-q="spring aop content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md"><a class="" href="../l4/c01-t05-spring-aop.html"><span>Spring AOP</span><span class="kind-pill "></span></a></li><li data-q="spring expression language (spel) content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md"><a class="" href="../l4/c01-t06-spring-expression-language-spel.html"><span>Spring Expression Language (SpEL)</span><span class="kind-pill "></span></a></li><li data-q="spring boot auto-configuration &amp; starters content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md"><a class="" href="../l4/c01-t07-spring-boot-auto-configuration-and-starters.html"><span>Spring Boot Auto-Configuration &amp; Starters</span><span class="kind-pill "></span></a></li><li data-q="spring boot properties &amp; profiles content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md"><a class="" href="../l4/c01-t08-spring-boot-properties-and-profiles.html"><span>Spring Boot Properties &amp; Profiles</span><span class="kind-pill "></span></a></li><li data-q="spring boot actuator content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md"><a class="" href="../l4/c01-t09-spring-boot-actuator.html"><span>Spring Boot Actuator</span><span class="kind-pill "></span></a></li><li data-q="spring mvc (rest controllers) content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md"><a class="" href="../l4/c01-t10-spring-mvc-rest-controllers.html"><span>Spring MVC (REST Controllers)</span><span class="kind-pill "></span></a></li><li data-q="validation (@valid, bean validation) content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md"><a class="" href="../l4/c01-t11-validation-valid-bean-validation.html"><span>Validation (@Valid, Bean Validation)</span><span class="kind-pill "></span></a></li><li data-q="exception handling (@controlleradvice) content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md"><a class="" href="../l4/c01-t12-exception-handling-controlleradvice.html"><span>Exception Handling (@ControllerAdvice)</span><span class="kind-pill "></span></a></li><li data-q="spring data content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md"><a class="" href="../l4/c01-t13-spring-data.html"><span>Spring Data</span><span class="kind-pill "></span></a></li><li data-q="spring security (authentication &amp; authorization) content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md"><a class="" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><span>Spring Security (authentication &amp; authorization)</span><span class="kind-pill "></span></a></li><li data-q="oauth2 / openid connect / jwt with spring security content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md"><a class="" href="../l4/c01-t15-oauth2-openid-connect-jwt-with-spring-security.html"><span>OAuth2 / OpenID Connect / JWT with Spring Security</span><span class="kind-pill "></span></a></li><li data-q="method-level security content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md"><a class="" href="../l4/c01-t16-method-level-security.html"><span>Method-Level Security</span><span class="kind-pill "></span></a></li><li data-q="spring webflux (reactive) content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md"><a class="" href="../l4/c01-t17-spring-webflux-reactive.html"><span>Spring WebFlux (reactive)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud (config, gateway, eureka, openfeign) content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md"><a class="" href="../l4/c01-t18-spring-cloud-config-gateway-eureka-openfeign.html"><span>Spring Cloud (Config, Gateway, Eureka, OpenFeign)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud resilience (resilience4j) content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md"><a class="" href="../l4/c01-t19-spring-cloud-resilience-resilience4j.html"><span>Spring Cloud Resilience (Resilience4j)</span><span class="kind-pill "></span></a></li><li data-q="spring batch content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md"><a class="" href="../l4/c01-t20-spring-batch.html"><span>Spring Batch</span><span class="kind-pill "></span></a></li><li data-q="spring integration content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md"><a class="" href="../l4/c01-t21-spring-integration.html"><span>Spring Integration</span><span class="kind-pill "></span></a></li><li data-q="spring for kafka / amqp content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md"><a class="" href="../l4/c01-t22-spring-for-kafka-amqp.html"><span>Spring for Kafka / AMQP</span><span class="kind-pill "></span></a></li><li data-q="spring session content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md"><a class="" href="../l4/c01-t23-spring-session.html"><span>Spring Session</span><span class="kind-pill "></span></a></li><li data-q="spring testing content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md"><a class="" href="../l4/c01-t24-spring-testing.html"><span>Spring Testing</span><span class="kind-pill "></span></a></li><li data-q="spring native / graalvm content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md"><a class="" href="../l4/c01-t25-spring-native-graalvm.html"><span>Spring Native / GraalVM</span><span class="kind-pill "></span></a></li><li data-q="spring boot 4 &amp; spring framework 7 content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><a class="" href="../l4/c01-t26-spring-boot-4-and-spring-framework-7.html"><span>Spring Boot 4 &amp; Spring Framework 7</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · persistence jpa hibernate content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><summary><span class="caret">▶</span><span>C02 · Persistence JPA Hibernate</span></summary><ul class="pages"><li data-q="backend engineering — persistence — jpa / hibernate / orm content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md"><a class="" href="../l4/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="orm concepts &amp; the impedance mismatch content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md"><a class="" href="../l4/c02-t01-orm-concepts-and-the-impedance-mismatch.html"><span>ORM concepts &amp; the impedance mismatch</span><span class="kind-pill "></span></a></li><li data-q="jpa fundamentals (entities, entitymanager) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md"><a class="" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><span>JPA fundamentals (entities, EntityManager)</span><span class="kind-pill "></span></a></li><li data-q="entity mappings &amp; relationships (@onetomany, etc.) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md"><a class="" href="../l4/c02-t03-entity-mappings-and-relationships-onetomany-etc.html"><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span><span class="kind-pill "></span></a></li><li data-q="hibernate architecture content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md"><a class="" href="../l4/c02-t04-hibernate-architecture.html"><span>Hibernate architecture</span><span class="kind-pill "></span></a></li><li data-q="persistence context &amp; entity lifecycle content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md"><a class="active" href="../l4/c02-t05-persistence-context-and-entity-lifecycle.html"><span>Persistence context &amp; entity lifecycle</span><span class="kind-pill "></span></a></li><li data-q="lazy vs eager loading content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md"><a class="" href="../l4/c02-t06-lazy-vs-eager-loading.html"><span>Lazy vs eager loading</span><span class="kind-pill "></span></a></li><li data-q="the n+1 problem &amp; fixes content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md"><a class="" href="../l4/c02-t07-the-n-plus-1-problem-and-fixes.html"><span>The N+1 problem &amp; fixes</span><span class="kind-pill "></span></a></li><li data-q="jpql &amp; criteria api content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md"><a class="" href="../l4/c02-t08-jpql-and-criteria-api.html"><span>JPQL &amp; Criteria API</span><span class="kind-pill "></span></a></li><li data-q="querydsl content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md"><a class="" href="../l4/c02-t09-querydsl.html"><span>QueryDSL</span><span class="kind-pill "></span></a></li><li data-q="native queries content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md"><a class="" href="../l4/c02-t10-native-queries.html"><span>Native queries</span><span class="kind-pill "></span></a></li><li data-q="caching (first/second level) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md"><a class="" href="../l4/c02-t11-caching-first-second-level.html"><span>Caching (first/second level)</span><span class="kind-pill "></span></a></li><li data-q="transactions with jpa content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md"><a class="" href="../l4/c02-t12-transactions-with-jpa.html"><span>Transactions with JPA</span><span class="kind-pill "></span></a></li><li data-q="optimistic vs pessimistic locking content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md"><a class="" href="../l4/c02-t13-optimistic-vs-pessimistic-locking.html"><span>Optimistic vs pessimistic locking</span><span class="kind-pill "></span></a></li><li data-q="spring data jpa repositories content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md"><a class="" href="../l4/c02-t14-spring-data-jpa-repositories.html"><span>Spring Data JPA repositories</span><span class="kind-pill "></span></a></li><li data-q="projections &amp; dto mapping content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md"><a class="" href="../l4/c02-t15-projections-and-dto-mapping.html"><span>Projections &amp; DTO mapping</span><span class="kind-pill "></span></a></li><li data-q="auditing content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><a class="" href="../l4/c02-t16-auditing.html"><span>Auditing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · databases advanced content/l4-backend-engineering/c03-databases-advanced/readme.md content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><summary><span class="caret">▶</span><span>C03 · Databases Advanced</span></summary><ul class="pages"><li data-q="backend engineering — databases — advanced content/l4-backend-engineering/c03-databases-advanced/readme.md"><a class="" href="../l4/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="indexing &amp; index types content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md"><a class="" href="../l4/c03-t01-indexing-and-index-types.html"><span>Indexing &amp; index types</span><span class="kind-pill "></span></a></li><li data-q="query optimization &amp; execution plans content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md"><a class="" href="../l4/c03-t02-query-optimization-and-execution-plans.html"><span>Query optimization &amp; execution plans</span><span class="kind-pill "></span></a></li><li data-q="database migrations (flyway, liquibase) content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md"><a class="" href="../l4/c03-t03-database-migrations-flyway-liquibase.html"><span>Database migrations (Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="replication &amp; read replicas content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md"><a class="" href="../l4/c03-t04-replication-and-read-replicas.html"><span>Replication &amp; read replicas</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; sharding content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md"><a class="" href="../l4/c03-t05-partitioning-and-sharding.html"><span>Partitioning &amp; sharding</span><span class="kind-pill "></span></a></li><li data-q="change data capture (debezium) content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><a class="" href="../l4/c03-t06-change-data-capture-debezium.html"><span>Change Data Capture (Debezium)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · nosql and caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><summary><span class="caret">▶</span><span>C04 · Nosql And Caching</span></summary><ul class="pages"><li data-q="backend engineering — nosql &amp; caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md"><a class="" href="../l4/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use nosql vs sql content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md"><a class="" href="../l4/c04-t01-when-to-use-nosql-vs-sql.html"><span>When to use NoSQL vs SQL</span><span class="kind-pill "></span></a></li><li data-q="document stores (mongodb) content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md"><a class="" href="../l4/c04-t02-document-stores-mongodb.html"><span>Document stores (MongoDB)</span><span class="kind-pill "></span></a></li><li data-q="key-value stores (redis) content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md"><a class="" href="../l4/c04-t03-key-value-stores-redis.html"><span>Key-value stores (Redis)</span><span class="kind-pill "></span></a></li><li data-q="wide-column stores (cassandra) content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md"><a class="" href="../l4/c04-t04-wide-column-stores-cassandra.html"><span>Wide-column stores (Cassandra)</span><span class="kind-pill "></span></a></li><li data-q="search engines (elasticsearch / opensearch) content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md"><a class="" href="../l4/c04-t05-search-engines-elasticsearch-opensearch.html"><span>Search engines (Elasticsearch / OpenSearch)</span><span class="kind-pill "></span></a></li><li data-q="graph databases (intro) content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md"><a class="" href="../l4/c04-t06-graph-databases-intro.html"><span>Graph databases (intro)</span><span class="kind-pill "></span></a></li><li data-q="spring data for nosql content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md"><a class="" href="../l4/c04-t07-spring-data-for-nosql.html"><span>Spring Data for NoSQL</span><span class="kind-pill "></span></a></li><li data-q="caching concepts (cache-aside, write-through, write-behind) content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md"><a class="" href="../l4/c04-t08-caching-concepts-cache-aside-write-through-write-behind.html"><span>Caching concepts (cache-aside, write-through, write-behind)</span><span class="kind-pill "></span></a></li><li data-q="local caching (caffeine) content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md"><a class="" href="../l4/c04-t09-local-caching-caffeine.html"><span>Local caching (Caffeine)</span><span class="kind-pill "></span></a></li><li data-q="distributed caching (redis) content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md"><a class="" href="../l4/c04-t10-distributed-caching-redis.html"><span>Distributed caching (Redis)</span><span class="kind-pill "></span></a></li><li data-q="cache invalidation &amp; ttls content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md"><a class="" href="../l4/c04-t11-cache-invalidation-and-ttls.html"><span>Cache invalidation &amp; TTLs</span><span class="kind-pill "></span></a></li><li data-q="cdn caching content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><a class="" href="../l4/c04-t12-cdn-caching.html"><span>CDN caching</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · apis advanced content/l4-backend-engineering/c05-apis-advanced/readme.md content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><summary><span class="caret">▶</span><span>C05 · APIs Advanced</span></summary><ul class="pages"><li data-q="backend engineering — apis — advanced content/l4-backend-engineering/c05-apis-advanced/readme.md"><a class="" href="../l4/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http/2 &amp; http/3 content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md"><a class="" href="../l4/c05-t01-http-2-and-http-3.html"><span>HTTP/2 &amp; HTTP/3</span><span class="kind-pill "></span></a></li><li data-q="richardson maturity model &amp; hateoas content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md"><a class="" href="../l4/c05-t02-richardson-maturity-model-and-hateoas.html"><span>Richardson Maturity Model &amp; HATEOAS</span><span class="kind-pill "></span></a></li><li data-q="idempotency in apis content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md"><a class="" href="../l4/c05-t03-idempotency-in-apis.html"><span>Idempotency in APIs</span><span class="kind-pill "></span></a></li><li data-q="openapi / swagger documentation content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md"><a class="" href="../l4/c05-t04-openapi-swagger-documentation.html"><span>OpenAPI / Swagger documentation</span><span class="kind-pill "></span></a></li><li data-q="graphql content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md"><a class="" href="../l4/c05-t05-graphql.html"><span>GraphQL</span><span class="kind-pill "></span></a></li><li data-q="grpc &amp; protocol buffers content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md"><a class="" href="../l4/c05-t06-grpc-and-protocol-buffers.html"><span>gRPC &amp; Protocol Buffers</span><span class="kind-pill "></span></a></li><li data-q="websockets content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md"><a class="" href="../l4/c05-t07-websockets.html"><span>WebSockets</span><span class="kind-pill "></span></a></li><li data-q="server-sent events (sse) content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md"><a class="" href="../l4/c05-t08-server-sent-events-sse.html"><span>Server-Sent Events (SSE)</span><span class="kind-pill "></span></a></li><li data-q="webhooks content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md"><a class="" href="../l4/c05-t09-webhooks.html"><span>Webhooks</span><span class="kind-pill "></span></a></li><li data-q="rate limiting &amp; throttling content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md"><a class="" href="../l4/c05-t10-rate-limiting-and-throttling.html"><span>Rate limiting &amp; throttling</span><span class="kind-pill "></span></a></li><li data-q="bff (backend for frontend) content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><a class="" href="../l4/c05-t11-bff-backend-for-frontend.html"><span>BFF (Backend for Frontend)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><summary><span class="caret">▶</span><span>C06 · Reactive Programming</span></summary><ul class="pages"><li data-q="backend engineering — reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md"><a class="" href="../l4/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="reactive principles &amp; the reactive streams spec content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md"><a class="" href="../l4/c06-t01-reactive-principles-and-the-reactive-streams-spec.html"><span>Reactive principles &amp; the Reactive Streams spec</span><span class="kind-pill "></span></a></li><li data-q="project reactor (mono / flux) content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md"><a class="" href="../l4/c06-t02-project-reactor-mono-flux.html"><span>Project Reactor (Mono / Flux)</span><span class="kind-pill "></span></a></li><li data-q="rxjava (alternative) content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md"><a class="" href="../l4/c06-t03-rxjava-alternative.html"><span>RxJava (alternative)</span><span class="kind-pill "></span></a></li><li data-q="backpressure content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md"><a class="" href="../l4/c06-t04-backpressure.html"><span>Backpressure</span><span class="kind-pill "></span></a></li><li data-q="spring webflux content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md"><a class="" href="../l4/c06-t05-spring-webflux.html"><span>Spring WebFlux</span><span class="kind-pill "></span></a></li><li data-q="r2dbc (reactive database access) content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md"><a class="" href="../l4/c06-t06-r2dbc-reactive-database-access.html"><span>R2DBC (reactive database access)</span><span class="kind-pill "></span></a></li><li data-q="reactive vs virtual threads (trade-offs) content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><a class="" href="../l4/c06-t07-reactive-vs-virtual-threads-trade-offs.html"><span>Reactive vs virtual threads (trade-offs)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · messaging and streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><summary><span class="caret">▶</span><span>C07 · Messaging And Streaming</span></summary><ul class="pages"><li data-q="backend engineering — messaging &amp; event streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md"><a class="" href="../l4/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="messaging concepts (queues, topics, pub/sub) content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md"><a class="" href="../l4/c07-t01-messaging-concepts-queues-topics-pub-sub.html"><span>Messaging concepts (queues, topics, pub/sub)</span><span class="kind-pill "></span></a></li><li data-q="jms &amp; activemq content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md"><a class="" href="../l4/c07-t02-jms-and-activemq.html"><span>JMS &amp; ActiveMQ</span><span class="kind-pill "></span></a></li><li data-q="rabbitmq (amqp) content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md"><a class="" href="../l4/c07-t03-rabbitmq-amqp.html"><span>RabbitMQ (AMQP)</span><span class="kind-pill "></span></a></li><li data-q="apache kafka fundamentals content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md"><a class="" href="../l4/c07-t04-apache-kafka-fundamentals.html"><span>Apache Kafka fundamentals</span><span class="kind-pill "></span></a></li><li data-q="kafka deep (partitions, consumer groups, offsets) content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md"><a class="" href="../l4/c07-t05-kafka-deep-partitions-consumer-groups-offsets.html"><span>Kafka deep (partitions, consumer groups, offsets)</span><span class="kind-pill "></span></a></li><li data-q="kafka streams content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md"><a class="" href="../l4/c07-t06-kafka-streams.html"><span>Kafka Streams</span><span class="kind-pill "></span></a></li><li data-q="event-driven architecture content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md"><a class="" href="../l4/c07-t07-event-driven-architecture.html"><span>Event-driven architecture</span><span class="kind-pill "></span></a></li><li data-q="async processing patterns content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md"><a class="" href="../l4/c07-t08-async-processing-patterns.html"><span>Async processing patterns</span><span class="kind-pill "></span></a></li><li data-q="outbox pattern &amp; exactly-once content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md"><a class="" href="../l4/c07-t09-outbox-pattern-and-exactly-once.html"><span>Outbox pattern &amp; exactly-once</span><span class="kind-pill "></span></a></li><li data-q="dead-letter queues &amp; retries content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md"><a class="" href="../l4/c07-t10-dead-letter-queues-and-retries.html"><span>Dead-letter queues &amp; retries</span><span class="kind-pill "></span></a></li><li data-q="stream processing (flink, intro) content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><a class="" href="../l4/c07-t11-stream-processing-flink-intro.html"><span>Stream processing (Flink, intro)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · security content/l4-backend-engineering/c08-security/readme.md content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md content/l4-backend-engineering/c08-security/t06-owasp-top-10.md content/l4-backend-engineering/c08-security/t07-sql-injection.md content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md content/l4-backend-engineering/c08-security/t11-tls-in-practice.md content/l4-backend-engineering/c08-security/t12-secrets-management.md content/l4-backend-engineering/c08-security/t13-security-headers.md content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><summary><span class="caret">▶</span><span>C08 · Security</span></summary><ul class="pages"><li data-q="backend engineering — security content/l4-backend-engineering/c08-security/readme.md"><a class="" href="../l4/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="authentication vs authorization content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md"><a class="" href="../l4/c08-t01-authentication-vs-authorization.html"><span>Authentication vs authorization</span><span class="kind-pill "></span></a></li><li data-q="sessions vs tokens content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md"><a class="" href="../l4/c08-t02-sessions-vs-tokens.html"><span>Sessions vs tokens</span><span class="kind-pill "></span></a></li><li data-q="oauth2 &amp; openid connect content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md"><a class="" href="../l4/c08-t03-oauth2-and-openid-connect.html"><span>OAuth2 &amp; OpenID Connect</span><span class="kind-pill "></span></a></li><li data-q="jwt (structure, validation, pitfalls) content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md"><a class="" href="../l4/c08-t04-jwt-structure-validation-pitfalls.html"><span>JWT (structure, validation, pitfalls)</span><span class="kind-pill "></span></a></li><li data-q="password storage (bcrypt, argon2) content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md"><a class="" href="../l4/c08-t05-password-storage-bcrypt-argon2.html"><span>Password storage (bcrypt, Argon2)</span><span class="kind-pill "></span></a></li><li data-q="owasp top 10 content/l4-backend-engineering/c08-security/t06-owasp-top-10.md"><a class="" href="../l4/c08-t06-owasp-top-10.html"><span>OWASP Top 10</span><span class="kind-pill "></span></a></li><li data-q="sql injection content/l4-backend-engineering/c08-security/t07-sql-injection.md"><a class="" href="../l4/c08-t07-sql-injection.html"><span>SQL injection</span><span class="kind-pill "></span></a></li><li data-q="xss &amp; csrf content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md"><a class="" href="../l4/c08-t08-xss-and-csrf.html"><span>XSS &amp; CSRF</span><span class="kind-pill "></span></a></li><li data-q="cors &amp; cross-origin requests content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md"><a class="" href="../l4/c08-t09-cors-and-cross-origin-requests.html"><span>CORS &amp; cross-origin requests</span><span class="kind-pill "></span></a></li><li data-q="encryption (symmetric/asymmetric, hashing) content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md"><a class="" href="../l4/c08-t10-encryption-symmetric-asymmetric-hashing.html"><span>Encryption (symmetric/asymmetric, hashing)</span><span class="kind-pill "></span></a></li><li data-q="tls in practice content/l4-backend-engineering/c08-security/t11-tls-in-practice.md"><a class="" href="../l4/c08-t11-tls-in-practice.html"><span>TLS in practice</span><span class="kind-pill "></span></a></li><li data-q="secrets management content/l4-backend-engineering/c08-security/t12-secrets-management.md"><a class="" href="../l4/c08-t12-secrets-management.html"><span>Secrets management</span><span class="kind-pill "></span></a></li><li data-q="security headers content/l4-backend-engineering/c08-security/t13-security-headers.md"><a class="" href="../l4/c08-t13-security-headers.html"><span>Security headers</span><span class="kind-pill "></span></a></li><li data-q="api security best practices content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md"><a class="" href="../l4/c08-t14-api-security-best-practices.html"><span>API security best practices</span><span class="kind-pill "></span></a></li><li data-q="dependency &amp; supply-chain security content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md"><a class="" href="../l4/c08-t15-dependency-and-supply-chain-security.html"><span>Dependency &amp; supply-chain security</span><span class="kind-pill "></span></a></li><li data-q="security architecture &amp; zero trust (intro) content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md"><a class="" href="../l4/c08-t16-security-architecture-and-zero-trust-intro.html"><span>Security architecture &amp; zero trust (intro)</span><span class="kind-pill "></span></a></li><li data-q="jvm-specific cves: log4shell, spring4shell &amp; the anatomy of java vulnerabilities content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md"><a class="" href="../l4/c08-t17-jvm-specific-cves-log4shell-spring4shell.html"><span>JVM-Specific CVEs: Log4Shell, Spring4Shell &amp; the Anatomy of Java Vulnerabilities</span><span class="kind-pill "></span></a></li><li data-q="modern authentication: oauth 2.1, fido2, webauthn &amp; passkeys content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md"><a class="" href="../l4/c08-t18-modern-auth-oauth21-fido2-webauthn-passkeys.html"><span>Modern Authentication: OAuth 2.1, FIDO2, WebAuthn &amp; Passkeys</span><span class="kind-pill "></span></a></li><li data-q="container security: distroless, wolfi, image signing &amp; runtime hardening content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><a class="" href="../l4/c08-t19-container-security-distroless-wolfi-image-signing.html"><span>Container Security: Distroless, Wolfi, Image Signing &amp; Runtime Hardening</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · testing advanced content/l4-backend-engineering/c09-testing-advanced/readme.md content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><summary><span class="caret">▶</span><span>C09 · Testing Advanced</span></summary><ul class="pages"><li data-q="backend engineering — testing — advanced content/l4-backend-engineering/c09-testing-advanced/readme.md"><a class="" href="../l4/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="integration testing content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md"><a class="" href="../l4/c09-t01-integration-testing.html"><span>Integration testing</span><span class="kind-pill "></span></a></li><li data-q="spring boot test slices content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md"><a class="" href="../l4/c09-t02-spring-boot-test-slices.html"><span>Spring Boot test slices</span><span class="kind-pill "></span></a></li><li data-q="testcontainers content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md"><a class="" href="../l4/c09-t03-testcontainers.html"><span>Testcontainers</span><span class="kind-pill "></span></a></li><li data-q="behavior-driven development (bdd, cucumber) content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md"><a class="" href="../l4/c09-t04-behavior-driven-development-bdd-cucumber.html"><span>Behavior-Driven Development (BDD, Cucumber)</span><span class="kind-pill "></span></a></li><li data-q="contract testing (spring cloud contract, pact) content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md"><a class="" href="../l4/c09-t05-contract-testing-spring-cloud-contract-pact.html"><span>Contract testing (Spring Cloud Contract, Pact)</span><span class="kind-pill "></span></a></li><li data-q="mutation testing (pit) content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md"><a class="" href="../l4/c09-t06-mutation-testing-pit.html"><span>Mutation testing (PIT)</span><span class="kind-pill "></span></a></li><li data-q="load &amp; performance testing (jmeter, gatling) content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md"><a class="" href="../l4/c09-t07-load-and-performance-testing-jmeter-gatling.html"><span>Load &amp; performance testing (JMeter, Gatling)</span><span class="kind-pill "></span></a></li><li data-q="the test pyramid &amp; testing strategy content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><a class="" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><span>The test pyramid &amp; testing strategy</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · devops and observability content/l4-backend-engineering/c10-devops-and-observability/readme.md content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><summary><span class="caret">▶</span><span>C10 · Devops And Observability</span></summary><ul class="pages"><li data-q="backend engineering — devops, cloud &amp; observability content/l4-backend-engineering/c10-devops-and-observability/readme.md"><a class="" href="../l4/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="docker &amp; containerization for java content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md"><a class="" href="../l4/c10-t01-docker-and-containerization-for-java.html"><span>Docker &amp; containerization for Java</span><span class="kind-pill "></span></a></li><li data-q="dockerfile best practices for java apps content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md"><a class="" href="../l4/c10-t02-dockerfile-best-practices-for-java-apps.html"><span>Dockerfile best practices for Java apps</span><span class="kind-pill "></span></a></li><li data-q="kubernetes basics content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md"><a class="" href="../l4/c10-t03-kubernetes-basics.html"><span>Kubernetes basics</span><span class="kind-pill "></span></a></li><li data-q="ci/cd concepts content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md"><a class="" href="../l4/c10-t04-ci-cd-concepts.html"><span>CI/CD concepts</span><span class="kind-pill "></span></a></li><li data-q="ci/cd tools (github actions, jenkins, gitlab ci) content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md"><a class="" href="../l4/c10-t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.html"><span>CI/CD tools (GitHub Actions, Jenkins, GitLab CI)</span><span class="kind-pill "></span></a></li><li data-q="deployment strategies (blue-green, canary, rolling) content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md"><a class="" href="../l4/c10-t06-deployment-strategies-blue-green-canary-rolling.html"><span>Deployment strategies (blue-green, canary, rolling)</span><span class="kind-pill "></span></a></li><li data-q="cloud basics for java devs (aws/gcp/azure) content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md"><a class="" href="../l4/c10-t07-cloud-basics-for-java-devs-aws-gcp-azure.html"><span>Cloud basics for Java devs (AWS/GCP/Azure)</span><span class="kind-pill "></span></a></li><li data-q="infrastructure as code (terraform, intro) content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md"><a class="" href="../l4/c10-t08-infrastructure-as-code-terraform-intro.html"><span>Infrastructure as Code (Terraform, intro)</span><span class="kind-pill "></span></a></li><li data-q="configuration and secrets management content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md"><a class="" href="../l4/c10-t09-configuration-and-secrets-management.html"><span>Configuration and secrets management</span><span class="kind-pill "></span></a></li><li data-q="feature flags content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md"><a class="" href="../l4/c10-t10-feature-flags.html"><span>Feature flags</span><span class="kind-pill "></span></a></li><li data-q="logging (slf4j, logback, log4j2, elk) content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md"><a class="" href="../l4/c10-t11-logging-slf4j-logback-log4j2-elk.html"><span>Logging (SLF4J, Logback, Log4j2, ELK)</span><span class="kind-pill "></span></a></li><li data-q="metrics (micrometer, prometheus, grafana) content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md"><a class="" href="../l4/c10-t12-metrics-micrometer-prometheus-grafana.html"><span>Metrics (Micrometer, Prometheus, Grafana)</span><span class="kind-pill "></span></a></li><li data-q="distributed tracing (opentelemetry, jaeger, zipkin) content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md"><a class="" href="../l4/c10-t13-distributed-tracing-opentelemetry-jaeger-zipkin.html"><span>Distributed tracing (OpenTelemetry, Jaeger, Zipkin)</span><span class="kind-pill "></span></a></li><li data-q="health checks and readiness/liveness probes content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md"><a class="" href="../l4/c10-t14-health-checks-and-readiness-liveness-probes.html"><span>Health checks and readiness/liveness probes</span><span class="kind-pill "></span></a></li><li data-q="monitoring and alerting content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md"><a class="" href="../l4/c10-t15-monitoring-and-alerting.html"><span>Monitoring and alerting</span><span class="kind-pill "></span></a></li><li data-q="sre concepts (error budgets, toil) content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md"><a class="" href="../l4/c10-t16-sre-concepts-error-budgets-toil.html"><span>SRE concepts (error budgets, toil)</span><span class="kind-pill "></span></a></li><li data-q="serverless java: aws lambda, snapstart &amp; cold starts content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md"><a class="" href="../l4/c10-t17-serverless-java-lambda-snapstart.html"><span>Serverless Java: AWS Lambda, SnapStart &amp; Cold Starts</span><span class="kind-pill "></span></a></li><li data-q="edge computing with java: workers, lambda@edge &amp; the network edge content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md"><a class="" href="../l4/c10-t18-edge-computing-java.html"><span>Edge Computing with Java: Workers, Lambda@Edge &amp; the Network Edge</span><span class="kind-pill "></span></a></li><li data-q="multi-runtime microservices with dapr content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md"><a class="" href="../l4/c10-t19-multi-runtime-dapr.html"><span>Multi-Runtime Microservices with Dapr</span><span class="kind-pill "></span></a></li><li data-q="ebpf &amp; continuous production profiling content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><a class="" href="../l4/c10-t20-ebpf-and-continuous-production-profiling.html"><span>eBPF &amp; Continuous Production Profiling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · tools and environment content/l4-backend-engineering/c11-tools-and-environment/readme.md content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><summary><span class="caret">▶</span><span>C11 · Tools And Environment</span></summary><ul class="pages"><li data-q="backend engineering — tools &amp; environment content/l4-backend-engineering/c11-tools-and-environment/readme.md"><a class="" href="../l4/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for backend engineering content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><a class="" href="../l4/c11-t01-tools-for-backend-engineering.html"><span>Tools for Backend Engineering</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · hands on content/l4-backend-engineering/c12-hands-on/readme.md content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><summary><span class="caret">▶</span><span>C12 · Hands On</span></summary><ul class="pages"><li data-q="backend engineering — hands-on content/l4-backend-engineering/c12-hands-on/readme.md"><a class="" href="../l4/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 level project: production-grade rest service content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><a class="" href="../l4/c12-t01-level-project-production-grade-rest-service.html"><span>L4 Level Project: Production-Grade REST Service</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · best practices content/l4-backend-engineering/c13-best-practices/readme.md content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><summary><span class="caret">▶</span><span>C13 · Best Practices</span></summary><ul class="pages"><li data-q="backend engineering — best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/readme.md"><a class="" href="../l4/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><a class="" href="../l4/c13-t01-best-practices-and-pitfalls-l4.html"><span>L4 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · interview prep content/l4-backend-engineering/c14-interview-prep/readme.md content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><summary><span class="caret">▶</span><span>C14 · Interview Prep</span></summary><ul class="pages"><li data-q="backend engineering — interview prep content/l4-backend-engineering/c14-interview-prep/readme.md"><a class="" href="../l4/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: senior backend engineer content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><a class="" href="../l4/c14-t01-interview-prep-senior-backend.html"><span>Interview Prep: Senior Backend Engineer</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c15 · qa faq content/l4-backend-engineering/c15-qa-faq/readme.md content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><summary><span class="caret">▶</span><span>C15 · QA FAQ</span></summary><ul class="pages"><li data-q="backend engineering — q&amp;a / faq content/l4-backend-engineering/c15-qa-faq/readme.md"><a class="" href="../l4/c15-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 q&amp;a and faq content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><a class="" href="../l4/c15-t01-l4-qa.html"><span>L4 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c16 · cheatsheets content/l4-backend-engineering/c16-cheatsheets/readme.md content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><summary><span class="caret">▶</span><span>C16 · Cheatsheets</span></summary><ul class="pages"><li data-q="backend engineering — cheatsheets &amp; reference content/l4-backend-engineering/c16-cheatsheets/readme.md"><a class="" href="../l4/c16-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 cheatsheets content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><a class="" href="../l4/c16-t01-l4-cheatsheets.html"><span>L4 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c17 · resources content/l4-backend-engineering/c17-resources/readme.md content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><summary><span class="caret">▶</span><span>C17 · Resources</span></summary><ul class="pages"><li data-q="backend engineering — resources content/l4-backend-engineering/c17-resources/readme.md"><a class="" href="../l4/c17-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 resources content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><a class="" href="../l4/c17-t01-l4-resources.html"><span>L4 Resources</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c18 · ai llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><summary><span class="caret">▶</span><span>C18 · Ai Llm Integration</span></summary><ul class="pages"><li data-q="ai/llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md"><a class="" href="../l4/c18-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="llm api fundamentals — openai, anthropic, local models content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md"><a class="" href="../l4/c18-t01-llm-api-fundamentals.html"><span>LLM API Fundamentals — OpenAI, Anthropic, Local Models</span><span class="kind-pill "></span></a></li><li data-q="langchain4j framework — java&#x27;s leading llm framework content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md"><a class="" href="../l4/c18-t02-langchain4j-framework.html"><span>LangChain4j Framework — Java&#x27;s Leading LLM Framework</span><span class="kind-pill "></span></a></li><li data-q="spring ai framework — spring&#x27;s official llm abstraction content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md"><a class="" href="../l4/c18-t03-spring-ai-framework.html"><span>Spring AI Framework — Spring&#x27;s Official LLM Abstraction</span><span class="kind-pill "></span></a></li><li data-q="prompt engineering for backend engineers — practical patterns content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md"><a class="" href="../l4/c18-t04-prompt-engineering-for-backend-engineers.html"><span>Prompt Engineering for Backend Engineers — Practical Patterns</span><span class="kind-pill "></span></a></li><li data-q="rag patterns — retrieval-augmented generation content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md"><a class="" href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html"><span>RAG Patterns — Retrieval-Augmented Generation</span><span class="kind-pill "></span></a></li><li data-q="vector databases — pinecone, weaviate, pgvector, qdrant content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md"><a class="" href="../l4/c18-t06-vector-databases-pinecone-weaviate-pgvector-qdrant.html"><span>Vector Databases — Pinecone, Weaviate, pgvector, Qdrant</span><span class="kind-pill "></span></a></li><li data-q="embedding generation &amp; storage — production pipelines content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md"><a class="" href="../l4/c18-t07-embedding-generation-and-storage.html"><span>Embedding Generation &amp; Storage — Production Pipelines</span><span class="kind-pill "></span></a></li><li data-q="ai agents with tools / function calling — multi-step workflows content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md"><a class="" href="../l4/c18-t08-ai-agents-with-tools-function-calling.html"><span>AI Agents with Tools / Function Calling — Multi-Step Workflows</span><span class="kind-pill "></span></a></li><li data-q="streaming llm responses — sse and websocket content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md"><a class="" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><span>Streaming LLM Responses — SSE and WebSocket</span><span class="kind-pill "></span></a></li><li data-q="ai observability &amp; cost tracking — opentelemetry, token accounting content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><a class="" href="../l4/c18-t10-ai-observability-and-cost-tracking.html"><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l4/index.html">L4 — Backend Engineering</a><span class="sep">/</span><span>Persistence context &amp; entity lifecycle</span></div>
+        <h1>Persistence context &amp; entity lifecycle</h1>
+        <div><span class="source-path">content/L4-backend-engineering/C02-persistence-jpa-hibernate/T05-persistence-context-and-entity-lifecycle.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~75 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Persistence context &amp; entity lifecycle"
+slug: persistence-context-and-entity-lifecycle
+level: L4
+module: "Backend Engineering"
+section: "Persistence — JPA / Hibernate / ORM"
+type: concept
+difficulty: senior
+order: 5
+tags: [persistence-context, l1-cache, first-level-cache, identity-map, entity-state, transient, managed, detached, removed, persist, merge, remove, find, getreference, refresh, detach, clear, contains, lifecycle, jpa-callbacks, prepersist, postpersist, preupdate, postupdate, preremove, postremove, postload, transaction-scoped, extended-persistence-context, openentitymanagerinview, opensessioninview, hibernate-session-management, conversation, persistence-context-size, large-transaction, memory-leak, flush-clear-pattern, batch-processing, detached-entity-problem, dto-vs-entity, lazy-init-exception, lazy-initialization, transactional-readonly, set-readonly-mode, dirty-check-skip, optimistic-locking-version]
+prerequisites: [jpa-fundamentals-entities-entitymanager, hibernate-architecture, spring-aop]
+status: complete
+estimated_minutes: 75
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="persistence-context-entity-lifecycle">Persistence context &amp; entity lifecycle</h1>
+<p>The <strong>persistence context</strong> is the most important concept in JPA — and the most misunderstood. It is <strong>the in-memory cache and identity map</strong> that lives inside a <code>Session</code> / <code>EntityManager</code> for the duration of one transaction (typically). Every entity you load, persist, merge, or interact with goes <em>through</em> it. It guarantees that two <code>em.find(User.class, 42)</code> calls in one transaction return <em>the same Java reference</em>. It tracks the entities you've mutated so the right UPDATE statements fire at flush. It coordinates cascading. It's also the source of the most frustrating Spring JPA bugs: <code>LazyInitializationException</code>, "why isn't my UPDATE running", detached-entity nightmares, OOM on batch jobs.</p>
+<p>A senior engineer needs to think of the persistence context as <strong>a working set</strong> — an explicit data structure with an explicit scope, contents, and operations. T01 mentioned it; T02 showed how to use <code>EntityManager</code>; T04 showed how Hibernate implements it; this topic <em>makes it concrete</em>. We cover: the four entity states (transient, managed, detached, removed) and the transitions between them; <code>persist</code> vs <code>merge</code> (the most-confused operation pair); the size of the persistence context and the OOM risk; the <code>flush + clear</code> batch pattern; the lazy-init exception and its causes; Spring's <code>@Transactional</code> boundaries as persistence-context boundaries; the <code>OpenEntityManagerInView</code> anti-pattern revisited; and the discipline of returning DTOs (not entities) to the caller.</p>
+<p>The depth-bar this topic clears: at the <strong>language layer</strong>, every entity state transition, every <code>EntityManager</code> operation that drives it, and every lifecycle callback. At the <strong>memory layer</strong>, the persistence context as a <code>Map&lt;EntityKey, Object&gt;</code> with auxiliary structures for snapshots, collection-state tracking, and pending actions; per-entity ~200 B + the snapshot ≈ same size as the entity; for 10 K entities, ~400 MB heap. At the <strong>architecture layer</strong> — the heart — <strong>the persistence context is the scope</strong> that defines identity, dirty tracking, lazy loading, and cascade. Get its boundaries right (transactional scope, <code>flush + clear</code> in batches, DTOs at the controller) and Hibernate sings; get them wrong and you get OOMs and N+1 traps.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t02-jpa-fundamentals-entities-entitymanager.html">JPA fundamentals (T02)</a>, <a href="c02-t03-entity-mappings-and-relationships-onetomany-etc.html">Entity mappings (T03)</a>, <a href="c02-t04-hibernate-architecture.html">Hibernate architecture (T04)</a>. Spring <code>@Transactional</code> (T05 of C01).</p></div></div>
+<h2 id="what-the-persistence-context-is">What The Persistence Context Is<a class="anchor" href="#what-the-persistence-context-is" aria-hidden="true">#</a></h2>
+<p>A <code>Map&lt;EntityKey, Object&gt;</code> holding every entity the <code>EntityManager</code> is currently tracking, plus per-entity snapshots for dirty checking, plus pending actions:</p>
+<div class="mermaid">flowchart TB
+  PC["PersistenceContext (per transaction)"]
+  Im["identity map: EntityKey(User, 42) → User@4a3b"]
+  Sn["snapshots: User@4a3b → {name='alice', email='a@x.io'}"]
+  Aq["action queue: [insert, update, delete pending]"]
+  Cs["collection states: order.items → uninitialized / initialized / dirty"]
+  PC --> Im
+  PC --> Sn
+  PC --> Aq
+  PC --> Cs
+</div>
+<p><strong>Identity map</strong>: same primary key → same Java reference. <code>em.find(User.class, 42)</code> twice returns the same object.</p>
+<p><strong>Snapshots</strong>: copy of every field at load time, for dirty checking (T04).</p>
+<p><strong>Action queue</strong>: pending INSERT/UPDATE/DELETE (T04).</p>
+<p><strong>Collection states</strong>: per <code>@OneToMany</code> / <code>@ManyToMany</code>, whether the collection has been initialized, whether it's dirty.</p>
+<h2 id="the-four-states">The Four States<a class="anchor" href="#the-four-states" aria-hidden="true">#</a></h2>
+<div class="mermaid">stateDiagram-v2
+  [*] --> Transient: new User()
+  Transient --> Managed: persist
+  Detached --> Managed: merge
+  Managed --> Detached: tx end, clear, detach, close
+  Managed --> Removed: remove
+  Removed --> Managed: persist again (rare; usually mistake)
+  Managed --> [*]: GC after detach
+  Transient: not known to JPA
+  Managed: tracked; dirty-checked; in identity map
+  Detached: not tracked; mutations don't persist
+  Removed: marked for DELETE; row deleted on flush
+</div>
+<h3 id="transient">Transient<a class="anchor" href="#transient" aria-hidden="true">#</a></h3>
+<p>A new instance not yet known to JPA:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">User u = new User(&quot;alice&quot;, &quot;alice@x.io&quot;);
+// u.id == null; not in any persistence context
+</code></pre></div>
+<p>The DB has no row for it. No dirty tracking. If you mutate and don't persist, it stays in heap, GC'd when no references remain.</p>
+<h3 id="managed">Managed<a class="anchor" href="#managed" aria-hidden="true">#</a></h3>
+<p>After <code>em.persist(u)</code> or <code>em.find(...)</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">em.persist(u);   // u is now MANAGED
+// u.id != null; persistence context tracks u
+u.setEmail(&quot;new@x.io&quot;);   // dirty-tracked
+// at flush: UPDATE users SET email='new@x.io' WHERE id=u.id
+</code></pre></div>
+<p>Managed entities are in the identity map. Mutations are tracked. The right state for the duration of a transaction.</p>
+<h3 id="detached">Detached<a class="anchor" href="#detached" aria-hidden="true">#</a></h3>
+<p>When the persistence context closes (transaction commits, <code>em.clear()</code>, or <code>em.detach(u)</code>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// At @Transactional end:
+User u = userService.load(42);   // managed
+// transaction commits; em closes
+// u is now DETACHED
+u.setEmail(&quot;new@x.io&quot;);   // mutation in heap; NOT tracked; NOT persisted
+</code></pre></div>
+<p>The Java object still exists in heap; its fields are still set. But Hibernate no longer knows about it. To re-attach, use <code>merge</code>.</p>
+<h3 id="removed">Removed<a class="anchor" href="#removed" aria-hidden="true">#</a></h3>
+<p><code>em.remove(u)</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">User u = em.find(User.class, 42);
+em.remove(u);
+// u is now REMOVED; at flush: DELETE FROM users WHERE id = 42
+// the Java object still exists in heap until GC
+</code></pre></div>
+<p>The row is deleted on flush. The Java object is now meaningless (referencing a non-existent row).</p>
+<h2 id="persist-vs-merge"><code>persist</code> vs <code>merge</code><a class="anchor" href="#persist-vs-merge" aria-hidden="true">#</a></h2>
+<p>The classic source of confusion.</p>
+<h3 id="persistu-for-new-entities"><code>persist(u)</code> — For New Entities<a class="anchor" href="#persistu-for-new-entities" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">User u = new User(&quot;alice&quot;, &quot;a@x.io&quot;);
+em.persist(u);
+// u becomes MANAGED
+// at flush: INSERT
+</code></pre></div>
+<p><strong>Required</strong>: <code>u</code> must be transient or already managed (no-op). Persisting a <em>detached</em> entity throws <code>PersistenceException</code> ("detached entity passed to persist").</p>
+<h3 id="mergeu-for-detached-entities"><code>merge(u)</code> — For Detached Entities<a class="anchor" href="#mergeu-for-detached-entities" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// u was loaded in a previous transaction; we have a reference but it's now detached
+User merged = em.merge(u);
+// merged is a NEW managed entity with u's data; u remains DETACHED
+// at flush: UPDATE
+</code></pre></div>
+<p><strong>The key catch</strong>: <code>merge</code> does <em>not</em> re-attach <code>u</code>. It copies <code>u</code>'s state into a <em>new</em> managed entity (<code>merged</code>) and returns it. <code>u</code> stays detached. <strong>You must use the return value.</strong></p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">em.merge(u);          // ⚠️ bug: result discarded
+em.merge(u).setEmail(&quot;x&quot;);   // ✅ correct
+</code></pre></div>
+<div class="mermaid">flowchart LR
+  D["u (DETACHED)"]
+  M["em.merge(u)"]
+  N["copy u's state to a new managed entity"]
+  Ret["return merged (MANAGED)"]
+  Orig["u stays DETACHED"]
+  D --> M --> N --> Ret
+  M --> Orig
+</div>
+<h3 id="when-to-use-each">When To Use Each<a class="anchor" href="#when-to-use-each" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New entity to insert</td>
+<td><code>persist</code></td>
+</tr>
+<tr>
+<td>Loaded entity, still in same tx, mutate-and-save</td>
+<td>nothing (dirty-tracked)</td>
+</tr>
+<tr>
+<td>Detached entity from a previous tx</td>
+<td><code>merge</code></td>
+</tr>
+<tr>
+<td>Re-attaching from cache / external source</td>
+<td><code>merge</code> (or <code>find</code> first then mutate)</td>
+</tr>
+<tr>
+<td>Cascade from a managed parent</td>
+<td><code>cascade = PERSIST</code> or <code>MERGE</code> handles it</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Spring Data JPA's <code>save(u)</code></strong>: if <code>u.id == null</code> → <code>persist</code>; else → <code>merge</code>. Convenient but ambiguous; you don't always know which path runs.</p>
+<h2 id="the-flush-clear-pattern-for-batch">The <code>flush + clear</code> Pattern For Batch<a class="anchor" href="#the-flush-clear-pattern-for-batch" aria-hidden="true">#</a></h2>
+<p>A 100 K-row batch with default settings:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional
+public void importAll(List&lt;UserData&gt; data) {
+    for (UserData d : data) {
+        em.persist(new User(d.name(), d.email()));
+        // each new entity stays in the persistence context
+    }
+    // at commit, 100K INSERTs fire
+    // the persistence context held 100K entities + 100K snapshots → ~40 MB
+}
+</code></pre></div>
+<p>Two problems: 100 K snapshots in memory; flush at commit is one giant transaction.</p>
+<p>The fix:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional
+public void importAll(List&lt;UserData&gt; data) {
+    int i = 0;
+    for (UserData d : data) {
+        em.persist(new User(d.name(), d.email()));
+        if (++i % 1000 == 0) {
+            em.flush();    // execute pending INSERTs
+            em.clear();    // detach everything; release memory
+        }
+    }
+    em.flush();
+    em.clear();
+}
+</code></pre></div>
+<p>Plus configure batch inserts:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 50
+        order_inserts: true
+</code></pre></div>
+<p>Now 100 K inserts flush in 100 batches of 1000 (with 50-row JDBC batches inside each), memory stays bounded, throughput is ~30× higher than the default.</p>
+<p><strong>For truly large jobs, use <code>StatelessSession</code> (T04) — bypass the persistence context entirely.</strong></p>
+<h2 id="lazy-initialization-the-detached-entity-problem">Lazy Initialization &amp; The Detached-Entity Problem<a class="anchor" href="#lazy-initialization-the-detached-entity-problem" aria-hidden="true">#</a></h2>
+<h3 id="lazyinitializationexception"><code>LazyInitializationException</code><a class="anchor" href="#lazyinitializationexception" aria-hidden="true">#</a></h3>
+<p>The infamous error:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>org.hibernate.LazyInitializationException: could not initialize proxy [User#42] - no Session
+</code></pre></div>
+<p>What happened:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional(readOnly = true)
+public User loadUser(long id) {
+    return userRepo.findById(id).orElseThrow();
+}
+
+// in controller:
+User u = userService.loadUser(42);
+String customerName = u.getOrder().getCustomer().getName();   // 💥 LazyInitException
+</code></pre></div>
+<p>The flow:</p>
+<ol>
+<li><code>loadUser</code> transaction starts; loads <code>u</code>.</li>
+<li><code>u.getOrder()</code> is <code>LAZY</code>; Hibernate stores a proxy.</li>
+<li>Transaction commits; <code>u</code> becomes detached.</li>
+<li>Controller accesses <code>u.getOrder().getCustomer().getName()</code>.</li>
+<li>The proxy tries to initialize; needs a session; there isn't one → exception.</li>
+</ol>
+<p>Three fixes, in order of preference:</p>
+<ol>
+<li><strong>Return a DTO, not the entity.</strong> Map inside the <code>@Transactional</code> method.
+   <code>java
+   @Transactional(readOnly = true)
+   public UserResponse loadUser(long id) {
+       User u = userRepo.findById(id).orElseThrow();
+       return new UserResponse(u.getId(), u.getName(),
+           u.getOrder().getCustomer().getName());   // access while managed
+   }</code></li>
+<li><strong>Eagerly fetch what you need via JOIN FETCH or <code>@EntityGraph</code>.</strong>
+   <code>java
+   @Query("SELECT u FROM User u JOIN FETCH u.order o JOIN FETCH o.customer WHERE u.id = ?1")
+   Optional&lt;User&gt; findByIdWithOrderAndCustomer(long id);</code></li>
+<li><strong>NEVER</strong> enable <code>open-in-view</code>. It papers over the bug but holds the session for the entire HTTP request.</li>
+</ol>
+<div class="mermaid">flowchart LR
+  Tx["@Transactional method runs"]
+  M["entity managed; lazy proxies set"]
+  End["tx commits; entity detached"]
+  Ctl["controller calls lazy getter"]
+  Boom["LazyInitException"]
+  Fix1["return DTO from service"]
+  Fix2["JOIN FETCH eagerly"]
+  Tx --> M --> End --> Ctl --> Boom
+  M -.-> Fix1
+  M -.-> Fix2
+</div>
+<h3 id="the-anti-pattern-open-in-view">The Anti-Pattern: <code>open-in-view</code><a class="anchor" href="#the-anti-pattern-open-in-view" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">spring.jpa.open-in-view: true   # default in Boot; FALSE in any sensible app
+</code></pre></div>
+<p>Keeps the <code>EntityManager</code> open until the HTTP response is rendered. The lazy load triggers a SELECT <em>during view rendering</em>. Three downsides:</p>
+<ul>
+<li><strong>N+1 hides</strong>: each lazy access fires a SELECT in the view layer.</li>
+<li><strong>DB connection held longer</strong>: from controller invocation to response done, including JSON serialization.</li>
+<li><strong>Layering leaks</strong>: persistence concerns reach into HTTP layer.</li>
+</ul>
+<p><strong>Always disable in REST services.</strong> Use DTOs.</p>
+<h3 id="hibernateinitialize-the-bandaid"><code>Hibernate.initialize</code> — The Bandaid<a class="anchor" href="#hibernateinitialize-the-bandaid" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional(readOnly = true)
+public User loadUser(long id) {
+    User u = userRepo.findById(id).orElseThrow();
+    Hibernate.initialize(u.getOrder());
+    Hibernate.initialize(u.getOrder().getCustomer());
+    return u;
+}
+</code></pre></div>
+<p>Forces the lazy proxies to load. Works but is N+1 — three SELECTs (user, order, customer). Use <code>JOIN FETCH</code> instead.</p>
+<h2 id="dtos-at-the-boundary-the-discipline">DTOs at the Boundary — The Discipline<a class="anchor" href="#dtos-at-the-boundary-the-discipline" aria-hidden="true">#</a></h2>
+<p>Mature Spring services have a strict rule: <strong>entities never cross the service-controller boundary.</strong> The service returns DTOs (records); the controller serializes the DTOs. Two reasons:</p>
+<ol>
+<li><strong>Detached-entity issues vanish.</strong> The DTO has no lazy proxies.</li>
+<li><strong>API contract decoupled from schema.</strong> Rename a column without changing the JSON; add fields to DTOs without exposing entities.</li>
+</ol>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+@Transactional(readOnly = true)
+public class UserService {
+    public UserResponse loadUser(long id) {
+        User u = userRepo.findById(id).orElseThrow();
+        return new UserResponse(u.getId(), u.getName(), u.getEmail(),
+            u.getOrders().stream().map(this::toOrderSummary).toList());
+    }
+    private OrderSummary toOrderSummary(Order o) {
+        return new OrderSummary(o.getId(), o.getStatus(), o.getTotal());
+    }
+}
+
+@RestController
+public class UserController {
+    @GetMapping(&quot;/api/users/{id}&quot;)
+    public UserResponse get(@PathVariable long id) {
+        return userService.loadUser(id);
+    }
+}
+</code></pre></div>
+<p>Mapping inside the transactional method ensures every lazy field is touched while managed. Outside, the DTO is plain data.</p>
+<h2 id="transactionalreadonly-true"><code>@Transactional(readOnly = true)</code><a class="anchor" href="#transactionalreadonly-true" aria-hidden="true">#</a></h2>
+<p>A hint Hibernate honors:</p>
+<ul>
+<li>Skips dirty checking (no snapshots; less memory; no UPDATE attempts).</li>
+<li>Flush mode set to <code>MANUAL</code> (no implicit flushes before queries).</li>
+<li>Database driver may use a read-only connection (depends on the connection pool).</li>
+</ul>
+<p>Always annotate read-only service methods. Saves memory on large reads.</p>
+<h2 id="emrefresh-and-emdetach"><code>em.refresh</code> and <code>em.detach</code><a class="anchor" href="#emrefresh-and-emdetach" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">User u = em.find(User.class, 42);
+// time passes; another tx mutates the row
+em.refresh(u);   // re-read from DB; discard local changes; reset snapshot
+</code></pre></div>
+<p>Useful when you suspect the entity is stale.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">em.detach(u);   // remove u from the persistence context
+u.setEmail(&quot;x&quot;);   // no longer tracked; no UPDATE
+</code></pre></div>
+<p>Rarely needed in modern code; relevant for explicit detached-entity workflows.</p>
+<h2 id="emcontains-and-emgetreference"><code>em.contains</code> and <code>em.getReference</code><a class="anchor" href="#emcontains-and-emgetreference" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">em.contains(u);   // is u in this persistence context?
+
+User u = em.getReference(User.class, 42);  // no SELECT; lazy proxy
+</code></pre></div>
+<p><code>getReference</code> is the right tool for "I only need this for setting a FK":</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Order o = new Order();
+o.setCustomer(em.getReference(Customer.class, customerId));   // no SELECT
+em.persist(o);
+</code></pre></div>
+<p>If you later access <code>o.getCustomer().getName()</code>, the proxy initializes (one SELECT). If you don't, you saved the SELECT.</p>
+<h2 id="persistence-context-scope-springs-transactional-boundaries">Persistence-Context Scope — Spring's <code>@Transactional</code> Boundaries<a class="anchor" href="#persistence-context-scope-springs-transactional-boundaries" aria-hidden="true">#</a></h2>
+<p>Spring's <code>JpaTransactionManager</code> opens a persistence context (a <code>Session</code>) on transaction begin and closes it on commit/rollback. So:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class UserService {
+    @Transactional
+    public User create(String name, String email) {
+        // tx start: persistence context opens
+        User u = new User(name, email);
+        em.persist(u);
+        // ... 
+        return u;
+        // tx commit: persistence context closes; u becomes detached
+    }
+}
+</code></pre></div>
+<p>Two <code>@Transactional</code> methods called from different beans use <em>different</em> persistence contexts. Two <code>@Transactional</code> methods called sequentially from the same outer non-transactional method use <em>separate</em> persistence contexts.</p>
+<p><strong>A propagation note</strong>: <code>@Transactional(propagation = REQUIRED)</code> (the default) joins an existing transaction if one is active; this means the persistence context is shared too. So:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class ServiceA {
+    @Transactional
+    public void doA() {
+        // tx start, pc open
+        serviceB.doB();   // joins THIS pc
+        // tx commit, pc closes
+    }
+}
+
+@Service
+public class ServiceB {
+    @Transactional
+    public void doB() {
+        // joins existing tx &amp; pc
+    }
+}
+</code></pre></div>
+<p><code>REQUIRES_NEW</code> opens a fresh transaction and fresh pc. Use rarely.</p>
+<h2 id="persistence-context-size-oom-watch">Persistence-Context Size — OOM Watch<a class="anchor" href="#persistence-context-size-oom-watch" aria-hidden="true">#</a></h2>
+<p>The persistence context grows with every entity touched. A loop loading entities accumulates:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional
+public void process(List&lt;Long&gt; ids) {
+    for (Long id : ids) {                     // 100 K iterations
+        User u = userRepo.findById(id).get(); // each is added to PC
+        process(u);
+    }
+    // PC now holds 100K entities + their snapshots → ~40-80 MB
+}
+</code></pre></div>
+<p>Same answers as before: <code>flush + clear</code>, or <code>StatelessSession</code>, or limit batch size with pagination.</p>
+<p>The dirty-check time is also proportional to PC size. A 100 K-entity flush spends most of its time on diffs, not SQL.</p>
+<h2 id="conversation-scoped-persistence-contexts">Conversation-Scoped Persistence Contexts<a class="anchor" href="#conversation-scoped-persistence-contexts" aria-hidden="true">#</a></h2>
+<p>JPA has a notion of an <strong>extended persistence context</strong> — one that spans multiple transactions:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@PersistenceContext(type = PersistenceContextType.EXTENDED)
+private EntityManager em;
+</code></pre></div>
+<p>Used for multi-step user workflows (wizards) where entities live across HTTP requests. <strong>Rare in Spring</strong> (Spring's transaction model defaults to TX-scoped). Generally avoid; use DTOs and re-load per request.</p>
+<h2 id="worked-example-full-lifecycle">Worked Example — Full Lifecycle<a class="anchor" href="#worked-example-full-lifecycle" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+@Transactional
+public class UserService {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    public User create(String name, String email) {
+        User u = new User(name, email);  // TRANSIENT
+        em.persist(u);                    // → MANAGED
+        // at commit, INSERT fires
+        return u;
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse load(long id) {
+        User u = em.find(User.class, id); // MANAGED (loaded from DB; or cache hit)
+        return UserResponse.of(u);         // map to DTO while still managed
+        // at method end, em closes; u becomes DETACHED; UserResponse is unaffected
+    }
+
+    public User updateName(long id, String newName) {
+        User u = em.find(User.class, id);  // MANAGED
+        u.setName(newName);                // dirty-tracked
+        return u;
+        // at commit, dirty check fires UPDATE; no save() needed
+    }
+
+    public void delete(long id) {
+        User u = em.find(User.class, id);  // MANAGED
+        em.remove(u);                       // → REMOVED
+        // at commit, DELETE fires
+    }
+
+    @Transactional
+    public User reattachAndUpdate(User stale) {  // stale is DETACHED
+        User merged = em.merge(stale);            // copy state into a new managed
+        merged.setName(&quot;updated&quot;);                // dirty-tracked on merged
+        return merged;
+        // commit fires UPDATE based on merged's current state
+    }
+}
+</code></pre></div>
+<p>Each method shows a different transition:</p>
+<ul>
+<li><code>create</code>: Transient → Managed (persist).</li>
+<li><code>load</code>: from DB into Managed; ends Detached after tx.</li>
+<li><code>updateName</code>: Managed throughout; mutation dirty-tracked.</li>
+<li><code>delete</code>: Managed → Removed.</li>
+<li><code>reattachAndUpdate</code>: detached merged into managed (a <em>new</em> object).</li>
+</ul>
+<h2 id="common-pitfalls">Common Pitfalls<a class="anchor" href="#common-pitfalls" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Calling <code>em.merge(u)</code> and not using the return value.</strong> <code>u</code> stays detached; the managed copy is the return value. Always <code>User saved = em.merge(u);</code>.</p><p>[!WARNING]
+<strong>Calling <code>setX(...)</code> on a detached entity expecting a save.</strong> Not tracked. Either re-load with <code>find</code>, then mutate, or <code>merge</code>.</p>
+<p>[!WARNING]
+<strong>Lazy access outside <code>@Transactional</code>.</strong> <code>LazyInitializationException</code>. Return DTOs from service.</p>
+<p>[!WARNING]
+<strong><code>open-in-view = true</code> in production.</strong> Hides N+1; leaks layering; holds connections.</p>
+<p>[!WARNING]
+<strong>Persistence-context not cleared in batch.</strong> OOM. Use <code>flush + clear</code> every N or <code>StatelessSession</code>.</p>
+<p>[!WARNING]
+<strong>Calling <code>em.flush()</code> manually mid-business-logic.</strong> Defeats batching; risks premature constraint failure. Trust the transaction commit.</p>
+<p>[!WARNING]
+<strong>Persisting a detached entity.</strong> <code>PersistenceException</code>. Use <code>merge</code>.</p>
+<p>[!WARNING]
+<strong>Manual <code>em.refresh()</code> on every read "to be safe".</strong> Doubles every read. Use only when you know stale data is possible.</p>
+<p>[!WARNING]
+<strong>Returning entities from REST controllers (with <code>@OneToMany</code> collections).</strong> Jackson serialization touches every lazy field → infinite recursion or N+1 explosion. Return DTOs.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li>Trace an entity through all four states: create transient, persist (managed), commit (detached), merge back (managed again), remove. Print the state at each step (<code>em.contains(u)</code>).</li>
+<li>Trigger the persist-vs-merge confusion: try <code>em.persist(detached)</code>; observe the exception.</li>
+<li>Demonstrate <code>merge</code> not returning the same instance: assert <code>merged != original</code>.</li>
+<li>Trigger <code>LazyInitializationException</code> deliberately. Fix three ways: (a) JOIN FETCH, (b) DTO mapping in service, (c) <code>@EntityGraph</code>. Compare emitted SQL.</li>
+<li>Batch-insert 100K entities; measure heap with and without <code>flush+clear</code>. Profile with VisualVM.</li>
+<li>Use <code>em.getReference</code> for a FK; confirm no SELECT via SQL log.</li>
+<li>Compare <code>@Transactional(readOnly=true)</code> vs <code>@Transactional</code>. Profile a 1000-entity read; observe the dirty-check memory difference.</li>
+<li>Pin <code>spring.jpa.open-in-view=false</code>. Build a controller that returns an entity with a lazy collection; expect failure. Fix by returning a DTO.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Define the persistence context as the per-transaction identity map + snapshot store + action queue + collection states.</li>
+<li>Walk every entity transition (Transient ↔ Managed ↔ Detached, Managed → Removed) and name the API that triggers each.</li>
+<li>Distinguish <code>persist</code> (transient → managed) from <code>merge</code> (detached → managed); always use <code>merge</code>'s return value.</li>
+<li>Use <code>em.find</code> for actual loads, <code>em.getReference</code> for FK-only references.</li>
+<li>Use <code>em.flush + em.clear</code> in batch loops (or <code>StatelessSession</code>) to keep persistence-context size bounded.</li>
+<li>Diagnose <code>LazyInitializationException</code>: the entity left the persistence context; either re-shape the load (JOIN FETCH / <code>@EntityGraph</code>) or return a DTO.</li>
+<li>Disable <code>open-in-view</code> and adopt the discipline of returning DTOs from service methods.</li>
+<li>Annotate read methods <code>@Transactional(readOnly = true)</code> for the dirty-check skip and connection hint.</li>
+<li>Reason about <code>@Transactional</code> propagation (REQUIRED joins, REQUIRES_NEW splits) and its effect on persistence-context scope.</li>
+<li>Avoid the canonical pitfalls: discarding merge result, mutating detached entities, lazy access outside tx, manual flush, OOM batch loops, returning entities from controllers.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t06-lazy-vs-eager-loading.html">Lazy vs eager loading</a> for the precise mechanics of <code>FetchType.LAZY</code> and <code>FetchType.EAGER</code> — what proxies look like at the bytecode level, when each is triggered, and the fetching strategies (<code>JOIN FETCH</code>, <code>@EntityGraph</code>, batch fetching, subselect) that close the lazy-vs-N+1 gap.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Persistence context &amp; entity lifecycle&quot;
+slug: persistence-context-and-entity-lifecycle
+level: L4
+module: &quot;Backend Engineering&quot;
+section: &quot;Persistence — JPA / Hibernate / ORM&quot;
+type: concept
+difficulty: senior
+order: 5
+tags: [persistence-context, l1-cache, first-level-cache, identity-map, entity-state, transient, managed, detached, removed, persist, merge, remove, find, getreference, refresh, detach, clear, contains, lifecycle, jpa-callbacks, prepersist, postpersist, preupdate, postupdate, preremove, postremove, postload, transaction-scoped, extended-persistence-context, openentitymanagerinview, opensessioninview, hibernate-session-management, conversation, persistence-context-size, large-transaction, memory-leak, flush-clear-pattern, batch-processing, detached-entity-problem, dto-vs-entity, lazy-init-exception, lazy-initialization, transactional-readonly, set-readonly-mode, dirty-check-skip, optimistic-locking-version]
+prerequisites: [jpa-fundamentals-entities-entitymanager, hibernate-architecture, spring-aop]
+status: complete
+estimated_minutes: 75
+last_updated: 2026-06-08
+---
+
+# Persistence context &amp; entity lifecycle
+
+The **persistence context** is the most important concept in JPA — and the most misunderstood. It is **the in-memory cache and identity map** that lives inside a `Session` / `EntityManager` for the duration of one transaction (typically). Every entity you load, persist, merge, or interact with goes *through* it. It guarantees that two `em.find(User.class, 42)` calls in one transaction return *the same Java reference*. It tracks the entities you&#x27;ve mutated so the right UPDATE statements fire at flush. It coordinates cascading. It&#x27;s also the source of the most frustrating Spring JPA bugs: `LazyInitializationException`, &quot;why isn&#x27;t my UPDATE running&quot;, detached-entity nightmares, OOM on batch jobs.
+
+A senior engineer needs to think of the persistence context as **a working set** — an explicit data structure with an explicit scope, contents, and operations. T01 mentioned it; T02 showed how to use `EntityManager`; T04 showed how Hibernate implements it; this topic *makes it concrete*. We cover: the four entity states (transient, managed, detached, removed) and the transitions between them; `persist` vs `merge` (the most-confused operation pair); the size of the persistence context and the OOM risk; the `flush + clear` batch pattern; the lazy-init exception and its causes; Spring&#x27;s `@Transactional` boundaries as persistence-context boundaries; the `OpenEntityManagerInView` anti-pattern revisited; and the discipline of returning DTOs (not entities) to the caller.
+
+The depth-bar this topic clears: at the **language layer**, every entity state transition, every `EntityManager` operation that drives it, and every lifecycle callback. At the **memory layer**, the persistence context as a `Map&lt;EntityKey, Object&gt;` with auxiliary structures for snapshots, collection-state tracking, and pending actions; per-entity ~200 B + the snapshot ≈ same size as the entity; for 10 K entities, ~400 MB heap. At the **architecture layer** — the heart — **the persistence context is the scope** that defines identity, dirty tracking, lazy loading, and cascade. Get its boundaries right (transactional scope, `flush + clear` in batches, DTOs at the controller) and Hibernate sings; get them wrong and you get OOMs and N+1 traps.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [JPA fundamentals (T02)](./T02-jpa-fundamentals-entities-entitymanager.md), [Entity mappings (T03)](./T03-entity-mappings-and-relationships-onetomany-etc.md), [Hibernate architecture (T04)](./T04-hibernate-architecture.md). Spring `@Transactional` (T05 of C01).
+
+## What The Persistence Context Is
+
+A `Map&lt;EntityKey, Object&gt;` holding every entity the `EntityManager` is currently tracking, plus per-entity snapshots for dirty checking, plus pending actions:
+
+```mermaid
+flowchart TB
+  PC[&quot;PersistenceContext (per transaction)&quot;]
+  Im[&quot;identity map: EntityKey(User, 42) → User@4a3b&quot;]
+  Sn[&quot;snapshots: User@4a3b → {name=&#x27;alice&#x27;, email=&#x27;a@x.io&#x27;}&quot;]
+  Aq[&quot;action queue: [insert, update, delete pending]&quot;]
+  Cs[&quot;collection states: order.items → uninitialized / initialized / dirty&quot;]
+  PC --&gt; Im
+  PC --&gt; Sn
+  PC --&gt; Aq
+  PC --&gt; Cs
+```
+
+**Identity map**: same primary key → same Java reference. `em.find(User.class, 42)` twice returns the same object.
+
+**Snapshots**: copy of every field at load time, for dirty checking (T04).
+
+**Action queue**: pending INSERT/UPDATE/DELETE (T04).
+
+**Collection states**: per `@OneToMany` / `@ManyToMany`, whether the collection has been initialized, whether it&#x27;s dirty.
+
+## The Four States
+
+```mermaid
+stateDiagram-v2
+  [*] --&gt; Transient: new User()
+  Transient --&gt; Managed: persist
+  Detached --&gt; Managed: merge
+  Managed --&gt; Detached: tx end, clear, detach, close
+  Managed --&gt; Removed: remove
+  Removed --&gt; Managed: persist again (rare; usually mistake)
+  Managed --&gt; [*]: GC after detach
+  Transient: not known to JPA
+  Managed: tracked; dirty-checked; in identity map
+  Detached: not tracked; mutations don&#x27;t persist
+  Removed: marked for DELETE; row deleted on flush
+```
+
+### Transient
+
+A new instance not yet known to JPA:
+
+```java
+User u = new User(&quot;alice&quot;, &quot;alice@x.io&quot;);
+// u.id == null; not in any persistence context
+```
+
+The DB has no row for it. No dirty tracking. If you mutate and don&#x27;t persist, it stays in heap, GC&#x27;d when no references remain.
+
+### Managed
+
+After `em.persist(u)` or `em.find(...)`:
+
+```java
+em.persist(u);   // u is now MANAGED
+// u.id != null; persistence context tracks u
+u.setEmail(&quot;new@x.io&quot;);   // dirty-tracked
+// at flush: UPDATE users SET email=&#x27;new@x.io&#x27; WHERE id=u.id
+```
+
+Managed entities are in the identity map. Mutations are tracked. The right state for the duration of a transaction.
+
+### Detached
+
+When the persistence context closes (transaction commits, `em.clear()`, or `em.detach(u)`):
+
+```java
+// At @Transactional end:
+User u = userService.load(42);   // managed
+// transaction commits; em closes
+// u is now DETACHED
+u.setEmail(&quot;new@x.io&quot;);   // mutation in heap; NOT tracked; NOT persisted
+```
+
+The Java object still exists in heap; its fields are still set. But Hibernate no longer knows about it. To re-attach, use `merge`.
+
+### Removed
+
+`em.remove(u)`:
+
+```java
+User u = em.find(User.class, 42);
+em.remove(u);
+// u is now REMOVED; at flush: DELETE FROM users WHERE id = 42
+// the Java object still exists in heap until GC
+```
+
+The row is deleted on flush. The Java object is now meaningless (referencing a non-existent row).
+
+## `persist` vs `merge`
+
+The classic source of confusion.
+
+### `persist(u)` — For New Entities
+
+```java
+User u = new User(&quot;alice&quot;, &quot;a@x.io&quot;);
+em.persist(u);
+// u becomes MANAGED
+// at flush: INSERT
+```
+
+**Required**: `u` must be transient or already managed (no-op). Persisting a *detached* entity throws `PersistenceException` (&quot;detached entity passed to persist&quot;).
+
+### `merge(u)` — For Detached Entities
+
+```java
+// u was loaded in a previous transaction; we have a reference but it&#x27;s now detached
+User merged = em.merge(u);
+// merged is a NEW managed entity with u&#x27;s data; u remains DETACHED
+// at flush: UPDATE
+```
+
+**The key catch**: `merge` does *not* re-attach `u`. It copies `u`&#x27;s state into a *new* managed entity (`merged`) and returns it. `u` stays detached. **You must use the return value.**
+
+```java
+em.merge(u);          // ⚠️ bug: result discarded
+em.merge(u).setEmail(&quot;x&quot;);   // ✅ correct
+```
+
+```mermaid
+flowchart LR
+  D[&quot;u (DETACHED)&quot;]
+  M[&quot;em.merge(u)&quot;]
+  N[&quot;copy u&#x27;s state to a new managed entity&quot;]
+  Ret[&quot;return merged (MANAGED)&quot;]
+  Orig[&quot;u stays DETACHED&quot;]
+  D --&gt; M --&gt; N --&gt; Ret
+  M --&gt; Orig
+```
+
+### When To Use Each
+
+| Scenario | Method |
+|----------|--------|
+| New entity to insert | `persist` |
+| Loaded entity, still in same tx, mutate-and-save | nothing (dirty-tracked) |
+| Detached entity from a previous tx | `merge` |
+| Re-attaching from cache / external source | `merge` (or `find` first then mutate) |
+| Cascade from a managed parent | `cascade = PERSIST` or `MERGE` handles it |
+
+**Spring Data JPA&#x27;s `save(u)`**: if `u.id == null` → `persist`; else → `merge`. Convenient but ambiguous; you don&#x27;t always know which path runs.
+
+## The `flush + clear` Pattern For Batch
+
+A 100 K-row batch with default settings:
+
+```java
+@Transactional
+public void importAll(List&lt;UserData&gt; data) {
+    for (UserData d : data) {
+        em.persist(new User(d.name(), d.email()));
+        // each new entity stays in the persistence context
+    }
+    // at commit, 100K INSERTs fire
+    // the persistence context held 100K entities + 100K snapshots → ~40 MB
+}
+```
+
+Two problems: 100 K snapshots in memory; flush at commit is one giant transaction.
+
+The fix:
+
+```java
+@Transactional
+public void importAll(List&lt;UserData&gt; data) {
+    int i = 0;
+    for (UserData d : data) {
+        em.persist(new User(d.name(), d.email()));
+        if (++i % 1000 == 0) {
+            em.flush();    // execute pending INSERTs
+            em.clear();    // detach everything; release memory
+        }
+    }
+    em.flush();
+    em.clear();
+}
+```
+
+Plus configure batch inserts:
+
+```yaml
+spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 50
+        order_inserts: true
+```
+
+Now 100 K inserts flush in 100 batches of 1000 (with 50-row JDBC batches inside each), memory stays bounded, throughput is ~30× higher than the default.
+
+**For truly large jobs, use `StatelessSession` (T04) — bypass the persistence context entirely.**
+
+## Lazy Initialization &amp; The Detached-Entity Problem
+
+### `LazyInitializationException`
+
+The infamous error:
+
+```
+org.hibernate.LazyInitializationException: could not initialize proxy [User#42] - no Session
+```
+
+What happened:
+
+```java
+@Transactional(readOnly = true)
+public User loadUser(long id) {
+    return userRepo.findById(id).orElseThrow();
+}
+
+// in controller:
+User u = userService.loadUser(42);
+String customerName = u.getOrder().getCustomer().getName();   // 💥 LazyInitException
+```
+
+The flow:
+
+1. `loadUser` transaction starts; loads `u`.
+2. `u.getOrder()` is `LAZY`; Hibernate stores a proxy.
+3. Transaction commits; `u` becomes detached.
+4. Controller accesses `u.getOrder().getCustomer().getName()`.
+5. The proxy tries to initialize; needs a session; there isn&#x27;t one → exception.
+
+Three fixes, in order of preference:
+
+1. **Return a DTO, not the entity.** Map inside the `@Transactional` method.
+   ```java
+   @Transactional(readOnly = true)
+   public UserResponse loadUser(long id) {
+       User u = userRepo.findById(id).orElseThrow();
+       return new UserResponse(u.getId(), u.getName(),
+           u.getOrder().getCustomer().getName());   // access while managed
+   }
+   ```
+2. **Eagerly fetch what you need via JOIN FETCH or `@EntityGraph`.**
+   ```java
+   @Query(&quot;SELECT u FROM User u JOIN FETCH u.order o JOIN FETCH o.customer WHERE u.id = ?1&quot;)
+   Optional&lt;User&gt; findByIdWithOrderAndCustomer(long id);
+   ```
+3. **NEVER** enable `open-in-view`. It papers over the bug but holds the session for the entire HTTP request.
+
+```mermaid
+flowchart LR
+  Tx[&quot;@Transactional method runs&quot;]
+  M[&quot;entity managed; lazy proxies set&quot;]
+  End[&quot;tx commits; entity detached&quot;]
+  Ctl[&quot;controller calls lazy getter&quot;]
+  Boom[&quot;LazyInitException&quot;]
+  Fix1[&quot;return DTO from service&quot;]
+  Fix2[&quot;JOIN FETCH eagerly&quot;]
+  Tx --&gt; M --&gt; End --&gt; Ctl --&gt; Boom
+  M -.-&gt; Fix1
+  M -.-&gt; Fix2
+```
+
+### The Anti-Pattern: `open-in-view`
+
+```yaml
+spring.jpa.open-in-view: true   # default in Boot; FALSE in any sensible app
+```
+
+Keeps the `EntityManager` open until the HTTP response is rendered. The lazy load triggers a SELECT *during view rendering*. Three downsides:
+
+- **N+1 hides**: each lazy access fires a SELECT in the view layer.
+- **DB connection held longer**: from controller invocation to response done, including JSON serialization.
+- **Layering leaks**: persistence concerns reach into HTTP layer.
+
+**Always disable in REST services.** Use DTOs.
+
+### `Hibernate.initialize` — The Bandaid
+
+```java
+@Transactional(readOnly = true)
+public User loadUser(long id) {
+    User u = userRepo.findById(id).orElseThrow();
+    Hibernate.initialize(u.getOrder());
+    Hibernate.initialize(u.getOrder().getCustomer());
+    return u;
+}
+```
+
+Forces the lazy proxies to load. Works but is N+1 — three SELECTs (user, order, customer). Use `JOIN FETCH` instead.
+
+## DTOs at the Boundary — The Discipline
+
+Mature Spring services have a strict rule: **entities never cross the service-controller boundary.** The service returns DTOs (records); the controller serializes the DTOs. Two reasons:
+
+1. **Detached-entity issues vanish.** The DTO has no lazy proxies.
+2. **API contract decoupled from schema.** Rename a column without changing the JSON; add fields to DTOs without exposing entities.
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class UserService {
+    public UserResponse loadUser(long id) {
+        User u = userRepo.findById(id).orElseThrow();
+        return new UserResponse(u.getId(), u.getName(), u.getEmail(),
+            u.getOrders().stream().map(this::toOrderSummary).toList());
+    }
+    private OrderSummary toOrderSummary(Order o) {
+        return new OrderSummary(o.getId(), o.getStatus(), o.getTotal());
+    }
+}
+
+@RestController
+public class UserController {
+    @GetMapping(&quot;/api/users/{id}&quot;)
+    public UserResponse get(@PathVariable long id) {
+        return userService.loadUser(id);
+    }
+}
+```
+
+Mapping inside the transactional method ensures every lazy field is touched while managed. Outside, the DTO is plain data.
+
+## `@Transactional(readOnly = true)`
+
+A hint Hibernate honors:
+
+- Skips dirty checking (no snapshots; less memory; no UPDATE attempts).
+- Flush mode set to `MANUAL` (no implicit flushes before queries).
+- Database driver may use a read-only connection (depends on the connection pool).
+
+Always annotate read-only service methods. Saves memory on large reads.
+
+## `em.refresh` and `em.detach`
+
+```java
+User u = em.find(User.class, 42);
+// time passes; another tx mutates the row
+em.refresh(u);   // re-read from DB; discard local changes; reset snapshot
+```
+
+Useful when you suspect the entity is stale.
+
+```java
+em.detach(u);   // remove u from the persistence context
+u.setEmail(&quot;x&quot;);   // no longer tracked; no UPDATE
+```
+
+Rarely needed in modern code; relevant for explicit detached-entity workflows.
+
+## `em.contains` and `em.getReference`
+
+```java
+em.contains(u);   // is u in this persistence context?
+
+User u = em.getReference(User.class, 42);  // no SELECT; lazy proxy
+```
+
+`getReference` is the right tool for &quot;I only need this for setting a FK&quot;:
+
+```java
+Order o = new Order();
+o.setCustomer(em.getReference(Customer.class, customerId));   // no SELECT
+em.persist(o);
+```
+
+If you later access `o.getCustomer().getName()`, the proxy initializes (one SELECT). If you don&#x27;t, you saved the SELECT.
+
+## Persistence-Context Scope — Spring&#x27;s `@Transactional` Boundaries
+
+Spring&#x27;s `JpaTransactionManager` opens a persistence context (a `Session`) on transaction begin and closes it on commit/rollback. So:
+
+```java
+@Service
+public class UserService {
+    @Transactional
+    public User create(String name, String email) {
+        // tx start: persistence context opens
+        User u = new User(name, email);
+        em.persist(u);
+        // ... 
+        return u;
+        // tx commit: persistence context closes; u becomes detached
+    }
+}
+```
+
+Two `@Transactional` methods called from different beans use *different* persistence contexts. Two `@Transactional` methods called sequentially from the same outer non-transactional method use *separate* persistence contexts.
+
+**A propagation note**: `@Transactional(propagation = REQUIRED)` (the default) joins an existing transaction if one is active; this means the persistence context is shared too. So:
+
+```java
+@Service
+public class ServiceA {
+    @Transactional
+    public void doA() {
+        // tx start, pc open
+        serviceB.doB();   // joins THIS pc
+        // tx commit, pc closes
+    }
+}
+
+@Service
+public class ServiceB {
+    @Transactional
+    public void doB() {
+        // joins existing tx &amp; pc
+    }
+}
+```
+
+`REQUIRES_NEW` opens a fresh transaction and fresh pc. Use rarely.
+
+## Persistence-Context Size — OOM Watch
+
+The persistence context grows with every entity touched. A loop loading entities accumulates:
+
+```java
+@Transactional
+public void process(List&lt;Long&gt; ids) {
+    for (Long id : ids) {                     // 100 K iterations
+        User u = userRepo.findById(id).get(); // each is added to PC
+        process(u);
+    }
+    // PC now holds 100K entities + their snapshots → ~40-80 MB
+}
+```
+
+Same answers as before: `flush + clear`, or `StatelessSession`, or limit batch size with pagination.
+
+The dirty-check time is also proportional to PC size. A 100 K-entity flush spends most of its time on diffs, not SQL.
+
+## Conversation-Scoped Persistence Contexts
+
+JPA has a notion of an **extended persistence context** — one that spans multiple transactions:
+
+```java
+@PersistenceContext(type = PersistenceContextType.EXTENDED)
+private EntityManager em;
+```
+
+Used for multi-step user workflows (wizards) where entities live across HTTP requests. **Rare in Spring** (Spring&#x27;s transaction model defaults to TX-scoped). Generally avoid; use DTOs and re-load per request.
+
+## Worked Example — Full Lifecycle
+
+```java
+@Service
+@Transactional
+public class UserService {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    public User create(String name, String email) {
+        User u = new User(name, email);  // TRANSIENT
+        em.persist(u);                    // → MANAGED
+        // at commit, INSERT fires
+        return u;
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse load(long id) {
+        User u = em.find(User.class, id); // MANAGED (loaded from DB; or cache hit)
+        return UserResponse.of(u);         // map to DTO while still managed
+        // at method end, em closes; u becomes DETACHED; UserResponse is unaffected
+    }
+
+    public User updateName(long id, String newName) {
+        User u = em.find(User.class, id);  // MANAGED
+        u.setName(newName);                // dirty-tracked
+        return u;
+        // at commit, dirty check fires UPDATE; no save() needed
+    }
+
+    public void delete(long id) {
+        User u = em.find(User.class, id);  // MANAGED
+        em.remove(u);                       // → REMOVED
+        // at commit, DELETE fires
+    }
+
+    @Transactional
+    public User reattachAndUpdate(User stale) {  // stale is DETACHED
+        User merged = em.merge(stale);            // copy state into a new managed
+        merged.setName(&quot;updated&quot;);                // dirty-tracked on merged
+        return merged;
+        // commit fires UPDATE based on merged&#x27;s current state
+    }
+}
+```
+
+Each method shows a different transition:
+
+- `create`: Transient → Managed (persist).
+- `load`: from DB into Managed; ends Detached after tx.
+- `updateName`: Managed throughout; mutation dirty-tracked.
+- `delete`: Managed → Removed.
+- `reattachAndUpdate`: detached merged into managed (a *new* object).
+
+## Common Pitfalls
+
+&gt; [!WARNING]
+&gt; **Calling `em.merge(u)` and not using the return value.** `u` stays detached; the managed copy is the return value. Always `User saved = em.merge(u);`.
+
+&gt; [!WARNING]
+&gt; **Calling `setX(...)` on a detached entity expecting a save.** Not tracked. Either re-load with `find`, then mutate, or `merge`.
+
+&gt; [!WARNING]
+&gt; **Lazy access outside `@Transactional`.** `LazyInitializationException`. Return DTOs from service.
+
+&gt; [!WARNING]
+&gt; **`open-in-view = true` in production.** Hides N+1; leaks layering; holds connections.
+
+&gt; [!WARNING]
+&gt; **Persistence-context not cleared in batch.** OOM. Use `flush + clear` every N or `StatelessSession`.
+
+&gt; [!WARNING]
+&gt; **Calling `em.flush()` manually mid-business-logic.** Defeats batching; risks premature constraint failure. Trust the transaction commit.
+
+&gt; [!WARNING]
+&gt; **Persisting a detached entity.** `PersistenceException`. Use `merge`.
+
+&gt; [!WARNING]
+&gt; **Manual `em.refresh()` on every read &quot;to be safe&quot;.** Doubles every read. Use only when you know stale data is possible.
+
+&gt; [!WARNING]
+&gt; **Returning entities from REST controllers (with `@OneToMany` collections).** Jackson serialization touches every lazy field → infinite recursion or N+1 explosion. Return DTOs.
+
+## Practice
+
+1. Trace an entity through all four states: create transient, persist (managed), commit (detached), merge back (managed again), remove. Print the state at each step (`em.contains(u)`).
+2. Trigger the persist-vs-merge confusion: try `em.persist(detached)`; observe the exception.
+3. Demonstrate `merge` not returning the same instance: assert `merged != original`.
+4. Trigger `LazyInitializationException` deliberately. Fix three ways: (a) JOIN FETCH, (b) DTO mapping in service, (c) `@EntityGraph`. Compare emitted SQL.
+5. Batch-insert 100K entities; measure heap with and without `flush+clear`. Profile with VisualVM.
+6. Use `em.getReference` for a FK; confirm no SELECT via SQL log.
+7. Compare `@Transactional(readOnly=true)` vs `@Transactional`. Profile a 1000-entity read; observe the dirty-check memory difference.
+8. Pin `spring.jpa.open-in-view=false`. Build a controller that returns an entity with a lazy collection; expect failure. Fix by returning a DTO.
+
+## Recap
+
+You should now be able to:
+
+- Define the persistence context as the per-transaction identity map + snapshot store + action queue + collection states.
+- Walk every entity transition (Transient ↔ Managed ↔ Detached, Managed → Removed) and name the API that triggers each.
+- Distinguish `persist` (transient → managed) from `merge` (detached → managed); always use `merge`&#x27;s return value.
+- Use `em.find` for actual loads, `em.getReference` for FK-only references.
+- Use `em.flush + em.clear` in batch loops (or `StatelessSession`) to keep persistence-context size bounded.
+- Diagnose `LazyInitializationException`: the entity left the persistence context; either re-shape the load (JOIN FETCH / `@EntityGraph`) or return a DTO.
+- Disable `open-in-view` and adopt the discipline of returning DTOs from service methods.
+- Annotate read methods `@Transactional(readOnly = true)` for the dirty-check skip and connection hint.
+- Reason about `@Transactional` propagation (REQUIRED joins, REQUIRES_NEW splits) and its effect on persistence-context scope.
+- Avoid the canonical pitfalls: discarding merge result, mutating detached entities, lazy access outside tx, manual flush, OOM batch loops, returning entities from controllers.
+
+## Next
+
+Continue to [Lazy vs eager loading](./T06-lazy-vs-eager-loading.md) for the precise mechanics of `FetchType.LAZY` and `FetchType.EAGER` — what proxies look like at the bytecode level, when each is triggered, and the fetching strategies (`JOIN FETCH`, `@EntityGraph`, batch fetching, subselect) that close the lazy-vs-N+1 gap.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l4/c02-t04-hibernate-architecture.html"><div class="lbl">← Previous</div><div class="ttl">T04-hibernate-architecture</div><div class="sub">Hibernate architecture</div></a><a class="next" href="../l4/c02-t06-lazy-vs-eager-loading.html"><div class="lbl">Next →</div><div class="ttl">T06-lazy-vs-eager-loading</div><div class="sub">Lazy vs eager loading</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-the-persistence-context-is" data-toc-link>What The Persistence Context Is</a></li><li class="lvl-2"><a href="#the-four-states" data-toc-link>The Four States</a></li><li class="lvl-3"><a href="#transient" data-toc-link>Transient</a></li><li class="lvl-3"><a href="#managed" data-toc-link>Managed</a></li><li class="lvl-3"><a href="#detached" data-toc-link>Detached</a></li><li class="lvl-3"><a href="#removed" data-toc-link>Removed</a></li><li class="lvl-2"><a href="#persist-vs-merge" data-toc-link>persist vs merge</a></li><li class="lvl-3"><a href="#persistu-for-new-entities" data-toc-link>persist(u) — For New Entities</a></li><li class="lvl-3"><a href="#mergeu-for-detached-entities" data-toc-link>merge(u) — For Detached Entities</a></li><li class="lvl-3"><a href="#when-to-use-each" data-toc-link>When To Use Each</a></li><li class="lvl-2"><a href="#the-flush-clear-pattern-for-batch" data-toc-link>The flush + clear Pattern For Batch</a></li><li class="lvl-2"><a href="#lazy-initialization-the-detached-entity-problem" data-toc-link>Lazy Initialization &amp;amp; The Detached-Entity Problem</a></li><li class="lvl-3"><a href="#lazyinitializationexception" data-toc-link>LazyInitializationException</a></li><li class="lvl-3"><a href="#the-anti-pattern-open-in-view" data-toc-link>The Anti-Pattern: open-in-view</a></li><li class="lvl-3"><a href="#hibernateinitialize-the-bandaid" data-toc-link>Hibernate.initialize — The Bandaid</a></li><li class="lvl-2"><a href="#dtos-at-the-boundary-the-discipline" data-toc-link>DTOs at the Boundary — The Discipline</a></li><li class="lvl-2"><a href="#transactionalreadonly-true" data-toc-link>@Transactional(readOnly = true)</a></li><li class="lvl-2"><a href="#emrefresh-and-emdetach" data-toc-link>em.refresh and em.detach</a></li><li class="lvl-2"><a href="#emcontains-and-emgetreference" data-toc-link>em.contains and em.getReference</a></li><li class="lvl-2"><a href="#persistence-context-scope-springs-transactional-boundaries" data-toc-link>Persistence-Context Scope — Spring&#x27;s @Transactional Boundaries</a></li><li class="lvl-2"><a href="#persistence-context-size-oom-watch" data-toc-link>Persistence-Context Size — OOM Watch</a></li><li class="lvl-2"><a href="#conversation-scoped-persistence-contexts" data-toc-link>Conversation-Scoped Persistence Contexts</a></li><li class="lvl-2"><a href="#worked-example-full-lifecycle" data-toc-link>Worked Example — Full Lifecycle</a></li><li class="lvl-2"><a href="#common-pitfalls" data-toc-link>Common Pitfalls</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

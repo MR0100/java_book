@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — DSA for Interviews (Java)
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -35,4 +35,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 13 | Greedy algorithms | `T13-greedy-algorithms.md` | planned |
 | 14 | Coding interview patterns & problem-solving framework | `T14-coding-interview-patterns-and-problem-solving-framework.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

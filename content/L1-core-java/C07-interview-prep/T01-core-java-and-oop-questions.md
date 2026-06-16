@@ -16,7 +16,7 @@ last_updated: 2026-06-05
 
 # Core Java & OOP Interview Questions
 
-The L1-level Java interview questions you'll get for **junior / 0–3-year** positions — Indian MNC service companies (TCS, Infosys, Wipro, Accenture, Capgemini, Cognizant, HCL, Tech Mahindra), most startup screens, and product-company entry rounds. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../CONVENTIONS.md). Distilled from the INTERVIEW callouts across the C01–C06 topics plus questions reported by candidates.
+The L1-level Java interview questions you'll get for **junior / 0–3-year** positions — Indian MNC service companies (TCS, Infosys, Wipro, Accenture, Capgemini, Cognizant, HCL, Tech Mahindra), most startup screens, and product-company entry rounds. Each follows the fixed Q&A format from [CONVENTIONS §9](../../../templates/CONVENTIONS.md). Distilled from the INTERVIEW callouts across the C01–C06 topics plus questions reported by candidates.
 
 > [!TIP]
 > For each Q: answer out loud (or write a short paragraph) *before* reading the answer. Articulating from memory is the prep — passive reading isn't. The follow-ups are where interviews actually go, so rehearse those too.

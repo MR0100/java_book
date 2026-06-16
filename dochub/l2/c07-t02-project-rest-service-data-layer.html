@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link active" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🛰</span><span>Ch. 4 · L2 — Intermediate &amp; Backend</span></div><div class="chapter-path">content/L2-intermediate-backend/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l2/overview.html" data-q="l2 — intermediate java &amp; backend foundations content/l2-intermediate-backend/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · functional and modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><summary><span class="caret">▶</span><span>C01 · Functional And Modern Java</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — functional &amp; modern java content/l2-intermediate-backend/c01-functional-and-modern-java/readme.md"><a class="" href="../l2/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="lambda expressions content/l2-intermediate-backend/c01-functional-and-modern-java/t01-lambda-expressions.md"><a class="" href="../l2/c01-t01-lambda-expressions.html"><span>Lambda expressions</span><span class="kind-pill "></span></a></li><li data-q="functional interfaces (function, predicate, supplier, consumer) content/l2-intermediate-backend/c01-functional-and-modern-java/t02-functional-interfaces-function-predicate-supplier-consumer.md"><a class="" href="../l2/c01-t02-functional-interfaces-function-predicate-supplier-consumer.html"><span>Functional interfaces (Function, Predicate, Supplier, Consumer)</span><span class="kind-pill "></span></a></li><li data-q="method &amp; constructor references content/l2-intermediate-backend/c01-functional-and-modern-java/t03-method-and-constructor-references.md"><a class="" href="../l2/c01-t03-method-and-constructor-references.html"><span>Method &amp; constructor references</span><span class="kind-pill "></span></a></li><li data-q="streams api (intermediate &amp; terminal operations) content/l2-intermediate-backend/c01-functional-and-modern-java/t04-streams-api-intermediate-and-terminal-operations.md"><a class="" href="../l2/c01-t04-streams-api-intermediate-and-terminal-operations.html"><span>Streams API (intermediate &amp; terminal operations)</span><span class="kind-pill "></span></a></li><li data-q="collectors &amp; grouping content/l2-intermediate-backend/c01-functional-and-modern-java/t05-collectors-and-grouping.md"><a class="" href="../l2/c01-t05-collectors-and-grouping.html"><span>Collectors &amp; grouping</span><span class="kind-pill "></span></a></li><li data-q="parallel streams content/l2-intermediate-backend/c01-functional-and-modern-java/t06-parallel-streams.md"><a class="" href="../l2/c01-t06-parallel-streams.html"><span>Parallel streams</span><span class="kind-pill "></span></a></li><li data-q="optional in depth content/l2-intermediate-backend/c01-functional-and-modern-java/t07-optional-in-depth.md"><a class="" href="../l2/c01-t07-optional-in-depth.html"><span>Optional in depth</span><span class="kind-pill "></span></a></li><li data-q="functional programming style &amp; immutability content/l2-intermediate-backend/c01-functional-and-modern-java/t08-functional-programming-style-and-immutability.md"><a class="" href="../l2/c01-t08-functional-programming-style-and-immutability.html"><span>Functional programming style &amp; immutability</span><span class="kind-pill "></span></a></li><li data-q="new language features by version (java 8 to 21+) content/l2-intermediate-backend/c01-functional-and-modern-java/t09-new-language-features-by-version-java-8-to-21-plus.md"><a class="" href="../l2/c01-t09-new-language-features-by-version-java-8-to-21-plus.html"><span>New language features by version (Java 8 to 21+)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · build tools and workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><summary><span class="caret">▶</span><span>C02 · Build Tools And Workflow</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — build tools &amp; developer workflow content/l2-intermediate-backend/c02-build-tools-and-workflow/readme.md"><a class="" href="../l2/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="maven (lifecycle, pom, dependencies, plugins) content/l2-intermediate-backend/c02-build-tools-and-workflow/t01-maven-lifecycle-pom-dependencies-plugins.md"><a class="" href="../l2/c02-t01-maven-lifecycle-pom-dependencies-plugins.html"><span>Maven (lifecycle, POM, dependencies, plugins)</span><span class="kind-pill "></span></a></li><li data-q="gradle (tasks, build scripts, dependencies) content/l2-intermediate-backend/c02-build-tools-and-workflow/t02-gradle-tasks-build-scripts-dependencies.md"><a class="" href="../l2/c02-t02-gradle-tasks-build-scripts-dependencies.html"><span>Gradle (tasks, build scripts, dependencies)</span><span class="kind-pill "></span></a></li><li data-q="dependency management &amp; version conflicts content/l2-intermediate-backend/c02-build-tools-and-workflow/t03-dependency-management-and-version-conflicts.md"><a class="" href="../l2/c02-t03-dependency-management-and-version-conflicts.html"><span>Dependency management &amp; version conflicts</span><span class="kind-pill "></span></a></li><li data-q="multi-module projects content/l2-intermediate-backend/c02-build-tools-and-workflow/t04-multi-module-projects.md"><a class="" href="../l2/c02-t04-multi-module-projects.html"><span>Multi-module projects</span><span class="kind-pill "></span></a></li><li data-q="git workflows (branching, prs, rebasing) content/l2-intermediate-backend/c02-build-tools-and-workflow/t05-git-workflows-branching-prs-rebasing.md"><a class="" href="../l2/c02-t05-git-workflows-branching-prs-rebasing.html"><span>Git workflows (branching, PRs, rebasing)</span><span class="kind-pill "></span></a></li><li data-q="code formatters &amp; linters (checkstyle, spotless) content/l2-intermediate-backend/c02-build-tools-and-workflow/t06-code-formatters-and-linters-checkstyle-spotless.md"><a class="" href="../l2/c02-t06-code-formatters-and-linters-checkstyle-spotless.html"><span>Code formatters &amp; linters (Checkstyle, Spotless)</span><span class="kind-pill "></span></a></li><li data-q="static analysis (pmd, spotbugs, sonarqube) content/l2-intermediate-backend/c02-build-tools-and-workflow/t07-static-analysis-pmd-spotbugs-sonarqube.md"><a class="" href="../l2/c02-t07-static-analysis-pmd-spotbugs-sonarqube.html"><span>Static analysis (PMD, SpotBugs, SonarQube)</span><span class="kind-pill "></span></a></li><li data-q="lombok content/l2-intermediate-backend/c02-build-tools-and-workflow/t08-lombok.md"><a class="" href="../l2/c02-t08-lombok.html"><span>Lombok</span><span class="kind-pill "></span></a></li><li data-q="mapstruct content/l2-intermediate-backend/c02-build-tools-and-workflow/t09-mapstruct.md"><a class="" href="../l2/c02-t09-mapstruct.html"><span>MapStruct</span><span class="kind-pill "></span></a></li><li data-q="annotation processing content/l2-intermediate-backend/c02-build-tools-and-workflow/t10-annotation-processing.md"><a class="" href="../l2/c02-t10-annotation-processing.html"><span>Annotation processing</span><span class="kind-pill "></span></a></li><li data-q="dependency vulnerability scanning content/l2-intermediate-backend/c02-build-tools-and-workflow/t11-dependency-vulnerability-scanning.md"><a class="" href="../l2/c02-t11-dependency-vulnerability-scanning.html"><span>Dependency vulnerability scanning</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · networking fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><summary><span class="caret">▶</span><span>C03 · Networking Fundamentals</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — networking &amp; web fundamentals content/l2-intermediate-backend/c03-networking-fundamentals/readme.md"><a class="" href="../l2/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="osi &amp; tcp/ip models content/l2-intermediate-backend/c03-networking-fundamentals/t01-osi-and-tcp-ip-models.md"><a class="" href="../l2/c03-t01-osi-and-tcp-ip-models.html"><span>OSI &amp; TCP/IP models</span><span class="kind-pill "></span></a></li><li data-q="tcp vs udp content/l2-intermediate-backend/c03-networking-fundamentals/t02-tcp-vs-udp.md"><a class="" href="../l2/c03-t02-tcp-vs-udp.html"><span>TCP vs UDP</span><span class="kind-pill "></span></a></li><li data-q="ip, ports &amp; sockets content/l2-intermediate-backend/c03-networking-fundamentals/t03-ip-ports-and-sockets.md"><a class="" href="../l2/c03-t03-ip-ports-and-sockets.html"><span>IP, ports &amp; sockets</span><span class="kind-pill "></span></a></li><li data-q="dns (resolution, records) content/l2-intermediate-backend/c03-networking-fundamentals/t04-dns-resolution-records.md"><a class="" href="../l2/c03-t04-dns-resolution-records.html"><span>DNS (resolution, records)</span><span class="kind-pill "></span></a></li><li data-q="http/https lifecycle content/l2-intermediate-backend/c03-networking-fundamentals/t05-http-https-lifecycle.md"><a class="" href="../l2/c03-t05-http-https-lifecycle.html"><span>HTTP/HTTPS lifecycle</span><span class="kind-pill "></span></a></li><li data-q="tls/ssl &amp; certificates content/l2-intermediate-backend/c03-networking-fundamentals/t06-tls-ssl-and-certificates.md"><a class="" href="../l2/c03-t06-tls-ssl-and-certificates.html"><span>TLS/SSL &amp; certificates</span><span class="kind-pill "></span></a></li><li data-q="cookies, sessions &amp; tokens content/l2-intermediate-backend/c03-networking-fundamentals/t07-cookies-sessions-and-tokens.md"><a class="" href="../l2/c03-t07-cookies-sessions-and-tokens.html"><span>Cookies, sessions &amp; tokens</span><span class="kind-pill "></span></a></li><li data-q="proxies &amp; reverse proxies content/l2-intermediate-backend/c03-networking-fundamentals/t08-proxies-and-reverse-proxies.md"><a class="" href="../l2/c03-t08-proxies-and-reverse-proxies.html"><span>Proxies &amp; reverse proxies</span><span class="kind-pill "></span></a></li><li data-q="load balancers content/l2-intermediate-backend/c03-networking-fundamentals/t09-load-balancers.md"><a class="" href="../l2/c03-t09-load-balancers.html"><span>Load balancers</span><span class="kind-pill "></span></a></li><li data-q="cdns content/l2-intermediate-backend/c03-networking-fundamentals/t10-cdns.md"><a class="" href="../l2/c03-t10-cdns.html"><span>CDNs</span><span class="kind-pill "></span></a></li><li data-q="firewalls &amp; nat (basics) content/l2-intermediate-backend/c03-networking-fundamentals/t11-firewalls-and-nat-basics.md"><a class="" href="../l2/c03-t11-firewalls-and-nat-basics.html"><span>Firewalls &amp; NAT (basics)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · web and rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><summary><span class="caret">▶</span><span>C04 · Web And REST Basics</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — web &amp; rest basics content/l2-intermediate-backend/c04-web-and-rest-basics/readme.md"><a class="" href="../l2/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http in depth (methods, status, headers) content/l2-intermediate-backend/c04-web-and-rest-basics/t01-http-in-depth-methods-status-headers.md"><a class="" href="../l2/c04-t01-http-in-depth-methods-status-headers.html"><span>HTTP in depth (methods, status, headers)</span><span class="kind-pill "></span></a></li><li data-q="rest principles &amp; best practices content/l2-intermediate-backend/c04-web-and-rest-basics/t02-rest-principles-and-best-practices.md"><a class="" href="../l2/c04-t02-rest-principles-and-best-practices.html"><span>REST principles &amp; best practices</span><span class="kind-pill "></span></a></li><li data-q="api design (resources, versioning, pagination, filtering) content/l2-intermediate-backend/c04-web-and-rest-basics/t03-api-design-resources-versioning-pagination-filtering.md"><a class="" href="../l2/c04-t03-api-design-resources-versioning-pagination-filtering.html"><span>API design (resources, versioning, pagination, filtering)</span><span class="kind-pill "></span></a></li><li data-q="content negotiation &amp; serialization (json/xml, jackson) content/l2-intermediate-backend/c04-web-and-rest-basics/t04-content-negotiation-and-serialization-json-xml-jackson.md"><a class="" href="../l2/c04-t04-content-negotiation-and-serialization-json-xml-jackson.html"><span>Content negotiation &amp; serialization (JSON/XML, Jackson)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · databases and sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><summary><span class="caret">▶</span><span>C05 · Databases And SQL</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — databases &amp; sql content/l2-intermediate-backend/c05-databases-and-sql/readme.md"><a class="" href="../l2/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="relational model &amp; terminology content/l2-intermediate-backend/c05-databases-and-sql/t01-relational-model-and-terminology.md"><a class="" href="../l2/c05-t01-relational-model-and-terminology.html"><span>Relational model &amp; terminology</span><span class="kind-pill "></span></a></li><li data-q="sql: select, joins, group by, subqueries content/l2-intermediate-backend/c05-databases-and-sql/t02-sql-select-joins-group-by-subqueries.md"><a class="" href="../l2/c05-t02-sql-select-joins-group-by-subqueries.html"><span>SQL: SELECT, JOINs, GROUP BY, subqueries</span><span class="kind-pill "></span></a></li><li data-q="sql: ddl/dml/dcl content/l2-intermediate-backend/c05-databases-and-sql/t03-sql-ddl-dml-dcl.md"><a class="" href="../l2/c05-t03-sql-ddl-dml-dcl.html"><span>SQL: DDL/DML/DCL</span><span class="kind-pill "></span></a></li><li data-q="normalization &amp; denormalization content/l2-intermediate-backend/c05-databases-and-sql/t04-normalization-and-denormalization.md"><a class="" href="../l2/c05-t04-normalization-and-denormalization.html"><span>Normalization &amp; denormalization</span><span class="kind-pill "></span></a></li><li data-q="keys, constraints &amp; relationships content/l2-intermediate-backend/c05-databases-and-sql/t05-keys-constraints-and-relationships.md"><a class="" href="../l2/c05-t05-keys-constraints-and-relationships.html"><span>Keys, constraints &amp; relationships</span><span class="kind-pill "></span></a></li><li data-q="transactions &amp; acid content/l2-intermediate-backend/c05-databases-and-sql/t06-transactions-and-acid.md"><a class="" href="../l2/c05-t06-transactions-and-acid.html"><span>Transactions &amp; ACID</span><span class="kind-pill "></span></a></li><li data-q="isolation levels &amp; locking content/l2-intermediate-backend/c05-databases-and-sql/t07-isolation-levels-and-locking.md"><a class="" href="../l2/c05-t07-isolation-levels-and-locking.html"><span>Isolation levels &amp; locking</span><span class="kind-pill "></span></a></li><li data-q="stored procedures, views, triggers content/l2-intermediate-backend/c05-databases-and-sql/t08-stored-procedures-views-triggers.md"><a class="" href="../l2/c05-t08-stored-procedures-views-triggers.html"><span>Stored procedures, views, triggers</span><span class="kind-pill "></span></a></li><li data-q="jdbc &amp; connection pooling (hikaricp) content/l2-intermediate-backend/c05-databases-and-sql/t09-jdbc-and-connection-pooling-hikaricp.md"><a class="" href="../l2/c05-t09-jdbc-and-connection-pooling-hikaricp.html"><span>JDBC &amp; connection pooling (HikariCP)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · tools and environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md content/l2-intermediate-backend/c06-tools-and-environment/t04-network-and-tls-diagnostics.md content/l2-intermediate-backend/c06-tools-and-environment/t05-local-dev-environment-docker-testcontainers.md"><summary><span class="caret">▶</span><span>C06 · Tools And Environment</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — tools &amp; environment content/l2-intermediate-backend/c06-tools-and-environment/readme.md"><a class="" href="../l2/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="backend toolchain quick reference content/l2-intermediate-backend/c06-tools-and-environment/t01-backend-toolchain-quick-reference.md"><a class="" href="../l2/c06-t01-backend-toolchain-quick-reference.html"><span>Backend Toolchain Quick Reference</span><span class="kind-pill "></span></a></li><li data-q="http &amp; api clients (curl, httpie, postman, devtools) content/l2-intermediate-backend/c06-tools-and-environment/t02-http-and-api-clients.md"><a class="" href="../l2/c06-t02-http-and-api-clients.html"><span>HTTP &amp; API Clients (curl, HTTPie, Postman, DevTools)</span><span class="kind-pill "></span></a></li><li data-q="database clients &amp; migration tools (psql, mysql, dbeaver, flyway, liquibase) content/l2-intermediate-backend/c06-tools-and-environment/t03-database-clients-and-migration-tools.md"><a class="" href="../l2/c06-t03-database-clients-and-migration-tools.html"><span>Database Clients &amp; Migration Tools (psql, mysql, DBeaver, Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="network &amp; tls diagnostics (dig, ss, lsof, nc, tcpdump, openssl) content/l2-intermediate-backend/c06-tools-and-environment/t04-network-and-tls-diagnostics.md"><a class="" href="../l2/c06-t04-network-and-tls-diagnostics.html"><span>Network &amp; TLS Diagnostics (dig, ss, lsof, nc, tcpdump, openssl)</span><span class="kind-pill "></span></a></li><li data-q="local dev environment: docker &amp; testcontainers content/l2-intermediate-backend/c06-tools-and-environment/t05-local-dev-environment-docker-testcontainers.md"><a class="" href="../l2/c06-t05-local-dev-environment-docker-testcontainers.html"><span>Local Dev Environment: Docker &amp; Testcontainers</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c07 · hands on content/l2-intermediate-backend/c07-hands-on/readme.md content/l2-intermediate-backend/c07-hands-on/t01-exercises.md content/l2-intermediate-backend/c07-hands-on/t02-project-rest-service-data-layer.md content/l2-intermediate-backend/c07-hands-on/t03-project-rest-service-api-layer.md"><summary><span class="caret">▶</span><span>C07 · Hands On</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — hands-on content/l2-intermediate-backend/c07-hands-on/readme.md"><a class="" href="../l2/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="exercises — applying l2 (c01–c05) content/l2-intermediate-backend/c07-hands-on/t01-exercises.md"><a class="" href="../l2/c07-t01-exercises.html"><span>Exercises — Applying L2 (C01–C05)</span><span class="kind-pill "></span></a></li><li data-q="level project · part 1 — the data layer (schema, migrations, jdbc, testcontainers) content/l2-intermediate-backend/c07-hands-on/t02-project-rest-service-data-layer.md"><a class="active" href="../l2/c07-t02-project-rest-service-data-layer.html"><span>Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers)</span><span class="kind-pill "></span></a></li><li data-q="level project · part 2 — the rest api (endpoints, dtos, validation, errors) content/l2-intermediate-backend/c07-hands-on/t03-project-rest-service-api-layer.md"><a class="" href="../l2/c07-t03-project-rest-service-api-layer.html"><span>Level Project · Part 2 — The REST API (endpoints, DTOs, validation, errors)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · best practices content/l2-intermediate-backend/c08-best-practices/readme.md content/l2-intermediate-backend/c08-best-practices/t01-l2-idioms.md content/l2-intermediate-backend/c08-best-practices/t02-l2-pitfalls-catalogue.md"><summary><span class="caret">▶</span><span>C08 · Best Practices</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — best practices &amp; pitfalls content/l2-intermediate-backend/c08-best-practices/readme.md"><a class="" href="../l2/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="idioms — the l2 reflexes content/l2-intermediate-backend/c08-best-practices/t01-l2-idioms.md"><a class="" href="../l2/c08-t01-l2-idioms.html"><span>Idioms — the L2 Reflexes</span><span class="kind-pill "></span></a></li><li data-q="pitfalls catalogue — the l2 traps content/l2-intermediate-backend/c08-best-practices/t02-l2-pitfalls-catalogue.md"><a class="" href="../l2/c08-t02-l2-pitfalls-catalogue.html"><span>Pitfalls Catalogue — the L2 Traps</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · interview prep content/l2-intermediate-backend/c09-interview-prep/readme.md content/l2-intermediate-backend/c09-interview-prep/t01-intermediate-backend-questions.md"><summary><span class="caret">▶</span><span>C09 · Interview Prep</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — interview prep content/l2-intermediate-backend/c09-interview-prep/readme.md"><a class="" href="../l2/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="intermediate backend interview questions content/l2-intermediate-backend/c09-interview-prep/t01-intermediate-backend-questions.md"><a class="" href="../l2/c09-t01-intermediate-backend-questions.html"><span>Intermediate Backend Interview Questions</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · qa faq content/l2-intermediate-backend/c10-qa-faq/readme.md content/l2-intermediate-backend/c10-qa-faq/t01-faq.md"><summary><span class="caret">▶</span><span>C10 · QA FAQ</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — q&amp;a / faq content/l2-intermediate-backend/c10-qa-faq/readme.md"><a class="" href="../l2/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l2 faq content/l2-intermediate-backend/c10-qa-faq/t01-faq.md"><a class="" href="../l2/c10-t01-faq.html"><span>L2 FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · cheatsheets content/l2-intermediate-backend/c11-cheatsheets/readme.md content/l2-intermediate-backend/c11-cheatsheets/t01-l2-cheatsheet.md"><summary><span class="caret">▶</span><span>C11 · Cheatsheets</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — cheatsheets &amp; reference content/l2-intermediate-backend/c11-cheatsheets/readme.md"><a class="" href="../l2/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l2 cheatsheet content/l2-intermediate-backend/c11-cheatsheets/t01-l2-cheatsheet.md"><a class="" href="../l2/c11-t01-l2-cheatsheet.html"><span>L2 Cheatsheet</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · resources content/l2-intermediate-backend/c12-resources/readme.md content/l2-intermediate-backend/c12-resources/t01-resources.md"><summary><span class="caret">▶</span><span>C12 · Resources</span></summary><ul class="pages"><li data-q="intermediate java &amp; backend foundations — resources content/l2-intermediate-backend/c12-resources/readme.md"><a class="" href="../l2/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l2 resources content/l2-intermediate-backend/c12-resources/t01-resources.md"><a class="" href="../l2/c12-t01-resources.html"><span>L2 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l2/index.html">L2 — Intermediate &amp; Backend</a><span class="sep">/</span><span>Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers)</span></div>
+        <h1>Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers)</h1>
+        <div><span class="source-path">content/L2-intermediate-backend/C07-hands-on/T02-project-rest-service-data-layer.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">intermediate</span><span class="meta-pill mins">~90 min</span><span class="meta-pill date">updated 2026-06-05</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers)"
+slug: l2-project-rest-service-data-layer
+level: L2
+module: "Intermediate Java &amp; Backend Foundations"
+section: "Hands-On"
+type: project
+difficulty: intermediate
+order: 2
+tags: [project, tasks-api, maven, postgresql, flyway, migrations, hikaricp, jdbc, preparedstatement, repository, rowmapper, keyset-pagination, transactions, testcontainers, integration-test, junit]
+prerequisites: [jdbc-and-connection-pooling-hikaricp, sql-ddl-dml-dcl, database-clients-and-migration-tools, local-dev-environment-docker-testcontainers]
+status: complete
+estimated_minutes: 90
+last_updated: 2026-06-05</p>
+<hr>
+<h1 id="level-project-part-1-the-data-layer">Level Project · Part 1 — The Data Layer</h1>
+<p>We build the <strong>Tasks API</strong> introduced in the <a href="c07-readme.html">C07 index</a>: users own tasks; tasks have a status and can be created, listed (with filtering + keyset pagination), fetched, updated, and deleted. This part builds the <strong>persistence layer</strong> end-to-end; <a href="c07-t03-project-rest-service-api-layer.html">Part 2 (T03)</a> puts the REST API on top.</p>
+<p>We use <strong>plain JDBC over HikariCP</strong> — no ORM, no Spring — so every line maps to a concept you've already met (<a href="c05-t09-jdbc-and-connection-pooling-hikaricp.html">C05/T09 JDBC</a>) and nothing is hidden. (Frameworks come in L4; you'll appreciate them more having done it by hand.)</p>
+<div class="mermaid">flowchart TB
+  Svc["TaskService<br/>(transactions — C05/T06)"] --> Repo["TaskRepository<br/>(PreparedStatement CRUD — C05/T09)"]
+  Repo --> DS["HikariDataSource<br/>(pool — C05/T09)"]
+  DS --> PG[("PostgreSQL<br/>schema via Flyway — C06/T03")]
+  IT["TaskRepositoryIT<br/>(Testcontainers — C06/T05)"] -.->|real Postgres| Repo
+</div>
+<hr>
+<h2 id="1-project-setup">1. Project Setup<a class="anchor" href="#1-project-setup" aria-hidden="true">#</a></h2>
+<p>A standard Maven layout (<a href="c02-t01-maven-lifecycle-pom-dependencies-plugins.html">C02</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">tasks-api/
+├── pom.xml
+├── docker-compose.yaml                 # local Postgres
+└── src
+    ├── main
+    │   ├── java/com/example/tasks/
+    │   │   ├── Main.java                # entry point (built in Part 2 / T03)
+    │   │   ├── domain/    (User, Task, TaskStatus, Page)
+    │   │   ├── db/        (Db — the DataSource factory)
+    │   │   ├── repo/      (TaskRepository, UserRepository)
+    │   │   └── api/       (Part 2 / T03: Json, DTOs, ApiException, TaskService, handlers)
+    │   └── resources/db/migration/     # Flyway SQL
+    │       ├── V1__init.sql
+    │       └── V2__task_indexes.sql
+    └── test/java/com/example/tasks/repo/TaskRepositoryIT.java
+</code></pre></div>
+<blockquote>
+<p>This is one project across both topics: Part 1 (here) builds <code>domain</code>/<code>db</code>/<code>repo</code> + migrations + tests; Part 2 (<a href="c07-t03-project-rest-service-api-layer.html">T03</a>) adds the <code>api</code> package and <code>Main</code>.</p>
+</blockquote>
+<p>The dependencies — driver, pool, migrations, JSON (used by the Part 2 REST layer), and the test stack. The <code>&lt;properties&gt;</code> pins <strong>Java 21</strong> so the records, switch expressions, and text blocks below compile:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;properties&gt;
+  &lt;maven.compiler.release&gt;21&lt;/maven.compiler.release&gt;
+  &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+&lt;/properties&gt;
+
+&lt;dependencies&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.postgresql&lt;/groupId&gt;&lt;artifactId&gt;postgresql&lt;/artifactId&gt;&lt;version&gt;42.7.3&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.zaxxer&lt;/groupId&gt;&lt;artifactId&gt;HikariCP&lt;/artifactId&gt;&lt;version&gt;5.1.0&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.flywaydb&lt;/groupId&gt;&lt;artifactId&gt;flyway-database-postgresql&lt;/artifactId&gt;&lt;version&gt;10.13.0&lt;/version&gt;&lt;/dependency&gt;
+  &lt;!-- JSON for the REST layer (T03) --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;&lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;&lt;version&gt;2.17.1&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;&lt;artifactId&gt;jackson-datatype-jsr310&lt;/artifactId&gt;&lt;version&gt;2.17.1&lt;/version&gt;&lt;/dependency&gt;
+
+  &lt;!-- test --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;&lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;&lt;version&gt;5.10.2&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.testcontainers&lt;/groupId&gt;&lt;artifactId&gt;postgresql&lt;/artifactId&gt;&lt;version&gt;1.19.8&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.testcontainers&lt;/groupId&gt;&lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;&lt;version&gt;1.19.8&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.assertj&lt;/groupId&gt;&lt;artifactId&gt;assertj-core&lt;/artifactId&gt;&lt;version&gt;3.25.3&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre></div>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Note the <code>&lt;scope&gt;test&lt;/scope&gt;</code> on JUnit, Testcontainers, and AssertJ — they're compile+run dependencies for tests only, never shipped in the production artifact (<a href="c02-t01-maven-lifecycle-pom-dependencies-plugins.html">C02 dependency scopes</a>). The Postgres driver, HikariCP, Flyway, and Jackson are <code>compile</code> (default) — the app needs them at runtime. <code>maven.compiler.release</code> (not the legacy <code>source</code>/<code>target</code>) also constrains the API to the target JDK.</p></div></div>
+<p>Local Postgres (<a href="c06-t05-local-dev-environment-docker-testcontainers.html">C06/T05</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># docker-compose.yaml
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: dev, POSTGRES_DB: tasks }
+    ports: [&quot;5432:5432&quot;]
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres&quot;]
+      interval: 5s
+      retries: 5
+</code></pre></div>
+<hr>
+<h2 id="2-the-domain-model">2. The Domain Model<a class="anchor" href="#2-the-domain-model" aria-hidden="true">#</a></h2>
+<p>Immutable <strong>records</strong> (<a href="c01-t07-optional-in-depth.html">C01 favors immutability</a>) — the data the layer moves:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.example.tasks.domain;
+import java.time.Instant;
+
+public enum TaskStatus { OPEN, IN_PROGRESS, DONE }
+
+public record User(long id, String name, String email) {}
+
+public record Task(long id, long userId, String title,
+                   TaskStatus status, Instant createdAt) {}
+
+// A page of results plus the cursor to fetch the next page (keyset pagination, §6)
+public record Page&lt;T&gt;(java.util.List&lt;T&gt; items, String nextCursor) {}
+</code></pre></div>
+<p>Records give us <code>equals</code>/<code>hashCode</code>/<code>toString</code> for free and make the objects safe to pass around — a row read from the database can't be mutated underneath us.</p>
+<hr>
+<h2 id="3-schema-migrations">3. Schema &amp; Migrations<a class="anchor" href="#3-schema-migrations" aria-hidden="true">#</a></h2>
+<p>The schema lives in versioned Flyway scripts (<a href="c06-t03-database-clients-and-migration-tools.html">C06/T03 migrations</a>), so dev, CI, and prod converge from empty. <code>V1</code> creates the tables with a foreign key (<a href="c05-t05-keys-constraints-and-relationships.html">C05/T05 keys</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">-- src/main/resources/db/migration/V1__init.sql
+CREATE TABLE users (
+    id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name  TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE                       -- UNIQUE → a 409 in the API layer (T03)
+);
+
+CREATE TABLE tasks (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title      TEXT   NOT NULL,
+    status     TEXT   NOT NULL DEFAULT 'OPEN'
+               CHECK (status IN ('OPEN','IN_PROGRESS','DONE')),   -- enforce the enum (C05/T05)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">-- src/main/resources/db/migration/V2__task_indexes.sql
+-- Index the columns we filter/paginate on (C05/T05 indexing, sargable — C07/T01 E5).
+-- One composite index serves the list query's full access path:
+--   WHERE user_id = ? AND status = ? AND id &gt; ?  ORDER BY id
+-- (leftmost-prefix user_id,status for the filter + id for the keyset range/sort — C05/T05).
+CREATE INDEX idx_tasks_user_status_id ON tasks(user_id, status, id);
+</code></pre></div>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>The <code>CHECK</code> constraint and the <code>REFERENCES … ON DELETE CASCADE</code> push integrity into the database — the single source of truth (<a href="c05-t05-keys-constraints-and-relationships.html">C05/T05</a>). Even a buggy app or a manual SQL edit can't insert an invalid status or an orphan task. App-layer validation (T03) is for <em>good error messages</em>, not the last line of defense.</p></div></div>
+<hr>
+<h2 id="4-the-datasource-hikaricp">4. The DataSource (HikariCP)<a class="anchor" href="#4-the-datasource-hikaricp" aria-hidden="true">#</a></h2>
+<p>One pooled <code>DataSource</code> for the whole app, configured from the environment (<a href="c06-t01-backend-toolchain-quick-reference.html">12-factor</a>; <a href="c05-t09-jdbc-and-connection-pooling-hikaricp.html">C05/T09 pooling</a>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.example.tasks.db;
+import com.zaxxer.hikari.*;
+import javax.sql.DataSource;
+import org.flywaydb.core.Flyway;
+
+public final class Db {
+    public static DataSource create() {
+        var cfg = new HikariConfig();
+        cfg.setJdbcUrl(env(&quot;DATABASE_URL&quot;, &quot;jdbc:postgresql://localhost:5432/tasks&quot;));
+        cfg.setUsername(env(&quot;DB_USER&quot;, &quot;postgres&quot;));
+        cfg.setPassword(env(&quot;DB_PASSWORD&quot;, &quot;dev&quot;));
+        cfg.setMaximumPoolSize(10);          // small pool — cores×2-ish (the C05/T09 paradox)
+        cfg.setPoolName(&quot;tasks-pool&quot;);
+        return new HikariDataSource(cfg);
+    }
+
+    /** Apply pending migrations on startup. */
+    public static void migrate(DataSource ds) {
+        Flyway.configure().dataSource(ds).load().migrate();
+    }
+
+    private static String env(String k, String def) {
+        return System.getenv().getOrDefault(k, def);
+    }
+    private Db() {}
+}
+</code></pre></div>
+<hr>
+<h2 id="5-the-repository-crud-with-preparedstatement">5. The Repository — CRUD with <code>PreparedStatement</code><a class="anchor" href="#5-the-repository-crud-with-preparedstatement" aria-hidden="true">#</a></h2>
+<p>The repository owns all SQL. Every query is a <strong><code>PreparedStatement</code></strong> with <code>?</code> placeholders — injection-proof and plan-cacheable (<a href="c05-t09-jdbc-and-connection-pooling-hikaricp.html">C05/T09</a>). A small private <code>map</code> turns a <code>ResultSet</code> row into a <code>Task</code>.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.example.tasks.repo;
+import com.example.tasks.domain.*;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.*;
+
+public class TaskRepository {
+    private final DataSource ds;
+    public TaskRepository(DataSource ds) { this.ds = ds; }
+
+    public Task create(long userId, String title) {
+        String sql = &quot;INSERT INTO tasks(user_id, title) VALUES (?, ?) &quot; +
+                     &quot;RETURNING id, user_id, title, status, created_at&quot;;   // RETURNING avoids a 2nd round trip
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setString(2, title);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return map(rs);
+            }
+        } catch (SQLException e) { throw new DataAccessException(&quot;create task&quot;, e); }
+    }
+
+    public Optional&lt;Task&gt; findById(long id) {
+        String sql = &quot;SELECT id, user_id, title, status, created_at FROM tasks WHERE id = ?&quot;;
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(map(rs)) : Optional.empty();   // Optional, not null (C01/T07)
+            }
+        } catch (SQLException e) { throw new DataAccessException(&quot;findById&quot;, e); }
+    }
+
+    public boolean updateStatus(long id, TaskStatus status) {
+        String sql = &quot;UPDATE tasks SET status = ? WHERE id = ?&quot;;
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setLong(2, id);
+            return ps.executeUpdate() == 1;          // rows affected → did it exist?
+        } catch (SQLException e) { throw new DataAccessException(&quot;updateStatus&quot;, e); }
+    }
+
+    public boolean delete(long id) {
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(&quot;DELETE FROM tasks WHERE id = ?&quot;)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) { throw new DataAccessException(&quot;delete&quot;, e); }
+    }
+
+    private static Task map(ResultSet rs) throws SQLException {
+        return new Task(
+            rs.getLong(&quot;id&quot;),
+            rs.getLong(&quot;user_id&quot;),
+            rs.getString(&quot;title&quot;),
+            TaskStatus.valueOf(rs.getString(&quot;status&quot;)),
+            rs.getTimestamp(&quot;created_at&quot;).toInstant());
+    }
+}
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// DataAccessException.java — a thin unchecked wrapper so callers aren't forced to handle SQLException.
+// It keeps the SQLException as its cause, so the REST layer (T03) can inspect the SQLState.
+public class DataAccessException extends RuntimeException {
+    public DataAccessException(String msg, Throwable cause) { super(msg, cause); }
+}
+</code></pre></div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p>Every <code>Connection</code>, <code>PreparedStatement</code>, and <code>ResultSet</code> is in <strong>try-with-resources</strong> — they close in reverse order, and a <code>Connection.close()</code> on a pooled datasource <em>returns it to the pool</em> rather than really closing it. Forget this and you leak connections until the pool is exhausted and every request hangs on <code>connectionTimeout</code> (<a href="c05-t09-jdbc-and-connection-pooling-hikaricp.html">C05/T09</a>, <a href="c06-t04-network-and-tls-diagnostics.html">C06/T04 CLOSE_WAIT</a>).</p></div></div>
+<hr>
+<h2 id="6-filtering-keyset-pagination">6. Filtering + Keyset Pagination<a class="anchor" href="#6-filtering-keyset-pagination" aria-hidden="true">#</a></h2>
+<p>Listing must filter by status and paginate. We use <strong>keyset (cursor) pagination</strong> — <code>WHERE id &gt; :lastSeenId ORDER BY id LIMIT n</code> — not <code>OFFSET</code>, because <code>OFFSET</code> rescans and skips all prior rows (slower the deeper you go) and can drop/duplicate rows under concurrent inserts (<a href="c04-t03-api-design-resources-versioning-pagination-filtering.html">C04/T03 pagination</a>).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public Page&lt;Task&gt; listByUser(long userId, TaskStatus status, long afterId, int limit) {
+    String sql = &quot;&quot;&quot;
+        SELECT id, user_id, title, status, created_at
+        FROM tasks
+        WHERE user_id = ? AND status = ? AND id &gt; ?
+        ORDER BY id
+        LIMIT ?&quot;&quot;&quot;;                              // uses idx_tasks_user_status_id (sargable — C07/T01 E5)
+    try (Connection c = ds.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+        ps.setLong(1, userId);
+        ps.setString(2, status.name());
+        ps.setLong(3, afterId);                  // 0 for the first page
+        ps.setInt(4, limit);
+        try (ResultSet rs = ps.executeQuery()) {
+            List&lt;Task&gt; items = new ArrayList&lt;&gt;();
+            while (rs.next()) items.add(map(rs));
+            String next = items.size() == limit
+                    ? String.valueOf(items.get(items.size() - 1).id())   // cursor = last id
+                    : null;                                              // no more pages
+            return new Page&lt;&gt;(items, next);
+        }
+    } catch (SQLException e) { throw new DataAccessException(&quot;listByUser&quot;, e); }
+}
+</code></pre></div>
+<p>The returned <code>nextCursor</code> is the last row's <code>id</code>; the client passes it back as <code>afterId</code> to get the next page. A <code>null</code> cursor means the last page — the loop terminator the REST layer (T03) exposes as the absence of a <code>next</code> link.</p>
+<hr>
+<h2 id="7-transactions-a-multi-write-unit-of-work">7. Transactions — a Multi-Write Unit of Work<a class="anchor" href="#7-transactions-a-multi-write-unit-of-work" aria-hidden="true">#</a></h2>
+<p>When two writes must both happen or neither, wrap them in one transaction: turn off autocommit, do the work on <strong>one <code>Connection</code></strong>, then <code>commit</code> (or <code>rollback</code> on failure) (<a href="c05-t06-transactions-and-acid.html">C05/T06 ACID</a>). Example: reassign every open task from one user to another atomically.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public void reassignOpenTasks(long fromUser, long toUser) {
+    String move = &quot;UPDATE tasks SET user_id = ? WHERE user_id = ? AND status = 'OPEN'&quot;;
+    try (Connection c = ds.getConnection()) {
+        c.setAutoCommit(false);                  // begin
+        try (PreparedStatement ps = c.prepareStatement(move)) {
+            ps.setLong(1, toUser);
+            ps.setLong(2, fromUser);
+            ps.executeUpdate();
+            // ... any further writes share THIS connection so they're in the same transaction ...
+            c.commit();                          // all-or-nothing
+        } catch (SQLException e) {
+            c.rollback();                        // undo on any failure
+            throw new DataAccessException(&quot;reassign&quot;, e);
+        }
+    } catch (SQLException e) { throw new DataAccessException(&quot;reassign tx&quot;, e); }
+}
+</code></pre></div>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p>The transaction boundary is the <strong><code>Connection</code></strong>. Two writes on two different pooled connections are two <em>separate</em> transactions — a partial failure leaves inconsistent data. A correct unit of work acquires one connection, does all its writes on it, and commits once. (This is exactly the plumbing Spring's <code>@Transactional</code> automates for you in L4.)</p></div></div>
+<hr>
+<h2 id="8-integration-tests-with-testcontainers">8. Integration Tests with Testcontainers<a class="anchor" href="#8-integration-tests-with-testcontainers" aria-hidden="true">#</a></h2>
+<p>Unit-testing this layer with mocks would test nothing — the value <em>is</em> the SQL. <strong>Testcontainers</strong> boots a real Postgres in Docker, runs the real migrations, and exercises the real queries (<a href="c06-t05-local-dev-environment-docker-testcontainers.html">C06/T05</a>). It catches what an in-memory H2 would miss: the <code>CHECK</code>/<code>UNIQUE</code> constraints, <code>RETURNING</code>, <code>TIMESTAMPTZ</code>, and real keyset ordering.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.example.tasks.repo;
+import com.example.tasks.db.Db;
+import com.example.tasks.domain.*;
+import com.zaxxer.hikari.*;
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.*;
+import javax.sql.DataSource;
+import static org.assertj.core.api.Assertions.*;
+
+@Testcontainers
+class TaskRepositoryIT {
+
+    @Container
+    static PostgreSQLContainer&lt;?&gt; pg = new PostgreSQLContainer&lt;&gt;(&quot;postgres:16&quot;);
+
+    static DataSource ds;
+    static TaskRepository repo;
+    static long userId;
+
+    @BeforeAll
+    static void setup() throws Exception {
+        var cfg = new HikariConfig();
+        cfg.setJdbcUrl(pg.getJdbcUrl());          // the container's RANDOM host port
+        cfg.setUsername(pg.getUsername());
+        cfg.setPassword(pg.getPassword());
+        ds = new HikariDataSource(cfg);
+        Db.migrate(ds);                           // run the SAME Flyway migrations as prod
+        repo = new TaskRepository(ds);
+        try (var c = ds.getConnection();
+             var ps = c.prepareStatement(
+                 &quot;INSERT INTO users(name,email) VALUES ('Ada','ada@x.io') RETURNING id&quot;)) {
+            var rs = ps.executeQuery(); rs.next(); userId = rs.getLong(1);
+        }
+    }
+
+    @Test
+    void createsAndReadsBack() {
+        Task t = repo.create(userId, &quot;write tests&quot;);
+        assertThat(t.id()).isPositive();
+        assertThat(t.status()).isEqualTo(TaskStatus.OPEN);            // the DB DEFAULT applied
+        assertThat(repo.findById(t.id())).contains(t);
+    }
+
+    @Test
+    void findByIdReturnsEmptyForMissing() {
+        assertThat(repo.findById(999_999)).isEmpty();                 // Optional, not null
+    }
+
+    @Test
+    void updatesStatusAndReportsRowCount() {
+        Task t = repo.create(userId, &quot;ship it&quot;);
+        assertThat(repo.updateStatus(t.id(), TaskStatus.DONE)).isTrue();
+        assertThat(repo.updateStatus(999_999, TaskStatus.DONE)).isFalse();   // no such row
+        assertThat(repo.findById(t.id()).orElseThrow().status()).isEqualTo(TaskStatus.DONE);
+    }
+
+    @Test
+    void keysetPaginationWalksAllPages() {
+        for (int i = 0; i &lt; 5; i++) repo.create(userId, &quot;p&quot; + i);
+        Page&lt;Task&gt; p1 = repo.listByUser(userId, TaskStatus.OPEN, 0, 2);
+        assertThat(p1.items()).hasSize(2);
+        assertThat(p1.nextCursor()).isNotNull();
+        Page&lt;Task&gt; p2 = repo.listByUser(userId, TaskStatus.OPEN, Long.parseLong(p1.nextCursor()), 2);
+        assertThat(p2.items().get(0).id()).isGreaterThan(p1.items().get(1).id());  // strictly after
+    }
+
+    @Test
+    void uniqueEmailIsEnforcedByTheDatabase() {
+        assertThatThrownBy(() -&gt; {
+            try (var c = ds.getConnection();
+                 var ps = c.prepareStatement(&quot;INSERT INTO users(name,email) VALUES ('Dup','ada@x.io')&quot;)) {
+                ps.executeUpdate();               // violates the UNIQUE constraint → SQLException
+            }
+        }).isInstanceOf(Exception.class);          // T03 maps this to HTTP 409
+    }
+}
+</code></pre></div>
+<p>Run them with <code>./mvnw verify</code> — Testcontainers pulls <code>postgres:16</code>, starts it, and tears it down after the class. The same tests run unchanged in CI (Docker available), with no shared test database to pollute.</p>
+<hr>
+<h2 id="9-run-it-locally">9. Run It Locally<a class="anchor" href="#9-run-it-locally" aria-hidden="true">#</a></h2>
+<p>A tiny <code>SmokeMain</code> (a normal <code>public static void main</code>) proves the wiring end to end before the REST layer exists:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.example.tasks;
+import com.example.tasks.db.Db;
+import com.example.tasks.repo.TaskRepository;
+
+public class SmokeMain {
+    public static void main(String[] args) {
+        var ds = Db.create();
+        Db.migrate(ds);                                  // schema up to date
+        var repo = new TaskRepository(ds);
+        // (assumes a user with id 1 exists — insert one first, or run against seeded data)
+        System.out.println(repo.create(1, &quot;smoke test&quot;));
+    }
+}
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">docker compose up -d                # start Postgres (waits healthy)
+./mvnw verify                       # build + run the Testcontainers integration tests (no DB setup needed)
+
+# To run SmokeMain against the compose Postgres, use the exec plugin by its full coordinates
+# (no pom change needed) — or just run Main from T03 once the REST layer exists:
+DATABASE_URL=jdbc:postgresql://localhost:5432/tasks \
+  ./mvnw -q compile org.codehaus.mojo:exec-maven-plugin:3.2.0:java \
+         -Dexec.mainClass=com.example.tasks.SmokeMain
+docker compose exec db psql -U postgres tasks -c 'SELECT id,title,status FROM tasks;'
+</code></pre></div>
+<p><code>./mvnw verify</code> is the one command that always works (Testcontainers needs no local DB setup); the <code>exec</code> line is optional and shown with the plugin's fully-qualified coordinates so it runs without adding it to the <code>pom.xml</code>.</p>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Plain JDBC over HikariCP</strong> keeps every line traceable to <a href="c05-t09-jdbc-and-connection-pooling-hikaricp.html">C05/T09</a>; a <code>DataSource</code> is created once and pooled (small pool ≈ cores×2).</li>
+<li><strong>Flyway migrations</strong> in <code>db/migration</code> make the schema a deterministic function of versioned scripts (<a href="c06-t03-database-clients-and-migration-tools.html">C06/T03</a>); integrity (<code>UNIQUE</code>, <code>CHECK</code>, <code>FK ON DELETE CASCADE</code>) lives in the database.</li>
+<li>The <strong>repository</strong> uses <code>PreparedStatement</code> everywhere (injection-proof, plan-cached), returns <strong><code>Optional</code></strong> for absent rows, uses <strong><code>RETURNING</code></strong> to avoid a second round trip, and wraps every JDBC object in <strong>try-with-resources</strong> (a leak exhausts the pool).</li>
+<li><strong>Keyset pagination</strong> (<code>WHERE id &gt; cursor ORDER BY id LIMIT n</code>) beats <code>OFFSET</code> for deep pages and concurrent inserts (<a href="c04-t03-api-design-resources-versioning-pagination-filtering.html">C04/T03</a>).</li>
+<li>A <strong>transaction</strong> is bounded by one <code>Connection</code>: <code>setAutoCommit(false)</code> → writes → <code>commit</code>/<code>rollback</code> (<a href="c05-t06-transactions-and-acid.html">C05/T06</a>).</li>
+<li><strong>Testcontainers</strong> tests the real database (real constraints, <code>RETURNING</code>, ordering) that mocks/H2 can't (<a href="c06-t05-local-dev-environment-docker-testcontainers.html">C06/T05</a>).</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Put the HTTP layer on top: <strong><a href="c07-t03-project-rest-service-api-layer.html">T03 — Level Project, Part 2: the REST API</a></strong> — endpoints, DTOs, validation, an error model (404/409/422), and pagination links, driven with curl.</p>
+<p><a href="c07-readme.html">Back to C07 index</a> · <a href="overview.html">Back to L2 index</a></p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Level Project · Part 1 — The Data Layer (schema, migrations, JDBC, Testcontainers)&quot;
+slug: l2-project-rest-service-data-layer
+level: L2
+module: &quot;Intermediate Java &amp; Backend Foundations&quot;
+section: &quot;Hands-On&quot;
+type: project
+difficulty: intermediate
+order: 2
+tags: [project, tasks-api, maven, postgresql, flyway, migrations, hikaricp, jdbc, preparedstatement, repository, rowmapper, keyset-pagination, transactions, testcontainers, integration-test, junit]
+prerequisites: [jdbc-and-connection-pooling-hikaricp, sql-ddl-dml-dcl, database-clients-and-migration-tools, local-dev-environment-docker-testcontainers]
+status: complete
+estimated_minutes: 90
+last_updated: 2026-06-05
+---
+
+# Level Project · Part 1 — The Data Layer
+
+We build the **Tasks API** introduced in the [C07 index](./README.md): users own tasks; tasks have a status and can be created, listed (with filtering + keyset pagination), fetched, updated, and deleted. This part builds the **persistence layer** end-to-end; [Part 2 (T03)](./T03-project-rest-service-api-layer.md) puts the REST API on top.
+
+We use **plain JDBC over HikariCP** — no ORM, no Spring — so every line maps to a concept you&#x27;ve already met ([C05/T09 JDBC](../C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md)) and nothing is hidden. (Frameworks come in L4; you&#x27;ll appreciate them more having done it by hand.)
+
+```mermaid
+flowchart TB
+  Svc[&quot;TaskService&lt;br/&gt;(transactions — C05/T06)&quot;] --&gt; Repo[&quot;TaskRepository&lt;br/&gt;(PreparedStatement CRUD — C05/T09)&quot;]
+  Repo --&gt; DS[&quot;HikariDataSource&lt;br/&gt;(pool — C05/T09)&quot;]
+  DS --&gt; PG[(&quot;PostgreSQL&lt;br/&gt;schema via Flyway — C06/T03&quot;)]
+  IT[&quot;TaskRepositoryIT&lt;br/&gt;(Testcontainers — C06/T05)&quot;] -.-&gt;|real Postgres| Repo
+```
+
+---
+
+## 1. Project Setup
+
+A standard Maven layout ([C02](../C02-build-tools-and-workflow/T01-maven-lifecycle-pom-dependencies-plugins.md)):
+
+```text
+tasks-api/
+├── pom.xml
+├── docker-compose.yaml                 # local Postgres
+└── src
+    ├── main
+    │   ├── java/com/example/tasks/
+    │   │   ├── Main.java                # entry point (built in Part 2 / T03)
+    │   │   ├── domain/    (User, Task, TaskStatus, Page)
+    │   │   ├── db/        (Db — the DataSource factory)
+    │   │   ├── repo/      (TaskRepository, UserRepository)
+    │   │   └── api/       (Part 2 / T03: Json, DTOs, ApiException, TaskService, handlers)
+    │   └── resources/db/migration/     # Flyway SQL
+    │       ├── V1__init.sql
+    │       └── V2__task_indexes.sql
+    └── test/java/com/example/tasks/repo/TaskRepositoryIT.java
+```
+
+&gt; This is one project across both topics: Part 1 (here) builds `domain`/`db`/`repo` + migrations + tests; Part 2 ([T03](./T03-project-rest-service-api-layer.md)) adds the `api` package and `Main`.
+
+The dependencies — driver, pool, migrations, JSON (used by the Part 2 REST layer), and the test stack. The `&lt;properties&gt;` pins **Java 21** so the records, switch expressions, and text blocks below compile:
+
+```xml
+&lt;properties&gt;
+  &lt;maven.compiler.release&gt;21&lt;/maven.compiler.release&gt;
+  &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+&lt;/properties&gt;
+
+&lt;dependencies&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.postgresql&lt;/groupId&gt;&lt;artifactId&gt;postgresql&lt;/artifactId&gt;&lt;version&gt;42.7.3&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.zaxxer&lt;/groupId&gt;&lt;artifactId&gt;HikariCP&lt;/artifactId&gt;&lt;version&gt;5.1.0&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.flywaydb&lt;/groupId&gt;&lt;artifactId&gt;flyway-database-postgresql&lt;/artifactId&gt;&lt;version&gt;10.13.0&lt;/version&gt;&lt;/dependency&gt;
+  &lt;!-- JSON for the REST layer (T03) --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;&lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;&lt;version&gt;2.17.1&lt;/version&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;&lt;artifactId&gt;jackson-datatype-jsr310&lt;/artifactId&gt;&lt;version&gt;2.17.1&lt;/version&gt;&lt;/dependency&gt;
+
+  &lt;!-- test --&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;&lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;&lt;version&gt;5.10.2&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.testcontainers&lt;/groupId&gt;&lt;artifactId&gt;postgresql&lt;/artifactId&gt;&lt;version&gt;1.19.8&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.testcontainers&lt;/groupId&gt;&lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;&lt;version&gt;1.19.8&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+  &lt;dependency&gt;&lt;groupId&gt;org.assertj&lt;/groupId&gt;&lt;artifactId&gt;assertj-core&lt;/artifactId&gt;&lt;version&gt;3.25.3&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;/dependencies&gt;
+```
+
+&gt; [!NOTE]
+&gt; Note the `&lt;scope&gt;test&lt;/scope&gt;` on JUnit, Testcontainers, and AssertJ — they&#x27;re compile+run dependencies for tests only, never shipped in the production artifact ([C02 dependency scopes](../C02-build-tools-and-workflow/T01-maven-lifecycle-pom-dependencies-plugins.md)). The Postgres driver, HikariCP, Flyway, and Jackson are `compile` (default) — the app needs them at runtime. `maven.compiler.release` (not the legacy `source`/`target`) also constrains the API to the target JDK.
+
+Local Postgres ([C06/T05](../C06-tools-and-environment/T05-local-dev-environment-docker-testcontainers.md)):
+
+```yaml
+# docker-compose.yaml
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: dev, POSTGRES_DB: tasks }
+    ports: [&quot;5432:5432&quot;]
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres&quot;]
+      interval: 5s
+      retries: 5
+```
+
+---
+
+## 2. The Domain Model
+
+Immutable **records** ([C01 favors immutability](../C01-functional-and-modern-java/T07-optional-in-depth.md)) — the data the layer moves:
+
+```java
+package com.example.tasks.domain;
+import java.time.Instant;
+
+public enum TaskStatus { OPEN, IN_PROGRESS, DONE }
+
+public record User(long id, String name, String email) {}
+
+public record Task(long id, long userId, String title,
+                   TaskStatus status, Instant createdAt) {}
+
+// A page of results plus the cursor to fetch the next page (keyset pagination, §6)
+public record Page&lt;T&gt;(java.util.List&lt;T&gt; items, String nextCursor) {}
+```
+
+Records give us `equals`/`hashCode`/`toString` for free and make the objects safe to pass around — a row read from the database can&#x27;t be mutated underneath us.
+
+---
+
+## 3. Schema &amp; Migrations
+
+The schema lives in versioned Flyway scripts ([C06/T03 migrations](../C06-tools-and-environment/T03-database-clients-and-migration-tools.md)), so dev, CI, and prod converge from empty. `V1` creates the tables with a foreign key ([C05/T05 keys](../C05-databases-and-sql/T05-keys-constraints-and-relationships.md)):
+
+```sql
+-- src/main/resources/db/migration/V1__init.sql
+CREATE TABLE users (
+    id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name  TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE                       -- UNIQUE → a 409 in the API layer (T03)
+);
+
+CREATE TABLE tasks (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title      TEXT   NOT NULL,
+    status     TEXT   NOT NULL DEFAULT &#x27;OPEN&#x27;
+               CHECK (status IN (&#x27;OPEN&#x27;,&#x27;IN_PROGRESS&#x27;,&#x27;DONE&#x27;)),   -- enforce the enum (C05/T05)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+```sql
+-- src/main/resources/db/migration/V2__task_indexes.sql
+-- Index the columns we filter/paginate on (C05/T05 indexing, sargable — C07/T01 E5).
+-- One composite index serves the list query&#x27;s full access path:
+--   WHERE user_id = ? AND status = ? AND id &gt; ?  ORDER BY id
+-- (leftmost-prefix user_id,status for the filter + id for the keyset range/sort — C05/T05).
+CREATE INDEX idx_tasks_user_status_id ON tasks(user_id, status, id);
+```
+
+&gt; [!NOTE]
+&gt; The `CHECK` constraint and the `REFERENCES … ON DELETE CASCADE` push integrity into the database — the single source of truth ([C05/T05](../C05-databases-and-sql/T05-keys-constraints-and-relationships.md)). Even a buggy app or a manual SQL edit can&#x27;t insert an invalid status or an orphan task. App-layer validation (T03) is for *good error messages*, not the last line of defense.
+
+---
+
+## 4. The DataSource (HikariCP)
+
+One pooled `DataSource` for the whole app, configured from the environment ([12-factor](../C06-tools-and-environment/T01-backend-toolchain-quick-reference.md); [C05/T09 pooling](../C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md)):
+
+```java
+package com.example.tasks.db;
+import com.zaxxer.hikari.*;
+import javax.sql.DataSource;
+import org.flywaydb.core.Flyway;
+
+public final class Db {
+    public static DataSource create() {
+        var cfg = new HikariConfig();
+        cfg.setJdbcUrl(env(&quot;DATABASE_URL&quot;, &quot;jdbc:postgresql://localhost:5432/tasks&quot;));
+        cfg.setUsername(env(&quot;DB_USER&quot;, &quot;postgres&quot;));
+        cfg.setPassword(env(&quot;DB_PASSWORD&quot;, &quot;dev&quot;));
+        cfg.setMaximumPoolSize(10);          // small pool — cores×2-ish (the C05/T09 paradox)
+        cfg.setPoolName(&quot;tasks-pool&quot;);
+        return new HikariDataSource(cfg);
+    }
+
+    /** Apply pending migrations on startup. */
+    public static void migrate(DataSource ds) {
+        Flyway.configure().dataSource(ds).load().migrate();
+    }
+
+    private static String env(String k, String def) {
+        return System.getenv().getOrDefault(k, def);
+    }
+    private Db() {}
+}
+```
+
+---
+
+## 5. The Repository — CRUD with `PreparedStatement`
+
+The repository owns all SQL. Every query is a **`PreparedStatement`** with `?` placeholders — injection-proof and plan-cacheable ([C05/T09](../C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md)). A small private `map` turns a `ResultSet` row into a `Task`.
+
+```java
+package com.example.tasks.repo;
+import com.example.tasks.domain.*;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.*;
+
+public class TaskRepository {
+    private final DataSource ds;
+    public TaskRepository(DataSource ds) { this.ds = ds; }
+
+    public Task create(long userId, String title) {
+        String sql = &quot;INSERT INTO tasks(user_id, title) VALUES (?, ?) &quot; +
+                     &quot;RETURNING id, user_id, title, status, created_at&quot;;   // RETURNING avoids a 2nd round trip
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setString(2, title);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return map(rs);
+            }
+        } catch (SQLException e) { throw new DataAccessException(&quot;create task&quot;, e); }
+    }
+
+    public Optional&lt;Task&gt; findById(long id) {
+        String sql = &quot;SELECT id, user_id, title, status, created_at FROM tasks WHERE id = ?&quot;;
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(map(rs)) : Optional.empty();   // Optional, not null (C01/T07)
+            }
+        } catch (SQLException e) { throw new DataAccessException(&quot;findById&quot;, e); }
+    }
+
+    public boolean updateStatus(long id, TaskStatus status) {
+        String sql = &quot;UPDATE tasks SET status = ? WHERE id = ?&quot;;
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setLong(2, id);
+            return ps.executeUpdate() == 1;          // rows affected → did it exist?
+        } catch (SQLException e) { throw new DataAccessException(&quot;updateStatus&quot;, e); }
+    }
+
+    public boolean delete(long id) {
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(&quot;DELETE FROM tasks WHERE id = ?&quot;)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) { throw new DataAccessException(&quot;delete&quot;, e); }
+    }
+
+    private static Task map(ResultSet rs) throws SQLException {
+        return new Task(
+            rs.getLong(&quot;id&quot;),
+            rs.getLong(&quot;user_id&quot;),
+            rs.getString(&quot;title&quot;),
+            TaskStatus.valueOf(rs.getString(&quot;status&quot;)),
+            rs.getTimestamp(&quot;created_at&quot;).toInstant());
+    }
+}
+```
+
+```java
+// DataAccessException.java — a thin unchecked wrapper so callers aren&#x27;t forced to handle SQLException.
+// It keeps the SQLException as its cause, so the REST layer (T03) can inspect the SQLState.
+public class DataAccessException extends RuntimeException {
+    public DataAccessException(String msg, Throwable cause) { super(msg, cause); }
+}
+```
+
+&gt; [!WARNING]
+&gt; Every `Connection`, `PreparedStatement`, and `ResultSet` is in **try-with-resources** — they close in reverse order, and a `Connection.close()` on a pooled datasource *returns it to the pool* rather than really closing it. Forget this and you leak connections until the pool is exhausted and every request hangs on `connectionTimeout` ([C05/T09](../C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md), [C06/T04 CLOSE_WAIT](../C06-tools-and-environment/T04-network-and-tls-diagnostics.md)).
+
+---
+
+## 6. Filtering + Keyset Pagination
+
+Listing must filter by status and paginate. We use **keyset (cursor) pagination** — `WHERE id &gt; :lastSeenId ORDER BY id LIMIT n` — not `OFFSET`, because `OFFSET` rescans and skips all prior rows (slower the deeper you go) and can drop/duplicate rows under concurrent inserts ([C04/T03 pagination](../C04-web-and-rest-basics/T03-api-design-resources-versioning-pagination-filtering.md)).
+
+```java
+public Page&lt;Task&gt; listByUser(long userId, TaskStatus status, long afterId, int limit) {
+    String sql = &quot;&quot;&quot;
+        SELECT id, user_id, title, status, created_at
+        FROM tasks
+        WHERE user_id = ? AND status = ? AND id &gt; ?
+        ORDER BY id
+        LIMIT ?&quot;&quot;&quot;;                              // uses idx_tasks_user_status_id (sargable — C07/T01 E5)
+    try (Connection c = ds.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+        ps.setLong(1, userId);
+        ps.setString(2, status.name());
+        ps.setLong(3, afterId);                  // 0 for the first page
+        ps.setInt(4, limit);
+        try (ResultSet rs = ps.executeQuery()) {
+            List&lt;Task&gt; items = new ArrayList&lt;&gt;();
+            while (rs.next()) items.add(map(rs));
+            String next = items.size() == limit
+                    ? String.valueOf(items.get(items.size() - 1).id())   // cursor = last id
+                    : null;                                              // no more pages
+            return new Page&lt;&gt;(items, next);
+        }
+    } catch (SQLException e) { throw new DataAccessException(&quot;listByUser&quot;, e); }
+}
+```
+
+The returned `nextCursor` is the last row&#x27;s `id`; the client passes it back as `afterId` to get the next page. A `null` cursor means the last page — the loop terminator the REST layer (T03) exposes as the absence of a `next` link.
+
+---
+
+## 7. Transactions — a Multi-Write Unit of Work
+
+When two writes must both happen or neither, wrap them in one transaction: turn off autocommit, do the work on **one `Connection`**, then `commit` (or `rollback` on failure) ([C05/T06 ACID](../C05-databases-and-sql/T06-transactions-and-acid.md)). Example: reassign every open task from one user to another atomically.
+
+```java
+public void reassignOpenTasks(long fromUser, long toUser) {
+    String move = &quot;UPDATE tasks SET user_id = ? WHERE user_id = ? AND status = &#x27;OPEN&#x27;&quot;;
+    try (Connection c = ds.getConnection()) {
+        c.setAutoCommit(false);                  // begin
+        try (PreparedStatement ps = c.prepareStatement(move)) {
+            ps.setLong(1, toUser);
+            ps.setLong(2, fromUser);
+            ps.executeUpdate();
+            // ... any further writes share THIS connection so they&#x27;re in the same transaction ...
+            c.commit();                          // all-or-nothing
+        } catch (SQLException e) {
+            c.rollback();                        // undo on any failure
+            throw new DataAccessException(&quot;reassign&quot;, e);
+        }
+    } catch (SQLException e) { throw new DataAccessException(&quot;reassign tx&quot;, e); }
+}
+```
+
+&gt; [!WARNING]
+&gt; The transaction boundary is the **`Connection`**. Two writes on two different pooled connections are two *separate* transactions — a partial failure leaves inconsistent data. A correct unit of work acquires one connection, does all its writes on it, and commits once. (This is exactly the plumbing Spring&#x27;s `@Transactional` automates for you in L4.)
+
+---
+
+## 8. Integration Tests with Testcontainers
+
+Unit-testing this layer with mocks would test nothing — the value *is* the SQL. **Testcontainers** boots a real Postgres in Docker, runs the real migrations, and exercises the real queries ([C06/T05](../C06-tools-and-environment/T05-local-dev-environment-docker-testcontainers.md)). It catches what an in-memory H2 would miss: the `CHECK`/`UNIQUE` constraints, `RETURNING`, `TIMESTAMPTZ`, and real keyset ordering.
+
+```java
+package com.example.tasks.repo;
+import com.example.tasks.db.Db;
+import com.example.tasks.domain.*;
+import com.zaxxer.hikari.*;
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.*;
+import javax.sql.DataSource;
+import static org.assertj.core.api.Assertions.*;
+
+@Testcontainers
+class TaskRepositoryIT {
+
+    @Container
+    static PostgreSQLContainer&lt;?&gt; pg = new PostgreSQLContainer&lt;&gt;(&quot;postgres:16&quot;);
+
+    static DataSource ds;
+    static TaskRepository repo;
+    static long userId;
+
+    @BeforeAll
+    static void setup() throws Exception {
+        var cfg = new HikariConfig();
+        cfg.setJdbcUrl(pg.getJdbcUrl());          // the container&#x27;s RANDOM host port
+        cfg.setUsername(pg.getUsername());
+        cfg.setPassword(pg.getPassword());
+        ds = new HikariDataSource(cfg);
+        Db.migrate(ds);                           // run the SAME Flyway migrations as prod
+        repo = new TaskRepository(ds);
+        try (var c = ds.getConnection();
+             var ps = c.prepareStatement(
+                 &quot;INSERT INTO users(name,email) VALUES (&#x27;Ada&#x27;,&#x27;ada@x.io&#x27;) RETURNING id&quot;)) {
+            var rs = ps.executeQuery(); rs.next(); userId = rs.getLong(1);
+        }
+    }
+
+    @Test
+    void createsAndReadsBack() {
+        Task t = repo.create(userId, &quot;write tests&quot;);
+        assertThat(t.id()).isPositive();
+        assertThat(t.status()).isEqualTo(TaskStatus.OPEN);            // the DB DEFAULT applied
+        assertThat(repo.findById(t.id())).contains(t);
+    }
+
+    @Test
+    void findByIdReturnsEmptyForMissing() {
+        assertThat(repo.findById(999_999)).isEmpty();                 // Optional, not null
+    }
+
+    @Test
+    void updatesStatusAndReportsRowCount() {
+        Task t = repo.create(userId, &quot;ship it&quot;);
+        assertThat(repo.updateStatus(t.id(), TaskStatus.DONE)).isTrue();
+        assertThat(repo.updateStatus(999_999, TaskStatus.DONE)).isFalse();   // no such row
+        assertThat(repo.findById(t.id()).orElseThrow().status()).isEqualTo(TaskStatus.DONE);
+    }
+
+    @Test
+    void keysetPaginationWalksAllPages() {
+        for (int i = 0; i &lt; 5; i++) repo.create(userId, &quot;p&quot; + i);
+        Page&lt;Task&gt; p1 = repo.listByUser(userId, TaskStatus.OPEN, 0, 2);
+        assertThat(p1.items()).hasSize(2);
+        assertThat(p1.nextCursor()).isNotNull();
+        Page&lt;Task&gt; p2 = repo.listByUser(userId, TaskStatus.OPEN, Long.parseLong(p1.nextCursor()), 2);
+        assertThat(p2.items().get(0).id()).isGreaterThan(p1.items().get(1).id());  // strictly after
+    }
+
+    @Test
+    void uniqueEmailIsEnforcedByTheDatabase() {
+        assertThatThrownBy(() -&gt; {
+            try (var c = ds.getConnection();
+                 var ps = c.prepareStatement(&quot;INSERT INTO users(name,email) VALUES (&#x27;Dup&#x27;,&#x27;ada@x.io&#x27;)&quot;)) {
+                ps.executeUpdate();               // violates the UNIQUE constraint → SQLException
+            }
+        }).isInstanceOf(Exception.class);          // T03 maps this to HTTP 409
+    }
+}
+```
+
+Run them with `./mvnw verify` — Testcontainers pulls `postgres:16`, starts it, and tears it down after the class. The same tests run unchanged in CI (Docker available), with no shared test database to pollute.
+
+---
+
+## 9. Run It Locally
+
+A tiny `SmokeMain` (a normal `public static void main`) proves the wiring end to end before the REST layer exists:
+
+```java
+package com.example.tasks;
+import com.example.tasks.db.Db;
+import com.example.tasks.repo.TaskRepository;
+
+public class SmokeMain {
+    public static void main(String[] args) {
+        var ds = Db.create();
+        Db.migrate(ds);                                  // schema up to date
+        var repo = new TaskRepository(ds);
+        // (assumes a user with id 1 exists — insert one first, or run against seeded data)
+        System.out.println(repo.create(1, &quot;smoke test&quot;));
+    }
+}
+```
+
+```bash
+docker compose up -d                # start Postgres (waits healthy)
+./mvnw verify                       # build + run the Testcontainers integration tests (no DB setup needed)
+
+# To run SmokeMain against the compose Postgres, use the exec plugin by its full coordinates
+# (no pom change needed) — or just run Main from T03 once the REST layer exists:
+DATABASE_URL=jdbc:postgresql://localhost:5432/tasks \
+  ./mvnw -q compile org.codehaus.mojo:exec-maven-plugin:3.2.0:java \
+         -Dexec.mainClass=com.example.tasks.SmokeMain
+docker compose exec db psql -U postgres tasks -c &#x27;SELECT id,title,status FROM tasks;&#x27;
+```
+
+`./mvnw verify` is the one command that always works (Testcontainers needs no local DB setup); the `exec` line is optional and shown with the plugin&#x27;s fully-qualified coordinates so it runs without adding it to the `pom.xml`.
+
+## Recap
+
+- **Plain JDBC over HikariCP** keeps every line traceable to [C05/T09](../C05-databases-and-sql/T09-jdbc-and-connection-pooling-hikaricp.md); a `DataSource` is created once and pooled (small pool ≈ cores×2).
+- **Flyway migrations** in `db/migration` make the schema a deterministic function of versioned scripts ([C06/T03](../C06-tools-and-environment/T03-database-clients-and-migration-tools.md)); integrity (`UNIQUE`, `CHECK`, `FK ON DELETE CASCADE`) lives in the database.
+- The **repository** uses `PreparedStatement` everywhere (injection-proof, plan-cached), returns **`Optional`** for absent rows, uses **`RETURNING`** to avoid a second round trip, and wraps every JDBC object in **try-with-resources** (a leak exhausts the pool).
+- **Keyset pagination** (`WHERE id &gt; cursor ORDER BY id LIMIT n`) beats `OFFSET` for deep pages and concurrent inserts ([C04/T03](../C04-web-and-rest-basics/T03-api-design-resources-versioning-pagination-filtering.md)).
+- A **transaction** is bounded by one `Connection`: `setAutoCommit(false)` → writes → `commit`/`rollback` ([C05/T06](../C05-databases-and-sql/T06-transactions-and-acid.md)).
+- **Testcontainers** tests the real database (real constraints, `RETURNING`, ordering) that mocks/H2 can&#x27;t ([C06/T05](../C06-tools-and-environment/T05-local-dev-environment-docker-testcontainers.md)).
+
+## Next
+
+Put the HTTP layer on top: **[T03 — Level Project, Part 2: the REST API](./T03-project-rest-service-api-layer.md)** — endpoints, DTOs, validation, an error model (404/409/422), and pagination links, driven with curl.
+
+[Back to C07 index](./README.md) · [Back to L2 index](../README.md)
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l2/c07-t01-exercises.html"><div class="lbl">← Previous</div><div class="ttl">T01-exercises</div><div class="sub">Exercises — Applying L2 (C01–C05)</div></a><a class="next" href="../l2/c07-t03-project-rest-service-api-layer.html"><div class="lbl">Next →</div><div class="ttl">T03-project-rest-service-api-layer</div><div class="sub">Level Project · Part 2 — The REST API (endpoints, DTOs, validation, errors)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#1-project-setup" data-toc-link>1. Project Setup</a></li><li class="lvl-2"><a href="#2-the-domain-model" data-toc-link>2. The Domain Model</a></li><li class="lvl-2"><a href="#3-schema-migrations" data-toc-link>3. Schema &amp;amp; Migrations</a></li><li class="lvl-2"><a href="#4-the-datasource-hikaricp" data-toc-link>4. The DataSource (HikariCP)</a></li><li class="lvl-2"><a href="#5-the-repository-crud-with-preparedstatement" data-toc-link>5. The Repository — CRUD with PreparedStatement</a></li><li class="lvl-2"><a href="#6-filtering-keyset-pagination" data-toc-link>6. Filtering + Keyset Pagination</a></li><li class="lvl-2"><a href="#7-transactions-a-multi-write-unit-of-work" data-toc-link>7. Transactions — a Multi-Write Unit of Work</a></li><li class="lvl-2"><a href="#8-integration-tests-with-testcontainers" data-toc-link>8. Integration Tests with Testcontainers</a></li><li class="lvl-2"><a href="#9-run-it-locally" data-toc-link>9. Run It Locally</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

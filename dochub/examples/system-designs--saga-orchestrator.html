@@ -1,0 +1,2668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Saga Orchestrator (orchestration-based, with compensation) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="active" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>Saga Orchestrator (orchestration-based, with compensation)</span></div>
+        <h1>Saga Orchestrator (orchestration-based, with compensation)</h1>
+        <div><span class="source-path">examples/system-designs/saga-orchestrator</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><p>A runnable, self-contained example of an <strong>orchestration-based Saga</strong> for a
+multi-step business transaction with <strong>compensation</strong>. Place an order through a
+saga with three steps:</p>
+<ol>
+<li><strong>reserve inventory</strong> (undo: release it)</li>
+<li><strong>charge payment</strong> (undo: refund it)</li>
+<li><strong>confirm shipping</strong> (undo: cancel it)</li>
+</ol>
+<p>If a later step <strong>fails</strong>, the orchestrator runs the compensations of the
+already-completed steps <strong>in reverse order</strong> (e.g. payment fails → release
+inventory; shipping fails → refund payment, then release inventory). Saga state
+and a per-step log are persisted to H2 so the transaction is <strong>auditable</strong> and
+(conceptually) <strong>recoverable</strong>.</p>
+<blockquote>
+<p><strong>Backs:</strong> L5/C02/T06 Distributed Transactions (Saga) + L6/C14/T04 (idempotency)</p>
+</blockquote>
+<p>Runs on an in-memory <strong>H2</strong> database with <strong>no external infrastructure</strong>.</p>
+<hr>
+<h2 id="why-a-saga-and-why-you-cant-just-2pc">Why a saga? (and why you can't just 2PC)<a class="anchor" href="#why-a-saga-and-why-you-cant-just-2pc" aria-hidden="true">#</a></h2>
+<p>A single ACID transaction gives you atomicity for free: either everything
+commits or everything rolls back. The moment your business operation spans
+<strong>multiple services</strong>, each with its <strong>own database</strong>, that free lunch is gone:</p>
+<ul>
+<li><strong>You can't two-phase-commit (2PC/XA) across services in practice.</strong> 2PC needs
+  a coordinator that holds <strong>locks</strong> on every participant for the whole
+  transaction, and every participant must support the XA protocol. That couples
+  availability (one slow/dead participant blocks everyone — the "blocking"
+  problem of 2PC), kills throughput under contention, and most cloud datastores
+  and HTTP/REST services simply don't expose XA. It does not scale and it does
+  not compose across heterogeneous services.</li>
+<li><strong>A saga trades atomicity for a sequence of local transactions plus
+  compensation.</strong> Each step commits <strong>on its own</strong> (<code>T1, T2, … Tn</code>). There is no
+  global lock. If step <code>k</code> fails, the saga restores a <em>semantically</em> consistent
+  state by running compensating transactions <code>Ck-1, … C1</code> for the steps that
+  already committed. You give up isolation (intermediate states are visible) in
+  exchange for availability and scale; you handle the lost isolation with
+  techniques like semantic locks, reservations, and commutative updates.</li>
+</ul>
+<p>This example makes the "each step commits on its own" property concrete: the
+orchestrator deliberately does <strong>not</strong> wrap the forward pass in one
+<code>@Transactional</code> method. Each service operation (and each log write) commits in
+its <strong>own</strong> transaction (<code>Propagation.REQUIRES_NEW</code>). If we used one big
+transaction, a failure would roll back the inventory reservation and there would
+be <strong>nothing to compensate</strong> — which is exactly <em>not</em> a saga.</p>
+<hr>
+<h2 id="orchestration-vs-choreography">Orchestration vs. choreography<a class="anchor" href="#orchestration-vs-choreography" aria-hidden="true">#</a></h2>
+<p>Two ways to coordinate a saga:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Orchestration</strong> (this example)</th>
+<th><strong>Choreography</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coordination</td>
+<td>A central <strong>orchestrator</strong> tells each participant what to do next and triggers compensations.</td>
+<td>No central brain. Each service <strong>reacts to events</strong> and emits its own; the flow emerges from the choreography.</td>
+</tr>
+<tr>
+<td>Control flow</td>
+<td>Explicit, in one place. Easy to see the whole saga and reason about ordering/compensation.</td>
+<td>Implicit, spread across services. The "saga" exists only as an emergent property of event subscriptions.</td>
+</tr>
+<tr>
+<td>Coupling</td>
+<td>Orchestrator knows all participants (more central coupling).</td>
+<td>Services only know events (looser coupling), but the end-to-end flow is harder to follow.</td>
+</tr>
+<tr>
+<td>Debuggability</td>
+<td>One log to read; the saga state machine is centralized and auditable.</td>
+<td>Must reconstruct flow from many services' logs/event traces.</td>
+</tr>
+<tr>
+<td>Risk</td>
+<td>Orchestrator can become a "god service" if it accretes business logic.</td>
+<td>Cyclic event dependencies and hard-to-trace flows as steps grow.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>When to use which:</strong></p>
+<ul>
+<li><strong>Orchestration</strong> when the flow is <strong>complex</strong>, has many steps/branches,
+  needs <strong>clear ownership</strong> of the transaction, strong <strong>auditability</strong>, or
+  explicit recovery logic. Easier for newcomers to understand.</li>
+<li><strong>Choreography</strong> when you want <strong>maximum decoupling</strong>, the flow is <strong>simple</strong>
+  / linear, and teams own services independently and prefer event-driven
+  integration. Fewer central bottlenecks, but watch out for tangled event webs.</li>
+</ul>
+<p>A common middle ground: orchestrate the <strong>critical</strong> transactional flow,
+choreograph peripheral reactions (notifications, analytics).</p>
+<hr>
+<h2 id="idempotent-commutative-compensations-and-why-it-matters">Idempotent + commutative compensations (and why it matters)<a class="anchor" href="#idempotent-commutative-compensations-and-why-it-matters" aria-hidden="true">#</a></h2>
+<p>In any real saga the orchestrator talks to participants over an unreliable
+network and a crash-prone coordinator. That forces two properties:</p>
+<ul>
+<li><strong>At-least-once delivery.</strong> A "charge" or a "refund" command may be delivered
+  more than once (retry after a timeout, retry after the coordinator crashed and
+  resumed from its log). So <strong>every step and every compensation must be
+  idempotent</strong>: applying it twice has the same effect as applying it once.
+  In this code, every operation is keyed by the caller's <code>orderRef</code> and the
+  service tables have a <strong>unique constraint</strong> on it; a repeated <code>charge</code> finds
+  the existing payment and is a no-op rather than billing the customer twice — the
+  classic <strong>idempotency-key</strong> pattern.</li>
+<li><strong>Commutative compensations.</strong> Compensations may run in an order you didn't
+  expect relative to other concurrent activity, so they should <strong>net out</strong>
+  regardless of interleaving. A refund of $X composes to the same financial
+  result whether it lands before or after some other adjustment. We model this by
+  making <code>release</code>/<code>refund</code>/<code>cancel</code> operate on absolute persisted state
+  (mark RELEASED/REFUNDED/CANCELLED) rather than blind decrements, and by
+  clamping the inventory release so it can't over-credit.</li>
+</ul>
+<p>Compensation is <strong>semantic</strong>, not physical: you can't "un-charge" a card by
+deleting a row — you issue a <strong>refund</strong>. The compensating transaction is itself a
+real business operation with its own side effects.</p>
+<hr>
+<h2 id="recovery-at-least-once-notes">Recovery &amp; at-least-once notes<a class="anchor" href="#recovery-at-least-once-notes" aria-hidden="true">#</a></h2>
+<p>The persisted <strong>saga log</strong> (<code>saga_instance</code> + <code>saga_step_log</code>) is what makes the
+saga recoverable:</p>
+<ul>
+<li>Each forward step records <code>EXECUTED</code> <em>after</em> it commits; a failed step records
+  <code>FAILED</code>; compensations record <code>COMPENSATED</code>. The overall saga moves through
+  <code>STARTED → COMPENSATING → COMPENSATED</code> (or <code>COMPLETED</code>, or
+  <code>COMPENSATION_FAILED</code> if an undo itself fails).</li>
+<li>On restart, a <strong>recovery sweep</strong> would scan for sagas stuck in <code>STARTED</code> or
+  <code>COMPENSATING</code> (see <code>SagaInstanceRepository.findByStatusIn</code>) and <strong>resume</strong>
+  them: re-run the next pending step, or continue compensating. Because every
+  step is idempotent, re-running a step that <em>did</em> commit before the crash is
+  safe.</li>
+<li>A <code>@Version</code> optimistic-lock column on the saga prevents two coordinators (or
+  a live request racing the recovery sweep) from both advancing the same saga.</li>
+<li>If a compensation <strong>cannot</strong> succeed (e.g. the refund gateway is permanently
+  rejecting), the saga is parked in <code>COMPENSATION_FAILED</code> for human/automated
+  intervention rather than silently lost.</li>
+</ul>
+<p>This example keeps the orchestrator <strong>synchronous and in-process</strong> for clarity.
+A production orchestrator (e.g. a workflow engine, or a custom coordinator over a
+message broker) would persist a command/event for each transition and drive the
+saga asynchronously with retries — but the state machine and the idempotency
+contract are exactly the ones modeled here.</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>JDK 21+</strong> (the build targets Java 21 bytecode; any JDK ≥ 21 compiles it).</li>
+<li><strong>Maven 3.9+</strong> (or use the <code>mvnw</code> wrapper of your repo if present).</li>
+<li>No database to install — H2 runs in-memory.</li>
+</ul>
+<h2 id="run">Run<a class="anchor" href="#run" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># from this directory
+mvn test          # run the test suite (happy path + compensation paths)
+mvn spring-boot:run   # start the app on http://localhost:8080
+</code></pre></div>
+<p>Then place orders:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Happy path -&gt; 201 Created, status COMPLETED
+curl -i -X POST http://localhost:8080/api/orders \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;orderRef&quot;:&quot;order-1&quot;,&quot;sku&quot;:&quot;SKU-WIDGET&quot;,&quot;quantity&quot;:2,&quot;amount&quot;:59.99,&quot;address&quot;:&quot;1 Main St&quot;}'
+
+# Force payment failure via a declined amount -&gt; 422, status COMPENSATED
+# (set the decline amount first by editing PaymentService, or use the test
+#  switches; see &quot;Injecting failures&quot; below)
+</code></pre></div>
+<p>Browse the persisted saga log at the H2 console:
+<code>http://localhost:8080/h2-console</code>
+(JDBC URL <code>jdbc:h2:mem:sagaorchestrator</code>, user <code>sa</code>, empty password) — look at
+<code>SAGA_INSTANCE</code>, <code>SAGA_STEP_LOG</code>, <code>RESERVATION</code>, <code>PAYMENT</code>, <code>SHIPMENT</code>.</p>
+<h3 id="injecting-failures-for-the-demotests">Injecting failures (for the demo/tests)<a class="anchor" href="#injecting-failures-for-the-demotests" aria-hidden="true">#</a></h3>
+<p><code>PaymentService</code> and <code>ShippingService</code> expose switches so failures are
+deterministic:</p>
+<ul>
+<li><code>paymentService.failNextCharge()</code> — next charge throws (transient gateway).</li>
+<li><code>paymentService.setDeclineAmount(new BigDecimal("120.00"))</code> — any charge for
+  exactly that amount is declined.</li>
+<li><code>shippingService.failNextConfirm()</code> — next shipping confirm throws (the <strong>last</strong>
+  step fails, so payment <em>and</em> inventory get compensated in reverse).</li>
+</ul>
+<p>The seeded inventory is <code>SKU-WIDGET=100</code>, <code>SKU-GADGET=5</code>; ordering more
+<code>SKU-GADGET</code> than 5 fails the <strong>first</strong> step (insufficient stock).</p>
+<h2 id="expected-output">Expected output<a class="anchor" href="#expected-output" aria-hidden="true">#</a></h2>
+<p><code>mvn test</code> ends with:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+</code></pre></div>
+<p>In the logs you can watch a compensating run, e.g. shipping failure:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>saga 5 -&gt; executing step 0 'reserve-inventory'
+saga 5 -&gt; executing step 1 'charge-payment'
+saga 5 -&gt; executing step 2 'confirm-shipping'
+saga 5 -&gt; step 2 'confirm-shipping' FAILED: simulated carrier outage ...
+saga 5 -&gt; compensating step 1 'charge-payment'   &lt;-- reverse order
+saga 5 -&gt; compensating step 0 'reserve-inventory'
+saga 5 -&gt; COMPENSATED (all undos applied in reverse order)
+</code></pre></div>
+<p>The happy-path HTTP call returns <code>201</code> with <code>"status":"COMPLETED"</code>; a
+compensated order returns <code>422</code> with <code>"status":"COMPENSATED"</code> and a step log
+showing the compensated steps.</p>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong><code>saga/SagaStep.java</code></strong> — the do/undo abstraction and the idempotency/
+   commutativity contract every step must honor.</li>
+<li><strong><code>saga/SagaOrchestrator.java</code></strong> — the generic coordinator: run steps in
+   order, on failure compensate completed steps <strong>in reverse</strong>. The heart of the
+   example.</li>
+<li><strong><code>saga/SagaLog.java</code></strong> — why each transition commits in its <strong>own</strong>
+   transaction (<code>REQUIRES_NEW</code>) and why that's split into its own bean.</li>
+<li><strong><code>service/OrderSagaService.java</code></strong> — wires the three services into an ordered
+   <code>SagaDefinition</code> (the place-order saga) and runs the orchestrator.</li>
+<li><strong><code>service/PaymentService.java</code></strong> — idempotent charge/refund with injectable
+   failures; the cleanest illustration of the idempotency-key pattern.</li>
+<li><strong><code>entity/SagaInstance.java</code> + <code>entity/SagaStepLog.java</code></strong> — the durable saga
+   log that makes the transaction auditable and recoverable.</li>
+<li><strong><code>controller/OrderController.java</code></strong> — <code>POST /api/orders</code> mapping saga
+   outcome to HTTP status (201 vs 422).</li>
+<li><strong>Tests</strong> — <code>SagaOrchestratorReverseOrderTest</code> (reverse-order proof),
+   <code>OrderSagaIntegrationTest</code> (happy + compensation paths with DB assertions),
+   <code>OrderControllerTest</code> (HTTP layer).</li>
+</ol>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>
+
+## Source files
+
+*31 key file(s) from `examples/system-designs/saga-orchestrator/`. Truncated files are marked; see the repo for the full source.*
+
+
+### `pom.xml`
+
+```xml
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!--
+      spring-boot-starter-parent gives us:
+        - a curated, conflict-free dependency BOM (we omit versions on the starters below)
+        - sensible compiler/plugin defaults
+        - the spring-boot-maven-plugin (repackage + `spring-boot:run`)
+      3.3.x is the latest Boot 3.3 line; it requires Java 17+ and is happy on 21.
+    --&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.3.5&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- look the parent up from the repository, not a local dir --&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;saga-orchestrator&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;saga-orchestrator&lt;/name&gt;
+    &lt;description&gt;Worked system-design example: an orchestration-based Saga with compensation, on H2.&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;!-- Targets Java 21 bytecode. Boot's compiler config turns this into a release-21 build. --&gt;
+        &lt;java.version&gt;21&lt;/java.version&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Web layer: embedded Tomcat + Spring MVC for the POST /api/orders controller. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Persistence: Spring Data JPA (Hibernate) over the saga + service entities. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          H2 in-memory database, runtime scope. This is what lets the whole app
+          start with ZERO external infrastructure: no Postgres/MySQL to install.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- JUnit 5, AssertJ, MockMvc, Spring test slices. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;!-- Enables `mvn spring-boot:run` and builds an executable fat-jar. --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&amp;lt;/project&amp;gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorinventoryseederjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/InventorySeeder.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorinventoryseederjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator;
+
+import com.javamastery.examples.sagaorchestrator.entity.InventoryItem;
+import com.javamastery.examples.sagaorchestrator.repository.InventoryItemRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Seeds a little inventory at startup so the demo has stock to reserve. With H2
+ * in-memory this runs every boot; a real deployment would use proper migrations
+ * and real stock data.
+ */
+@Configuration
+public class InventorySeeder {
+
+    private static final Logger log = LoggerFactory.getLogger(InventorySeeder.class);
+
+    @Bean
+    ApplicationRunner seedInventory(InventoryItemRepository items) {
+        return args -&gt; {
+            if (items.count() == 0) {
+                items.save(new InventoryItem(&quot;SKU-WIDGET&quot;, 100));
+                items.save(new InventoryItem(&quot;SKU-GADGET&quot;, 5));
+                log.info(&quot;seeded inventory: SKU-WIDGET=100, SKU-GADGET=5&quot;);
+            }
+        };
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagaorchestratorapplicationjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/SagaOrchestratorApplication.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagaorchestratorapplicationjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Entry point for the orchestration-based Saga demo.
+ *
+ * &lt;p&gt;The whole app boots on an in-memory H2 database with no external
+ * infrastructure. Hit {@code POST /api/orders} to drive a multi-step business
+ * transaction (reserve inventory -&gt; charge payment -&gt; confirm shipping) through
+ * the {@link com.javamastery.examples.sagaorchestrator.saga.SagaOrchestrator}.
+ * If a later step fails, the orchestrator runs the compensations of the
+ * already-completed steps in reverse order.
+ */
+@SpringBootApplication
+public class SagaOrchestratorApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SagaOrchestratorApplication.class, args);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorcontrollerordercontrollerjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/controller/OrderController.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorcontrollerordercontrollerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.controller;
+
+import com.javamastery.examples.sagaorchestrator.dto.OrderResultResponse;
+import com.javamastery.examples.sagaorchestrator.dto.PlaceOrderRequest;
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStatus;
+import com.javamastery.examples.sagaorchestrator.service.OrderSagaService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * REST entry point for placing an order through the saga.
+ *
+ * &lt;p&gt;{@code POST /api/orders} always returns the saga outcome (it does not 500
+ * on a business failure): a COMPLETED saga yields {@code 201 Created}; a
+ * COMPENSATED saga (a step failed and the completed steps were rolled back via
+ * compensation) yields {@code 422 Unprocessable Entity} with the step log so the
+ * client can see what happened.
+ */
+@RestController
+@RequestMapping(&quot;/api/orders&quot;)
+public class OrderController {
+
+    private final OrderSagaService orderSagaService;
+
+    public OrderController(OrderSagaService orderSagaService) {
+        this.orderSagaService = orderSagaService;
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;OrderResultResponse&gt; placeOrder(@RequestBody PlaceOrderRequest request) {
+        Long sagaId = orderSagaService.placeOrder(
+                request.orderRef(),
+                request.sku(),
+                request.quantity(),
+                request.amount(),
+                request.address());
+
+        SagaInstance saga = orderSagaService.loadSaga(sagaId);
+        OrderResultResponse body = OrderResultResponse.from(saga);
+
+        HttpStatus status = (saga.getStatus() == SagaStatus.COMPLETED)
+                ? HttpStatus.CREATED
+                : HttpStatus.UNPROCESSABLE_ENTITY;
+        return ResponseEntity.status(status).body(body);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratordtoorderresultresponsejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/dto/OrderResultResponse.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratordtoorderresultresponsejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.dto;
+
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.entity.SagaStepLog;
+import java.util.List;
+
+/**
+ * Response for {@code POST /api/orders}: the final saga state plus the step log,
+ * so the caller can see exactly what ran (and, on failure, what was compensated
+ * in reverse order).
+ */
+public record OrderResultResponse(
+        Long sagaId,
+        String orderRef,
+        String status,
+        String failureReason,
+        List&lt;StepView&gt; steps) {
+
+    /** One row of the audit log. */
+    public record StepView(int sequence, String name, String status) {
+    }
+
+    public static OrderResultResponse from(SagaInstance saga) {
+        List&lt;StepView&gt; steps = saga.getSteps().stream()
+                .sorted((a, b) -&gt; Integer.compare(a.getSequence(), b.getSequence()))
+                .map(OrderResultResponse::toView)
+                .toList();
+        return new OrderResultResponse(
+                saga.getId(),
+                saga.getCorrelationId(),
+                saga.getStatus().name(),
+                saga.getFailureReason(),
+                steps);
+    }
+
+    private static StepView toView(SagaStepLog s) {
+        return new StepView(s.getSequence(), s.getStepName(), s.getStatus().name());
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratordtoplaceorderrequestjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/dto/PlaceOrderRequest.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratordtoplaceorderrequestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.dto;
+
+import java.math.BigDecimal;
+
+/**
+ * Request body for {@code POST /api/orders}.
+ *
+ * @param orderRef caller-supplied idempotency / correlation key for the saga
+ * @param sku      the product to order
+ * @param quantity units to reserve
+ * @param amount   total to charge
+ * @param address  shipping address
+ */
+public record PlaceOrderRequest(
+        String orderRef,
+        String sku,
+        int quantity,
+        BigDecimal amount,
+        String address) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentityinventoryitemjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/InventoryItem.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityinventoryitemjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+
+/**
+ * Stock for one SKU. {@code available} is the free quantity; {@code reserved}
+ * is held against in-flight orders. The reserve step moves units from available
+ * to reserved; its compensation moves them back.
+ */
+@Entity
+@Table(name = &quot;inventory_item&quot;)
+public class InventoryItem {
+
+    @Id
+    private String sku;
+
+    @Column(nullable = false)
+    private int available;
+
+    @Column(nullable = false)
+    private int reserved;
+
+    @Version
+    private Long version;
+
+    protected InventoryItem() {
+        // JPA
+    }
+
+    public InventoryItem(String sku, int available) {
+        this.sku = sku;
+        this.available = available;
+        this.reserved = 0;
+    }
+
+    public void reserve(int qty) {
+        if (qty &lt;= 0) {
+            throw new IllegalArgumentException(&quot;quantity must be positive: &quot; + qty);
+        }
+        if (available &lt; qty) {
+            throw new IllegalStateException(
+                    &quot;insufficient stock for &quot; + sku + &quot;: need &quot; + qty + &quot;, have &quot; + available);
+        }
+        available -= qty;
+        reserved += qty;
+    }
+
+    /** Undo a reservation. Clamped so it is safe to call more than once (idempotent-ish). */
+    public void release(int qty) {
+        int toRelease = Math.min(qty, reserved);
+        reserved -= toRelease;
+        available += toRelease;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public int getAvailable() {
+        return available;
+    }
+
+    public int getReserved() {
+        return reserved;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentitypaymentjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Payment.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitypaymentjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.math.BigDecimal;
+
+/**
+ * A charge taken by the payment step. The {@code orderRef} is unique so a
+ * retried charge is idempotent (the existing charge is returned rather than the
+ * customer being billed twice -- the classic idempotency-key pattern). The
+ * refund compensation flips it to REFUNDED.
+ */
+@Entity
+@Table(name = &quot;payment&quot;)
+public class Payment {
+
+    public enum State { CHARGED, REFUNDED }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /** Idempotency key for the charge step. */
+    @Column(nullable = false, unique = true, updatable = false)
+    private String orderRef;
+
+    @Column(nullable = false, updatable = false, precision = 12, scale = 2)
+    private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
+
+    protected Payment() {
+        // JPA
+    }
+
+    public Payment(String orderRef, BigDecimal amount) {
+        this.orderRef = orderRef;
+        this.amount = amount;
+        this.state = State.CHARGED;
+    }
+
+    public void markRefunded() {
+        this.state = State.REFUNDED;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderRef() {
+        return orderRef;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public State getState() {
+        return state;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentityreservationjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Reservation.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityreservationjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/**
+ * A single inventory reservation made by the reserve step. Persisting it (a) lets
+ * the release compensation find exactly what to undo and (b) makes the reserve
+ * step idempotent: the {@code orderRef} is unique, so a retried reserve finds the
+ * existing row instead of double-reserving.
+ */
+@Entity
+@Table(name = &quot;reservation&quot;)
+public class Reservation {
+
+    public enum State { ACTIVE, RELEASED }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /** Idempotency key for the reserve step. */
+    @Column(nullable = false, unique = true, updatable = false)
+    private String orderRef;
+
+    @Column(nullable = false, updatable = false)
+    private String sku;
+
+    @Column(nullable = false, updatable = false)
+    private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
+
+    protected Reservation() {
+        // JPA
+    }
+
+    public Reservation(String orderRef, String sku, int quantity) {
+        this.orderRef = orderRef;
+        this.sku = sku;
+        this.quantity = quantity;
+        this.state = State.ACTIVE;
+    }
+
+    public void markReleased() {
+        this.state = State.RELEASED;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderRef() {
+        return orderRef;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public State getState() {
+        return state;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentitysagainstancejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/SagaInstance.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitysagainstancejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import com.javamastery.examples.sagaorchestrator.saga.SagaStatus;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Persisted state of one saga run. This is the durable &quot;saga log&quot;: it makes the
+ * transaction auditable and is the anchor a real recovery process would scan on
+ * restart (&quot;find sagas stuck in STARTED/COMPENSATING and resume them&quot;).
+ */
+@Entity
+@Table(name = &quot;saga_instance&quot;)
+public class SagaInstance {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /** The saga type, e.g. {@code PLACE_ORDER}. Lets recovery pick the right step list. */
+    @Column(nullable = false, updatable = false)
+    private String sagaType;
+
+    /**
+     * Idempotency key supplied by the caller (here, the client order reference).
+     * Re-submitting the same key must NOT start a second saga -- see
+     * {@code OrderSagaService}. Unique so the DB enforces it as a backstop.
+     */
+    @Column(nullable = false, updatable = false, unique = true)
+    private String correlationId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SagaStatus status;
+
+    @Column(nullable = false, updatable = false)
+    private Instant startedAt;
+
+    @Column
+    private Instant finishedAt;
+
+    /** Free-text reason captured when a forward step fails. */
+    @Column(length = 1024)
+    private String failureReason;
+
+    /**
+     * Optimistic-lock guard. Two coordinator threads (or a live request racing a
+     * recovery sweep) cannot both advance the same saga: the second commit fails.
+     */
+    @Version
+    private Long version;
+
+    @OneToMany(mappedBy = &quot;saga&quot;, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OrderBy(&quot;sequence ASC&quot;)
+    private List&lt;SagaStepLog&gt; steps = new ArrayList&lt;&gt;();
+
+    protected SagaInstance() {
+        // JPA
+    }
+
+    public SagaInstance(String sagaType, String correlationId) {
+        this.sagaType = sagaType;
+        this.correlationId = correlationId;
+        this.status = SagaStatus.STARTED;
+        this.startedAt = Instant.now();
+    }
+
+    /** Append a step-log row, wiring up the back-reference. */
+    public SagaStepLog addStep(String stepName, int sequence) {
+        SagaStepLog log = new SagaStepLog(this, stepName, sequence);
+        steps.add(log);
+        return log;
+    }
+
+    public void markCompleted() {
+        this.status = SagaStatus.COMPLETED;
+        this.finishedAt = Instant.now();
+    }
+
+    public void markCompensating(String failureReason) {
+        this.status = SagaStatus.COMPENSATING;
+        // Only record a reason when one is supplied; never clobber an existing
+        // reason with null when we later re-assert the COMPENSATING status.
+        if (failureReason != null) {
+            this.failureReason = failureReason;
+        }
+    }
+
+    public void markCompensated() {
+        this.status = SagaStatus.COMPENSATED;
+        this.finishedAt = Instant.now();
+    }
+
+    public void markCompensationFailed() {
+        this.status = SagaStatus.COMPENSATION_FAILED;
+        this.finishedAt = Instant.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getSagaType() {
+        return sagaType;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public SagaStatus getStatus() {
+        return status;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public List&lt;SagaStepLog&gt; getSteps() {
+        return steps;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentitysagasteplogjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/SagaStepLog.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitysagasteplogjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.Instant;
+
+/**
+ * One row per step per saga run. The {@code sequence} preserves execution order
+ * so an auditor (or a test) can see that compensations ran in reverse, and a
+ * recovery process can tell exactly how far the forward pass got.
+ */
+@Entity
+@Table(name = &quot;saga_step_log&quot;)
+public class SagaStepLog {
+
+    /** Per-step lifecycle, independent of the overall saga status. */
+    public enum StepStatus {
+        PENDING,
+        EXECUTED,
+        FAILED,
+        COMPENSATED,
+        COMPENSATION_FAILED
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = &quot;saga_id&quot;, nullable = false)
+    private SagaInstance saga;
+
+    @Column(nullable = false, updatable = false)
+    private String stepName;
+
+    /** 0-based position in the forward order. */
+    @Column(nullable = false, updatable = false)
+    private int sequence;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StepStatus status;
+
+    @Column
+    private Instant executedAt;
+
+    @Column
+    private Instant compensatedAt;
+
+    protected SagaStepLog() {
+        // JPA
+    }
+
+    SagaStepLog(SagaInstance saga, String stepName, int sequence) {
+        this.saga = saga;
+        this.stepName = stepName;
+        this.sequence = sequence;
+        this.status = StepStatus.PENDING;
+    }
+
+    public void markExecuted() {
+        this.status = StepStatus.EXECUTED;
+        this.executedAt = Instant.now();
+    }
+
+    public void markFailed() {
+        this.status = StepStatus.FAILED;
+    }
+
+    public void markCompensated() {
+        this.status = StepStatus.COMPENSATED;
+        this.compensatedAt = Instant.now();
+    }
+
+    public void markCompensationFailed() {
+        this.status = StepStatus.COMPENSATION_FAILED;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getStepName() {
+        return stepName;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public StepStatus getStatus() {
+        return status;
+    }
+
+    public Instant getExecutedAt() {
+        return executedAt;
+    }
+
+    public Instant getCompensatedAt() {
+        return compensatedAt;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorentityshipmentjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Shipment.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityshipmentjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/**
+ * A shipment booked by the (final) confirm-shipping step. As the last step it is
+ * never compensated in this saga, but it still gets a cancel compensation so the
+ * step is symmetric and the saga is robust to adding steps after it later.
+ */
+@Entity
+@Table(name = &quot;shipment&quot;)
+public class Shipment {
+
+    public enum State { CONFIRMED, CANCELLED }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /** Idempotency key for the shipping step. */
+    @Column(nullable = false, unique = true, updatable = false)
+    private String orderRef;
+
+    @Column(nullable = false, updatable = false)
+    private String address;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
+
+    protected Shipment() {
+        // JPA
+    }
+
+    public Shipment(String orderRef, String address) {
+        this.orderRef = orderRef;
+        this.address = address;
+        this.state = State.CONFIRMED;
+    }
+
+    public void markCancelled() {
+        this.state = State.CANCELLED;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderRef() {
+        return orderRef;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public State getState() {
+        return state;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryinventoryitemrepositoryjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/repository/InventoryItemRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryinventoryitemrepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.repository;
+
+import com.javamastery.examples.sagaorchestrator.entity.InventoryItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InventoryItemRepository extends JpaRepository&amp;lt;InventoryItem, String&amp;gt; {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorrepositorypaymentrepositoryjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/repository/PaymentRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositorypaymentrepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.repository;
+
+import com.javamastery.examples.sagaorchestrator.entity.Payment;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PaymentRepository extends JpaRepository&amp;lt;Payment, Long&amp;gt; {
+
+    /** Idempotency lookup for the charge step / refund compensation. */
+    Optional&lt;Payment&gt; findByOrderRef(String orderRef);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryreservationrepositoryjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/repository/ReservationRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryreservationrepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.repository;
+
+import com.javamastery.examples.sagaorchestrator.entity.Reservation;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ReservationRepository extends JpaRepository&amp;lt;Reservation, Long&amp;gt; {
+
+    /** Idempotency lookup for the reserve step / release compensation. */
+    Optional&lt;Reservation&gt; findByOrderRef(String orderRef);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorrepositorysagainstancerepositoryjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/repository/SagaInstanceRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositorysagainstancerepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.repository;
+
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStatus;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Persistence for the saga log. {@link #findByCorrelationId} is the idempotency
+ * lookup; {@link #findByStatusIn} is what a recovery sweep would call on startup
+ * to find sagas left mid-flight (STARTED / COMPENSATING) and resume them.
+ */
+public interface SagaInstanceRepository extends JpaRepository&amp;lt;SagaInstance, Long&amp;gt; {
+
+    Optional&lt;SagaInstance&gt; findByCorrelationId(String correlationId);
+
+    List&lt;SagaInstance&gt; findByStatusIn(List&lt;SagaStatus&gt; statuses);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryshipmentrepositoryjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/repository/ShipmentRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryshipmentrepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.repository;
+
+import com.javamastery.examples.sagaorchestrator.entity.Shipment;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ShipmentRepository extends JpaRepository&amp;lt;Shipment, Long&amp;gt; {
+
+    /** Idempotency lookup for the shipping step / cancel compensation. */
+    Optional&lt;Shipment&gt; findByOrderRef(String orderRef);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagadefinitionjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaDefinition.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagadefinitionjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+import java.util.List;
+
+/**
+ * An ordered, named list of {@link SagaStep}s that the orchestrator runs as a
+ * unit. Pulling the definition out of the orchestrator keeps the orchestrator
+ * generic: it knows how to run/compensate &lt;em&gt;any&lt;/em&gt; step list, while each
+ * saga type (PLACE_ORDER here) just supplies its own ordered steps.
+ *
+ * @param &amp;lt;C&amp;gt; the shared saga context type
+ */
+public record SagaDefinition&amp;lt;C&amp;gt;(String sagaType, List&lt;SagaStep&amp;lt;C&amp;gt;&gt; steps) {
+
+    public SagaDefinition {
+        if (sagaType == null || sagaType.isBlank()) {
+            throw new IllegalArgumentException(&quot;sagaType is required&quot;);
+        }
+        steps = List.copyOf(steps); // defensive, immutable copy
+        if (steps.isEmpty()) {
+            throw new IllegalArgumentException(&quot;a saga needs at least one step&quot;);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaexecutionexceptionjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaExecutionException.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaexecutionexceptionjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+/**
+ * Thrown by the orchestrator when a forward step failed. By the time this
+ * surfaces, the already-completed steps have been compensated (or, in the worst
+ * case, the saga is marked COMPENSATION_FAILED -- inspect the saga log).
+ *
+ * &lt;p&gt;It carries the saga id so callers/tests can look up the persisted outcome,
+ * and wraps the original step failure as its cause.
+ */
+public class SagaExecutionException extends RuntimeException {
+
+    private final Long sagaId;
+    private final String failedStep;
+
+    public SagaExecutionException(Long sagaId, String failedStep, Throwable cause) {
+        super(&quot;Saga %d failed at step '%s': %s&quot;.formatted(sagaId, failedStep, cause.getMessage()), cause);
+        this.sagaId = sagaId;
+        this.failedStep = failedStep;
+    }
+
+    public Long getSagaId() {
+        return sagaId;
+    }
+
+    public String getFailedStep() {
+        return failedStep;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagalogjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaLog.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagalogjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.entity.SagaStepLog;
+import com.javamastery.examples.sagaorchestrator.repository.SagaInstanceRepository;
+import java.util.List;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Durable bookkeeping for the orchestrator, split out as its own bean.
+ *
+ * &lt;p&gt;Why a separate bean? Each mutation here commits in its &lt;b&gt;own&lt;/b&gt;
+ * transaction ({@link Propagation#REQUIRES_NEW}). Spring's {@code @Transactional}
+ * is applied by a proxy, and a method called via {@code this.method()} from
+ * within the same bean bypasses that proxy. By making the orchestrator call
+ * &lt;em&gt;this&lt;/em&gt; bean, every call crosses the proxy boundary and the per-step
+ * transaction semantics actually take effect.
+ *
+ * &lt;p&gt;Independent commits are essential: the saga log must persist a step's
+ * EXECUTED state even though the overall request will later throw, and a
+ * business step's own DB write must not be rolled back by orchestration
+ * bookkeeping.
+ */
+@Component
+public class SagaLog {
+
+    private final SagaInstanceRepository sagaRepository;
+
+    public SagaLog(SagaInstanceRepository sagaRepository) {
+        this.sagaRepository = sagaRepository;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public SagaInstance createSaga(String sagaType, String correlationId, List&lt;String&gt; stepNames) {
+        SagaInstance saga = new SagaInstance(sagaType, correlationId);
+        for (int i = 0; i &lt; stepNames.size(); i++) {
+            saga.addStep(stepNames.get(i), i);
+        }
+        return sagaRepository.save(saga);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordStepExecuted(Long sagaId, int sequence) {
+        stepLog(sagaId, sequence).markExecuted();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordStepFailed(Long sagaId, int sequence, String reason) {
+        SagaInstance saga = load(sagaId);
+        stepLogOf(saga, sequence).markFailed();
+        saga.markCompensating(reason);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordStepCompensated(Long sagaId, int sequence) {
+        stepLog(sagaId, sequence).markCompensated();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordStepCompensationFailed(Long sagaId, int sequence) {
+        stepLog(sagaId, sequence).markCompensationFailed();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markCompleted(Long sagaId) {
+        load(sagaId).markCompleted();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markCompensating(Long sagaId) {
+        load(sagaId).markCompensating(null);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markCompensated(Long sagaId) {
+        load(sagaId).markCompensated();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markCompensationFailed(Long sagaId) {
+        load(sagaId).markCompensationFailed();
+    }
+
+    private SagaInstance load(Long sagaId) {
+        return sagaRepository.findById(sagaId)
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;saga not found: &quot; + sagaId));
+    }
+
+    private SagaStepLog stepLog(Long sagaId, int sequence) {
+        return stepLogOf(load(sagaId), sequence);
+    }
+
+    private SagaStepLog stepLogOf(SagaInstance saga, int sequence) {
+        return saga.getSteps().stream()
+                .filter(s -&gt; s.getSequence() == sequence)
+                .findFirst()
+                .orElseThrow(() -&gt; new IllegalStateException(
+                        &quot;step log not found: saga=&quot; + saga.getId() + &quot; seq=&quot; + sequence));
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaorchestratorjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaOrchestrator.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaorchestratorjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * Generic orchestration-based saga coordinator.
+ *
+ * &lt;p&gt;Given a {@link SagaDefinition} (an ordered list of {@link SagaStep}s) and a
+ * fresh context, it:
+ * &lt;ol&gt;
+ *   &lt;li&gt;creates a durable saga log keyed by a caller-supplied
+ *       correlation/idempotency id;&lt;/li&gt;
+ *   &lt;li&gt;runs each step's {@code execute} in order, recording progress;&lt;/li&gt;
+ *   &lt;li&gt;on the first failure, runs {@code compensate} for the
+ *       &lt;b&gt;already-completed&lt;/b&gt; steps in &lt;b&gt;reverse&lt;/b&gt; order, then marks the
+ *       saga {@code COMPENSATED} (or {@code COMPENSATION_FAILED}).&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * &lt;h2&gt;Why this is NOT one big transaction&lt;/h2&gt;
+ * A saga is precisely &lt;em&gt;not&lt;/em&gt; a single ACID transaction. The forward pass
+ * is deliberately not wrapped in one {@code @Transactional} method: if it were,
+ * a rollback would erase the inventory reservation and there would be nothing to
+ * compensate. Each business step commits independently (in the model here, each
+ * &quot;service&quot; is its own H2-backed component; in production they would be separate
+ * databases you cannot two-phase-commit across). The persistence of progress is
+ * delegated to {@link SagaLog}, whose methods each run in their own committed
+ * transaction.
+ *
+ * &lt;h2&gt;Idempotency &amp;amp; recovery&lt;/h2&gt;
+ * Compensations must be idempotent (see {@link SagaStep}) because a real
+ * coordinator delivers undo messages at-least-once and may retry after a crash.
+ * The persisted step log lets a recovery sweep resume a saga left mid-flight.
+ */
+@Component
+public class SagaOrchestrator {
+
+    private static final Logger log = LoggerFactory.getLogger(SagaOrchestrator.class);
+
+    private final SagaLog sagaLog;
+
+    public SagaOrchestrator(SagaLog sagaLog) {
+        this.sagaLog = sagaLog;
+    }
+
+    /**
+     * Run the saga to completion (or to a compensated end state).
+     *
+     * @param definition    the ordered steps for this saga type
+     * @param correlationId idempotency key; the unique constraint on the saga
+     *                      log means reusing a key fails fast
+     * @param context       the shared, mutable context passed to every step
+     * @param &lt;C&gt;           the context type
+     * @return the id of the persisted saga instance
+     * @throws SagaExecutionException if a forward step failed (after compensation)
+     */
+    public &lt;C&gt; Long run(SagaDefinition&lt;C&gt; definition, String correlationId, C context) {
+        List&lt;SagaStep&lt;C&gt;&gt; steps = definition.steps();
+        List&lt;String&gt; stepNames = steps.stream().map(SagaStep::name).toList();
+        Long sagaId = sagaLog.createSaga(definition.sagaType(), correlationId, stepNames).getId();
+
+        // Indexes of steps that actually executed, so we compensate exactly those.
+        List&lt;Integer&gt; completed = new ArrayList&lt;&gt;();
+
+        for (int i = 0; i &lt; steps.size(); i++) {
+            SagaStep&lt;C&gt; step = steps.get(i);
+            try {
+                log.info(&quot;saga {} -&gt; executing step {} '{}'&quot;, sagaId, i, step.name());
+                step.execute(context);
+                sagaLog.recordStepExecuted(sagaId, i);
+                completed.add(i);
+            } catch (RuntimeException stepFailure) {
+                log.warn(&quot;saga {} -&gt; step {} '{}' FAILED: {}&quot;, sagaId, i, step.name(),
+                        stepFailure.getMessage());
+                sagaLog.recordStepFailed(sagaId, i, stepFailure.getMessage());
+                compensate(definition, sagaId, context, completed);
+                throw new SagaExecutionException(sagaId, step.name(), stepFailure);
+            }
+        }
+
+        sagaLog.markCompleted(sagaId);
+        log.info(&quot;saga {} -&gt; COMPLETED&quot;, sagaId);
+        return sagaId;
+    }
+
+    /**
+     * Compensate the completed steps in REVERSE order. Each compensation runs in
+     * its own transaction; one failing compensation does not stop the others (we
+     * still undo everything we can), but it downgrades the final status to
+     * COMPENSATION_FAILED for human attention.
+     */
+    private &lt;C&gt; void compensate(SagaDefinition&lt;C&gt; definition, Long sagaId, C context,
+                                List&lt;Integer&gt; completed) {
+        sagaLog.markCompensating(sagaId);
+        List&lt;SagaStep&lt;C&gt;&gt; steps = definition.steps();
+        boolean allUndone = true;
+
+        for (int idx = completed.size() - 1; idx &gt;= 0; idx--) {
+            int stepIndex = completed.get(idx);
+            SagaStep&lt;C&gt; step = steps.get(stepIndex);
+            try {
+                log.info(&quot;saga {} -&gt; compensating step {} '{}'&quot;, sagaId, stepIndex, step.name());
+                step.compensate(context);
+                sagaLog.recordStepCompensated(sagaId, stepIndex);
+            } catch (RuntimeException compFailure) {
+                allUndone = false;
+                log.error(&quot;saga {} -&gt; compensation of step {} '{}' FAILED: {}&quot;,
+                        sagaId, stepIndex, step.name(), compFailure.getMessage(), compFailure);
+                sagaLog.recordStepCompensationFailed(sagaId, stepIndex);
+                // keep going: undo as much as possible
+            }
+        }
+
+        if (allUndone) {
+            sagaLog.markCompensated(sagaId);
+            log.info(&quot;saga {} -&gt; COMPENSATED (all undos applied in reverse order)&quot;, sagaId);
+        } else {
+            sagaLog.markCompensationFailed(sagaId);
+            log.error(&quot;saga {} -&gt; COMPENSATION_FAILED (manual intervention required)&quot;, sagaId);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastatusjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaStatus.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastatusjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+/**
+ * Lifecycle of a saga instance, as persisted for auditing and (conceptual)
+ * recovery.
+ *
+ * &lt;pre&gt;
+ *   STARTED ----all steps ok----&gt; COMPLETED
+ *      |
+ *      | a step failed
+ *      v
+ *   COMPENSATING --all undos ok--&gt; COMPENSATED
+ *      |
+ *      | a compensation itself failed
+ *      v
+ *   COMPENSATION_FAILED   (needs human / retry intervention)
+ * &lt;/pre&gt;
+ */
+public enum SagaStatus {
+    /** Forward execution is in progress. */
+    STARTED,
+    /** A forward step failed; compensations are running. */
+    COMPENSATING,
+    /** Every forward step committed; the business transaction succeeded. */
+    COMPLETED,
+    /** A step failed and all completed steps were successfully compensated. */
+    COMPENSATED,
+    /** A compensation itself failed; the saga is left in a &quot;needs attention&quot; state. */
+    COMPENSATION_FAILED
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastepjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaStep.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastepjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.saga;
+
+/**
+ * One forward action in a saga together with the compensating action that
+ * logically undoes it.
+ *
+ * &lt;p&gt;A saga is a sequence of &lt;em&gt;local&lt;/em&gt; transactions {@code T1 .. Tn}.
+ * There is no distributed lock and no two-phase commit across the participants:
+ * each {@link #execute()} commits on its own. To preserve atomicity at the
+ * business level, every step also supplies a {@link #compensate()} that
+ * semantically reverses the effect of its {@code execute} (release the
+ * inventory it reserved, refund the payment it took, and so on).
+ *
+ * &lt;h2&gt;Contract for implementations&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;execute&lt;/b&gt; performs a single local transaction. Throwing any
+ *       exception signals failure and triggers compensation of the steps that
+ *       already succeeded.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;compensate&lt;/b&gt; must be &lt;b&gt;idempotent&lt;/b&gt; (safe to apply more than
+ *       once: at-least-once delivery and retries are the norm in a real saga
+ *       coordinator) and ideally &lt;b&gt;commutative&lt;/b&gt; with respect to other
+ *       concurrent activity (a refund should net out regardless of ordering).
+ *       It must also tolerate being called when {@code execute} only partially
+ *       applied, and should never itself throw for the &quot;nothing to undo&quot; case.&lt;/li&gt;
+ *   &lt;li&gt;Compensation runs in &lt;b&gt;reverse&lt;/b&gt; order of execution, so a step never
+ *       has to reason about steps that ran after it.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * @param &amp;lt;C&amp;gt; the mutable saga context shared across steps; each step reads the
+ *            inputs it needs and stashes the handles (reservation id, charge id)
+ *            its own compensation will require
+ */
+public interface SagaStep&amp;lt;C&amp;gt; {
+
+    /** Stable, human-readable name used in the persisted step log. */
+    String name();
+
+    /**
+     * Run this step's forward local transaction.
+     *
+     * @param context shared saga context; the step may record handles it will
+     *                need to compensate later
+     * @throws RuntimeException if the step fails; the orchestrator will then
+     *                          compensate the already-completed steps
+     */
+    void execute(C context);
+
+    /**
+     * Semantically undo {@link #execute(Object)}. Must be idempotent and safe to
+     * call even if {@code execute} did not fully complete. Should not throw for
+     * the &quot;already undone / nothing to do&quot; case.
+     *
+     * @param context the same context populated during the forward pass
+     */
+    void compensate(C context);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorserviceinventoryservicejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/service/InventoryService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceinventoryservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.service;
+
+import com.javamastery.examples.sagaorchestrator.entity.InventoryItem;
+import com.javamastery.examples.sagaorchestrator.entity.Reservation;
+import com.javamastery.examples.sagaorchestrator.repository.InventoryItemRepository;
+import com.javamastery.examples.sagaorchestrator.repository.ReservationRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Local &quot;inventory service&quot; backed by H2. In a real system this would be a
+ * separate microservice with its own database; here it is just another bean, but
+ * each operation commits in its OWN transaction ({@link Propagation#REQUIRES_NEW})
+ * to mimic that independence -- the reservation is durable the instant it is made,
+ * which is exactly why a later payment failure needs an explicit compensation
+ * rather than a rollback.
+ */
+@Service
+public class InventoryService {
+
+    private static final Logger log = LoggerFactory.getLogger(InventoryService.class);
+
+    private final InventoryItemRepository items;
+    private final ReservationRepository reservations;
+
+    public InventoryService(InventoryItemRepository items, ReservationRepository reservations) {
+        this.items = items;
+        this.reservations = reservations;
+    }
+
+    /**
+     * Reserve {@code quantity} units of {@code sku} against {@code orderRef}.
+     *
+     * &lt;p&gt;Idempotent: if a reservation for this orderRef already exists, it is
+     * returned unchanged instead of reserving twice (handles at-least-once
+     * retries). Throws if there is not enough stock -- the saga treats that as a
+     * step failure.
+     *
+     * @return the reservation id
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long reserve(String orderRef, String sku, int quantity) {
+        var existing = reservations.findByOrderRef(orderRef);
+        if (existing.isPresent()) {
+            log.info(&quot;inventory: reservation already exists for {} (idempotent no-op)&quot;, orderRef);
+            return existing.get().getId();
+        }
+        InventoryItem item = items.findById(sku)
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;unknown SKU: &quot; + sku));
+        item.reserve(quantity); // throws IllegalStateException if insufficient stock
+        Reservation reservation = reservations.save(new Reservation(orderRef, sku, quantity));
+        log.info(&quot;inventory: reserved {} x {} for {} (reservation {})&quot;,
+                quantity, sku, orderRef, reservation.getId());
+        return reservation.getId();
+    }
+
+    /**
+     * Release the reservation for {@code orderRef} (compensation for {@link #reserve}).
+     *
+     * &lt;p&gt;Idempotent: a missing or already-RELEASED reservation is a no-op, so it
+     * is safe to retry. Releasing returns the held units to available stock.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void release(String orderRef) {
+        var maybe = reservations.findByOrderRef(orderRef);
+        if (maybe.isEmpty()) {
+            log.info(&quot;inventory: no reservation for {} to release (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        Reservation reservation = maybe.get();
+        if (reservation.getState() == Reservation.State.RELEASED) {
+            log.info(&quot;inventory: reservation {} already released (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        InventoryItem item = items.findById(reservation.getSku())
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;unknown SKU: &quot; + reservation.getSku()));
+        item.release(reservation.getQuantity());
+        reservation.markReleased();
+        log.info(&quot;inventory: released {} x {} for {}&quot;,
+                reservation.getQuantity(), reservation.getSku(), orderRef);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagacontextjava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/service/OrderSagaContext.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagacontextjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.service;
+
+import java.math.BigDecimal;
+
+/**
+ * Mutable context threaded through the place-order saga steps.
+ *
+ * &lt;p&gt;The immutable inputs (orderRef, sku, quantity, amount, address) are the
+ * order request. The mutable handle fields are filled in by each step's forward
+ * action and read back by that same step's compensation -- e.g. the reserve step
+ * stores {@code reservationId}, and the release compensation uses {@code orderRef}
+ * (the idempotency key) to find and undo it. Using the orderRef as the universal
+ * idempotency key is what makes every step and compensation safely retryable.
+ */
+public class OrderSagaContext {
+
+    private final String orderRef;
+    private final String sku;
+    private final int quantity;
+    private final BigDecimal amount;
+    private final String address;
+
+    // Handles produced by the forward pass.
+    private Long reservationId;
+    private Long paymentId;
+    private Long shipmentId;
+
+    public OrderSagaContext(String orderRef, String sku, int quantity, BigDecimal amount,
+                            String address) {
+        this.orderRef = orderRef;
+        this.sku = sku;
+        this.quantity = quantity;
+        this.amount = amount;
+        this.address = address;
+    }
+
+    public String orderRef() {
+        return orderRef;
+    }
+
+    public String sku() {
+        return sku;
+    }
+
+    public int quantity() {
+        return quantity;
+    }
+
+    public BigDecimal amount() {
+        return amount;
+    }
+
+    public String address() {
+        return address;
+    }
+
+    public Long reservationId() {
+        return reservationId;
+    }
+
+    public void reservationId(Long reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    public Long paymentId() {
+        return paymentId;
+    }
+
+    public void paymentId(Long paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public Long shipmentId() {
+        return shipmentId;
+    }
+
+    public void shipmentId(Long shipmentId) {
+        this.shipmentId = shipmentId;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagaservicejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/service/OrderSagaService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagaservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.service;
+
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.repository.SagaInstanceRepository;
+import com.javamastery.examples.sagaorchestrator.saga.SagaDefinition;
+import com.javamastery.examples.sagaorchestrator.saga.SagaExecutionException;
+import com.javamastery.examples.sagaorchestrator.saga.SagaOrchestrator;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStep;
+import java.math.BigDecimal;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Builds the place-order saga and drives it through the generic orchestrator.
+ *
+ * &lt;p&gt;The ordered steps are:
+ * &lt;ol&gt;
+ *   &lt;li&gt;&lt;b&gt;reserve-inventory&lt;/b&gt; -- hold stock (undo: release it)&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;charge-payment&lt;/b&gt; -- take the money (undo: refund it)&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;confirm-shipping&lt;/b&gt; -- book the carrier (undo: cancel it)&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * &lt;p&gt;If charge-payment fails, the orchestrator compensates the one completed
+ * step (release inventory). If confirm-shipping fails, it compensates the two
+ * completed steps in reverse order: refund payment, then release inventory. This
+ * class only declares the steps; the reverse-order compensation logic lives in
+ * the reusable {@code SagaOrchestrator}.
+ */
+@Service
+public class OrderSagaService {
+
+    public static final String SAGA_TYPE = &quot;PLACE_ORDER&quot;;
+
+    private final SagaOrchestrator orchestrator;
+    private final SagaInstanceRepository sagaRepository;
+    private final InventoryService inventoryService;
+    private final PaymentService paymentService;
+    private final ShippingService shippingService;
+
+    public OrderSagaService(SagaOrchestrator orchestrator,
+                            SagaInstanceRepository sagaRepository,
+                            InventoryService inventoryService,
+                            PaymentService paymentService,
+                            ShippingService shippingService) {
+        this.orchestrator = orchestrator;
+        this.sagaRepository = sagaRepository;
+        this.inventoryService = inventoryService;
+        this.paymentService = paymentService;
+        this.shippingService = shippingService;
+    }
+
+    /**
+     * Place an order via the saga and return the resulting (persisted) saga
+     * instance, fully loaded with its step log.
+     *
+     * &lt;p&gt;On a forward-step failure the orchestrator has already compensated the
+     * completed steps; we swallow the {@link SagaExecutionException} here and
+     * still return the saga so the caller can inspect the COMPENSATED state and
+     * the reverse-order step log. Re-using an {@code orderRef} is rejected by the
+     * unique constraint on the saga log (idempotency at the saga level).
+     *
+     * @return the saga id
+     */
+    public Long placeOrder(String orderRef, String sku, int quantity, BigDecimal amount,
+                           String address) {
+        OrderSagaContext context = new OrderSagaContext(orderRef, sku, quantity, amount, address);
+        try {
+            return orchestrator.run(definition(), orderRef, context);
+        } catch (SagaExecutionException failed) {
+            // The saga was compensated; surface the persisted outcome, not a 500.
+            return failed.getSagaId();
+        }
+    }
+
+    /** Load a saga with its step log eagerly initialised for the response DTO. */
+    @Transactional(readOnly = true)
+    public SagaInstance loadSaga(Long sagaId) {
+        SagaInstance saga = sagaRepository.findById(sagaId)
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;saga not found: &quot; + sagaId));
+        saga.getSteps().size(); // force-initialise the lazy/eager collection within the tx
+        return saga;
+    }
+
+    /** The ordered step list for a place-order saga, ready to hand to the orchestrator. */
+    public SagaDefinition&lt;OrderSagaContext&gt; definition() {
+        return new SagaDefinition&lt;&gt;(SAGA_TYPE, List.of(
+                reserveInventoryStep(),
+                chargePaymentStep(),
+                confirmShippingStep()));
+    }
+
+    private SagaStep&lt;OrderSagaContext&gt; reserveInventoryStep() {
+        return new SagaStep&lt;&gt;() {
+            @Override
+            public String name() {
+                return &quot;reserve-inventory&quot;;
+            }
+
+            @Override
+            public void execute(OrderSagaContext ctx) {
+                Long reservationId =
+                        inventoryService.reserve(ctx.orderRef(), ctx.sku(), ctx.quantity());
+                ctx.reservationId(reservationId);
+            }
+
+            @Override
+            public void compensate(OrderSagaContext ctx) {
+                inventoryService.release(ctx.orderRef());
+            }
+        };
+    }
+
+    private SagaStep&lt;OrderSagaContext&gt; chargePaymentStep() {
+        return new SagaStep&lt;&gt;() {
+            @Override
+            public String name() {
+                return &quot;charge-payment&quot;;
+            }
+
+            @Override
+            public void execute(OrderSagaContext ctx) {
+                Long paymentId = paymentService.charge(ctx.orderRef(), ctx.amount());
+                ctx.paymentId(paymentId);
+            }
+
+            @Override
+            public void compensate(OrderSagaContext ctx) {
+                paymentService.refund(ctx.orderRef());
+            }
+        };
+    }
+
+    private SagaStep&lt;OrderSagaContext&gt; confirmShippingStep() {
+        return new SagaStep&lt;&gt;() {
+            @Override
+            public String name() {
+                return &quot;confirm-shipping&quot;;
+            }
+
+            @Override
+            public void execute(OrderSagaContext ctx) {
+                Long shipmentId = shippingService.confirm(ctx.orderRef(), ctx.address());
+                ctx.shipmentId(shipmentId);
+            }
+
+            @Override
+            public void compensate(OrderSagaContext ctx) {
+                shippingService.cancel(ctx.orderRef());
+            }
+        };
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorservicepaymentservicejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/service/PaymentService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorservicepaymentservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.service;
+
+import com.javamastery.examples.sagaorchestrator.entity.Payment;
+import com.javamastery.examples.sagaorchestrator.repository.PaymentRepository;
+import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Local &quot;payment service&quot; backed by H2, with INJECTABLE failure so tests (and a
+ * curious operator) can drive the compensation path deterministically.
+ *
+ * &lt;p&gt;Two failure switches:
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@link #failNextCharge()} -- the very next {@link #charge} throws (a
+ *       transient gateway error);&lt;/li&gt;
+ *   &lt;li&gt;{@link #setDeclineAmount(BigDecimal)} -- any charge for exactly this
+ *       amount is declined (a &quot;this card was rejected&quot; style failure).&lt;/li&gt;
+ * &lt;/ul&gt;
+ * When a charge fails the saga compensates the already-reserved inventory.
+ */
+@Service
+public class PaymentService {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
+
+    private final PaymentRepository payments;
+
+    /** One-shot &quot;fail the next charge&quot; switch (transient-failure simulation). */
+    private final AtomicBoolean failNext = new AtomicBoolean(false);
+
+    /** Charges for exactly this amount are declined; null disables it. */
+    private volatile BigDecimal declineAmount;
+
+    public PaymentService(PaymentRepository payments) {
+        this.payments = payments;
+    }
+
+    /** Make the next {@link #charge} call throw a simulated gateway error. */
+    public void failNextCharge() {
+        failNext.set(true);
+    }
+
+    /** Decline any charge whose amount equals {@code amount} (or null to disable). */
+    public void setDeclineAmount(BigDecimal amount) {
+        this.declineAmount = amount;
+    }
+
+    /** Reset both failure switches (handy for test isolation). */
+    public void resetFailureInjection() {
+        failNext.set(false);
+        declineAmount = null;
+    }
+
+    /**
+     * Charge {@code amount} against {@code orderRef}.
+     *
+     * &lt;p&gt;Idempotent: a charge already recorded for this orderRef is returned
+     * unchanged (the customer is not billed twice). Throws
+     * {@link PaymentDeclinedException} when a failure switch fires.
+     *
+     * @return the payment id
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long charge(String orderRef, BigDecimal amount) {
+        var existing = payments.findByOrderRef(orderRef);
+        if (existing.isPresent()) {
+            log.info(&quot;payment: charge already recorded for {} (idempotent no-op)&quot;, orderRef);
+            return existing.get().getId();
+        }
+        // --- injected failures (checked before we persist anything) ---
+        if (failNext.compareAndSet(true, false)) {
+            throw new PaymentDeclinedException(&quot;simulated transient gateway failure for &quot; + orderRef);
+        }
+        if (declineAmount != null &amp;&amp; declineAmount.compareTo(amount) == 0) {
+            throw new PaymentDeclinedException(
+                    &quot;payment declined for amount &quot; + amount + &quot; on &quot; + orderRef);
+        }
+
+        Payment payment = payments.save(new Payment(orderRef, amount));
+        log.info(&quot;payment: charged {} for {} (payment {})&quot;, amount, orderRef, payment.getId());
+        return payment.getId();
+    }
+
+    /**
+     * Refund the charge for {@code orderRef} (compensation for {@link #charge}).
+     *
+     * &lt;p&gt;Idempotent: a missing or already-REFUNDED payment is a no-op. Commutative
+     * in effect -- the net financial result is the same regardless of how it
+     * interleaves with other refunds.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void refund(String orderRef) {
+        var maybe = payments.findByOrderRef(orderRef);
+        if (maybe.isEmpty()) {
+            log.info(&quot;payment: no charge for {} to refund (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        Payment payment = maybe.get();
+        if (payment.getState() == Payment.State.REFUNDED) {
+            log.info(&quot;payment: charge {} already refunded (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        payment.markRefunded();
+        log.info(&quot;payment: refunded {} for {}&quot;, payment.getAmount(), orderRef);
+    }
+
+    /** Thrown when a charge is rejected; the orchestrator treats it as a step failure. */
+    public static class PaymentDeclinedException extends RuntimeException {
+        public PaymentDeclinedException(String message) {
+            super(message);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplessagaorchestratorserviceshippingservicejava"><code>src/main/java/com/javamastery/examples/sagaorchestrator/service/ShippingService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceshippingservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator.service;
+
+import com.javamastery.examples.sagaorchestrator.entity.Shipment;
+import com.javamastery.examples.sagaorchestrator.repository.ShipmentRepository;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Local &quot;shipping service&quot; backed by H2. As the final saga step, confirming a
+ * shipment is the commit point; it still exposes a {@link #cancel} compensation
+ * for symmetry and so the saga stays correct if more steps are appended later.
+ *
+ * &lt;p&gt;{@link #failNextConfirm()} lets tests force a failure at the LAST step,
+ * which should then compensate BOTH payment and inventory in reverse order.
+ */
+@Service
+public class ShippingService {
+
+    private static final Logger log = LoggerFactory.getLogger(ShippingService.class);
+
+    private final ShipmentRepository shipments;
+    private final AtomicBoolean failNext = new AtomicBoolean(false);
+
+    public ShippingService(ShipmentRepository shipments) {
+        this.shipments = shipments;
+    }
+
+    /** Make the next {@link #confirm} call throw a simulated carrier failure. */
+    public void failNextConfirm() {
+        failNext.set(true);
+    }
+
+    public void resetFailureInjection() {
+        failNext.set(false);
+    }
+
+    /**
+     * Confirm a shipment to {@code address} for {@code orderRef}.
+     *
+     * &lt;p&gt;Idempotent on {@code orderRef}. Throws {@link ShippingFailedException}
+     * when the failure switch fires.
+     *
+     * @return the shipment id
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long confirm(String orderRef, String address) {
+        var existing = shipments.findByOrderRef(orderRef);
+        if (existing.isPresent()) {
+            log.info(&quot;shipping: shipment already confirmed for {} (idempotent no-op)&quot;, orderRef);
+            return existing.get().getId();
+        }
+        if (failNext.compareAndSet(true, false)) {
+            throw new ShippingFailedException(&quot;simulated carrier outage for &quot; + orderRef);
+        }
+        Shipment shipment = shipments.save(new Shipment(orderRef, address));
+        log.info(&quot;shipping: confirmed shipment for {} to '{}' (shipment {})&quot;,
+                orderRef, address, shipment.getId());
+        return shipment.getId();
+    }
+
+    /**
+     * Cancel the shipment for {@code orderRef} (compensation for {@link #confirm}).
+     * Idempotent: missing/already-cancelled is a no-op.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void cancel(String orderRef) {
+        var maybe = shipments.findByOrderRef(orderRef);
+        if (maybe.isEmpty()) {
+            log.info(&quot;shipping: no shipment for {} to cancel (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        Shipment shipment = maybe.get();
+        if (shipment.getState() == Shipment.State.CANCELLED) {
+            log.info(&quot;shipping: shipment {} already cancelled (idempotent no-op)&quot;, orderRef);
+            return;
+        }
+        shipment.markCancelled();
+        log.info(&quot;shipping: cancelled shipment for {}&quot;, orderRef);
+    }
+
+    /** Thrown when shipping cannot be confirmed; the orchestrator treats it as a step failure. */
+    public static class ShippingFailedException extends RuntimeException {
+        public ShippingFailedException(String message) {
+            super(message);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplessagaorchestratorordercontrollertestjava"><code>src/test/java/com/javamastery/examples/sagaorchestrator/OrderControllerTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplessagaorchestratorordercontrollertestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.javamastery.examples.sagaorchestrator.dto.PlaceOrderRequest;
+import com.javamastery.examples.sagaorchestrator.service.PaymentService;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+/**
+ * HTTP-level tests for {@code POST /api/orders}: a successful saga returns 201
+ * with status COMPLETED; a saga whose payment step fails returns 422 with status
+ * COMPENSATED and a step log showing the inventory step compensated.
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
+class OrderControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @AfterEach
+    void reset() {
+        paymentService.resetFailureInjection();
+    }
+
+    @Test
+    @DisplayName(&quot;POST /api/orders happy path -&gt; 201 Created, status COMPLETED&quot;)
+    void placeOrderHappyPath() throws Exception {
+        var request = new PlaceOrderRequest(
+                &quot;HTTP-OK-1&quot;, &quot;SKU-WIDGET&quot;, 1, new BigDecimal(&quot;9.99&quot;), &quot;10 Main St&quot;);
+
+        mockMvc.perform(post(&quot;/api/orders&quot;)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath(&quot;$.status&quot;).value(&quot;COMPLETED&quot;))
+                .andExpect(jsonPath(&quot;$.orderRef&quot;).value(&quot;HTTP-OK-1&quot;))
+                .andExpect(jsonPath(&quot;$.steps[0].name&quot;).value(&quot;reserve-inventory&quot;))
+                .andExpect(jsonPath(&quot;$.steps[0].status&quot;).value(&quot;EXECUTED&quot;));
+    }
+
+    @Test
+    @DisplayName(&quot;POST /api/orders with payment failure -&gt; 422, status COMPENSATED, inventory compensated&quot;)
+    void placeOrderPaymentFailure() throws Exception {
+        paymentService.failNextCharge();
+        var request = new PlaceOrderRequest(
+                &quot;HTTP-FAIL-1&quot;, &quot;SKU-WIDGET&quot;, 1, new BigDecimal(&quot;9.99&quot;), &quot;11 Main St&quot;);
+
+        mockMvc.perform(post(&quot;/api/orders&quot;)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath(&quot;$.status&quot;).value(&quot;COMPENSATED&quot;))
+                .andExpect(jsonPath(&quot;$.steps[0].name&quot;).value(&quot;reserve-inventory&quot;))
+                .andExpect(jsonPath(&quot;$.steps[0].status&quot;).value(&quot;COMPENSATED&quot;))
+                .andExpect(jsonPath(&quot;$.steps[1].name&quot;).value(&quot;charge-payment&quot;))
+                .andExpect(jsonPath(&quot;$.steps[1].status&quot;).value(&quot;FAILED&quot;));
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplessagaorchestratorordersagaintegrationtestjava"><code>src/test/java/com/javamastery/examples/sagaorchestrator/OrderSagaIntegrationTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplessagaorchestratorordersagaintegrationtestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.javamastery.examples.sagaorchestrator.entity.InventoryItem;
+import com.javamastery.examples.sagaorchestrator.entity.Payment;
+import com.javamastery.examples.sagaorchestrator.entity.Reservation;
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.entity.SagaStepLog;
+import com.javamastery.examples.sagaorchestrator.entity.Shipment;
+import com.javamastery.examples.sagaorchestrator.repository.InventoryItemRepository;
+import com.javamastery.examples.sagaorchestrator.repository.PaymentRepository;
+import com.javamastery.examples.sagaorchestrator.repository.ReservationRepository;
+import com.javamastery.examples.sagaorchestrator.repository.ShipmentRepository;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStatus;
+import com.javamastery.examples.sagaorchestrator.service.OrderSagaService;
+import com.javamastery.examples.sagaorchestrator.service.PaymentService;
+import com.javamastery.examples.sagaorchestrator.service.ShippingService;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+/**
+ * End-to-end saga tests against the real services on H2: the happy path and the
+ * compensation path (failure at payment). Asserts both the final saga state and
+ * the side effects in the inventory/payment tables.
+ */
+@SpringBootTest
+class OrderSagaIntegrationTest {
+
+    @Autowired
+    private OrderSagaService orderSagaService;
+
+    @Autowired
+    private InventoryItemRepository inventoryItems;
+
+    @Autowired
+    private ReservationRepository reservations;
+
+    @Autowired
+    private PaymentRepository payments;
+
+    @Autowired
+    private ShipmentRepository shipments;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private ShippingService shippingService;
+
+    @BeforeEach
+    void resetInjectedFailures() {
+        paymentService.resetFailureInjection();
+        shippingService.resetFailureInjection();
+    }
+
+    @Test
+    @DisplayName(&quot;happy path: all steps commit, saga COMPLETED, stock reserved, charge &amp; shipment recorded&quot;)
+    void happyPath() {
+        String orderRef = &quot;ORDER-HAPPY-1&quot;;
+        int before = availableOf(&quot;SKU-WIDGET&quot;);
+
+        Long sagaId = orderSagaService.placeOrder(
+                orderRef, &quot;SKU-WIDGET&quot;, 3, new BigDecimal(&quot;59.99&quot;), &quot;1 Main St&quot;);
+
+        SagaInstance saga = orderSagaService.loadSaga(sagaId);
+        assertThat(saga.getStatus()).isEqualTo(SagaStatus.COMPLETED);
+
+        // every step log row is EXECUTED, in forward order
+        assertThat(saga.getSteps())
+                .extracting(SagaStepLog::getStepName, SagaStepLog::getStatus)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(
+                                &quot;reserve-inventory&quot;, SagaStepLog.StepStatus.EXECUTED),
+                        org.assertj.core.groups.Tuple.tuple(
+                                &quot;charge-payment&quot;, SagaStepLog.StepStatus.EXECUTED),
+                        org.assertj.core.groups.Tuple.tuple(
+                                &quot;confirm-shipping&quot;, SagaStepLog.StepStatus.EXECUTED));
+
+        // side effects committed
+        assertThat(availableOf(&quot;SKU-WIDGET&quot;)).isEqualTo(before - 3);
+        assertThat(reservations.findByOrderRef(orderRef))
+                .get().extracting(Reservation::getState).isEqualTo(Reservation.State.ACTIVE);
+        assertThat(payments.findByOrderRef(orderRef))
+                .get().extracting(Payment::getState).isEqualTo(Payment.State.CHARGED);
+        assertThat(shipments.findByOrderRef(orderRef))
+                .get().extracting(Shipment::getState).isEqualTo(Shipment.State.CONFIRMED);
+    }
+
+    @Test
+    @DisplayName(&quot;payment failure: inventory compensated (released), no charge, saga COMPENSATED&quot;)
+    void paymentFailureCompensatesInventory() {
+        String orderRef = &quot;ORDER-FAIL-PAY-1&quot;;
+        int before = availableOf(&quot;SKU-WIDGET&quot;);
+
+        // Force the charge step to fail.
+        paymentService.failNextCharge();
+
+        Long sagaId = orderSagaService.placeOrder(
+                orderRef, &quot;SKU-WIDGET&quot;, 4, new BigDecimal(&quot;120.00&quot;), &quot;2 Main St&quot;);
+
+        SagaInstance saga = orderSagaService.loadSaga(sagaId);
+        assertThat(saga.getStatus()).isEqualTo(SagaStatus.COMPENSATED);
+        assertThat(saga.getFailureReason()).contains(&quot;simulated transient gateway failure&quot;);
+
+        // reserve EXECUTED then COMPENSATED; charge FAILED; shipping never ran (PENDING)
+        assertThat(stepStatus(saga, &quot;reserve-inventory&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.COMPENSATED);
+        assertThat(stepStatus(saga, &quot;charge-payment&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.FAILED);
+        assertThat(stepStatus(saga, &quot;confirm-shipping&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.PENDING);
+
+        // inventory was RELEASED back to where it started; no charge, no shipment
+        assertThat(availableOf(&quot;SKU-WIDGET&quot;)).isEqualTo(before);
+        assertThat(reservations.findByOrderRef(orderRef))
+                .get().extracting(Reservation::getState).isEqualTo(Reservation.State.RELEASED);
+        assertThat(payments.findByOrderRef(orderRef)).isEmpty();
+        assertThat(shipments.findByOrderRef(orderRef)).isEmpty();
+    }
+
+    @Test
+    @DisplayName(&quot;shipping failure: payment refunded AND inventory released, saga COMPENSATED&quot;)
+    void shippingFailureCompensatesPaymentThenInventory() {
+        String orderRef = &quot;ORDER-FAIL-SHIP-1&quot;;
+        int before = availableOf(&quot;SKU-WIDGET&quot;);
+
+        // Force the LAST step to fail; both prior steps must be compensated.
+        shippingService.failNextConfirm();
+
+        Long sagaId = orderSagaService.placeOrder(
+                orderRef, &quot;SKU-WIDGET&quot;, 2, new BigDecimal(&quot;42.00&quot;), &quot;3 Main St&quot;);
+
+        SagaInstance saga = orderSagaService.loadSaga(sagaId);
+        assertThat(saga.getStatus()).isEqualTo(SagaStatus.COMPENSATED);
+
+        assertThat(stepStatus(saga, &quot;reserve-inventory&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.COMPENSATED);
+        assertThat(stepStatus(saga, &quot;charge-payment&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.COMPENSATED);
+        assertThat(stepStatus(saga, &quot;confirm-shipping&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.FAILED);
+
+        assertThat(availableOf(&quot;SKU-WIDGET&quot;)).isEqualTo(before);
+        assertThat(reservations.findByOrderRef(orderRef))
+                .get().extracting(Reservation::getState).isEqualTo(Reservation.State.RELEASED);
+        assertThat(payments.findByOrderRef(orderRef))
+                .get().extracting(Payment::getState).isEqualTo(Payment.State.REFUNDED);
+        assertThat(shipments.findByOrderRef(orderRef)).isEmpty();
+    }
+
+    @Test
+    @DisplayName(&quot;insufficient stock fails the first step: nothing to compensate, saga COMPENSATED&quot;)
+    void insufficientStockFailsFirstStep() {
+        String orderRef = &quot;ORDER-NO-STOCK-1&quot;;
+
+        // SKU-GADGET seeded with only 5 units; ask for 999.
+        Long sagaId = orderSagaService.placeOrder(
+                orderRef, &quot;SKU-GADGET&quot;, 999, new BigDecimal(&quot;10.00&quot;), &quot;4 Main St&quot;);
+
+        SagaInstance saga = orderSagaService.loadSaga(sagaId);
+        assertThat(saga.getStatus()).isEqualTo(SagaStatus.COMPENSATED);
+        assertThat(stepStatus(saga, &quot;reserve-inventory&quot;))
+                .isEqualTo(SagaStepLog.StepStatus.FAILED);
+        assertThat(payments.findByOrderRef(orderRef)).isEmpty();
+        assertThat(shipments.findByOrderRef(orderRef)).isEmpty();
+    }
+
+    private int availableOf(String sku) {
+        return inventoryItems.findById(sku).map(InventoryItem::getAvailable).orElseThrow();
+    }
+
+    private SagaStepLog.StepStatus stepStatus(SagaInstance saga, String stepName) {
+        return saga.getSteps().stream()
+                .filter(s -&gt; s.getStepName().equals(stepName))
+                .map(SagaStepLog::getStatus)
+                .findFirst()
+                .orElseThrow();
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplessagaorchestratorsagaorchestratorreverseordertestjava"><code>src/test/java/com/javamastery/examples/sagaorchestrator/SagaOrchestratorReverseOrderTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplessagaorchestratorsagaorchestratorreverseordertestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.sagaorchestrator;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.javamastery.examples.sagaorchestrator.entity.SagaInstance;
+import com.javamastery.examples.sagaorchestrator.entity.SagaStepLog;
+import com.javamastery.examples.sagaorchestrator.repository.SagaInstanceRepository;
+import com.javamastery.examples.sagaorchestrator.saga.SagaDefinition;
+import com.javamastery.examples.sagaorchestrator.saga.SagaExecutionException;
+import com.javamastery.examples.sagaorchestrator.saga.SagaOrchestrator;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStatus;
+import com.javamastery.examples.sagaorchestrator.saga.SagaStep;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+/**
+ * Drives the GENERIC orchestrator with synthetic recording steps so we can make
+ * the reverse-order compensation guarantee explicit and independent of the order
+ * domain.
+ */
+@SpringBootTest
+class SagaOrchestratorReverseOrderTest {
+
+    @Autowired
+    private SagaOrchestrator orchestrator;
+
+    @Autowired
+    private SagaInstanceRepository sagaRepository;
+
+    /** A step that records execute/compensate calls into a shared trace list. */
+    private static final class RecordingStep implements SagaStep&lt;List&lt;String&gt;&gt; {
+        private final String name;
+        private final boolean failOnExecute;
+
+        RecordingStep(String name, boolean failOnExecute) {
+            this.name = name;
+            this.failOnExecute = failOnExecute;
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public void execute(List&lt;String&gt; trace) {
+            if (failOnExecute) {
+                throw new IllegalStateException(&quot;boom@&quot; + name);
+            }
+            trace.add(&quot;exec:&quot; + name);
+        }
+
+        @Override
+        public void compensate(List&lt;String&gt; trace) {
+            trace.add(&quot;comp:&quot; + name);
+        }
+    }
+
+    @Test
+    @DisplayName(&quot;on failure, completed steps are compensated in REVERSE order&quot;)
+    void compensatesInReverseOrder() {
+        List&lt;String&gt; trace = new ArrayList&lt;&gt;();
+        var definition = new SagaDefinition&lt;&gt;(&quot;TEST_REVERSE&quot;, List.of(
+                new RecordingStep(&quot;A&quot;, false),
+                new RecordingStep(&quot;B&quot;, false),
+                new RecordingStep(&quot;C&quot;, true),   // fails here
+                new RecordingStep(&quot;D&quot;, false))); // never runs
+
+        String correlationId = &quot;reverse-&quot; + UUID.randomUUID();
+
+        assertThatThrownBy(() -&gt; orchestrator.run(definition, correlationId, trace))
+                .isInstanceOf(SagaExecutionException.class)
+                .hasMessageContaining(&quot;'C'&quot;);
+
+        // A, B executed forward; then compensated in reverse (B before A); C/D never compensated.
+        assertThat(trace).containsExactly(&quot;exec:A&quot;, &quot;exec:B&quot;, &quot;comp:B&quot;, &quot;comp:A&quot;);
+    }
+
+    @Test
+    @DisplayName(&quot;happy path records all steps EXECUTED and saga COMPLETED&quot;)
+    void happyPathCompletes() {
+        List&lt;String&gt; trace = new ArrayList&lt;&gt;();
+        var definition = new SagaDefinition&lt;&gt;(&quot;TEST_OK&quot;, List.of(
+                new RecordingStep(&quot;A&quot;, false),
+                new RecordingStep(&quot;B&quot;, false)));
+
+        String correlationId = &quot;ok-&quot; + UUID.randomUUID();
+        Long sagaId = orchestrator.run(definition, correlationId, trace);
+
+        assertThat(trace).containsExactly(&quot;exec:A&quot;, &quot;exec:B&quot;);
+
+        SagaInstance saga = sagaRepository.findById(sagaId).orElseThrow();
+        assertThat(saga.getStatus()).isEqualTo(SagaStatus.COMPLETED);
+        assertThat(saga.getSteps())
+                .allSatisfy(s -&gt; assertThat(s.getStatus()).isEqualTo(SagaStepLog.StepStatus.EXECUTED));
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># Saga Orchestrator (orchestration-based, with compensation)
+
+A runnable, self-contained example of an **orchestration-based Saga** for a
+multi-step business transaction with **compensation**. Place an order through a
+saga with three steps:
+
+1. **reserve inventory** (undo: release it)
+2. **charge payment** (undo: refund it)
+3. **confirm shipping** (undo: cancel it)
+
+If a later step **fails**, the orchestrator runs the compensations of the
+already-completed steps **in reverse order** (e.g. payment fails → release
+inventory; shipping fails → refund payment, then release inventory). Saga state
+and a per-step log are persisted to H2 so the transaction is **auditable** and
+(conceptually) **recoverable**.
+
+&gt; **Backs:** L5/C02/T06 Distributed Transactions (Saga) + L6/C14/T04 (idempotency)
+
+Runs on an in-memory **H2** database with **no external infrastructure**.
+
+---
+
+## Why a saga? (and why you can&#x27;t just 2PC)
+
+A single ACID transaction gives you atomicity for free: either everything
+commits or everything rolls back. The moment your business operation spans
+**multiple services**, each with its **own database**, that free lunch is gone:
+
+- **You can&#x27;t two-phase-commit (2PC/XA) across services in practice.** 2PC needs
+  a coordinator that holds **locks** on every participant for the whole
+  transaction, and every participant must support the XA protocol. That couples
+  availability (one slow/dead participant blocks everyone — the &quot;blocking&quot;
+  problem of 2PC), kills throughput under contention, and most cloud datastores
+  and HTTP/REST services simply don&#x27;t expose XA. It does not scale and it does
+  not compose across heterogeneous services.
+- **A saga trades atomicity for a sequence of local transactions plus
+  compensation.** Each step commits **on its own** (`T1, T2, … Tn`). There is no
+  global lock. If step `k` fails, the saga restores a *semantically* consistent
+  state by running compensating transactions `Ck-1, … C1` for the steps that
+  already committed. You give up isolation (intermediate states are visible) in
+  exchange for availability and scale; you handle the lost isolation with
+  techniques like semantic locks, reservations, and commutative updates.
+
+This example makes the &quot;each step commits on its own&quot; property concrete: the
+orchestrator deliberately does **not** wrap the forward pass in one
+`@Transactional` method. Each service operation (and each log write) commits in
+its **own** transaction (`Propagation.REQUIRES_NEW`). If we used one big
+transaction, a failure would roll back the inventory reservation and there would
+be **nothing to compensate** — which is exactly *not* a saga.
+
+---
+
+## Orchestration vs. choreography
+
+Two ways to coordinate a saga:
+
+| | **Orchestration** (this example) | **Choreography** |
+|---|---|---|
+| Coordination | A central **orchestrator** tells each participant what to do next and triggers compensations. | No central brain. Each service **reacts to events** and emits its own; the flow emerges from the choreography. |
+| Control flow | Explicit, in one place. Easy to see the whole saga and reason about ordering/compensation. | Implicit, spread across services. The &quot;saga&quot; exists only as an emergent property of event subscriptions. |
+| Coupling | Orchestrator knows all participants (more central coupling). | Services only know events (looser coupling), but the end-to-end flow is harder to follow. |
+| Debuggability | One log to read; the saga state machine is centralized and auditable. | Must reconstruct flow from many services&#x27; logs/event traces. |
+| Risk | Orchestrator can become a &quot;god service&quot; if it accretes business logic. | Cyclic event dependencies and hard-to-trace flows as steps grow. |
+
+**When to use which:**
+
+- **Orchestration** when the flow is **complex**, has many steps/branches,
+  needs **clear ownership** of the transaction, strong **auditability**, or
+  explicit recovery logic. Easier for newcomers to understand.
+- **Choreography** when you want **maximum decoupling**, the flow is **simple**
+  / linear, and teams own services independently and prefer event-driven
+  integration. Fewer central bottlenecks, but watch out for tangled event webs.
+
+A common middle ground: orchestrate the **critical** transactional flow,
+choreograph peripheral reactions (notifications, analytics).
+
+---
+
+## Idempotent + commutative compensations (and why it matters)
+
+In any real saga the orchestrator talks to participants over an unreliable
+network and a crash-prone coordinator. That forces two properties:
+
+- **At-least-once delivery.** A &quot;charge&quot; or a &quot;refund&quot; command may be delivered
+  more than once (retry after a timeout, retry after the coordinator crashed and
+  resumed from its log). So **every step and every compensation must be
+  idempotent**: applying it twice has the same effect as applying it once.
+  In this code, every operation is keyed by the caller&#x27;s `orderRef` and the
+  service tables have a **unique constraint** on it; a repeated `charge` finds
+  the existing payment and is a no-op rather than billing the customer twice — the
+  classic **idempotency-key** pattern.
+- **Commutative compensations.** Compensations may run in an order you didn&#x27;t
+  expect relative to other concurrent activity, so they should **net out**
+  regardless of interleaving. A refund of $X composes to the same financial
+  result whether it lands before or after some other adjustment. We model this by
+  making `release`/`refund`/`cancel` operate on absolute persisted state
+  (mark RELEASED/REFUNDED/CANCELLED) rather than blind decrements, and by
+  clamping the inventory release so it can&#x27;t over-credit.
+
+Compensation is **semantic**, not physical: you can&#x27;t &quot;un-charge&quot; a card by
+deleting a row — you issue a **refund**. The compensating transaction is itself a
+real business operation with its own side effects.
+
+---
+
+## Recovery &amp; at-least-once notes
+
+The persisted **saga log** (`saga_instance` + `saga_step_log`) is what makes the
+saga recoverable:
+
+- Each forward step records `EXECUTED` *after* it commits; a failed step records
+  `FAILED`; compensations record `COMPENSATED`. The overall saga moves through
+  `STARTED → COMPENSATING → COMPENSATED` (or `COMPLETED`, or
+  `COMPENSATION_FAILED` if an undo itself fails).
+- On restart, a **recovery sweep** would scan for sagas stuck in `STARTED` or
+  `COMPENSATING` (see `SagaInstanceRepository.findByStatusIn`) and **resume**
+  them: re-run the next pending step, or continue compensating. Because every
+  step is idempotent, re-running a step that *did* commit before the crash is
+  safe.
+- A `@Version` optimistic-lock column on the saga prevents two coordinators (or
+  a live request racing the recovery sweep) from both advancing the same saga.
+- If a compensation **cannot** succeed (e.g. the refund gateway is permanently
+  rejecting), the saga is parked in `COMPENSATION_FAILED` for human/automated
+  intervention rather than silently lost.
+
+This example keeps the orchestrator **synchronous and in-process** for clarity.
+A production orchestrator (e.g. a workflow engine, or a custom coordinator over a
+message broker) would persist a command/event for each transition and drive the
+saga asynchronously with retries — but the state machine and the idempotency
+contract are exactly the ones modeled here.
+
+---
+
+## Prerequisites
+
+- **JDK 21+** (the build targets Java 21 bytecode; any JDK ≥ 21 compiles it).
+- **Maven 3.9+** (or use the `mvnw` wrapper of your repo if present).
+- No database to install — H2 runs in-memory.
+
+## Run
+
+```bash
+# from this directory
+mvn test          # run the test suite (happy path + compensation paths)
+mvn spring-boot:run   # start the app on http://localhost:8080
+```
+
+Then place orders:
+
+```bash
+# Happy path -&gt; 201 Created, status COMPLETED
+curl -i -X POST http://localhost:8080/api/orders \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{&quot;orderRef&quot;:&quot;order-1&quot;,&quot;sku&quot;:&quot;SKU-WIDGET&quot;,&quot;quantity&quot;:2,&quot;amount&quot;:59.99,&quot;address&quot;:&quot;1 Main St&quot;}&#x27;
+
+# Force payment failure via a declined amount -&gt; 422, status COMPENSATED
+# (set the decline amount first by editing PaymentService, or use the test
+#  switches; see &quot;Injecting failures&quot; below)
+```
+
+Browse the persisted saga log at the H2 console:
+`http://localhost:8080/h2-console`
+(JDBC URL `jdbc:h2:mem:sagaorchestrator`, user `sa`, empty password) — look at
+`SAGA_INSTANCE`, `SAGA_STEP_LOG`, `RESERVATION`, `PAYMENT`, `SHIPMENT`.
+
+### Injecting failures (for the demo/tests)
+
+`PaymentService` and `ShippingService` expose switches so failures are
+deterministic:
+
+- `paymentService.failNextCharge()` — next charge throws (transient gateway).
+- `paymentService.setDeclineAmount(new BigDecimal(&quot;120.00&quot;))` — any charge for
+  exactly that amount is declined.
+- `shippingService.failNextConfirm()` — next shipping confirm throws (the **last**
+  step fails, so payment *and* inventory get compensated in reverse).
+
+The seeded inventory is `SKU-WIDGET=100`, `SKU-GADGET=5`; ordering more
+`SKU-GADGET` than 5 fails the **first** step (insufficient stock).
+
+## Expected output
+
+`mvn test` ends with:
+
+```
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+In the logs you can watch a compensating run, e.g. shipping failure:
+
+```
+saga 5 -&gt; executing step 0 &#x27;reserve-inventory&#x27;
+saga 5 -&gt; executing step 1 &#x27;charge-payment&#x27;
+saga 5 -&gt; executing step 2 &#x27;confirm-shipping&#x27;
+saga 5 -&gt; step 2 &#x27;confirm-shipping&#x27; FAILED: simulated carrier outage ...
+saga 5 -&gt; compensating step 1 &#x27;charge-payment&#x27;   &lt;-- reverse order
+saga 5 -&gt; compensating step 0 &#x27;reserve-inventory&#x27;
+saga 5 -&gt; COMPENSATED (all undos applied in reverse order)
+```
+
+The happy-path HTTP call returns `201` with `&quot;status&quot;:&quot;COMPLETED&quot;`; a
+compensated order returns `422` with `&quot;status&quot;:&quot;COMPENSATED&quot;` and a step log
+showing the compensated steps.
+
+---
+
+## Files to read first
+
+1. **`saga/SagaStep.java`** — the do/undo abstraction and the idempotency/
+   commutativity contract every step must honor.
+2. **`saga/SagaOrchestrator.java`** — the generic coordinator: run steps in
+   order, on failure compensate completed steps **in reverse**. The heart of the
+   example.
+3. **`saga/SagaLog.java`** — why each transition commits in its **own**
+   transaction (`REQUIRES_NEW`) and why that&#x27;s split into its own bean.
+4. **`service/OrderSagaService.java`** — wires the three services into an ordered
+   `SagaDefinition` (the place-order saga) and runs the orchestrator.
+5. **`service/PaymentService.java`** — idempotent charge/refund with injectable
+   failures; the cleanest illustration of the idempotency-key pattern.
+6. **`entity/SagaInstance.java` + `entity/SagaStepLog.java`** — the durable saga
+   log that makes the transaction auditable and recoverable.
+7. **`controller/OrderController.java`** — `POST /api/orders` mapping saga
+   outcome to HTTP status (201 vs 422).
+8. **Tests** — `SagaOrchestratorReverseOrderTest` (reverse-order proof),
+   `OrderSagaIntegrationTest` (happy + compensation paths with DB assertions),
+   `OrderControllerTest` (HTTP layer).
+```
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/system-designs--rate-limiter-redis-lua.html"><div class="lbl">← Previous</div><div class="ttl">rate-limiter-redis-lua</div><div class="sub">Distributed Rate Limiter — Redis + atomic Lua script</div></a><a class="next" href="../examples/system-designs--url-shortener.html"><div class="lbl">Next →</div><div class="ttl">url-shortener</div><div class="sub">URL Shortener — a worked system design, made runnable</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-a-saga-and-why-you-cant-just-2pc" data-toc-link>Why a saga? (and why you can&#x27;t just 2PC)</a></li><li class="lvl-2"><a href="#orchestration-vs-choreography" data-toc-link>Orchestration vs. choreography</a></li><li class="lvl-2"><a href="#idempotent-commutative-compensations-and-why-it-matters" data-toc-link>Idempotent + commutative compensations (and why it matters)</a></li><li class="lvl-2"><a href="#recovery-at-least-once-notes" data-toc-link>Recovery &amp;amp; at-least-once notes</a></li><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#run" data-toc-link>Run</a></li><li class="lvl-3"><a href="#injecting-failures-for-the-demotests" data-toc-link>Injecting failures (for the demo/tests)</a></li><li class="lvl-2"><a href="#expected-output" data-toc-link>Expected output</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorinventoryseederjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/InventorySeeder.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagaorchestratorapplicationjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/SagaOrchestratorApplication.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorcontrollerordercontrollerjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/controller/OrderController.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratordtoorderresultresponsejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/dto/OrderResultResponse.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratordtoplaceorderrequestjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/dto/PlaceOrderRequest.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityinventoryitemjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/InventoryItem.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitypaymentjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Payment.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityreservationjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Reservation.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitysagainstancejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/SagaInstance.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentitysagasteplogjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/SagaStepLog.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorentityshipmentjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/entity/Shipment.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryinventoryitemrepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/repository/InventoryItemRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositorypaymentrepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/repository/PaymentRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryreservationrepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/repository/ReservationRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositorysagainstancerepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/repository/SagaInstanceRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorrepositoryshipmentrepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/repository/ShipmentRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagadefinitionjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaDefinition.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaexecutionexceptionjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaExecutionException.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagalogjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaLog.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagaorchestratorjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaOrchestrator.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastatusjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaStatus.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorsagasagastepjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/saga/SagaStep.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceinventoryservicejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/service/InventoryService.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagacontextjava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/service/OrderSagaContext.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceordersagaservicejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/service/OrderSagaService.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorservicepaymentservicejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/service/PaymentService.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplessagaorchestratorserviceshippingservicejava" data-toc-link>src/main/java/com/javamastery/examples/sagaorchestrator/service/ShippingService.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplessagaorchestratorordercontrollertestjava" data-toc-link>src/test/java/com/javamastery/examples/sagaorchestrator/OrderControllerTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplessagaorchestratorordersagaintegrationtestjava" data-toc-link>src/test/java/com/javamastery/examples/sagaorchestrator/OrderSagaIntegrationTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplessagaorchestratorsagaorchestratorreverseordertestjava" data-toc-link>src/test/java/com/javamastery/examples/sagaorchestrator/SagaOrchestratorReverseOrderTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

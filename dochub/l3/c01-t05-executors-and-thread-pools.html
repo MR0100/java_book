@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Executors &amp; Thread Pools — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="active" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Executors &amp; Thread Pools</span></div>
+        <h1>Executors &amp; Thread Pools</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T05-executors-and-thread-pools.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~160 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Executors &amp; Thread Pools"
+slug: executors-and-thread-pools
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 5
+tags: [executor, executorservice, scheduledexecutorservice, threadpoolexecutor, scheduledthreadpoolexecutor, forkjoinpool, work-stealing, executors-factory, newfixedthreadpool, newcachedthreadpool, newsinglethreadexecutor, newscheduledthreadpool, newworkstealingpool, newvirtualthreadpertaskexecutor, corepoolsize, maximumpoolsize, keepalivetime, allowcorethreadtimeout, blockingqueue, synchronousqueue, linkedblockingqueue, arrayblockingqueue, delayedworkqueue, priorityblockingqueue, rejectedexecutionhandler, abortpolicy, callerrunspolicy, discardpolicy, discardoldestpolicy, rejectedexecutionexception, threadfactory, before-execute, after-execute, terminated-hook, ctl, runstate, worker, aqs-worker, mainlock, hashset-workers, runworker, gettask, submit, future, futuretask, runnablefuture, invokeall, invokeany, schedule, schedulewithfixeddelay, scheduleatfixedrate, periodic-task-suppression, backpressure, brian-goetz-formula, ncpu-plus-one, virtual-thread-executor, jep-444, thread-leak, pool-deadlock, pool-shutdown, awaittermination, shutdownnow]
+prerequisites: [wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states, threads-and-runnable]
+status: complete
+estimated_minutes: 160
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="executors-thread-pools">Executors &amp; Thread Pools</h1>
+<p>A thread costs ~1 MB of stack + tens of microseconds to create + a kernel data structure that the OS must schedule. Spinning up one thread per task — the obvious shape — burns most of your budget on overhead and exposes the OS thread limit (low thousands on Linux, lower on Windows) as a <em>throughput ceiling</em> for every server you write. The fix everyone arrives at independently: keep a small pool of long-lived threads, hand them work through a queue, reuse them. The <code>java.util.concurrent.Executor</code> framework — introduced in JDK 5, now twenty years old and still the foundation of every Spring controller, Tomcat acceptor, Netty handler, and <code>CompletableFuture</code> callback — is Java's standard answer.</p>
+<p>The depth-bar requirement isn't "use <code>Executors.newFixedThreadPool</code>." At the <strong>language</strong> layer, the <code>Executor</code> / <code>ExecutorService</code> / <code>ScheduledExecutorService</code> hierarchy decouples <em>what to do</em> (a <code>Runnable</code>/<code>Callable</code>) from <em>who does it</em> (a pool, a scheduler, a virtual-thread spawner), unified by one <code>submit(...)</code> API. At the <strong>library</strong> layer, the concrete <code>ThreadPoolExecutor</code> is configured by <strong>seven</strong> constructor parameters (core size, max size, keep-alive, queue, thread factory, rejection handler, time unit) whose <em>interaction</em> produces every classic pool shape — fixed, cached, single, custom-bounded — and whose <em>misconfiguration</em> produces every classic pool bug — OOM via unbounded queue, thread explosion, silent rejection, pool deadlock. At the <strong>JVM internals</strong> layer, a <code>ThreadPoolExecutor</code> packs its life-cycle state (3 bits: RUNNING/SHUTDOWN/STOP/TIDYING/TERMINATED) and worker count (29 bits) into a <em>single atomic int</em> (<code>ctl</code>) so every state transition is one CAS, each <code>Worker</code> is itself an <code>AbstractQueuedSynchronizer</code> (T08), and the worker loop is a <code>getTask().run()</code> cycle that times out idle workers via the queue's <code>poll(timeout)</code>. At the <strong>architecture / OS</strong> layer, pool sizing is governed by Brian Goetz's formula — <strong>N × (1 + W/C)</strong> for IO-bound, <strong>N + 1</strong> for CPU-bound — and tuned against backpressure semantics; <strong>virtual threads</strong> (JDK 21, T14) invert the whole calculus by making "one thread per task" cheap again. We will cover all four layers.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t04-wait-notify-notifyall.html">wait / notify / notifyAll</a> (L3/C01/T04) — the protocol every <code>BlockingQueue</code> uses internally; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized, monitors &amp; intrinsic locks</a> (L3/C01/T03) — <code>ReentrantLock</code>/<code>Condition</code> underpin <code>LinkedBlockingQueue</code> and <code>ArrayBlockingQueue</code>; <a href="c01-t02-thread-lifecycle-and-states.html">Thread lifecycle &amp; states</a> (L3/C01/T02) — worker threads are in <code>RUNNABLE</code>/<code>WAITING (parking)</code>; <a href="c01-t01-threads-and-runnable.html">Threads &amp; Runnable</a> (L3/C01/T01) — <code>Runnable</code> is the task interface; the per-thread stack is the dominant memory cost of a pool.</p></div></div>
+<h2 id="why-a-pool-the-cost-of-one-thread-per-task">Why a Pool — the Cost of One-Thread-per-Task<a class="anchor" href="#why-a-pool-the-cost-of-one-thread-per-task" aria-hidden="true">#</a></h2>
+<p>A platform thread is not free. Concrete costs, on Linux x86-64 with HotSpot 21:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Cost</th>
+<th style="text-align: right;">Order of magnitude</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Memory per thread</td>
+<td style="text-align: right;"><strong>~1 MB</strong></td>
+<td><code>-Xss</code> default; pre-allocated stack address space (not all touched, but reserved)</td>
+</tr>
+<tr>
+<td>Creation latency</td>
+<td style="text-align: right;"><strong>~50–100 µs</strong></td>
+<td><code>pthread_create</code> + kernel TCB + scheduler entry + JVM <code>Thread</code> bookkeeping</td>
+</tr>
+<tr>
+<td>Context-switch latency</td>
+<td style="text-align: right;"><strong>~1–10 µs</strong></td>
+<td>register save/restore + TLB miss risk + L1/L2 thrash</td>
+</tr>
+<tr>
+<td>OS thread cap</td>
+<td style="text-align: right;"><strong>~thousands</strong></td>
+<td><code>/proc/sys/kernel/threads-max</code>; per-user <code>RLIMIT_NPROC</code>; system memory</td>
+</tr>
+</tbody>
+</table></div>
+<p>Doing <code>new Thread(task).start()</code> per HTTP request at 10k req/s burns ~1 GB/s of stack-reservation churn and ~1 ms of CPU just on thread setup — before any work. A pool of, say, 200 threads sized to the workload reuses the same kernel objects across millions of tasks; the setup cost is paid once per pool, not once per task.</p>
+<div class="mermaid">flowchart LR
+  Naive["per task:<br/>new Thread(task).start()"]
+  Pool["pool:<br/>submit(task) → run on idle worker"]
+  Naive -- "~100 µs setup<br/>~1 MB stack<br/>thread cap risk" --> Bad["unscalable"]
+  Pool -- "~1 µs queue + run<br/>fixed memory<br/>bounded resource" --> Good["scales"]
+  Note["pre-Loom: pooling is mandatory at scale.<br/>Post-Loom (JDK 21+, T14): virtual threads<br/>are the new 'cheap thread' answer."]
+</div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Why do we use thread pools?" is the warm-up. The senior answer is the <em>cost ladder above</em> + <strong>the secondary reason</strong>: a bounded pool <em>bounds concurrency</em>. Even after Loom makes thread cost negligible, a pool of size <code>N</code> is the simplest <em>concurrency limiter</em> for a downstream resource — a connection pool, a rate-limited API, a database — and that role doesn't go away even when threads themselves stop being scarce.</p></div></div>
+<h2 id="the-type-hierarchy">The Type Hierarchy<a class="anchor" href="#the-type-hierarchy" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  Exec["interface Executor<br/>void execute(Runnable)"]
+  ES["interface ExecutorService<br/>+ shutdown / submit / invokeAll / invokeAny"]
+  SES["interface ScheduledExecutorService<br/>+ schedule / scheduleAtFixedRate / scheduleWithFixedDelay"]
+  TPE["class ThreadPoolExecutor<br/>(the concrete workhorse)"]
+  STPE["class ScheduledThreadPoolExecutor<br/>(extends TPE)"]
+  FJP["class ForkJoinPool<br/>(work-stealing; T13)"]
+  Vexec["VirtualThreadPerTaskExecutor (JDK 21+)"]
+  Exec --> ES --> SES
+  ES --> TPE
+  SES --> STPE
+  ES --> FJP
+  ES --> Vexec
+</div>
+<p>Three interfaces, each a strict superset of the prior:</p>
+<ul>
+<li><strong><code>Executor</code></strong> — one method: <code>void execute(Runnable command)</code>. The base contract: "run this somewhere, sometime." Says nothing about <em>when</em>, <em>where</em>, or <em>return value</em>. Almost too thin to use directly — exists so you can hand a generic <code>Runnable</code> sink to any framework that wants one.</li>
+<li><strong><code>ExecutorService</code></strong> — adds <em>lifecycle</em> (<code>shutdown</code>, <code>shutdownNow</code>, <code>awaitTermination</code>) and <em>task submission with results</em> (<code>submit(Callable)</code> returns <code>Future&lt;T&gt;</code>, <code>invokeAll</code>, <code>invokeAny</code>). This is the everyday API.</li>
+<li><strong><code>ScheduledExecutorService</code></strong> — adds delayed and periodic submission. Backed by <code>ScheduledThreadPoolExecutor</code> whose queue is a <em>heap</em> ordered by due-time.</li>
+</ul>
+<p>The concrete implementations: <strong><code>ThreadPoolExecutor</code></strong> is the workhorse for queue-based pools, <strong><code>ScheduledThreadPoolExecutor</code></strong> extends it for scheduled work, <strong><code>ForkJoinPool</code></strong> (T13) is the work-stealing variant for divide-and-conquer parallelism, and (JDK 21+) <strong><code>Executors.newVirtualThreadPerTaskExecutor()</code></strong> returns an <code>ExecutorService</code> that spawns a fresh virtual thread per task — no pooling at all.</p>
+<h2 id="threadpoolexecutor-the-seven-constructor-parameters"><code>ThreadPoolExecutor</code> — the Seven Constructor Parameters<a class="anchor" href="#threadpoolexecutor-the-seven-constructor-parameters" aria-hidden="true">#</a></h2>
+<p>The full constructor (the one all the factory methods delegate to):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public ThreadPoolExecutor(
+    int corePoolSize,                         // 1. threads to keep alive even when idle
+    int maximumPoolSize,                      // 2. hard cap on concurrent workers
+    long keepAliveTime, TimeUnit unit,        // 3+4. how long extra (non-core) workers idle before exit
+    BlockingQueue&lt;Runnable&gt; workQueue,        // 5. THE crucial choice — shapes the whole pool's behavior
+    ThreadFactory threadFactory,              // 6. how to make threads (naming, daemon flag, group)
+    RejectedExecutionHandler handler          // 7. what to do when saturated + queue full
+);
+</code></pre></div>
+<p>Each parameter is independently tunable, and the interaction of <code>corePoolSize</code>, <code>maximumPoolSize</code>, and <code>workQueue</code> produces <em>every</em> classic pool shape. Memorize the four-step submission flow and you can derive any pool's behavior from its parameters:</p>
+<h3 id="the-four-step-submission-flow">The four-step submission flow<a class="anchor" href="#the-four-step-submission-flow" aria-hidden="true">#</a></h3>
+<p>When you call <code>pool.execute(task)</code>, the pool tries to dispatch it through <strong>exactly</strong> this sequence:</p>
+<div class="mermaid">flowchart TB
+  Sub["execute(task) called"]
+  S1{"workers < corePoolSize?"}
+  S2{"queue.offer(task) succeeded?"}
+  S3{"workers < maximumPoolSize?"}
+  Rej["RejectedExecutionHandler.rejectedExecution(...)"]
+  Sub --> S1
+  S1 -- yes --> NewCore["create core worker, run task<br/>(even if idle workers exist)"]
+  S1 -- no --> S2
+  S2 -- yes --> Enq["task queued; some worker will poll it eventually"]
+  S2 -- no --> S3
+  S3 -- yes --> NewExtra["create non-core worker (capped at max)<br/>run task immediately"]
+  S3 -- no --> Rej
+</div>
+<p>Three counter-intuitive consequences fall out of this flow:</p>
+<ol>
+<li><strong>The queue is tried <em>before</em> growing past core size.</strong> If you set <code>core=2, max=10, queue=LinkedBlockingQueue(1000)</code>, a burst of 100 tasks will result in <strong>2 working threads + 98 queued tasks</strong> — <em>not</em> 10 working threads. The extra capacity (<code>max-core</code>) is only used when the queue refuses, which an unbounded queue <em>never</em> does.</li>
+<li><strong><code>maximumPoolSize</code> is meaningless with an unbounded queue.</strong> This is <em>the</em> design flaw of <code>Executors.newFixedThreadPool(N)</code> (next section) — it sets <code>core = max = N</code> <em>and</em> uses an unbounded <code>LinkedBlockingQueue</code>, so <code>max</code> would be inert anyway; under overload, the queue grows until OOM.</li>
+<li><strong>A <code>SynchronousQueue</code> always refuses.</strong> It has zero capacity; <code>offer</code> succeeds only if a worker is already waiting in <code>take()</code>. So with <code>SynchronousQueue</code>, <em>every</em> task either hands off to a waiting worker or triggers step 3 (new worker spawn if under max) or step 4 (rejection). This is how <code>newCachedThreadPool</code> keeps spawning threads.</li>
+</ol>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>The submission flow is the single most important invariant in this entire topic. If you can recite it cold and apply it to <em>any</em> combination of {core, max, queue}, you can predict every pool's behavior under any load — including the failure modes. Memorize the flow before tuning numbers.</p></div></div>
+<h2 id="queue-strategies-where-pool-behaviour-actually-lives">Queue Strategies — Where Pool Behaviour Actually Lives<a class="anchor" href="#queue-strategies-where-pool-behaviour-actually-lives" aria-hidden="true">#</a></h2>
+<p>The choice of <code>BlockingQueue</code> defines the pool more than any other parameter. The six common queues, with the behaviour they impose:</p>
+<h3 id="synchronousqueue-direct-handoff-zero-capacity"><code>SynchronousQueue</code> — direct handoff, zero capacity<a class="anchor" href="#synchronousqueue-direct-handoff-zero-capacity" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, SECONDS,
+                       new SynchronousQueue&lt;&gt;(), factory, handler);
+</code></pre></div>
+<p>This is <code>newCachedThreadPool</code> in skeleton form. <code>SynchronousQueue</code> has no buffer; <code>offer(task)</code> succeeds <em>only if</em> a consumer is <code>take()</code>-ing right now. So step-2 in the flow always <em>fails</em> unless a worker is idle and parked at the queue's <code>take()</code>. Result: every submission becomes "hand to an idle worker, else spawn a new worker (step 3, up to <code>Integer.MAX_VALUE</code>)." Workers that go idle for 60 s exit (step's keep-alive). The pool's size tracks the workload <em>exactly</em> — but with <strong>no upper bound on thread count</strong>, which under sudden burst will spawn until the OS thread limit (T01) — usually before, since each thread reserves 1 MB. <em>Production rule: never use a <code>SynchronousQueue</code> with <code>Integer.MAX_VALUE</code> max in a server that can be DoS'd.</em></p>
+<h3 id="linkedblockingqueueunbounded-used-by-newfixedthreadpool"><code>LinkedBlockingQueue(unbounded)</code> — used by <code>newFixedThreadPool</code><a class="anchor" href="#linkedblockingqueueunbounded-used-by-newfixedthreadpool" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(N, N, 0L, MILLISECONDS,
+                       new LinkedBlockingQueue&lt;&gt;(),         // ← no capacity arg = Integer.MAX_VALUE
+                       factory, handler);
+</code></pre></div>
+<p><code>core = max = N</code>, queue is unbounded. Step-2 <em>always</em> succeeds (the queue never refuses), so steps 3 and 4 are <em>unreachable</em>. The pool has exactly <code>N</code> workers; excess work accumulates in the queue. Under sustained overload, the queue grows without bound until OOM. The famous "Effective Java Item 80" anti-pattern.</p>
+<p><code>LinkedBlockingQueue</code> internally uses <strong>two separate <code>ReentrantLock</code>s</strong> — one for the head (consumers <code>take</code>/<code>poll</code>) and one for the tail (producers <code>put</code>/<code>offer</code>). Producers and consumers operate on opposite ends without contending unless the queue is empty or full. This <em>two-lock</em> design is why <code>LinkedBlockingQueue</code> scales better than <code>ArrayBlockingQueue</code> under high producer-consumer concurrency.</p>
+<h3 id="linkedblockingqueuebounded-the-sane-production-default"><code>LinkedBlockingQueue(bounded)</code> — the sane production default<a class="anchor" href="#linkedblockingqueuebounded-the-sane-production-default" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(coreN, maxN, 60, SECONDS,
+                       new LinkedBlockingQueue&lt;&gt;(queueCapacity),
+                       factory, handler);
+</code></pre></div>
+<p>This is the production-grade configuration that the <code>Executors</code> factory <em>should</em> have provided. Under load:</p>
+<ul>
+<li>Bursts up to <code>queueCapacity</code> are absorbed into the queue.</li>
+<li>If queue fills, new workers spawn up to <code>maxN</code>.</li>
+<li>If both saturate, rejection fires (next section) — and <em>that's the right time to apply backpressure</em>, not OOM.</li>
+</ul>
+<p>The <code>core</code>/<code>max</code>/<code>queueCapacity</code> trio is a three-level escalation: queue absorbs bursts cheaply, extra workers handle sustained pressure, rejection applies backpressure to the caller.</p>
+<h3 id="arrayblockingqueue-bounded-single-lock"><code>ArrayBlockingQueue</code> — bounded, single-lock<a class="anchor" href="#arrayblockingqueue-bounded-single-lock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ArrayBlockingQueue&lt;&gt;(capacity, /* fair = */ false);
+</code></pre></div>
+<p>Backed by a circular array of fixed size, protected by <strong>one</strong> <code>ReentrantLock</code> and <strong>two</strong> <code>Condition</code>s (<code>notEmpty</code>, <code>notFull</code>) — exactly the bounded-buffer reference from T04. Under high contention from many producers/consumers, the single lock becomes a bottleneck; under low-to-moderate contention, the contiguous array has better cache behaviour than <code>LinkedBlockingQueue</code>'s linked nodes. The <code>fair=true</code> variant uses a fair lock (FIFO on the entry queue) — typically 2–3× slower under contention; rarely worth it.</p>
+<h3 id="priorityblockingqueue-unbounded-priority-heap"><code>PriorityBlockingQueue</code> — unbounded priority heap<a class="anchor" href="#priorityblockingqueue-unbounded-priority-heap" aria-hidden="true">#</a></h3>
+<p>Tasks dequeue in <code>Comparable</code> order, not FIFO. Backed by a binary heap. The pool runs tasks in priority order — useful for schedulers, real-time pipelines, anything with "important first." Has the same OOM risk as any unbounded queue: a flood of low-priority tasks accumulates indefinitely.</p>
+<h3 id="delayedworkqueue-used-by-scheduledthreadpoolexecutor"><code>DelayedWorkQueue</code> — used by <code>ScheduledThreadPoolExecutor</code><a class="anchor" href="#delayedworkqueue-used-by-scheduledthreadpoolexecutor" aria-hidden="true">#</a></h3>
+<p>A binary heap of <code>RunnableScheduledFuture</code> ordered by <em>due time</em>. <code>take()</code> blocks until the head's due time, then returns it. Capacity is unbounded but bounded in practice by your scheduling rate. Internals: see <a href="#scheduledthreadpoolexecutor--time-driven-work">Scheduled Executors</a> below.</p>
+<div class="mermaid">flowchart LR
+  subgraph Queues
+    SQ["SynchronousQueue<br/>(0-capacity, direct handoff)"]
+    LBu["LinkedBlockingQueue (∞)<br/>two-lock; OOM risk"]
+    LBb["LinkedBlockingQueue (cap)<br/>two-lock; bounded — production default"]
+    ABQ["ArrayBlockingQueue (cap)<br/>single lock + 2 conditions"]
+    PBQ["PriorityBlockingQueue<br/>(unbounded heap)"]
+    DWQ["DelayedWorkQueue<br/>(heap by due time)"]
+  end
+  Pool["pool behavior is mostly the queue choice"]
+  SQ --> Cached["cached pool: spawn on demand,<br/>cap = MAX_VALUE, NEVER for servers"]
+  LBu --> Fixed["fixed pool: N workers,<br/>queue can OOM"]
+  LBb --> Prod["production sane: bounded queue,<br/>then more workers, then reject"]
+  ABQ --> Mod["moderate contention,<br/>cache-friendly array"]
+  PBQ --> Prio["priority scheduling"]
+  DWQ --> Sched["ScheduledThreadPoolExecutor"]
+</div>
+<h2 id="rejection-policies">Rejection Policies<a class="anchor" href="#rejection-policies" aria-hidden="true">#</a></h2>
+<p>When step 4 of the flow fires — queue full <em>and</em> maxPoolSize reached — the configured <code>RejectedExecutionHandler</code> runs. The JDK ships four; you can write your own.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Behavior</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>AbortPolicy</code></strong> (default)</td>
+<td>throws <code>RejectedExecutionException</code></td>
+<td>callers must handle / retry / report. Surface failure loudly.</td>
+</tr>
+<tr>
+<td><strong><code>CallerRunsPolicy</code></strong></td>
+<td>runs the task <em>on the calling thread</em></td>
+<td>natural backpressure — the submitter is itself blocked, slowing the producer. Great for offload pipelines.</td>
+</tr>
+<tr>
+<td><strong><code>DiscardPolicy</code></strong></td>
+<td>silently drops the task</td>
+<td>rarely correct (silent data loss) — only for non-critical telemetry, metrics</td>
+</tr>
+<tr>
+<td><strong><code>DiscardOldestPolicy</code></strong></td>
+<td>drops the head of the queue, retries <code>offer</code></td>
+<td>latest-wins scenarios — UI events, sensor readings where freshness &gt; completeness</td>
+</tr>
+</tbody>
+</table></div>
+<div class="mermaid">flowchart LR
+  Reject["pool full + queue full"]
+  Reject --> Abort["AbortPolicy<br/>throw → caller must handle"]
+  Reject --> Caller["CallerRunsPolicy<br/>caller runs → automatic backpressure"]
+  Reject --> Disc["DiscardPolicy<br/>silent drop → data loss"]
+  Reject --> Old["DiscardOldestPolicy<br/>evict oldest queued task"]
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong><code>CallerRunsPolicy</code> is the single best backpressure mechanism in plain <code>ThreadPoolExecutor</code>.</strong> It costs nothing extra to wire up, and it does the right thing under sustained overload: when the pool can't keep up, submission <em>itself</em> slows down, because the submitting thread is now busy running the task it wanted to offload. Memory does not grow unbounded, downstream stays bounded by the pool's capacity, and the only cost is reduced throughput on the submitter — which is exactly what backpressure <em>is</em>. For server-side pipelines that can tolerate latency over crash, this is almost always the right rejection policy.</p></div></div>
+<p>Custom handlers are one-method classes:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">RejectedExecutionHandler timeoutBackoff = (task, executor) -&gt; {
+    try {
+        if (!executor.getQueue().offer(task, 250, MILLISECONDS)) {
+            throw new RejectedExecutionException(&quot;backoff timeout&quot;);
+        }
+    } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        throw new RejectedExecutionException(ie);
+    }
+};
+</code></pre></div>
+<h2 id="executors-factory-methods-mostly-anti-patterns-in-2026"><code>Executors</code> Factory Methods — Mostly Anti-Patterns in 2026<a class="anchor" href="#executors-factory-methods-mostly-anti-patterns-in-2026" aria-hidden="true">#</a></h2>
+<p>The <code>Executors</code> class ships convenience factories. Each maps to a specific <code>ThreadPoolExecutor</code> configuration; almost all carry a footgun.</p>
+<h3 id="newfixedthreadpoolint-n"><code>newFixedThreadPool(int n)</code><a class="anchor" href="#newfixedthreadpoolint-n" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(n, n, 0L, MS, new LinkedBlockingQueue&lt;&gt;());
+</code></pre></div>
+<p>Unbounded queue. <strong>OOM under overload.</strong> Acceptable only if your producer is <em>strictly</em> bounded (e.g., reading a finite file).</p>
+<h3 id="newcachedthreadpool"><code>newCachedThreadPool()</code><a class="anchor" href="#newcachedthreadpool" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, S, new SynchronousQueue&lt;&gt;());
+</code></pre></div>
+<p>Spawns threads without limit. <strong>OS thread cap exhaustion / OOM via stack reservation</strong> under burst. Acceptable only for short-lived bursty work whose peak rate is <em>strictly bounded</em> by something else — almost never true on servers.</p>
+<h3 id="newsinglethreadexecutor"><code>newSingleThreadExecutor()</code><a class="anchor" href="#newsinglethreadexecutor" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ThreadPoolExecutor(1, 1, 0L, MS, new LinkedBlockingQueue&lt;&gt;());
+</code></pre></div>
+<p>One worker, unbounded queue. Same OOM risk as <code>newFixedThreadPool(1)</code>, plus <em>cannot</em> be reconfigured to a bigger pool later (it returns a <em>wrapper</em> that hides the underlying <code>ThreadPoolExecutor</code>).</p>
+<h3 id="newscheduledthreadpoolint-n"><code>newScheduledThreadPool(int n)</code><a class="anchor" href="#newscheduledthreadpoolint-n" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">new ScheduledThreadPoolExecutor(n);    // queue is DelayedWorkQueue
+</code></pre></div>
+<p>The only factory that's safe to use as-is — its queue is a bounded-in-practice heap, and scheduled-task overflow is rare in normal designs.</p>
+<h3 id="newworkstealingpool-newworkstealingpoolparallelism"><code>newWorkStealingPool()</code> / <code>newWorkStealingPool(parallelism)</code><a class="anchor" href="#newworkstealingpool-newworkstealingpoolparallelism" aria-hidden="true">#</a></h3>
+<p>Returns a <code>ForkJoinPool</code> (T13). Different work model (work-stealing deques per worker) — not a <code>ThreadPoolExecutor</code>. Good for divide-and-conquer parallel computation; <em>not</em> a drop-in for IO-bound submission workloads.</p>
+<h3 id="newvirtualthreadpertaskexecutor-jdk-21"><code>newVirtualThreadPerTaskExecutor()</code> (JDK 21+)<a class="anchor" href="#newvirtualthreadpertaskexecutor-jdk-21" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ExecutorService es = Executors.newVirtualThreadPerTaskExecutor();
+</code></pre></div>
+<p>Every <code>submit</code>/<code>execute</code> spawns a <strong>brand-new virtual thread</strong> (T14). Not a pool — no reuse, no queue, no rejection. The virtual-thread runtime's <em>carrier pool</em> (a <code>ForkJoinPool</code> sized to <code>Runtime.availableProcessors()</code>) handles the actual execution. For blocking-IO-heavy workloads, this is the JDK 21+ default. For CPU-bound workloads, prefer a platform-thread pool sized to cores.</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><em>Joshua Bloch, Effective Java 3rd ed., Item 80:</em> <strong>"avoid <code>Executors.newFixedThreadPool</code> and <code>newCachedThreadPool</code> in production server code"</strong> — exactly because both have unbounded resource modes that fail open under overload (OOM or thread explosion). Construct <code>new ThreadPoolExecutor(...)</code> directly with a <em>bounded</em> queue and a sensible rejection policy. The exception in 2026: <code>newVirtualThreadPerTaskExecutor()</code> is safe and idiomatic for IO-bound work; it's the only <code>Executors</code>-factory whose use is unambiguously recommended.</p></div></div>
+<h2 id="internals-how-threadpoolexecutor-really-works">Internals — How <code>ThreadPoolExecutor</code> Really Works<a class="anchor" href="#internals-how-threadpoolexecutor-really-works" aria-hidden="true">#</a></h2>
+<p>The <code>ThreadPoolExecutor</code> source is one of the most-studied 1,500 lines in the JDK; it's worth knowing what's in there.</p>
+<h3 id="the-ctl-atomic-int-state-count-in-one-word">The <code>ctl</code> atomic int — state + count in one word<a class="anchor" href="#the-ctl-atomic-int-state-count-in-one-word" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+
+// 3 high bits = runState (one of RUNNING / SHUTDOWN / STOP / TIDYING / TERMINATED)
+// 29 low bits = worker count (max ~500 million workers — comfortably more than feasible)
+
+private static final int  COUNT_BITS  = Integer.SIZE - 3;
+private static final int  COUNT_MASK  = (1 &lt;&lt; COUNT_BITS) - 1;     // 0x1FFF_FFFF
+private static final int  RUNNING     = -1 &lt;&lt; COUNT_BITS;
+private static final int  SHUTDOWN    =  0 &lt;&lt; COUNT_BITS;
+private static final int  STOP        =  1 &lt;&lt; COUNT_BITS;
+private static final int  TIDYING     =  2 &lt;&lt; COUNT_BITS;
+private static final int  TERMINATED  =  3 &lt;&lt; COUNT_BITS;
+
+private static int runStateOf(int c)     { return c &amp; ~COUNT_MASK; }
+private static int workerCountOf(int c)  { return c &amp;  COUNT_MASK; }
+private static int ctlOf(int rs, int wc) { return rs | wc; }
+</code></pre></div>
+<p>Packing both state and worker count into one int means <strong>every</strong> state transition is one CAS — no lock needed for the combination. Increment worker count + check state both happen atomically. This is the same technique <code>ReentrantLock</code>'s AQS uses (T08) and the same reason it scales: the contended path is a single CAS, not a critical section.</p>
+<p>The state machine:</p>
+<div class="mermaid">stateDiagram-v2
+  Running: RUNNING<br/>(accepts new tasks + processes queue)
+  Shutdown: SHUTDOWN<br/>(rejects new tasks, processes queue)
+  Stop: STOP<br/>(rejects new tasks, drops queue, interrupts workers)
+  Tidying: TIDYING<br/>(all done, about to call terminated())
+  Terminated: TERMINATED
+
+  Running --> Shutdown: shutdown()
+  Running --> Stop: shutdownNow()
+  Shutdown --> Stop: shutdownNow()
+  Shutdown --> Tidying: queue empty + workers gone
+  Stop --> Tidying: workers gone (queue already dropped)
+  Tidying --> Terminated: terminated() callback fires
+</div>
+<p>Five states, four transitions, all driven by atomic CAS on <code>ctl</code>. The state machine is monotonic — once advanced, it never goes back — which lets <code>awaitTermination</code> simply wait on a single <code>Condition</code> for <code>TERMINATED</code>.</p>
+<h3 id="the-worker-class-an-aqs-backed-runnable">The <code>Worker</code> class — an AQS-backed runnable<a class="anchor" href="#the-worker-class-an-aqs-backed-runnable" aria-hidden="true">#</a></h3>
+<p>Each worker is <em>not</em> just a <code>Thread</code>; it's a <code>Worker extends AbstractQueuedSynchronizer implements Runnable</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private final class Worker extends AbstractQueuedSynchronizer implements Runnable {
+    final Thread thread;
+    Runnable firstTask;
+    volatile long completedTasks;
+
+    Worker(Runnable firstTask) {
+        setState(-1);                            // disallow interrupt until runWorker starts
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);   // &lt;-- Worker IS the Runnable
+    }
+
+    public void run() { runWorker(this); }
+
+    // AQS lock methods: state 0 = unlocked, 1 = locked
+    // Used by interruptIdleWorkers to skip currently-running workers (locked)
+    protected boolean tryAcquire(int unused) { return compareAndSetState(0, 1) ? (setExclusiveOwnerThread(currentThread()), true) : false; }
+    protected boolean tryRelease(int unused) { setExclusiveOwnerThread(null); setState(0); return true; }
+}
+</code></pre></div>
+<p>Why does the worker extend AQS? Because <code>shutdown()</code> and <code>shutdownNow()</code> need to interrupt <strong>only idle workers</strong> (not workers currently running a task — that would interrupt the user's code mid-execution). The AQS lock around each task execution is the signal: if <code>tryAcquire</code> succeeds, the worker is idle; if it fails, the worker is mid-task. So <code>interruptIdleWorkers</code> iterates the worker set, <code>tryAcquire</code>-s each, and interrupts only the ones it could lock. Beautiful reuse of the AQS state bit for a non-mutex purpose.</p>
+<h3 id="the-runworker-loop">The <code>runWorker</code> loop<a class="anchor" href="#the-runworker-loop" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">final void runWorker(Worker w) {
+    Runnable task = w.firstTask;
+    w.firstTask = null;
+    w.unlock();                                  // allow interrupts now
+    try {
+        while (task != null || (task = getTask()) != null) {
+            w.lock();
+            try {
+                beforeExecute(w.thread, task);    // hook
+                Throwable thrown = null;
+                try { task.run(); }                // &lt;-- run the user task
+                catch (Throwable x) { thrown = x; throw x; }
+                finally { afterExecute(task, thrown); }  // hook
+            } finally {
+                task = null;
+                w.completedTasks++;
+                w.unlock();
+            }
+        }
+    } finally {
+        processWorkerExit(w, false);              // dec ctl, possibly trigger TIDYING
+    }
+}
+</code></pre></div>
+<p>Two details that matter:</p>
+<ol>
+<li><strong><code>getTask()</code> is the <em>only</em> idle-waiting point in the entire pool.</strong> It polls <code>workQueue</code> with <code>poll(keepAliveTime, unit)</code> for non-core (or <code>allowCoreThreadTimeOut=true</code>) workers, and <code>take()</code> (no timeout) for core workers. So worker idle time is implemented as the queue's wait — the futex/Condition machinery from T04. A worker in <code>WAITING (parking)</code> on its queue is a worker waiting for work.</li>
+<li><strong><code>beforeExecute</code> and <code>afterExecute</code> are protected overridable hooks.</strong> Subclass <code>ThreadPoolExecutor</code> to log every task, propagate MDC (logging context), instrument metrics, or detect long-running tasks. <code>afterExecute</code> receives the task's exception (if any) — <em>the</em> place to centralize uncaught-exception logging across a pool.</li>
+</ol>
+<h3 id="why-pool-deadlock-happens">Why pool deadlock happens<a class="anchor" href="#why-pool-deadlock-happens" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ExecutorService pool = Executors.newFixedThreadPool(2);
+Future&lt;Integer&gt; f1 = pool.submit(() -&gt; {
+    Future&lt;Integer&gt; inner = pool.submit(() -&gt; 42);   // submit a child task
+    return inner.get();                              // WAIT for the child — but on what thread?
+});
+f1.get();
+</code></pre></div>
+<p>If <code>pool</code> has 2 worker threads and both are blocked in <code>inner.get()</code> (waiting for a child task to complete), there are <strong>no workers left to run the child tasks</strong> — and the children sit in the queue forever. Self-deadlock. The fix: never submit dependent tasks to the same bounded pool from inside a task. Use separate pools for parent and child layers, or use <code>ForkJoinPool</code> (T13), which is <em>designed</em> for this with work-stealing, or use <code>CompletableFuture</code> chains (T07) that don't block worker threads.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"How does <code>ThreadPoolExecutor</code> know when to grow vs queue vs reject?" — Walk the four-step submission flow. "Why is <code>ctl</code> an atomic int?" — single-CAS state transitions, no extra lock for state-plus-count updates. "Why does <code>Worker</code> extend AQS?" — to mark itself locked while running a task, so <code>shutdown</code> can interrupt only idle workers without disturbing mid-task ones. "Why is the queue choice the most important configuration?" — because it determines whether step 2 always succeeds (unbounded → OOM), sometimes succeeds (bounded → escalates to step 3 and 4 under pressure), or never succeeds (Synchronous → always goes to step 3).</p></div></div>
+<h2 id="submit-future-and-futuretask"><code>submit</code>, <code>Future</code>, and <code>FutureTask</code><a class="anchor" href="#submit-future-and-futuretask" aria-hidden="true">#</a></h2>
+<p><code>execute(Runnable)</code> is fire-and-forget. <code>submit(...)</code> adds a return channel:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Future&lt;?&gt; submit(Runnable task);
+&lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result);
+&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task);
+</code></pre></div>
+<p>All three internally wrap the task in a <strong><code>FutureTask</code></strong> (which <code>implements RunnableFuture&lt;T&gt;</code>, i.e., it's both a <code>Runnable</code> and a <code>Future</code>). The pool runs the <code>Runnable</code> half; the caller gets the <code>Future</code> half to query later. T06 covers <code>Future</code>/<code>Callable</code> exhaustively; the placement here is that <strong><code>submit</code> and <code>Future</code> are layered on top of <code>execute</code>, not separate machinery</strong> — the pool itself only ever sees <code>Runnable</code>s.</p>
+<p>The two collection-level methods:</p>
+<ul>
+<li><strong><code>invokeAll(Collection&lt;Callable&lt;T&gt;&gt;)</code></strong> — submits all, blocks until all complete (or fail), returns <code>List&lt;Future&lt;T&gt;&gt;</code>. Use for parallel fan-out/fan-in.</li>
+<li><strong><code>invokeAll(Collection&lt;Callable&lt;T&gt;&gt;, long timeout, TimeUnit)</code></strong> — same, with a total deadline; unfinished tasks are cancelled at timeout.</li>
+<li><strong><code>invokeAny(Collection&lt;Callable&lt;T&gt;&gt;)</code></strong> — returns the result of the <strong>first</strong> successful task, cancels the rest. Use for "try several providers; take the fastest."</li>
+</ul>
+<div class="mermaid">flowchart LR
+  Sub["submit(Callable)"]
+  Wrap["wrap in FutureTask"]
+  Exec["execute(FutureTask)"]
+  Fut["return Future to caller"]
+  Run["worker runs FutureTask.run() → sets result/exception → unparks waiters in get()"]
+  Sub --> Wrap --> Exec
+  Wrap -.-> Fut
+  Exec --> Run
+</div>
+<h2 id="scheduledthreadpoolexecutor-time-driven-work"><code>ScheduledThreadPoolExecutor</code> — Time-Driven Work<a class="anchor" href="#scheduledthreadpoolexecutor-time-driven-work" aria-hidden="true">#</a></h2>
+<p>The scheduled variant overrides the queue with a <strong><code>DelayedWorkQueue</code></strong> — a binary heap of <code>RunnableScheduledFuture</code> ordered by due time. <code>take()</code> peeks the head, computes <code>headDue - now</code>, and parks for that long via <code>Condition.awaitNanos</code>. The pool's workers are otherwise identical to plain <code>ThreadPoolExecutor</code>'s.</p>
+<h3 id="schedule-one-shot-delay"><code>schedule</code> — one-shot delay<a class="anchor" href="#schedule-one-shot-delay" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ses.schedule(() -&gt; doIt(), 5, SECONDS);
+</code></pre></div>
+<p>Runs <code>doIt()</code> 5 s from now, exactly once.</p>
+<h3 id="scheduleatfixedrate-vs-schedulewithfixeddelay-the-canonical-difference"><code>scheduleAtFixedRate</code> vs <code>scheduleWithFixedDelay</code> — the canonical difference<a class="anchor" href="#scheduleatfixedrate-vs-schedulewithfixeddelay-the-canonical-difference" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ses.scheduleAtFixedRate(task, 0, 1, SECONDS);    // run at t=0, 1, 2, 3, ... (rate from start time)
+ses.scheduleWithFixedDelay(task, 0, 1, SECONDS); // run at t=0; finish; wait 1s; run again ...
+</code></pre></div>
+<p>The famous distinction:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>API</th>
+<th>Schedules next run at</th>
+<th>Effect if task duration &gt; period</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scheduleAtFixedRate(t, period)</code></td>
+<td><strong>start time + period × n</strong></td>
+<td>runs immediately after each — <em>no overlap</em>, but the period is "lost"</td>
+</tr>
+<tr>
+<td><code>scheduleWithFixedDelay(t, delay)</code></td>
+<td><strong>end time + delay</strong></td>
+<td>natural spacing; each iteration adds full delay after finish</td>
+</tr>
+</tbody>
+</table></div>
+<div class="mermaid">gantt
+  title scheduleAtFixedRate(period=1s) — task takes 400ms
+  dateFormat  s
+  axisFormat  %S
+  section task
+  run 1 :a1, 0, 0.4
+  run 2 :a2, 1, 0.4
+  run 3 :a3, 2, 0.4
+  run 4 :a4, 3, 0.4
+</div>
+<div class="mermaid">gantt
+  title scheduleWithFixedDelay(delay=1s) — task takes 400ms
+  dateFormat  s
+  axisFormat  %S
+  section task
+  run 1 :b1, 0,   0.4
+  run 2 :b2, 1.4, 0.4
+  run 3 :b3, 2.8, 0.4
+  run 4 :b4, 4.2, 0.4
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>A periodic task that throws is silently suppressed.</strong> <code>ScheduledThreadPoolExecutor</code> catches the exception inside its wrapping <code>RunnableScheduledFuture</code>, sets the future's exception, and <strong>does not reschedule</strong>. The next run <em>never happens</em>; no log line, no metric. This is the most-bitten bug in the entire scheduler API.</p><p>The fix: wrap every periodic task in your own <code>try/catch (Throwable t) { log.error(...); }</code> so the exception never escapes to the future:</p>
+<p><code>java
+ses.scheduleAtFixedRate(() -&gt; {
+    try { doIt(); }
+    catch (Throwable t) { logger.error("periodic task failed", t); }
+}, 0, 1, SECONDS);</code></p>
+<p>Equivalently: override <code>afterExecute(Runnable r, Throwable t)</code> on the executor and inspect the future for an exception — but the per-task <code>try/catch</code> is the only memorable, copy-pasteable defense.</p></div></div>
+<h2 id="sizing-the-pool-brian-goetzs-formula">Sizing the Pool — Brian Goetz's Formula<a class="anchor" href="#sizing-the-pool-brian-goetzs-formula" aria-hidden="true">#</a></h2>
+<p>The textbook (Goetz, <em>Java Concurrency in Practice</em>, ch. 8) formula for IO-bound workloads:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>optimal threads ≈ N_cpu × U_cpu × (1 + W/C)
+</code></pre></div>
+<p>where:</p>
+<ul>
+<li><code>N_cpu</code> = number of cores</li>
+<li><code>U_cpu</code> = target CPU utilization (0..1)</li>
+<li><code>W</code> = wait time (time spent blocked, e.g., on IO)</li>
+<li><code>C</code> = compute time (time spent on CPU)</li>
+</ul>
+<p>Two regime extremes:</p>
+<ul>
+<li><strong>CPU-bound</strong> (<code>W ≈ 0</code>): <code>~N_cpu</code> threads. Adding more just thrashes the cache; you have no IO to hide behind. The classic recommendation is <code>N_cpu + 1</code> — the +1 lets a thread run when another is briefly suspended (page fault, GC pause).</li>
+<li><strong>IO-bound</strong> (<code>W &gt;&gt; C</code>): much higher. A workload spending 90% of its time in IO and 10% on CPU wants ~10×<code>N_cpu</code> threads to keep cores saturated. This is the regime where <code>newFixedThreadPool(200)</code> exists.</li>
+</ul>
+<div class="mermaid">flowchart LR
+  CPU["CPU-bound:<br/>~N_cpu + 1 threads"]
+  IO["IO-bound:<br/>N × (1 + W/C)"]
+  Both["Mixed:<br/>Goetz formula gives a starting point;<br/>measure under load and adjust"]
+  Loom["Virtual threads (T14, JDK 21+):<br/>change the calculus —<br/>thousands of virtual threads on a small carrier pool"]
+  CPU --- Both --- IO --- Loom
+</div>
+<p>The honest version: the formula gives a <em>starting point</em>. Real-world workloads have variable W/C, GC pauses, lock contention, and external rate limits that the formula doesn't model. The practical method: instrument throughput vs pool size, plot the curve, find the inflection. The formula is a Bayesian prior; the load test is the data.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"How would you size a thread pool for a web server doing database calls?" — The <em>literal</em> answer: Goetz formula with <code>W</code> = expected DB call latency, <code>C</code> = expected handler CPU time per request. The <em>senior</em> answer: "I'd start with <code>2 × N_cpu</code> as a heuristic, then load-test and tune by measuring 95th-percentile request latency at increasing pool sizes — the right answer is the smallest pool where latency doesn't degrade. And in 2026, I'd reach for virtual threads first; the question only matters if I'm CPU-bound or need explicit concurrency limits."</p></div></div>
+<h2 id="threadfactory-why-naming-threads-matters"><code>ThreadFactory</code> — Why Naming Threads Matters<a class="anchor" href="#threadfactory-why-naming-threads-matters" aria-hidden="true">#</a></h2>
+<p>The default <code>Executors.defaultThreadFactory()</code> produces threads named <code>pool-N-thread-M</code>. Useless. A thread dump full of <code>pool-3-thread-7</code> tells you <em>nothing</em> about which pool that worker belongs to.</p>
+<p>A named factory:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">import java.util.concurrent.atomic.AtomicInteger;
+
+class NamedThreadFactory implements ThreadFactory {
+    private final String prefix;
+    private final boolean daemon;
+    private final AtomicInteger seq = new AtomicInteger();
+
+    NamedThreadFactory(String prefix, boolean daemon) {
+        this.prefix = prefix; this.daemon = daemon;
+    }
+
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(r, prefix + &quot;-&quot; + seq.incrementAndGet());
+        t.setDaemon(daemon);
+        return t;
+    }
+}
+
+// usage
+ExecutorService imagePool = new ThreadPoolExecutor(
+    4, 8, 60, SECONDS, new LinkedBlockingQueue&lt;&gt;(1000),
+    new NamedThreadFactory(&quot;img-resize&quot;, true),    // &lt;-- threads named img-resize-1, img-resize-2, ...
+    new ThreadPoolExecutor.CallerRunsPolicy());
+</code></pre></div>
+<p>Now a thread dump shows <code>"img-resize-3"</code> instead of <code>"pool-3-thread-7"</code> — and an oncall engineer at 3 AM can see which subsystem owns which workers. <strong>This is not a stylistic preference; it's a production necessity.</strong></p>
+<p>The <code>daemon</code> flag matters too: daemon threads don't keep the JVM alive (T01). Set it <code>true</code> for fire-and-forget background pools; leave it <code>false</code> (default) when the pool's tasks must run to completion before exit (e.g., a graceful-shutdown manager).</p>
+<h2 id="lifecycle-shutdown-done-right">Lifecycle — Shutdown Done Right<a class="anchor" href="#lifecycle-shutdown-done-right" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">pool.shutdown();                                // stop accepting; finish queued tasks
+boolean clean = pool.awaitTermination(30, SECONDS);
+if (!clean) {
+    pool.shutdownNow();                         // interrupt workers; drop queued
+    if (!pool.awaitTermination(5, SECONDS)) {
+        logger.warn(&quot;pool did not terminate cleanly&quot;);
+    }
+}
+</code></pre></div>
+<p>Five rules for clean shutdown:</p>
+<ol>
+<li><strong>Always shut down.</strong> A <code>ThreadPoolExecutor</code> whose threads are non-daemon will keep the JVM alive forever. The default factory creates <em>non-daemon</em> threads. A common cause of "my CLI hangs at the end."</li>
+<li><strong>Two-phase: <code>shutdown()</code> then <code>shutdownNow()</code>.</strong> First a soft request (let queued tasks finish), then a hard interrupt if the soft request times out.</li>
+<li><strong><code>shutdownNow()</code> returns the un-run queue.</strong> If you cared about the queued work, capture the list and replay it later.</li>
+<li><strong><code>shutdownNow()</code> <em>interrupts</em> workers — it does not stop them.</strong> Workers must cooperate (T02 — interrupt protocol). If your task ignores <code>InterruptedException</code> or never checks <code>isInterrupted()</code>, <code>shutdownNow()</code> won't make it stop.</li>
+<li><strong><code>awaitTermination</code> is the only way to know the pool is <em>really</em> done.</strong> <code>isShutdown()</code> returns <code>true</code> immediately after <code>shutdown()</code>; <code>isTerminated()</code> doesn't return <code>true</code> until all workers have exited. Don't confuse them.</li>
+</ol>
+<h2 id="backpressure-the-real-tuning-question">Backpressure — the Real Tuning Question<a class="anchor" href="#backpressure-the-real-tuning-question" aria-hidden="true">#</a></h2>
+<p>The pool's configuration <em>is</em> its backpressure policy. The four common strategies, with their failure modes:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Queue</th>
+<th>Max</th>
+<th>Rejection</th>
+<th>Behavior under overload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unbounded</td>
+<td>unbounded</td>
+<td>meaningless</td>
+<td>n/a</td>
+<td>OOM (latent crash)</td>
+</tr>
+<tr>
+<td>Bounded + Abort</td>
+<td>bounded</td>
+<td>bounded</td>
+<td><code>Abort</code></td>
+<td>caller sees <code>RejectedExecutionException</code> — must retry / drop / log</td>
+</tr>
+<tr>
+<td>Bounded + CallerRuns</td>
+<td>bounded</td>
+<td>bounded</td>
+<td><code>CallerRuns</code></td>
+<td>submitter blocks executing the task; producer naturally slows</td>
+</tr>
+<tr>
+<td>Bounded + custom timed-offer</td>
+<td>bounded</td>
+<td>bounded</td>
+<td><code>offer(t, ms)</code> then abort</td>
+<td>bounded latency, bounded drop, observable failure</td>
+</tr>
+</tbody>
+</table></div>
+<div class="mermaid">flowchart TB
+  Over["task arrival rate > processing rate"]
+  Over --> Unb["unbounded queue:<br/>queue grows → OOM (crash)"]
+  Over --> Abort["bounded + Abort:<br/>caller sees REE, must decide"]
+  Over --> Caller["bounded + CallerRuns:<br/>caller runs task → producer slows down<br/>(automatic backpressure)"]
+  Over --> Custom["bounded + custom:<br/>e.g., timed-offer then Abort —<br/>bounded latency + observable failure"]
+</div>
+<p>The fundamental choice: <strong>does your caller tolerate slowing down?</strong> Sync request handlers (each request is its own thread) tolerate caller-runs — the request just takes longer. Async event-loops or message-driven systems often <em>cannot</em> tolerate it — slowing the event loop creates head-of-line blocking. For those, prefer <code>Abort</code> and let the caller decide (<code>retry</code>, <code>route elsewhere</code>, <code>drop with metric</code>).</p>
+<h2 id="virtual-threads-change-the-calculus">Virtual Threads Change the Calculus<a class="anchor" href="#virtual-threads-change-the-calculus" aria-hidden="true">#</a></h2>
+<p>JDK 21's virtual threads (T14, JEP 444) re-frame the entire pool sizing conversation. A virtual thread costs ~200 bytes of heap + ~1 KB of growable stack, not 1 MB. A million virtual threads is plausible; a million platform threads is impossible. So for IO-bound work, the answer is no longer "size a pool of N platform threads" — it's "give every task its own virtual thread and let the runtime manage the carriers."</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var es = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (var req : requests) {
+        es.submit(() -&gt; handle(req));
+    }
+}
+</code></pre></div>
+<p>What <code>newVirtualThreadPerTaskExecutor()</code> returns is a <em>different shape</em> of <code>ExecutorService</code>: no queue (every submit spawns), no pool size (unbounded virtual threads — bounded by memory, not threads), no rejection (there's no saturation point in the pool itself). The carriers underneath — the platform-thread <code>ForkJoinPool</code> that virtual threads run on — are sized to <code>Runtime.availableProcessors()</code> by default.</p>
+<p><strong>What remains true</strong> for thread pools in the virtual-thread era:</p>
+<ul>
+<li><strong>CPU-bound work still wants a platform-thread pool sized to cores.</strong> Spawning a million virtual threads to do CPU-bound computation just ping-pongs them across the carriers; you want exactly N CPU-bound platform workers.</li>
+<li><strong>Concurrency limiting is still useful.</strong> A platform-thread pool of <code>N</code> is the simplest possible <em>concurrency limiter</em> — at most <code>N</code> tasks run at once. Useful when downstream resources (a database, a partner API) have their own limits. Virtual threads don't replace this role; for it, use <code>Semaphore</code> (T09) gating around a virtual-thread executor instead.</li>
+<li><strong>Scheduling (<code>ScheduledExecutorService</code>) is unchanged.</strong> Periodic tasks remain useful and the scheduler's implementation is orthogonal to whether the work runs on platform or virtual threads.</li>
+</ul>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"Should I migrate to virtual threads in JDK 21?" — Senior answer: "For IO-bound server workloads, yes — replace <code>Executors.newFixedThreadPool(200)</code> with <code>Executors.newVirtualThreadPerTaskExecutor()</code> and remove the artificial concurrency cap. For CPU-bound parallel computation, no — keep a platform-thread pool sized to cores. For periodic scheduling, no — <code>ScheduledThreadPoolExecutor</code> is unchanged. And on JDK 21–23, audit <code>synchronized</code> blocks on hot blocking paths for pinning; <strong>JEP 491 in JDK 24</strong> removes that audit need."</p></div></div>
+<h2 id="observing-pools-in-production">Observing Pools in Production<a class="anchor" href="#observing-pools-in-production" aria-hidden="true">#</a></h2>
+<h3 id="thread-dumps">Thread dumps<a class="anchor" href="#thread-dumps" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">&quot;img-resize-3&quot; #42 prio=5 daemon ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071ab2&gt; (a j.u.c.locks.AbstractQueuedSynchronizer$ConditionObject)
+   at j.u.c.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
+   at j.u.c.ThreadPoolExecutor.getTask(...)
+   at j.u.c.ThreadPoolExecutor.runWorker(...)
+</code></pre></div>
+<p>A worker <code>parking to wait for</code> a <code>ConditionObject</code> deep in <code>getTask</code> is <strong>idle</strong>, parked on the queue's <code>notEmpty</code> condition. Many workers in this state = pool is over-provisioned. None of them in this state, with the queue backing up = pool is under-provisioned.</p>
+<h3 id="jfr">JFR<a class="anchor" href="#jfr" aria-hidden="true">#</a></h3>
+<p><code>jdk.ThreadPoolExecutor</code> is not a JFR event — but JFR's <code>jdk.JavaMonitorWait</code>, <code>jdk.JavaMonitorEnter</code>, and <code>jdk.ThreadPark</code> reveal time spent parked in <code>getTask</code>, contending on queue locks, and parked in user code respectively. Cross-pool comparison of those is more diagnostic than any single thread-count metric.</p>
+<h3 id="threadpoolexecutor-runtime-metrics"><code>ThreadPoolExecutor</code> runtime metrics<a class="anchor" href="#threadpoolexecutor-runtime-metrics" aria-hidden="true">#</a></h3>
+<p>The pool exposes <code>getActiveCount()</code>, <code>getPoolSize()</code>, <code>getLargestPoolSize()</code>, <code>getCompletedTaskCount()</code>, <code>getTaskCount()</code>, <code>getQueue().size()</code>. Wire them to your metrics system; the <strong>queue size</strong> and <strong>active count</strong> are the two that flag overload first. (Note: <code>getActiveCount</code> is approximate — it walks the worker set without locking.)</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Gauge.builder(&quot;pool.queue.size&quot;, pool, p -&gt; p.getQueue().size()).register(registry);
+Gauge.builder(&quot;pool.active&quot;,     pool, ThreadPoolExecutor::getActiveCount).register(registry);
+Gauge.builder(&quot;pool.size&quot;,       pool, ThreadPoolExecutor::getPoolSize).register(registry);
+</code></pre></div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="using-executorsnewfixedthreadpool-or-newcachedthreadpool-in-production">Using <code>Executors.newFixedThreadPool</code> or <code>newCachedThreadPool</code> in production<a class="anchor" href="#using-executorsnewfixedthreadpool-or-newcachedthreadpool-in-production" aria-hidden="true">#</a></h3>
+<p>Unbounded queue (fixed) or unbounded thread spawn (cached). Both fail open under overload. Construct <code>ThreadPoolExecutor</code> directly with bounded resources and an explicit rejection policy.</p>
+<h3 id="submitting-dependent-tasks-to-the-same-bounded-pool">Submitting dependent tasks to the same bounded pool<a class="anchor" href="#submitting-dependent-tasks-to-the-same-bounded-pool" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ExecutorService pool = ...;  // bounded
+pool.submit(() -&gt; {
+    Future&lt;X&gt; child = pool.submit(...);   // submits to the SAME pool from inside a task
+    return child.get();                    // ✗ if all workers are doing this, deadlock
+});
+</code></pre></div>
+<p>Worker exhaustion deadlock. Use separate pools by layer, <code>ForkJoinPool</code> (T13), or non-blocking composition (<code>CompletableFuture</code>, T07).</p>
+<h3 id="ignoring-futureget-exceptions">Ignoring <code>Future.get()</code> exceptions<a class="anchor" href="#ignoring-futureget-exceptions" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Future&lt;X&gt; f = pool.submit(task);
+X x = f.get();                              // ✗ ExecutionException, InterruptedException — what to do?
+</code></pre></div>
+<p><code>get()</code> throws <code>ExecutionException</code> wrapping the task's exception. Catching only <code>Exception</code> swallows it; not catching it crashes. Document the exception contract; rethrow as a domain exception, log, retry — but <em>handle</em> it. Same for <code>InterruptedException</code> (T02 — restore + propagate).</p>
+<h3 id="forgetting-to-shut-down-the-pool">Forgetting to shut down the pool<a class="anchor" href="#forgetting-to-shut-down-the-pool" aria-hidden="true">#</a></h3>
+<p>A non-daemon pool keeps the JVM alive forever — even if <code>main</code> returned. Wrap the pool in <code>try-with-resources</code> (JDK 19+ — <code>ExecutorService</code> is now <code>AutoCloseable</code>, <code>close()</code> calls <code>shutdown()</code> + <code>awaitTermination</code>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var pool = Executors.newFixedThreadPool(4)) {     // JDK 19+
+    pool.submit(task);
+}                                                       // shutdown + awaitTermination at }
+</code></pre></div>
+<p>Pre-JDK-19, use an explicit <code>try/finally</code> with <code>pool.shutdown()</code>. Better yet, give the factory <code>setDaemon(true)</code> so abnormal exit doesn't hang the process.</p>
+<h3 id="submitting-a-runnable-whose-run-throws">Submitting a <code>Runnable</code> whose <code>run()</code> throws<a class="anchor" href="#submitting-a-runnable-whose-run-throws" aria-hidden="true">#</a></h3>
+<p>Plain <code>execute(Runnable)</code> with an uncaught exception triggers the thread's <code>UncaughtExceptionHandler</code> (T01) — usually <code>System.err</code> and the thread dies; the pool replaces it. With <code>submit</code>, the exception is <em>captured</em> in the <code>Future</code> and is invisible unless someone calls <code>get()</code>. This is <em>the</em> subtle reason async pipelines lose exceptions: a fire-and-forget <code>submit</code> whose task throws produces <em>no</em> output. Either always <code>get()</code> (and handle the exception), or wrap the task's body in <code>try/catch</code> and log.</p>
+<h3 id="scheduleatfixedrate-with-a-task-that-can-throw"><code>scheduleAtFixedRate</code> with a task that can throw<a class="anchor" href="#scheduleatfixedrate-with-a-task-that-can-throw" aria-hidden="true">#</a></h3>
+<p>Silently suppressed (above). Always wrap periodic-task bodies in <code>try { ... } catch (Throwable t) { log.error(...); }</code>.</p>
+<h3 id="sharing-one-pool-across-unrelated-subsystems">Sharing one pool across unrelated subsystems<a class="anchor" href="#sharing-one-pool-across-unrelated-subsystems" aria-hidden="true">#</a></h3>
+<p>Two subsystems share one bounded pool; one floods the queue with slow tasks; the other's quick tasks pile up behind them, head-of-line-blocked. <em>Priority inversion</em> via a shared resource. Solution: each subsystem owns its own pool (and a <code>SemaphoreBoundedExecutor</code> if a subsystem needs internal concurrency limits beyond the pool's size).</p>
+<h3 id="misusing-callerrunspolicy-in-an-async-context">Misusing <code>CallerRunsPolicy</code> in an async context<a class="anchor" href="#misusing-callerrunspolicy-in-an-async-context" aria-hidden="true">#</a></h3>
+<p><code>CallerRunsPolicy</code> blocks the <em>submitting</em> thread to run the task. Fine when the submitter is a request thread that can wait. <strong>Wrong</strong> when the submitter is an event loop, an NIO selector thread, or a <code>ForkJoinPool</code> worker doing work-stealing — slowing those threads doesn't just slow throughput, it stalls every other task they should be doing. Verify the submitter context before choosing <code>CallerRuns</code>.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Reproduce the four-step flow.</strong> Build a <code>ThreadPoolExecutor(2, 5, 10, SECONDS, new LinkedBlockingQueue&lt;&gt;(3), factory, AbortPolicy)</code>. Submit 1, then 10, then 20 tasks in bursts; print queue size, active count, pool size, and rejected count at each step. Trace each task's path through the four-step flow.</li>
+<li><strong>Show <code>newFixedThreadPool</code> OOM.</strong> Submit ever-larger objects to a <code>newFixedThreadPool(1)</code> from a tight loop without consuming them. Watch the heap fill. Replace with a <em>bounded</em> <code>LinkedBlockingQueue</code>; observe <code>RejectedExecutionException</code> instead of OOM.</li>
+<li><strong>The pool-deadlock pattern.</strong> With <code>newFixedThreadPool(2)</code>, submit a task that submits a <em>child</em> task to the same pool and <code>.get()</code>s it. Run 2 such tasks concurrently; observe the hang. Take a thread dump; identify the two workers blocked in <code>Future.get()</code> waiting for a child task with no worker to run it.</li>
+<li><strong>Periodic-task suppression.</strong> <code>scheduleAtFixedRate</code> a task that throws every 5th iteration. Run for 30 s; observe the silent stop after the first throw. Wrap the body in <code>try/catch (Throwable)</code>; rerun; confirm continued execution.</li>
+<li><strong><code>fixedRate</code> vs <code>fixedDelay</code>.</strong> Schedule a task that takes 200 ms with <code>fixedRate(0, 1, SECONDS)</code> and (separately) <code>fixedDelay(0, 1, SECONDS)</code>. Record start timestamps; plot the two. Confirm the rate version starts at 0/1/2/3 s and the delay version at 0/1.2/2.4/3.6 s.</li>
+<li><strong>Named thread factory in a thread dump.</strong> Configure two pools with named factories (<code>img-resize</code>, <code>db-write</code>). Submit blocking tasks to both. Take a <code>jstack</code>; verify thread names show the pool of origin. Then strip the factories; observe how unreadable the dump becomes.</li>
+<li><strong><code>CallerRunsPolicy</code> backpressure measurement.</strong> Build a producer-consumer where the producer is a tight loop and the consumer is slow. With <code>Abort</code>, measure how quickly the producer fails. With <code>CallerRuns</code>, measure how the producer's throughput drops to the consumer's rate. Plot both.</li>
+<li><strong><code>ctl</code> packing.</strong> Read the <code>java.util.concurrent.ThreadPoolExecutor</code> source (it's only ~1,500 lines; this is a worthwhile evening). Confirm <code>runStateOf</code>, <code>workerCountOf</code>, <code>ctlOf</code> are pure bit-ops. Search the source for every <code>ctl.compareAndSet</code> and explain what each transition does.</li>
+<li><strong><code>Worker</code> AQS reuse.</strong> Confirm — via the source — that <code>Worker.tryAcquire</code> is used only by <code>interruptIdleWorkers</code>, and not as a general mutex. Why does the worker's AQS state default to <code>-1</code> instead of <code>0</code> in the constructor?</li>
+<li><strong>Hook injection.</strong> Subclass <code>ThreadPoolExecutor</code>; override <code>beforeExecute</code> to start a per-task timer, <code>afterExecute</code> to record the elapsed time + any exception. Wire to a metrics registry. Verify task-level p95/p99 latency comes out cleanly.</li>
+<li><strong><code>shutdownNow</code> doesn't stop uninterruptible tasks.</strong> Submit a task with an infinite <code>while(true)</code> body that doesn't check <code>isInterrupted()</code>. Call <code>shutdownNow()</code>. Confirm the task keeps running (the interrupt is set but ignored). Modify the task to check <code>Thread.interrupted()</code>; confirm it now stops.</li>
+<li><strong>Virtual-thread executor comparison.</strong> Implement an IO-bound workload (10,000 HTTP calls) two ways: <code>newFixedThreadPool(100)</code> and <code>newVirtualThreadPerTaskExecutor()</code>. Measure total wall time, peak memory, peak OS thread count. The virtual-thread version should be near-equal in throughput and dramatically lower in OS-thread count.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Defend <strong>why a pool exists</strong>: thread creation is ~50–100 µs and 1 MB; reuse amortizes; <em>and</em> a bounded pool <em>bounds</em> concurrency, a value that survives even into the virtual-thread era.</li>
+<li>Place the four core interfaces — <code>Executor</code>, <code>ExecutorService</code>, <code>ScheduledExecutorService</code> — and their concrete implementations (<code>ThreadPoolExecutor</code>, <code>ScheduledThreadPoolExecutor</code>, <code>ForkJoinPool</code>, the virtual-thread executor).</li>
+<li>Recite the <strong>seven <code>ThreadPoolExecutor</code> parameters</strong> and the <strong>four-step submission flow</strong> (core → queue → max → reject), and predict any pool's behavior under load from {core, max, queue}.</li>
+<li>Choose <strong><code>BlockingQueue</code> strategy by need</strong>: <code>SynchronousQueue</code> (direct handoff), <code>LinkedBlockingQueue</code> (two-lock, fast under contention; bounded if you don't want OOM), <code>ArrayBlockingQueue</code> (single-lock, cache-friendly), <code>PriorityBlockingQueue</code> (heap), <code>DelayedWorkQueue</code> (scheduler heap by due time).</li>
+<li>Pick the right <strong>rejection policy</strong>: <code>Abort</code> (surface failure), <code>CallerRuns</code> (natural backpressure for sync submitters), <code>Discard</code>/<code>DiscardOldest</code> (only for non-critical streams), or a custom timed-offer-then-abort hybrid.</li>
+<li>Diagnose <strong>the <code>Executors</code> factory anti-patterns</strong> — <code>newFixedThreadPool</code> (unbounded queue → OOM) and <code>newCachedThreadPool</code> (unbounded threads → thread/memory exhaustion) — and replace them with <code>new ThreadPoolExecutor(...)</code> directly. Recognize <code>newVirtualThreadPerTaskExecutor()</code> as the one new safe default.</li>
+<li>Walk through <strong><code>ThreadPoolExecutor</code>'s internals</strong>: the <strong><code>ctl</code> atomic int</strong> packing 3-bit state + 29-bit count for single-CAS transitions; the <strong>five-state machine</strong> (RUNNING → SHUTDOWN/STOP → TIDYING → TERMINATED); the <strong><code>Worker</code> extends AQS</strong> trick for marking mid-task vs idle; the <strong><code>runWorker</code> loop</strong> with <code>getTask()</code> as the only idle-park point.</li>
+<li>Understand <strong><code>submit</code> / <code>Future</code> / <code>FutureTask</code> layering</strong> — <code>submit</code> wraps a task in a <code>FutureTask</code> (a <code>RunnableFuture</code>) so the pool only sees <code>Runnable</code>s — and the use of <strong><code>invokeAll</code>/<code>invokeAny</code></strong> for parallel fan-out.</li>
+<li>Explain <strong><code>ScheduledThreadPoolExecutor</code></strong>: the <code>DelayedWorkQueue</code> (heap by due time), <code>schedule</code> (one-shot), <code>scheduleAtFixedRate</code> (next = start + n×period; runs immediately if late), <code>scheduleWithFixedDelay</code> (next = end + delay), and the <strong>silent-suppression bug</strong> for periodic tasks that throw.</li>
+<li>Apply <strong>Goetz's pool-sizing formula</strong> — <code>N × (1 + W/C)</code> for IO-bound, <code>N + 1</code> for CPU-bound — as a <em>starting point</em> for load testing, not a final answer.</li>
+<li>Use a <strong>named <code>ThreadFactory</code></strong> so thread dumps name the pool of origin, and set <strong><code>daemon</code></strong> appropriately so the pool's lifecycle matches the application's.</li>
+<li>Run a <strong>clean shutdown</strong> (<code>shutdown()</code> → <code>awaitTermination</code> → <code>shutdownNow()</code> → final <code>awaitTermination</code>) and explain why pre-JDK-19 code needs <code>try/finally</code> and JDK-19+ code can use <code>try-with-resources</code>.</li>
+<li>Reason about <strong>backpressure</strong>: unbounded queue → OOM, bounded + abort → caller-handled failure, bounded + caller-runs → automatic producer slowing — and pick by whether the submitter context tolerates slowing.</li>
+<li>Adapt to <strong>virtual threads (JDK 21+)</strong>: <code>newVirtualThreadPerTaskExecutor</code> for IO-bound work; <em>still</em> a platform-thread pool for CPU-bound parallelism and explicit concurrency limiting; <code>ScheduledThreadPoolExecutor</code> unchanged. JEP 491 (JDK 24) removes the prior <code>synchronized</code> pinning concern.</li>
+<li>Avoid <strong>the eight common bugs</strong>: unbounded factories in production, dependent-task pool deadlock, <code>Future.get()</code> exception silence, forgotten shutdown, <code>submit</code> swallowing thrown exceptions, periodic-task throw suppression, shared pool head-of-line blocking, misplaced <code>CallerRunsPolicy</code> in async contexts.</li>
+<li>Use the <strong>observability tools</strong>: thread dump showing <code>LinkedBlockingQueue.take</code> for idle workers, JFR's <code>jdk.JavaMonitorWait</code> for queue-park hotspots, the pool's <code>getQueue().size()</code> / <code>getActiveCount()</code> exposed as metrics.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t06-callable-and-future.html">Callable &amp; Future</a> — the result-bearing side of task submission. We'll dissect <code>FutureTask</code>'s state machine (NEW → COMPLETING → NORMAL/EXCEPTIONAL/CANCELLED/INTERRUPTING/INTERRUPTED), the <em>atomic-result-publication-then-unpark-waiters</em> idiom, how <code>get()</code>'s blocking integrates with <code>LockSupport.park</code>, and why <code>Future.cancel(true)</code> is the <em>only</em> clean way to stop a worker thread holding cooperative-cancellation discipline.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Executors &amp; Thread Pools&quot;
+slug: executors-and-thread-pools
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 5
+tags: [executor, executorservice, scheduledexecutorservice, threadpoolexecutor, scheduledthreadpoolexecutor, forkjoinpool, work-stealing, executors-factory, newfixedthreadpool, newcachedthreadpool, newsinglethreadexecutor, newscheduledthreadpool, newworkstealingpool, newvirtualthreadpertaskexecutor, corepoolsize, maximumpoolsize, keepalivetime, allowcorethreadtimeout, blockingqueue, synchronousqueue, linkedblockingqueue, arrayblockingqueue, delayedworkqueue, priorityblockingqueue, rejectedexecutionhandler, abortpolicy, callerrunspolicy, discardpolicy, discardoldestpolicy, rejectedexecutionexception, threadfactory, before-execute, after-execute, terminated-hook, ctl, runstate, worker, aqs-worker, mainlock, hashset-workers, runworker, gettask, submit, future, futuretask, runnablefuture, invokeall, invokeany, schedule, schedulewithfixeddelay, scheduleatfixedrate, periodic-task-suppression, backpressure, brian-goetz-formula, ncpu-plus-one, virtual-thread-executor, jep-444, thread-leak, pool-deadlock, pool-shutdown, awaittermination, shutdownnow]
+prerequisites: [wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states, threads-and-runnable]
+status: complete
+estimated_minutes: 160
+last_updated: 2026-06-08
+---
+
+# Executors &amp; Thread Pools
+
+A thread costs ~1 MB of stack + tens of microseconds to create + a kernel data structure that the OS must schedule. Spinning up one thread per task — the obvious shape — burns most of your budget on overhead and exposes the OS thread limit (low thousands on Linux, lower on Windows) as a *throughput ceiling* for every server you write. The fix everyone arrives at independently: keep a small pool of long-lived threads, hand them work through a queue, reuse them. The `java.util.concurrent.Executor` framework — introduced in JDK 5, now twenty years old and still the foundation of every Spring controller, Tomcat acceptor, Netty handler, and `CompletableFuture` callback — is Java&#x27;s standard answer.
+
+The depth-bar requirement isn&#x27;t &quot;use `Executors.newFixedThreadPool`.&quot; At the **language** layer, the `Executor` / `ExecutorService` / `ScheduledExecutorService` hierarchy decouples *what to do* (a `Runnable`/`Callable`) from *who does it* (a pool, a scheduler, a virtual-thread spawner), unified by one `submit(...)` API. At the **library** layer, the concrete `ThreadPoolExecutor` is configured by **seven** constructor parameters (core size, max size, keep-alive, queue, thread factory, rejection handler, time unit) whose *interaction* produces every classic pool shape — fixed, cached, single, custom-bounded — and whose *misconfiguration* produces every classic pool bug — OOM via unbounded queue, thread explosion, silent rejection, pool deadlock. At the **JVM internals** layer, a `ThreadPoolExecutor` packs its life-cycle state (3 bits: RUNNING/SHUTDOWN/STOP/TIDYING/TERMINATED) and worker count (29 bits) into a *single atomic int* (`ctl`) so every state transition is one CAS, each `Worker` is itself an `AbstractQueuedSynchronizer` (T08), and the worker loop is a `getTask().run()` cycle that times out idle workers via the queue&#x27;s `poll(timeout)`. At the **architecture / OS** layer, pool sizing is governed by Brian Goetz&#x27;s formula — **N × (1 + W/C)** for IO-bound, **N + 1** for CPU-bound — and tuned against backpressure semantics; **virtual threads** (JDK 21, T14) invert the whole calculus by making &quot;one thread per task&quot; cheap again. We will cover all four layers.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [wait / notify / notifyAll](./T04-wait-notify-notifyall.md) (L3/C01/T04) — the protocol every `BlockingQueue` uses internally; [synchronized, monitors &amp; intrinsic locks](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — `ReentrantLock`/`Condition` underpin `LinkedBlockingQueue` and `ArrayBlockingQueue`; [Thread lifecycle &amp; states](./T02-thread-lifecycle-and-states.md) (L3/C01/T02) — worker threads are in `RUNNABLE`/`WAITING (parking)`; [Threads &amp; Runnable](./T01-threads-and-runnable.md) (L3/C01/T01) — `Runnable` is the task interface; the per-thread stack is the dominant memory cost of a pool.
+
+## Why a Pool — the Cost of One-Thread-per-Task
+
+A platform thread is not free. Concrete costs, on Linux x86-64 with HotSpot 21:
+
+| Cost | Order of magnitude | Reason |
+|------|-------------------:|--------|
+| Memory per thread | **~1 MB** | `-Xss` default; pre-allocated stack address space (not all touched, but reserved) |
+| Creation latency | **~50–100 µs** | `pthread_create` + kernel TCB + scheduler entry + JVM `Thread` bookkeeping |
+| Context-switch latency | **~1–10 µs** | register save/restore + TLB miss risk + L1/L2 thrash |
+| OS thread cap | **~thousands** | `/proc/sys/kernel/threads-max`; per-user `RLIMIT_NPROC`; system memory |
+
+Doing `new Thread(task).start()` per HTTP request at 10k req/s burns ~1 GB/s of stack-reservation churn and ~1 ms of CPU just on thread setup — before any work. A pool of, say, 200 threads sized to the workload reuses the same kernel objects across millions of tasks; the setup cost is paid once per pool, not once per task.
+
+```mermaid
+flowchart LR
+  Naive[&quot;per task:&lt;br/&gt;new Thread(task).start()&quot;]
+  Pool[&quot;pool:&lt;br/&gt;submit(task) → run on idle worker&quot;]
+  Naive -- &quot;~100 µs setup&lt;br/&gt;~1 MB stack&lt;br/&gt;thread cap risk&quot; --&gt; Bad[&quot;unscalable&quot;]
+  Pool -- &quot;~1 µs queue + run&lt;br/&gt;fixed memory&lt;br/&gt;bounded resource&quot; --&gt; Good[&quot;scales&quot;]
+  Note[&quot;pre-Loom: pooling is mandatory at scale.&lt;br/&gt;Post-Loom (JDK 21+, T14): virtual threads&lt;br/&gt;are the new &#x27;cheap thread&#x27; answer.&quot;]
+```
+
+&gt; [!INTERVIEW]
+&gt; &quot;Why do we use thread pools?&quot; is the warm-up. The senior answer is the *cost ladder above* + **the secondary reason**: a bounded pool *bounds concurrency*. Even after Loom makes thread cost negligible, a pool of size `N` is the simplest *concurrency limiter* for a downstream resource — a connection pool, a rate-limited API, a database — and that role doesn&#x27;t go away even when threads themselves stop being scarce.
+
+## The Type Hierarchy
+
+```mermaid
+flowchart TB
+  Exec[&quot;interface Executor&lt;br/&gt;void execute(Runnable)&quot;]
+  ES[&quot;interface ExecutorService&lt;br/&gt;+ shutdown / submit / invokeAll / invokeAny&quot;]
+  SES[&quot;interface ScheduledExecutorService&lt;br/&gt;+ schedule / scheduleAtFixedRate / scheduleWithFixedDelay&quot;]
+  TPE[&quot;class ThreadPoolExecutor&lt;br/&gt;(the concrete workhorse)&quot;]
+  STPE[&quot;class ScheduledThreadPoolExecutor&lt;br/&gt;(extends TPE)&quot;]
+  FJP[&quot;class ForkJoinPool&lt;br/&gt;(work-stealing; T13)&quot;]
+  Vexec[&quot;VirtualThreadPerTaskExecutor (JDK 21+)&quot;]
+  Exec --&gt; ES --&gt; SES
+  ES --&gt; TPE
+  SES --&gt; STPE
+  ES --&gt; FJP
+  ES --&gt; Vexec
+```
+
+Three interfaces, each a strict superset of the prior:
+
+- **`Executor`** — one method: `void execute(Runnable command)`. The base contract: &quot;run this somewhere, sometime.&quot; Says nothing about *when*, *where*, or *return value*. Almost too thin to use directly — exists so you can hand a generic `Runnable` sink to any framework that wants one.
+- **`ExecutorService`** — adds *lifecycle* (`shutdown`, `shutdownNow`, `awaitTermination`) and *task submission with results* (`submit(Callable)` returns `Future&lt;T&gt;`, `invokeAll`, `invokeAny`). This is the everyday API.
+- **`ScheduledExecutorService`** — adds delayed and periodic submission. Backed by `ScheduledThreadPoolExecutor` whose queue is a *heap* ordered by due-time.
+
+The concrete implementations: **`ThreadPoolExecutor`** is the workhorse for queue-based pools, **`ScheduledThreadPoolExecutor`** extends it for scheduled work, **`ForkJoinPool`** (T13) is the work-stealing variant for divide-and-conquer parallelism, and (JDK 21+) **`Executors.newVirtualThreadPerTaskExecutor()`** returns an `ExecutorService` that spawns a fresh virtual thread per task — no pooling at all.
+
+## `ThreadPoolExecutor` — the Seven Constructor Parameters
+
+The full constructor (the one all the factory methods delegate to):
+
+```java
+public ThreadPoolExecutor(
+    int corePoolSize,                         // 1. threads to keep alive even when idle
+    int maximumPoolSize,                      // 2. hard cap on concurrent workers
+    long keepAliveTime, TimeUnit unit,        // 3+4. how long extra (non-core) workers idle before exit
+    BlockingQueue&lt;Runnable&gt; workQueue,        // 5. THE crucial choice — shapes the whole pool&#x27;s behavior
+    ThreadFactory threadFactory,              // 6. how to make threads (naming, daemon flag, group)
+    RejectedExecutionHandler handler          // 7. what to do when saturated + queue full
+);
+```
+
+Each parameter is independently tunable, and the interaction of `corePoolSize`, `maximumPoolSize`, and `workQueue` produces *every* classic pool shape. Memorize the four-step submission flow and you can derive any pool&#x27;s behavior from its parameters:
+
+### The four-step submission flow
+
+When you call `pool.execute(task)`, the pool tries to dispatch it through **exactly** this sequence:
+
+```mermaid
+flowchart TB
+  Sub[&quot;execute(task) called&quot;]
+  S1{&quot;workers &lt; corePoolSize?&quot;}
+  S2{&quot;queue.offer(task) succeeded?&quot;}
+  S3{&quot;workers &lt; maximumPoolSize?&quot;}
+  Rej[&quot;RejectedExecutionHandler.rejectedExecution(...)&quot;]
+  Sub --&gt; S1
+  S1 -- yes --&gt; NewCore[&quot;create core worker, run task&lt;br/&gt;(even if idle workers exist)&quot;]
+  S1 -- no --&gt; S2
+  S2 -- yes --&gt; Enq[&quot;task queued; some worker will poll it eventually&quot;]
+  S2 -- no --&gt; S3
+  S3 -- yes --&gt; NewExtra[&quot;create non-core worker (capped at max)&lt;br/&gt;run task immediately&quot;]
+  S3 -- no --&gt; Rej
+```
+
+Three counter-intuitive consequences fall out of this flow:
+
+1. **The queue is tried *before* growing past core size.** If you set `core=2, max=10, queue=LinkedBlockingQueue(1000)`, a burst of 100 tasks will result in **2 working threads + 98 queued tasks** — *not* 10 working threads. The extra capacity (`max-core`) is only used when the queue refuses, which an unbounded queue *never* does.
+2. **`maximumPoolSize` is meaningless with an unbounded queue.** This is *the* design flaw of `Executors.newFixedThreadPool(N)` (next section) — it sets `core = max = N` *and* uses an unbounded `LinkedBlockingQueue`, so `max` would be inert anyway; under overload, the queue grows until OOM.
+3. **A `SynchronousQueue` always refuses.** It has zero capacity; `offer` succeeds only if a worker is already waiting in `take()`. So with `SynchronousQueue`, *every* task either hands off to a waiting worker or triggers step 3 (new worker spawn if under max) or step 4 (rejection). This is how `newCachedThreadPool` keeps spawning threads.
+
+&gt; [!IMPORTANT]
+&gt; The submission flow is the single most important invariant in this entire topic. If you can recite it cold and apply it to *any* combination of {core, max, queue}, you can predict every pool&#x27;s behavior under any load — including the failure modes. Memorize the flow before tuning numbers.
+
+## Queue Strategies — Where Pool Behaviour Actually Lives
+
+The choice of `BlockingQueue` defines the pool more than any other parameter. The six common queues, with the behaviour they impose:
+
+### `SynchronousQueue` — direct handoff, zero capacity
+
+```java
+new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, SECONDS,
+                       new SynchronousQueue&lt;&gt;(), factory, handler);
+```
+
+This is `newCachedThreadPool` in skeleton form. `SynchronousQueue` has no buffer; `offer(task)` succeeds *only if* a consumer is `take()`-ing right now. So step-2 in the flow always *fails* unless a worker is idle and parked at the queue&#x27;s `take()`. Result: every submission becomes &quot;hand to an idle worker, else spawn a new worker (step 3, up to `Integer.MAX_VALUE`).&quot; Workers that go idle for 60 s exit (step&#x27;s keep-alive). The pool&#x27;s size tracks the workload *exactly* — but with **no upper bound on thread count**, which under sudden burst will spawn until the OS thread limit (T01) — usually before, since each thread reserves 1 MB. *Production rule: never use a `SynchronousQueue` with `Integer.MAX_VALUE` max in a server that can be DoS&#x27;d.*
+
+### `LinkedBlockingQueue(unbounded)` — used by `newFixedThreadPool`
+
+```java
+new ThreadPoolExecutor(N, N, 0L, MILLISECONDS,
+                       new LinkedBlockingQueue&lt;&gt;(),         // ← no capacity arg = Integer.MAX_VALUE
+                       factory, handler);
+```
+
+`core = max = N`, queue is unbounded. Step-2 *always* succeeds (the queue never refuses), so steps 3 and 4 are *unreachable*. The pool has exactly `N` workers; excess work accumulates in the queue. Under sustained overload, the queue grows without bound until OOM. The famous &quot;Effective Java Item 80&quot; anti-pattern.
+
+`LinkedBlockingQueue` internally uses **two separate `ReentrantLock`s** — one for the head (consumers `take`/`poll`) and one for the tail (producers `put`/`offer`). Producers and consumers operate on opposite ends without contending unless the queue is empty or full. This *two-lock* design is why `LinkedBlockingQueue` scales better than `ArrayBlockingQueue` under high producer-consumer concurrency.
+
+### `LinkedBlockingQueue(bounded)` — the sane production default
+
+```java
+new ThreadPoolExecutor(coreN, maxN, 60, SECONDS,
+                       new LinkedBlockingQueue&lt;&gt;(queueCapacity),
+                       factory, handler);
+```
+
+This is the production-grade configuration that the `Executors` factory *should* have provided. Under load:
+
+- Bursts up to `queueCapacity` are absorbed into the queue.
+- If queue fills, new workers spawn up to `maxN`.
+- If both saturate, rejection fires (next section) — and *that&#x27;s the right time to apply backpressure*, not OOM.
+
+The `core`/`max`/`queueCapacity` trio is a three-level escalation: queue absorbs bursts cheaply, extra workers handle sustained pressure, rejection applies backpressure to the caller.
+
+### `ArrayBlockingQueue` — bounded, single-lock
+
+```java
+new ArrayBlockingQueue&lt;&gt;(capacity, /* fair = */ false);
+```
+
+Backed by a circular array of fixed size, protected by **one** `ReentrantLock` and **two** `Condition`s (`notEmpty`, `notFull`) — exactly the bounded-buffer reference from T04. Under high contention from many producers/consumers, the single lock becomes a bottleneck; under low-to-moderate contention, the contiguous array has better cache behaviour than `LinkedBlockingQueue`&#x27;s linked nodes. The `fair=true` variant uses a fair lock (FIFO on the entry queue) — typically 2–3× slower under contention; rarely worth it.
+
+### `PriorityBlockingQueue` — unbounded priority heap
+
+Tasks dequeue in `Comparable` order, not FIFO. Backed by a binary heap. The pool runs tasks in priority order — useful for schedulers, real-time pipelines, anything with &quot;important first.&quot; Has the same OOM risk as any unbounded queue: a flood of low-priority tasks accumulates indefinitely.
+
+### `DelayedWorkQueue` — used by `ScheduledThreadPoolExecutor`
+
+A binary heap of `RunnableScheduledFuture` ordered by *due time*. `take()` blocks until the head&#x27;s due time, then returns it. Capacity is unbounded but bounded in practice by your scheduling rate. Internals: see [Scheduled Executors](#scheduledthreadpoolexecutor--time-driven-work) below.
+
+```mermaid
+flowchart LR
+  subgraph Queues
+    SQ[&quot;SynchronousQueue&lt;br/&gt;(0-capacity, direct handoff)&quot;]
+    LBu[&quot;LinkedBlockingQueue (∞)&lt;br/&gt;two-lock; OOM risk&quot;]
+    LBb[&quot;LinkedBlockingQueue (cap)&lt;br/&gt;two-lock; bounded — production default&quot;]
+    ABQ[&quot;ArrayBlockingQueue (cap)&lt;br/&gt;single lock + 2 conditions&quot;]
+    PBQ[&quot;PriorityBlockingQueue&lt;br/&gt;(unbounded heap)&quot;]
+    DWQ[&quot;DelayedWorkQueue&lt;br/&gt;(heap by due time)&quot;]
+  end
+  Pool[&quot;pool behavior is mostly the queue choice&quot;]
+  SQ --&gt; Cached[&quot;cached pool: spawn on demand,&lt;br/&gt;cap = MAX_VALUE, NEVER for servers&quot;]
+  LBu --&gt; Fixed[&quot;fixed pool: N workers,&lt;br/&gt;queue can OOM&quot;]
+  LBb --&gt; Prod[&quot;production sane: bounded queue,&lt;br/&gt;then more workers, then reject&quot;]
+  ABQ --&gt; Mod[&quot;moderate contention,&lt;br/&gt;cache-friendly array&quot;]
+  PBQ --&gt; Prio[&quot;priority scheduling&quot;]
+  DWQ --&gt; Sched[&quot;ScheduledThreadPoolExecutor&quot;]
+```
+
+## Rejection Policies
+
+When step 4 of the flow fires — queue full *and* maxPoolSize reached — the configured `RejectedExecutionHandler` runs. The JDK ships four; you can write your own.
+
+| Handler | Behavior | When to use |
+|---------|----------|-------------|
+| **`AbortPolicy`** (default) | throws `RejectedExecutionException` | callers must handle / retry / report. Surface failure loudly. |
+| **`CallerRunsPolicy`** | runs the task *on the calling thread* | natural backpressure — the submitter is itself blocked, slowing the producer. Great for offload pipelines. |
+| **`DiscardPolicy`** | silently drops the task | rarely correct (silent data loss) — only for non-critical telemetry, metrics |
+| **`DiscardOldestPolicy`** | drops the head of the queue, retries `offer` | latest-wins scenarios — UI events, sensor readings where freshness &gt; completeness |
+
+```mermaid
+flowchart LR
+  Reject[&quot;pool full + queue full&quot;]
+  Reject --&gt; Abort[&quot;AbortPolicy&lt;br/&gt;throw → caller must handle&quot;]
+  Reject --&gt; Caller[&quot;CallerRunsPolicy&lt;br/&gt;caller runs → automatic backpressure&quot;]
+  Reject --&gt; Disc[&quot;DiscardPolicy&lt;br/&gt;silent drop → data loss&quot;]
+  Reject --&gt; Old[&quot;DiscardOldestPolicy&lt;br/&gt;evict oldest queued task&quot;]
+```
+
+&gt; [!IMPORTANT]
+&gt; **`CallerRunsPolicy` is the single best backpressure mechanism in plain `ThreadPoolExecutor`.** It costs nothing extra to wire up, and it does the right thing under sustained overload: when the pool can&#x27;t keep up, submission *itself* slows down, because the submitting thread is now busy running the task it wanted to offload. Memory does not grow unbounded, downstream stays bounded by the pool&#x27;s capacity, and the only cost is reduced throughput on the submitter — which is exactly what backpressure *is*. For server-side pipelines that can tolerate latency over crash, this is almost always the right rejection policy.
+
+Custom handlers are one-method classes:
+
+```java
+RejectedExecutionHandler timeoutBackoff = (task, executor) -&gt; {
+    try {
+        if (!executor.getQueue().offer(task, 250, MILLISECONDS)) {
+            throw new RejectedExecutionException(&quot;backoff timeout&quot;);
+        }
+    } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        throw new RejectedExecutionException(ie);
+    }
+};
+```
+
+## `Executors` Factory Methods — Mostly Anti-Patterns in 2026
+
+The `Executors` class ships convenience factories. Each maps to a specific `ThreadPoolExecutor` configuration; almost all carry a footgun.
+
+### `newFixedThreadPool(int n)`
+
+```java
+new ThreadPoolExecutor(n, n, 0L, MS, new LinkedBlockingQueue&lt;&gt;());
+```
+
+Unbounded queue. **OOM under overload.** Acceptable only if your producer is *strictly* bounded (e.g., reading a finite file).
+
+### `newCachedThreadPool()`
+
+```java
+new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, S, new SynchronousQueue&lt;&gt;());
+```
+
+Spawns threads without limit. **OS thread cap exhaustion / OOM via stack reservation** under burst. Acceptable only for short-lived bursty work whose peak rate is *strictly bounded* by something else — almost never true on servers.
+
+### `newSingleThreadExecutor()`
+
+```java
+new ThreadPoolExecutor(1, 1, 0L, MS, new LinkedBlockingQueue&lt;&gt;());
+```
+
+One worker, unbounded queue. Same OOM risk as `newFixedThreadPool(1)`, plus *cannot* be reconfigured to a bigger pool later (it returns a *wrapper* that hides the underlying `ThreadPoolExecutor`).
+
+### `newScheduledThreadPool(int n)`
+
+```java
+new ScheduledThreadPoolExecutor(n);    // queue is DelayedWorkQueue
+```
+
+The only factory that&#x27;s safe to use as-is — its queue is a bounded-in-practice heap, and scheduled-task overflow is rare in normal designs.
+
+### `newWorkStealingPool()` / `newWorkStealingPool(parallelism)`
+
+Returns a `ForkJoinPool` (T13). Different work model (work-stealing deques per worker) — not a `ThreadPoolExecutor`. Good for divide-and-conquer parallel computation; *not* a drop-in for IO-bound submission workloads.
+
+### `newVirtualThreadPerTaskExecutor()` (JDK 21+)
+
+```java
+ExecutorService es = Executors.newVirtualThreadPerTaskExecutor();
+```
+
+Every `submit`/`execute` spawns a **brand-new virtual thread** (T14). Not a pool — no reuse, no queue, no rejection. The virtual-thread runtime&#x27;s *carrier pool* (a `ForkJoinPool` sized to `Runtime.availableProcessors()`) handles the actual execution. For blocking-IO-heavy workloads, this is the JDK 21+ default. For CPU-bound workloads, prefer a platform-thread pool sized to cores.
+
+&gt; [!WARNING]
+&gt; *Joshua Bloch, Effective Java 3rd ed., Item 80:* **&quot;avoid `Executors.newFixedThreadPool` and `newCachedThreadPool` in production server code&quot;** — exactly because both have unbounded resource modes that fail open under overload (OOM or thread explosion). Construct `new ThreadPoolExecutor(...)` directly with a *bounded* queue and a sensible rejection policy. The exception in 2026: `newVirtualThreadPerTaskExecutor()` is safe and idiomatic for IO-bound work; it&#x27;s the only `Executors`-factory whose use is unambiguously recommended.
+
+## Internals — How `ThreadPoolExecutor` Really Works
+
+The `ThreadPoolExecutor` source is one of the most-studied 1,500 lines in the JDK; it&#x27;s worth knowing what&#x27;s in there.
+
+### The `ctl` atomic int — state + count in one word
+
+```java
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+
+// 3 high bits = runState (one of RUNNING / SHUTDOWN / STOP / TIDYING / TERMINATED)
+// 29 low bits = worker count (max ~500 million workers — comfortably more than feasible)
+
+private static final int  COUNT_BITS  = Integer.SIZE - 3;
+private static final int  COUNT_MASK  = (1 &lt;&lt; COUNT_BITS) - 1;     // 0x1FFF_FFFF
+private static final int  RUNNING     = -1 &lt;&lt; COUNT_BITS;
+private static final int  SHUTDOWN    =  0 &lt;&lt; COUNT_BITS;
+private static final int  STOP        =  1 &lt;&lt; COUNT_BITS;
+private static final int  TIDYING     =  2 &lt;&lt; COUNT_BITS;
+private static final int  TERMINATED  =  3 &lt;&lt; COUNT_BITS;
+
+private static int runStateOf(int c)     { return c &amp; ~COUNT_MASK; }
+private static int workerCountOf(int c)  { return c &amp;  COUNT_MASK; }
+private static int ctlOf(int rs, int wc) { return rs | wc; }
+```
+
+Packing both state and worker count into one int means **every** state transition is one CAS — no lock needed for the combination. Increment worker count + check state both happen atomically. This is the same technique `ReentrantLock`&#x27;s AQS uses (T08) and the same reason it scales: the contended path is a single CAS, not a critical section.
+
+The state machine:
+
+```mermaid
+stateDiagram-v2
+  Running: RUNNING&lt;br/&gt;(accepts new tasks + processes queue)
+  Shutdown: SHUTDOWN&lt;br/&gt;(rejects new tasks, processes queue)
+  Stop: STOP&lt;br/&gt;(rejects new tasks, drops queue, interrupts workers)
+  Tidying: TIDYING&lt;br/&gt;(all done, about to call terminated())
+  Terminated: TERMINATED
+
+  Running --&gt; Shutdown: shutdown()
+  Running --&gt; Stop: shutdownNow()
+  Shutdown --&gt; Stop: shutdownNow()
+  Shutdown --&gt; Tidying: queue empty + workers gone
+  Stop --&gt; Tidying: workers gone (queue already dropped)
+  Tidying --&gt; Terminated: terminated() callback fires
+```
+
+Five states, four transitions, all driven by atomic CAS on `ctl`. The state machine is monotonic — once advanced, it never goes back — which lets `awaitTermination` simply wait on a single `Condition` for `TERMINATED`.
+
+### The `Worker` class — an AQS-backed runnable
+
+Each worker is *not* just a `Thread`; it&#x27;s a `Worker extends AbstractQueuedSynchronizer implements Runnable`:
+
+```java
+private final class Worker extends AbstractQueuedSynchronizer implements Runnable {
+    final Thread thread;
+    Runnable firstTask;
+    volatile long completedTasks;
+
+    Worker(Runnable firstTask) {
+        setState(-1);                            // disallow interrupt until runWorker starts
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);   // &lt;-- Worker IS the Runnable
+    }
+
+    public void run() { runWorker(this); }
+
+    // AQS lock methods: state 0 = unlocked, 1 = locked
+    // Used by interruptIdleWorkers to skip currently-running workers (locked)
+    protected boolean tryAcquire(int unused) { return compareAndSetState(0, 1) ? (setExclusiveOwnerThread(currentThread()), true) : false; }
+    protected boolean tryRelease(int unused) { setExclusiveOwnerThread(null); setState(0); return true; }
+}
+```
+
+Why does the worker extend AQS? Because `shutdown()` and `shutdownNow()` need to interrupt **only idle workers** (not workers currently running a task — that would interrupt the user&#x27;s code mid-execution). The AQS lock around each task execution is the signal: if `tryAcquire` succeeds, the worker is idle; if it fails, the worker is mid-task. So `interruptIdleWorkers` iterates the worker set, `tryAcquire`-s each, and interrupts only the ones it could lock. Beautiful reuse of the AQS state bit for a non-mutex purpose.
+
+### The `runWorker` loop
+
+```java
+final void runWorker(Worker w) {
+    Runnable task = w.firstTask;
+    w.firstTask = null;
+    w.unlock();                                  // allow interrupts now
+    try {
+        while (task != null || (task = getTask()) != null) {
+            w.lock();
+            try {
+                beforeExecute(w.thread, task);    // hook
+                Throwable thrown = null;
+                try { task.run(); }                // &lt;-- run the user task
+                catch (Throwable x) { thrown = x; throw x; }
+                finally { afterExecute(task, thrown); }  // hook
+            } finally {
+                task = null;
+                w.completedTasks++;
+                w.unlock();
+            }
+        }
+    } finally {
+        processWorkerExit(w, false);              // dec ctl, possibly trigger TIDYING
+    }
+}
+```
+
+Two details that matter:
+
+1. **`getTask()` is the *only* idle-waiting point in the entire pool.** It polls `workQueue` with `poll(keepAliveTime, unit)` for non-core (or `allowCoreThreadTimeOut=true`) workers, and `take()` (no timeout) for core workers. So worker idle time is implemented as the queue&#x27;s wait — the futex/Condition machinery from T04. A worker in `WAITING (parking)` on its queue is a worker waiting for work.
+2. **`beforeExecute` and `afterExecute` are protected overridable hooks.** Subclass `ThreadPoolExecutor` to log every task, propagate MDC (logging context), instrument metrics, or detect long-running tasks. `afterExecute` receives the task&#x27;s exception (if any) — *the* place to centralize uncaught-exception logging across a pool.
+
+### Why pool deadlock happens
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(2);
+Future&lt;Integer&gt; f1 = pool.submit(() -&gt; {
+    Future&lt;Integer&gt; inner = pool.submit(() -&gt; 42);   // submit a child task
+    return inner.get();                              // WAIT for the child — but on what thread?
+});
+f1.get();
+```
+
+If `pool` has 2 worker threads and both are blocked in `inner.get()` (waiting for a child task to complete), there are **no workers left to run the child tasks** — and the children sit in the queue forever. Self-deadlock. The fix: never submit dependent tasks to the same bounded pool from inside a task. Use separate pools for parent and child layers, or use `ForkJoinPool` (T13), which is *designed* for this with work-stealing, or use `CompletableFuture` chains (T07) that don&#x27;t block worker threads.
+
+&gt; [!INTERVIEW]
+&gt; &quot;How does `ThreadPoolExecutor` know when to grow vs queue vs reject?&quot; — Walk the four-step submission flow. &quot;Why is `ctl` an atomic int?&quot; — single-CAS state transitions, no extra lock for state-plus-count updates. &quot;Why does `Worker` extend AQS?&quot; — to mark itself locked while running a task, so `shutdown` can interrupt only idle workers without disturbing mid-task ones. &quot;Why is the queue choice the most important configuration?&quot; — because it determines whether step 2 always succeeds (unbounded → OOM), sometimes succeeds (bounded → escalates to step 3 and 4 under pressure), or never succeeds (Synchronous → always goes to step 3).
+
+## `submit`, `Future`, and `FutureTask`
+
+`execute(Runnable)` is fire-and-forget. `submit(...)` adds a return channel:
+
+```java
+Future&lt;?&gt; submit(Runnable task);
+&lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result);
+&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task);
+```
+
+All three internally wrap the task in a **`FutureTask`** (which `implements RunnableFuture&lt;T&gt;`, i.e., it&#x27;s both a `Runnable` and a `Future`). The pool runs the `Runnable` half; the caller gets the `Future` half to query later. T06 covers `Future`/`Callable` exhaustively; the placement here is that **`submit` and `Future` are layered on top of `execute`, not separate machinery** — the pool itself only ever sees `Runnable`s.
+
+The two collection-level methods:
+
+- **`invokeAll(Collection&lt;Callable&lt;T&gt;&gt;)`** — submits all, blocks until all complete (or fail), returns `List&lt;Future&lt;T&gt;&gt;`. Use for parallel fan-out/fan-in.
+- **`invokeAll(Collection&lt;Callable&lt;T&gt;&gt;, long timeout, TimeUnit)`** — same, with a total deadline; unfinished tasks are cancelled at timeout.
+- **`invokeAny(Collection&lt;Callable&lt;T&gt;&gt;)`** — returns the result of the **first** successful task, cancels the rest. Use for &quot;try several providers; take the fastest.&quot;
+
+```mermaid
+flowchart LR
+  Sub[&quot;submit(Callable)&quot;]
+  Wrap[&quot;wrap in FutureTask&quot;]
+  Exec[&quot;execute(FutureTask)&quot;]
+  Fut[&quot;return Future to caller&quot;]
+  Run[&quot;worker runs FutureTask.run() → sets result/exception → unparks waiters in get()&quot;]
+  Sub --&gt; Wrap --&gt; Exec
+  Wrap -.-&gt; Fut
+  Exec --&gt; Run
+```
+
+## `ScheduledThreadPoolExecutor` — Time-Driven Work
+
+The scheduled variant overrides the queue with a **`DelayedWorkQueue`** — a binary heap of `RunnableScheduledFuture` ordered by due time. `take()` peeks the head, computes `headDue - now`, and parks for that long via `Condition.awaitNanos`. The pool&#x27;s workers are otherwise identical to plain `ThreadPoolExecutor`&#x27;s.
+
+### `schedule` — one-shot delay
+
+```java
+ses.schedule(() -&gt; doIt(), 5, SECONDS);
+```
+
+Runs `doIt()` 5 s from now, exactly once.
+
+### `scheduleAtFixedRate` vs `scheduleWithFixedDelay` — the canonical difference
+
+```java
+ses.scheduleAtFixedRate(task, 0, 1, SECONDS);    // run at t=0, 1, 2, 3, ... (rate from start time)
+ses.scheduleWithFixedDelay(task, 0, 1, SECONDS); // run at t=0; finish; wait 1s; run again ...
+```
+
+The famous distinction:
+
+| API | Schedules next run at | Effect if task duration &gt; period |
+|-----|----------------------|----------------------------------|
+| `scheduleAtFixedRate(t, period)` | **start time + period × n** | runs immediately after each — *no overlap*, but the period is &quot;lost&quot; |
+| `scheduleWithFixedDelay(t, delay)` | **end time + delay** | natural spacing; each iteration adds full delay after finish |
+
+```mermaid
+gantt
+  title scheduleAtFixedRate(period=1s) — task takes 400ms
+  dateFormat  s
+  axisFormat  %S
+  section task
+  run 1 :a1, 0, 0.4
+  run 2 :a2, 1, 0.4
+  run 3 :a3, 2, 0.4
+  run 4 :a4, 3, 0.4
+```
+
+```mermaid
+gantt
+  title scheduleWithFixedDelay(delay=1s) — task takes 400ms
+  dateFormat  s
+  axisFormat  %S
+  section task
+  run 1 :b1, 0,   0.4
+  run 2 :b2, 1.4, 0.4
+  run 3 :b3, 2.8, 0.4
+  run 4 :b4, 4.2, 0.4
+```
+
+&gt; [!IMPORTANT]
+&gt; **A periodic task that throws is silently suppressed.** `ScheduledThreadPoolExecutor` catches the exception inside its wrapping `RunnableScheduledFuture`, sets the future&#x27;s exception, and **does not reschedule**. The next run *never happens*; no log line, no metric. This is the most-bitten bug in the entire scheduler API.
+&gt;
+&gt; The fix: wrap every periodic task in your own `try/catch (Throwable t) { log.error(...); }` so the exception never escapes to the future:
+&gt;
+&gt; ```java
+&gt; ses.scheduleAtFixedRate(() -&gt; {
+&gt;     try { doIt(); }
+&gt;     catch (Throwable t) { logger.error(&quot;periodic task failed&quot;, t); }
+&gt; }, 0, 1, SECONDS);
+&gt; ```
+&gt;
+&gt; Equivalently: override `afterExecute(Runnable r, Throwable t)` on the executor and inspect the future for an exception — but the per-task `try/catch` is the only memorable, copy-pasteable defense.
+
+## Sizing the Pool — Brian Goetz&#x27;s Formula
+
+The textbook (Goetz, *Java Concurrency in Practice*, ch. 8) formula for IO-bound workloads:
+
+```
+optimal threads ≈ N_cpu × U_cpu × (1 + W/C)
+```
+
+where:
+
+- `N_cpu` = number of cores
+- `U_cpu` = target CPU utilization (0..1)
+- `W` = wait time (time spent blocked, e.g., on IO)
+- `C` = compute time (time spent on CPU)
+
+Two regime extremes:
+
+- **CPU-bound** (`W ≈ 0`): `~N_cpu` threads. Adding more just thrashes the cache; you have no IO to hide behind. The classic recommendation is `N_cpu + 1` — the +1 lets a thread run when another is briefly suspended (page fault, GC pause).
+- **IO-bound** (`W &gt;&gt; C`): much higher. A workload spending 90% of its time in IO and 10% on CPU wants ~10×`N_cpu` threads to keep cores saturated. This is the regime where `newFixedThreadPool(200)` exists.
+
+```mermaid
+flowchart LR
+  CPU[&quot;CPU-bound:&lt;br/&gt;~N_cpu + 1 threads&quot;]
+  IO[&quot;IO-bound:&lt;br/&gt;N × (1 + W/C)&quot;]
+  Both[&quot;Mixed:&lt;br/&gt;Goetz formula gives a starting point;&lt;br/&gt;measure under load and adjust&quot;]
+  Loom[&quot;Virtual threads (T14, JDK 21+):&lt;br/&gt;change the calculus —&lt;br/&gt;thousands of virtual threads on a small carrier pool&quot;]
+  CPU --- Both --- IO --- Loom
+```
+
+The honest version: the formula gives a *starting point*. Real-world workloads have variable W/C, GC pauses, lock contention, and external rate limits that the formula doesn&#x27;t model. The practical method: instrument throughput vs pool size, plot the curve, find the inflection. The formula is a Bayesian prior; the load test is the data.
+
+&gt; [!INTERVIEW]
+&gt; &quot;How would you size a thread pool for a web server doing database calls?&quot; — The *literal* answer: Goetz formula with `W` = expected DB call latency, `C` = expected handler CPU time per request. The *senior* answer: &quot;I&#x27;d start with `2 × N_cpu` as a heuristic, then load-test and tune by measuring 95th-percentile request latency at increasing pool sizes — the right answer is the smallest pool where latency doesn&#x27;t degrade. And in 2026, I&#x27;d reach for virtual threads first; the question only matters if I&#x27;m CPU-bound or need explicit concurrency limits.&quot;
+
+## `ThreadFactory` — Why Naming Threads Matters
+
+The default `Executors.defaultThreadFactory()` produces threads named `pool-N-thread-M`. Useless. A thread dump full of `pool-3-thread-7` tells you *nothing* about which pool that worker belongs to.
+
+A named factory:
+
+```java
+import java.util.concurrent.atomic.AtomicInteger;
+
+class NamedThreadFactory implements ThreadFactory {
+    private final String prefix;
+    private final boolean daemon;
+    private final AtomicInteger seq = new AtomicInteger();
+
+    NamedThreadFactory(String prefix, boolean daemon) {
+        this.prefix = prefix; this.daemon = daemon;
+    }
+
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(r, prefix + &quot;-&quot; + seq.incrementAndGet());
+        t.setDaemon(daemon);
+        return t;
+    }
+}
+
+// usage
+ExecutorService imagePool = new ThreadPoolExecutor(
+    4, 8, 60, SECONDS, new LinkedBlockingQueue&lt;&gt;(1000),
+    new NamedThreadFactory(&quot;img-resize&quot;, true),    // &lt;-- threads named img-resize-1, img-resize-2, ...
+    new ThreadPoolExecutor.CallerRunsPolicy());
+```
+
+Now a thread dump shows `&quot;img-resize-3&quot;` instead of `&quot;pool-3-thread-7&quot;` — and an oncall engineer at 3 AM can see which subsystem owns which workers. **This is not a stylistic preference; it&#x27;s a production necessity.**
+
+The `daemon` flag matters too: daemon threads don&#x27;t keep the JVM alive (T01). Set it `true` for fire-and-forget background pools; leave it `false` (default) when the pool&#x27;s tasks must run to completion before exit (e.g., a graceful-shutdown manager).
+
+## Lifecycle — Shutdown Done Right
+
+```java
+pool.shutdown();                                // stop accepting; finish queued tasks
+boolean clean = pool.awaitTermination(30, SECONDS);
+if (!clean) {
+    pool.shutdownNow();                         // interrupt workers; drop queued
+    if (!pool.awaitTermination(5, SECONDS)) {
+        logger.warn(&quot;pool did not terminate cleanly&quot;);
+    }
+}
+```
+
+Five rules for clean shutdown:
+
+1. **Always shut down.** A `ThreadPoolExecutor` whose threads are non-daemon will keep the JVM alive forever. The default factory creates *non-daemon* threads. A common cause of &quot;my CLI hangs at the end.&quot;
+2. **Two-phase: `shutdown()` then `shutdownNow()`.** First a soft request (let queued tasks finish), then a hard interrupt if the soft request times out.
+3. **`shutdownNow()` returns the un-run queue.** If you cared about the queued work, capture the list and replay it later.
+4. **`shutdownNow()` *interrupts* workers — it does not stop them.** Workers must cooperate (T02 — interrupt protocol). If your task ignores `InterruptedException` or never checks `isInterrupted()`, `shutdownNow()` won&#x27;t make it stop.
+5. **`awaitTermination` is the only way to know the pool is *really* done.** `isShutdown()` returns `true` immediately after `shutdown()`; `isTerminated()` doesn&#x27;t return `true` until all workers have exited. Don&#x27;t confuse them.
+
+## Backpressure — the Real Tuning Question
+
+The pool&#x27;s configuration *is* its backpressure policy. The four common strategies, with their failure modes:
+
+| Strategy | Queue | Max | Rejection | Behavior under overload |
+|----------|------|-----|-----------|-------------------------|
+| Unbounded | unbounded | meaningless | n/a | OOM (latent crash) |
+| Bounded + Abort | bounded | bounded | `Abort` | caller sees `RejectedExecutionException` — must retry / drop / log |
+| Bounded + CallerRuns | bounded | bounded | `CallerRuns` | submitter blocks executing the task; producer naturally slows |
+| Bounded + custom timed-offer | bounded | bounded | `offer(t, ms)` then abort | bounded latency, bounded drop, observable failure |
+
+```mermaid
+flowchart TB
+  Over[&quot;task arrival rate &gt; processing rate&quot;]
+  Over --&gt; Unb[&quot;unbounded queue:&lt;br/&gt;queue grows → OOM (crash)&quot;]
+  Over --&gt; Abort[&quot;bounded + Abort:&lt;br/&gt;caller sees REE, must decide&quot;]
+  Over --&gt; Caller[&quot;bounded + CallerRuns:&lt;br/&gt;caller runs task → producer slows down&lt;br/&gt;(automatic backpressure)&quot;]
+  Over --&gt; Custom[&quot;bounded + custom:&lt;br/&gt;e.g., timed-offer then Abort —&lt;br/&gt;bounded latency + observable failure&quot;]
+```
+
+The fundamental choice: **does your caller tolerate slowing down?** Sync request handlers (each request is its own thread) tolerate caller-runs — the request just takes longer. Async event-loops or message-driven systems often *cannot* tolerate it — slowing the event loop creates head-of-line blocking. For those, prefer `Abort` and let the caller decide (`retry`, `route elsewhere`, `drop with metric`).
+
+## Virtual Threads Change the Calculus
+
+JDK 21&#x27;s virtual threads (T14, JEP 444) re-frame the entire pool sizing conversation. A virtual thread costs ~200 bytes of heap + ~1 KB of growable stack, not 1 MB. A million virtual threads is plausible; a million platform threads is impossible. So for IO-bound work, the answer is no longer &quot;size a pool of N platform threads&quot; — it&#x27;s &quot;give every task its own virtual thread and let the runtime manage the carriers.&quot;
+
+```java
+try (var es = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (var req : requests) {
+        es.submit(() -&gt; handle(req));
+    }
+}
+```
+
+What `newVirtualThreadPerTaskExecutor()` returns is a *different shape* of `ExecutorService`: no queue (every submit spawns), no pool size (unbounded virtual threads — bounded by memory, not threads), no rejection (there&#x27;s no saturation point in the pool itself). The carriers underneath — the platform-thread `ForkJoinPool` that virtual threads run on — are sized to `Runtime.availableProcessors()` by default.
+
+**What remains true** for thread pools in the virtual-thread era:
+
+- **CPU-bound work still wants a platform-thread pool sized to cores.** Spawning a million virtual threads to do CPU-bound computation just ping-pongs them across the carriers; you want exactly N CPU-bound platform workers.
+- **Concurrency limiting is still useful.** A platform-thread pool of `N` is the simplest possible *concurrency limiter* — at most `N` tasks run at once. Useful when downstream resources (a database, a partner API) have their own limits. Virtual threads don&#x27;t replace this role; for it, use `Semaphore` (T09) gating around a virtual-thread executor instead.
+- **Scheduling (`ScheduledExecutorService`) is unchanged.** Periodic tasks remain useful and the scheduler&#x27;s implementation is orthogonal to whether the work runs on platform or virtual threads.
+
+&gt; [!INTERVIEW]
+&gt; &quot;Should I migrate to virtual threads in JDK 21?&quot; — Senior answer: &quot;For IO-bound server workloads, yes — replace `Executors.newFixedThreadPool(200)` with `Executors.newVirtualThreadPerTaskExecutor()` and remove the artificial concurrency cap. For CPU-bound parallel computation, no — keep a platform-thread pool sized to cores. For periodic scheduling, no — `ScheduledThreadPoolExecutor` is unchanged. And on JDK 21–23, audit `synchronized` blocks on hot blocking paths for pinning; **JEP 491 in JDK 24** removes that audit need.&quot;
+
+## Observing Pools in Production
+
+### Thread dumps
+
+```text
+&quot;img-resize-3&quot; #42 prio=5 daemon ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071ab2&gt; (a j.u.c.locks.AbstractQueuedSynchronizer$ConditionObject)
+   at j.u.c.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
+   at j.u.c.ThreadPoolExecutor.getTask(...)
+   at j.u.c.ThreadPoolExecutor.runWorker(...)
+```
+
+A worker `parking to wait for` a `ConditionObject` deep in `getTask` is **idle**, parked on the queue&#x27;s `notEmpty` condition. Many workers in this state = pool is over-provisioned. None of them in this state, with the queue backing up = pool is under-provisioned.
+
+### JFR
+
+`jdk.ThreadPoolExecutor` is not a JFR event — but JFR&#x27;s `jdk.JavaMonitorWait`, `jdk.JavaMonitorEnter`, and `jdk.ThreadPark` reveal time spent parked in `getTask`, contending on queue locks, and parked in user code respectively. Cross-pool comparison of those is more diagnostic than any single thread-count metric.
+
+### `ThreadPoolExecutor` runtime metrics
+
+The pool exposes `getActiveCount()`, `getPoolSize()`, `getLargestPoolSize()`, `getCompletedTaskCount()`, `getTaskCount()`, `getQueue().size()`. Wire them to your metrics system; the **queue size** and **active count** are the two that flag overload first. (Note: `getActiveCount` is approximate — it walks the worker set without locking.)
+
+```java
+Gauge.builder(&quot;pool.queue.size&quot;, pool, p -&gt; p.getQueue().size()).register(registry);
+Gauge.builder(&quot;pool.active&quot;,     pool, ThreadPoolExecutor::getActiveCount).register(registry);
+Gauge.builder(&quot;pool.size&quot;,       pool, ThreadPoolExecutor::getPoolSize).register(registry);
+```
+
+## Common Mistakes
+
+### Using `Executors.newFixedThreadPool` or `newCachedThreadPool` in production
+
+Unbounded queue (fixed) or unbounded thread spawn (cached). Both fail open under overload. Construct `ThreadPoolExecutor` directly with bounded resources and an explicit rejection policy.
+
+### Submitting dependent tasks to the same bounded pool
+
+```java
+ExecutorService pool = ...;  // bounded
+pool.submit(() -&gt; {
+    Future&lt;X&gt; child = pool.submit(...);   // submits to the SAME pool from inside a task
+    return child.get();                    // ✗ if all workers are doing this, deadlock
+});
+```
+
+Worker exhaustion deadlock. Use separate pools by layer, `ForkJoinPool` (T13), or non-blocking composition (`CompletableFuture`, T07).
+
+### Ignoring `Future.get()` exceptions
+
+```java
+Future&lt;X&gt; f = pool.submit(task);
+X x = f.get();                              // ✗ ExecutionException, InterruptedException — what to do?
+```
+
+`get()` throws `ExecutionException` wrapping the task&#x27;s exception. Catching only `Exception` swallows it; not catching it crashes. Document the exception contract; rethrow as a domain exception, log, retry — but *handle* it. Same for `InterruptedException` (T02 — restore + propagate).
+
+### Forgetting to shut down the pool
+
+A non-daemon pool keeps the JVM alive forever — even if `main` returned. Wrap the pool in `try-with-resources` (JDK 19+ — `ExecutorService` is now `AutoCloseable`, `close()` calls `shutdown()` + `awaitTermination`):
+
+```java
+try (var pool = Executors.newFixedThreadPool(4)) {     // JDK 19+
+    pool.submit(task);
+}                                                       // shutdown + awaitTermination at }
+```
+
+Pre-JDK-19, use an explicit `try/finally` with `pool.shutdown()`. Better yet, give the factory `setDaemon(true)` so abnormal exit doesn&#x27;t hang the process.
+
+### Submitting a `Runnable` whose `run()` throws
+
+Plain `execute(Runnable)` with an uncaught exception triggers the thread&#x27;s `UncaughtExceptionHandler` (T01) — usually `System.err` and the thread dies; the pool replaces it. With `submit`, the exception is *captured* in the `Future` and is invisible unless someone calls `get()`. This is *the* subtle reason async pipelines lose exceptions: a fire-and-forget `submit` whose task throws produces *no* output. Either always `get()` (and handle the exception), or wrap the task&#x27;s body in `try/catch` and log.
+
+### `scheduleAtFixedRate` with a task that can throw
+
+Silently suppressed (above). Always wrap periodic-task bodies in `try { ... } catch (Throwable t) { log.error(...); }`.
+
+### Sharing one pool across unrelated subsystems
+
+Two subsystems share one bounded pool; one floods the queue with slow tasks; the other&#x27;s quick tasks pile up behind them, head-of-line-blocked. *Priority inversion* via a shared resource. Solution: each subsystem owns its own pool (and a `SemaphoreBoundedExecutor` if a subsystem needs internal concurrency limits beyond the pool&#x27;s size).
+
+### Misusing `CallerRunsPolicy` in an async context
+
+`CallerRunsPolicy` blocks the *submitting* thread to run the task. Fine when the submitter is a request thread that can wait. **Wrong** when the submitter is an event loop, an NIO selector thread, or a `ForkJoinPool` worker doing work-stealing — slowing those threads doesn&#x27;t just slow throughput, it stalls every other task they should be doing. Verify the submitter context before choosing `CallerRuns`.
+
+## Practice
+
+1. **Reproduce the four-step flow.** Build a `ThreadPoolExecutor(2, 5, 10, SECONDS, new LinkedBlockingQueue&lt;&gt;(3), factory, AbortPolicy)`. Submit 1, then 10, then 20 tasks in bursts; print queue size, active count, pool size, and rejected count at each step. Trace each task&#x27;s path through the four-step flow.
+2. **Show `newFixedThreadPool` OOM.** Submit ever-larger objects to a `newFixedThreadPool(1)` from a tight loop without consuming them. Watch the heap fill. Replace with a *bounded* `LinkedBlockingQueue`; observe `RejectedExecutionException` instead of OOM.
+3. **The pool-deadlock pattern.** With `newFixedThreadPool(2)`, submit a task that submits a *child* task to the same pool and `.get()`s it. Run 2 such tasks concurrently; observe the hang. Take a thread dump; identify the two workers blocked in `Future.get()` waiting for a child task with no worker to run it.
+4. **Periodic-task suppression.** `scheduleAtFixedRate` a task that throws every 5th iteration. Run for 30 s; observe the silent stop after the first throw. Wrap the body in `try/catch (Throwable)`; rerun; confirm continued execution.
+5. **`fixedRate` vs `fixedDelay`.** Schedule a task that takes 200 ms with `fixedRate(0, 1, SECONDS)` and (separately) `fixedDelay(0, 1, SECONDS)`. Record start timestamps; plot the two. Confirm the rate version starts at 0/1/2/3 s and the delay version at 0/1.2/2.4/3.6 s.
+6. **Named thread factory in a thread dump.** Configure two pools with named factories (`img-resize`, `db-write`). Submit blocking tasks to both. Take a `jstack`; verify thread names show the pool of origin. Then strip the factories; observe how unreadable the dump becomes.
+7. **`CallerRunsPolicy` backpressure measurement.** Build a producer-consumer where the producer is a tight loop and the consumer is slow. With `Abort`, measure how quickly the producer fails. With `CallerRuns`, measure how the producer&#x27;s throughput drops to the consumer&#x27;s rate. Plot both.
+8. **`ctl` packing.** Read the `java.util.concurrent.ThreadPoolExecutor` source (it&#x27;s only ~1,500 lines; this is a worthwhile evening). Confirm `runStateOf`, `workerCountOf`, `ctlOf` are pure bit-ops. Search the source for every `ctl.compareAndSet` and explain what each transition does.
+9. **`Worker` AQS reuse.** Confirm — via the source — that `Worker.tryAcquire` is used only by `interruptIdleWorkers`, and not as a general mutex. Why does the worker&#x27;s AQS state default to `-1` instead of `0` in the constructor?
+10. **Hook injection.** Subclass `ThreadPoolExecutor`; override `beforeExecute` to start a per-task timer, `afterExecute` to record the elapsed time + any exception. Wire to a metrics registry. Verify task-level p95/p99 latency comes out cleanly.
+11. **`shutdownNow` doesn&#x27;t stop uninterruptible tasks.** Submit a task with an infinite `while(true)` body that doesn&#x27;t check `isInterrupted()`. Call `shutdownNow()`. Confirm the task keeps running (the interrupt is set but ignored). Modify the task to check `Thread.interrupted()`; confirm it now stops.
+12. **Virtual-thread executor comparison.** Implement an IO-bound workload (10,000 HTTP calls) two ways: `newFixedThreadPool(100)` and `newVirtualThreadPerTaskExecutor()`. Measure total wall time, peak memory, peak OS thread count. The virtual-thread version should be near-equal in throughput and dramatically lower in OS-thread count.
+
+## Recap
+
+You should now be able to:
+
+- Defend **why a pool exists**: thread creation is ~50–100 µs and 1 MB; reuse amortizes; *and* a bounded pool *bounds* concurrency, a value that survives even into the virtual-thread era.
+- Place the four core interfaces — `Executor`, `ExecutorService`, `ScheduledExecutorService` — and their concrete implementations (`ThreadPoolExecutor`, `ScheduledThreadPoolExecutor`, `ForkJoinPool`, the virtual-thread executor).
+- Recite the **seven `ThreadPoolExecutor` parameters** and the **four-step submission flow** (core → queue → max → reject), and predict any pool&#x27;s behavior under load from {core, max, queue}.
+- Choose **`BlockingQueue` strategy by need**: `SynchronousQueue` (direct handoff), `LinkedBlockingQueue` (two-lock, fast under contention; bounded if you don&#x27;t want OOM), `ArrayBlockingQueue` (single-lock, cache-friendly), `PriorityBlockingQueue` (heap), `DelayedWorkQueue` (scheduler heap by due time).
+- Pick the right **rejection policy**: `Abort` (surface failure), `CallerRuns` (natural backpressure for sync submitters), `Discard`/`DiscardOldest` (only for non-critical streams), or a custom timed-offer-then-abort hybrid.
+- Diagnose **the `Executors` factory anti-patterns** — `newFixedThreadPool` (unbounded queue → OOM) and `newCachedThreadPool` (unbounded threads → thread/memory exhaustion) — and replace them with `new ThreadPoolExecutor(...)` directly. Recognize `newVirtualThreadPerTaskExecutor()` as the one new safe default.
+- Walk through **`ThreadPoolExecutor`&#x27;s internals**: the **`ctl` atomic int** packing 3-bit state + 29-bit count for single-CAS transitions; the **five-state machine** (RUNNING → SHUTDOWN/STOP → TIDYING → TERMINATED); the **`Worker` extends AQS** trick for marking mid-task vs idle; the **`runWorker` loop** with `getTask()` as the only idle-park point.
+- Understand **`submit` / `Future` / `FutureTask` layering** — `submit` wraps a task in a `FutureTask` (a `RunnableFuture`) so the pool only sees `Runnable`s — and the use of **`invokeAll`/`invokeAny`** for parallel fan-out.
+- Explain **`ScheduledThreadPoolExecutor`**: the `DelayedWorkQueue` (heap by due time), `schedule` (one-shot), `scheduleAtFixedRate` (next = start + n×period; runs immediately if late), `scheduleWithFixedDelay` (next = end + delay), and the **silent-suppression bug** for periodic tasks that throw.
+- Apply **Goetz&#x27;s pool-sizing formula** — `N × (1 + W/C)` for IO-bound, `N + 1` for CPU-bound — as a *starting point* for load testing, not a final answer.
+- Use a **named `ThreadFactory`** so thread dumps name the pool of origin, and set **`daemon`** appropriately so the pool&#x27;s lifecycle matches the application&#x27;s.
+- Run a **clean shutdown** (`shutdown()` → `awaitTermination` → `shutdownNow()` → final `awaitTermination`) and explain why pre-JDK-19 code needs `try/finally` and JDK-19+ code can use `try-with-resources`.
+- Reason about **backpressure**: unbounded queue → OOM, bounded + abort → caller-handled failure, bounded + caller-runs → automatic producer slowing — and pick by whether the submitter context tolerates slowing.
+- Adapt to **virtual threads (JDK 21+)**: `newVirtualThreadPerTaskExecutor` for IO-bound work; *still* a platform-thread pool for CPU-bound parallelism and explicit concurrency limiting; `ScheduledThreadPoolExecutor` unchanged. JEP 491 (JDK 24) removes the prior `synchronized` pinning concern.
+- Avoid **the eight common bugs**: unbounded factories in production, dependent-task pool deadlock, `Future.get()` exception silence, forgotten shutdown, `submit` swallowing thrown exceptions, periodic-task throw suppression, shared pool head-of-line blocking, misplaced `CallerRunsPolicy` in async contexts.
+- Use the **observability tools**: thread dump showing `LinkedBlockingQueue.take` for idle workers, JFR&#x27;s `jdk.JavaMonitorWait` for queue-park hotspots, the pool&#x27;s `getQueue().size()` / `getActiveCount()` exposed as metrics.
+
+## Next
+
+Continue to [Callable &amp; Future](./T06-callable-and-future.md) — the result-bearing side of task submission. We&#x27;ll dissect `FutureTask`&#x27;s state machine (NEW → COMPLETING → NORMAL/EXCEPTIONAL/CANCELLED/INTERRUPTING/INTERRUPTED), the *atomic-result-publication-then-unpark-waiters* idiom, how `get()`&#x27;s blocking integrates with `LockSupport.park`, and why `Future.cancel(true)` is the *only* clean way to stop a worker thread holding cooperative-cancellation discipline.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t04-wait-notify-notifyall.html"><div class="lbl">← Previous</div><div class="ttl">T04-wait-notify-notifyall</div><div class="sub">wait / notify / notifyAll</div></a><a class="next" href="../l3/c01-t06-callable-and-future.html"><div class="lbl">Next →</div><div class="ttl">T06-callable-and-future</div><div class="sub">Callable &amp; Future</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-a-pool-the-cost-of-one-thread-per-task" data-toc-link>Why a Pool — the Cost of One-Thread-per-Task</a></li><li class="lvl-2"><a href="#the-type-hierarchy" data-toc-link>The Type Hierarchy</a></li><li class="lvl-2"><a href="#threadpoolexecutor-the-seven-constructor-parameters" data-toc-link>ThreadPoolExecutor — the Seven Constructor Parameters</a></li><li class="lvl-3"><a href="#the-four-step-submission-flow" data-toc-link>The four-step submission flow</a></li><li class="lvl-2"><a href="#queue-strategies-where-pool-behaviour-actually-lives" data-toc-link>Queue Strategies — Where Pool Behaviour Actually Lives</a></li><li class="lvl-3"><a href="#synchronousqueue-direct-handoff-zero-capacity" data-toc-link>SynchronousQueue — direct handoff, zero capacity</a></li><li class="lvl-3"><a href="#linkedblockingqueueunbounded-used-by-newfixedthreadpool" data-toc-link>LinkedBlockingQueue(unbounded) — used by newFixedThreadPool</a></li><li class="lvl-3"><a href="#linkedblockingqueuebounded-the-sane-production-default" data-toc-link>LinkedBlockingQueue(bounded) — the sane production default</a></li><li class="lvl-3"><a href="#arrayblockingqueue-bounded-single-lock" data-toc-link>ArrayBlockingQueue — bounded, single-lock</a></li><li class="lvl-3"><a href="#priorityblockingqueue-unbounded-priority-heap" data-toc-link>PriorityBlockingQueue — unbounded priority heap</a></li><li class="lvl-3"><a href="#delayedworkqueue-used-by-scheduledthreadpoolexecutor" data-toc-link>DelayedWorkQueue — used by ScheduledThreadPoolExecutor</a></li><li class="lvl-2"><a href="#rejection-policies" data-toc-link>Rejection Policies</a></li><li class="lvl-2"><a href="#executors-factory-methods-mostly-anti-patterns-in-2026" data-toc-link>Executors Factory Methods — Mostly Anti-Patterns in 2026</a></li><li class="lvl-3"><a href="#newfixedthreadpoolint-n" data-toc-link>newFixedThreadPool(int n)</a></li><li class="lvl-3"><a href="#newcachedthreadpool" data-toc-link>newCachedThreadPool()</a></li><li class="lvl-3"><a href="#newsinglethreadexecutor" data-toc-link>newSingleThreadExecutor()</a></li><li class="lvl-3"><a href="#newscheduledthreadpoolint-n" data-toc-link>newScheduledThreadPool(int n)</a></li><li class="lvl-3"><a href="#newworkstealingpool-newworkstealingpoolparallelism" data-toc-link>newWorkStealingPool() / newWorkStealingPool(parallelism)</a></li><li class="lvl-3"><a href="#newvirtualthreadpertaskexecutor-jdk-21" data-toc-link>newVirtualThreadPerTaskExecutor() (JDK 21+)</a></li><li class="lvl-2"><a href="#internals-how-threadpoolexecutor-really-works" data-toc-link>Internals — How ThreadPoolExecutor Really Works</a></li><li class="lvl-3"><a href="#the-ctl-atomic-int-state-count-in-one-word" data-toc-link>The ctl atomic int — state + count in one word</a></li><li class="lvl-3"><a href="#the-worker-class-an-aqs-backed-runnable" data-toc-link>The Worker class — an AQS-backed runnable</a></li><li class="lvl-3"><a href="#the-runworker-loop" data-toc-link>The runWorker loop</a></li><li class="lvl-3"><a href="#why-pool-deadlock-happens" data-toc-link>Why pool deadlock happens</a></li><li class="lvl-2"><a href="#submit-future-and-futuretask" data-toc-link>submit, Future, and FutureTask</a></li><li class="lvl-2"><a href="#scheduledthreadpoolexecutor-time-driven-work" data-toc-link>ScheduledThreadPoolExecutor — Time-Driven Work</a></li><li class="lvl-3"><a href="#schedule-one-shot-delay" data-toc-link>schedule — one-shot delay</a></li><li class="lvl-3"><a href="#scheduleatfixedrate-vs-schedulewithfixeddelay-the-canonical-difference" data-toc-link>scheduleAtFixedRate vs scheduleWithFixedDelay — the canonical difference</a></li><li class="lvl-2"><a href="#sizing-the-pool-brian-goetzs-formula" data-toc-link>Sizing the Pool — Brian Goetz&#x27;s Formula</a></li><li class="lvl-2"><a href="#threadfactory-why-naming-threads-matters" data-toc-link>ThreadFactory — Why Naming Threads Matters</a></li><li class="lvl-2"><a href="#lifecycle-shutdown-done-right" data-toc-link>Lifecycle — Shutdown Done Right</a></li><li class="lvl-2"><a href="#backpressure-the-real-tuning-question" data-toc-link>Backpressure — the Real Tuning Question</a></li><li class="lvl-2"><a href="#virtual-threads-change-the-calculus" data-toc-link>Virtual Threads Change the Calculus</a></li><li class="lvl-2"><a href="#observing-pools-in-production" data-toc-link>Observing Pools in Production</a></li><li class="lvl-3"><a href="#thread-dumps" data-toc-link>Thread dumps</a></li><li class="lvl-3"><a href="#jfr" data-toc-link>JFR</a></li><li class="lvl-3"><a href="#threadpoolexecutor-runtime-metrics" data-toc-link>ThreadPoolExecutor runtime metrics</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#using-executorsnewfixedthreadpool-or-newcachedthreadpool-in-production" data-toc-link>Using Executors.newFixedThreadPool or newCachedThreadPool in production</a></li><li class="lvl-3"><a href="#submitting-dependent-tasks-to-the-same-bounded-pool" data-toc-link>Submitting dependent tasks to the same bounded pool</a></li><li class="lvl-3"><a href="#ignoring-futureget-exceptions" data-toc-link>Ignoring Future.get() exceptions</a></li><li class="lvl-3"><a href="#forgetting-to-shut-down-the-pool" data-toc-link>Forgetting to shut down the pool</a></li><li class="lvl-3"><a href="#submitting-a-runnable-whose-run-throws" data-toc-link>Submitting a Runnable whose run() throws</a></li><li class="lvl-3"><a href="#scheduleatfixedrate-with-a-task-that-can-throw" data-toc-link>scheduleAtFixedRate with a task that can throw</a></li><li class="lvl-3"><a href="#sharing-one-pool-across-unrelated-subsystems" data-toc-link>Sharing one pool across unrelated subsystems</a></li><li class="lvl-3"><a href="#misusing-callerrunspolicy-in-an-async-context" data-toc-link>Misusing CallerRunsPolicy in an async context</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

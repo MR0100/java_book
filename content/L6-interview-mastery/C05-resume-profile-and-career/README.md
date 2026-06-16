@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — Resume, Profile & Career Preparation
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -31,4 +31,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 09 | Offer evaluation & salary negotiation | `T09-offer-evaluation-and-salary-negotiation.md` | planned |
 | 10 | First 90 days — onboarding & demonstrating impact | `T10-first-90-days-onboarding-and-demonstrating-impact.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

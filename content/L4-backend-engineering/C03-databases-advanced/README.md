@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Backend Engineering — Databases — Advanced
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -27,4 +27,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 05 | Partitioning & sharding | `T05-partitioning-and-sharding.md` | planned |
 | 06 | Change Data Capture (Debezium) | `T06-change-data-capture-debezium.md` | planned |
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

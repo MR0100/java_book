@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — Behavioral & Company Tracks
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -33,4 +33,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 11 | Company track: Banking & finance tech (Goldman, JPMC, Morgan Stanley, Barclays) | `T11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.md` | planned |
 | 12 | Mock interviews & self-grading rubrics | `T12-mock-interviews-and-self-grading-rubrics.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

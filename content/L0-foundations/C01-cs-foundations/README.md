@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Foundations — CS & Programming Foundations
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -32,4 +32,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 10 | Introduction to Git & version control | `T10-introduction-to-git-and-version-control.md` | planned |
 | 11 | Reading errors & stack traces | `T11-reading-errors-and-stack-traces.md` | planned |
 
-[Back to L0 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L0 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

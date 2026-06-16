@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 05 — Profile with async-profiler / JFR — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="active" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>Lab 05 — Profile with async-profiler / JFR</span></div>
+        <h1>Lab 05 — Profile with async-profiler / JFR</h1>
+        <div><span class="source-path">examples/labs/lab-05-profile-with-async-profiler</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><blockquote>
+<p><strong>Backs: L3/C02/T11 — Profiling (JFR, async-profiler, VisualVM) — hands-on lab</strong></p>
+</blockquote>
+<p>A self-contained, runnable lab that teaches you to find a <strong>hidden CPU hotspot</strong>
+the way you do it in production: you do not read the code looking for it, you
+<strong>profile the running JVM</strong>, read a <strong>flame graph</strong>, point at the wide bar, fix
+it, and <strong>re-profile to confirm</strong> the bar is gone.</p>
+<p>The workload (<code>WorkloadApp</code>) looks like an ordinary log-analytics job. It has
+<strong>two performance bugs buried a few frames deep</strong> — you are not told where. By
+the end you will have located both on a flame graph, applied the fix, and proven
+(with the JUnit test) that the fix did not change the result.</p>
+<p>Plain Java 21, Maven, JUnit 5. <strong>No Spring, no frameworks</strong> — a profiler measures
+the <em>whole</em> process, so the less unrelated code on the classpath, the cleaner the
+flame graph. Everything you see profiling <code>WorkloadApp</code> is <em>your</em> code.</p>
+<hr>
+<h2 id="the-mental-model-what-a-profiler-does">The mental model: what a profiler does<a class="anchor" href="#the-mental-model-what-a-profiler-does" aria-hidden="true">#</a></h2>
+<p>A <strong>sampling profiler</strong> wakes up hundreds of times per second, snapshots the
+call stack of the running threads, and tallies how often each stack appears.
+The frame that shows up in the most samples is, by definition, where the program
+spends the most of that resource. It does <strong>not</strong> instrument every method call
+(that is "tracing" and it distorts timing); it just samples, cheaply, so the
+numbers reflect reality.</p>
+<p>Three things you can sample, and the question each answers:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Samples on…</th>
+<th>Answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>cpu</strong></td>
+<td>threads actually running on a CPU</td>
+<td>"where is my CPU time going?"</td>
+</tr>
+<tr>
+<td><strong>wall</strong></td>
+<td><em>all</em> threads, running <strong>or blocked</strong></td>
+<td>"where is wall-clock time going?" (incl. sleeps, locks, I/O waits)</td>
+</tr>
+<tr>
+<td><strong>alloc</strong></td>
+<td>heap allocations (TLAB-sampled)</td>
+<td>"what is allocating, creating GC pressure?"</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>WorkloadApp</code> deliberately exercises <strong>two different paths</strong> so you feel the
+difference:</p>
+<ul>
+<li>a <strong>CPU path</strong> (<code>LogAnalyzer.analyze</code>) — burns CPU on the two hidden hotspots.
+  A <strong>cpu</strong> profile makes them wide bars.</li>
+<li>a <strong>blocking path</strong> (<code>simulateSlowSink</code>) — parks the thread (a stand-in for a
+  slow disk/network write). It uses ~no CPU, so a <strong>cpu</strong> profile barely shows
+  it, but a <strong>wall</strong> profile shows it as a huge bar. <em>A hotspot you cannot find
+  in a cpu profile may be a blocked thread you can only see in a wall profile.</em></li>
+</ul>
+<hr>
+<h2 id="how-to-read-a-flame-graph-read-this-before-you-generate-one">How to read a flame graph (read this before you generate one)<a class="anchor" href="#how-to-read-a-flame-graph-read-this-before-you-generate-one" aria-hidden="true">#</a></h2>
+<p>A flame graph is a picture of the sampled stacks, aggregated:</p>
+<ul>
+<li><strong>Each box is a stack frame</strong> (a method). A box sits <em>on top of</em> its caller.</li>
+<li><strong>Width = number of samples = time</strong> (for cpu/wall) or <strong>bytes</strong> (for alloc).
+  <strong>Wider = more.</strong> This is the only thing that matters — width.</li>
+<li><strong>The y-axis is stack depth, not time.</strong> Reading left-to-right is <strong>not</strong> a
+  timeline; the ordering is alphabetical/merge order. Do not read it as "first
+  this, then that".</li>
+<li><strong>Find the widest box that is your own code, then look UP.</strong> A wide <em>plateau</em>
+  near the top — a frame that is wide and has little or nothing above it — is a
+  <strong>leaf hotspot</strong>: the program is <em>spending</em> time <em>in that method itself</em>, not
+  in something it calls. That plateau is your target.</li>
+<li>A frame that is wide but has an equally-wide child is just <em>passing through</em> —
+  the cost is deeper. Keep climbing until the width "lands" on a plateau.</li>
+</ul>
+<p>For this lab, when you profile the <strong>slow</strong> build in <strong>cpu</strong> mode you are
+looking for wide plateaus a few frames below <code>LogAnalyzer.analyze</code>. (Spoiler in
+the very last section — try to find them yourself first.)</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>JDK 21 or newer</strong> on your <code>PATH</code>. Check: <code>java -version</code>.</li>
+<li>JFR is built into the JDK — nothing to install.</li>
+<li>async-profiler resolves Java frames against the running JVM, so a modern
+    JDK gives you proper frames (and, on HotSpot, inlined-method and
+    JIT-compiled frames too).</li>
+<li><strong>Maven 3.9+</strong>: <code>mvn -version</code>.</li>
+<li><strong>async-profiler</strong> (for the async-profiler half of the lab) — download below.
+  The JFR half needs nothing extra.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -version     # must be 21+
+mvn -version
+</code></pre></div>
+<blockquote>
+<p><strong>Note on the JDK version.</strong> The project compiles to <strong>Java 21 bytecode</strong>
+(class file v65) via <code>maven.compiler.release=21</code>. If the <code>java</code> on your <code>PATH</code>
+is older than 21 you will get <code>UnsupportedClassVersionError</code> when you run
+<code>WorkloadApp</code> — point <code>JAVA_HOME</code>/<code>PATH</code> at a 21+ JDK (the same one Maven
+uses is fine).</p>
+</blockquote>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong><code>WorkloadApp.java</code></strong> — the runnable workload you profile. Note the two
+   paths (CPU vs blocking) and the <code>PID</code> it prints on startup.</li>
+<li><strong><code>LogAnalyzer.java</code></strong> — the "as shipped" analyzer. <strong>Has the two hidden
+   hotspots.</strong> The Javadoc on the private helpers is the answer key — don't peek
+   until you've found them on a flame graph.</li>
+<li><strong><code>optimized/OptimizedLogAnalyzer.java</code></strong> — the fixed version. Diff it against
+   <code>LogAnalyzer</code> to see exactly what changed.</li>
+<li><strong><code>LogAnalyzerEquivalenceTest.java</code></strong> — proves the fix is behaviour-preserving
+   and (sanity-check) faster.</li>
+</ol>
+<hr>
+<h2 id="step-0-build-and-run-the-workload">Step 0 — Build and run the workload<a class="anchor" href="#step-0-build-and-run-the-workload" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q test          # compiles + runs the (fast) JUnit tests
+</code></pre></div>
+<p>Launch the <strong>slow</strong> workload. It prints its <strong>PID</strong> and then runs for ~25s
+(enough time to attach a profiler), analysing a 200k-line batch over and over:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># raw java -cp (preferred: a clean process is the cleanest profiling target)
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+
+# …or via Maven's exec plugin (note: this adds a Maven/forked-JVM wrapper)
+mvn -q compile exec:java
+</code></pre></div>
+<p>You'll see:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>WorkloadApp: analyzer=SLOW (has hidden hotspots), linesPerBatch=200,000, ...
+PID = 12345  &lt;-- attach async-profiler / JFR to this
+  iter 10  uniqueIps=512  errors=...
+  ...
+</code></pre></div>
+<p>Grab that <strong>PID</strong> (or use <code>jps -l</code>). Optional args:
+<code>WorkloadApp &lt;slow|optimized&gt; &lt;linesPerBatch&gt; &lt;maxIterations&gt; &lt;runSeconds&gt;</code>.</p>
+<hr>
+<h2 id="step-1-profile-with-async-profiler">Step 1 — Profile with async-profiler<a class="anchor" href="#step-1-profile-with-async-profiler" aria-hidden="true">#</a></h2>
+<h3 id="get-async-profiler">Get async-profiler<a class="anchor" href="#get-async-profiler" aria-hidden="true">#</a></h3>
+<p>Download a release for your OS/arch from
+<a href="https://github.com/async-profiler/async-profiler/releases">https://github.com/async-profiler/async-profiler/releases</a> (e.g.
+<code>asprof-&lt;ver&gt;-macos.zip</code> or <code>…-linux-x64.tar.gz</code>), unpack it, and use the
+<code>bin/asprof</code> binary. (Older releases shipped a <code>profiler.sh</code> wrapper; current
+releases use <code>asprof</code> and a <code>lib/libasyncProfiler.{so,dylib}</code> agent.)</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># example: put it somewhere and point a var at it
+export AP=~/tools/async-profiler/bin/asprof
+</code></pre></div>
+<h3 id="platform-setup-do-this-once">Platform setup (do this once)<a class="anchor" href="#platform-setup-do-this-once" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Linux</strong> — the kernel's <code>perf_events</code> is locked down by default. To let
+  async-profiler read CPU performance counters and kernel stacks:</li>
+</ul>
+<p><code>bash
+  sudo sysctl kernel.perf_event_paranoid=1    # 1 = allow user-space CPU sampling
+  sudo sysctl kernel.kptr_restrict=0          # let it resolve kernel symbols</code></p>
+<p>If you can't change those (locked-down CI, containers), async-profiler falls
+  back to its <strong><code>itimer</code></strong> CPU engine — pass <code>-e itimer</code> and you still get Java
+  frames, just no kernel/native frames.</p>
+<ul>
+<li><strong>macOS</strong> — there is <strong>no <code>perf_events</code></strong>; async-profiler uses the <code>itimer</code>
+  engine automatically for cpu mode. <code>cpu</code>, <code>wall</code>, and <code>alloc</code> all work. You do
+  <strong>not</strong> need <code>sudo</code> for <code>wall</code>/<code>alloc</code>; <code>cpu</code> (itimer) also works without it.
+  (No <code>perf_event_paranoid</code> knob exists on macOS — that setting is Linux-only.)</li>
+</ul>
+<h3 id="attach-to-the-running-pid-and-make-a-cpu-flame-graph">Attach to the running PID and make a CPU flame graph<a class="anchor" href="#attach-to-the-running-pid-and-make-a-cpu-flame-graph" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># -d 30  : profile for 30 seconds
+# -e cpu : CPU sampling
+# -f cpu.html : write an interactive flame graph (format inferred from .html)
+$AP -d 30 -e cpu -f cpu.html &lt;PID&gt;
+</code></pre></div>
+<p>Open <code>cpu.html</code> in a browser. <strong>Find the widest plateau</strong> under
+<code>LogAnalyzer.analyze</code> (see "How to read a flame graph"). You will see a fat bar
+that, when you climb into it, lands on a regex-compilation frame — and a second
+fat bar landing on a list-scan frame.</p>
+<h3 id="the-wall-clock-vs-cpu-contrast">The wall-clock vs CPU contrast<a class="anchor" href="#the-wall-clock-vs-cpu-contrast" aria-hidden="true">#</a></h3>
+<p>Profile the <strong>same</strong> process in <strong>wall</strong> mode and compare:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">$AP -d 30 -e wall -f wall.html &lt;PID&gt;
+</code></pre></div>
+<p>In <code>wall.html</code> a big new bar appears that was tiny (or absent) in <code>cpu.html</code>:
+<code>WorkloadApp.simulateSlowSink → LockSupport.parkNanos</code>. That blocked time costs
+<strong>wall-clock</strong> time but <strong>no CPU</strong> — which is exactly why you must pick the mode
+that matches your question. ("Why is the <em>throughput</em> low?" → cpu. "Why does each
+request <em>take so long</em>?" → wall.)</p>
+<h3 id="allocation-profile-bonus">Allocation profile (bonus)<a class="anchor" href="#allocation-profile-bonus" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">$AP -d 30 -e alloc -f alloc.html &lt;PID&gt;
+</code></pre></div>
+<p>Wide bars here are allocation sites (the per-line <code>LogEvent</code>, the <code>split()</code>
+arrays, autoboxed <code>Long</code>s in the map merges). Useful when GC, not CPU, is the
+bottleneck. You don't need it to solve this lab, but it shows the third lens.</p>
+<h3 id="alternative-run-as-a-launch-time-agent-no-pid-needed">Alternative: run as a launch-time agent (no PID needed)<a class="anchor" href="#alternative-run-as-a-launch-time-agent-no-pid-needed" aria-hidden="true">#</a></h3>
+<p>Instead of attaching, you can start the JVM with the profiler agent so it
+profiles from the first instruction and dumps on exit:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -agentpath:$HOME/tools/async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=cpu.html \
+     -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+</code></pre></div>
+<p>(<code>.dylib</code> instead of <code>.so</code> on macOS.) This is the right approach when the hotspot
+is in <strong>startup</strong> code that's over before you can attach.</p>
+<hr>
+<h2 id="step-2-the-jfr-alternative-zero-downloads">Step 2 — The JFR alternative (zero downloads)<a class="anchor" href="#step-2-the-jfr-alternative-zero-downloads" aria-hidden="true">#</a></h2>
+<p>JDK Flight Recorder is built in. It is lower-overhead and broader (GC, locks,
+I/O, allocations, JIT) but its method profiler samples a bit coarser than
+async-profiler. Two ways to record:</p>
+<p><strong>a) Start recording at launch</strong></p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -XX:StartFlightRecording=duration=30s,filename=workload.jfr,settings=profile \
+     -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+</code></pre></div>
+<p><code>settings=profile</code> turns on the higher-rate method sampler (vs the lighter
+<code>default</code>). The <code>.jfr</code> is written when the recording stops / the JVM exits.</p>
+<p><strong>b) Attach to a running PID with <code>jcmd</code></strong></p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;PID&gt; JFR.start name=lab duration=30s filename=workload.jfr settings=profile
+jcmd &lt;PID&gt; JFR.dump  name=lab filename=workload.jfr     # dump early if you like
+jcmd &lt;PID&gt; JFR.stop  name=lab
+</code></pre></div>
+<h3 id="read-the-jfr-recording">Read the JFR recording<a class="anchor" href="#read-the-jfr-recording" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Command line</strong> — summarise the hot methods straight from the file:</li>
+</ul>
+<p><code>bash
+  jfr summary workload.jfr                                  # event counts overview
+  jfr print --events jdk.ExecutionSample workload.jfr | less</code></p>
+<p>The <code>jdk.ExecutionSample</code> events are the CPU stack samples; the methods that
+  appear most are your hotspots — the same answer the flame graph gives, in text.</p>
+<ul>
+<li><strong>GUI</strong> — open <code>workload.jfr</code> in <strong>JDK Mission Control (JMC)</strong> (separate
+  download from <a href="https://jdk.java.net/jmc/">https://jdk.java.net/jmc/</a> or your vendor). Go to
+  <strong>Method Profiling</strong> → its flame-graph / hot-methods view shows the same wide
+  frames. VisualVM (with the Startup/JFR plugins) can also open <code>.jfr</code> files and
+  has its own live sampler if you prefer attaching interactively.</li>
+</ul>
+<hr>
+<h2 id="step-3-apply-the-fix-and-re-profile">Step 3 — Apply the fix and re-profile<a class="anchor" href="#step-3-apply-the-fix-and-re-profile" aria-hidden="true">#</a></h2>
+<p>Both bugs are fixed in <code>optimized/OptimizedLogAnalyzer.java</code>. Run that variant
+and profile it the same way:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -cp target/classes com.javamastery.examples.profiling.WorkloadApp optimized
+# then, in another terminal:
+$AP -d 30 -e cpu -f cpu-after.html &lt;PID&gt;
+</code></pre></div>
+<p>Compare <code>cpu.html</code> (before) with <code>cpu-after.html</code> (after). The two wide plateaus
+are <strong>gone</strong>; what remains is the genuinely necessary work (<code>String.split</code>,
+<code>Long.parseLong</code>, the map merges). The throughput jump is also visible in the
+app's own output: the optimized build completes far more iterations in the same
+wall-clock window. <strong>That before/after pair is the deliverable of the lab</strong> — a
+profile that proves the fix worked, not a hunch.</p>
+<hr>
+<h2 id="step-4-prove-the-fix-is-behaviour-preserving">Step 4 — Prove the fix is behaviour-preserving<a class="anchor" href="#step-4-prove-the-fix-is-behaviour-preserving" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q test
+</code></pre></div>
+<p><code>LogAnalyzerEquivalenceTest</code>:</p>
+<ul>
+<li><strong><code>optimizedProducesSameResultAsSlow</code></strong> — feeds both analyzers identical input
+  across several sizes (including empty) and asserts the reports are <code>equals()</code>.
+  <em>An "optimization" that changes the answer is just a different bug.</em></li>
+<li><strong><code>reportContentsAreActuallyCorrect</code></strong> — independently checks the report is
+  right, so "they agree" can't mean "they agree on the same wrong answer".</li>
+<li><strong><code>optimizedIsNotSlowerThanSlow</code></strong> — a coarse timing <strong>sanity check</strong> on a
+  modest workload (runs in well under a second; <strong>not</strong> a benchmark). For real
+  numbers, profile the app (this lab) or use <strong>JMH</strong> (lab 04).</li>
+</ul>
+<hr>
+<h2 id="the-answer-key-dont-read-until-youve-found-them">The answer key (don't read until you've found them)<a class="anchor" href="#the-answer-key-dont-read-until-youve-found-them" aria-hidden="true">#</a></h2>
+<details>
+<summary>Spoiler: the two hidden hotspots</summary>
+
+1. **Regex recompiled per line.** `LogAnalyzer.isValidIp` calls
+   `Pattern.compile(...)` on **every** log line. Compiling a regex (parse + build
+   the matcher state machine) is far more expensive than matching against an
+   already-compiled `Pattern`. On the cpu flame graph this is a wide plateau
+   under `Pattern.compile` / `Pattern.<init>`, below `isValidIp` ← `parse` ←
+   `analyze`. **Fix:** hoist the `Pattern` to a `private static final` field so
+   it compiles **once** (see `OptimizedLogAnalyzer.IP_PATTERN`).
+
+2. **O(n²) membership test.** `LogAnalyzer.recordUniqueIp` uses
+   `ArrayList.contains(ip)` — a linear scan — once per line, so the unique-IP
+   accounting is quadratic in the number of distinct IPs. On the flame graph
+   this is a second wide bar under `ArrayList.indexOf`/`contains` below
+   `recordUniqueIp`. **Fix:** a `HashSet` → amortised O(1) membership (see
+   `OptimizedLogAnalyzer.seenIps`).
+
+Both are invisible from `analyze`'s signature and only obvious *on the profile* —
+which is the entire point: **profile, don't guess.**
+
+</details>
+
+<hr>
+<h2 id="run-command-cheat-sheet">Run-command cheat sheet<a class="anchor" href="#run-command-cheat-sheet" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q test                                              # build + fast tests
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp           # slow (default)
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp optimized # fixed
+
+# async-profiler (attach to &lt;PID&gt;)
+$AP -d 30 -e cpu   -f cpu.html   &lt;PID&gt;
+$AP -d 30 -e wall  -f wall.html  &lt;PID&gt;
+$AP -d 30 -e alloc -f alloc.html &lt;PID&gt;
+
+# JFR
+java -XX:StartFlightRecording=duration=30s,filename=workload.jfr,settings=profile -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+jcmd &lt;PID&gt; JFR.start name=lab duration=30s filename=workload.jfr settings=profile
+jfr print --events jdk.ExecutionSample workload.jfr
+</code></pre></div>
+<p>Clean up generated profiles with <code>git clean -nx</code> (preview) — <code>*.html</code>, <code>*.jfr</code>,
+<code>*.collapsed</code> are already git-ignored.</p>
+<h2 id="source-files">Source files<a class="anchor" href="#source-files" aria-hidden="true">#</a></h2>
+<p><em>8 key file(s) from <code>examples/labs/lab-05-profile-with-async-profiler/</code>. Truncated files are marked; see the repo for the full source.</em></p>
+<h3 id="pomxml"><code>pom.xml</code><a class="anchor" href="#pomxml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!--
+      ============================================================================
+      LAB 05 - PROFILE WITH ASYNC-PROFILER / JFR
+      Backs: L3/C02/T11 &quot;Profiling (JFR, async-profiler, VisualVM)&quot; (hands-on lab)
+      ============================================================================
+
+      Plain Java 21 - NO Spring, NO frameworks. A profiler measures the WHOLE
+      process; the less unrelated code on the classpath, the cleaner the flame
+      graph. Everything you see in the profile of WorkloadApp is YOUR code, not a
+      DI container spinning up beans on background threads.
+
+      The only dependency is JUnit 5, in test scope. async-profiler and JFR are
+      attached at RUNTIME (an agent / a JVM flag), so there is deliberately NO
+      profiling library on the build classpath. That is the realistic model:
+      you profile a normal jar with an external tool, you do not compile the
+      profiler in.
+    --&gt;
+
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;lab-05-profile-with-async-profiler&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+    &lt;name&gt;lab-05-profile-with-async-profiler&lt;/name&gt;
+    &lt;description&gt;Hands-on lab: find a hidden CPU hotspot with async-profiler / JFR, read it on a flame graph, and fix it. CPU vs wall-clock vs alloc profiling. Java 21, plain Java.&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;!--
+          maven.compiler.release pins the BYTECODE level to 21. Unlike
+          source/target, `release` also restricts the visible JDK API to Java 21,
+          so you cannot accidentally call a 22+ method. A newer JDK (22..25) can
+          still compile and run this while emitting genuine Java 21 class files.
+
+          This matters for the lab: async-profiler resolves Java frames against
+          the running JVM, and JFR is a JDK feature, so the runtime JDK is what
+          counts. Anything 21+ on your PATH works.
+        --&gt;
+        &lt;maven.compiler.release&gt;21&lt;/maven.compiler.release&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+
+        &lt;junit.version&gt;5.11.3&lt;/junit.version&gt;
+        &lt;surefire.version&gt;3.5.2&lt;/surefire.version&gt;
+        &lt;compiler.plugin.version&gt;3.13.0&lt;/compiler.plugin.version&gt;
+        &lt;exec.plugin.version&gt;3.5.0&lt;/exec.plugin.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;!--
+              JUnit 5 BOM keeps jupiter-api / jupiter-engine / platform on
+              mutually-compatible versions so we can omit &lt;version&gt; below.
+            --&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.junit&lt;/groupId&gt;
+                &lt;artifactId&gt;junit-bom&lt;/artifactId&gt;
+                &lt;version&gt;${junit.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;dependencies&gt;
+        &lt;!--
+          JUnit Jupiter (API + engine), TEST scope only. None of this is on the
+          runtime classpath of WorkloadApp, which you launch with
+          `java -cp target/classes ...`. The test proves the optimized path is
+          behaviour-preserving (identical output) and is a touch faster on a
+          tiny workload - it does NOT run a real benchmark (that would make
+          `mvn test` slow and flaky in CI).
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+            &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;!--
+              Compiler plugin pinned + release 21 (via maven.compiler.release).
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${compiler.plugin.version}&lt;/version&gt;
+            &lt;/plugin&gt;
+
+            &lt;!--
+              Surefire runs the JUnit 5 tests during `mvn test`. The timing
+              sanity check uses a MODEST workload sized to finish in well under a
+              second, so CI stays fast and green. We do not set any profiling
+              flags here - profiling is something you do by hand to the launched
+              app, per the README.
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${surefire.version}&lt;/version&gt;
+            &lt;/plugin&gt;
+
+            &lt;!--
+              exec-maven-plugin: convenience launcher so you do not hand-type a
+              classpath. The README mostly uses a raw `java -cp target/classes`
+              invocation, because to ATTACH a profiler you need the PID of a
+              long-running JVM, and a raw `java` process is the cleanest target.
+
+                mvn -q compile exec:java \
+                  -Dexec.mainClass=com.javamastery.examples.profiling.WorkloadApp
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+                &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${exec.plugin.version}&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;mainClass&gt;com.javamastery.examples.profiling.WorkloadApp&lt;/mainClass&gt;
+                    &lt;classpathScope&gt;compile&lt;/classpathScope&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilinganalysisreportjava"><code>src/main/java/com/javamastery/examples/profiling/AnalysisReport.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilinganalysisreportjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * The result of analysing a batch of logs. Two analyzers (slow and optimized)
+ * must produce an {@code AnalysisReport} that is {@code equals()} for the same
+ * input - that equality is how the JUnit test proves the optimization did not
+ * change behaviour.
+ *
+ * &lt;p&gt;Maps are wrapped in {@link TreeMap} on construction so iteration order and
+ * {@link #equals(Object)} are deterministic regardless of how each analyzer
+ * built them.&lt;/p&gt;
+ */
+public final class AnalysisReport {
+
+    private final Map&lt;String, Long&gt; countByLevel;
+    private final Map&lt;String, Long&gt; countByService;
+    private final long errorCount;
+    private final int uniqueIps;
+
+    public AnalysisReport(Map&lt;String, Long&gt; countByLevel,
+                          Map&lt;String, Long&gt; countByService,
+                          long errorCount,
+                          int uniqueIps) {
+        this.countByLevel = new TreeMap&lt;&gt;(countByLevel);
+        this.countByService = new TreeMap&lt;&gt;(countByService);
+        this.errorCount = errorCount;
+        this.uniqueIps = uniqueIps;
+    }
+
+    public Map&lt;String, Long&gt; countByLevel() {
+        return countByLevel;
+    }
+
+    public Map&lt;String, Long&gt; countByService() {
+        return countByService;
+    }
+
+    public long errorCount() {
+        return errorCount;
+    }
+
+    public int uniqueIps() {
+        return uniqueIps;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AnalysisReport other)) {
+            return false;
+        }
+        return errorCount == other.errorCount
+                &amp;&amp; uniqueIps == other.uniqueIps
+                &amp;&amp; countByLevel.equals(other.countByLevel)
+                &amp;&amp; countByService.equals(other.countByService);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Long.hashCode(errorCount);
+        result = 31 * result + Integer.hashCode(uniqueIps);
+        result = 31 * result + countByLevel.hashCode();
+        result = 31 * result + countByService.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;AnalysisReport{byLevel=&quot; + countByLevel
+                + &quot;, byService=&quot; + countByService
+                + &quot;, errorCount=&quot; + errorCount
+                + &quot;, uniqueIps=&quot; + uniqueIps + '}';
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilingloganalyzerjava"><code>src/main/java/com/javamastery/examples/profiling/LogAnalyzer.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilingloganalyzerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+/**
+ * The &quot;as shipped&quot; log analyzer. It WORKS - the output is correct - but it has
+ * two performance bugs hidden a few frames below {@link #analyze(List)}. You are
+ * not told what they are; you find them on a flame graph. (Spoilers live in the
+ * README and in {@link com.javamastery.examples.profiling.optimized.OptimizedLogAnalyzer}.)
+ *
+ * &lt;p&gt;The public entry point looks innocent: parse each line, count by level and
+ * service, count errors, count unique IPs. Nothing here screams &quot;slow&quot;. The cost
+ * is buried in helpers it calls in a tight loop - which is exactly why a
+ * profiler, not a code reading, is the right tool: the wide bar on the flame
+ * graph points at the real frame, however deep it is.&lt;/p&gt;
+ */
+public final class LogAnalyzer {
+
+    private LogAnalyzer() {
+    }
+
+    /**
+     * Analyse a batch of raw log lines.
+     *
+     * @param rawLines pipe-delimited lines from {@link LogGenerator}
+     * @return a correct {@link AnalysisReport}
+     */
+    public static AnalysisReport analyze(List&lt;String&gt; rawLines) {
+        Map&lt;String, Long&gt; byLevel = new HashMap&lt;&gt;();
+        Map&lt;String, Long&gt; byService = new HashMap&lt;&gt;();
+        long errors = 0;
+
+        // &quot;recentIps&quot; accumulates every distinct IP we have seen. Using a List
+        // and List.contains for the distinctness check is the O(n^2) bug: each
+        // new line scans the whole list-so-far. It is hidden one frame down, in
+        // recordUniqueIp(...).
+        List&lt;String&gt; recentIps = new ArrayList&lt;&gt;();
+
+        for (String line : rawLines) {
+            LogEvent event = parse(line);
+
+            byLevel.merge(event.level(), 1L, Long::sum);
+            byService.merge(event.service(), 1L, Long::sum);
+            if (&quot;ERROR&quot;.equals(event.level())) {
+                errors++;
+            }
+            recordUniqueIp(recentIps, event.ip());
+        }
+
+        return new AnalysisReport(byLevel, byService, errors, recentIps.size());
+    }
+
+    /**
+     * Parse one pipe-delimited line into a {@link LogEvent}.
+     *
+     * &lt;p&gt;Looks fine. But it validates the IP via {@link #isValidIp(String)},
+     * which is where the FIRST hotspot lives.&lt;/p&gt;
+     */
+    private static LogEvent parse(String line) {
+        String[] parts = line.split(&quot;\\|&quot;, 5);
+        long ts = Long.parseLong(parts[0]);
+        String ip = parts[1];
+        String level = parts[2];
+        String service = parts[3];
+        String message = parts[4];
+
+        // A &quot;defensive&quot; validation. The cost is not here - it is one frame down.
+        if (!isValidIp(ip)) {
+            throw new IllegalArgumentException(&quot;bad ip: &quot; + ip);
+        }
+        return new LogEvent(ts, ip, level, service, message);
+    }
+
+    /**
+     * HOTSPOT #1 (recompiled regex).
+     *
+     * &lt;p&gt;{@link Pattern#compile(String)} parses the regex string and builds an
+     * NFA every single call. Here it is called once per log line, so for a
+     * million lines we compile the same pattern a million times. Compiling a
+     * regex is dramatically more expensive than matching against an
+     * already-compiled one. On a CPU flame graph this shows up as a wide
+     * plateau under {@code Pattern.compile} / {@code Pattern.&lt;init&gt;}, sitting
+     * below {@code isValidIp} below {@code parse} below {@code analyze}.&lt;/p&gt;
+     *
+     * &lt;p&gt;The fix (see optimized package) is to hoist the {@code Pattern} into a
+     * {@code static final} field so it is compiled exactly once.&lt;/p&gt;
+     */
+    private static boolean isValidIp(String ip) {
+        // BUG: compiled on every invocation.
+        Pattern p = Pattern.compile(&quot;^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$&quot;);
+        return p.matcher(ip).matches();
+    }
+
+    /**
+     * HOTSPOT #2 (O(n^2) membership test).
+     *
+     * &lt;p&gt;{@code seen.contains(ip)} is a linear scan of an {@link ArrayList}. Do
+     * it once per line and the total work is quadratic in the number of distinct
+     * IPs accumulated. On the flame graph this is a second wide bar under
+     * {@code ArrayList.contains} / {@code ArrayList.indexOf} below
+     * {@code recordUniqueIp}.&lt;/p&gt;
+     *
+     * &lt;p&gt;The fix is a {@link java.util.HashSet}: amortised O(1) membership.&lt;/p&gt;
+     */
+    private static void recordUniqueIp(List&lt;String&gt; seen, String ip) {
+        if (!seen.contains(ip)) { // BUG: O(n) per call -&gt; O(n^2) overall
+            seen.add(ip);
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilinglogeventjava"><code>src/main/java/com/javamastery/examples/profiling/LogEvent.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilinglogeventjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+/**
+ * One parsed log line.
+ *
+ * &lt;p&gt;A {@code record} so it is an immutable, value-like carrier. On a 64-bit
+ * HotSpot with compressed oops (the default below ~32 GB heaps), one instance is
+ * a 16-byte object header (mark word + narrow class word) plus four 4-byte
+ * narrow object references ({@code ip}, {@code level}, {@code message},
+ * {@code service}) = 32 bytes, padded to an 8-byte boundary. The {@code long}
+ * {@code epochMillis} adds 8 bytes inline. So roughly 40 bytes of header+fields
+ * per event, BEFORE the {@link String} payloads each reference point at on the
+ * heap. We deliberately keep this tiny: the lab is about CPU time, not layout,
+ * but it is worth knowing that every event you parse is also an allocation the
+ * &lt;b&gt;alloc&lt;/b&gt; profiler can see.&lt;/p&gt;
+ */
+public record LogEvent(long epochMillis, String ip, String level, String service, String message) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilingloggeneratorjava"><code>src/main/java/com/javamastery/examples/profiling/LogGenerator.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilingloggeneratorjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Generates a deterministic batch of raw log lines.
+ *
+ * &lt;p&gt;Deterministic on purpose: both the slow {@link LogAnalyzer} and the
+ * {@link com.javamastery.examples.profiling.optimized.OptimizedLogAnalyzer}
+ * are fed the EXACT same input from the same seed, so any difference in their
+ * output is a real correctness bug, and any difference in their &lt;i&gt;time&lt;/i&gt; is
+ * a real performance win - not noise from different data.&lt;/p&gt;
+ *
+ * &lt;p&gt;The line format mimics a common app log:
+ * &lt;pre&gt;{@code 1718409600000|192.168.0.42|INFO|checkout|order placed ok}&lt;/pre&gt;
+ * pipe-delimited: epochMillis | ip | level | service | message.&lt;/p&gt;
+ */
+public final class LogGenerator {
+
+    private static final String[] LEVELS = {&quot;INFO&quot;, &quot;INFO&quot;, &quot;INFO&quot;, &quot;WARN&quot;, &quot;ERROR&quot;, &quot;DEBUG&quot;};
+    private static final String[] SERVICES = {&quot;checkout&quot;, &quot;auth&quot;, &quot;search&quot;, &quot;inventory&quot;, &quot;payments&quot;};
+    private static final String[] MESSAGES = {
+            &quot;request handled&quot;,
+            &quot;user logged in&quot;,
+            &quot;cache miss&quot;,
+            &quot;retrying upstream call&quot;,
+            &quot;validation failed for field email&quot;,
+            &quot;connection reset by peer&quot;
+    };
+
+    private LogGenerator() {
+    }
+
+    /**
+     * @param count number of raw log lines to produce
+     * @param seed  RNG seed - same seed gives byte-for-byte identical lines
+     * @return immutable-enough {@link List} of pipe-delimited raw lines
+     */
+    public static List&lt;String&gt; generate(int count, long seed) {
+        Random rnd = new Random(seed);
+        List&lt;String&gt; lines = new ArrayList&lt;&gt;(count);
+        long baseMillis = 1_718_409_600_000L; // fixed epoch so output is stable
+        for (int i = 0; i &lt; count; i++) {
+            long ts = baseMillis + i * 7L;
+            // A small pool of IPs so the &quot;recent unique IPs&quot; set stays small but
+            // collides often - this is what makes the O(n^2) dedup in the slow
+            // analyzer actually do work on every line.
+            String ip = &quot;10.0.&quot; + rnd.nextInt(8) + &quot;.&quot; + rnd.nextInt(64);
+            String level = LEVELS[rnd.nextInt(LEVELS.length)];
+            String service = SERVICES[rnd.nextInt(SERVICES.length)];
+            String message = MESSAGES[rnd.nextInt(MESSAGES.length)];
+            lines.add(ts + &quot;|&quot; + ip + &quot;|&quot; + level + &quot;|&quot; + service + &quot;|&quot; + message);
+        }
+        return lines;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilingworkloadappjava"><code>src/main/java/com/javamastery/examples/profiling/WorkloadApp.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilingworkloadappjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+import com.javamastery.examples.profiling.optimized.OptimizedLogAnalyzer;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
+/**
+ * The runnable workload you profile.
+ *
+ * &lt;p&gt;It does realistic-looking work - generate a batch of logs, then analyse it
+ * over and over - so the JVM stays busy long enough for you to grab its PID and
+ * attach async-profiler or JFR. By default it runs the SLOW analyzer
+ * ({@link LogAnalyzer}) so the hotspots are present. Pass {@code optimized} to
+ * run the fixed one for the before/after comparison.&lt;/p&gt;
+ *
+ * &lt;h2&gt;Two intentionally different paths&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;CPU path&lt;/b&gt; - {@link LogAnalyzer#analyze(List)} burns CPU on two
+ *       hidden hotspots (a recompiled regex and an O(n^2) membership test).
+ *       A &lt;b&gt;cpu&lt;/b&gt; profile makes these wide bars.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Blocking path&lt;/b&gt; - {@link #simulateSlowSink(int)} parks the thread
+ *       (as a stand-in for a slow disk / network write). It uses almost NO CPU,
+ *       so a &lt;b&gt;cpu&lt;/b&gt; profile barely shows it - but a &lt;b&gt;wall&lt;/b&gt; profile shows
+ *       it as a huge bar, because wall-clock counts time the thread spends
+ *       blocked. This contrast is the whole reason you pick the right profiling
+ *       mode for the question you are asking.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Usage&lt;/h2&gt;
+ * &lt;pre&gt;{@code
+ * # default: slow analyzer, ~25s of CPU work + some blocking, then exits
+ * java -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+ *
+ * # run the FIXED analyzer (for the &quot;after&quot; profile)
+ * java -cp target/classes com.javamastery.examples.profiling.WorkloadApp optimized
+ *
+ * # tune: &lt;variant&gt; &lt;lines-per-batch&gt; &lt;iterations&gt; &lt;run-seconds&gt;
+ * java -cp target/classes com.javamastery.examples.profiling.WorkloadApp slow 200000 1000 30
+ * }&lt;/pre&gt;
+ */
+public final class WorkloadApp {
+
+    private static final int DEFAULT_LINES = 200_000;
+    private static final int DEFAULT_ITERATIONS = 100_000; // bounded by run-seconds in practice
+    private static final int DEFAULT_RUN_SECONDS = 25;
+
+    private WorkloadApp() {
+    }
+
+    public static void main(String[] args) {
+        boolean optimized = args.length &gt;= 1 &amp;&amp; args[0].equalsIgnoreCase(&quot;optimized&quot;);
+        int linesPerBatch = args.length &gt;= 2 ? Integer.parseInt(args[1]) : DEFAULT_LINES;
+        int maxIterations = args.length &gt;= 3 ? Integer.parseInt(args[2]) : DEFAULT_ITERATIONS;
+        int runSeconds = args.length &gt;= 4 ? Integer.parseInt(args[3]) : DEFAULT_RUN_SECONDS;
+
+        System.out.printf(Locale.ROOT,
+                &quot;WorkloadApp: analyzer=%s, linesPerBatch=%,d, maxIterations=%,d, runSeconds=%d%n&quot;,
+                optimized ? &quot;OPTIMIZED&quot; : &quot;SLOW (has hidden hotspots)&quot;,
+                linesPerBatch, maxIterations, runSeconds);
+        System.out.println(&quot;PID = &quot; + ProcessHandle.current().pid()
+                + &quot;  &lt;-- attach async-profiler / JFR to this&quot;);
+
+        // Build the input ONCE so the loop measures analysis, not generation.
+        List&lt;String&gt; logs = LogGenerator.generate(linesPerBatch, 42L);
+
+        long deadline = System.nanoTime() + Duration.ofSeconds(runSeconds).toNanos();
+        long iterations = 0;
+        AnalysisReport last = null;
+
+        while (iterations &lt; maxIterations &amp;&amp; System.nanoTime() &lt; deadline) {
+            // --- CPU path: the hot work the cpu/alloc profiler should reveal ---
+            last = optimized
+                    ? OptimizedLogAnalyzer.analyze(logs)
+                    : LogAnalyzer.analyze(logs);
+
+            // --- Blocking path: invisible to a cpu profile, loud in a wall profile.
+            // Simulate flushing the report to a slow sink every few iterations.
+            if (iterations % 20 == 0) {
+                simulateSlowSink(15);
+            }
+
+            iterations++;
+            if (iterations % 10 == 0) {
+                System.out.printf(Locale.ROOT,
+                        &quot;  iter %,d  uniqueIps=%d  errors=%d%n&quot;,
+                        iterations, last.uniqueIps(), last.errorCount());
+            }
+        }
+
+        System.out.printf(Locale.ROOT,
+                &quot;Done: %,d iterations. Final report: %s%n&quot;, iterations, last);
+    }
+
+    /**
+     * Stand-in for a blocking I/O sink (slow disk, remote log shipper, etc.).
+     *
+     * &lt;p&gt;{@link LockSupport#parkNanos(long)} blocks the thread WITHOUT spinning,
+     * so it consumes virtually no CPU. A cpu profiler (which samples on-CPU
+     * threads) will hardly see this method; a wall-clock profiler (which samples
+     * ALL threads, on- or off-CPU) will show it consuming real elapsed time.
+     * That is the lesson: a hotspot you cannot find in a cpu profile may be a
+     * blocked thread you can only see in a wall profile.&lt;/p&gt;
+     *
+     * @param millis how long to &quot;write&quot; for
+     */
+    private static void simulateSlowSink(int millis) {
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(millis));
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesprofilingoptimizedoptimizedloganalyzerjava"><code>src/main/java/com/javamastery/examples/profiling/optimized/OptimizedLogAnalyzer.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesprofilingoptimizedoptimizedloganalyzerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling.optimized;
+
+import com.javamastery.examples.profiling.AnalysisReport;
+import com.javamastery.examples.profiling.LogEvent;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+/**
+ * The FIXED analyzer. Same algorithm, same output, two hotspots removed. Compare
+ * its flame graph against {@link com.javamastery.examples.profiling.LogAnalyzer}'s
+ * after re-profiling: the two wide plateaus
+ * ({@code Pattern.compile} and {@code ArrayList.contains}) are gone, and the
+ * remaining time is dominated by the genuinely necessary work - {@code split},
+ * {@code parseLong}, and map merges.
+ *
+ * &lt;p&gt;The behaviour is identical, which is the whole point of an optimization: it
+ * is only a &quot;fix&quot; if it preserves the result. The JUnit test asserts the two
+ * analyzers return {@code equals()} reports for the same input.&lt;/p&gt;
+ */
+public final class OptimizedLogAnalyzer {
+
+    /**
+     * FIX for HOTSPOT #1: compile the regex ONCE, at class-load time, into a
+     * {@code static final} {@link Pattern}. A {@code Pattern} is immutable and
+     * thread-safe, so a single shared instance is reused by every call. The
+     * per-line cost drops from &quot;parse a regex + build an NFA&quot; to &quot;run an
+     * existing matcher&quot;.
+     */
+    private static final Pattern IP_PATTERN =
+            Pattern.compile(&quot;^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$&quot;);
+
+    private OptimizedLogAnalyzer() {
+    }
+
+    /**
+     * Analyse a batch of raw log lines. Identical contract to
+     * {@link com.javamastery.examples.profiling.LogAnalyzer#analyze(List)}.
+     */
+    public static AnalysisReport analyze(List&lt;String&gt; rawLines) {
+        Map&lt;String, Long&gt; byLevel = new HashMap&lt;&gt;();
+        Map&lt;String, Long&gt; byService = new HashMap&lt;&gt;();
+        long errors = 0;
+
+        // FIX for HOTSPOT #2: a HashSet gives amortised O(1) membership, so the
+        // unique-IP accounting is O(n) overall instead of O(n^2). We only need
+        // the COUNT of distinct IPs, so a Set is the right data structure.
+        Set&lt;String&gt; seenIps = new HashSet&lt;&gt;();
+
+        for (String line : rawLines) {
+            LogEvent event = parse(line);
+
+            byLevel.merge(event.level(), 1L, Long::sum);
+            byService.merge(event.service(), 1L, Long::sum);
+            if (&quot;ERROR&quot;.equals(event.level())) {
+                errors++;
+            }
+            seenIps.add(event.ip()); // add() is idempotent; no separate contains() needed
+        }
+
+        return new AnalysisReport(byLevel, byService, errors, seenIps.size());
+    }
+
+    private static LogEvent parse(String line) {
+        String[] parts = line.split(&quot;\\|&quot;, 5);
+        long ts = Long.parseLong(parts[0]);
+        String ip = parts[1];
+        String level = parts[2];
+        String service = parts[3];
+        String message = parts[4];
+
+        if (!isValidIp(ip)) {
+            throw new IllegalArgumentException(&quot;bad ip: &quot; + ip);
+        }
+        return new LogEvent(ts, ip, level, service, message);
+    }
+
+    private static boolean isValidIp(String ip) {
+        // Reuse the precompiled pattern. matcher() is cheap; compile() is not.
+        return IP_PATTERN.matcher(ip).matches();
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesprofilingloganalyzerequivalencetestjava"><code>src/test/java/com/javamastery/examples/profiling/LogAnalyzerEquivalenceTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesprofilingloganalyzerequivalencetestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.profiling;
+
+import com.javamastery.examples.profiling.optimized.OptimizedLogAnalyzer;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Proves the optimization is BEHAVIOUR-PRESERVING and (sanity-check) faster.
+ *
+ * &lt;p&gt;The key test, {@link #optimizedProducesSameResultAsSlow()}, is the contract
+ * that makes the whole lab honest: a &quot;faster&quot; analyzer that returns a different
+ * answer is just a different (broken) analyzer. Both are fed identical input and
+ * must return {@code equals()} reports.&lt;/p&gt;
+ *
+ * &lt;p&gt;The timing check uses a MODEST workload sized to run in a few hundred
+ * milliseconds so it is fast and reliable in CI. It is a coarse sanity check
+ * (&quot;the fix is not accidentally slower&quot;), NOT a benchmark - for real numbers you
+ * profile the app (this lab) or use JMH (lab 04).&lt;/p&gt;
+ */
+class LogAnalyzerEquivalenceTest {
+
+    @Test
+    void optimizedProducesSameResultAsSlow() {
+        // A range of sizes, including tiny and empty, to catch off-by-one and
+        // empty-input bugs in either implementation.
+        for (int size : new int[]{0, 1, 5, 100, 5_000}) {
+            List&lt;String&gt; logs = LogGenerator.generate(size, 42L);
+
+            AnalysisReport slow = LogAnalyzer.analyze(logs);
+            AnalysisReport optimized = OptimizedLogAnalyzer.analyze(logs);
+
+            assertEquals(slow, optimized,
+                    &quot;Optimized analyzer must produce an identical report for size=&quot; + size);
+        }
+    }
+
+    @Test
+    void reportContentsAreActuallyCorrect() {
+        // Independently verify the report is right, so &quot;they agree&quot; cannot mean
+        // &quot;they agree on the same wrong answer&quot;.
+        List&lt;String&gt; logs = LogGenerator.generate(1_000, 7L);
+        AnalysisReport report = OptimizedLogAnalyzer.analyze(logs);
+
+        long totalByLevel = report.countByLevel().values().stream().mapToLong(Long::longValue).sum();
+        long totalByService = report.countByService().values().stream().mapToLong(Long::longValue).sum();
+        assertEquals(1_000, totalByLevel, &quot;every line must be counted once by level&quot;);
+        assertEquals(1_000, totalByService, &quot;every line must be counted once by service&quot;);
+
+        long errorsFromMap = report.countByLevel().getOrDefault(&quot;ERROR&quot;, 0L);
+        assertEquals(errorsFromMap, report.errorCount(),
+                &quot;errorCount must match the ERROR bucket in countByLevel&quot;);
+
+        assertTrue(report.uniqueIps() &gt; 0 &amp;&amp; report.uniqueIps() &lt;= 1_000,
+                &quot;uniqueIps must be in (0, lineCount]&quot;);
+    }
+
+    /**
+     * Coarse timing SANITY check on a modest workload. Not a benchmark - just
+     * confirms the &quot;optimization&quot; did not regress. We warm both paths a little
+     * to let the JIT compile them, then compare a few timed runs. The assertion
+     * is generous (optimized must not be much slower than slow) so it cannot flap
+     * on a noisy CI box; in practice the optimized path is many times faster.
+     */
+    @Test
+    void optimizedIsNotSlowerThanSlow() {
+        // Modest size: big enough that the O(n^2) bug bites, small enough that
+        // the whole test is well under a second.
+        List&lt;String&gt; logs = LogGenerator.generate(4_000, 99L);
+
+        // Warmup (trigger JIT compilation; results discarded).
+        for (int i = 0; i &lt; 5; i++) {
+            LogAnalyzer.analyze(logs);
+            OptimizedLogAnalyzer.analyze(logs);
+        }
+
+        long slowNanos = timeMedian(() -&gt; LogAnalyzer.analyze(logs));
+        long fastNanos = timeMedian(() -&gt; OptimizedLogAnalyzer.analyze(logs));
+
+        System.out.printf(&quot;slow=%.2fms  optimized=%.2fms  speedup=%.1fx%n&quot;,
+                slowNanos / 1_000_000.0, fastNanos / 1_000_000.0,
+                slowNanos / (double) Math.max(fastNanos, 1));
+
+        // Generous bound: optimized must be at most 1.5x the slow time. This is
+        // deliberately loose so the test is robust on shared/noisy CI hardware;
+        // it still fails loudly if the &quot;fix&quot; ever becomes a real regression.
+        assertTrue(fastNanos &lt;= slowNanos * 3L / 2L,
+                () -&gt; &quot;optimized (&quot; + fastNanos + &quot;ns) should not be slower than slow (&quot;
+                        + slowNanos + &quot;ns)&quot;);
+    }
+
+    private static long timeMedian(Runnable r) {
+        long[] samples = new long[5];
+        for (int i = 0; i &lt; samples.length; i++) {
+            long t0 = System.nanoTime();
+            r.run();
+            samples[i] = System.nanoTime() - t0;
+        }
+        java.util.Arrays.sort(samples);
+        return samples[samples.length / 2];
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># Lab 05 — Profile with async-profiler / JFR
+
+&gt; **Backs: L3/C02/T11 — Profiling (JFR, async-profiler, VisualVM) — hands-on lab**
+
+A self-contained, runnable lab that teaches you to find a **hidden CPU hotspot**
+the way you do it in production: you do not read the code looking for it, you
+**profile the running JVM**, read a **flame graph**, point at the wide bar, fix
+it, and **re-profile to confirm** the bar is gone.
+
+The workload (`WorkloadApp`) looks like an ordinary log-analytics job. It has
+**two performance bugs buried a few frames deep** — you are not told where. By
+the end you will have located both on a flame graph, applied the fix, and proven
+(with the JUnit test) that the fix did not change the result.
+
+Plain Java 21, Maven, JUnit 5. **No Spring, no frameworks** — a profiler measures
+the *whole* process, so the less unrelated code on the classpath, the cleaner the
+flame graph. Everything you see profiling `WorkloadApp` is *your* code.
+
+---
+
+## The mental model: what a profiler does
+
+A **sampling profiler** wakes up hundreds of times per second, snapshots the
+call stack of the running threads, and tallies how often each stack appears.
+The frame that shows up in the most samples is, by definition, where the program
+spends the most of that resource. It does **not** instrument every method call
+(that is &quot;tracing&quot; and it distorts timing); it just samples, cheaply, so the
+numbers reflect reality.
+
+Three things you can sample, and the question each answers:
+
+| Mode  | Samples on…                              | Answers                                  |
+|-------|------------------------------------------|------------------------------------------|
+| **cpu**   | threads actually running on a CPU    | &quot;where is my CPU time going?&quot;            |
+| **wall**  | *all* threads, running **or blocked**| &quot;where is wall-clock time going?&quot; (incl. sleeps, locks, I/O waits) |
+| **alloc** | heap allocations (TLAB-sampled)      | &quot;what is allocating, creating GC pressure?&quot; |
+
+`WorkloadApp` deliberately exercises **two different paths** so you feel the
+difference:
+
+- a **CPU path** (`LogAnalyzer.analyze`) — burns CPU on the two hidden hotspots.
+  A **cpu** profile makes them wide bars.
+- a **blocking path** (`simulateSlowSink`) — parks the thread (a stand-in for a
+  slow disk/network write). It uses ~no CPU, so a **cpu** profile barely shows
+  it, but a **wall** profile shows it as a huge bar. *A hotspot you cannot find
+  in a cpu profile may be a blocked thread you can only see in a wall profile.*
+
+---
+
+## How to read a flame graph (read this before you generate one)
+
+A flame graph is a picture of the sampled stacks, aggregated:
+
+- **Each box is a stack frame** (a method). A box sits *on top of* its caller.
+- **Width = number of samples = time** (for cpu/wall) or **bytes** (for alloc).
+  **Wider = more.** This is the only thing that matters — width.
+- **The y-axis is stack depth, not time.** Reading left-to-right is **not** a
+  timeline; the ordering is alphabetical/merge order. Do not read it as &quot;first
+  this, then that&quot;.
+- **Find the widest box that is your own code, then look UP.** A wide *plateau*
+  near the top — a frame that is wide and has little or nothing above it — is a
+  **leaf hotspot**: the program is *spending* time *in that method itself*, not
+  in something it calls. That plateau is your target.
+- A frame that is wide but has an equally-wide child is just *passing through* —
+  the cost is deeper. Keep climbing until the width &quot;lands&quot; on a plateau.
+
+For this lab, when you profile the **slow** build in **cpu** mode you are
+looking for wide plateaus a few frames below `LogAnalyzer.analyze`. (Spoiler in
+the very last section — try to find them yourself first.)
+
+---
+
+## Prerequisites
+
+- **JDK 21 or newer** on your `PATH`. Check: `java -version`.
+  - JFR is built into the JDK — nothing to install.
+  - async-profiler resolves Java frames against the running JVM, so a modern
+    JDK gives you proper frames (and, on HotSpot, inlined-method and
+    JIT-compiled frames too).
+- **Maven 3.9+**: `mvn -version`.
+- **async-profiler** (for the async-profiler half of the lab) — download below.
+  The JFR half needs nothing extra.
+
+```bash
+java -version     # must be 21+
+mvn -version
+```
+
+&gt; **Note on the JDK version.** The project compiles to **Java 21 bytecode**
+&gt; (class file v65) via `maven.compiler.release=21`. If the `java` on your `PATH`
+&gt; is older than 21 you will get `UnsupportedClassVersionError` when you run
+&gt; `WorkloadApp` — point `JAVA_HOME`/`PATH` at a 21+ JDK (the same one Maven
+&gt; uses is fine).
+
+---
+
+## Files to read first
+
+1. **`WorkloadApp.java`** — the runnable workload you profile. Note the two
+   paths (CPU vs blocking) and the `PID` it prints on startup.
+2. **`LogAnalyzer.java`** — the &quot;as shipped&quot; analyzer. **Has the two hidden
+   hotspots.** The Javadoc on the private helpers is the answer key — don&#x27;t peek
+   until you&#x27;ve found them on a flame graph.
+3. **`optimized/OptimizedLogAnalyzer.java`** — the fixed version. Diff it against
+   `LogAnalyzer` to see exactly what changed.
+4. **`LogAnalyzerEquivalenceTest.java`** — proves the fix is behaviour-preserving
+   and (sanity-check) faster.
+
+---
+
+## Step 0 — Build and run the workload
+
+```bash
+mvn -q test          # compiles + runs the (fast) JUnit tests
+```
+
+Launch the **slow** workload. It prints its **PID** and then runs for ~25s
+(enough time to attach a profiler), analysing a 200k-line batch over and over:
+
+```bash
+# raw java -cp (preferred: a clean process is the cleanest profiling target)
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+
+# …or via Maven&#x27;s exec plugin (note: this adds a Maven/forked-JVM wrapper)
+mvn -q compile exec:java
+```
+
+You&#x27;ll see:
+
+```
+WorkloadApp: analyzer=SLOW (has hidden hotspots), linesPerBatch=200,000, ...
+PID = 12345  &lt;-- attach async-profiler / JFR to this
+  iter 10  uniqueIps=512  errors=...
+  ...
+```
+
+Grab that **PID** (or use `jps -l`). Optional args:
+`WorkloadApp &lt;slow|optimized&gt; &lt;linesPerBatch&gt; &lt;maxIterations&gt; &lt;runSeconds&gt;`.
+
+---
+
+## Step 1 — Profile with async-profiler
+
+### Get async-profiler
+
+Download a release for your OS/arch from
+&lt;https://github.com/async-profiler/async-profiler/releases&gt; (e.g.
+`asprof-&lt;ver&gt;-macos.zip` or `…-linux-x64.tar.gz`), unpack it, and use the
+`bin/asprof` binary. (Older releases shipped a `profiler.sh` wrapper; current
+releases use `asprof` and a `lib/libasyncProfiler.{so,dylib}` agent.)
+
+```bash
+# example: put it somewhere and point a var at it
+export AP=~/tools/async-profiler/bin/asprof
+```
+
+### Platform setup (do this once)
+
+- **Linux** — the kernel&#x27;s `perf_events` is locked down by default. To let
+  async-profiler read CPU performance counters and kernel stacks:
+
+  ```bash
+  sudo sysctl kernel.perf_event_paranoid=1    # 1 = allow user-space CPU sampling
+  sudo sysctl kernel.kptr_restrict=0          # let it resolve kernel symbols
+  ```
+
+  If you can&#x27;t change those (locked-down CI, containers), async-profiler falls
+  back to its **`itimer`** CPU engine — pass `-e itimer` and you still get Java
+  frames, just no kernel/native frames.
+
+- **macOS** — there is **no `perf_events`**; async-profiler uses the `itimer`
+  engine automatically for cpu mode. `cpu`, `wall`, and `alloc` all work. You do
+  **not** need `sudo` for `wall`/`alloc`; `cpu` (itimer) also works without it.
+  (No `perf_event_paranoid` knob exists on macOS — that setting is Linux-only.)
+
+### Attach to the running PID and make a CPU flame graph
+
+```bash
+# -d 30  : profile for 30 seconds
+# -e cpu : CPU sampling
+# -f cpu.html : write an interactive flame graph (format inferred from .html)
+$AP -d 30 -e cpu -f cpu.html &lt;PID&gt;
+```
+
+Open `cpu.html` in a browser. **Find the widest plateau** under
+`LogAnalyzer.analyze` (see &quot;How to read a flame graph&quot;). You will see a fat bar
+that, when you climb into it, lands on a regex-compilation frame — and a second
+fat bar landing on a list-scan frame.
+
+### The wall-clock vs CPU contrast
+
+Profile the **same** process in **wall** mode and compare:
+
+```bash
+$AP -d 30 -e wall -f wall.html &lt;PID&gt;
+```
+
+In `wall.html` a big new bar appears that was tiny (or absent) in `cpu.html`:
+`WorkloadApp.simulateSlowSink → LockSupport.parkNanos`. That blocked time costs
+**wall-clock** time but **no CPU** — which is exactly why you must pick the mode
+that matches your question. (&quot;Why is the *throughput* low?&quot; → cpu. &quot;Why does each
+request *take so long*?&quot; → wall.)
+
+### Allocation profile (bonus)
+
+```bash
+$AP -d 30 -e alloc -f alloc.html &lt;PID&gt;
+```
+
+Wide bars here are allocation sites (the per-line `LogEvent`, the `split()`
+arrays, autoboxed `Long`s in the map merges). Useful when GC, not CPU, is the
+bottleneck. You don&#x27;t need it to solve this lab, but it shows the third lens.
+
+### Alternative: run as a launch-time agent (no PID needed)
+
+Instead of attaching, you can start the JVM with the profiler agent so it
+profiles from the first instruction and dumps on exit:
+
+```bash
+java -agentpath:$HOME/tools/async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=cpu.html \
+     -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+```
+
+(`.dylib` instead of `.so` on macOS.) This is the right approach when the hotspot
+is in **startup** code that&#x27;s over before you can attach.
+
+---
+
+## Step 2 — The JFR alternative (zero downloads)
+
+JDK Flight Recorder is built in. It is lower-overhead and broader (GC, locks,
+I/O, allocations, JIT) but its method profiler samples a bit coarser than
+async-profiler. Two ways to record:
+
+**a) Start recording at launch**
+
+```bash
+java -XX:StartFlightRecording=duration=30s,filename=workload.jfr,settings=profile \
+     -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+```
+
+`settings=profile` turns on the higher-rate method sampler (vs the lighter
+`default`). The `.jfr` is written when the recording stops / the JVM exits.
+
+**b) Attach to a running PID with `jcmd`**
+
+```bash
+jcmd &lt;PID&gt; JFR.start name=lab duration=30s filename=workload.jfr settings=profile
+jcmd &lt;PID&gt; JFR.dump  name=lab filename=workload.jfr     # dump early if you like
+jcmd &lt;PID&gt; JFR.stop  name=lab
+```
+
+### Read the JFR recording
+
+- **Command line** — summarise the hot methods straight from the file:
+
+  ```bash
+  jfr summary workload.jfr                                  # event counts overview
+  jfr print --events jdk.ExecutionSample workload.jfr | less
+  ```
+
+  The `jdk.ExecutionSample` events are the CPU stack samples; the methods that
+  appear most are your hotspots — the same answer the flame graph gives, in text.
+
+- **GUI** — open `workload.jfr` in **JDK Mission Control (JMC)** (separate
+  download from &lt;https://jdk.java.net/jmc/&gt; or your vendor). Go to
+  **Method Profiling** → its flame-graph / hot-methods view shows the same wide
+  frames. VisualVM (with the Startup/JFR plugins) can also open `.jfr` files and
+  has its own live sampler if you prefer attaching interactively.
+
+---
+
+## Step 3 — Apply the fix and re-profile
+
+Both bugs are fixed in `optimized/OptimizedLogAnalyzer.java`. Run that variant
+and profile it the same way:
+
+```bash
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp optimized
+# then, in another terminal:
+$AP -d 30 -e cpu -f cpu-after.html &lt;PID&gt;
+```
+
+Compare `cpu.html` (before) with `cpu-after.html` (after). The two wide plateaus
+are **gone**; what remains is the genuinely necessary work (`String.split`,
+`Long.parseLong`, the map merges). The throughput jump is also visible in the
+app&#x27;s own output: the optimized build completes far more iterations in the same
+wall-clock window. **That before/after pair is the deliverable of the lab** — a
+profile that proves the fix worked, not a hunch.
+
+---
+
+## Step 4 — Prove the fix is behaviour-preserving
+
+```bash
+mvn -q test
+```
+
+`LogAnalyzerEquivalenceTest`:
+
+- **`optimizedProducesSameResultAsSlow`** — feeds both analyzers identical input
+  across several sizes (including empty) and asserts the reports are `equals()`.
+  *An &quot;optimization&quot; that changes the answer is just a different bug.*
+- **`reportContentsAreActuallyCorrect`** — independently checks the report is
+  right, so &quot;they agree&quot; can&#x27;t mean &quot;they agree on the same wrong answer&quot;.
+- **`optimizedIsNotSlowerThanSlow`** — a coarse timing **sanity check** on a
+  modest workload (runs in well under a second; **not** a benchmark). For real
+  numbers, profile the app (this lab) or use **JMH** (lab 04).
+
+---
+
+## The answer key (don&#x27;t read until you&#x27;ve found them)
+
+&lt;details&gt;
+&lt;summary&gt;Spoiler: the two hidden hotspots&lt;/summary&gt;
+
+1. **Regex recompiled per line.** `LogAnalyzer.isValidIp` calls
+   `Pattern.compile(...)` on **every** log line. Compiling a regex (parse + build
+   the matcher state machine) is far more expensive than matching against an
+   already-compiled `Pattern`. On the cpu flame graph this is a wide plateau
+   under `Pattern.compile` / `Pattern.&lt;init&gt;`, below `isValidIp` ← `parse` ←
+   `analyze`. **Fix:** hoist the `Pattern` to a `private static final` field so
+   it compiles **once** (see `OptimizedLogAnalyzer.IP_PATTERN`).
+
+2. **O(n²) membership test.** `LogAnalyzer.recordUniqueIp` uses
+   `ArrayList.contains(ip)` — a linear scan — once per line, so the unique-IP
+   accounting is quadratic in the number of distinct IPs. On the flame graph
+   this is a second wide bar under `ArrayList.indexOf`/`contains` below
+   `recordUniqueIp`. **Fix:** a `HashSet` → amortised O(1) membership (see
+   `OptimizedLogAnalyzer.seenIps`).
+
+Both are invisible from `analyze`&#x27;s signature and only obvious *on the profile* —
+which is the entire point: **profile, don&#x27;t guess.**
+
+&lt;/details&gt;
+
+---
+
+## Run-command cheat sheet
+
+```bash
+mvn -q test                                              # build + fast tests
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp           # slow (default)
+java -cp target/classes com.javamastery.examples.profiling.WorkloadApp optimized # fixed
+
+# async-profiler (attach to &lt;PID&gt;)
+$AP -d 30 -e cpu   -f cpu.html   &lt;PID&gt;
+$AP -d 30 -e wall  -f wall.html  &lt;PID&gt;
+$AP -d 30 -e alloc -f alloc.html &lt;PID&gt;
+
+# JFR
+java -XX:StartFlightRecording=duration=30s,filename=workload.jfr,settings=profile -cp target/classes com.javamastery.examples.profiling.WorkloadApp
+jcmd &lt;PID&gt; JFR.start name=lab duration=30s filename=workload.jfr settings=profile
+jfr print --events jdk.ExecutionSample workload.jfr
+```
+
+Clean up generated profiles with `git clean -nx` (preview) — `*.html`, `*.jfr`,
+`*.collapsed` are already git-ignored.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/labs--lab-04-jmh-microbenchmark.html"><div class="lbl">← Previous</div><div class="ttl">lab-04-jmh-microbenchmark</div><div class="sub">Lab 04 — JMH Microbenchmarking</div></a><a class="next" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><div class="lbl">Next →</div><div class="ttl">lab-06-distributed-tracing-from-scratch</div><div class="sub">Lab 06 — Distributed Tracing From Scratch</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-mental-model-what-a-profiler-does" data-toc-link>The mental model: what a profiler does</a></li><li class="lvl-2"><a href="#how-to-read-a-flame-graph-read-this-before-you-generate-one" data-toc-link>How to read a flame graph (read this before you generate one)</a></li><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-2"><a href="#step-0-build-and-run-the-workload" data-toc-link>Step 0 — Build and run the workload</a></li><li class="lvl-2"><a href="#step-1-profile-with-async-profiler" data-toc-link>Step 1 — Profile with async-profiler</a></li><li class="lvl-3"><a href="#get-async-profiler" data-toc-link>Get async-profiler</a></li><li class="lvl-3"><a href="#platform-setup-do-this-once" data-toc-link>Platform setup (do this once)</a></li><li class="lvl-3"><a href="#attach-to-the-running-pid-and-make-a-cpu-flame-graph" data-toc-link>Attach to the running PID and make a CPU flame graph</a></li><li class="lvl-3"><a href="#the-wall-clock-vs-cpu-contrast" data-toc-link>The wall-clock vs CPU contrast</a></li><li class="lvl-3"><a href="#allocation-profile-bonus" data-toc-link>Allocation profile (bonus)</a></li><li class="lvl-3"><a href="#alternative-run-as-a-launch-time-agent-no-pid-needed" data-toc-link>Alternative: run as a launch-time agent (no PID needed)</a></li><li class="lvl-2"><a href="#step-2-the-jfr-alternative-zero-downloads" data-toc-link>Step 2 — The JFR alternative (zero downloads)</a></li><li class="lvl-3"><a href="#read-the-jfr-recording" data-toc-link>Read the JFR recording</a></li><li class="lvl-2"><a href="#step-3-apply-the-fix-and-re-profile" data-toc-link>Step 3 — Apply the fix and re-profile</a></li><li class="lvl-2"><a href="#step-4-prove-the-fix-is-behaviour-preserving" data-toc-link>Step 4 — Prove the fix is behaviour-preserving</a></li><li class="lvl-2"><a href="#the-answer-key-dont-read-until-youve-found-them" data-toc-link>The answer key (don&#x27;t read until you&#x27;ve found them)</a></li><li class="lvl-2"><a href="#run-command-cheat-sheet" data-toc-link>Run-command cheat sheet</a></li><li class="lvl-2"><a href="#source-files" data-toc-link>Source files</a></li><li class="lvl-3"><a href="#pomxml" data-toc-link>pom.xml</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilinganalysisreportjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/AnalysisReport.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilingloganalyzerjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/LogAnalyzer.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilinglogeventjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/LogEvent.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilingloggeneratorjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/LogGenerator.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilingworkloadappjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/WorkloadApp.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesprofilingoptimizedoptimizedloganalyzerjava" data-toc-link>src/main/java/com/javamastery/examples/profiling/optimized/OptimizedLogAnalyzer.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesprofilingloganalyzerequivalencetestjava" data-toc-link>src/test/java/com/javamastery/examples/profiling/LogAnalyzerEquivalenceTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -22,4 +22,4 @@ Quick question to answer reference for this module.
 
 - [Staff Engineer Q&A / FAQ](T01-staff-engineer-qa.md)
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

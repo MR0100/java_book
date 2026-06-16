@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Intermediate Java & Backend Foundations — Functional & Modern Java
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -30,4 +30,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 08 | Functional programming style & immutability | `T08-functional-programming-style-and-immutability.md` | planned |
 | 09 | New language features by version (Java 8 to 21+) | `T09-new-language-features-by-version-java-8-to-21-plus.md` | planned |
 
-[Back to L2 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L2 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

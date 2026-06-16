@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Two Pointers &amp; Sliding Window — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link active" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🎯</span><span>Ch. 8 · L6 — Interview Mastery</span></div><div class="chapter-path">content/L6-interview-mastery/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l6/overview.html" data-q="l6 — interview mastery (faangm + mnc) content/l6-interview-mastery/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · foundations of interviewing content/l6-interview-mastery/c01-foundations-of-interviewing/readme.md content/l6-interview-mastery/c01-foundations-of-interviewing/t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.md content/l6-interview-mastery/c01-foundations-of-interviewing/t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.md content/l6-interview-mastery/c01-foundations-of-interviewing/t03-the-interviewer-s-rubric-signals-scoring-calibration.md content/l6-interview-mastery/c01-foundations-of-interviewing/t04-big-o-time-and-space-complexity.md content/l6-interview-mastery/c01-foundations-of-interviewing/t05-communication-mechanics-clarify-structure-think-aloud-recover.md content/l6-interview-mastery/c01-foundations-of-interviewing/t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md"><summary><span class="caret">▶</span><span>C01 · Foundations Of Interviewing</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — foundations of interviewing content/l6-interview-mastery/c01-foundations-of-interviewing/readme.md"><a class="" href="../l6/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="how tech interviews &amp; leveling work (mnc vs faangm) content/l6-interview-mastery/c01-foundations-of-interviewing/t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.md"><a class="" href="../l6/c01-t01-how-tech-interviews-and-leveling-work-mnc-vs-faangm.html"><span>How Tech Interviews &amp; Leveling Work (MNC vs FAANGM)</span><span class="kind-pill "></span></a></li><li data-q="the interview funnel — recruiter, screen, loop, debrief, offer content/l6-interview-mastery/c01-foundations-of-interviewing/t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.md"><a class="" href="../l6/c01-t02-the-interview-funnel-recruiter-screen-loop-debrief-offer.html"><span>The Interview Funnel — Recruiter, Screen, Loop, Debrief, Offer</span><span class="kind-pill "></span></a></li><li data-q="the interviewer&#x27;s rubric — signals, scoring, calibration content/l6-interview-mastery/c01-foundations-of-interviewing/t03-the-interviewer-s-rubric-signals-scoring-calibration.md"><a class="" href="../l6/c01-t03-the-interviewer-s-rubric-signals-scoring-calibration.html"><span>The Interviewer&#x27;s Rubric — Signals, Scoring, Calibration</span><span class="kind-pill "></span></a></li><li data-q="big-o / time &amp; space complexity content/l6-interview-mastery/c01-foundations-of-interviewing/t04-big-o-time-and-space-complexity.md"><a class="" href="../l6/c01-t04-big-o-time-and-space-complexity.html"><span>Big-O / Time &amp; Space Complexity</span><span class="kind-pill "></span></a></li><li data-q="communication mechanics — clarify, structure, think-aloud, recover content/l6-interview-mastery/c01-foundations-of-interviewing/t05-communication-mechanics-clarify-structure-think-aloud-recover.md"><a class="" href="../l6/c01-t05-communication-mechanics-clarify-structure-think-aloud-recover.html"><span>Communication Mechanics — Clarify, Structure, Think-Aloud, Recover</span><span class="kind-pill "></span></a></li><li data-q="prep system — weeks-out plan, mock cadence, day-of routine content/l6-interview-mastery/c01-foundations-of-interviewing/t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md"><a class="" href="../l6/c01-t06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.html"><span>Prep System — Weeks-Out Plan, Mock Cadence, Day-Of Routine</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · dsa for interviews content/l6-interview-mastery/c02-dsa-for-interviews/readme.md content/l6-interview-mastery/c02-dsa-for-interviews/t01-arrays-and-strings.md content/l6-interview-mastery/c02-dsa-for-interviews/t02-hashing.md content/l6-interview-mastery/c02-dsa-for-interviews/t03-two-pointers-and-sliding-window.md content/l6-interview-mastery/c02-dsa-for-interviews/t04-recursion-and-backtracking.md content/l6-interview-mastery/c02-dsa-for-interviews/t05-sorting-and-searching.md content/l6-interview-mastery/c02-dsa-for-interviews/t06-linked-lists.md content/l6-interview-mastery/c02-dsa-for-interviews/t07-stacks-and-queues.md content/l6-interview-mastery/c02-dsa-for-interviews/t08-trees-and-bsts.md content/l6-interview-mastery/c02-dsa-for-interviews/t09-graphs-bfs-dfs-shortest-paths.md content/l6-interview-mastery/c02-dsa-for-interviews/t10-heaps-and-priority-queues.md content/l6-interview-mastery/c02-dsa-for-interviews/t11-tries.md content/l6-interview-mastery/c02-dsa-for-interviews/t12-dynamic-programming.md content/l6-interview-mastery/c02-dsa-for-interviews/t13-greedy-algorithms.md content/l6-interview-mastery/c02-dsa-for-interviews/t14-coding-interview-patterns-and-problem-solving-framework.md"><summary><span class="caret">▶</span><span>C02 · DSA For Interviews</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — dsa for interviews (java) content/l6-interview-mastery/c02-dsa-for-interviews/readme.md"><a class="" href="../l6/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="arrays &amp; strings content/l6-interview-mastery/c02-dsa-for-interviews/t01-arrays-and-strings.md"><a class="" href="../l6/c02-t01-arrays-and-strings.html"><span>Arrays &amp; Strings</span><span class="kind-pill "></span></a></li><li data-q="hashing content/l6-interview-mastery/c02-dsa-for-interviews/t02-hashing.md"><a class="" href="../l6/c02-t02-hashing.html"><span>Hashing</span><span class="kind-pill "></span></a></li><li data-q="two pointers &amp; sliding window content/l6-interview-mastery/c02-dsa-for-interviews/t03-two-pointers-and-sliding-window.md"><a class="active" href="../l6/c02-t03-two-pointers-and-sliding-window.html"><span>Two Pointers &amp; Sliding Window</span><span class="kind-pill "></span></a></li><li data-q="recursion &amp; backtracking content/l6-interview-mastery/c02-dsa-for-interviews/t04-recursion-and-backtracking.md"><a class="" href="../l6/c02-t04-recursion-and-backtracking.html"><span>Recursion &amp; Backtracking</span><span class="kind-pill "></span></a></li><li data-q="sorting &amp; searching content/l6-interview-mastery/c02-dsa-for-interviews/t05-sorting-and-searching.md"><a class="" href="../l6/c02-t05-sorting-and-searching.html"><span>Sorting &amp; Searching</span><span class="kind-pill "></span></a></li><li data-q="linked lists content/l6-interview-mastery/c02-dsa-for-interviews/t06-linked-lists.md"><a class="" href="../l6/c02-t06-linked-lists.html"><span>Linked Lists</span><span class="kind-pill "></span></a></li><li data-q="stacks &amp; queues content/l6-interview-mastery/c02-dsa-for-interviews/t07-stacks-and-queues.md"><a class="" href="../l6/c02-t07-stacks-and-queues.html"><span>Stacks &amp; Queues</span><span class="kind-pill "></span></a></li><li data-q="trees &amp; bsts content/l6-interview-mastery/c02-dsa-for-interviews/t08-trees-and-bsts.md"><a class="" href="../l6/c02-t08-trees-and-bsts.html"><span>Trees &amp; BSTs</span><span class="kind-pill "></span></a></li><li data-q="graphs (bfs/dfs, shortest paths) content/l6-interview-mastery/c02-dsa-for-interviews/t09-graphs-bfs-dfs-shortest-paths.md"><a class="" href="../l6/c02-t09-graphs-bfs-dfs-shortest-paths.html"><span>Graphs (BFS/DFS, Shortest Paths)</span><span class="kind-pill "></span></a></li><li data-q="heaps &amp; priority queues content/l6-interview-mastery/c02-dsa-for-interviews/t10-heaps-and-priority-queues.md"><a class="" href="../l6/c02-t10-heaps-and-priority-queues.html"><span>Heaps &amp; Priority Queues</span><span class="kind-pill "></span></a></li><li data-q="tries content/l6-interview-mastery/c02-dsa-for-interviews/t11-tries.md"><a class="" href="../l6/c02-t11-tries.html"><span>Tries</span><span class="kind-pill "></span></a></li><li data-q="dynamic programming content/l6-interview-mastery/c02-dsa-for-interviews/t12-dynamic-programming.md"><a class="" href="../l6/c02-t12-dynamic-programming.html"><span>Dynamic Programming</span><span class="kind-pill "></span></a></li><li data-q="greedy algorithms content/l6-interview-mastery/c02-dsa-for-interviews/t13-greedy-algorithms.md"><a class="" href="../l6/c02-t13-greedy-algorithms.html"><span>Greedy Algorithms</span><span class="kind-pill "></span></a></li><li data-q="coding interview patterns &amp; problem-solving framework content/l6-interview-mastery/c02-dsa-for-interviews/t14-coding-interview-patterns-and-problem-solving-framework.md"><a class="" href="../l6/c02-t14-coding-interview-patterns-and-problem-solving-framework.html"><span>Coding Interview Patterns &amp; Problem-Solving Framework</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design interviews content/l6-interview-mastery/c03-design-interviews/readme.md content/l6-interview-mastery/c03-design-interviews/t01-low-level-design-ood-interviews-framework.md content/l6-interview-mastery/c03-design-interviews/t02-ood-case-study-parking-lot.md content/l6-interview-mastery/c03-design-interviews/t03-ood-case-study-splitwise.md content/l6-interview-mastery/c03-design-interviews/t04-ood-case-study-library-management.md content/l6-interview-mastery/c03-design-interviews/t05-machine-coding-round-flipkart-style-90-minute-build.md content/l6-interview-mastery/c03-design-interviews/t06-high-level-system-design-interviews-framework.md content/l6-interview-mastery/c03-design-interviews/t07-hld-case-study-url-shortener.md content/l6-interview-mastery/c03-design-interviews/t08-hld-case-study-chat-messaging.md content/l6-interview-mastery/c03-design-interviews/t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.md"><summary><span class="caret">▶</span><span>C03 · Design Interviews</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — design interviews (lld &amp; hld) content/l6-interview-mastery/c03-design-interviews/readme.md"><a class="" href="../l6/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="low-level design (ood) interviews — framework content/l6-interview-mastery/c03-design-interviews/t01-low-level-design-ood-interviews-framework.md"><a class="" href="../l6/c03-t01-low-level-design-ood-interviews-framework.html"><span>Low-Level Design (OOD) Interviews — Framework</span><span class="kind-pill "></span></a></li><li data-q="ood case study: parking lot content/l6-interview-mastery/c03-design-interviews/t02-ood-case-study-parking-lot.md"><a class="" href="../l6/c03-t02-ood-case-study-parking-lot.html"><span>OOD Case Study: Parking Lot</span><span class="kind-pill "></span></a></li><li data-q="ood case study: splitwise content/l6-interview-mastery/c03-design-interviews/t03-ood-case-study-splitwise.md"><a class="" href="../l6/c03-t03-ood-case-study-splitwise.html"><span>OOD Case Study: Splitwise</span><span class="kind-pill "></span></a></li><li data-q="ood case study: library management content/l6-interview-mastery/c03-design-interviews/t04-ood-case-study-library-management.md"><a class="" href="../l6/c03-t04-ood-case-study-library-management.html"><span>OOD Case Study: Library Management</span><span class="kind-pill "></span></a></li><li data-q="machine coding round (flipkart-style 90-minute build) content/l6-interview-mastery/c03-design-interviews/t05-machine-coding-round-flipkart-style-90-minute-build.md"><a class="" href="../l6/c03-t05-machine-coding-round-flipkart-style-90-minute-build.html"><span>Machine Coding Round (Flipkart-style 90-Minute Build)</span><span class="kind-pill "></span></a></li><li data-q="high-level / system design interviews — framework content/l6-interview-mastery/c03-design-interviews/t06-high-level-system-design-interviews-framework.md"><a class="" href="../l6/c03-t06-high-level-system-design-interviews-framework.html"><span>High-Level / System Design Interviews — Framework</span><span class="kind-pill "></span></a></li><li data-q="hld case study: url shortener content/l6-interview-mastery/c03-design-interviews/t07-hld-case-study-url-shortener.md"><a class="" href="../l6/c03-t07-hld-case-study-url-shortener.html"><span>HLD Case Study: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="hld case study: chat / messaging content/l6-interview-mastery/c03-design-interviews/t08-hld-case-study-chat-messaging.md"><a class="" href="../l6/c03-t08-hld-case-study-chat-messaging.html"><span>HLD Case Study: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="hld case bundle: news feed, rate limiter, payments, notifications content/l6-interview-mastery/c03-design-interviews/t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.md"><a class="" href="../l6/c03-t09-hld-case-bundle-news-feed-rate-limiter-payments-notifications.html"><span>HLD Case Bundle: News Feed, Rate Limiter, Payments, Notifications</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · behavioral and company tracks content/l6-interview-mastery/c04-behavioral-and-company-tracks/readme.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t01-behavioral-interviews-star-car-sbi.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t02-java-specific-interview-q-and-a-by-level.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t03-company-track-amazon-leadership-principles.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t04-company-track-google.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t05-company-track-meta.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t06-company-track-apple.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t07-company-track-netflix.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t08-company-track-microsoft.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t09-company-track-flipkart.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.md content/l6-interview-mastery/c04-behavioral-and-company-tracks/t12-mock-interviews-and-self-grading-rubrics.md"><summary><span class="caret">▶</span><span>C04 · Behavioral And Company Tracks</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — behavioral &amp; company tracks content/l6-interview-mastery/c04-behavioral-and-company-tracks/readme.md"><a class="" href="../l6/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="behavioural interviews (star, car, sbi) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t01-behavioral-interviews-star-car-sbi.md"><a class="" href="../l6/c04-t01-behavioral-interviews-star-car-sbi.html"><span>Behavioural Interviews (STAR, CAR, SBI)</span><span class="kind-pill "></span></a></li><li data-q="java-specific interview q&amp;a (by level) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t02-java-specific-interview-q-and-a-by-level.md"><a class="" href="../l6/c04-t02-java-specific-interview-q-and-a-by-level.html"><span>Java-Specific Interview Q&amp;A (by Level)</span><span class="kind-pill "></span></a></li><li data-q="company track: amazon (leadership principles) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t03-company-track-amazon-leadership-principles.md"><a class="" href="../l6/c04-t03-company-track-amazon-leadership-principles.html"><span>Company Track: Amazon (Leadership Principles)</span><span class="kind-pill "></span></a></li><li data-q="company track: google content/l6-interview-mastery/c04-behavioral-and-company-tracks/t04-company-track-google.md"><a class="" href="../l6/c04-t04-company-track-google.html"><span>Company Track: Google</span><span class="kind-pill "></span></a></li><li data-q="company track: meta content/l6-interview-mastery/c04-behavioral-and-company-tracks/t05-company-track-meta.md"><a class="" href="../l6/c04-t05-company-track-meta.html"><span>Company Track: Meta</span><span class="kind-pill "></span></a></li><li data-q="company track: apple content/l6-interview-mastery/c04-behavioral-and-company-tracks/t06-company-track-apple.md"><a class="" href="../l6/c04-t06-company-track-apple.html"><span>Company Track: Apple</span><span class="kind-pill "></span></a></li><li data-q="company track: netflix content/l6-interview-mastery/c04-behavioral-and-company-tracks/t07-company-track-netflix.md"><a class="" href="../l6/c04-t07-company-track-netflix.html"><span>Company Track: Netflix</span><span class="kind-pill "></span></a></li><li data-q="company track: microsoft content/l6-interview-mastery/c04-behavioral-and-company-tracks/t08-company-track-microsoft.md"><a class="" href="../l6/c04-t08-company-track-microsoft.html"><span>Company Track: Microsoft</span><span class="kind-pill "></span></a></li><li data-q="company track: flipkart content/l6-interview-mastery/c04-behavioral-and-company-tracks/t09-company-track-flipkart.md"><a class="" href="../l6/c04-t09-company-track-flipkart.html"><span>Company Track: Flipkart</span><span class="kind-pill "></span></a></li><li data-q="company track: indian unicorns (razorpay, phonepe, swiggy, zomato, cred, myntra) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.md"><a class="" href="../l6/c04-t10-company-track-indian-unicorns-razorpay-phonepe-swiggy-zomato-cred-myntra.html"><span>Company Track: Indian Unicorns (Razorpay, PhonePe, Swiggy, Zomato, Cred, Myntra)</span><span class="kind-pill "></span></a></li><li data-q="company track: banking &amp; finance tech (goldman, jpmc, morgan stanley, barclays) content/l6-interview-mastery/c04-behavioral-and-company-tracks/t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.md"><a class="" href="../l6/c04-t11-company-track-banking-and-finance-tech-goldman-jpmc-morgan-stanley-barclays.html"><span>Company Track: Banking &amp; Finance Tech (Goldman, JPMC, Morgan Stanley, Barclays)</span><span class="kind-pill "></span></a></li><li data-q="mock interviews &amp; self-grading rubrics content/l6-interview-mastery/c04-behavioral-and-company-tracks/t12-mock-interviews-and-self-grading-rubrics.md"><a class="" href="../l6/c04-t12-mock-interviews-and-self-grading-rubrics.html"><span>Mock Interviews &amp; Self-Grading Rubrics</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · resume profile and career content/l6-interview-mastery/c05-resume-profile-and-career/readme.md content/l6-interview-mastery/c05-resume-profile-and-career/t01-resume-fundamentals-structure-length-ats-friendly-format.md content/l6-interview-mastery/c05-resume-profile-and-career/t02-writing-impactful-bullet-points-xyz-formula-metrics.md content/l6-interview-mastery/c05-resume-profile-and-career/t03-tailoring-resume-per-company-and-role.md content/l6-interview-mastery/c05-resume-profile-and-career/t04-linkedin-profile-and-recruiter-seo.md content/l6-interview-mastery/c05-resume-profile-and-career/t05-github-profile-projects-and-portfolio.md content/l6-interview-mastery/c05-resume-profile-and-career/t06-cover-letters-and-cold-outreach.md content/l6-interview-mastery/c05-resume-profile-and-career/t07-referrals-sourcing-and-asking.md content/l6-interview-mastery/c05-resume-profile-and-career/t08-job-search-pipeline-and-application-tracking.md content/l6-interview-mastery/c05-resume-profile-and-career/t09-offer-evaluation-and-salary-negotiation.md content/l6-interview-mastery/c05-resume-profile-and-career/t10-first-90-days-onboarding-and-demonstrating-impact.md"><summary><span class="caret">▶</span><span>C05 · Resume Profile And Career</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — resume, profile &amp; career preparation content/l6-interview-mastery/c05-resume-profile-and-career/readme.md"><a class="" href="../l6/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="resume fundamentals — structure, length, ats-friendly format content/l6-interview-mastery/c05-resume-profile-and-career/t01-resume-fundamentals-structure-length-ats-friendly-format.md"><a class="" href="../l6/c05-t01-resume-fundamentals-structure-length-ats-friendly-format.html"><span>Resume Fundamentals — Structure, Length, ATS-Friendly Format</span><span class="kind-pill "></span></a></li><li data-q="writing impactful bullet points (xyz formula, metrics) content/l6-interview-mastery/c05-resume-profile-and-career/t02-writing-impactful-bullet-points-xyz-formula-metrics.md"><a class="" href="../l6/c05-t02-writing-impactful-bullet-points-xyz-formula-metrics.html"><span>Writing Impactful Bullet Points (XYZ Formula, Metrics)</span><span class="kind-pill "></span></a></li><li data-q="tailoring resume per company &amp; role content/l6-interview-mastery/c05-resume-profile-and-career/t03-tailoring-resume-per-company-and-role.md"><a class="" href="../l6/c05-t03-tailoring-resume-per-company-and-role.html"><span>Tailoring Resume Per Company &amp; Role</span><span class="kind-pill "></span></a></li><li data-q="linkedin profile &amp; recruiter seo content/l6-interview-mastery/c05-resume-profile-and-career/t04-linkedin-profile-and-recruiter-seo.md"><a class="" href="../l6/c05-t04-linkedin-profile-and-recruiter-seo.html"><span>LinkedIn Profile &amp; Recruiter SEO</span><span class="kind-pill "></span></a></li><li data-q="github profile, projects &amp; portfolio content/l6-interview-mastery/c05-resume-profile-and-career/t05-github-profile-projects-and-portfolio.md"><a class="" href="../l6/c05-t05-github-profile-projects-and-portfolio.html"><span>GitHub Profile, Projects &amp; Portfolio</span><span class="kind-pill "></span></a></li><li data-q="cover letters &amp; cold outreach content/l6-interview-mastery/c05-resume-profile-and-career/t06-cover-letters-and-cold-outreach.md"><a class="" href="../l6/c05-t06-cover-letters-and-cold-outreach.html"><span>Cover Letters &amp; Cold Outreach</span><span class="kind-pill "></span></a></li><li data-q="referrals — sourcing and asking content/l6-interview-mastery/c05-resume-profile-and-career/t07-referrals-sourcing-and-asking.md"><a class="" href="../l6/c05-t07-referrals-sourcing-and-asking.html"><span>Referrals — Sourcing and Asking</span><span class="kind-pill "></span></a></li><li data-q="job-search pipeline &amp; application tracking content/l6-interview-mastery/c05-resume-profile-and-career/t08-job-search-pipeline-and-application-tracking.md"><a class="" href="../l6/c05-t08-job-search-pipeline-and-application-tracking.html"><span>Job-Search Pipeline &amp; Application Tracking</span><span class="kind-pill "></span></a></li><li data-q="offer evaluation &amp; salary negotiation content/l6-interview-mastery/c05-resume-profile-and-career/t09-offer-evaluation-and-salary-negotiation.md"><a class="" href="../l6/c05-t09-offer-evaluation-and-salary-negotiation.html"><span>Offer Evaluation &amp; Salary Negotiation</span><span class="kind-pill "></span></a></li><li data-q="first 90 days — onboarding &amp; demonstrating impact content/l6-interview-mastery/c05-resume-profile-and-career/t10-first-90-days-onboarding-and-demonstrating-impact.md"><a class="" href="../l6/c05-t10-first-90-days-onboarding-and-demonstrating-impact.html"><span>First 90 Days — Onboarding &amp; Demonstrating Impact</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · staff level interview question banks content/l6-interview-mastery/c06-staff-level-interview-question-banks/readme.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t01-java-language-and-core-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t02-java-concurrency-jvm-and-performance-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t03-collections-and-data-structures-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t04-spring-and-spring-boot-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t05-databases-and-persistence-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t06-system-design-and-architecture-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t07-distributed-systems-and-messaging-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t08-microservices-apis-and-cloud-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t09-security-devops-and-observability-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t10-behavioural-and-leadership-staff-principal-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t11-project-management-and-engineering-process-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t12-agile-scrum-and-team-practices-q-and-a-bank.md content/l6-interview-mastery/c06-staff-level-interview-question-banks/t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.md"><summary><span class="caret">▶</span><span>C06 · Staff Level Interview Question Banks</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — staff-level interview question banks content/l6-interview-mastery/c06-staff-level-interview-question-banks/readme.md"><a class="" href="../l6/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="java language &amp; core — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t01-java-language-and-core-q-and-a-bank.md"><a class="" href="../l6/c06-t01-java-language-and-core-q-and-a-bank.html"><span>Java Language &amp; Core — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="java concurrency, jvm &amp; performance — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t02-java-concurrency-jvm-and-performance-q-and-a-bank.md"><a class="" href="../l6/c06-t02-java-concurrency-jvm-and-performance-q-and-a-bank.html"><span>Java Concurrency, JVM &amp; Performance — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="collections &amp; data structures — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t03-collections-and-data-structures-q-and-a-bank.md"><a class="" href="../l6/c06-t03-collections-and-data-structures-q-and-a-bank.html"><span>Collections &amp; Data Structures — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="spring &amp; spring boot — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t04-spring-and-spring-boot-q-and-a-bank.md"><a class="" href="../l6/c06-t04-spring-and-spring-boot-q-and-a-bank.html"><span>Spring &amp; Spring Boot — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="databases &amp; persistence — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t05-databases-and-persistence-q-and-a-bank.md"><a class="" href="../l6/c06-t05-databases-and-persistence-q-and-a-bank.html"><span>Databases &amp; Persistence — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="system design &amp; architecture — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t06-system-design-and-architecture-q-and-a-bank.md"><a class="" href="../l6/c06-t06-system-design-and-architecture-q-and-a-bank.html"><span>System Design &amp; Architecture — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="distributed systems &amp; messaging — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t07-distributed-systems-and-messaging-q-and-a-bank.md"><a class="" href="../l6/c06-t07-distributed-systems-and-messaging-q-and-a-bank.html"><span>Distributed Systems &amp; Messaging — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="microservices, apis &amp; cloud — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t08-microservices-apis-and-cloud-q-and-a-bank.md"><a class="" href="../l6/c06-t08-microservices-apis-and-cloud-q-and-a-bank.html"><span>Microservices, APIs &amp; Cloud — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="security, devops &amp; observability — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t09-security-devops-and-observability-q-and-a-bank.md"><a class="" href="../l6/c06-t09-security-devops-and-observability-q-and-a-bank.html"><span>Security, DevOps &amp; Observability — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="behavioural &amp; leadership (staff / principal) — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t10-behavioural-and-leadership-staff-principal-q-and-a-bank.md"><a class="" href="../l6/c06-t10-behavioural-and-leadership-staff-principal-q-and-a-bank.html"><span>Behavioural &amp; Leadership (Staff / Principal) — Q&amp;A Bank</span><span class="kind-pill "></span></a></li><li data-q="project management &amp; engineering process — q&amp;a bank (staff level) content/l6-interview-mastery/c06-staff-level-interview-question-banks/t11-project-management-and-engineering-process-q-and-a-bank.md"><a class="" href="../l6/c06-t11-project-management-and-engineering-process-q-and-a-bank.html"><span>Project Management &amp; Engineering Process — Q&amp;A Bank (Staff Level)</span><span class="kind-pill "></span></a></li><li data-q="agile, scrum &amp; team practices — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t12-agile-scrum-and-team-practices-q-and-a-bank.md"><a class="" href="../l6/c06-t12-agile-scrum-and-team-practices-q-and-a-bank.html"><span>Agile, Scrum &amp; Team Practices — Q&amp;A Bank</span><span class="kind-pill "></span></a></li><li data-q="engineering tools (jira, confluence, git, ide, monitoring) — q&amp;a bank content/l6-interview-mastery/c06-staff-level-interview-question-banks/t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.md"><a class="" href="../l6/c06-t13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.html"><span>Engineering Tools (Jira, Confluence, Git, IDE, Monitoring) — Q&amp;A Bank</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · tools and environment content/l6-interview-mastery/c07-tools-and-environment/readme.md content/l6-interview-mastery/c07-tools-and-environment/t01-tools-for-interview-prep.md"><summary><span class="caret">▶</span><span>C07 · Tools And Environment</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — tools &amp; environment content/l6-interview-mastery/c07-tools-and-environment/readme.md"><a class="" href="../l6/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools &amp; environment for interview prep content/l6-interview-mastery/c07-tools-and-environment/t01-tools-for-interview-prep.md"><a class="" href="../l6/c07-t01-tools-for-interview-prep.html"><span>Tools &amp; Environment for Interview Prep</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · hands on content/l6-interview-mastery/c08-hands-on/readme.md content/l6-interview-mastery/c08-hands-on/t01-mock-interview-gauntlet.md"><summary><span class="caret">▶</span><span>C08 · Hands On</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — hands-on content/l6-interview-mastery/c08-hands-on/readme.md"><a class="" href="../l6/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l6 level project — mock interview gauntlet content/l6-interview-mastery/c08-hands-on/t01-mock-interview-gauntlet.md"><a class="" href="../l6/c08-t01-mock-interview-gauntlet.html"><span>L6 Level Project — Mock Interview Gauntlet</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · best practices content/l6-interview-mastery/c09-best-practices/readme.md content/l6-interview-mastery/c09-best-practices/t01-interview-best-practices-and-pitfalls.md"><summary><span class="caret">▶</span><span>C09 · Best Practices</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — best practices &amp; pitfalls content/l6-interview-mastery/c09-best-practices/readme.md"><a class="" href="../l6/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="best practices &amp; pitfalls — interview anti-patterns content/l6-interview-mastery/c09-best-practices/t01-interview-best-practices-and-pitfalls.md"><a class="" href="../l6/c09-t01-interview-best-practices-and-pitfalls.html"><span>Best Practices &amp; Pitfalls — Interview Anti-Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · qa faq content/l6-interview-mastery/c10-qa-faq/readme.md content/l6-interview-mastery/c10-qa-faq/t01-interview-prep-faq.md"><summary><span class="caret">▶</span><span>C10 · QA FAQ</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — q&amp;a / faq content/l6-interview-mastery/c10-qa-faq/readme.md"><a class="" href="../l6/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="q&amp;a / faq — interview prep frequently asked questions content/l6-interview-mastery/c10-qa-faq/t01-interview-prep-faq.md"><a class="" href="../l6/c10-t01-interview-prep-faq.html"><span>Q&amp;A / FAQ — Interview Prep Frequently Asked Questions</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · cheatsheets content/l6-interview-mastery/c11-cheatsheets/readme.md content/l6-interview-mastery/c11-cheatsheets/t01-l6-cheatsheets.md"><summary><span class="caret">▶</span><span>C11 · Cheatsheets</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — cheatsheets &amp; reference content/l6-interview-mastery/c11-cheatsheets/readme.md"><a class="" href="../l6/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l6 cheatsheets — one-pagers for the loop content/l6-interview-mastery/c11-cheatsheets/t01-l6-cheatsheets.md"><a class="" href="../l6/c11-t01-l6-cheatsheets.html"><span>L6 Cheatsheets — One-Pagers for the Loop</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · cross module index content/l6-interview-mastery/c12-cross-module-index/readme.md content/l6-interview-mastery/c12-cross-module-index/t01-cross-module-interview-index.md"><summary><span class="caret">▶</span><span>C12 · Cross Module Index</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — cross-module interview index content/l6-interview-mastery/c12-cross-module-index/readme.md"><a class="" href="../l6/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cross-module interview index content/l6-interview-mastery/c12-cross-module-index/t01-cross-module-interview-index.md"><a class="" href="../l6/c12-t01-cross-module-interview-index.html"><span>Cross-Module Interview Index</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · resources content/l6-interview-mastery/c13-resources/readme.md content/l6-interview-mastery/c13-resources/t01-resources-books-courses-blogs.md"><summary><span class="caret">▶</span><span>C13 · Resources</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — resources content/l6-interview-mastery/c13-resources/readme.md"><a class="" href="../l6/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="resources — books, courses, blogs, communities content/l6-interview-mastery/c13-resources/t01-resources-books-courses-blogs.md"><a class="" href="../l6/c13-t01-resources-books-courses-blogs.html"><span>Resources — Books, Courses, Blogs, Communities</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · mock interview library content/l6-interview-mastery/c14-mock-interview-library/readme.md content/l6-interview-mastery/c14-mock-interview-library/t01-mock-faang-senior-backend-coding.md content/l6-interview-mastery/c14-mock-interview-library/t02-mock-faang-staff-system-design.md content/l6-interview-mastery/c14-mock-interview-library/t03-mock-amazon-leadership-principles-behavioral.md content/l6-interview-mastery/c14-mock-interview-library/t04-mock-stripe-payment-system-design.md content/l6-interview-mastery/c14-mock-interview-library/t05-mock-indian-unicorn-senior-coding.md content/l6-interview-mastery/c14-mock-interview-library/t06-mock-banking-jvm-deep-interview.md content/l6-interview-mastery/c14-mock-interview-library/t07-mock-staff-architect-google-l6.md content/l6-interview-mastery/c14-mock-interview-library/t08-mock-cross-functional-staff-meta-e6.md content/l6-interview-mastery/c14-mock-interview-library/t09-mock-tech-lead-behavioral.md content/l6-interview-mastery/c14-mock-interview-library/t10-mock-hiring-manager-round.md content/l6-interview-mastery/c14-mock-interview-library/t11-mock-bar-raiser-executive-round.md content/l6-interview-mastery/c14-mock-interview-library/t12-mock-ai-ml-platform-engineer-2026.md content/l6-interview-mastery/c14-mock-interview-library/t13-mock-negotiation-conversation.md content/l6-interview-mastery/c14-mock-interview-library/t14-mock-90-day-plan-presentation.md content/l6-interview-mastery/c14-mock-interview-library/t15-anti-patterns-what-not-to-say.md"><summary><span class="caret">▶</span><span>C14 · Mock Interview Library</span></summary><ul class="pages"><li data-q="interview mastery (faangm + mnc) — mock interview library content/l6-interview-mastery/c14-mock-interview-library/readme.md"><a class="" href="../l6/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="mock: faang senior backend — coding round content/l6-interview-mastery/c14-mock-interview-library/t01-mock-faang-senior-backend-coding.md"><a class="" href="../l6/c14-t01-mock-faang-senior-backend-coding.html"><span>Mock: FAANG Senior Backend — Coding Round</span><span class="kind-pill "></span></a></li><li data-q="mock: faang staff — system design round content/l6-interview-mastery/c14-mock-interview-library/t02-mock-faang-staff-system-design.md"><a class="" href="../l6/c14-t02-mock-faang-staff-system-design.html"><span>Mock: FAANG Staff — System Design Round</span><span class="kind-pill "></span></a></li><li data-q="mock: amazon-style leadership principles — behavioral round content/l6-interview-mastery/c14-mock-interview-library/t03-mock-amazon-leadership-principles-behavioral.md"><a class="" href="../l6/c14-t03-mock-amazon-leadership-principles-behavioral.html"><span>Mock: Amazon-Style Leadership Principles — Behavioral Round</span><span class="kind-pill "></span></a></li><li data-q="mock: stripe-style payment — system design round content/l6-interview-mastery/c14-mock-interview-library/t04-mock-stripe-payment-system-design.md"><a class="" href="../l6/c14-t04-mock-stripe-payment-system-design.html"><span>Mock: Stripe-Style Payment — System Design Round</span><span class="kind-pill "></span></a></li><li data-q="mock: indian unicorn senior — coding + lld round content/l6-interview-mastery/c14-mock-interview-library/t05-mock-indian-unicorn-senior-coding.md"><a class="" href="../l6/c14-t05-mock-indian-unicorn-senior-coding.html"><span>Mock: Indian Unicorn Senior — Coding + LLD Round</span><span class="kind-pill "></span></a></li><li data-q="mock: banking jvm-deep interview (goldman-style) content/l6-interview-mastery/c14-mock-interview-library/t06-mock-banking-jvm-deep-interview.md"><a class="" href="../l6/c14-t06-mock-banking-jvm-deep-interview.html"><span>Mock: Banking JVM-Deep Interview (Goldman-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: staff architect (google l6-style) content/l6-interview-mastery/c14-mock-interview-library/t07-mock-staff-architect-google-l6.md"><a class="" href="../l6/c14-t07-mock-staff-architect-google-l6.html"><span>Mock: Staff Architect (Google L6-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: cross-functional staff (meta e6-style) content/l6-interview-mastery/c14-mock-interview-library/t08-mock-cross-functional-staff-meta-e6.md"><a class="" href="../l6/c14-t08-mock-cross-functional-staff-meta-e6.html"><span>Mock: Cross-Functional Staff (Meta E6-Style)</span><span class="kind-pill "></span></a></li><li data-q="mock: tech lead — behavioral round content/l6-interview-mastery/c14-mock-interview-library/t09-mock-tech-lead-behavioral.md"><a class="" href="../l6/c14-t09-mock-tech-lead-behavioral.html"><span>Mock: Tech Lead — Behavioral Round</span><span class="kind-pill "></span></a></li><li data-q="mock: hiring manager round content/l6-interview-mastery/c14-mock-interview-library/t10-mock-hiring-manager-round.md"><a class="" href="../l6/c14-t10-mock-hiring-manager-round.html"><span>Mock: Hiring Manager Round</span><span class="kind-pill "></span></a></li><li data-q="mock: bar raiser / executive round content/l6-interview-mastery/c14-mock-interview-library/t11-mock-bar-raiser-executive-round.md"><a class="" href="../l6/c14-t11-mock-bar-raiser-executive-round.html"><span>Mock: Bar Raiser / Executive Round</span><span class="kind-pill "></span></a></li><li data-q="mock: ai/ml platform engineer (2026) content/l6-interview-mastery/c14-mock-interview-library/t12-mock-ai-ml-platform-engineer-2026.md"><a class="" href="../l6/c14-t12-mock-ai-ml-platform-engineer-2026.html"><span>Mock: AI/ML Platform Engineer (2026)</span><span class="kind-pill "></span></a></li><li data-q="mock: compensation negotiation (verbatim) content/l6-interview-mastery/c14-mock-interview-library/t13-mock-negotiation-conversation.md"><a class="" href="../l6/c14-t13-mock-negotiation-conversation.html"><span>Mock: Compensation Negotiation (Verbatim)</span><span class="kind-pill "></span></a></li><li data-q="mock: the 90-day plan presentation content/l6-interview-mastery/c14-mock-interview-library/t14-mock-90-day-plan-presentation.md"><a class="" href="../l6/c14-t14-mock-90-day-plan-presentation.html"><span>Mock: The 90-Day Plan Presentation</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns: what not to say content/l6-interview-mastery/c14-mock-interview-library/t15-anti-patterns-what-not-to-say.md"><a class="" href="../l6/c14-t15-anti-patterns-what-not-to-say.html"><span>Anti-Patterns: What NOT To Say</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l6/index.html">L6 — Interview Mastery</a><span class="sep">/</span><span>Two Pointers &amp; Sliding Window</span></div>
+        <h1>Two Pointers &amp; Sliding Window</h1>
+        <div><span class="source-path">content/L6-interview-mastery/C02-dsa-for-interviews/T03-two-pointers-and-sliding-window.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~50 min</span><span class="meta-pill date">updated 2026-06-09</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Two Pointers &amp; Sliding Window"
+slug: two-pointers-and-sliding-window
+level: L6
+module: "Interview Mastery (FAANGM + MNC)"
+section: "DSA for Interviews (Java)"
+type: concept
+difficulty: senior
+order: 3
+tags: [two-pointers, sliding-window, monotonic, dsa, java, patterns]
+prerequisites: [hashing-interview-patterns]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-09</p>
+<hr>
+<h1 id="two-pointers-sliding-window">Two Pointers &amp; Sliding Window</h1>
+<p>Two-pointer and sliding-window techniques are <strong>the second-most-leveraged pattern family in interviews after hashing</strong>. They let you replace O(n²) brute-force scans with O(n) walks by maintaining a "window" or "pair of cursors" over the input, exploiting monotonic properties. Half of all "longest/shortest subarray with property X" problems collapse to sliding window; most "find pair in sorted array" problems are two-pointer. The patterns are small in number but apply to dozens of interview prompts.</p>
+<p>This topic covers the two pattern families, their precise applicability rules, and the Java idioms for fixed-window, variable-window, and two-pointer.</p>
+<h2 id="when-to-reach-for-each">When To Reach For Each<a class="anchor" href="#when-to-reach-for-each" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  P[Problem] --> Q1{Sorted array<br/>or pair-condition?}
+  Q1 -->|Yes| TP[Two pointers]
+  Q1 -->|No| Q2{Contiguous subarray<br/>or substring?}
+  Q2 -->|Yes, fixed size| FW[Fixed-size sliding window]
+  Q2 -->|Yes, variable size| VW[Variable sliding window]
+  Q2 -->|No| Other[Hashing / DP / other]
+</div>
+<p><strong>Two pointers</strong>: usually two cursors moving toward each other (or both moving forward at different rates) over a sorted or monotonic structure.</p>
+<p><strong>Sliding window</strong>: one cursor expands, another shrinks; maintain a state about the current window; track best/longest/shortest.</p>
+<p>The two are cousins — sliding window IS a flavour of two pointer where both move in the same direction.</p>
+<h2 id="two-pointers-the-three-flavours">Two Pointers — The Three Flavours<a class="anchor" href="#two-pointers-the-three-flavours" aria-hidden="true">#</a></h2>
+<h3 id="flavour-1-converging-pointers-on-sorted-input">Flavour 1: Converging pointers on sorted input<a class="anchor" href="#flavour-1-converging-pointers-on-sorted-input" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Two Sum II — Input Array Sorted&quot;
+public int[] twoSum(int[] nums, int target) {
+    int lo = 0, hi = nums.length - 1;
+    while (lo &lt; hi) {
+        int sum = nums[lo] + nums[hi];
+        if (sum == target) return new int[]{lo + 1, hi + 1};
+        else if (sum &lt; target) lo++;
+        else hi--;
+    }
+    return new int[]{-1, -1};
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p>The monotonic property: when sum &lt; target, increasing <code>lo</code> is the only way to reach target (decreasing <code>hi</code> makes sum smaller).</p>
+<p><strong>Variants</strong>: 3Sum (fix one, two-pointer the rest), 3Sum Closest, 4Sum, Container With Most Water.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Container With Most Water&quot;
+public int maxArea(int[] height) {
+    int lo = 0, hi = height.length - 1, best = 0;
+    while (lo &lt; hi) {
+        int area = Math.min(height[lo], height[hi]) * (hi - lo);
+        best = Math.max(best, area);
+        if (height[lo] &lt; height[hi]) lo++; else hi--;
+    }
+    return best;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p>The insight: the shorter side limits area, so moving the taller side cannot improve area — always move the shorter side.</p>
+<h3 id="flavour-2-same-direction-pointers-fast-slow">Flavour 2: Same-direction pointers (fast &amp; slow)<a class="anchor" href="#flavour-2-same-direction-pointers-fast-slow" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Remove Duplicates from Sorted Array&quot; — return new length, in-place
+public int removeDuplicates(int[] nums) {
+    if (nums.length == 0) return 0;
+    int write = 1;
+    for (int read = 1; read &lt; nums.length; read++) {
+        if (nums[read] != nums[read - 1]) {
+            nums[write++] = nums[read];
+        }
+    }
+    return write;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p><code>read</code> walks the input; <code>write</code> advances only on "kept" elements. Pattern: read ≥ write always.</p>
+<h3 id="flavour-3-cycle-detection-floyds-tortoise-hare">Flavour 3: Cycle detection (Floyd's tortoise + hare)<a class="anchor" href="#flavour-3-cycle-detection-floyds-tortoise-hare" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Linked List Cycle&quot;
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null &amp;&amp; fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p>Fast moves 2× speed; if there's a cycle, fast catches slow inside it. (Linked-list specific — see <a href="c02-t06-linked-lists.html">T06</a>.)</p>
+<h2 id="sliding-window-the-two-flavours">Sliding Window — The Two Flavours<a class="anchor" href="#sliding-window-the-two-flavours" aria-hidden="true">#</a></h2>
+<h3 id="fixed-size-window">Fixed-size window<a class="anchor" href="#fixed-size-window" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Maximum Average Subarray I&quot; — fixed window size k
+public double findMaxAverage(int[] nums, int k) {
+    int sum = 0;
+    for (int i = 0; i &lt; k; i++) sum += nums[i];
+    int best = sum;
+    for (int i = k; i &lt; nums.length; i++) {
+        sum += nums[i] - nums[i - k];           // slide: add new, remove old
+        best = Math.max(best, sum);
+    }
+    return best / (double) k;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p>Pattern: initialise window of size k, then slide one step at a time, updating state in O(1) per step.</p>
+<h3 id="variable-size-window-expand-shrink">Variable-size window (expand-shrink)<a class="anchor" href="#variable-size-window-expand-shrink" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Minimum Size Subarray Sum&quot; — smallest contiguous sum ≥ target
+public int minSubArrayLen(int target, int[] nums) {
+    int lo = 0, sum = 0, best = Integer.MAX_VALUE;
+    for (int hi = 0; hi &lt; nums.length; hi++) {
+        sum += nums[hi];                          // expand
+        while (sum &gt;= target) {                   // shrink while still valid
+            best = Math.min(best, hi - lo + 1);
+            sum -= nums[lo++];
+        }
+    }
+    return best == Integer.MAX_VALUE ? 0 : best;
+}
+// O(n) time — each element added once and removed at most once
+</code></pre></div>
+<p>Two-cursor expand-then-shrink. The <code>hi</code> cursor walks forward; <code>lo</code> advances only when the window can shrink while remaining valid.</p>
+<h3 id="variable-window-with-state-map">Variable window with state map<a class="anchor" href="#variable-window-with-state-map" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Longest Substring Without Repeating Characters&quot;
+public int lengthOfLongestSubstring(String s) {
+    Map&lt;Character, Integer&gt; last = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        if (last.containsKey(c) &amp;&amp; last.get(c) &gt;= lo) {
+            lo = last.get(c) + 1;                 // jump past last occurrence
+        }
+        last.put(c, hi);
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(min(n, alphabet)) space
+</code></pre></div>
+<p>When the window contains a duplicate, jump <code>lo</code> past the duplicate's previous position.</p>
+<h3 id="variable-window-with-frequency-state">Variable window with frequency state<a class="anchor" href="#variable-window-with-frequency-state" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// &quot;Minimum Window Substring&quot; — smallest window of s containing all chars of t
+public String minWindow(String s, String t) {
+    Map&lt;Character, Integer&gt; need = new HashMap&lt;&gt;();
+    for (char c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+    int needed = need.size(), formed = 0;
+    Map&lt;Character, Integer&gt; window = new HashMap&lt;&gt;();
+    int lo = 0, bestLen = Integer.MAX_VALUE, bestLo = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        window.merge(c, 1, Integer::sum);
+        if (need.containsKey(c) &amp;&amp; window.get(c).equals(need.get(c))) formed++;
+        while (formed == needed) {
+            if (hi - lo + 1 &lt; bestLen) { bestLen = hi - lo + 1; bestLo = lo; }
+            char d = s.charAt(lo++);
+            window.merge(d, -1, Integer::sum);
+            if (need.containsKey(d) &amp;&amp; window.get(d) &lt; need.get(d)) formed--;
+        }
+    }
+    return bestLen == Integer.MAX_VALUE ? &quot;&quot; : s.substring(bestLo, bestLo + bestLen);
+}
+// O(|s| + |t|) time, O(|s| + |t|) space
+</code></pre></div>
+<p>The hardest template: window + need-map + formed-counter. Used for "smallest window containing all", "permutation in string", "find all anagrams" family.</p>
+<h2 id="the-sliding-window-template">The Sliding-Window Template<a class="anchor" href="#the-sliding-window-template" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">initialise lo = 0, state = empty, best = bad-default
+for hi in 0..n-1:
+    add nums[hi] / s.charAt(hi) to state
+    while window invalid OR shrinkable while still valid:
+        update best (if window-valid)
+        remove nums[lo] / s.charAt(lo) from state
+        lo++
+    update best (if outside while loop is the right place)
+return best
+</code></pre></div>
+<p>The two key decisions:
+1. <strong>What's the validity condition?</strong> (sum ≥ target, no duplicates, formed == needed)
+2. <strong>Where do you update <code>best</code>?</strong> Inside the shrink loop (for "smallest"), or after expanding (for "largest" — when the while loop ensures validity, the max is outside).</p>
+<h2 id="when-sliding-window-doesnt-apply">When Sliding Window DOESN'T Apply<a class="anchor" href="#when-sliding-window-doesnt-apply" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Subarrays with negatives where you need a target sum</strong> — window doesn't monotonically grow/shrink. Use prefix sum + hashmap instead.</li>
+<li><strong>Non-contiguous subsequences</strong> — sliding window is contiguous only.</li>
+<li><strong>Need all subarrays of size k</strong>, not just min/max — sliding window gives min/max in O(n) but enumerating all is O(n·k).</li>
+</ul>
+<h2 id="common-mistakes-that-score-low">Common Mistakes That Score Low<a class="anchor" href="#common-mistakes-that-score-low" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Confusing "subarray" (contiguous) with "subsequence" (any order)</strong>. Subarray → window; subsequence → DP or recursion.</li>
+<li><strong>Wrong while-loop condition</strong> — invalidates the window or fails to shrink.</li>
+<li><strong>Updating <code>best</code> in the wrong place</strong> — outside the shrink loop for "smallest" gives wrong answer.</li>
+<li><strong>Forgetting to remove from state on shrink</strong> — window state diverges from actual window.</li>
+<li><strong>Off-by-one on window length</strong> — <code>hi - lo + 1</code>, not <code>hi - lo</code>.</li>
+</ul>
+<h2 id="worked-end-to-end-example">Worked End-To-End Example<a class="anchor" href="#worked-end-to-end-example" aria-hidden="true">#</a></h2>
+<p><strong>Problem</strong>: "Longest Substring with At Most K Distinct Characters."</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int lengthOfLongestSubstringKDistinct(String s, int k) {
+    if (k == 0) return 0;
+    Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        count.merge(s.charAt(hi), 1, Integer::sum);
+        while (count.size() &gt; k) {
+            char d = s.charAt(lo++);
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(k) space
+</code></pre></div>
+<p><strong>Talking through</strong>: <em>"Sliding window with a frequency map of the current window's chars. Window invalid when distinct count &gt; k; shrink by advancing <code>lo</code> until valid again. Update best after the shrink (since we want the largest valid window). Edge case: k=0 returns 0. Final: O(n) time, O(k) space."</em></p>
+<h2 id="sources-further-reading">Sources &amp; Further Reading<a class="anchor" href="#sources-further-reading" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="https://leetcode.com/tag/sliding-window/">LeetCode Sliding Window tag</a></li>
+<li><a href="https://www.educative.io/courses/grokking-the-coding-interview">Educative — Grokking the Coding Interview</a></li>
+<li><a href="https://www.techinterviewhandbook.org/algorithms/two-pointers/">Tech Interview Handbook — Two Pointers</a></li>
+</ul>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Two Sum II (sorted)</strong> — converging two-pointer.</li>
+<li><strong>3Sum</strong> — fix-one + two-pointer.</li>
+<li><strong>Container With Most Water</strong> — converging with monotonic insight.</li>
+<li><strong>Trapping Rain Water</strong> — two-pointer with max-from-left + max-from-right.</li>
+<li><strong>Remove Duplicates from Sorted Array</strong> — same-direction.</li>
+<li><strong>Move Zeros</strong> — same-direction (also in T01).</li>
+<li><strong>Maximum Average Subarray I</strong> — fixed window.</li>
+<li><strong>Minimum Size Subarray Sum</strong> — variable window.</li>
+<li><strong>Longest Substring Without Repeating Characters</strong> — variable + state map.</li>
+<li><strong>Minimum Window Substring</strong> — variable + need-formed counter.</li>
+<li><strong>Permutation in String</strong> — variable window with frequency comparison.</li>
+<li><strong>Find All Anagrams in a String</strong> — fixed window with frequency comparison.</li>
+<li><strong>Longest Substring with At Most K Distinct Characters</strong> — variable + frequency map size.</li>
+<li><strong>Fruit Into Baskets</strong> — same as "at most 2 distinct".</li>
+<li><strong>Sliding Window Maximum</strong> — monotonic deque (covered in T07 Stacks/Queues).</li>
+</ol>
+<h2 id="detailed-worked-solutions">Detailed Worked Solutions<a class="anchor" href="#detailed-worked-solutions" aria-hidden="true">#</a></h2>
+<h3 id="1-remove-duplicates-from-sorted-array">1. Remove Duplicates from Sorted Array<a class="anchor" href="#1-remove-duplicates-from-sorted-array" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> In-place remove duplicates; return new length. Elements beyond new length don't matter.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int removeDuplicates(int[] nums) {
+    if (nums.length == 0) return 0;
+    int write = 1;
+    for (int read = 1; read &lt; nums.length; read++) {
+        if (nums[read] != nums[read - 1]) nums[write++] = nums[read];
+    }
+    return write;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p><strong>Walkthrough on <code>[1,1,2,2,3]</code></strong>: write=1, read=1→nums[1]==nums[0] skip; read=2→nums[2]=2, write=2; read=3→skip; read=4→nums[3]=3, write=3. Returns 3; array=[1,2,3,2,3].</p>
+<h3 id="2-maximum-average-subarray-i-fixed-window">2. Maximum Average Subarray I (fixed window)<a class="anchor" href="#2-maximum-average-subarray-i-fixed-window" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Find the contiguous subarray of length <code>k</code> with maximum average.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public double findMaxAverage(int[] nums, int k) {
+    int sum = 0;
+    for (int i = 0; i &lt; k; i++) sum += nums[i];
+    int best = sum;
+    for (int i = k; i &lt; nums.length; i++) {
+        sum += nums[i] - nums[i - k];
+        best = Math.max(best, sum);
+    }
+    return best / (double) k;
+}
+// O(n) time, O(1) space
+</code></pre></div>
+<p><strong>Key trick</strong>: maintain <code>sum</code> incrementally — add new element, remove old leftmost. O(1) per slide.</p>
+<h3 id="3-minimum-size-subarray-sum">3. Minimum Size Subarray Sum<a class="anchor" href="#3-minimum-size-subarray-sum" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Find the minimal length of a contiguous subarray with sum ≥ <code>target</code>. Return 0 if none.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int minSubArrayLen(int target, int[] nums) {
+    int lo = 0, sum = 0, best = Integer.MAX_VALUE;
+    for (int hi = 0; hi &lt; nums.length; hi++) {
+        sum += nums[hi];
+        while (sum &gt;= target) {
+            best = Math.min(best, hi - lo + 1);
+            sum -= nums[lo++];
+        }
+    }
+    return best == Integer.MAX_VALUE ? 0 : best;
+}
+// O(n) time — each element added once + removed at most once
+</code></pre></div>
+<p><strong>Walkthrough on <code>nums=[2,3,1,2,4,3], target=7</code></strong>:
+- hi=0 sum=2
+- hi=1 sum=5
+- hi=2 sum=6
+- hi=3 sum=8 → shrink: best=4 (len 4), sum=6, lo=1 → loop exits (sum&lt;7)
+- hi=4 sum=10 → best=4, sum=8, lo=2 → best=3 (len 3), sum=7, lo=3 → best=2 (len 2), sum=6, lo=4 → exit
+- hi=5 sum=9 → best=2 (len 2), sum=6 → exit. Return 2 (subarray [4,3]).</p>
+<h3 id="4-minimum-window-substring-the-hardest-sliding-window">4. Minimum Window Substring (the hardest sliding window)<a class="anchor" href="#4-minimum-window-substring-the-hardest-sliding-window" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Find the smallest substring of <code>s</code> that contains every character of <code>t</code> (with multiplicity).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public String minWindow(String s, String t) {
+    if (t.length() &gt; s.length()) return &quot;&quot;;
+    Map&lt;Character, Integer&gt; need = new HashMap&lt;&gt;();
+    for (char c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+    int needed = need.size(), formed = 0;
+    Map&lt;Character, Integer&gt; window = new HashMap&lt;&gt;();
+    int lo = 0, bestLen = Integer.MAX_VALUE, bestLo = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        window.merge(c, 1, Integer::sum);
+        if (need.containsKey(c) &amp;&amp; window.get(c).intValue() == need.get(c).intValue()) formed++;
+        while (formed == needed) {
+            if (hi - lo + 1 &lt; bestLen) { bestLen = hi - lo + 1; bestLo = lo; }
+            char d = s.charAt(lo++);
+            window.merge(d, -1, Integer::sum);
+            if (need.containsKey(d) &amp;&amp; window.get(d) &lt; need.get(d)) formed--;
+        }
+    }
+    return bestLen == Integer.MAX_VALUE ? &quot;&quot; : s.substring(bestLo, bestLo + bestLen);
+}
+// O(|s| + |t|) time, O(|s| + |t|) space
+</code></pre></div>
+<p><strong>Walkthrough on <code>s="ADOBECODEBANC", t="ABC"</code></strong>:
+- need = {A:1, B:1, C:1}, needed=3.
+- Expand until <code>formed==3</code>: window <code>"ADOBEC"</code> has all → record best.
+- Shrink from left: remove <code>A</code> → formed=2 → expand again.
+- Eventually best = <code>"BANC"</code> (length 4).</p>
+<p><strong>Critical</strong>: <code>.intValue()</code> comparison avoids <code>Integer == Integer</code> cache trap.</p>
+<h3 id="5-permutation-in-string-sliding-window-with-frequency-comparison">5. Permutation in String (sliding window with frequency comparison)<a class="anchor" href="#5-permutation-in-string-sliding-window-with-frequency-comparison" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Return true if <code>s2</code> contains any permutation of <code>s1</code> as a substring.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public boolean checkInclusion(String s1, String s2) {
+    if (s1.length() &gt; s2.length()) return false;
+    int[] need = new int[26], have = new int[26];
+    for (char c : s1.toCharArray()) need[c - 'a']++;
+    int k = s1.length();
+    for (int i = 0; i &lt; s2.length(); i++) {
+        have[s2.charAt(i) - 'a']++;
+        if (i &gt;= k) have[s2.charAt(i - k) - 'a']--;
+        if (Arrays.equals(have, need)) return true;
+    }
+    return false;
+}
+// O(n × 26) ≈ O(n) time, O(1) space
+</code></pre></div>
+<p><strong>Why <code>Arrays.equals</code> on 26-element arrays is OK</strong>: 26 is constant; total O(n).</p>
+<h3 id="6-find-all-anagrams-in-a-string">6. Find All Anagrams in a String<a class="anchor" href="#6-find-all-anagrams-in-a-string" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Return all starting indices where any anagram of <code>p</code> is a substring of <code>s</code>.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public List&lt;Integer&gt; findAnagrams(String s, String p) {
+    List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+    if (s.length() &lt; p.length()) return result;
+    int[] need = new int[26], have = new int[26];
+    for (char c : p.toCharArray()) need[c - 'a']++;
+    int k = p.length();
+    for (int i = 0; i &lt; s.length(); i++) {
+        have[s.charAt(i) - 'a']++;
+        if (i &gt;= k) have[s.charAt(i - k) - 'a']--;
+        if (i &gt;= k - 1 &amp;&amp; Arrays.equals(have, need)) result.add(i - k + 1);
+    }
+    return result;
+}
+// O(n) time, O(1) space (26 alphabet)
+</code></pre></div>
+<h3 id="7-longest-substring-with-at-most-k-distinct-characters">7. Longest Substring with At Most K Distinct Characters<a class="anchor" href="#7-longest-substring-with-at-most-k-distinct-characters" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Length of longest substring containing ≤ k distinct characters.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int lengthOfLongestSubstringKDistinct(String s, int k) {
+    if (k == 0) return 0;
+    Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        count.merge(s.charAt(hi), 1, Integer::sum);
+        while (count.size() &gt; k) {
+            char d = s.charAt(lo++);
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(k) space
+</code></pre></div>
+<p><strong>Edge case</strong>: <code>k = 0</code> → return 0 (no characters allowed).</p>
+<h3 id="8-fruit-into-baskets-k2-variant">8. Fruit Into Baskets (k=2 variant)<a class="anchor" href="#8-fruit-into-baskets-k2-variant" aria-hidden="true">#</a></h3>
+<p><strong>Problem.</strong> Equivalent to "longest substring with at most 2 distinct" — return max length.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public int totalFruit(int[] fruits) {
+    Map&lt;Integer, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; fruits.length; hi++) {
+        count.merge(fruits[hi], 1, Integer::sum);
+        while (count.size() &gt; 2) {
+            int d = fruits[lo++];
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(1) space (at most 3 entries in map)
+</code></pre></div>
+<p><strong>Same pattern as problem 7 with k=2 hardcoded</strong> — pattern recognition matters more than memorising each problem.</p>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Pick between <strong>two pointers, fixed window, and variable window</strong> for any "subarray / substring with property" prompt.</li>
+<li>Apply the <strong>three two-pointer flavours</strong>: converging (sorted), same-direction (read/write), Floyd's cycle (slow/fast).</li>
+<li>Apply the <strong>two sliding-window flavours</strong>: fixed-size (slide by one) and variable-size (expand-shrink).</li>
+<li>Use the <strong>standard variable-window template</strong> (lo + hi + state + while-invalid shrink + update best).</li>
+<li>Handle the <strong>frequency-state variant</strong> (need map + formed counter) for the "minimum window containing all" family.</li>
+<li>Recognise when <strong>sliding window does NOT apply</strong> (negatives + target sum, subsequences, all-subarrays-of-size-k).</li>
+<li>Avoid the <strong>common mistakes</strong> (subarray vs subsequence, wrong shrink condition, wrong update-best placement, off-by-one length).</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t04-recursion-and-backtracking.html">Recursion &amp; Backtracking</a>.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Two Pointers &amp; Sliding Window&quot;
+slug: two-pointers-and-sliding-window
+level: L6
+module: &quot;Interview Mastery (FAANGM + MNC)&quot;
+section: &quot;DSA for Interviews (Java)&quot;
+type: concept
+difficulty: senior
+order: 3
+tags: [two-pointers, sliding-window, monotonic, dsa, java, patterns]
+prerequisites: [hashing-interview-patterns]
+status: complete
+estimated_minutes: 50
+last_updated: 2026-06-09
+---
+
+# Two Pointers &amp; Sliding Window
+
+Two-pointer and sliding-window techniques are **the second-most-leveraged pattern family in interviews after hashing**. They let you replace O(n²) brute-force scans with O(n) walks by maintaining a &quot;window&quot; or &quot;pair of cursors&quot; over the input, exploiting monotonic properties. Half of all &quot;longest/shortest subarray with property X&quot; problems collapse to sliding window; most &quot;find pair in sorted array&quot; problems are two-pointer. The patterns are small in number but apply to dozens of interview prompts.
+
+This topic covers the two pattern families, their precise applicability rules, and the Java idioms for fixed-window, variable-window, and two-pointer.
+
+## When To Reach For Each
+
+```mermaid
+flowchart TB
+  P[Problem] --&gt; Q1{Sorted array&lt;br/&gt;or pair-condition?}
+  Q1 --&gt;|Yes| TP[Two pointers]
+  Q1 --&gt;|No| Q2{Contiguous subarray&lt;br/&gt;or substring?}
+  Q2 --&gt;|Yes, fixed size| FW[Fixed-size sliding window]
+  Q2 --&gt;|Yes, variable size| VW[Variable sliding window]
+  Q2 --&gt;|No| Other[Hashing / DP / other]
+```
+
+**Two pointers**: usually two cursors moving toward each other (or both moving forward at different rates) over a sorted or monotonic structure.
+
+**Sliding window**: one cursor expands, another shrinks; maintain a state about the current window; track best/longest/shortest.
+
+The two are cousins — sliding window IS a flavour of two pointer where both move in the same direction.
+
+## Two Pointers — The Three Flavours
+
+### Flavour 1: Converging pointers on sorted input
+
+```java
+// &quot;Two Sum II — Input Array Sorted&quot;
+public int[] twoSum(int[] nums, int target) {
+    int lo = 0, hi = nums.length - 1;
+    while (lo &lt; hi) {
+        int sum = nums[lo] + nums[hi];
+        if (sum == target) return new int[]{lo + 1, hi + 1};
+        else if (sum &lt; target) lo++;
+        else hi--;
+    }
+    return new int[]{-1, -1};
+}
+// O(n) time, O(1) space
+```
+
+The monotonic property: when sum &lt; target, increasing `lo` is the only way to reach target (decreasing `hi` makes sum smaller).
+
+**Variants**: 3Sum (fix one, two-pointer the rest), 3Sum Closest, 4Sum, Container With Most Water.
+
+```java
+// &quot;Container With Most Water&quot;
+public int maxArea(int[] height) {
+    int lo = 0, hi = height.length - 1, best = 0;
+    while (lo &lt; hi) {
+        int area = Math.min(height[lo], height[hi]) * (hi - lo);
+        best = Math.max(best, area);
+        if (height[lo] &lt; height[hi]) lo++; else hi--;
+    }
+    return best;
+}
+// O(n) time, O(1) space
+```
+
+The insight: the shorter side limits area, so moving the taller side cannot improve area — always move the shorter side.
+
+### Flavour 2: Same-direction pointers (fast &amp; slow)
+
+```java
+// &quot;Remove Duplicates from Sorted Array&quot; — return new length, in-place
+public int removeDuplicates(int[] nums) {
+    if (nums.length == 0) return 0;
+    int write = 1;
+    for (int read = 1; read &lt; nums.length; read++) {
+        if (nums[read] != nums[read - 1]) {
+            nums[write++] = nums[read];
+        }
+    }
+    return write;
+}
+// O(n) time, O(1) space
+```
+
+`read` walks the input; `write` advances only on &quot;kept&quot; elements. Pattern: read ≥ write always.
+
+### Flavour 3: Cycle detection (Floyd&#x27;s tortoise + hare)
+
+```java
+// &quot;Linked List Cycle&quot;
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null &amp;&amp; fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+// O(n) time, O(1) space
+```
+
+Fast moves 2× speed; if there&#x27;s a cycle, fast catches slow inside it. (Linked-list specific — see [T06](./T06-linked-lists.md).)
+
+## Sliding Window — The Two Flavours
+
+### Fixed-size window
+
+```java
+// &quot;Maximum Average Subarray I&quot; — fixed window size k
+public double findMaxAverage(int[] nums, int k) {
+    int sum = 0;
+    for (int i = 0; i &lt; k; i++) sum += nums[i];
+    int best = sum;
+    for (int i = k; i &lt; nums.length; i++) {
+        sum += nums[i] - nums[i - k];           // slide: add new, remove old
+        best = Math.max(best, sum);
+    }
+    return best / (double) k;
+}
+// O(n) time, O(1) space
+```
+
+Pattern: initialise window of size k, then slide one step at a time, updating state in O(1) per step.
+
+### Variable-size window (expand-shrink)
+
+```java
+// &quot;Minimum Size Subarray Sum&quot; — smallest contiguous sum ≥ target
+public int minSubArrayLen(int target, int[] nums) {
+    int lo = 0, sum = 0, best = Integer.MAX_VALUE;
+    for (int hi = 0; hi &lt; nums.length; hi++) {
+        sum += nums[hi];                          // expand
+        while (sum &gt;= target) {                   // shrink while still valid
+            best = Math.min(best, hi - lo + 1);
+            sum -= nums[lo++];
+        }
+    }
+    return best == Integer.MAX_VALUE ? 0 : best;
+}
+// O(n) time — each element added once and removed at most once
+```
+
+Two-cursor expand-then-shrink. The `hi` cursor walks forward; `lo` advances only when the window can shrink while remaining valid.
+
+### Variable window with state map
+
+```java
+// &quot;Longest Substring Without Repeating Characters&quot;
+public int lengthOfLongestSubstring(String s) {
+    Map&lt;Character, Integer&gt; last = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        if (last.containsKey(c) &amp;&amp; last.get(c) &gt;= lo) {
+            lo = last.get(c) + 1;                 // jump past last occurrence
+        }
+        last.put(c, hi);
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(min(n, alphabet)) space
+```
+
+When the window contains a duplicate, jump `lo` past the duplicate&#x27;s previous position.
+
+### Variable window with frequency state
+
+```java
+// &quot;Minimum Window Substring&quot; — smallest window of s containing all chars of t
+public String minWindow(String s, String t) {
+    Map&lt;Character, Integer&gt; need = new HashMap&lt;&gt;();
+    for (char c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+    int needed = need.size(), formed = 0;
+    Map&lt;Character, Integer&gt; window = new HashMap&lt;&gt;();
+    int lo = 0, bestLen = Integer.MAX_VALUE, bestLo = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        window.merge(c, 1, Integer::sum);
+        if (need.containsKey(c) &amp;&amp; window.get(c).equals(need.get(c))) formed++;
+        while (formed == needed) {
+            if (hi - lo + 1 &lt; bestLen) { bestLen = hi - lo + 1; bestLo = lo; }
+            char d = s.charAt(lo++);
+            window.merge(d, -1, Integer::sum);
+            if (need.containsKey(d) &amp;&amp; window.get(d) &lt; need.get(d)) formed--;
+        }
+    }
+    return bestLen == Integer.MAX_VALUE ? &quot;&quot; : s.substring(bestLo, bestLo + bestLen);
+}
+// O(|s| + |t|) time, O(|s| + |t|) space
+```
+
+The hardest template: window + need-map + formed-counter. Used for &quot;smallest window containing all&quot;, &quot;permutation in string&quot;, &quot;find all anagrams&quot; family.
+
+## The Sliding-Window Template
+
+```text
+initialise lo = 0, state = empty, best = bad-default
+for hi in 0..n-1:
+    add nums[hi] / s.charAt(hi) to state
+    while window invalid OR shrinkable while still valid:
+        update best (if window-valid)
+        remove nums[lo] / s.charAt(lo) from state
+        lo++
+    update best (if outside while loop is the right place)
+return best
+```
+
+The two key decisions:
+1. **What&#x27;s the validity condition?** (sum ≥ target, no duplicates, formed == needed)
+2. **Where do you update `best`?** Inside the shrink loop (for &quot;smallest&quot;), or after expanding (for &quot;largest&quot; — when the while loop ensures validity, the max is outside).
+
+## When Sliding Window DOESN&#x27;T Apply
+
+- **Subarrays with negatives where you need a target sum** — window doesn&#x27;t monotonically grow/shrink. Use prefix sum + hashmap instead.
+- **Non-contiguous subsequences** — sliding window is contiguous only.
+- **Need all subarrays of size k**, not just min/max — sliding window gives min/max in O(n) but enumerating all is O(n·k).
+
+## Common Mistakes That Score Low
+
+- **Confusing &quot;subarray&quot; (contiguous) with &quot;subsequence&quot; (any order)**. Subarray → window; subsequence → DP or recursion.
+- **Wrong while-loop condition** — invalidates the window or fails to shrink.
+- **Updating `best` in the wrong place** — outside the shrink loop for &quot;smallest&quot; gives wrong answer.
+- **Forgetting to remove from state on shrink** — window state diverges from actual window.
+- **Off-by-one on window length** — `hi - lo + 1`, not `hi - lo`.
+
+## Worked End-To-End Example
+
+**Problem**: &quot;Longest Substring with At Most K Distinct Characters.&quot;
+
+```java
+public int lengthOfLongestSubstringKDistinct(String s, int k) {
+    if (k == 0) return 0;
+    Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        count.merge(s.charAt(hi), 1, Integer::sum);
+        while (count.size() &gt; k) {
+            char d = s.charAt(lo++);
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(k) space
+```
+
+**Talking through**: *&quot;Sliding window with a frequency map of the current window&#x27;s chars. Window invalid when distinct count &gt; k; shrink by advancing `lo` until valid again. Update best after the shrink (since we want the largest valid window). Edge case: k=0 returns 0. Final: O(n) time, O(k) space.&quot;*
+
+## Sources &amp; Further Reading
+
+- [LeetCode Sliding Window tag](https://leetcode.com/tag/sliding-window/)
+- [Educative — Grokking the Coding Interview](https://www.educative.io/courses/grokking-the-coding-interview)
+- [Tech Interview Handbook — Two Pointers](https://www.techinterviewhandbook.org/algorithms/two-pointers/)
+
+## Practice
+
+1. **Two Sum II (sorted)** — converging two-pointer.
+2. **3Sum** — fix-one + two-pointer.
+3. **Container With Most Water** — converging with monotonic insight.
+4. **Trapping Rain Water** — two-pointer with max-from-left + max-from-right.
+5. **Remove Duplicates from Sorted Array** — same-direction.
+6. **Move Zeros** — same-direction (also in T01).
+7. **Maximum Average Subarray I** — fixed window.
+8. **Minimum Size Subarray Sum** — variable window.
+9. **Longest Substring Without Repeating Characters** — variable + state map.
+10. **Minimum Window Substring** — variable + need-formed counter.
+11. **Permutation in String** — variable window with frequency comparison.
+12. **Find All Anagrams in a String** — fixed window with frequency comparison.
+13. **Longest Substring with At Most K Distinct Characters** — variable + frequency map size.
+14. **Fruit Into Baskets** — same as &quot;at most 2 distinct&quot;.
+15. **Sliding Window Maximum** — monotonic deque (covered in T07 Stacks/Queues).
+
+## Detailed Worked Solutions
+
+### 1. Remove Duplicates from Sorted Array
+
+**Problem.** In-place remove duplicates; return new length. Elements beyond new length don&#x27;t matter.
+
+```java
+public int removeDuplicates(int[] nums) {
+    if (nums.length == 0) return 0;
+    int write = 1;
+    for (int read = 1; read &lt; nums.length; read++) {
+        if (nums[read] != nums[read - 1]) nums[write++] = nums[read];
+    }
+    return write;
+}
+// O(n) time, O(1) space
+```
+
+**Walkthrough on `[1,1,2,2,3]`**: write=1, read=1→nums[1]==nums[0] skip; read=2→nums[2]=2, write=2; read=3→skip; read=4→nums[3]=3, write=3. Returns 3; array=[1,2,3,2,3].
+
+### 2. Maximum Average Subarray I (fixed window)
+
+**Problem.** Find the contiguous subarray of length `k` with maximum average.
+
+```java
+public double findMaxAverage(int[] nums, int k) {
+    int sum = 0;
+    for (int i = 0; i &lt; k; i++) sum += nums[i];
+    int best = sum;
+    for (int i = k; i &lt; nums.length; i++) {
+        sum += nums[i] - nums[i - k];
+        best = Math.max(best, sum);
+    }
+    return best / (double) k;
+}
+// O(n) time, O(1) space
+```
+
+**Key trick**: maintain `sum` incrementally — add new element, remove old leftmost. O(1) per slide.
+
+### 3. Minimum Size Subarray Sum
+
+**Problem.** Find the minimal length of a contiguous subarray with sum ≥ `target`. Return 0 if none.
+
+```java
+public int minSubArrayLen(int target, int[] nums) {
+    int lo = 0, sum = 0, best = Integer.MAX_VALUE;
+    for (int hi = 0; hi &lt; nums.length; hi++) {
+        sum += nums[hi];
+        while (sum &gt;= target) {
+            best = Math.min(best, hi - lo + 1);
+            sum -= nums[lo++];
+        }
+    }
+    return best == Integer.MAX_VALUE ? 0 : best;
+}
+// O(n) time — each element added once + removed at most once
+```
+
+**Walkthrough on `nums=[2,3,1,2,4,3], target=7`**:
+- hi=0 sum=2
+- hi=1 sum=5
+- hi=2 sum=6
+- hi=3 sum=8 → shrink: best=4 (len 4), sum=6, lo=1 → loop exits (sum&lt;7)
+- hi=4 sum=10 → best=4, sum=8, lo=2 → best=3 (len 3), sum=7, lo=3 → best=2 (len 2), sum=6, lo=4 → exit
+- hi=5 sum=9 → best=2 (len 2), sum=6 → exit. Return 2 (subarray [4,3]).
+
+### 4. Minimum Window Substring (the hardest sliding window)
+
+**Problem.** Find the smallest substring of `s` that contains every character of `t` (with multiplicity).
+
+```java
+public String minWindow(String s, String t) {
+    if (t.length() &gt; s.length()) return &quot;&quot;;
+    Map&lt;Character, Integer&gt; need = new HashMap&lt;&gt;();
+    for (char c : t.toCharArray()) need.merge(c, 1, Integer::sum);
+    int needed = need.size(), formed = 0;
+    Map&lt;Character, Integer&gt; window = new HashMap&lt;&gt;();
+    int lo = 0, bestLen = Integer.MAX_VALUE, bestLo = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        char c = s.charAt(hi);
+        window.merge(c, 1, Integer::sum);
+        if (need.containsKey(c) &amp;&amp; window.get(c).intValue() == need.get(c).intValue()) formed++;
+        while (formed == needed) {
+            if (hi - lo + 1 &lt; bestLen) { bestLen = hi - lo + 1; bestLo = lo; }
+            char d = s.charAt(lo++);
+            window.merge(d, -1, Integer::sum);
+            if (need.containsKey(d) &amp;&amp; window.get(d) &lt; need.get(d)) formed--;
+        }
+    }
+    return bestLen == Integer.MAX_VALUE ? &quot;&quot; : s.substring(bestLo, bestLo + bestLen);
+}
+// O(|s| + |t|) time, O(|s| + |t|) space
+```
+
+**Walkthrough on `s=&quot;ADOBECODEBANC&quot;, t=&quot;ABC&quot;`**:
+- need = {A:1, B:1, C:1}, needed=3.
+- Expand until `formed==3`: window `&quot;ADOBEC&quot;` has all → record best.
+- Shrink from left: remove `A` → formed=2 → expand again.
+- Eventually best = `&quot;BANC&quot;` (length 4).
+
+**Critical**: `.intValue()` comparison avoids `Integer == Integer` cache trap.
+
+### 5. Permutation in String (sliding window with frequency comparison)
+
+**Problem.** Return true if `s2` contains any permutation of `s1` as a substring.
+
+```java
+public boolean checkInclusion(String s1, String s2) {
+    if (s1.length() &gt; s2.length()) return false;
+    int[] need = new int[26], have = new int[26];
+    for (char c : s1.toCharArray()) need[c - &#x27;a&#x27;]++;
+    int k = s1.length();
+    for (int i = 0; i &lt; s2.length(); i++) {
+        have[s2.charAt(i) - &#x27;a&#x27;]++;
+        if (i &gt;= k) have[s2.charAt(i - k) - &#x27;a&#x27;]--;
+        if (Arrays.equals(have, need)) return true;
+    }
+    return false;
+}
+// O(n × 26) ≈ O(n) time, O(1) space
+```
+
+**Why `Arrays.equals` on 26-element arrays is OK**: 26 is constant; total O(n).
+
+### 6. Find All Anagrams in a String
+
+**Problem.** Return all starting indices where any anagram of `p` is a substring of `s`.
+
+```java
+public List&lt;Integer&gt; findAnagrams(String s, String p) {
+    List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+    if (s.length() &lt; p.length()) return result;
+    int[] need = new int[26], have = new int[26];
+    for (char c : p.toCharArray()) need[c - &#x27;a&#x27;]++;
+    int k = p.length();
+    for (int i = 0; i &lt; s.length(); i++) {
+        have[s.charAt(i) - &#x27;a&#x27;]++;
+        if (i &gt;= k) have[s.charAt(i - k) - &#x27;a&#x27;]--;
+        if (i &gt;= k - 1 &amp;&amp; Arrays.equals(have, need)) result.add(i - k + 1);
+    }
+    return result;
+}
+// O(n) time, O(1) space (26 alphabet)
+```
+
+### 7. Longest Substring with At Most K Distinct Characters
+
+**Problem.** Length of longest substring containing ≤ k distinct characters.
+
+```java
+public int lengthOfLongestSubstringKDistinct(String s, int k) {
+    if (k == 0) return 0;
+    Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; s.length(); hi++) {
+        count.merge(s.charAt(hi), 1, Integer::sum);
+        while (count.size() &gt; k) {
+            char d = s.charAt(lo++);
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(k) space
+```
+
+**Edge case**: `k = 0` → return 0 (no characters allowed).
+
+### 8. Fruit Into Baskets (k=2 variant)
+
+**Problem.** Equivalent to &quot;longest substring with at most 2 distinct&quot; — return max length.
+
+```java
+public int totalFruit(int[] fruits) {
+    Map&lt;Integer, Integer&gt; count = new HashMap&lt;&gt;();
+    int lo = 0, best = 0;
+    for (int hi = 0; hi &lt; fruits.length; hi++) {
+        count.merge(fruits[hi], 1, Integer::sum);
+        while (count.size() &gt; 2) {
+            int d = fruits[lo++];
+            if (count.merge(d, -1, Integer::sum) == 0) count.remove(d);
+        }
+        best = Math.max(best, hi - lo + 1);
+    }
+    return best;
+}
+// O(n) time, O(1) space (at most 3 entries in map)
+```
+
+**Same pattern as problem 7 with k=2 hardcoded** — pattern recognition matters more than memorising each problem.
+
+## Recap
+
+You should now be able to:
+
+- Pick between **two pointers, fixed window, and variable window** for any &quot;subarray / substring with property&quot; prompt.
+- Apply the **three two-pointer flavours**: converging (sorted), same-direction (read/write), Floyd&#x27;s cycle (slow/fast).
+- Apply the **two sliding-window flavours**: fixed-size (slide by one) and variable-size (expand-shrink).
+- Use the **standard variable-window template** (lo + hi + state + while-invalid shrink + update best).
+- Handle the **frequency-state variant** (need map + formed counter) for the &quot;minimum window containing all&quot; family.
+- Recognise when **sliding window does NOT apply** (negatives + target sum, subsequences, all-subarrays-of-size-k).
+- Avoid the **common mistakes** (subarray vs subsequence, wrong shrink condition, wrong update-best placement, off-by-one length).
+
+## Next
+
+Continue to [Recursion &amp; Backtracking](./T04-recursion-and-backtracking.md).
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l6/c02-t02-hashing.html"><div class="lbl">← Previous</div><div class="ttl">T02-hashing</div><div class="sub">Hashing</div></a><a class="next" href="../l6/c02-t04-recursion-and-backtracking.html"><div class="lbl">Next →</div><div class="ttl">T04-recursion-and-backtracking</div><div class="sub">Recursion &amp; Backtracking</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#when-to-reach-for-each" data-toc-link>When To Reach For Each</a></li><li class="lvl-2"><a href="#two-pointers-the-three-flavours" data-toc-link>Two Pointers — The Three Flavours</a></li><li class="lvl-3"><a href="#flavour-1-converging-pointers-on-sorted-input" data-toc-link>Flavour 1: Converging pointers on sorted input</a></li><li class="lvl-3"><a href="#flavour-2-same-direction-pointers-fast-slow" data-toc-link>Flavour 2: Same-direction pointers (fast &amp;amp; slow)</a></li><li class="lvl-3"><a href="#flavour-3-cycle-detection-floyds-tortoise-hare" data-toc-link>Flavour 3: Cycle detection (Floyd&#x27;s tortoise + hare)</a></li><li class="lvl-2"><a href="#sliding-window-the-two-flavours" data-toc-link>Sliding Window — The Two Flavours</a></li><li class="lvl-3"><a href="#fixed-size-window" data-toc-link>Fixed-size window</a></li><li class="lvl-3"><a href="#variable-size-window-expand-shrink" data-toc-link>Variable-size window (expand-shrink)</a></li><li class="lvl-3"><a href="#variable-window-with-state-map" data-toc-link>Variable window with state map</a></li><li class="lvl-3"><a href="#variable-window-with-frequency-state" data-toc-link>Variable window with frequency state</a></li><li class="lvl-2"><a href="#the-sliding-window-template" data-toc-link>The Sliding-Window Template</a></li><li class="lvl-2"><a href="#when-sliding-window-doesnt-apply" data-toc-link>When Sliding Window DOESN&#x27;T Apply</a></li><li class="lvl-2"><a href="#common-mistakes-that-score-low" data-toc-link>Common Mistakes That Score Low</a></li><li class="lvl-2"><a href="#worked-end-to-end-example" data-toc-link>Worked End-To-End Example</a></li><li class="lvl-2"><a href="#sources-further-reading" data-toc-link>Sources &amp;amp; Further Reading</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#detailed-worked-solutions" data-toc-link>Detailed Worked Solutions</a></li><li class="lvl-3"><a href="#1-remove-duplicates-from-sorted-array" data-toc-link>1. Remove Duplicates from Sorted Array</a></li><li class="lvl-3"><a href="#2-maximum-average-subarray-i-fixed-window" data-toc-link>2. Maximum Average Subarray I (fixed window)</a></li><li class="lvl-3"><a href="#3-minimum-size-subarray-sum" data-toc-link>3. Minimum Size Subarray Sum</a></li><li class="lvl-3"><a href="#4-minimum-window-substring-the-hardest-sliding-window" data-toc-link>4. Minimum Window Substring (the hardest sliding window)</a></li><li class="lvl-3"><a href="#5-permutation-in-string-sliding-window-with-frequency-comparison" data-toc-link>5. Permutation in String (sliding window with frequency comparison)</a></li><li class="lvl-3"><a href="#6-find-all-anagrams-in-a-string" data-toc-link>6. Find All Anagrams in a String</a></li><li class="lvl-3"><a href="#7-longest-substring-with-at-most-k-distinct-characters" data-toc-link>7. Longest Substring with At Most K Distinct Characters</a></li><li class="lvl-3"><a href="#8-fruit-into-baskets-k2-variant" data-toc-link>8. Fruit Into Baskets (k=2 variant)</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

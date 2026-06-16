@@ -1,0 +1,1322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Entity mappings &amp; relationships (@OneToMany, etc.) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link active" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🏗</span><span>Ch. 6 · L4 — Backend Engineering</span></div><div class="chapter-path">content/L4-backend-engineering/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l4/overview.html" data-q="l4 — backend engineering content/l4-backend-engineering/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · spring framework content/l4-backend-engineering/c01-spring-framework/readme.md content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><summary><span class="caret">▶</span><span>C01 · Spring Framework</span></summary><ul class="pages"><li data-q="backend engineering — spring framework &amp; ecosystem content/l4-backend-engineering/c01-spring-framework/readme.md"><a class="" href="../l4/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="spring core: ioc container &amp; beans content/l4-backend-engineering/c01-spring-framework/t01-spring-core-ioc-container-and-beans.md"><a class="" href="../l4/c01-t01-spring-core-ioc-container-and-beans.html"><span>Spring Core: IoC Container &amp; Beans</span><span class="kind-pill "></span></a></li><li data-q="dependency injection (constructor / field / setter) content/l4-backend-engineering/c01-spring-framework/t02-dependency-injection-constructor-field-setter.md"><a class="" href="../l4/c01-t02-dependency-injection-constructor-field-setter.html"><span>Dependency Injection (constructor / field / setter)</span><span class="kind-pill "></span></a></li><li data-q="bean scopes &amp; lifecycle content/l4-backend-engineering/c01-spring-framework/t03-bean-scopes-and-lifecycle.md"><a class="" href="../l4/c01-t03-bean-scopes-and-lifecycle.html"><span>Bean Scopes &amp; Lifecycle</span><span class="kind-pill "></span></a></li><li data-q="spring configuration (java / annotation / xml) content/l4-backend-engineering/c01-spring-framework/t04-spring-configuration-java-annotation-xml.md"><a class="" href="../l4/c01-t04-spring-configuration-java-annotation-xml.html"><span>Spring Configuration (Java / Annotation / XML)</span><span class="kind-pill "></span></a></li><li data-q="spring aop content/l4-backend-engineering/c01-spring-framework/t05-spring-aop.md"><a class="" href="../l4/c01-t05-spring-aop.html"><span>Spring AOP</span><span class="kind-pill "></span></a></li><li data-q="spring expression language (spel) content/l4-backend-engineering/c01-spring-framework/t06-spring-expression-language-spel.md"><a class="" href="../l4/c01-t06-spring-expression-language-spel.html"><span>Spring Expression Language (SpEL)</span><span class="kind-pill "></span></a></li><li data-q="spring boot auto-configuration &amp; starters content/l4-backend-engineering/c01-spring-framework/t07-spring-boot-auto-configuration-and-starters.md"><a class="" href="../l4/c01-t07-spring-boot-auto-configuration-and-starters.html"><span>Spring Boot Auto-Configuration &amp; Starters</span><span class="kind-pill "></span></a></li><li data-q="spring boot properties &amp; profiles content/l4-backend-engineering/c01-spring-framework/t08-spring-boot-properties-and-profiles.md"><a class="" href="../l4/c01-t08-spring-boot-properties-and-profiles.html"><span>Spring Boot Properties &amp; Profiles</span><span class="kind-pill "></span></a></li><li data-q="spring boot actuator content/l4-backend-engineering/c01-spring-framework/t09-spring-boot-actuator.md"><a class="" href="../l4/c01-t09-spring-boot-actuator.html"><span>Spring Boot Actuator</span><span class="kind-pill "></span></a></li><li data-q="spring mvc (rest controllers) content/l4-backend-engineering/c01-spring-framework/t10-spring-mvc-rest-controllers.md"><a class="" href="../l4/c01-t10-spring-mvc-rest-controllers.html"><span>Spring MVC (REST Controllers)</span><span class="kind-pill "></span></a></li><li data-q="validation (@valid, bean validation) content/l4-backend-engineering/c01-spring-framework/t11-validation-valid-bean-validation.md"><a class="" href="../l4/c01-t11-validation-valid-bean-validation.html"><span>Validation (@Valid, Bean Validation)</span><span class="kind-pill "></span></a></li><li data-q="exception handling (@controlleradvice) content/l4-backend-engineering/c01-spring-framework/t12-exception-handling-controlleradvice.md"><a class="" href="../l4/c01-t12-exception-handling-controlleradvice.html"><span>Exception Handling (@ControllerAdvice)</span><span class="kind-pill "></span></a></li><li data-q="spring data content/l4-backend-engineering/c01-spring-framework/t13-spring-data.md"><a class="" href="../l4/c01-t13-spring-data.html"><span>Spring Data</span><span class="kind-pill "></span></a></li><li data-q="spring security (authentication &amp; authorization) content/l4-backend-engineering/c01-spring-framework/t14-spring-security-authentication-and-authorization.md"><a class="" href="../l4/c01-t14-spring-security-authentication-and-authorization.html"><span>Spring Security (authentication &amp; authorization)</span><span class="kind-pill "></span></a></li><li data-q="oauth2 / openid connect / jwt with spring security content/l4-backend-engineering/c01-spring-framework/t15-oauth2-openid-connect-jwt-with-spring-security.md"><a class="" href="../l4/c01-t15-oauth2-openid-connect-jwt-with-spring-security.html"><span>OAuth2 / OpenID Connect / JWT with Spring Security</span><span class="kind-pill "></span></a></li><li data-q="method-level security content/l4-backend-engineering/c01-spring-framework/t16-method-level-security.md"><a class="" href="../l4/c01-t16-method-level-security.html"><span>Method-Level Security</span><span class="kind-pill "></span></a></li><li data-q="spring webflux (reactive) content/l4-backend-engineering/c01-spring-framework/t17-spring-webflux-reactive.md"><a class="" href="../l4/c01-t17-spring-webflux-reactive.html"><span>Spring WebFlux (reactive)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud (config, gateway, eureka, openfeign) content/l4-backend-engineering/c01-spring-framework/t18-spring-cloud-config-gateway-eureka-openfeign.md"><a class="" href="../l4/c01-t18-spring-cloud-config-gateway-eureka-openfeign.html"><span>Spring Cloud (Config, Gateway, Eureka, OpenFeign)</span><span class="kind-pill "></span></a></li><li data-q="spring cloud resilience (resilience4j) content/l4-backend-engineering/c01-spring-framework/t19-spring-cloud-resilience-resilience4j.md"><a class="" href="../l4/c01-t19-spring-cloud-resilience-resilience4j.html"><span>Spring Cloud Resilience (Resilience4j)</span><span class="kind-pill "></span></a></li><li data-q="spring batch content/l4-backend-engineering/c01-spring-framework/t20-spring-batch.md"><a class="" href="../l4/c01-t20-spring-batch.html"><span>Spring Batch</span><span class="kind-pill "></span></a></li><li data-q="spring integration content/l4-backend-engineering/c01-spring-framework/t21-spring-integration.md"><a class="" href="../l4/c01-t21-spring-integration.html"><span>Spring Integration</span><span class="kind-pill "></span></a></li><li data-q="spring for kafka / amqp content/l4-backend-engineering/c01-spring-framework/t22-spring-for-kafka-amqp.md"><a class="" href="../l4/c01-t22-spring-for-kafka-amqp.html"><span>Spring for Kafka / AMQP</span><span class="kind-pill "></span></a></li><li data-q="spring session content/l4-backend-engineering/c01-spring-framework/t23-spring-session.md"><a class="" href="../l4/c01-t23-spring-session.html"><span>Spring Session</span><span class="kind-pill "></span></a></li><li data-q="spring testing content/l4-backend-engineering/c01-spring-framework/t24-spring-testing.md"><a class="" href="../l4/c01-t24-spring-testing.html"><span>Spring Testing</span><span class="kind-pill "></span></a></li><li data-q="spring native / graalvm content/l4-backend-engineering/c01-spring-framework/t25-spring-native-graalvm.md"><a class="" href="../l4/c01-t25-spring-native-graalvm.html"><span>Spring Native / GraalVM</span><span class="kind-pill "></span></a></li><li data-q="spring boot 4 &amp; spring framework 7 content/l4-backend-engineering/c01-spring-framework/t26-spring-boot-4-and-spring-framework-7.md"><a class="" href="../l4/c01-t26-spring-boot-4-and-spring-framework-7.html"><span>Spring Boot 4 &amp; Spring Framework 7</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · persistence jpa hibernate content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><summary><span class="caret">▶</span><span>C02 · Persistence JPA Hibernate</span></summary><ul class="pages"><li data-q="backend engineering — persistence — jpa / hibernate / orm content/l4-backend-engineering/c02-persistence-jpa-hibernate/readme.md"><a class="" href="../l4/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="orm concepts &amp; the impedance mismatch content/l4-backend-engineering/c02-persistence-jpa-hibernate/t01-orm-concepts-and-the-impedance-mismatch.md"><a class="" href="../l4/c02-t01-orm-concepts-and-the-impedance-mismatch.html"><span>ORM concepts &amp; the impedance mismatch</span><span class="kind-pill "></span></a></li><li data-q="jpa fundamentals (entities, entitymanager) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t02-jpa-fundamentals-entities-entitymanager.md"><a class="" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><span>JPA fundamentals (entities, EntityManager)</span><span class="kind-pill "></span></a></li><li data-q="entity mappings &amp; relationships (@onetomany, etc.) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t03-entity-mappings-and-relationships-onetomany-etc.md"><a class="active" href="../l4/c02-t03-entity-mappings-and-relationships-onetomany-etc.html"><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span><span class="kind-pill "></span></a></li><li data-q="hibernate architecture content/l4-backend-engineering/c02-persistence-jpa-hibernate/t04-hibernate-architecture.md"><a class="" href="../l4/c02-t04-hibernate-architecture.html"><span>Hibernate architecture</span><span class="kind-pill "></span></a></li><li data-q="persistence context &amp; entity lifecycle content/l4-backend-engineering/c02-persistence-jpa-hibernate/t05-persistence-context-and-entity-lifecycle.md"><a class="" href="../l4/c02-t05-persistence-context-and-entity-lifecycle.html"><span>Persistence context &amp; entity lifecycle</span><span class="kind-pill "></span></a></li><li data-q="lazy vs eager loading content/l4-backend-engineering/c02-persistence-jpa-hibernate/t06-lazy-vs-eager-loading.md"><a class="" href="../l4/c02-t06-lazy-vs-eager-loading.html"><span>Lazy vs eager loading</span><span class="kind-pill "></span></a></li><li data-q="the n+1 problem &amp; fixes content/l4-backend-engineering/c02-persistence-jpa-hibernate/t07-the-n-plus-1-problem-and-fixes.md"><a class="" href="../l4/c02-t07-the-n-plus-1-problem-and-fixes.html"><span>The N+1 problem &amp; fixes</span><span class="kind-pill "></span></a></li><li data-q="jpql &amp; criteria api content/l4-backend-engineering/c02-persistence-jpa-hibernate/t08-jpql-and-criteria-api.md"><a class="" href="../l4/c02-t08-jpql-and-criteria-api.html"><span>JPQL &amp; Criteria API</span><span class="kind-pill "></span></a></li><li data-q="querydsl content/l4-backend-engineering/c02-persistence-jpa-hibernate/t09-querydsl.md"><a class="" href="../l4/c02-t09-querydsl.html"><span>QueryDSL</span><span class="kind-pill "></span></a></li><li data-q="native queries content/l4-backend-engineering/c02-persistence-jpa-hibernate/t10-native-queries.md"><a class="" href="../l4/c02-t10-native-queries.html"><span>Native queries</span><span class="kind-pill "></span></a></li><li data-q="caching (first/second level) content/l4-backend-engineering/c02-persistence-jpa-hibernate/t11-caching-first-second-level.md"><a class="" href="../l4/c02-t11-caching-first-second-level.html"><span>Caching (first/second level)</span><span class="kind-pill "></span></a></li><li data-q="transactions with jpa content/l4-backend-engineering/c02-persistence-jpa-hibernate/t12-transactions-with-jpa.md"><a class="" href="../l4/c02-t12-transactions-with-jpa.html"><span>Transactions with JPA</span><span class="kind-pill "></span></a></li><li data-q="optimistic vs pessimistic locking content/l4-backend-engineering/c02-persistence-jpa-hibernate/t13-optimistic-vs-pessimistic-locking.md"><a class="" href="../l4/c02-t13-optimistic-vs-pessimistic-locking.html"><span>Optimistic vs pessimistic locking</span><span class="kind-pill "></span></a></li><li data-q="spring data jpa repositories content/l4-backend-engineering/c02-persistence-jpa-hibernate/t14-spring-data-jpa-repositories.md"><a class="" href="../l4/c02-t14-spring-data-jpa-repositories.html"><span>Spring Data JPA repositories</span><span class="kind-pill "></span></a></li><li data-q="projections &amp; dto mapping content/l4-backend-engineering/c02-persistence-jpa-hibernate/t15-projections-and-dto-mapping.md"><a class="" href="../l4/c02-t15-projections-and-dto-mapping.html"><span>Projections &amp; DTO mapping</span><span class="kind-pill "></span></a></li><li data-q="auditing content/l4-backend-engineering/c02-persistence-jpa-hibernate/t16-auditing.md"><a class="" href="../l4/c02-t16-auditing.html"><span>Auditing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · databases advanced content/l4-backend-engineering/c03-databases-advanced/readme.md content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><summary><span class="caret">▶</span><span>C03 · Databases Advanced</span></summary><ul class="pages"><li data-q="backend engineering — databases — advanced content/l4-backend-engineering/c03-databases-advanced/readme.md"><a class="" href="../l4/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="indexing &amp; index types content/l4-backend-engineering/c03-databases-advanced/t01-indexing-and-index-types.md"><a class="" href="../l4/c03-t01-indexing-and-index-types.html"><span>Indexing &amp; index types</span><span class="kind-pill "></span></a></li><li data-q="query optimization &amp; execution plans content/l4-backend-engineering/c03-databases-advanced/t02-query-optimization-and-execution-plans.md"><a class="" href="../l4/c03-t02-query-optimization-and-execution-plans.html"><span>Query optimization &amp; execution plans</span><span class="kind-pill "></span></a></li><li data-q="database migrations (flyway, liquibase) content/l4-backend-engineering/c03-databases-advanced/t03-database-migrations-flyway-liquibase.md"><a class="" href="../l4/c03-t03-database-migrations-flyway-liquibase.html"><span>Database migrations (Flyway, Liquibase)</span><span class="kind-pill "></span></a></li><li data-q="replication &amp; read replicas content/l4-backend-engineering/c03-databases-advanced/t04-replication-and-read-replicas.md"><a class="" href="../l4/c03-t04-replication-and-read-replicas.html"><span>Replication &amp; read replicas</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; sharding content/l4-backend-engineering/c03-databases-advanced/t05-partitioning-and-sharding.md"><a class="" href="../l4/c03-t05-partitioning-and-sharding.html"><span>Partitioning &amp; sharding</span><span class="kind-pill "></span></a></li><li data-q="change data capture (debezium) content/l4-backend-engineering/c03-databases-advanced/t06-change-data-capture-debezium.md"><a class="" href="../l4/c03-t06-change-data-capture-debezium.html"><span>Change Data Capture (Debezium)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · nosql and caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><summary><span class="caret">▶</span><span>C04 · Nosql And Caching</span></summary><ul class="pages"><li data-q="backend engineering — nosql &amp; caching content/l4-backend-engineering/c04-nosql-and-caching/readme.md"><a class="" href="../l4/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use nosql vs sql content/l4-backend-engineering/c04-nosql-and-caching/t01-when-to-use-nosql-vs-sql.md"><a class="" href="../l4/c04-t01-when-to-use-nosql-vs-sql.html"><span>When to use NoSQL vs SQL</span><span class="kind-pill "></span></a></li><li data-q="document stores (mongodb) content/l4-backend-engineering/c04-nosql-and-caching/t02-document-stores-mongodb.md"><a class="" href="../l4/c04-t02-document-stores-mongodb.html"><span>Document stores (MongoDB)</span><span class="kind-pill "></span></a></li><li data-q="key-value stores (redis) content/l4-backend-engineering/c04-nosql-and-caching/t03-key-value-stores-redis.md"><a class="" href="../l4/c04-t03-key-value-stores-redis.html"><span>Key-value stores (Redis)</span><span class="kind-pill "></span></a></li><li data-q="wide-column stores (cassandra) content/l4-backend-engineering/c04-nosql-and-caching/t04-wide-column-stores-cassandra.md"><a class="" href="../l4/c04-t04-wide-column-stores-cassandra.html"><span>Wide-column stores (Cassandra)</span><span class="kind-pill "></span></a></li><li data-q="search engines (elasticsearch / opensearch) content/l4-backend-engineering/c04-nosql-and-caching/t05-search-engines-elasticsearch-opensearch.md"><a class="" href="../l4/c04-t05-search-engines-elasticsearch-opensearch.html"><span>Search engines (Elasticsearch / OpenSearch)</span><span class="kind-pill "></span></a></li><li data-q="graph databases (intro) content/l4-backend-engineering/c04-nosql-and-caching/t06-graph-databases-intro.md"><a class="" href="../l4/c04-t06-graph-databases-intro.html"><span>Graph databases (intro)</span><span class="kind-pill "></span></a></li><li data-q="spring data for nosql content/l4-backend-engineering/c04-nosql-and-caching/t07-spring-data-for-nosql.md"><a class="" href="../l4/c04-t07-spring-data-for-nosql.html"><span>Spring Data for NoSQL</span><span class="kind-pill "></span></a></li><li data-q="caching concepts (cache-aside, write-through, write-behind) content/l4-backend-engineering/c04-nosql-and-caching/t08-caching-concepts-cache-aside-write-through-write-behind.md"><a class="" href="../l4/c04-t08-caching-concepts-cache-aside-write-through-write-behind.html"><span>Caching concepts (cache-aside, write-through, write-behind)</span><span class="kind-pill "></span></a></li><li data-q="local caching (caffeine) content/l4-backend-engineering/c04-nosql-and-caching/t09-local-caching-caffeine.md"><a class="" href="../l4/c04-t09-local-caching-caffeine.html"><span>Local caching (Caffeine)</span><span class="kind-pill "></span></a></li><li data-q="distributed caching (redis) content/l4-backend-engineering/c04-nosql-and-caching/t10-distributed-caching-redis.md"><a class="" href="../l4/c04-t10-distributed-caching-redis.html"><span>Distributed caching (Redis)</span><span class="kind-pill "></span></a></li><li data-q="cache invalidation &amp; ttls content/l4-backend-engineering/c04-nosql-and-caching/t11-cache-invalidation-and-ttls.md"><a class="" href="../l4/c04-t11-cache-invalidation-and-ttls.html"><span>Cache invalidation &amp; TTLs</span><span class="kind-pill "></span></a></li><li data-q="cdn caching content/l4-backend-engineering/c04-nosql-and-caching/t12-cdn-caching.md"><a class="" href="../l4/c04-t12-cdn-caching.html"><span>CDN caching</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · apis advanced content/l4-backend-engineering/c05-apis-advanced/readme.md content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><summary><span class="caret">▶</span><span>C05 · APIs Advanced</span></summary><ul class="pages"><li data-q="backend engineering — apis — advanced content/l4-backend-engineering/c05-apis-advanced/readme.md"><a class="" href="../l4/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="http/2 &amp; http/3 content/l4-backend-engineering/c05-apis-advanced/t01-http-2-and-http-3.md"><a class="" href="../l4/c05-t01-http-2-and-http-3.html"><span>HTTP/2 &amp; HTTP/3</span><span class="kind-pill "></span></a></li><li data-q="richardson maturity model &amp; hateoas content/l4-backend-engineering/c05-apis-advanced/t02-richardson-maturity-model-and-hateoas.md"><a class="" href="../l4/c05-t02-richardson-maturity-model-and-hateoas.html"><span>Richardson Maturity Model &amp; HATEOAS</span><span class="kind-pill "></span></a></li><li data-q="idempotency in apis content/l4-backend-engineering/c05-apis-advanced/t03-idempotency-in-apis.md"><a class="" href="../l4/c05-t03-idempotency-in-apis.html"><span>Idempotency in APIs</span><span class="kind-pill "></span></a></li><li data-q="openapi / swagger documentation content/l4-backend-engineering/c05-apis-advanced/t04-openapi-swagger-documentation.md"><a class="" href="../l4/c05-t04-openapi-swagger-documentation.html"><span>OpenAPI / Swagger documentation</span><span class="kind-pill "></span></a></li><li data-q="graphql content/l4-backend-engineering/c05-apis-advanced/t05-graphql.md"><a class="" href="../l4/c05-t05-graphql.html"><span>GraphQL</span><span class="kind-pill "></span></a></li><li data-q="grpc &amp; protocol buffers content/l4-backend-engineering/c05-apis-advanced/t06-grpc-and-protocol-buffers.md"><a class="" href="../l4/c05-t06-grpc-and-protocol-buffers.html"><span>gRPC &amp; Protocol Buffers</span><span class="kind-pill "></span></a></li><li data-q="websockets content/l4-backend-engineering/c05-apis-advanced/t07-websockets.md"><a class="" href="../l4/c05-t07-websockets.html"><span>WebSockets</span><span class="kind-pill "></span></a></li><li data-q="server-sent events (sse) content/l4-backend-engineering/c05-apis-advanced/t08-server-sent-events-sse.md"><a class="" href="../l4/c05-t08-server-sent-events-sse.html"><span>Server-Sent Events (SSE)</span><span class="kind-pill "></span></a></li><li data-q="webhooks content/l4-backend-engineering/c05-apis-advanced/t09-webhooks.md"><a class="" href="../l4/c05-t09-webhooks.html"><span>Webhooks</span><span class="kind-pill "></span></a></li><li data-q="rate limiting &amp; throttling content/l4-backend-engineering/c05-apis-advanced/t10-rate-limiting-and-throttling.md"><a class="" href="../l4/c05-t10-rate-limiting-and-throttling.html"><span>Rate limiting &amp; throttling</span><span class="kind-pill "></span></a></li><li data-q="bff (backend for frontend) content/l4-backend-engineering/c05-apis-advanced/t11-bff-backend-for-frontend.md"><a class="" href="../l4/c05-t11-bff-backend-for-frontend.html"><span>BFF (Backend for Frontend)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><summary><span class="caret">▶</span><span>C06 · Reactive Programming</span></summary><ul class="pages"><li data-q="backend engineering — reactive programming content/l4-backend-engineering/c06-reactive-programming/readme.md"><a class="" href="../l4/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="reactive principles &amp; the reactive streams spec content/l4-backend-engineering/c06-reactive-programming/t01-reactive-principles-and-the-reactive-streams-spec.md"><a class="" href="../l4/c06-t01-reactive-principles-and-the-reactive-streams-spec.html"><span>Reactive principles &amp; the Reactive Streams spec</span><span class="kind-pill "></span></a></li><li data-q="project reactor (mono / flux) content/l4-backend-engineering/c06-reactive-programming/t02-project-reactor-mono-flux.md"><a class="" href="../l4/c06-t02-project-reactor-mono-flux.html"><span>Project Reactor (Mono / Flux)</span><span class="kind-pill "></span></a></li><li data-q="rxjava (alternative) content/l4-backend-engineering/c06-reactive-programming/t03-rxjava-alternative.md"><a class="" href="../l4/c06-t03-rxjava-alternative.html"><span>RxJava (alternative)</span><span class="kind-pill "></span></a></li><li data-q="backpressure content/l4-backend-engineering/c06-reactive-programming/t04-backpressure.md"><a class="" href="../l4/c06-t04-backpressure.html"><span>Backpressure</span><span class="kind-pill "></span></a></li><li data-q="spring webflux content/l4-backend-engineering/c06-reactive-programming/t05-spring-webflux.md"><a class="" href="../l4/c06-t05-spring-webflux.html"><span>Spring WebFlux</span><span class="kind-pill "></span></a></li><li data-q="r2dbc (reactive database access) content/l4-backend-engineering/c06-reactive-programming/t06-r2dbc-reactive-database-access.md"><a class="" href="../l4/c06-t06-r2dbc-reactive-database-access.html"><span>R2DBC (reactive database access)</span><span class="kind-pill "></span></a></li><li data-q="reactive vs virtual threads (trade-offs) content/l4-backend-engineering/c06-reactive-programming/t07-reactive-vs-virtual-threads-trade-offs.md"><a class="" href="../l4/c06-t07-reactive-vs-virtual-threads-trade-offs.html"><span>Reactive vs virtual threads (trade-offs)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · messaging and streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><summary><span class="caret">▶</span><span>C07 · Messaging And Streaming</span></summary><ul class="pages"><li data-q="backend engineering — messaging &amp; event streaming content/l4-backend-engineering/c07-messaging-and-streaming/readme.md"><a class="" href="../l4/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="messaging concepts (queues, topics, pub/sub) content/l4-backend-engineering/c07-messaging-and-streaming/t01-messaging-concepts-queues-topics-pub-sub.md"><a class="" href="../l4/c07-t01-messaging-concepts-queues-topics-pub-sub.html"><span>Messaging concepts (queues, topics, pub/sub)</span><span class="kind-pill "></span></a></li><li data-q="jms &amp; activemq content/l4-backend-engineering/c07-messaging-and-streaming/t02-jms-and-activemq.md"><a class="" href="../l4/c07-t02-jms-and-activemq.html"><span>JMS &amp; ActiveMQ</span><span class="kind-pill "></span></a></li><li data-q="rabbitmq (amqp) content/l4-backend-engineering/c07-messaging-and-streaming/t03-rabbitmq-amqp.md"><a class="" href="../l4/c07-t03-rabbitmq-amqp.html"><span>RabbitMQ (AMQP)</span><span class="kind-pill "></span></a></li><li data-q="apache kafka fundamentals content/l4-backend-engineering/c07-messaging-and-streaming/t04-apache-kafka-fundamentals.md"><a class="" href="../l4/c07-t04-apache-kafka-fundamentals.html"><span>Apache Kafka fundamentals</span><span class="kind-pill "></span></a></li><li data-q="kafka deep (partitions, consumer groups, offsets) content/l4-backend-engineering/c07-messaging-and-streaming/t05-kafka-deep-partitions-consumer-groups-offsets.md"><a class="" href="../l4/c07-t05-kafka-deep-partitions-consumer-groups-offsets.html"><span>Kafka deep (partitions, consumer groups, offsets)</span><span class="kind-pill "></span></a></li><li data-q="kafka streams content/l4-backend-engineering/c07-messaging-and-streaming/t06-kafka-streams.md"><a class="" href="../l4/c07-t06-kafka-streams.html"><span>Kafka Streams</span><span class="kind-pill "></span></a></li><li data-q="event-driven architecture content/l4-backend-engineering/c07-messaging-and-streaming/t07-event-driven-architecture.md"><a class="" href="../l4/c07-t07-event-driven-architecture.html"><span>Event-driven architecture</span><span class="kind-pill "></span></a></li><li data-q="async processing patterns content/l4-backend-engineering/c07-messaging-and-streaming/t08-async-processing-patterns.md"><a class="" href="../l4/c07-t08-async-processing-patterns.html"><span>Async processing patterns</span><span class="kind-pill "></span></a></li><li data-q="outbox pattern &amp; exactly-once content/l4-backend-engineering/c07-messaging-and-streaming/t09-outbox-pattern-and-exactly-once.md"><a class="" href="../l4/c07-t09-outbox-pattern-and-exactly-once.html"><span>Outbox pattern &amp; exactly-once</span><span class="kind-pill "></span></a></li><li data-q="dead-letter queues &amp; retries content/l4-backend-engineering/c07-messaging-and-streaming/t10-dead-letter-queues-and-retries.md"><a class="" href="../l4/c07-t10-dead-letter-queues-and-retries.html"><span>Dead-letter queues &amp; retries</span><span class="kind-pill "></span></a></li><li data-q="stream processing (flink, intro) content/l4-backend-engineering/c07-messaging-and-streaming/t11-stream-processing-flink-intro.md"><a class="" href="../l4/c07-t11-stream-processing-flink-intro.html"><span>Stream processing (Flink, intro)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · security content/l4-backend-engineering/c08-security/readme.md content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md content/l4-backend-engineering/c08-security/t06-owasp-top-10.md content/l4-backend-engineering/c08-security/t07-sql-injection.md content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md content/l4-backend-engineering/c08-security/t11-tls-in-practice.md content/l4-backend-engineering/c08-security/t12-secrets-management.md content/l4-backend-engineering/c08-security/t13-security-headers.md content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><summary><span class="caret">▶</span><span>C08 · Security</span></summary><ul class="pages"><li data-q="backend engineering — security content/l4-backend-engineering/c08-security/readme.md"><a class="" href="../l4/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="authentication vs authorization content/l4-backend-engineering/c08-security/t01-authentication-vs-authorization.md"><a class="" href="../l4/c08-t01-authentication-vs-authorization.html"><span>Authentication vs authorization</span><span class="kind-pill "></span></a></li><li data-q="sessions vs tokens content/l4-backend-engineering/c08-security/t02-sessions-vs-tokens.md"><a class="" href="../l4/c08-t02-sessions-vs-tokens.html"><span>Sessions vs tokens</span><span class="kind-pill "></span></a></li><li data-q="oauth2 &amp; openid connect content/l4-backend-engineering/c08-security/t03-oauth2-and-openid-connect.md"><a class="" href="../l4/c08-t03-oauth2-and-openid-connect.html"><span>OAuth2 &amp; OpenID Connect</span><span class="kind-pill "></span></a></li><li data-q="jwt (structure, validation, pitfalls) content/l4-backend-engineering/c08-security/t04-jwt-structure-validation-pitfalls.md"><a class="" href="../l4/c08-t04-jwt-structure-validation-pitfalls.html"><span>JWT (structure, validation, pitfalls)</span><span class="kind-pill "></span></a></li><li data-q="password storage (bcrypt, argon2) content/l4-backend-engineering/c08-security/t05-password-storage-bcrypt-argon2.md"><a class="" href="../l4/c08-t05-password-storage-bcrypt-argon2.html"><span>Password storage (bcrypt, Argon2)</span><span class="kind-pill "></span></a></li><li data-q="owasp top 10 content/l4-backend-engineering/c08-security/t06-owasp-top-10.md"><a class="" href="../l4/c08-t06-owasp-top-10.html"><span>OWASP Top 10</span><span class="kind-pill "></span></a></li><li data-q="sql injection content/l4-backend-engineering/c08-security/t07-sql-injection.md"><a class="" href="../l4/c08-t07-sql-injection.html"><span>SQL injection</span><span class="kind-pill "></span></a></li><li data-q="xss &amp; csrf content/l4-backend-engineering/c08-security/t08-xss-and-csrf.md"><a class="" href="../l4/c08-t08-xss-and-csrf.html"><span>XSS &amp; CSRF</span><span class="kind-pill "></span></a></li><li data-q="cors &amp; cross-origin requests content/l4-backend-engineering/c08-security/t09-cors-and-cross-origin-requests.md"><a class="" href="../l4/c08-t09-cors-and-cross-origin-requests.html"><span>CORS &amp; cross-origin requests</span><span class="kind-pill "></span></a></li><li data-q="encryption (symmetric/asymmetric, hashing) content/l4-backend-engineering/c08-security/t10-encryption-symmetric-asymmetric-hashing.md"><a class="" href="../l4/c08-t10-encryption-symmetric-asymmetric-hashing.html"><span>Encryption (symmetric/asymmetric, hashing)</span><span class="kind-pill "></span></a></li><li data-q="tls in practice content/l4-backend-engineering/c08-security/t11-tls-in-practice.md"><a class="" href="../l4/c08-t11-tls-in-practice.html"><span>TLS in practice</span><span class="kind-pill "></span></a></li><li data-q="secrets management content/l4-backend-engineering/c08-security/t12-secrets-management.md"><a class="" href="../l4/c08-t12-secrets-management.html"><span>Secrets management</span><span class="kind-pill "></span></a></li><li data-q="security headers content/l4-backend-engineering/c08-security/t13-security-headers.md"><a class="" href="../l4/c08-t13-security-headers.html"><span>Security headers</span><span class="kind-pill "></span></a></li><li data-q="api security best practices content/l4-backend-engineering/c08-security/t14-api-security-best-practices.md"><a class="" href="../l4/c08-t14-api-security-best-practices.html"><span>API security best practices</span><span class="kind-pill "></span></a></li><li data-q="dependency &amp; supply-chain security content/l4-backend-engineering/c08-security/t15-dependency-and-supply-chain-security.md"><a class="" href="../l4/c08-t15-dependency-and-supply-chain-security.html"><span>Dependency &amp; supply-chain security</span><span class="kind-pill "></span></a></li><li data-q="security architecture &amp; zero trust (intro) content/l4-backend-engineering/c08-security/t16-security-architecture-and-zero-trust-intro.md"><a class="" href="../l4/c08-t16-security-architecture-and-zero-trust-intro.html"><span>Security architecture &amp; zero trust (intro)</span><span class="kind-pill "></span></a></li><li data-q="jvm-specific cves: log4shell, spring4shell &amp; the anatomy of java vulnerabilities content/l4-backend-engineering/c08-security/t17-jvm-specific-cves-log4shell-spring4shell.md"><a class="" href="../l4/c08-t17-jvm-specific-cves-log4shell-spring4shell.html"><span>JVM-Specific CVEs: Log4Shell, Spring4Shell &amp; the Anatomy of Java Vulnerabilities</span><span class="kind-pill "></span></a></li><li data-q="modern authentication: oauth 2.1, fido2, webauthn &amp; passkeys content/l4-backend-engineering/c08-security/t18-modern-auth-oauth21-fido2-webauthn-passkeys.md"><a class="" href="../l4/c08-t18-modern-auth-oauth21-fido2-webauthn-passkeys.html"><span>Modern Authentication: OAuth 2.1, FIDO2, WebAuthn &amp; Passkeys</span><span class="kind-pill "></span></a></li><li data-q="container security: distroless, wolfi, image signing &amp; runtime hardening content/l4-backend-engineering/c08-security/t19-container-security-distroless-wolfi-image-signing.md"><a class="" href="../l4/c08-t19-container-security-distroless-wolfi-image-signing.html"><span>Container Security: Distroless, Wolfi, Image Signing &amp; Runtime Hardening</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · testing advanced content/l4-backend-engineering/c09-testing-advanced/readme.md content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><summary><span class="caret">▶</span><span>C09 · Testing Advanced</span></summary><ul class="pages"><li data-q="backend engineering — testing — advanced content/l4-backend-engineering/c09-testing-advanced/readme.md"><a class="" href="../l4/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="integration testing content/l4-backend-engineering/c09-testing-advanced/t01-integration-testing.md"><a class="" href="../l4/c09-t01-integration-testing.html"><span>Integration testing</span><span class="kind-pill "></span></a></li><li data-q="spring boot test slices content/l4-backend-engineering/c09-testing-advanced/t02-spring-boot-test-slices.md"><a class="" href="../l4/c09-t02-spring-boot-test-slices.html"><span>Spring Boot test slices</span><span class="kind-pill "></span></a></li><li data-q="testcontainers content/l4-backend-engineering/c09-testing-advanced/t03-testcontainers.md"><a class="" href="../l4/c09-t03-testcontainers.html"><span>Testcontainers</span><span class="kind-pill "></span></a></li><li data-q="behavior-driven development (bdd, cucumber) content/l4-backend-engineering/c09-testing-advanced/t04-behavior-driven-development-bdd-cucumber.md"><a class="" href="../l4/c09-t04-behavior-driven-development-bdd-cucumber.html"><span>Behavior-Driven Development (BDD, Cucumber)</span><span class="kind-pill "></span></a></li><li data-q="contract testing (spring cloud contract, pact) content/l4-backend-engineering/c09-testing-advanced/t05-contract-testing-spring-cloud-contract-pact.md"><a class="" href="../l4/c09-t05-contract-testing-spring-cloud-contract-pact.html"><span>Contract testing (Spring Cloud Contract, Pact)</span><span class="kind-pill "></span></a></li><li data-q="mutation testing (pit) content/l4-backend-engineering/c09-testing-advanced/t06-mutation-testing-pit.md"><a class="" href="../l4/c09-t06-mutation-testing-pit.html"><span>Mutation testing (PIT)</span><span class="kind-pill "></span></a></li><li data-q="load &amp; performance testing (jmeter, gatling) content/l4-backend-engineering/c09-testing-advanced/t07-load-and-performance-testing-jmeter-gatling.md"><a class="" href="../l4/c09-t07-load-and-performance-testing-jmeter-gatling.html"><span>Load &amp; performance testing (JMeter, Gatling)</span><span class="kind-pill "></span></a></li><li data-q="the test pyramid &amp; testing strategy content/l4-backend-engineering/c09-testing-advanced/t08-the-test-pyramid-and-testing-strategy.md"><a class="" href="../l4/c09-t08-the-test-pyramid-and-testing-strategy.html"><span>The test pyramid &amp; testing strategy</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · devops and observability content/l4-backend-engineering/c10-devops-and-observability/readme.md content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><summary><span class="caret">▶</span><span>C10 · Devops And Observability</span></summary><ul class="pages"><li data-q="backend engineering — devops, cloud &amp; observability content/l4-backend-engineering/c10-devops-and-observability/readme.md"><a class="" href="../l4/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="docker &amp; containerization for java content/l4-backend-engineering/c10-devops-and-observability/t01-docker-and-containerization-for-java.md"><a class="" href="../l4/c10-t01-docker-and-containerization-for-java.html"><span>Docker &amp; containerization for Java</span><span class="kind-pill "></span></a></li><li data-q="dockerfile best practices for java apps content/l4-backend-engineering/c10-devops-and-observability/t02-dockerfile-best-practices-for-java-apps.md"><a class="" href="../l4/c10-t02-dockerfile-best-practices-for-java-apps.html"><span>Dockerfile best practices for Java apps</span><span class="kind-pill "></span></a></li><li data-q="kubernetes basics content/l4-backend-engineering/c10-devops-and-observability/t03-kubernetes-basics.md"><a class="" href="../l4/c10-t03-kubernetes-basics.html"><span>Kubernetes basics</span><span class="kind-pill "></span></a></li><li data-q="ci/cd concepts content/l4-backend-engineering/c10-devops-and-observability/t04-ci-cd-concepts.md"><a class="" href="../l4/c10-t04-ci-cd-concepts.html"><span>CI/CD concepts</span><span class="kind-pill "></span></a></li><li data-q="ci/cd tools (github actions, jenkins, gitlab ci) content/l4-backend-engineering/c10-devops-and-observability/t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.md"><a class="" href="../l4/c10-t05-ci-cd-tools-github-actions-jenkins-gitlab-ci.html"><span>CI/CD tools (GitHub Actions, Jenkins, GitLab CI)</span><span class="kind-pill "></span></a></li><li data-q="deployment strategies (blue-green, canary, rolling) content/l4-backend-engineering/c10-devops-and-observability/t06-deployment-strategies-blue-green-canary-rolling.md"><a class="" href="../l4/c10-t06-deployment-strategies-blue-green-canary-rolling.html"><span>Deployment strategies (blue-green, canary, rolling)</span><span class="kind-pill "></span></a></li><li data-q="cloud basics for java devs (aws/gcp/azure) content/l4-backend-engineering/c10-devops-and-observability/t07-cloud-basics-for-java-devs-aws-gcp-azure.md"><a class="" href="../l4/c10-t07-cloud-basics-for-java-devs-aws-gcp-azure.html"><span>Cloud basics for Java devs (AWS/GCP/Azure)</span><span class="kind-pill "></span></a></li><li data-q="infrastructure as code (terraform, intro) content/l4-backend-engineering/c10-devops-and-observability/t08-infrastructure-as-code-terraform-intro.md"><a class="" href="../l4/c10-t08-infrastructure-as-code-terraform-intro.html"><span>Infrastructure as Code (Terraform, intro)</span><span class="kind-pill "></span></a></li><li data-q="configuration and secrets management content/l4-backend-engineering/c10-devops-and-observability/t09-configuration-and-secrets-management.md"><a class="" href="../l4/c10-t09-configuration-and-secrets-management.html"><span>Configuration and secrets management</span><span class="kind-pill "></span></a></li><li data-q="feature flags content/l4-backend-engineering/c10-devops-and-observability/t10-feature-flags.md"><a class="" href="../l4/c10-t10-feature-flags.html"><span>Feature flags</span><span class="kind-pill "></span></a></li><li data-q="logging (slf4j, logback, log4j2, elk) content/l4-backend-engineering/c10-devops-and-observability/t11-logging-slf4j-logback-log4j2-elk.md"><a class="" href="../l4/c10-t11-logging-slf4j-logback-log4j2-elk.html"><span>Logging (SLF4J, Logback, Log4j2, ELK)</span><span class="kind-pill "></span></a></li><li data-q="metrics (micrometer, prometheus, grafana) content/l4-backend-engineering/c10-devops-and-observability/t12-metrics-micrometer-prometheus-grafana.md"><a class="" href="../l4/c10-t12-metrics-micrometer-prometheus-grafana.html"><span>Metrics (Micrometer, Prometheus, Grafana)</span><span class="kind-pill "></span></a></li><li data-q="distributed tracing (opentelemetry, jaeger, zipkin) content/l4-backend-engineering/c10-devops-and-observability/t13-distributed-tracing-opentelemetry-jaeger-zipkin.md"><a class="" href="../l4/c10-t13-distributed-tracing-opentelemetry-jaeger-zipkin.html"><span>Distributed tracing (OpenTelemetry, Jaeger, Zipkin)</span><span class="kind-pill "></span></a></li><li data-q="health checks and readiness/liveness probes content/l4-backend-engineering/c10-devops-and-observability/t14-health-checks-and-readiness-liveness-probes.md"><a class="" href="../l4/c10-t14-health-checks-and-readiness-liveness-probes.html"><span>Health checks and readiness/liveness probes</span><span class="kind-pill "></span></a></li><li data-q="monitoring and alerting content/l4-backend-engineering/c10-devops-and-observability/t15-monitoring-and-alerting.md"><a class="" href="../l4/c10-t15-monitoring-and-alerting.html"><span>Monitoring and alerting</span><span class="kind-pill "></span></a></li><li data-q="sre concepts (error budgets, toil) content/l4-backend-engineering/c10-devops-and-observability/t16-sre-concepts-error-budgets-toil.md"><a class="" href="../l4/c10-t16-sre-concepts-error-budgets-toil.html"><span>SRE concepts (error budgets, toil)</span><span class="kind-pill "></span></a></li><li data-q="serverless java: aws lambda, snapstart &amp; cold starts content/l4-backend-engineering/c10-devops-and-observability/t17-serverless-java-lambda-snapstart.md"><a class="" href="../l4/c10-t17-serverless-java-lambda-snapstart.html"><span>Serverless Java: AWS Lambda, SnapStart &amp; Cold Starts</span><span class="kind-pill "></span></a></li><li data-q="edge computing with java: workers, lambda@edge &amp; the network edge content/l4-backend-engineering/c10-devops-and-observability/t18-edge-computing-java.md"><a class="" href="../l4/c10-t18-edge-computing-java.html"><span>Edge Computing with Java: Workers, Lambda@Edge &amp; the Network Edge</span><span class="kind-pill "></span></a></li><li data-q="multi-runtime microservices with dapr content/l4-backend-engineering/c10-devops-and-observability/t19-multi-runtime-dapr.md"><a class="" href="../l4/c10-t19-multi-runtime-dapr.html"><span>Multi-Runtime Microservices with Dapr</span><span class="kind-pill "></span></a></li><li data-q="ebpf &amp; continuous production profiling content/l4-backend-engineering/c10-devops-and-observability/t20-ebpf-and-continuous-production-profiling.md"><a class="" href="../l4/c10-t20-ebpf-and-continuous-production-profiling.html"><span>eBPF &amp; Continuous Production Profiling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · tools and environment content/l4-backend-engineering/c11-tools-and-environment/readme.md content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><summary><span class="caret">▶</span><span>C11 · Tools And Environment</span></summary><ul class="pages"><li data-q="backend engineering — tools &amp; environment content/l4-backend-engineering/c11-tools-and-environment/readme.md"><a class="" href="../l4/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for backend engineering content/l4-backend-engineering/c11-tools-and-environment/t01-tools-for-backend-engineering.md"><a class="" href="../l4/c11-t01-tools-for-backend-engineering.html"><span>Tools for Backend Engineering</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · hands on content/l4-backend-engineering/c12-hands-on/readme.md content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><summary><span class="caret">▶</span><span>C12 · Hands On</span></summary><ul class="pages"><li data-q="backend engineering — hands-on content/l4-backend-engineering/c12-hands-on/readme.md"><a class="" href="../l4/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 level project: production-grade rest service content/l4-backend-engineering/c12-hands-on/t01-level-project-production-grade-rest-service.md"><a class="" href="../l4/c12-t01-level-project-production-grade-rest-service.html"><span>L4 Level Project: Production-Grade REST Service</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c13 · best practices content/l4-backend-engineering/c13-best-practices/readme.md content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><summary><span class="caret">▶</span><span>C13 · Best Practices</span></summary><ul class="pages"><li data-q="backend engineering — best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/readme.md"><a class="" href="../l4/c13-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 best practices &amp; pitfalls content/l4-backend-engineering/c13-best-practices/t01-best-practices-and-pitfalls-l4.md"><a class="" href="../l4/c13-t01-best-practices-and-pitfalls-l4.html"><span>L4 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c14 · interview prep content/l4-backend-engineering/c14-interview-prep/readme.md content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><summary><span class="caret">▶</span><span>C14 · Interview Prep</span></summary><ul class="pages"><li data-q="backend engineering — interview prep content/l4-backend-engineering/c14-interview-prep/readme.md"><a class="" href="../l4/c14-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: senior backend engineer content/l4-backend-engineering/c14-interview-prep/t01-interview-prep-senior-backend.md"><a class="" href="../l4/c14-t01-interview-prep-senior-backend.html"><span>Interview Prep: Senior Backend Engineer</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c15 · qa faq content/l4-backend-engineering/c15-qa-faq/readme.md content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><summary><span class="caret">▶</span><span>C15 · QA FAQ</span></summary><ul class="pages"><li data-q="backend engineering — q&amp;a / faq content/l4-backend-engineering/c15-qa-faq/readme.md"><a class="" href="../l4/c15-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 q&amp;a and faq content/l4-backend-engineering/c15-qa-faq/t01-l4-qa.md"><a class="" href="../l4/c15-t01-l4-qa.html"><span>L4 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c16 · cheatsheets content/l4-backend-engineering/c16-cheatsheets/readme.md content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><summary><span class="caret">▶</span><span>C16 · Cheatsheets</span></summary><ul class="pages"><li data-q="backend engineering — cheatsheets &amp; reference content/l4-backend-engineering/c16-cheatsheets/readme.md"><a class="" href="../l4/c16-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 cheatsheets content/l4-backend-engineering/c16-cheatsheets/t01-l4-cheatsheets.md"><a class="" href="../l4/c16-t01-l4-cheatsheets.html"><span>L4 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c17 · resources content/l4-backend-engineering/c17-resources/readme.md content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><summary><span class="caret">▶</span><span>C17 · Resources</span></summary><ul class="pages"><li data-q="backend engineering — resources content/l4-backend-engineering/c17-resources/readme.md"><a class="" href="../l4/c17-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l4 resources content/l4-backend-engineering/c17-resources/t01-l4-resources.md"><a class="" href="../l4/c17-t01-l4-resources.html"><span>L4 Resources</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c18 · ai llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><summary><span class="caret">▶</span><span>C18 · Ai Llm Integration</span></summary><ul class="pages"><li data-q="ai/llm integration content/l4-backend-engineering/c18-ai-llm-integration/readme.md"><a class="" href="../l4/c18-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="llm api fundamentals — openai, anthropic, local models content/l4-backend-engineering/c18-ai-llm-integration/t01-llm-api-fundamentals.md"><a class="" href="../l4/c18-t01-llm-api-fundamentals.html"><span>LLM API Fundamentals — OpenAI, Anthropic, Local Models</span><span class="kind-pill "></span></a></li><li data-q="langchain4j framework — java&#x27;s leading llm framework content/l4-backend-engineering/c18-ai-llm-integration/t02-langchain4j-framework.md"><a class="" href="../l4/c18-t02-langchain4j-framework.html"><span>LangChain4j Framework — Java&#x27;s Leading LLM Framework</span><span class="kind-pill "></span></a></li><li data-q="spring ai framework — spring&#x27;s official llm abstraction content/l4-backend-engineering/c18-ai-llm-integration/t03-spring-ai-framework.md"><a class="" href="../l4/c18-t03-spring-ai-framework.html"><span>Spring AI Framework — Spring&#x27;s Official LLM Abstraction</span><span class="kind-pill "></span></a></li><li data-q="prompt engineering for backend engineers — practical patterns content/l4-backend-engineering/c18-ai-llm-integration/t04-prompt-engineering-for-backend-engineers.md"><a class="" href="../l4/c18-t04-prompt-engineering-for-backend-engineers.html"><span>Prompt Engineering for Backend Engineers — Practical Patterns</span><span class="kind-pill "></span></a></li><li data-q="rag patterns — retrieval-augmented generation content/l4-backend-engineering/c18-ai-llm-integration/t05-rag-retrieval-augmented-generation-patterns.md"><a class="" href="../l4/c18-t05-rag-retrieval-augmented-generation-patterns.html"><span>RAG Patterns — Retrieval-Augmented Generation</span><span class="kind-pill "></span></a></li><li data-q="vector databases — pinecone, weaviate, pgvector, qdrant content/l4-backend-engineering/c18-ai-llm-integration/t06-vector-databases-pinecone-weaviate-pgvector-qdrant.md"><a class="" href="../l4/c18-t06-vector-databases-pinecone-weaviate-pgvector-qdrant.html"><span>Vector Databases — Pinecone, Weaviate, pgvector, Qdrant</span><span class="kind-pill "></span></a></li><li data-q="embedding generation &amp; storage — production pipelines content/l4-backend-engineering/c18-ai-llm-integration/t07-embedding-generation-and-storage.md"><a class="" href="../l4/c18-t07-embedding-generation-and-storage.html"><span>Embedding Generation &amp; Storage — Production Pipelines</span><span class="kind-pill "></span></a></li><li data-q="ai agents with tools / function calling — multi-step workflows content/l4-backend-engineering/c18-ai-llm-integration/t08-ai-agents-with-tools-function-calling.md"><a class="" href="../l4/c18-t08-ai-agents-with-tools-function-calling.html"><span>AI Agents with Tools / Function Calling — Multi-Step Workflows</span><span class="kind-pill "></span></a></li><li data-q="streaming llm responses — sse and websocket content/l4-backend-engineering/c18-ai-llm-integration/t09-streaming-llm-responses-sse-websocket.md"><a class="" href="../l4/c18-t09-streaming-llm-responses-sse-websocket.html"><span>Streaming LLM Responses — SSE and WebSocket</span><span class="kind-pill "></span></a></li><li data-q="ai observability &amp; cost tracking — opentelemetry, token accounting content/l4-backend-engineering/c18-ai-llm-integration/t10-ai-observability-and-cost-tracking.md"><a class="" href="../l4/c18-t10-ai-observability-and-cost-tracking.html"><span>AI Observability &amp; Cost Tracking — OpenTelemetry, Token Accounting</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l4/index.html">L4 — Backend Engineering</a><span class="sep">/</span><span>Entity mappings &amp; relationships (@OneToMany, etc.)</span></div>
+        <h1>Entity mappings &amp; relationships (@OneToMany, etc.)</h1>
+        <div><span class="source-path">content/L4-backend-engineering/C02-persistence-jpa-hibernate/T03-entity-mappings-and-relationships-onetomany-etc.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">senior</span><span class="meta-pill mins">~80 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Entity mappings &amp; relationships (@OneToMany, etc.)"
+slug: entity-mappings-and-relationships-onetomany-etc
+level: L4
+module: "Backend Engineering"
+section: "Persistence — JPA / Hibernate / ORM"
+type: concept
+difficulty: senior
+order: 3
+tags: [jpa-relationships, onetoone, onetomany, manytoone, manytomany, owning-side, inverse-side, mappedby, foreign-key, joincolumn, jointable, fetch-type-lazy, fetch-type-eager, cascade-type, cascade-all, cascade-persist, cascade-merge, cascade-remove, cascade-refresh, cascade-detach, orphan-removal, bidirectional, unidirectional, association-fetch, list-vs-set-vs-bag, ordered-collection, indexed-collection, mapkey, elementcollection, embedded, embedded-id, idclass, inheritance-mapping, discriminator-column, single-table-inheritance-2, joined-table-inheritance-2, secondary-table, attribute-override, association-override, derived-id, optional, foreign-key-constraint, fetch-graph, load-graph, named-entity-graph]
+prerequisites: [orm-concepts-and-the-impedance-mismatch, jpa-fundamentals-entities-entitymanager]
+status: complete
+estimated_minutes: 80
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="entity-mappings-relationships-onetomany-etc">Entity mappings &amp; relationships (@OneToMany, etc.)</h1>
+<p>Relationships are where ORM earns its complexity. A flat entity (one table, no associations) is straightforward — JPA's value-add over plain JDBC is modest. The moment two entities reference each other, JPA does something genuinely useful: navigates the link, decides which side owns the foreign key, lazily loads, cascades operations, removes orphans. It also gives you ~12 ways to get the same mapping subtly wrong, with consequences ranging from a missing update to N+1 queries to entire tables of orphaned rows.</p>
+<p>This topic is the <strong>deep treatment of associations</strong> — every cardinality (<code>@OneToOne</code>, <code>@OneToMany</code>, <code>@ManyToOne</code>, <code>@ManyToMany</code>), every directionality (unidirectional, bidirectional), the <strong>owning side vs inverse side</strong> distinction that drives every confused beginner, cascade semantics, orphan removal, collection mappings (<code>List</code> vs <code>Set</code> vs <code>Bag</code>), embeddable types, and inheritance mapping. T06 follows up with lazy vs eager fetching; T07 with the N+1 problem; this topic establishes the <em>mapping vocabulary</em> both depend on.</p>
+<p>The depth-bar this topic clears: at the <strong>language layer</strong>, every relationship annotation with its attributes (<code>@JoinColumn</code>, <code>@JoinTable</code>, <code>mappedBy</code>, <code>cascade</code>, <code>fetch</code>, <code>optional</code>, <code>orphanRemoval</code>); collection mapping options; inheritance strategies; embeddable types; element collections. At the <strong>memory layer</strong>, what each cardinality emits as SQL — <code>@ManyToOne</code> is a FK column on this entity's row; <code>@OneToMany(mappedBy=...)</code> is the <em>inverse</em> (no FK column, a lazy proxy that issues a SELECT when iterated); <code>@ManyToMany</code> is a join table with composite key. At the <strong>architecture layer</strong> — the heart — <strong>the owning-side rule</strong> (the owning side is the one with the <code>@JoinColumn</code>; updates only on the owning side affect the DB), the <strong>bidirectional-sync requirement</strong> (you must keep both sides consistent in Java code), <strong>cascade semantics</strong> (which operations cross associations and which don't), and the <strong>mapping decisions that drive query shapes downstream</strong> — get them right or fight Hibernate every day.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t01-orm-concepts-and-the-impedance-mismatch.html">ORM concepts (T01)</a>, <a href="c02-t02-jpa-fundamentals-entities-entitymanager.html">JPA fundamentals (T02)</a>. Familiarity with FK/PK relationships in SQL.</p></div></div>
+<h2 id="the-four-cardinalities">The Four Cardinalities<a class="anchor" href="#the-four-cardinalities" aria-hidden="true">#</a></h2>
+<p>A relationship has two endpoints; each can be "one" or "many":</p>
+<div class="mermaid">flowchart LR
+  A["One Order"]
+  B["Many OrderItems"]
+  Mat["@OneToMany (Order → items)<br/>@ManyToOne (item → order)"]
+  A --- B
+  A -.-> Mat
+  B -.-> Mat
+</div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Example</th>
+<th>DB shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@OneToOne</code></td>
+<td>User ↔ Profile</td>
+<td>FK on either side; usually with UNIQUE constraint</td>
+</tr>
+<tr>
+<td><code>@ManyToOne</code></td>
+<td>OrderItem → Order</td>
+<td>FK column on the <em>many</em> side</td>
+</tr>
+<tr>
+<td><code>@OneToMany</code></td>
+<td>Order → items</td>
+<td>no column on this side; the <em>many</em> side has the FK</td>
+</tr>
+<tr>
+<td><code>@ManyToMany</code></td>
+<td>Course ↔ Student</td>
+<td>join table with two FKs</td>
+</tr>
+</tbody>
+</table></div>
+<p>The number of associations in a real app is usually 80% <code>@ManyToOne</code>, 15% <code>@OneToOne</code>, 5% <code>@ManyToMany</code> (and <code>@OneToMany</code> is always paired with a <code>@ManyToOne</code> on the other side).</p>
+<h2 id="unidirectional-vs-bidirectional">Unidirectional vs Bidirectional<a class="anchor" href="#unidirectional-vs-bidirectional" aria-hidden="true">#</a></h2>
+<p>A relationship is <strong>unidirectional</strong> if only one side has a Java field referencing the other; <strong>bidirectional</strong> if both do.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Unidirectional ManyToOne — only OrderItem knows about Order
+@Entity public class OrderItem {
+    @ManyToOne Order order;
+    // ...
+}
+@Entity public class Order {
+    // no items field
+}
+
+// Bidirectional OneToMany / ManyToOne — both sides have references
+@Entity public class OrderItem {
+    @ManyToOne Order order;
+}
+@Entity public class Order {
+    @OneToMany(mappedBy = &quot;order&quot;) List&lt;OrderItem&gt; items;
+}
+</code></pre></div>
+<p>The DB is <strong>the same</strong> for both — a FK column <code>orders_id</code> on the <code>order_items</code> table. The difference is purely Java-side.</p>
+<p>When to choose:</p>
+<ul>
+<li><strong>Unidirectional</strong> is simpler. Use when only one side ever needs to navigate to the other.</li>
+<li><strong>Bidirectional</strong> is convenient when both sides need access. Costs: more code to keep in sync; more complex queries.</li>
+</ul>
+<h2 id="owning-side-vs-inverse-side-the-one-rule-to-remember">Owning Side vs Inverse Side — The One Rule To Remember<a class="anchor" href="#owning-side-vs-inverse-side-the-one-rule-to-remember" aria-hidden="true">#</a></h2>
+<p>In a bidirectional association, <strong>one side is the owning side and the other is the inverse</strong>.</p>
+<blockquote>
+<p><strong>The owning side is the side with the <code>@JoinColumn</code> (or, for <code>@ManyToMany</code>, the <code>@JoinTable</code>).</strong> The inverse side has <code>mappedBy = "fieldNameOnOwningSide"</code>.</p>
+<p><strong>Updates to the owning-side field are reflected in the DB. Updates to the inverse-side collection are NOT.</strong></p>
+</blockquote>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Order is the INVERSE side
+@OneToMany(mappedBy = &quot;order&quot;)
+List&lt;OrderItem&gt; items;
+
+// OrderItem is the OWNING side
+@ManyToOne
+@JoinColumn(name = &quot;order_id&quot;)
+Order order;
+</code></pre></div>
+<p>If you do this:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Order order = orderRepo.findById(1L).get();
+OrderItem item = new OrderItem();
+order.getItems().add(item);   // adds to inverse side; NO FK is set!
+em.persist(item);
+// ⇒ the item is saved with NULL order_id;
+// the FK is the owning-side field, which was never set
+</code></pre></div>
+<p>The correct pattern:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">item.setOrder(order);          // set the OWNING side
+order.getItems().add(item);     // also update the inverse for in-memory consistency
+em.persist(item);
+</code></pre></div>
+<p>Best practice: write helper methods that always update both sides:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity public class Order {
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
+}
+</code></pre></div>
+<div class="mermaid">flowchart LR
+  Owning["Owning side<br/>has @JoinColumn<br/>setter affects FK in DB"]
+  Inverse["Inverse side<br/>has mappedBy<br/>collection mutations have no DB effect"]
+  Best["Maintain both sides in code<br/>(addX / removeX helper methods)"]
+  Owning --> Best
+  Inverse --> Best
+</div>
+<h2 id="manytoone-the-most-common-mapping"><code>@ManyToOne</code> — The Most Common Mapping<a class="anchor" href="#manytoone-the-most-common-mapping" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Table(name = &quot;order_items&quot;)
+public class OrderItem {
+
+    @Id @GeneratedValue Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;order_id&quot;, nullable = false)
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;product_id&quot;)
+    private Product product;
+
+    private int quantity;
+}
+</code></pre></div>
+<p>DDL:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">CREATE TABLE order_items (
+    id BIGINT PRIMARY KEY,
+    order_id BIGINT NOT NULL REFERENCES orders(id),
+    product_id BIGINT REFERENCES products(id),
+    quantity INT
+);
+</code></pre></div>
+<p>Attributes:</p>
+<ul>
+<li><strong><code>fetch = LAZY</code></strong> (the right default; covered in T06). Without it, every <code>OrderItem</code> load <em>eagerly</em> loads its <code>Order</code> and <code>Product</code> — major N+1 risk.</li>
+<li><strong><code>optional = false</code></strong> — JPA hint that the FK is not nullable. Enables some optimizations and matches the DB-level constraint.</li>
+<li><strong><code>@JoinColumn(name = "order_id")</code></strong> — specifies the FK column name. Defaults to <code>&lt;field-name&gt;_id</code> if omitted.</li>
+</ul>
+<p><code>@ManyToOne</code> is the <strong>default association</strong> for any "many things belong to one parent" model. Almost always lazy, almost always non-null.</p>
+<h2 id="onetomany-inverse-of-manytoone"><code>@OneToMany</code> — Inverse of <code>@ManyToOne</code><a class="anchor" href="#onetomany-inverse-of-manytoone" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+public class Order {
+
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+}
+</code></pre></div>
+<p>Attributes:</p>
+<ul>
+<li><strong><code>mappedBy = "order"</code></strong> — this is the inverse side; the owning field on <code>OrderItem</code> is called <code>order</code>.</li>
+<li><strong><code>cascade = CascadeType.ALL</code></strong> — persist / merge / remove / refresh / detach all cascade to children (covered below).</li>
+<li><strong><code>orphanRemoval = true</code></strong> — removing a child from the collection deletes it from the DB (covered below).</li>
+</ul>
+<p><strong>No <code>@JoinColumn</code></strong> — this is the inverse side; no FK lives here.</p>
+<p>Without <code>mappedBy</code>, JPA assumes the association is <em>unidirectional</em> and creates a <strong>join table</strong> (which is almost never what you want for a one-to-many). Always specify <code>mappedBy</code> for true one-to-many.</p>
+<h3 id="unidirectional-onetomany-avoid">Unidirectional <code>@OneToMany</code> — Avoid<a class="anchor" href="#unidirectional-onetomany-avoid" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@OneToMany
+@JoinColumn(name = &quot;order_id&quot;)
+private List&lt;OrderItem&gt; items;   // ⚠️ no mappedBy
+</code></pre></div>
+<p>Hibernate <strong>without <code>@JoinColumn</code></strong> creates a join table <code>order_items_link(order_id, item_id)</code>. With <code>@JoinColumn</code> it's a unidirectional FK but the <em>child</em> (OrderItem) has no back-reference, which is awkward and prevents many optimizations.</p>
+<p>Modern Hibernate (6+) handles unidirectional better than 4.x did, but the canonical answer is: <strong>always use bidirectional <code>@OneToMany</code> / <code>@ManyToOne</code> with <code>mappedBy</code>.</strong></p>
+<h2 id="onetoone"><code>@OneToOne</code><a class="anchor" href="#onetoone" aria-hidden="true">#</a></h2>
+<p>Two flavors: <strong>shared primary key</strong> (the dependent shares the parent's id) or <strong>foreign key</strong> (a separate FK column).</p>
+<p><strong>Shared-primary-key OneToOne</strong> (preferred for "extension" relationships):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue Long id;
+    @OneToOne(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL)
+    private UserProfile profile;
+}
+
+@Entity
+public class UserProfile {
+    @Id Long id;
+    @MapsId
+    @OneToOne
+    @JoinColumn(name = &quot;id&quot;)
+    private User user;
+    private String bio;
+}
+</code></pre></div>
+<p>The <code>UserProfile</code> row has <code>id</code> equal to the user's <code>id</code>. One FK; one primary key. No null FK; no UNIQUE constraint needed.</p>
+<p><strong>Foreign-key OneToOne</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+public class User {
+    @OneToOne(mappedBy = &quot;user&quot;)
+    private UserProfile profile;
+}
+@Entity
+public class UserProfile {
+    @Id @GeneratedValue Long id;
+    @OneToOne
+    @JoinColumn(name = &quot;user_id&quot;, unique = true)
+    private User user;
+    private String bio;
+}
+</code></pre></div>
+<p>The <code>user_profiles.user_id</code> is a FK with a UNIQUE constraint. Slightly more flexible (the profile can exist without a user temporarily during creation) but requires the UNIQUE.</p>
+<h2 id="manytomany"><code>@ManyToMany</code><a class="anchor" href="#manytomany" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity public class Course {
+    @Id @GeneratedValue Long id;
+    @ManyToMany
+    @JoinTable(
+        name = &quot;course_students&quot;,
+        joinColumns = @JoinColumn(name = &quot;course_id&quot;),
+        inverseJoinColumns = @JoinColumn(name = &quot;student_id&quot;))
+    Set&lt;Student&gt; students = new HashSet&lt;&gt;();
+}
+@Entity public class Student {
+    @Id @GeneratedValue Long id;
+    @ManyToMany(mappedBy = &quot;students&quot;)
+    Set&lt;Course&gt; courses = new HashSet&lt;&gt;();
+}
+</code></pre></div>
+<p>A separate join table <code>course_students(course_id, student_id)</code> with composite primary key. Hibernate handles INSERTs and DELETEs on the join table automatically.</p>
+<p><strong>Caveat</strong>: pure <code>@ManyToMany</code> is <em>limited</em> because the join table can hold only the two FKs. The moment you need a field on the link itself (<code>enrolled_at</code>, <code>grade</code>), promote the join table to an entity:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Table(name = &quot;enrollments&quot;)
+public class Enrollment {
+    @EmbeddedId
+    EnrollmentId id;
+    @ManyToOne @MapsId(&quot;courseId&quot;) Course course;
+    @ManyToOne @MapsId(&quot;studentId&quot;) Student student;
+    Instant enrolledAt;
+    Grade grade;
+}
+@Embeddable
+public record EnrollmentId(long courseId, long studentId) implements Serializable { }
+</code></pre></div>
+<p>Now <code>Enrollment</code> is a first-class entity. <code>Course</code> and <code>Student</code> become <code>@OneToMany</code> to <code>Enrollment</code>. <strong>This is the right shape for almost every "many-to-many with extra fields" case.</strong></p>
+<div class="mermaid">flowchart LR
+  C["Course"]
+  E["Enrollment (link entity with extra fields)"]
+  S["Student"]
+  C ---|"@OneToMany"| E
+  S ---|"@OneToMany"| E
+</div>
+<h2 id="cascade-types">Cascade Types<a class="anchor" href="#cascade-types" aria-hidden="true">#</a></h2>
+<p><code>CascadeType</code> controls which operations propagate from parent to child:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Cascade</th>
+<th>Effect on parent operation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PERSIST</code></td>
+<td>persisting the parent persists the children</td>
+</tr>
+<tr>
+<td><code>MERGE</code></td>
+<td>merging the parent merges the children</td>
+</tr>
+<tr>
+<td><code>REMOVE</code></td>
+<td>removing the parent removes the children</td>
+</tr>
+<tr>
+<td><code>REFRESH</code></td>
+<td>refreshing the parent refreshes the children</td>
+</tr>
+<tr>
+<td><code>DETACH</code></td>
+<td>detaching the parent detaches the children</td>
+</tr>
+<tr>
+<td><code>ALL</code></td>
+<td>all of the above</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>CascadeType.ALL</code> is the right default for parent-child relationships</strong> where the child has no independent identity (order → items, user → addresses).</p>
+<p><strong>Avoid <code>CascadeType.ALL</code> for shared relationships</strong> (user → orders is <em>not</em> parent-child; an order can outlive a user logically, and you don't want deleting a user to delete their orders).</p>
+<h3 id="orphan-removal">Orphan Removal<a class="anchor" href="#orphan-removal" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+</code></pre></div>
+<p>With <code>orphanRemoval = true</code>, removing a child from the parent's collection issues a DELETE for that child:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">order.getItems().remove(item);   // → DELETE FROM order_items WHERE id = ?
+</code></pre></div>
+<p>Without <code>orphanRemoval</code>, the child becomes an orphan (its FK is set to NULL if the column allows it, or the operation fails). Always set <code>orphanRemoval = true</code> for true parent-child relationships.</p>
+<h2 id="collection-types-list-vs-set-vs-map">Collection Types — <code>List</code> vs <code>Set</code> vs <code>Map</code><a class="anchor" href="#collection-types-list-vs-set-vs-map" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@OneToMany List&lt;OrderItem&gt; items;       // List
+@OneToMany Set&lt;OrderItem&gt; items;        // Set
+@OneToMany Map&lt;String, OrderItem&gt; items; // Map keyed by something
+@OneToMany List&lt;OrderItem&gt; items;       // Bag (unordered, allows duplicates) without @OrderColumn
+@OneToMany @OrderColumn(name = &quot;position&quot;) List&lt;OrderItem&gt; items;  // Indexed list
+</code></pre></div>
+<p><strong><code>List</code> without <code>@OrderColumn</code></strong> is a "bag" — ordered by whatever the DB returns; duplicates allowed. Hibernate has historical surprises with bags (cannot fetch two bags eagerly in the same query).</p>
+<p><strong><code>Set</code></strong> — unique by <code>equals</code> (be careful with managed entities and the surrogate key problem; see below).</p>
+<p><strong><code>Map</code></strong> — keyed by an attribute of the value (<code>@MapKey</code>) or by an explicit key column.</p>
+<p><strong><code>List</code> with <code>@OrderColumn</code></strong> — Hibernate maintains a <code>position</code> column; insert/remove updates the column. Useful for genuinely-ordered collections (playlist, comments by position). Costs: extra column; reordering on insert/delete; only one list per parent can have <code>@OrderColumn</code>.</p>
+<p>The right defaults:</p>
+<ul>
+<li><strong><code>Set&lt;Child&gt;</code> with <code>equals/hashCode</code> based on natural keys</strong> — for unordered children where uniqueness matters.</li>
+<li><strong><code>List&lt;Child&gt;</code> (bag)</strong> for "just a collection, don't care about order or uniqueness."</li>
+<li><strong><code>@OrderColumn</code></strong> only when order <em>is</em> business data.</li>
+</ul>
+<h3 id="the-equalshashcode-trap-on-entities-in-sets">The <code>equals/hashCode</code> Trap on Entities In Sets<a class="anchor" href="#the-equalshashcode-trap-on-entities-in-sets" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+public class OrderItem {
+    @Id @GeneratedValue Long id;
+    // generated equals/hashCode based on id
+}
+
+Set&lt;OrderItem&gt; items = new HashSet&lt;&gt;();
+OrderItem fresh = new OrderItem();    // id == null
+items.add(fresh);
+em.persist(fresh);                    // now id == 42
+items.contains(fresh);                // → false! (hashCode changed)
+</code></pre></div>
+<p>The id changed from <code>null</code> to <code>42</code> after persist; the <code>hashCode()</code> changed; the set "lost" the object.</p>
+<p>The fix: <strong>use a natural business key for <code>equals/hashCode</code> if you have one</strong>. If only a surrogate key exists, override to use the <em>initial</em> identity (<code>Objects.hash(getClass(), ...)</code>) or use <code>@NaturalId</code> (Hibernate-specific) or just always use <code>List</code> (bag) and check uniqueness explicitly.</p>
+<h2 id="embedded-types-granularity-done-right">Embedded Types — Granularity Done Right<a class="anchor" href="#embedded-types-granularity-done-right" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Embeddable
+public record Address(String line1, String line2, String city, String country) { }
+
+@Entity
+public class User {
+    @Embedded
+    private Address billingAddress;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = &quot;line1&quot;, column = @Column(name = &quot;shipping_line1&quot;)),
+        @AttributeOverride(name = &quot;line2&quot;, column = @Column(name = &quot;shipping_line2&quot;)),
+        // ...
+    })
+    private Address shippingAddress;
+}
+</code></pre></div>
+<p>Both addresses are <em>value types</em> — no separate table, no identity, flat in the <code>users</code> row. <code>@Embeddable</code> (T01's granularity-mismatch answer) is the right answer for any "this small group of fields conceptually belongs together but doesn't deserve its own table" pattern.</p>
+<p>DDL:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">CREATE TABLE users (
+    id BIGINT PRIMARY KEY,
+    line1 VARCHAR(100), line2 VARCHAR(100), city VARCHAR(40), country VARCHAR(40),
+    shipping_line1 VARCHAR(100), shipping_line2 VARCHAR(100), shipping_city VARCHAR(40), shipping_country VARCHAR(40)
+);
+</code></pre></div>
+<h2 id="elementcollection-collections-of-value-types"><code>@ElementCollection</code> — Collections of Value Types<a class="anchor" href="#elementcollection-collections-of-value-types" aria-hidden="true">#</a></h2>
+<p>For a list of <em>value types</em> (not entities):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+public class User {
+    @ElementCollection
+    @CollectionTable(name = &quot;user_tags&quot;, joinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    @Column(name = &quot;tag&quot;)
+    private Set&lt;String&gt; tags = new HashSet&lt;&gt;();
+
+    @ElementCollection
+    @CollectionTable(name = &quot;user_phones&quot;, joinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    private List&lt;Phone&gt; phones = new ArrayList&lt;&gt;();
+}
+
+@Embeddable
+public record Phone(String type, String number) { }
+</code></pre></div>
+<p>A separate table <code>user_tags(user_id, tag)</code> or <code>user_phones(user_id, type, number)</code>. The value type has no entity-level identity; the row's PK is the composite of all columns. Operations: on add/remove, Hibernate runs DELETE + INSERT (no UPDATE since there's no id).</p>
+<p>Use for genuinely-value collections — tags, phone numbers per user, scopes per role. Cleaner than promoting to an entity.</p>
+<h2 id="inheritance-mapping">Inheritance Mapping<a class="anchor" href="#inheritance-mapping" aria-hidden="true">#</a></h2>
+<p>Four strategies (T01's inheritance mismatch). <code>@Inheritance(strategy = ...)</code>:</p>
+<h3 id="single_table-default"><code>SINGLE_TABLE</code> (default)<a class="anchor" href="#single_table-default" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = &quot;payment_type&quot;, discriminatorType = DiscriminatorType.STRING)
+public abstract class Payment {
+    @Id @GeneratedValue Long id;
+    BigDecimal amount;
+}
+
+@Entity
+@DiscriminatorValue(&quot;CARD&quot;)
+public class CardPayment extends Payment {
+    String cardNumberLast4;
+}
+
+@Entity
+@DiscriminatorValue(&quot;BANK&quot;)
+public class BankPayment extends Payment {
+    String bankAccount;
+}
+</code></pre></div>
+<p>One table <code>payments</code> with a <code>payment_type</code> column. Polymorphic queries are fast (one table, no join). NULLs for subtype columns. NOT NULL constraints on subtype-specific columns are impossible.</p>
+<p><strong>Default and almost always the right choice</strong> unless subtype-specific NOT NULL is critical.</p>
+<h3 id="joined"><code>JOINED</code><a class="anchor" href="#joined" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Payment { ... }
+@Entity @PrimaryKeyJoinColumn(name = &quot;payment_id&quot;) public class CardPayment extends Payment { ... }
+@Entity @PrimaryKeyJoinColumn(name = &quot;payment_id&quot;) public class BankPayment extends Payment { ... }
+</code></pre></div>
+<p>One table per class. Each subtype row JOINs the parent. NOT NULL constraints work; columns are typed. Polymorphic queries JOIN N tables — slower for large hierarchies.</p>
+<p>Use when subtype-specific NOT NULL matters and the hierarchy is small.</p>
+<h3 id="table_per_class"><code>TABLE_PER_CLASS</code><a class="anchor" href="#table_per_class" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Payment { ... }
+</code></pre></div>
+<p>One table per concrete class, no parent table. Polymorphic queries do <code>UNION ALL</code> across all subtype tables — slow. Each class has its own id sequence (a problem if you want unique cross-class ids).</p>
+<p>Rarely the right choice.</p>
+<h3 id="mapped_superclass"><code>MAPPED_SUPERCLASS</code><a class="anchor" href="#mapped_superclass" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@MappedSuperclass
+public abstract class AuditableEntity {
+    @CreatedDate Instant createdAt;
+    @LastModifiedDate Instant updatedAt;
+}
+
+@Entity
+public class User extends AuditableEntity { ... }
+</code></pre></div>
+<p>The parent is <strong>not</strong> an entity — just a Java mixin. No polymorphic queries on <code>AuditableEntity</code>. Each subclass has its own table; no parent table or column. The right tool for shared audit / metadata fields, not for true polymorphism.</p>
+<div class="mermaid">flowchart TB
+  Choice["Inheritance choice"]
+  SS["Subtype-specific NOT NULL critical?"]
+  Many["Many subtypes (10+)?"]
+  Poly["Need polymorphic queries?"]
+  Single["SINGLE_TABLE (default)"]
+  Joined["JOINED"]
+  Mapped["MAPPED_SUPERCLASS"]
+  Choice --> SS
+  SS -->|"no"| Single
+  SS -->|"yes"| Joined
+  Choice --> Poly
+  Poly -->|"no"| Mapped
+</div>
+<h2 id="secondarytable"><code>@SecondaryTable</code><a class="anchor" href="#secondarytable" aria-hidden="true">#</a></h2>
+<p>Split one entity across two tables when legacy schema requires:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Table(name = &quot;users&quot;)
+@SecondaryTable(name = &quot;user_details&quot;, pkJoinColumns = @PrimaryKeyJoinColumn(name = &quot;user_id&quot;))
+public class User {
+    @Id Long id;
+    String name;
+    @Column(table = &quot;user_details&quot;) String bio;
+}
+</code></pre></div>
+<p><code>@Column(table = "user_details")</code> puts that field in the secondary table. JPA JOINs on every load. <strong>Use sparingly</strong> — usually a <code>@OneToOne</code> to a child entity is cleaner.</p>
+<h2 id="worked-example-full-order-domain">Worked Example — Full Order Domain<a class="anchor" href="#worked-example-full-order-domain" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Entity
+@Table(name = &quot;orders&quot;)
+public class Order {
+
+    @Id @GeneratedValue Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;customer_id&quot;, nullable = false)
+    private Customer customer;
+
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = &quot;amount&quot;, column = @Column(name = &quot;total_amount&quot;)),
+        @AttributeOverride(name = &quot;currency&quot;, column = @Column(name = &quot;total_currency&quot;))
+    })
+    private Money total;
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
+}
+
+@Entity
+@Table(name = &quot;order_items&quot;)
+public class OrderItem {
+    @Id @GeneratedValue Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;order_id&quot;, nullable = false)
+    private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;product_id&quot;)
+    private Product product;
+    private int quantity;
+    @Embedded
+    private Money unitPrice;
+}
+
+@Embeddable
+public record Money(BigDecimal amount, String currency) { }
+</code></pre></div>
+<p>Persisting:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Order o = new Order();
+o.setCustomer(em.getReference(Customer.class, customerId));   // no SELECT
+OrderItem item = new OrderItem();
+item.setProduct(em.getReference(Product.class, productId));
+item.setQuantity(2);
+o.addItem(item);   // updates both sides
+em.persist(o);     // cascades to item; both INSERT on flush
+</code></pre></div>
+<p>Hibernate emits one INSERT into <code>orders</code>, one INSERT into <code>order_items</code> — no SELECTs (we used <code>getReference</code>).</p>
+<h2 id="common-pitfalls">Common Pitfalls<a class="anchor" href="#common-pitfalls" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Forgetting to set the owning side.</strong> <code>order.items.add(item)</code> without <code>item.setOrder(order)</code> saves the item with <code>NULL</code> FK or fails the not-null constraint. Always use bidirectional helper methods.</p><p>[!WARNING]
+<strong><code>@OneToMany</code> without <code>mappedBy</code>.</strong> Hibernate creates a join table. Almost always wrong.</p>
+<p>[!WARNING]
+<strong><code>fetch = FetchType.EAGER</code> on <code>@OneToMany</code>.</strong> Loads every child on every parent fetch. Catastrophic for N children. Default lazy; reach for <code>JOIN FETCH</code> per-query.</p>
+<p>[!WARNING]
+<strong><code>@ManyToMany</code> with extra fields on the link.</strong> Promote to an entity. <code>@ManyToMany</code> is for "just a relationship" — no link metadata.</p>
+<p>[!WARNING]
+<strong><code>CascadeType.ALL</code> on non-parent-child relationships.</strong> Deleting one entity unexpectedly deletes the other. Use cascade only for true parent-child ownership.</p>
+<p>[!WARNING]
+<strong><code>Set&lt;Entity&gt;</code> with id-based <code>equals/hashCode</code>.</strong> Items lost when persist assigns the id. Use natural key or <code>List</code> (bag).</p>
+<p>[!WARNING]
+<strong><code>@OrderColumn</code> on a high-write list.</strong> Every insert / delete updates <code>position</code> on subsequent rows. Avoid for large lists.</p>
+<p>[!WARNING]
+<strong>Recursive <code>toString()</code> in bidirectional relationships.</strong> Lombok's <code>@ToString</code> recurses both sides → stack overflow. Exclude with <code>@ToString(exclude = "items")</code>.</p>
+<p>[!WARNING]
+<strong><code>@Inheritance(JOINED)</code> on a 50-class hierarchy.</strong> Polymorphic queries JOIN 50 tables. Switch to <code>SINGLE_TABLE</code>.</p>
+<p>[!WARNING]
+<strong>Missing <code>nullable = false</code> on a non-optional <code>@ManyToOne</code>.</strong> Schema allows NULL; data integrity suffers. Always be explicit.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li>Build the order domain (Order, OrderItem, Customer, Product) with proper bidirectional mappings, cascades, orphan removal. Generate DDL; review.</li>
+<li>Try <code>cascade = ALL, orphanRemoval = true</code> on Order → items. Remove an item from the collection; observe the DELETE.</li>
+<li>Try <code>@ManyToMany</code> between Course and Student. Then promote the join to an <code>Enrollment</code> entity with extra fields.</li>
+<li>Build inheritance with each strategy (<code>SINGLE_TABLE</code>, <code>JOINED</code>, <code>MAPPED_SUPERCLASS</code>). Compare the generated DDL and the SQL emitted for <code>SELECT * FROM Payment WHERE amount &gt; 100</code>.</li>
+<li>Implement an <code>@Embeddable Money</code>. Use it in three entities. Try <code>@AttributeOverride</code> to remap columns per usage.</li>
+<li>Add <code>@ElementCollection Set&lt;String&gt; tags</code> to a <code>User</code>. Add and remove tags; observe SQL.</li>
+<li>Trigger the <code>Set</code> + surrogate-id hashcode bug. Switch to natural-key-based equals; verify it goes away.</li>
+<li>Build a self-referential association (Employee → manager Employee). Choose unidirectional or bidirectional; observe how cycles are handled.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Distinguish unidirectional from bidirectional associations and choose deliberately.</li>
+<li>Identify the <strong>owning side</strong> of any association (the one with <code>@JoinColumn</code> / <code>@JoinTable</code>); always update the owning side to affect the DB.</li>
+<li>Write helper methods (<code>addX</code>/<code>removeX</code>) that maintain both sides of a bidirectional relationship.</li>
+<li>Use <code>@ManyToOne</code> as the default; lazy by default; <code>optional = false</code> for not-null FKs.</li>
+<li>Use <code>@OneToMany(mappedBy = ...)</code> for true one-to-many; never unidirectional <code>@OneToMany</code> without <code>@JoinColumn</code>.</li>
+<li>Choose between shared-PK <code>@OneToOne</code> and FK-based <code>@OneToOne</code> per use case.</li>
+<li>Promote <code>@ManyToMany</code> to a join entity (<code>Enrollment</code>) when the link needs fields.</li>
+<li>Choose <code>CascadeType.ALL + orphanRemoval = true</code> for parent-child; nothing or limited cascade for shared relationships.</li>
+<li>Pick collection types (<code>List</code> bag, <code>Set</code>, <code>List</code> with <code>@OrderColumn</code>, <code>Map</code>) based on order/uniqueness needs.</li>
+<li>Use <code>@Embeddable</code> / <code>@Embedded</code> for value types; <code>@ElementCollection</code> for collections of values.</li>
+<li>Choose inheritance strategy (<code>SINGLE_TABLE</code> default, <code>JOINED</code> when subtype NOT NULL matters, <code>MAPPED_SUPERCLASS</code> for mixins) deliberately.</li>
+<li>Avoid the canonical pitfalls: missing owning-side set, missing <code>mappedBy</code>, eager <code>@OneToMany</code>, <code>Set</code> with id-based hash, cascade on shared relationships.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t04-hibernate-architecture.html">Hibernate architecture</a> for the inside of the JPA provider — <code>SessionFactory</code> vs <code>EntityManagerFactory</code>, <code>Session</code> vs <code>EntityManager</code>, the action queue, the event listeners, the SPI for customization, and the metamodel — the layer underneath every annotation you wrote here.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Entity mappings &amp; relationships (@OneToMany, etc.)&quot;
+slug: entity-mappings-and-relationships-onetomany-etc
+level: L4
+module: &quot;Backend Engineering&quot;
+section: &quot;Persistence — JPA / Hibernate / ORM&quot;
+type: concept
+difficulty: senior
+order: 3
+tags: [jpa-relationships, onetoone, onetomany, manytoone, manytomany, owning-side, inverse-side, mappedby, foreign-key, joincolumn, jointable, fetch-type-lazy, fetch-type-eager, cascade-type, cascade-all, cascade-persist, cascade-merge, cascade-remove, cascade-refresh, cascade-detach, orphan-removal, bidirectional, unidirectional, association-fetch, list-vs-set-vs-bag, ordered-collection, indexed-collection, mapkey, elementcollection, embedded, embedded-id, idclass, inheritance-mapping, discriminator-column, single-table-inheritance-2, joined-table-inheritance-2, secondary-table, attribute-override, association-override, derived-id, optional, foreign-key-constraint, fetch-graph, load-graph, named-entity-graph]
+prerequisites: [orm-concepts-and-the-impedance-mismatch, jpa-fundamentals-entities-entitymanager]
+status: complete
+estimated_minutes: 80
+last_updated: 2026-06-08
+---
+
+# Entity mappings &amp; relationships (@OneToMany, etc.)
+
+Relationships are where ORM earns its complexity. A flat entity (one table, no associations) is straightforward — JPA&#x27;s value-add over plain JDBC is modest. The moment two entities reference each other, JPA does something genuinely useful: navigates the link, decides which side owns the foreign key, lazily loads, cascades operations, removes orphans. It also gives you ~12 ways to get the same mapping subtly wrong, with consequences ranging from a missing update to N+1 queries to entire tables of orphaned rows.
+
+This topic is the **deep treatment of associations** — every cardinality (`@OneToOne`, `@OneToMany`, `@ManyToOne`, `@ManyToMany`), every directionality (unidirectional, bidirectional), the **owning side vs inverse side** distinction that drives every confused beginner, cascade semantics, orphan removal, collection mappings (`List` vs `Set` vs `Bag`), embeddable types, and inheritance mapping. T06 follows up with lazy vs eager fetching; T07 with the N+1 problem; this topic establishes the *mapping vocabulary* both depend on.
+
+The depth-bar this topic clears: at the **language layer**, every relationship annotation with its attributes (`@JoinColumn`, `@JoinTable`, `mappedBy`, `cascade`, `fetch`, `optional`, `orphanRemoval`); collection mapping options; inheritance strategies; embeddable types; element collections. At the **memory layer**, what each cardinality emits as SQL — `@ManyToOne` is a FK column on this entity&#x27;s row; `@OneToMany(mappedBy=...)` is the *inverse* (no FK column, a lazy proxy that issues a SELECT when iterated); `@ManyToMany` is a join table with composite key. At the **architecture layer** — the heart — **the owning-side rule** (the owning side is the one with the `@JoinColumn`; updates only on the owning side affect the DB), the **bidirectional-sync requirement** (you must keep both sides consistent in Java code), **cascade semantics** (which operations cross associations and which don&#x27;t), and the **mapping decisions that drive query shapes downstream** — get them right or fight Hibernate every day.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [ORM concepts (T01)](./T01-orm-concepts-and-the-impedance-mismatch.md), [JPA fundamentals (T02)](./T02-jpa-fundamentals-entities-entitymanager.md). Familiarity with FK/PK relationships in SQL.
+
+## The Four Cardinalities
+
+A relationship has two endpoints; each can be &quot;one&quot; or &quot;many&quot;:
+
+```mermaid
+flowchart LR
+  A[&quot;One Order&quot;]
+  B[&quot;Many OrderItems&quot;]
+  Mat[&quot;@OneToMany (Order → items)&lt;br/&gt;@ManyToOne (item → order)&quot;]
+  A --- B
+  A -.-&gt; Mat
+  B -.-&gt; Mat
+```
+
+| Annotation | Example | DB shape |
+|------------|---------|----------|
+| `@OneToOne` | User ↔ Profile | FK on either side; usually with UNIQUE constraint |
+| `@ManyToOne` | OrderItem → Order | FK column on the *many* side |
+| `@OneToMany` | Order → items | no column on this side; the *many* side has the FK |
+| `@ManyToMany` | Course ↔ Student | join table with two FKs |
+
+The number of associations in a real app is usually 80% `@ManyToOne`, 15% `@OneToOne`, 5% `@ManyToMany` (and `@OneToMany` is always paired with a `@ManyToOne` on the other side).
+
+## Unidirectional vs Bidirectional
+
+A relationship is **unidirectional** if only one side has a Java field referencing the other; **bidirectional** if both do.
+
+```java
+// Unidirectional ManyToOne — only OrderItem knows about Order
+@Entity public class OrderItem {
+    @ManyToOne Order order;
+    // ...
+}
+@Entity public class Order {
+    // no items field
+}
+
+// Bidirectional OneToMany / ManyToOne — both sides have references
+@Entity public class OrderItem {
+    @ManyToOne Order order;
+}
+@Entity public class Order {
+    @OneToMany(mappedBy = &quot;order&quot;) List&lt;OrderItem&gt; items;
+}
+```
+
+The DB is **the same** for both — a FK column `orders_id` on the `order_items` table. The difference is purely Java-side.
+
+When to choose:
+
+- **Unidirectional** is simpler. Use when only one side ever needs to navigate to the other.
+- **Bidirectional** is convenient when both sides need access. Costs: more code to keep in sync; more complex queries.
+
+## Owning Side vs Inverse Side — The One Rule To Remember
+
+In a bidirectional association, **one side is the owning side and the other is the inverse**.
+
+&gt; **The owning side is the side with the `@JoinColumn` (or, for `@ManyToMany`, the `@JoinTable`).** The inverse side has `mappedBy = &quot;fieldNameOnOwningSide&quot;`.
+
+&gt; **Updates to the owning-side field are reflected in the DB. Updates to the inverse-side collection are NOT.**
+
+```java
+// Order is the INVERSE side
+@OneToMany(mappedBy = &quot;order&quot;)
+List&lt;OrderItem&gt; items;
+
+// OrderItem is the OWNING side
+@ManyToOne
+@JoinColumn(name = &quot;order_id&quot;)
+Order order;
+```
+
+If you do this:
+
+```java
+Order order = orderRepo.findById(1L).get();
+OrderItem item = new OrderItem();
+order.getItems().add(item);   // adds to inverse side; NO FK is set!
+em.persist(item);
+// ⇒ the item is saved with NULL order_id;
+// the FK is the owning-side field, which was never set
+```
+
+The correct pattern:
+
+```java
+item.setOrder(order);          // set the OWNING side
+order.getItems().add(item);     // also update the inverse for in-memory consistency
+em.persist(item);
+```
+
+Best practice: write helper methods that always update both sides:
+
+```java
+@Entity public class Order {
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
+}
+```
+
+```mermaid
+flowchart LR
+  Owning[&quot;Owning side&lt;br/&gt;has @JoinColumn&lt;br/&gt;setter affects FK in DB&quot;]
+  Inverse[&quot;Inverse side&lt;br/&gt;has mappedBy&lt;br/&gt;collection mutations have no DB effect&quot;]
+  Best[&quot;Maintain both sides in code&lt;br/&gt;(addX / removeX helper methods)&quot;]
+  Owning --&gt; Best
+  Inverse --&gt; Best
+```
+
+## `@ManyToOne` — The Most Common Mapping
+
+```java
+@Entity
+@Table(name = &quot;order_items&quot;)
+public class OrderItem {
+
+    @Id @GeneratedValue Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;order_id&quot;, nullable = false)
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;product_id&quot;)
+    private Product product;
+
+    private int quantity;
+}
+```
+
+DDL:
+
+```sql
+CREATE TABLE order_items (
+    id BIGINT PRIMARY KEY,
+    order_id BIGINT NOT NULL REFERENCES orders(id),
+    product_id BIGINT REFERENCES products(id),
+    quantity INT
+);
+```
+
+Attributes:
+
+- **`fetch = LAZY`** (the right default; covered in T06). Without it, every `OrderItem` load *eagerly* loads its `Order` and `Product` — major N+1 risk.
+- **`optional = false`** — JPA hint that the FK is not nullable. Enables some optimizations and matches the DB-level constraint.
+- **`@JoinColumn(name = &quot;order_id&quot;)`** — specifies the FK column name. Defaults to `&lt;field-name&gt;_id` if omitted.
+
+`@ManyToOne` is the **default association** for any &quot;many things belong to one parent&quot; model. Almost always lazy, almost always non-null.
+
+## `@OneToMany` — Inverse of `@ManyToOne`
+
+```java
+@Entity
+public class Order {
+
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+}
+```
+
+Attributes:
+
+- **`mappedBy = &quot;order&quot;`** — this is the inverse side; the owning field on `OrderItem` is called `order`.
+- **`cascade = CascadeType.ALL`** — persist / merge / remove / refresh / detach all cascade to children (covered below).
+- **`orphanRemoval = true`** — removing a child from the collection deletes it from the DB (covered below).
+
+**No `@JoinColumn`** — this is the inverse side; no FK lives here.
+
+Without `mappedBy`, JPA assumes the association is *unidirectional* and creates a **join table** (which is almost never what you want for a one-to-many). Always specify `mappedBy` for true one-to-many.
+
+### Unidirectional `@OneToMany` — Avoid
+
+```java
+@OneToMany
+@JoinColumn(name = &quot;order_id&quot;)
+private List&lt;OrderItem&gt; items;   // ⚠️ no mappedBy
+```
+
+Hibernate **without `@JoinColumn`** creates a join table `order_items_link(order_id, item_id)`. With `@JoinColumn` it&#x27;s a unidirectional FK but the *child* (OrderItem) has no back-reference, which is awkward and prevents many optimizations.
+
+Modern Hibernate (6+) handles unidirectional better than 4.x did, but the canonical answer is: **always use bidirectional `@OneToMany` / `@ManyToOne` with `mappedBy`.**
+
+## `@OneToOne`
+
+Two flavors: **shared primary key** (the dependent shares the parent&#x27;s id) or **foreign key** (a separate FK column).
+
+**Shared-primary-key OneToOne** (preferred for &quot;extension&quot; relationships):
+
+```java
+@Entity
+public class User {
+    @Id @GeneratedValue Long id;
+    @OneToOne(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL)
+    private UserProfile profile;
+}
+
+@Entity
+public class UserProfile {
+    @Id Long id;
+    @MapsId
+    @OneToOne
+    @JoinColumn(name = &quot;id&quot;)
+    private User user;
+    private String bio;
+}
+```
+
+The `UserProfile` row has `id` equal to the user&#x27;s `id`. One FK; one primary key. No null FK; no UNIQUE constraint needed.
+
+**Foreign-key OneToOne**:
+
+```java
+@Entity
+public class User {
+    @OneToOne(mappedBy = &quot;user&quot;)
+    private UserProfile profile;
+}
+@Entity
+public class UserProfile {
+    @Id @GeneratedValue Long id;
+    @OneToOne
+    @JoinColumn(name = &quot;user_id&quot;, unique = true)
+    private User user;
+    private String bio;
+}
+```
+
+The `user_profiles.user_id` is a FK with a UNIQUE constraint. Slightly more flexible (the profile can exist without a user temporarily during creation) but requires the UNIQUE.
+
+## `@ManyToMany`
+
+```java
+@Entity public class Course {
+    @Id @GeneratedValue Long id;
+    @ManyToMany
+    @JoinTable(
+        name = &quot;course_students&quot;,
+        joinColumns = @JoinColumn(name = &quot;course_id&quot;),
+        inverseJoinColumns = @JoinColumn(name = &quot;student_id&quot;))
+    Set&lt;Student&gt; students = new HashSet&lt;&gt;();
+}
+@Entity public class Student {
+    @Id @GeneratedValue Long id;
+    @ManyToMany(mappedBy = &quot;students&quot;)
+    Set&lt;Course&gt; courses = new HashSet&lt;&gt;();
+}
+```
+
+A separate join table `course_students(course_id, student_id)` with composite primary key. Hibernate handles INSERTs and DELETEs on the join table automatically.
+
+**Caveat**: pure `@ManyToMany` is *limited* because the join table can hold only the two FKs. The moment you need a field on the link itself (`enrolled_at`, `grade`), promote the join table to an entity:
+
+```java
+@Entity
+@Table(name = &quot;enrollments&quot;)
+public class Enrollment {
+    @EmbeddedId
+    EnrollmentId id;
+    @ManyToOne @MapsId(&quot;courseId&quot;) Course course;
+    @ManyToOne @MapsId(&quot;studentId&quot;) Student student;
+    Instant enrolledAt;
+    Grade grade;
+}
+@Embeddable
+public record EnrollmentId(long courseId, long studentId) implements Serializable { }
+```
+
+Now `Enrollment` is a first-class entity. `Course` and `Student` become `@OneToMany` to `Enrollment`. **This is the right shape for almost every &quot;many-to-many with extra fields&quot; case.**
+
+```mermaid
+flowchart LR
+  C[&quot;Course&quot;]
+  E[&quot;Enrollment (link entity with extra fields)&quot;]
+  S[&quot;Student&quot;]
+  C ---|&quot;@OneToMany&quot;| E
+  S ---|&quot;@OneToMany&quot;| E
+```
+
+## Cascade Types
+
+`CascadeType` controls which operations propagate from parent to child:
+
+| Cascade | Effect on parent operation |
+|---------|---------------------------|
+| `PERSIST` | persisting the parent persists the children |
+| `MERGE` | merging the parent merges the children |
+| `REMOVE` | removing the parent removes the children |
+| `REFRESH` | refreshing the parent refreshes the children |
+| `DETACH` | detaching the parent detaches the children |
+| `ALL` | all of the above |
+
+**`CascadeType.ALL` is the right default for parent-child relationships** where the child has no independent identity (order → items, user → addresses).
+
+**Avoid `CascadeType.ALL` for shared relationships** (user → orders is *not* parent-child; an order can outlive a user logically, and you don&#x27;t want deleting a user to delete their orders).
+
+### Orphan Removal
+
+```java
+@OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+```
+
+With `orphanRemoval = true`, removing a child from the parent&#x27;s collection issues a DELETE for that child:
+
+```java
+order.getItems().remove(item);   // → DELETE FROM order_items WHERE id = ?
+```
+
+Without `orphanRemoval`, the child becomes an orphan (its FK is set to NULL if the column allows it, or the operation fails). Always set `orphanRemoval = true` for true parent-child relationships.
+
+## Collection Types — `List` vs `Set` vs `Map`
+
+```java
+@OneToMany List&lt;OrderItem&gt; items;       // List
+@OneToMany Set&lt;OrderItem&gt; items;        // Set
+@OneToMany Map&lt;String, OrderItem&gt; items; // Map keyed by something
+@OneToMany List&lt;OrderItem&gt; items;       // Bag (unordered, allows duplicates) without @OrderColumn
+@OneToMany @OrderColumn(name = &quot;position&quot;) List&lt;OrderItem&gt; items;  // Indexed list
+```
+
+**`List` without `@OrderColumn`** is a &quot;bag&quot; — ordered by whatever the DB returns; duplicates allowed. Hibernate has historical surprises with bags (cannot fetch two bags eagerly in the same query).
+
+**`Set`** — unique by `equals` (be careful with managed entities and the surrogate key problem; see below).
+
+**`Map`** — keyed by an attribute of the value (`@MapKey`) or by an explicit key column.
+
+**`List` with `@OrderColumn`** — Hibernate maintains a `position` column; insert/remove updates the column. Useful for genuinely-ordered collections (playlist, comments by position). Costs: extra column; reordering on insert/delete; only one list per parent can have `@OrderColumn`.
+
+The right defaults:
+
+- **`Set&lt;Child&gt;` with `equals/hashCode` based on natural keys** — for unordered children where uniqueness matters.
+- **`List&lt;Child&gt;` (bag)** for &quot;just a collection, don&#x27;t care about order or uniqueness.&quot;
+- **`@OrderColumn`** only when order *is* business data.
+
+### The `equals/hashCode` Trap on Entities In Sets
+
+```java
+@Entity
+public class OrderItem {
+    @Id @GeneratedValue Long id;
+    // generated equals/hashCode based on id
+}
+
+Set&lt;OrderItem&gt; items = new HashSet&lt;&gt;();
+OrderItem fresh = new OrderItem();    // id == null
+items.add(fresh);
+em.persist(fresh);                    // now id == 42
+items.contains(fresh);                // → false! (hashCode changed)
+```
+
+The id changed from `null` to `42` after persist; the `hashCode()` changed; the set &quot;lost&quot; the object.
+
+The fix: **use a natural business key for `equals/hashCode` if you have one**. If only a surrogate key exists, override to use the *initial* identity (`Objects.hash(getClass(), ...)`) or use `@NaturalId` (Hibernate-specific) or just always use `List` (bag) and check uniqueness explicitly.
+
+## Embedded Types — Granularity Done Right
+
+```java
+@Embeddable
+public record Address(String line1, String line2, String city, String country) { }
+
+@Entity
+public class User {
+    @Embedded
+    private Address billingAddress;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = &quot;line1&quot;, column = @Column(name = &quot;shipping_line1&quot;)),
+        @AttributeOverride(name = &quot;line2&quot;, column = @Column(name = &quot;shipping_line2&quot;)),
+        // ...
+    })
+    private Address shippingAddress;
+}
+```
+
+Both addresses are *value types* — no separate table, no identity, flat in the `users` row. `@Embeddable` (T01&#x27;s granularity-mismatch answer) is the right answer for any &quot;this small group of fields conceptually belongs together but doesn&#x27;t deserve its own table&quot; pattern.
+
+DDL:
+```sql
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY,
+    line1 VARCHAR(100), line2 VARCHAR(100), city VARCHAR(40), country VARCHAR(40),
+    shipping_line1 VARCHAR(100), shipping_line2 VARCHAR(100), shipping_city VARCHAR(40), shipping_country VARCHAR(40)
+);
+```
+
+## `@ElementCollection` — Collections of Value Types
+
+For a list of *value types* (not entities):
+
+```java
+@Entity
+public class User {
+    @ElementCollection
+    @CollectionTable(name = &quot;user_tags&quot;, joinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    @Column(name = &quot;tag&quot;)
+    private Set&lt;String&gt; tags = new HashSet&lt;&gt;();
+
+    @ElementCollection
+    @CollectionTable(name = &quot;user_phones&quot;, joinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    private List&lt;Phone&gt; phones = new ArrayList&lt;&gt;();
+}
+
+@Embeddable
+public record Phone(String type, String number) { }
+```
+
+A separate table `user_tags(user_id, tag)` or `user_phones(user_id, type, number)`. The value type has no entity-level identity; the row&#x27;s PK is the composite of all columns. Operations: on add/remove, Hibernate runs DELETE + INSERT (no UPDATE since there&#x27;s no id).
+
+Use for genuinely-value collections — tags, phone numbers per user, scopes per role. Cleaner than promoting to an entity.
+
+## Inheritance Mapping
+
+Four strategies (T01&#x27;s inheritance mismatch). `@Inheritance(strategy = ...)`:
+
+### `SINGLE_TABLE` (default)
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = &quot;payment_type&quot;, discriminatorType = DiscriminatorType.STRING)
+public abstract class Payment {
+    @Id @GeneratedValue Long id;
+    BigDecimal amount;
+}
+
+@Entity
+@DiscriminatorValue(&quot;CARD&quot;)
+public class CardPayment extends Payment {
+    String cardNumberLast4;
+}
+
+@Entity
+@DiscriminatorValue(&quot;BANK&quot;)
+public class BankPayment extends Payment {
+    String bankAccount;
+}
+```
+
+One table `payments` with a `payment_type` column. Polymorphic queries are fast (one table, no join). NULLs for subtype columns. NOT NULL constraints on subtype-specific columns are impossible.
+
+**Default and almost always the right choice** unless subtype-specific NOT NULL is critical.
+
+### `JOINED`
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Payment { ... }
+@Entity @PrimaryKeyJoinColumn(name = &quot;payment_id&quot;) public class CardPayment extends Payment { ... }
+@Entity @PrimaryKeyJoinColumn(name = &quot;payment_id&quot;) public class BankPayment extends Payment { ... }
+```
+
+One table per class. Each subtype row JOINs the parent. NOT NULL constraints work; columns are typed. Polymorphic queries JOIN N tables — slower for large hierarchies.
+
+Use when subtype-specific NOT NULL matters and the hierarchy is small.
+
+### `TABLE_PER_CLASS`
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Payment { ... }
+```
+
+One table per concrete class, no parent table. Polymorphic queries do `UNION ALL` across all subtype tables — slow. Each class has its own id sequence (a problem if you want unique cross-class ids).
+
+Rarely the right choice.
+
+### `MAPPED_SUPERCLASS`
+
+```java
+@MappedSuperclass
+public abstract class AuditableEntity {
+    @CreatedDate Instant createdAt;
+    @LastModifiedDate Instant updatedAt;
+}
+
+@Entity
+public class User extends AuditableEntity { ... }
+```
+
+The parent is **not** an entity — just a Java mixin. No polymorphic queries on `AuditableEntity`. Each subclass has its own table; no parent table or column. The right tool for shared audit / metadata fields, not for true polymorphism.
+
+```mermaid
+flowchart TB
+  Choice[&quot;Inheritance choice&quot;]
+  SS[&quot;Subtype-specific NOT NULL critical?&quot;]
+  Many[&quot;Many subtypes (10+)?&quot;]
+  Poly[&quot;Need polymorphic queries?&quot;]
+  Single[&quot;SINGLE_TABLE (default)&quot;]
+  Joined[&quot;JOINED&quot;]
+  Mapped[&quot;MAPPED_SUPERCLASS&quot;]
+  Choice --&gt; SS
+  SS --&gt;|&quot;no&quot;| Single
+  SS --&gt;|&quot;yes&quot;| Joined
+  Choice --&gt; Poly
+  Poly --&gt;|&quot;no&quot;| Mapped
+```
+
+## `@SecondaryTable`
+
+Split one entity across two tables when legacy schema requires:
+
+```java
+@Entity
+@Table(name = &quot;users&quot;)
+@SecondaryTable(name = &quot;user_details&quot;, pkJoinColumns = @PrimaryKeyJoinColumn(name = &quot;user_id&quot;))
+public class User {
+    @Id Long id;
+    String name;
+    @Column(table = &quot;user_details&quot;) String bio;
+}
+```
+
+`@Column(table = &quot;user_details&quot;)` puts that field in the secondary table. JPA JOINs on every load. **Use sparingly** — usually a `@OneToOne` to a child entity is cleaner.
+
+## Worked Example — Full Order Domain
+
+```java
+@Entity
+@Table(name = &quot;orders&quot;)
+public class Order {
+
+    @Id @GeneratedValue Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;customer_id&quot;, nullable = false)
+    private Customer customer;
+
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = &quot;amount&quot;, column = @Column(name = &quot;total_amount&quot;)),
+        @AttributeOverride(name = &quot;currency&quot;, column = @Column(name = &quot;total_currency&quot;))
+    })
+    private Money total;
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
+}
+
+@Entity
+@Table(name = &quot;order_items&quot;)
+public class OrderItem {
+    @Id @GeneratedValue Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;order_id&quot;, nullable = false)
+    private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;product_id&quot;)
+    private Product product;
+    private int quantity;
+    @Embedded
+    private Money unitPrice;
+}
+
+@Embeddable
+public record Money(BigDecimal amount, String currency) { }
+```
+
+Persisting:
+
+```java
+Order o = new Order();
+o.setCustomer(em.getReference(Customer.class, customerId));   // no SELECT
+OrderItem item = new OrderItem();
+item.setProduct(em.getReference(Product.class, productId));
+item.setQuantity(2);
+o.addItem(item);   // updates both sides
+em.persist(o);     // cascades to item; both INSERT on flush
+```
+
+Hibernate emits one INSERT into `orders`, one INSERT into `order_items` — no SELECTs (we used `getReference`).
+
+## Common Pitfalls
+
+&gt; [!WARNING]
+&gt; **Forgetting to set the owning side.** `order.items.add(item)` without `item.setOrder(order)` saves the item with `NULL` FK or fails the not-null constraint. Always use bidirectional helper methods.
+
+&gt; [!WARNING]
+&gt; **`@OneToMany` without `mappedBy`.** Hibernate creates a join table. Almost always wrong.
+
+&gt; [!WARNING]
+&gt; **`fetch = FetchType.EAGER` on `@OneToMany`.** Loads every child on every parent fetch. Catastrophic for N children. Default lazy; reach for `JOIN FETCH` per-query.
+
+&gt; [!WARNING]
+&gt; **`@ManyToMany` with extra fields on the link.** Promote to an entity. `@ManyToMany` is for &quot;just a relationship&quot; — no link metadata.
+
+&gt; [!WARNING]
+&gt; **`CascadeType.ALL` on non-parent-child relationships.** Deleting one entity unexpectedly deletes the other. Use cascade only for true parent-child ownership.
+
+&gt; [!WARNING]
+&gt; **`Set&lt;Entity&gt;` with id-based `equals/hashCode`.** Items lost when persist assigns the id. Use natural key or `List` (bag).
+
+&gt; [!WARNING]
+&gt; **`@OrderColumn` on a high-write list.** Every insert / delete updates `position` on subsequent rows. Avoid for large lists.
+
+&gt; [!WARNING]
+&gt; **Recursive `toString()` in bidirectional relationships.** Lombok&#x27;s `@ToString` recurses both sides → stack overflow. Exclude with `@ToString(exclude = &quot;items&quot;)`.
+
+&gt; [!WARNING]
+&gt; **`@Inheritance(JOINED)` on a 50-class hierarchy.** Polymorphic queries JOIN 50 tables. Switch to `SINGLE_TABLE`.
+
+&gt; [!WARNING]
+&gt; **Missing `nullable = false` on a non-optional `@ManyToOne`.** Schema allows NULL; data integrity suffers. Always be explicit.
+
+## Practice
+
+1. Build the order domain (Order, OrderItem, Customer, Product) with proper bidirectional mappings, cascades, orphan removal. Generate DDL; review.
+2. Try `cascade = ALL, orphanRemoval = true` on Order → items. Remove an item from the collection; observe the DELETE.
+3. Try `@ManyToMany` between Course and Student. Then promote the join to an `Enrollment` entity with extra fields.
+4. Build inheritance with each strategy (`SINGLE_TABLE`, `JOINED`, `MAPPED_SUPERCLASS`). Compare the generated DDL and the SQL emitted for `SELECT * FROM Payment WHERE amount &gt; 100`.
+5. Implement an `@Embeddable Money`. Use it in three entities. Try `@AttributeOverride` to remap columns per usage.
+6. Add `@ElementCollection Set&lt;String&gt; tags` to a `User`. Add and remove tags; observe SQL.
+7. Trigger the `Set` + surrogate-id hashcode bug. Switch to natural-key-based equals; verify it goes away.
+8. Build a self-referential association (Employee → manager Employee). Choose unidirectional or bidirectional; observe how cycles are handled.
+
+## Recap
+
+You should now be able to:
+
+- Distinguish unidirectional from bidirectional associations and choose deliberately.
+- Identify the **owning side** of any association (the one with `@JoinColumn` / `@JoinTable`); always update the owning side to affect the DB.
+- Write helper methods (`addX`/`removeX`) that maintain both sides of a bidirectional relationship.
+- Use `@ManyToOne` as the default; lazy by default; `optional = false` for not-null FKs.
+- Use `@OneToMany(mappedBy = ...)` for true one-to-many; never unidirectional `@OneToMany` without `@JoinColumn`.
+- Choose between shared-PK `@OneToOne` and FK-based `@OneToOne` per use case.
+- Promote `@ManyToMany` to a join entity (`Enrollment`) when the link needs fields.
+- Choose `CascadeType.ALL + orphanRemoval = true` for parent-child; nothing or limited cascade for shared relationships.
+- Pick collection types (`List` bag, `Set`, `List` with `@OrderColumn`, `Map`) based on order/uniqueness needs.
+- Use `@Embeddable` / `@Embedded` for value types; `@ElementCollection` for collections of values.
+- Choose inheritance strategy (`SINGLE_TABLE` default, `JOINED` when subtype NOT NULL matters, `MAPPED_SUPERCLASS` for mixins) deliberately.
+- Avoid the canonical pitfalls: missing owning-side set, missing `mappedBy`, eager `@OneToMany`, `Set` with id-based hash, cascade on shared relationships.
+
+## Next
+
+Continue to [Hibernate architecture](./T04-hibernate-architecture.md) for the inside of the JPA provider — `SessionFactory` vs `EntityManagerFactory`, `Session` vs `EntityManager`, the action queue, the event listeners, the SPI for customization, and the metamodel — the layer underneath every annotation you wrote here.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l4/c02-t02-jpa-fundamentals-entities-entitymanager.html"><div class="lbl">← Previous</div><div class="ttl">T02-jpa-fundamentals-entities-entitymanager</div><div class="sub">JPA fundamentals (entities, EntityManager)</div></a><a class="next" href="../l4/c02-t04-hibernate-architecture.html"><div class="lbl">Next →</div><div class="ttl">T04-hibernate-architecture</div><div class="sub">Hibernate architecture</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-four-cardinalities" data-toc-link>The Four Cardinalities</a></li><li class="lvl-2"><a href="#unidirectional-vs-bidirectional" data-toc-link>Unidirectional vs Bidirectional</a></li><li class="lvl-2"><a href="#owning-side-vs-inverse-side-the-one-rule-to-remember" data-toc-link>Owning Side vs Inverse Side — The One Rule To Remember</a></li><li class="lvl-2"><a href="#manytoone-the-most-common-mapping" data-toc-link>@ManyToOne — The Most Common Mapping</a></li><li class="lvl-2"><a href="#onetomany-inverse-of-manytoone" data-toc-link>@OneToMany — Inverse of @ManyToOne</a></li><li class="lvl-3"><a href="#unidirectional-onetomany-avoid" data-toc-link>Unidirectional @OneToMany — Avoid</a></li><li class="lvl-2"><a href="#onetoone" data-toc-link>@OneToOne</a></li><li class="lvl-2"><a href="#manytomany" data-toc-link>@ManyToMany</a></li><li class="lvl-2"><a href="#cascade-types" data-toc-link>Cascade Types</a></li><li class="lvl-3"><a href="#orphan-removal" data-toc-link>Orphan Removal</a></li><li class="lvl-2"><a href="#collection-types-list-vs-set-vs-map" data-toc-link>Collection Types — List vs Set vs Map</a></li><li class="lvl-3"><a href="#the-equalshashcode-trap-on-entities-in-sets" data-toc-link>The equals/hashCode Trap on Entities In Sets</a></li><li class="lvl-2"><a href="#embedded-types-granularity-done-right" data-toc-link>Embedded Types — Granularity Done Right</a></li><li class="lvl-2"><a href="#elementcollection-collections-of-value-types" data-toc-link>@ElementCollection — Collections of Value Types</a></li><li class="lvl-2"><a href="#inheritance-mapping" data-toc-link>Inheritance Mapping</a></li><li class="lvl-3"><a href="#single_table-default" data-toc-link>SINGLE_TABLE (default)</a></li><li class="lvl-3"><a href="#joined" data-toc-link>JOINED</a></li><li class="lvl-3"><a href="#table_per_class" data-toc-link>TABLE_PER_CLASS</a></li><li class="lvl-3"><a href="#mapped_superclass" data-toc-link>MAPPED_SUPERCLASS</a></li><li class="lvl-2"><a href="#secondarytable" data-toc-link>@SecondaryTable</a></li><li class="lvl-2"><a href="#worked-example-full-order-domain" data-toc-link>Worked Example — Full Order Domain</a></li><li class="lvl-2"><a href="#common-pitfalls" data-toc-link>Common Pitfalls</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

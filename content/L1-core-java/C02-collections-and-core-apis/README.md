@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Core Java & OOP — Collections & Core APIs
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -44,4 +44,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 22 | Networking (Socket, HttpClient) | `T22-networking-socket-httpclient.md` | planned |
 | 23 | Internationalization (i18n) & formatting | `T23-internationalization-i18n-and-formatting.md` | planned |
 
-[Back to L1 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L1 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

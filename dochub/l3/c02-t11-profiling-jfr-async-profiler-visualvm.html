@@ -1,0 +1,1928 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Profiling (JFR, async-profiler, VisualVM) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="active" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Profiling (JFR, async-profiler, VisualVM)</span></div>
+        <h1>Profiling (JFR, async-profiler, VisualVM)</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T11-profiling-jfr-async-profiler-visualvm.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~175 min</span><span class="meta-pill date">updated 2026-06-15</span></div>
+        <div class="example-links"><a class="example-link" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Lab 05 — Profile with async-profiler / JFR</span><span class="example-link-sub">Hands-on Labs · lab-05-profile-with-async-profiler</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a></div>
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Profiling (JFR, async-profiler, VisualVM)"
+slug: profiling-jfr-async-profiler-visualvm
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 11
+tags: [profiling, sampling-profiler, instrumentation-profiler, performance-bottleneck, jfr, java-flight-recorder, jfr-event-types, jfr-continuous-recording, jfr-default-settings, jfr-profile-settings, jcmd-jfr-start, jcmd-jfr-dump, jdk-mission-control, jmc, method-profiler, hot-threads, allocation-events, gc-events, lock-contention-events, jfr-safepoint-bias, async-profiler, perf-events, perf-event-open, flame-graph, brendan-gregg, differential-flame-graph, wall-clock-profile, cpu-profile, off-cpu-profile, allocation-profile, visualvm, jprofiler-commercial, yourkit-commercial, honest-profiler, linux-perf, profile-workflow, hot-method, hot-allocation, hot-lock, logging-hot-path, reflection-tight-loop, string-concat-jdk9, linkedlist-get-on, jdbc-resultset-metadata, jackson-objectmapper, autoboxing-loop, primitive-collections, eclipse-collections, fastutil, container-profiling, kubectl-exec-jcmd, side-car-profiler, datadog-continuous-profiling, newrelic-pyroscope, opentelemetry-profiling, apm-profiler, prod-profiling, observability-stack, performance-question, allocation-profiling, wall-clock-profiling, lock-profiling, jfr-event-streaming, safepoint-bias, asyncgetcalltrace, async-profiler-agent, async-profiler-attach, collapsed-stacks, icicle-graph, off-cpu-profiling, jfr-cli, jfr-print, jfr-view, ttsp, time-to-safepoint, frame-pointer, perf-map-agent, ap-loader, monitor-contention, differential-flamegraph, jdk-flight-recorder-streaming, recordingstream]
+prerequisites: [memory-leaks-and-heap-dump-analysis, gc-tuning-and-monitoring, jit-compilation-c1-c2-tiered, jvm-architecture-and-runtime-data-areas]
+status: complete
+estimated_minutes: 175
+last_updated: 2026-06-15</p>
+<hr>
+<h1 id="profiling-jfr-async-profiler-visualvm">Profiling (JFR, async-profiler, VisualVM)</h1>
+<p>T10 covered <em>memory</em> diagnosis. This topic covers <em>CPU</em> diagnosis: where time is spent in the running JVM, which methods are hot, where allocations happen, where threads block. Profiling is the bridge from "the service is slow" to "we know exactly what to fix." In 2026 the two essential profilers are <strong>JFR (Java Flight Recorder)</strong> — built into the JDK, ~1-3% overhead, the production-default choice — and <strong>async-profiler</strong> — external tool with <strong>flame graphs</strong> as its specialty, no safepoint bias, the modern alternative for the cases JFR's safepoint sampling misses.</p>
+<p>The depth-bar requirement isn't "use JFR." At the <strong>methodology</strong> layer, profiling follows a disciplined workflow — define the performance question, choose the right tool, capture under realistic load, analyze, identify the hot path, make a targeted change, re-profile to verify — and most profiling failures are violations of this discipline (capturing dev workload, optimizing the cold path, reading absolute numbers instead of relative). At the <strong>tooling</strong> layer, <strong>JFR</strong> is the <em>production default</em> (always-on continuous recording is feasible at 1-3% overhead), records ~140 event types covering CPU samples / allocation / GC / lock contention / I/O / thread states / JIT / exceptions, and is analyzed in <strong>JMC (JDK Mission Control)</strong> — but suffers a <strong>safepoint bias</strong> that under-samples tight loops and long native calls. <strong>async-profiler</strong> complements JFR by sampling via Linux perf events (no safepoint bias) and producing <strong>flame graphs</strong> that visualize sampling data as wide-box-near-top = hot self-time. At the <strong>interpretation</strong> layer, <strong>flame graphs</strong> (Brendan Gregg, 2011) are the canonical visualization — X-axis aggregated samples (<em>not</em> time), Y-axis call depth, width = relative sampling count; reading them is its own learnable skill. At the <strong>profile-type</strong> layer, <strong>CPU profiling</strong> (time on-CPU) is different from <strong>wall-clock profiling</strong> (time on-CPU + blocked time), which is critical for I/O-heavy services where blocked time dominates; <strong>allocation profiling</strong> finds GC-pressure sources; <strong>lock contention profiling</strong> finds synchronization bottlenecks. We will cover all four layers, with practical examples for the canonical performance patterns (logging hot path, reflection in tight loops, autoboxing) and a production observability stack (continuous JFR + on-demand async-profiler + Prometheus + OpenTelemetry traces + APM continuous-profiling backends).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t10-memory-leaks-and-heap-dump-analysis.html">Memory leaks &amp; heap dump analysis</a> (L3/C02/T10) — the parallel topic for memory diagnosis; <a href="c02-t09-gc-tuning-and-monitoring.html">GC tuning &amp; monitoring</a> (L3/C02/T09) — GC events overlap with profiling data; <a href="c02-t04-jit-compilation-c1-c2-tiered.html">JIT compilation</a> (L3/C02/T04) — JIT events visible in JFR; <a href="c02-t01-jvm-architecture-and-runtime-data-areas.html">JVM architecture</a> (L3/C02/T01) — runtime areas profilers observe.</p></div></div>
+<h2 id="what-profiling-is">What Profiling Is<a class="anchor" href="#what-profiling-is" aria-hidden="true">#</a></h2>
+<p><strong>Profiling</strong> is measuring where time and resources are spent in a running program. Two main approaches:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>How it works</th>
+<th>Overhead</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sampling</strong></td>
+<td>Periodically snapshot the call stack</td>
+<td>Low (~1-5%)</td>
+<td>Statistically valid; misses brief events</td>
+</tr>
+<tr>
+<td><strong>Instrumentation</strong></td>
+<td>Insert measurement code into every method</td>
+<td>High (10-50%+)</td>
+<td>Precise; biases results</td>
+</tr>
+</tbody>
+</table></div>
+<p>Production profiling almost always uses sampling. Modern Java tools (JFR, async-profiler) are sampling profilers; legacy ones (older VisualVM CPU profiling) used instrumentation.</p>
+<p>The basic logic: "if 30% of stack-trace samples show <code>method X</code>, then X took ~30% of CPU time." Over enough samples, this converges to a useful approximation.</p>
+<h2 id="the-systematic-profiling-workflow">The Systematic Profiling Workflow<a class="anchor" href="#the-systematic-profiling-workflow" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  Q["1. Define the performance question<br/>('p99 latency increased; why?')"]
+  Tool["2. Choose the tool (JFR / async-profiler / VisualVM)"]
+  Cap["3. Capture under realistic load<br/>(prod or prod-like)"]
+  Analyze["4. Analyze (flame graph / method profiler)"]
+  Hot["5. Identify hot methods<br/>or hot allocation paths"]
+  Why["6. Diagnose WHY hot<br/>(algorithm? allocation? IO? sync?)"]
+  Fix["7. Make targeted change"]
+  Verify["8. Re-profile to verify"]
+  Q --> Tool --> Cap --> Analyze --> Hot --> Why --> Fix --> Verify
+  Verify -- "not fixed" --> Tool
+</div>
+<p>The rules:</p>
+<ul>
+<li><strong>Always have a performance question.</strong> "Profile this app" with no goal yields noise.</li>
+<li><strong>Capture realistic load.</strong> Dev workloads don't match production hot paths.</li>
+<li><strong>Look at relative cost, not absolute.</strong> "30% of time in X" matters; "X took 100 ms" depends on the load.</li>
+<li><strong>Verify the fix.</strong> Most "improvements" are noise.</li>
+</ul>
+<h2 id="jfr-java-flight-recorder-the-production-default">JFR (Java Flight Recorder) — the Production Default<a class="anchor" href="#jfr-java-flight-recorder-the-production-default" aria-hidden="true">#</a></h2>
+<p>JFR is built into the JDK since JDK 11 (and Oracle JDK 7+). It's the <em>production-grade</em> profiler:</p>
+<ul>
+<li><strong>~1-3% overhead</strong> with <code>profile</code> settings.</li>
+<li><strong>Continuous recording</strong> with rolling window — always-on.</li>
+<li><strong>~140 event types</strong> covering nearly every JVM subsystem.</li>
+<li><strong>No special permissions</strong> needed in modern JDKs.</li>
+</ul>
+<h3 id="starting-jfr">Starting JFR<a class="anchor" href="#starting-jfr" aria-hidden="true">#</a></h3>
+<p><strong>Continuous recording with rolling window</strong> (the production default):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -XX:StartFlightRecording=disk=true,maxage=24h,maxsize=200m,filename=/tmp/jfr ...
+</code></pre></div>
+<p>Captures the last 24 hours into a 200 MB rotating file. When something goes wrong, the data is already there.</p>
+<p><strong>On-demand for a specific window</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/spike.jfr
+# ... reproduce the issue ...
+jcmd &lt;pid&gt; JFR.dump filename=/tmp/snapshot.jfr   # also works without duration
+</code></pre></div>
+<p><strong>Stop and dump</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.dump filename=/tmp/now.jfr
+jcmd &lt;pid&gt; JFR.stop
+</code></pre></div>
+<h3 id="jfr-settings">JFR settings<a class="anchor" href="#jfr-settings" aria-hidden="true">#</a></h3>
+<p>Two built-in configurations:</p>
+<ul>
+<li><strong><code>default</code></strong>: ~1% overhead. Excludes some heavy events (e.g., allocation sampling). Good for always-on.</li>
+<li><strong><code>profile</code></strong>: ~2-3% overhead. Includes allocation, lock contention, more detail. Good for diagnosis.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/p.jfr
+</code></pre></div>
+<p>Custom <code>.jfc</code> files let you enable specific events:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.start settings=custom.jfc filename=/tmp/c.jfr
+</code></pre></div>
+<h3 id="jfr-event-types-sample">JFR event types (sample)<a class="anchor" href="#jfr-event-types-sample" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jdk.CPULoad</code></td>
+<td>system + process CPU</td>
+</tr>
+<tr>
+<td><code>jdk.ThreadCPULoad</code></td>
+<td>per-thread CPU</td>
+</tr>
+<tr>
+<td><code>jdk.ExecutionSample</code></td>
+<td>sampled stack traces (the CPU profile)</td>
+</tr>
+<tr>
+<td><code>jdk.ObjectAllocationInNewTLAB</code></td>
+<td>TLAB allocation sample</td>
+</tr>
+<tr>
+<td><code>jdk.ObjectAllocationOutsideTLAB</code></td>
+<td>slow-path allocation sample</td>
+</tr>
+<tr>
+<td><code>jdk.GarbageCollection</code></td>
+<td>every GC</td>
+</tr>
+<tr>
+<td><code>jdk.GCPhasePause</code></td>
+<td>STW phase pause</td>
+</tr>
+<tr>
+<td><code>jdk.JavaMonitorEnter</code></td>
+<td>monitor contention</td>
+</tr>
+<tr>
+<td><code>jdk.JavaMonitorWait</code></td>
+<td>wait() blocking</td>
+</tr>
+<tr>
+<td><code>jdk.ThreadPark</code></td>
+<td>LockSupport.park blocking</td>
+</tr>
+<tr>
+<td><code>jdk.FileRead</code> / <code>jdk.FileWrite</code></td>
+<td>file I/O</td>
+</tr>
+<tr>
+<td><code>jdk.SocketRead</code> / <code>jdk.SocketWrite</code></td>
+<td>network I/O</td>
+</tr>
+<tr>
+<td><code>jdk.ThreadStart</code> / <code>jdk.ThreadEnd</code></td>
+<td>thread lifecycle</td>
+</tr>
+<tr>
+<td><code>jdk.JITCompilation</code></td>
+<td>every method compiled</td>
+</tr>
+<tr>
+<td><code>jdk.MethodSample</code></td>
+<td>method-level sampling</td>
+</tr>
+<tr>
+<td><code>jdk.VirtualThreadStart</code> / <code>jdk.VirtualThreadPinned</code></td>
+<td>virtual thread lifecycle (T14 from C01)</td>
+</tr>
+<tr>
+<td><code>jdk.JavaErrorThrow</code> / <code>jdk.JavaExceptionThrow</code></td>
+<td>exceptions thrown</td>
+</tr>
+</tbody>
+</table></div>
+<p>Per-event filtering, sampling rates, and stack-trace depth are configurable.</p>
+<h3 id="analyzing-jfr-with-jdk-mission-control-jmc">Analyzing JFR with JDK Mission Control (JMC)<a class="anchor" href="#analyzing-jfr-with-jdk-mission-control-jmc" aria-hidden="true">#</a></h3>
+<p>JMC is the GUI for JFR files. Download from https://www.oracle.com/java/technologies/jdk-mission-control.html (Adoptium has builds too).</p>
+<p>Key views:</p>
+<ul>
+<li><strong>Method Profiling</strong>: hot methods by sample count. Self-time vs total-time. Drill into call tree.</li>
+<li><strong>Hot Threads</strong>: which threads use most CPU.</li>
+<li><strong>Allocation Profiling</strong>: where allocations happen (by class, by stack).</li>
+<li><strong>Memory</strong>: heap usage, GC pauses over time.</li>
+<li><strong>Lock Contention</strong>: which monitors are contended.</li>
+<li><strong>Outliers</strong>: long method invocations, slow disk reads, etc.</li>
+</ul>
+<h3 id="jfrs-safepoint-bias">JFR's safepoint bias<a class="anchor" href="#jfrs-safepoint-bias" aria-hidden="true">#</a></h3>
+<p>JFR samples at JVM safepoints (T07 — safepoint polls inserted by JIT). This means:</p>
+<ul>
+<li><strong>Methods called from a safepoint</strong> (most code) are accurately sampled.</li>
+<li><strong>Methods between safepoints</strong> (tight loops without poll insertion, long native calls) are <em>under-sampled</em>.</li>
+</ul>
+<p>JFR's profile is biased toward "where the JIT was happy to put a poll." It misses:</p>
+<ul>
+<li>Tight numeric loops with <code>-XX:-EliminateBackedgeInTracedLoop</code> not generating polls.</li>
+<li>Long JNI calls (no safepoints inside native code).</li>
+<li>Synthetic methods, lambdas, certain compiler-generated frames.</li>
+</ul>
+<p>The fix: <strong>async-profiler</strong>.</p>
+<h2 id="async-profiler-no-safepoint-bias">async-profiler — No Safepoint Bias<a class="anchor" href="#async-profiler-no-safepoint-bias" aria-hidden="true">#</a></h2>
+<p><a href="https://github.com/async-profiler/async-profiler">async-profiler</a> (Andrei Pangin et al.) is the modern alternative to JFR for low-bias CPU profiling. Uses Linux <code>perf_event_open</code> (or <code>AsyncGetCallTrace</code> on other platforms) — sampling at the OS level, <em>not</em> at JVM safepoints.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Download from GitHub releases
+# Unpack into /opt/async-profiler
+
+# CPU profile, 60 seconds, flame graph output:
+/opt/async-profiler/profiler.sh -d 60 -f /tmp/cpu.html &lt;pid&gt;
+
+# Allocation profile:
+/opt/async-profiler/profiler.sh -e alloc -d 60 -f /tmp/alloc.html &lt;pid&gt;
+
+# Wall-clock profile (CPU + blocked time):
+/opt/async-profiler/profiler.sh -e wall -d 60 -f /tmp/wall.html &lt;pid&gt;
+
+# Lock profile (Java monitor contention):
+/opt/async-profiler/profiler.sh -e lock -d 60 -f /tmp/lock.html &lt;pid&gt;
+</code></pre></div>
+<h3 id="async-profiler-vs-jfr">async-profiler vs JFR<a class="anchor" href="#async-profiler-vs-jfr" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>JFR</th>
+<th>async-profiler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Safepoint bias</strong></td>
+<td>Yes</td>
+<td><strong>No</strong></td>
+</tr>
+<tr>
+<td><strong>Overhead</strong></td>
+<td>1-3%</td>
+<td>&lt; 1%</td>
+</tr>
+<tr>
+<td><strong>Default</strong></td>
+<td>Yes (built-in)</td>
+<td>Requires install</td>
+</tr>
+<tr>
+<td><strong>Output</strong></td>
+<td>Binary .jfr file</td>
+<td>Flame graph HTML, .jfr, others</td>
+</tr>
+<tr>
+<td><strong>Event variety</strong></td>
+<td>~140 types</td>
+<td>CPU, alloc, wall, lock, perf events</td>
+</tr>
+<tr>
+<td><strong>Production-safe</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Continuous recording</strong></td>
+<td>Yes</td>
+<td>Not its strength</td>
+</tr>
+<tr>
+<td><strong>Visualization</strong></td>
+<td>JMC (full-featured)</td>
+<td>Flame graphs (focused)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The 2026 stack: <strong>continuous JFR for everything; on-demand async-profiler for accurate flame graphs</strong>. They complement each other.</p>
+<h2 id="flame-graphs-reading-and-interpretation">Flame Graphs — Reading and Interpretation<a class="anchor" href="#flame-graphs-reading-and-interpretation" aria-hidden="true">#</a></h2>
+<p>Invented by <a href="https://www.brendangregg.com/flamegraphs.html">Brendan Gregg</a> (2011). The canonical visualization for sampling profiler data.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">       width = % of samples (NOT time)
+   ┌──────────────────────────────────────────────────┐
+   │              Socket.read()                          │ ← top of stack (most recent call)
+   ├──────────────────────────────────────────────────┤
+   │           JDBC.executeQuery()                       │
+   ├──────────────────────────────────────────────────┤
+   │       DB.fetchUser()                                │
+   ├──────────────────────────────────────────────────┤
+   │   Service.handleRequest()                           │
+   ├──────────────────────────────────────────────────┤
+   │              main()                                  │ ← bottom (entry point)
+   └──────────────────────────────────────────────────┘
+</code></pre></div>
+<ul>
+<li><strong>X-axis</strong>: aggregated stack-trace samples, alphabetical by frame name (NOT time).</li>
+<li><strong>Y-axis</strong>: call depth. Caller at bottom; callee on top.</li>
+<li><strong>Box width</strong>: percentage of total samples this frame appears in. <em>The wider, the hotter.</em></li>
+<li><strong>Box color</strong>: usually arbitrary (helps distinguish frames); some tools encode special info (e.g., red for inlined).</li>
+</ul>
+<h3 id="how-to-read">How to read<a class="anchor" href="#how-to-read" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>Look at the top.</strong> The frames at the top are the <em>self-time</em> hot spots — where time was actually spent.</li>
+<li><strong>Wide flat box near top</strong> = lots of self-time. This is what to optimize.</li>
+<li><strong>Narrow tall stack</strong> = deep but rarely sampled — usually not interesting.</li>
+<li><strong>Wide narrow stack</strong> (wide at bottom, narrow at top) = a hot top-level method, but actual work elsewhere.</li>
+</ol>
+<h3 id="example-flame-graph-reading">Example flame graph reading<a class="anchor" href="#example-flame-graph-reading" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">┌────────────────────────────────────────────────────────────┐
+│             Pattern.matcher()             │   String.intern() │  ← hot self-time
+├────────────────────────────────────────────────────────────┤
+│             String.matches()              │     Service.cache() │
+├────────────────────────────────────────────────────────────┤
+│                   Validator.validate()                          │
+├────────────────────────────────────────────────────────────┤
+│                   handler.handle()                               │
+└────────────────────────────────────────────────────────────┘
+</code></pre></div>
+<p>Reading: validator.validate() is the parent, but the <em>hot work</em> is <code>Pattern.matcher()</code> — regex compilation. Likely fix: pre-compile the pattern (cache the <code>Pattern</code> instance) instead of re-compiling per request.</p>
+<h3 id="differential-flame-graphs">Differential flame graphs<a class="anchor" href="#differential-flame-graphs" aria-hidden="true">#</a></h3>
+<p>Compare two profiles (before vs after a deploy):</p>
+<ul>
+<li><strong>Red</strong> boxes = grew between the two profiles (regressed).</li>
+<li><strong>Blue</strong> boxes = shrank (improved).</li>
+<li><strong>Gray</strong> = unchanged.</li>
+</ul>
+<p>Tells you exactly what got worse (or better) between two runs.</p>
+<h2 id="visualvm-quick-triage">VisualVM — Quick Triage<a class="anchor" href="#visualvm-quick-triage" aria-hidden="true">#</a></h2>
+<p><a href="https://visualvm.github.io/">VisualVM</a> is the lighter alternative — separate download since JDK 9 (was bundled before). Best for quick dev-time investigations.</p>
+<p>Features:</p>
+<ul>
+<li>CPU profiling (instrumentation-based; heavier than JFR/async-profiler).</li>
+<li>Memory profiling.</li>
+<li>Thread visualization with state colors.</li>
+<li>JMX MBean inspector.</li>
+<li>Heap dump capture and basic analysis.</li>
+<li>Plugins (Visual GC, MBeans extensions, etc.).</li>
+</ul>
+<p>When to use:</p>
+<ul>
+<li>Dev-time debugging.</li>
+<li>Quick checks of a running JVM ("what's it doing right now?").</li>
+<li>JMX inspection.</li>
+</ul>
+<p>When NOT to use:</p>
+<ul>
+<li>Production CPU profiling (heavier than JFR/async-profiler).</li>
+<li>Heap dump analysis at scale (use Eclipse MAT, T10).</li>
+</ul>
+<h2 id="other-tools">Other Tools<a class="anchor" href="#other-tools" aria-hidden="true">#</a></h2>
+<h3 id="jprofiler-yourkit-commercial">JProfiler / YourKit (commercial)<a class="anchor" href="#jprofiler-yourkit-commercial" aria-hidden="true">#</a></h3>
+<p>Rich UIs, real-time JDBC query profiling, distributed tracing integration. Enterprise teams often deploy them. Expensive licenses; powerful features.</p>
+<h3 id="honest-profiler">honest-profiler<a class="anchor" href="#honest-profiler" aria-hidden="true">#</a></h3>
+<p>Historical low-overhead sampling profiler. Largely superseded by async-profiler. Mentioned for completeness.</p>
+<h3 id="linux-perf">Linux <code>perf</code><a class="anchor" href="#linux-perf" aria-hidden="true">#</a></h3>
+<p>Kernel-level profiler — useful with <code>--frame-pointer</code> for native code. For Java code, use async-profiler (which uses <code>perf</code> internally on Linux but adds Java symbol resolution).</p>
+<h2 id="profile-types-cpu-vs-wall-vs-allocation-vs-lock">Profile Types — CPU vs Wall vs Allocation vs Lock<a class="anchor" href="#profile-types-cpu-vs-wall-vs-allocation-vs-lock" aria-hidden="true">#</a></h2>
+<p>Different questions need different profiles:</p>
+<h3 id="cpu-profile">CPU profile<a class="anchor" href="#cpu-profile" aria-hidden="true">#</a></h3>
+<p>Samples when threads are <strong>on-CPU</strong>. Best for CPU-bound workloads (computation, parsing, encryption).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprofiler.sh -e cpu -d 60 -f /tmp/cpu.html &lt;pid&gt;
+</code></pre></div>
+<h3 id="wall-clock-profile">Wall-clock profile<a class="anchor" href="#wall-clock-profile" aria-hidden="true">#</a></h3>
+<p>Samples regardless of thread state (on-CPU or blocked). <strong>Critical for I/O-heavy services</strong> where most time is spent blocked.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprofiler.sh -e wall -d 60 -f /tmp/wall.html &lt;pid&gt;
+</code></pre></div>
+<p>For a service whose p99 is 500 ms and CPU is at 5%, <strong>the CPU profile shows almost nothing useful</strong> — most time isn't on CPU. The wall-clock profile shows where the time actually went (waiting on DB, network, lock).</p>
+<h3 id="allocation-profile">Allocation profile<a class="anchor" href="#allocation-profile" aria-hidden="true">#</a></h3>
+<p>Samples allocations. Shows where GC pressure comes from.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprofiler.sh -e alloc -d 60 -f /tmp/alloc.html &lt;pid&gt;
+# Or JFR: jdk.ObjectAllocationInNewTLAB / jdk.ObjectAllocationOutsideTLAB
+</code></pre></div>
+<p>Useful when GC pauses are too frequent or too long — reducing allocation reduces GC work.</p>
+<h3 id="lock-contention-profile">Lock contention profile<a class="anchor" href="#lock-contention-profile" aria-hidden="true">#</a></h3>
+<p>Samples threads blocked on monitor enter or LockSupport.park.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprofiler.sh -e lock -d 60 -f /tmp/lock.html &lt;pid&gt;
+# Or JFR: jdk.JavaMonitorEnter / jdk.ThreadPark
+</code></pre></div>
+<p>Reveals synchronization bottlenecks — the canonical fix is reducing critical-section duration or switching to lock-free structures.</p>
+<h2 id="common-performance-patterns-found-via-profiling">Common Performance Patterns Found via Profiling<a class="anchor" href="#common-performance-patterns-found-via-profiling" aria-hidden="true">#</a></h2>
+<h3 id="logging-in-hot-path-with-non-parameterized-strings">Logging in hot path with non-parameterized strings<a class="anchor" href="#logging-in-hot-path-with-non-parameterized-strings" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Always formats the string, even at INFO level when DEBUG is disabled:
+logger.debug(&quot;processing &quot; + request.toString() + &quot; with config &quot; + config);
+
+// ✓ Parameterized — string only built if DEBUG is enabled:
+logger.debug(&quot;processing {} with config {}&quot;, request, config);
+</code></pre></div>
+<p>Visible as <code>String.concat</code>/<code>StringBuilder.append</code> high in CPU profile.</p>
+<h3 id="reflection-in-tight-loops">Reflection in tight loops<a class="anchor" href="#reflection-in-tight-loops" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Reflective lookup every iteration:
+for (var x : items) {
+    Method m = x.getClass().getMethod(&quot;process&quot;);
+    m.invoke(x);
+}
+
+// ✓ Cache the Method:
+Method m = Item.class.getMethod(&quot;process&quot;);
+for (var x : items) m.invoke(x);
+</code></pre></div>
+<p>Or better: use a proper interface instead of reflection.</p>
+<h3 id="pre-jdk-9-stringbuilder-churn">Pre-JDK-9 StringBuilder churn<a class="anchor" href="#pre-jdk-9-stringbuilder-churn" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Pre-JDK-9 — StringBuilder per iteration:
+for (var x : items) {
+    String s = &quot;prefix&quot; + x + &quot;suffix&quot;;   // StringBuilder churn
+    process(s);
+}
+</code></pre></div>
+<p>JDK 9+ uses invokedynamic (T03) and is usually fine. Profile to confirm.</p>
+<h3 id="linkedlistgeti-on">LinkedList.get(i) — O(n)<a class="anchor" href="#linkedlistgeti-on" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;X&gt; list = new LinkedList&lt;&gt;();
+for (int i = 0; i &lt; list.size(); i++) {
+    process(list.get(i));   // ✗ O(n^2) — get(i) walks the list
+}
+</code></pre></div>
+<p>Fix: ArrayList (O(1) indexed access), or use iterator/for-each.</p>
+<h3 id="jdbc-resultset-metadata-lookup-per-row">JDBC ResultSet metadata lookup per row<a class="anchor" href="#jdbc-resultset-metadata-lookup-per-row" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">while (rs.next()) {
+    int id = rs.getInt(rs.findColumn(&quot;id&quot;));   // ✗ string lookup per row
+    String name = rs.getString(rs.findColumn(&quot;name&quot;));
+}
+
+// ✓ Cache the column indices once:
+int idCol = rs.findColumn(&quot;id&quot;);
+int nameCol = rs.findColumn(&quot;name&quot;);
+while (rs.next()) {
+    int id = rs.getInt(idCol);
+    String name = rs.getString(nameCol);
+}
+</code></pre></div>
+<h3 id="json-serialization-reflection">JSON serialization reflection<a class="anchor" href="#json-serialization-reflection" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ ObjectMapper created per request (re-discovers all classes):
+String json = new ObjectMapper().writeValueAsString(obj);
+
+// ✓ Shared, immutable, thread-safe:
+private static final ObjectMapper MAPPER = new ObjectMapper();
+String json = MAPPER.writeValueAsString(obj);
+</code></pre></div>
+<h3 id="autoboxing-in-loops">Autoboxing in loops<a class="anchor" href="#autoboxing-in-loops" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Autoboxes every iteration:
+Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+for (int i = 0; i &lt; 1_000_000; i++) {
+    map.merge(i, 1, Integer::sum);   // Integer.valueOf(i) per call
+}
+
+// ✓ Primitive map (Eclipse Collections, fastutil):
+IntIntHashMap map = new IntIntHashMap();
+for (int i = 0; i &lt; 1_000_000; i++) {
+    map.addToValue(i, 1);
+}
+</code></pre></div>
+<p>Eclipse Collections, fastutil, HPPC offer primitive-typed collections with massive allocation reductions.</p>
+<h2 id="container-profiling">Container Profiling<a class="anchor" href="#container-profiling" aria-hidden="true">#</a></h2>
+<p>Profilers work in containers, but with some setup:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># JFR — output to a volume:
+kubectl exec &lt;pod&gt; -- jcmd 1 JFR.start duration=60s filename=/tmp/p.jfr
+kubectl cp &lt;pod&gt;:/tmp/p.jfr ./local.jfr
+
+# async-profiler — needs to be present in container:
+# Either bake into the image, or use a side-car
+kubectl exec &lt;pod&gt; -- /opt/async-profiler/profiler.sh -d 60 -f /tmp/cpu.html 1
+</code></pre></div>
+<p>For Kubernetes, side-car patterns (e.g., Pyroscope agent) handle continuous profiling without code changes.</p>
+<h2 id="production-observability-stack">Production Observability Stack<a class="anchor" href="#production-observability-stack" aria-hidden="true">#</a></h2>
+<p>A complete observability stack combines:</p>
+<div class="mermaid">flowchart TB
+  JVM["JVM (production)"]
+  JFR["Continuous JFR<br/>(24h rolling window)"]
+  Met["Micrometer → Prometheus<br/>(real-time metrics)"]
+  Trace["OpenTelemetry → Jaeger<br/>(distributed traces)"]
+  APM["APM continuous profiler<br/>(Datadog/NewRelic/Dynatrace/Pyroscope)"]
+  Adhoc["async-profiler<br/>(on-demand investigation)"]
+  JVM --> JFR
+  JVM --> Met
+  JVM --> Trace
+  JVM --> APM
+  JVM --> Adhoc
+</div>
+<p>Each stream answers a different question:</p>
+<ul>
+<li><strong>JFR</strong>: deep JVM internals (always-on, post-mortem).</li>
+<li><strong>Prometheus</strong>: real-time alerts and dashboards.</li>
+<li><strong>OpenTelemetry traces</strong>: per-request flow across services.</li>
+<li><strong>APM continuous profiler</strong>: aggregated flame graphs across the fleet.</li>
+<li><strong>async-profiler</strong>: precise on-demand investigation.</li>
+</ul>
+<h2 id="apm-integration">APM Integration<a class="anchor" href="#apm-integration" aria-hidden="true">#</a></h2>
+<p>Continuous profiling has become a feature of every major APM platform:</p>
+<ul>
+<li><strong>Datadog Continuous Profiler</strong> — Java agent, aggregates flame graphs.</li>
+<li><strong>New Relic / AppDynamics / Dynatrace</strong> — similar offerings.</li>
+<li><strong>Pyroscope</strong> (now Grafana Pyroscope) — open-source continuous profiling, integrates with Grafana.</li>
+<li><strong>Sentry Profiling</strong> — focused on slow request investigation.</li>
+</ul>
+<p>All use sampling underneath (often async-profiler or similar). The differentiator is the <em>aggregation</em> — viewing flame graphs across services, deploys, and instances.</p>
+<h2 id="async-profiler-how-it-actually-works-deep-dive">async-profiler — How It Actually Works (Deep Dive)<a class="anchor" href="#async-profiler-how-it-actually-works-deep-dive" aria-hidden="true">#</a></h2>
+<p>The sections above introduced async-profiler as "the no-safepoint-bias alternative." Now we go under the hood: <em>why</em> it has no safepoint bias, <em>how</em> it captures Java stacks from an arbitrary point in time, and the full menu of profiling modes with the exact commands a 2026 engineer types.</p>
+<h3 id="the-two-engines-perf_events-asyncgetcalltrace">The Two Engines: <code>perf_events</code> + <code>AsyncGetCallTrace</code><a class="anchor" href="#the-two-engines-perf_events-asyncgetcalltrace" aria-hidden="true">#</a></h3>
+<p>async-profiler is really two cooperating mechanisms stitched together:</p>
+<ol>
+<li><strong>The trigger (when to sample).</strong> On Linux, async-profiler asks the kernel's <strong><code>perf_events</code></strong> subsystem (via the <code>perf_event_open(2)</code> syscall) to deliver a signal every N CPU cycles (or N nanoseconds of wall time, or every M bytes allocated — depending on mode). Because the <em>kernel</em> decides when to interrupt the thread, the sample can land <strong>anywhere</strong> — inside a tight loop, in JIT-compiled code with no safepoint poll, mid-way through a method. This is the crucial difference from JFR's <code>jdk.ExecutionSample</code>, which can only capture a stack when a thread voluntarily reaches a <strong>safepoint</strong>.</li>
+<li><strong>The capture (what the stack is).</strong> When the signal handler fires, async-profiler calls <strong><code>AsyncGetCallTrace</code></strong> — an undocumented but stable HotSpot internal function (the "Async" in the name) that walks the Java stack of the <em>currently interrupted</em> thread without requiring it to be at a safepoint. <code>AsyncGetCallTrace</code> is signal-async-safe: it can run inside a signal handler. It returns the JVM-level Java frames; async-profiler then stitches them together with native frames (resolved via the frame pointer or DWARF unwinding) to produce a <strong>mixed-mode</strong> stack — Java + JNI + kernel — in one trace.</li>
+</ol>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">  perf_events timer fires  ───►  SIGPROF delivered to a running thread
+            (kernel decides the instant — no safepoint needed)
+                                          │
+                                          ▼
+                          async-profiler signal handler
+                                          │
+                    ┌─────────────────────┴─────────────────────┐
+                    ▼                                             ▼
+        AsyncGetCallTrace (Java frames)            frame-pointer / DWARF unwind
+        — walks the interpreter &amp; JIT               (native libs, kernel,
+          stack of the interrupted thread)            JNI, malloc, syscalls)
+                    └─────────────────────┬─────────────────────┘
+                                          ▼
+                         one mixed-mode stack trace (Java + native)
+                                          │
+                                          ▼
+                       aggregated into the flame graph / .jfr / collapsed file
+</code></pre></div>
+<h3 id="why-this-beats-the-safepoint-bias-problem">Why This Beats the Safepoint-Bias Problem<a class="anchor" href="#why-this-beats-the-safepoint-bias-problem" aria-hidden="true">#</a></h3>
+<p>Recall the safepoint-bias problem (covered above for JFR, and again here from the <em>sampler</em> angle): a safepoint-based sampler can only photograph a thread when that thread parks at a poll point. The JIT inserts polls at method entry/exit and (sometimes) loop back-edges — but a hot, fully-inlined numeric loop may run for microseconds with <strong>no poll inside it</strong>. A safepoint sampler asked to take a snapshot during that loop must <em>wait</em> until the thread leaves the loop, then records the stack at the next poll — systematically attributing the loop's time to whatever method comes after it. The classic symptom: a profiler that swears the hot method is some innocent caller, while the real CPU burner (the inlined loop) is invisible.</p>
+<p>Older VisualVM CPU sampling and many legacy commercial samplers were safepoint-based and suffered exactly this. async-profiler sidesteps it entirely because the kernel interrupts the thread <em>in place</em> — the snapshot is of wherever the program counter genuinely was. This is the single biggest reason to reach for async-profiler when a JFR flame graph "smells wrong."</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>There is a related but distinct metric called <strong>time-to-safepoint (TTSP)</strong> — how long it takes <em>all</em> threads to reach a safepoint once one is requested (e.g. for a GC or a <code>jstack</code>). A thread stuck in a long counted loop or a slow JNI call inflates TTSP and can stall the whole VM. JFR's safepoint <em>bias</em> (a sampling-accuracy problem) and TTSP (a pause-latency problem) share the same root cause — poll placement — but are different concerns. async-profiler can help diagnose long-TTSP culprits because it <em>can</em> sample inside the offending loop.</p></div></div>
+<h3 id="the-profiling-modes-and-when-each-one-earns-its-keep">The Profiling Modes — and When Each One Earns Its Keep<a class="anchor" href="#the-profiling-modes-and-when-each-one-earns-its-keep" aria-hidden="true">#</a></h3>
+<p>async-profiler is not "a CPU profiler." It is a sampler with interchangeable <strong>events</strong>. The <code>-e &lt;event&gt;</code> flag selects what the kernel counts down to before firing the sampling signal. Choosing the wrong event is the most common reason a profile "shows nothing" — the deeper sections below pair each mode with the question it answers.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mode (<code>-e</code>)</th>
+<th>Samples when…</th>
+<th>The question it answers</th>
+<th>Reach for it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cpu</code></td>
+<td>a thread is burning a CPU (HW perf counter)</td>
+<td>"What is consuming CPU cycles?"</td>
+<td>CPU is pegged; throughput-bound compute</td>
+</tr>
+<tr>
+<td><code>itimer</code></td>
+<td>wall-clock timer fires (CPU-time, no <code>perf</code>)</td>
+<td>same as <code>cpu</code>, fallback where <code>perf_events</code> is unavailable (locked-down containers, macOS)</td>
+<td><code>perf_event_open</code> denied (<code>perf_event_paranoid</code>), no <code>CAP_PERFMON</code></td>
+</tr>
+<tr>
+<td><code>wall</code></td>
+<td>every thread, on-CPU <strong>or blocked</strong></td>
+<td>"Where is <em>wall-clock</em> latency going, including waiting?"</td>
+<td>I/O-bound service; p99 high but CPU low</td>
+</tr>
+<tr>
+<td><code>alloc</code></td>
+<td>the JVM allocates ~N bytes (TLAB-driven)</td>
+<td>"What is creating GC pressure / allocating the most?"</td>
+<td>frequent GC, allocation-rate alarms</td>
+</tr>
+<tr>
+<td><code>lock</code></td>
+<td>a thread blocks on a monitor / <code>ReentrantLock</code></td>
+<td>"Which lock is contended, and who waits on it?"</td>
+<td>high context-switch rate; sync bottleneck suspected</td>
+</tr>
+<tr>
+<td><code>cache-misses</code>, <code>branch-misses</code>, <code>LLC-load-misses</code>, …</td>
+<td>the named HW perf counter overflows</td>
+<td>"Is this loop memory-bound? branch-mispredicting?"</td>
+<td>micro-arch tuning of a known hot kernel</td>
+</tr>
+</tbody>
+</table></div>
+<p>Some real invocations beyond the basics already shown:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># CPU profile, sample every 1 ms of CPU time (-i = sampling interval):
+asprof -e cpu -i 1ms -d 30 -f /tmp/cpu.html &lt;pid&gt;
+
+# Allocation profile — sample every 512 KB allocated; flame graph by allocated bytes:
+asprof -e alloc --alloc 512k -d 60 -f /tmp/alloc.html &lt;pid&gt;
+
+# Wall-clock profile of ONLY the request-handler threads (filter by name):
+asprof -e wall -t -d 60 -f /tmp/wall.html &lt;pid&gt;   # -t = split by thread
+
+# Lock/monitor contention, ignoring locks held &lt; 250 us (--lock threshold):
+asprof -e lock --lock 250us -d 60 -f /tmp/lock.html &lt;pid&gt;
+
+# Hardware cache-miss profile of a memory-bound kernel:
+asprof -e cache-misses -d 30 -f /tmp/cache.html &lt;pid&gt;
+</code></pre></div>
+<blockquote>
+<p>The modern launcher is <code>asprof</code> (renamed from <code>profiler.sh</code> in async-profiler 3.0, 2023). Older docs and the examples earlier in this topic use <code>profiler.sh</code>/<code>asprofiler.sh</code>; the flags are the same. There is also <strong><code>ap-loader</code></strong> — a single fat-jar that bundles native libraries for every platform, handy in CI and containers where you can't pre-install binaries.</p>
+</blockquote>
+<h3 id="agent-at-launch-vs-attach-to-live-pid">Agent-at-Launch vs Attach-to-Live-PID<a class="anchor" href="#agent-at-launch-vs-attach-to-live-pid" aria-hidden="true">#</a></h3>
+<p>There are two fundamentally different ways to get async-profiler into a JVM, and the choice has real consequences:</p>
+<p><strong>1. Attach to a live PID (the common case).</strong> The <code>asprof</code> launcher uses the JVM's <strong>dynamic attach</strong> mechanism (the same channel <code>jcmd</code> uses) to inject <code>libasyncProfiler.so</code> into an already-running process. Zero restart, zero config — perfect for "production is slow <em>right now</em>."</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Attach, profile 30s, detach automatically:
+asprof -d 30 -f /tmp/now.html 12345
+</code></pre></div>
+<p><strong>2. Load as a <code>-agentpath</code> at JVM launch.</strong> Start the profiler with the process so you capture <strong>startup and warm-up</strong> — the JIT compiling, classes loading, the first requests — which an attach-later approach misses entirely.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -agentpath:/opt/async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=/tmp/startup.jfr,jfr \
+     -jar app.jar
+</code></pre></div>
+<p>When to pick which:
+- <strong>Attach</strong> for incident response, ad-hoc investigation, and when you cannot (or don't want to) restart the process.
+- <strong>Agent-at-launch</strong> for benchmarking cold-start, GraalVM-vs-JIT warm-up comparisons (see L3/C02/T05), and CI performance gates where you control the launch.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>On Linux, attach mode needs the kernel to allow <code>perf_events</code>: check <code>/proc/sys/kernel/perf_event_paranoid</code> (a value of <code>1</code> or lower, or granting <code>CAP_PERFMON</code>/<code>CAP_SYS_ADMIN</code>, lets async-profiler use hardware CPU counters). In a restricted container where that's denied, async-profiler automatically falls back to <code>itimer</code> mode — still useful, just without hardware-counter precision. This is the single most common "why is my container CPU profile empty?" gotcha.</p></div></div>
+<h3 id="output-formats-flame-graph-jfr-or-collapsed">Output Formats — Flame Graph, JFR, or Collapsed<a class="anchor" href="#output-formats-flame-graph-jfr-or-collapsed" aria-hidden="true">#</a></h3>
+<p>The <code>-o</code> / <code>-f</code> flags pick the output. The same captured samples can be rendered three ways:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Flag</th>
+<th>What it is</th>
+<th>Use it to…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Flame graph</strong></td>
+<td><code>-f out.html</code></td>
+<td>self-contained interactive HTML (zoom, search, click)</td>
+<td>eyeball the hot path in a browser, share with the team</td>
+</tr>
+<tr>
+<td><strong>JFR</strong></td>
+<td><code>-f out.jfr -o jfr</code></td>
+<td>a real <code>.jfr</code> file async-profiler wrote itself</td>
+<td>open in <strong>JMC</strong> alongside JFR's own recordings; merge both tools' data</td>
+</tr>
+<tr>
+<td><strong>Collapsed</strong></td>
+<td><code>-f out.txt -o collapsed</code></td>
+<td>one folded stack per line + a count</td>
+<td>feed to Brendan Gregg's <code>flamegraph.pl</code>, build <strong>differential</strong> graphs, or post-process with scripts</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Capture once as collapsed stacks, render a flame graph from them later:
+asprof -e cpu -d 30 -o collapsed -f /tmp/prof.txt &lt;pid&gt;
+flamegraph.pl /tmp/prof.txt &gt; /tmp/prof.svg     # Brendan Gregg's script
+</code></pre></div>
+<p>That async-profiler can emit <code>.jfr</code> is the quiet superpower of the 2026 stack: you can run a low-bias async-profiler capture and then analyze it in <strong>JMC</strong> with the same rich tooling you'd use for a native JFR recording — getting JFR's analysis UI <em>and</em> async-profiler's sampling accuracy at once.</p>
+<h2 id="reading-a-flame-graph-the-full-method">Reading a Flame Graph — The Full Method<a class="anchor" href="#reading-a-flame-graph-the-full-method" aria-hidden="true">#</a></h2>
+<p>The earlier "Flame Graphs — Reading and Interpretation" section gave the rules. This section turns those rules into a <em>diagnostic procedure</em> and clears up the visual conventions that trip people up.</p>
+<h3 id="the-one-sentence-mental-model">The One-Sentence Mental Model<a class="anchor" href="#the-one-sentence-mental-model" aria-hidden="true">#</a></h3>
+<blockquote>
+<p>A flame graph is a heat map of where your program spent its day. The <strong>widest bars are where the hours went.</strong> You don't read it left-to-right like a timeline — you scan for <em>width</em>, then climb to the <em>top</em> of the widest tower to find the method actually doing the work.</p>
+</blockquote>
+<h3 id="x-axis-is-samples-not-time-internalize-this">x-axis is Samples, Not Time — Internalize This<a class="anchor" href="#x-axis-is-samples-not-time-internalize-this" aria-hidden="true">#</a></h3>
+<p>This is the single most misread property, so it's worth restating with teeth: <strong>the horizontal position of a box means nothing.</strong> Frames are sorted alphabetically and merged, <em>not</em> laid out in execution order. A box on the far left did not run "before" a box on the right. Width is the <em>only</em> horizontal signal — it is the fraction of collected samples in which that exact frame appeared on the stack. If <code>parseJson()</code> is 40% of the width, ~40% of your samples caught a thread somewhere inside <code>parseJson()</code> (or its callees). With enough samples, that ≈ 40% of whatever the event measures (CPU time, blocked time, allocated bytes).</p>
+<h3 id="the-three-shapes-you-are-hunting-for">The Three Shapes You Are Hunting For<a class="anchor" href="#the-three-shapes-you-are-hunting-for" aria-hidden="true">#</a></h3>
+<div class="mermaid">flowchart TB
+  subgraph S1["A — Hot LEAF (a tall tower topped by one wide box)"]
+    direction TB
+    a1["handleRequest()"] --> a2["serialize()"] --> a3["gzip.deflate()  ← WIDE leaf = real CPU sink"]
+  end
+  subgraph S2["B — Wide PLATEAU (one frame wide across the top)"]
+    direction TB
+    b1["eventLoop()"] --> b2["String.intern()  ← wide & shallow = self-time hog"]
+  end
+  subgraph S3["C — Wide BASE, splintered top (dispatcher, work elsewhere)"]
+    direction TB
+    c1["dispatch()  (wide)"] --> c2["...many thin children..."]
+  end
+</div>
+<ul>
+<li><strong>A — Hot leaf.</strong> A tower whose <em>topmost</em> box is wide. That leaf is where self-time is spent. This is your prime optimization target — e.g. <code>gzip.deflate()</code> eating CPU suggests turning off compression for small payloads or caching results.</li>
+<li><strong>B — Wide plateau.</strong> A single frame stretched wide at or near the top, with little above it. Classic self-time hog — <code>String.intern()</code>, a regex <code>Pattern.matcher()</code>, an <code>equals()</code> on a huge object. Fix the algorithm or cache the result.</li>
+<li><strong>C — Wide base, splintered top.</strong> A wide low frame (a dispatcher, an event loop, <code>main</code>) whose children fan out into many thin slivers means the time is <em>spread</em> — no single hot spot. Don't optimize the wide base; it's just the funnel everything flows through.</li>
+</ul>
+<h3 id="climbing-the-graph-the-procedure">Climbing the Graph — The Procedure<a class="anchor" href="#climbing-the-graph-the-procedure" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>Zoom out, find the widest top-row regions.</strong> Ignore everything narrower than a few percent.</li>
+<li><strong>For each wide region, climb to its top.</strong> The topmost wide box is the self-time culprit; everything below it is just "how we got here."</li>
+<li><strong>Click to zoom</strong> (the HTML graphs are interactive) into that subtree to read the now-magnified children.</li>
+<li><strong>Use search/highlight.</strong> Typing a class name (e.g. <code>GC</code> or <code>java/util/regex</code>) highlights every matching frame and sums their combined width across the whole graph — instantly answering "how much total time is in regex / in GC / in JSON?"</li>
+<li><strong>Ask "why is this hot?"</strong> — algorithmic (O(n²)?), allocation (feeding GC?), I/O (should be a wall profile?), or contention (should be a lock profile?).</li>
+</ol>
+<h3 id="cpu-vs-allocation-vs-off-cpu-flame-graphs-look-different">CPU vs Allocation vs Off-CPU Flame Graphs Look Different<a class="anchor" href="#cpu-vs-allocation-vs-off-cpu-flame-graphs-look-different" aria-hidden="true">#</a></h3>
+<p>The <em>shape</em> you should expect depends on the event — and confusing them leads to wrong conclusions:</p>
+<ul>
+<li><strong>CPU flame graph.</strong> Width = CPU cycles. Dominated by compute, parsing, crypto, and — on an idle-ish but GC-churny app — by GC threads and <code>arraycopy</code>. A blocked thread contributes <strong>nothing</strong> here (it's off-CPU).</li>
+<li><strong>Allocation flame graph.</strong> Width = <em>bytes allocated</em> (or allocation samples), not time. A method that allocates a giant <code>byte[]</code> once can dominate even though it costs almost no CPU. Reading it like a CPU graph ("this is slow!") is the classic mistake — it's not slow, it's <em>hungry</em>, and the cost is paid later as GC.</li>
+<li><strong>Off-CPU / wall-clock flame graph.</strong> Width = wall time including <em>blocked</em> time. Here the wide towers are <code>Socket.read()</code>, <code>parkNanos</code>, <code>Object.wait()</code>, <code>Unsafe.park</code> — places the thread sat idle. A CPU profile of the same workload would show these as nearly nothing.</li>
+</ul>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>Always label and date your flame graphs with the <strong>event type</strong>. A flame graph SVG with no caption is ambiguous: a wide <code>Socket.read()</code> box means "we're I/O-bound and that's expected" in a wall profile, but would be alarming (and impossible) in a CPU profile. Half of all flame-graph misreadings come from not knowing which event produced the picture.</p></div></div>
+<h3 id="flame-vs-icicle-orientation">Flame vs Icicle (Orientation)<a class="anchor" href="#flame-vs-icicle-orientation" aria-hidden="true">#</a></h3>
+<p>The orientation is purely cosmetic but the names matter in tools and docs:</p>
+<ul>
+<li><strong>Flame graph</strong> — root (entry point) at the <strong>bottom</strong>, leaves at the <strong>top</strong>, growing <em>upward</em> like flames. The default; what every example above uses.</li>
+<li><strong>Icicle graph</strong> — root at the <strong>top</strong>, callees hanging <em>downward</em> like icicles. JMC's "Flame View" and many APM UIs default to icicle orientation. Same data, flipped. The reading rules are identical — just remember "widest box, then travel <em>toward the leaves</em>" (up for flames, down for icicles).</li>
+</ul>
+<h3 id="differential-flame-graphs-before-vs-after-concretely">Differential Flame Graphs — Before vs After, Concretely<a class="anchor" href="#differential-flame-graphs-before-vs-after-concretely" aria-hidden="true">#</a></h3>
+<p>The earlier section noted red=grew, blue=shrank. Here's how you actually generate one and what it buys you. Because async-profiler emits <strong>collapsed</strong> stacks, you can diff two captures with a standard script:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Capture baseline, deploy a change, capture again — both as collapsed stacks:
+asprof -e cpu -d 60 -o collapsed -f /tmp/before.txt &lt;pid_before&gt;
+asprof -e cpu -d 60 -o collapsed -f /tmp/after.txt  &lt;pid_after&gt;
+
+# Brendan Gregg's differential script (from the FlameGraph repo):
+difffolded.pl /tmp/before.txt /tmp/after.txt | flamegraph.pl &gt; /tmp/diff.svg
+</code></pre></div>
+<p>The diff graph colors each frame by how its width <em>changed</em>: <strong>red = wider after (regressed)</strong>, <strong>blue = narrower after (improved)</strong>, gray = unchanged. This is the fastest way to answer "the p99 jumped after Tuesday's deploy — <em>what</em> got slower?" without staring at two graphs side by side. A wide red tower over <code>Logger.format</code> after a deploy that "just added some debug logging" tells the whole story in one glance.</p>
+<h2 id="jfr-deeper-than-the-gui-events-cli-streaming">JFR — Deeper Than the GUI (Events, CLI, Streaming)<a class="anchor" href="#jfr-deeper-than-the-gui-events-cli-streaming" aria-hidden="true">#</a></h2>
+<p>The earlier JFR section covered starting recordings and opening them in JMC. This section goes deeper on <em>what JFR records and how cheap it is</em>, the <strong>command-line</strong> analysis path (no GUI needed — ideal in a terminal-only prod box or CI), and <strong>event streaming</strong> for live, in-process consumption.</p>
+<h3 id="why-jfr-is-nearly-free-and-always-on-able">Why JFR Is Nearly Free — and Always-On-able<a class="anchor" href="#why-jfr-is-nearly-free-and-always-on-able" aria-hidden="true">#</a></h3>
+<p>JFR's defining trait is overhead so low that you can leave it <strong>running continuously in production</strong>. The reasons:</p>
+<ul>
+<li><strong>It is built into the VM, not bolted on.</strong> Events are emitted from instrumentation <em>already present</em> in HotSpot (allocation hits a TLAB boundary, a GC phase ends, a monitor inflates) — JFR just records the data the VM was already producing, into a thread-local buffer with no locking on the hot path.</li>
+<li><strong>Thread-local buffers, batched to disk.</strong> Each thread writes events to its own buffer; full buffers flush to a global buffer and then to the chunked <code>.jfr</code> file. No synchronization per event.</li>
+<li><strong>Sampling, not tracing, for the expensive stuff.</strong> CPU stacks (<code>jdk.ExecutionSample</code>) and allocations are <em>sampled</em>, so cost scales with sample rate, not with how busy the app is.</li>
+</ul>
+<p>The payoff is the production posture already shown (<code>maxage</code>/<code>maxsize</code> rolling window): when an incident hits, <strong>the evidence is already on disk</strong> — you <code>JFR.dump</code> the last N minutes that were being recorded all along. You don't have to reproduce the problem with a profiler attached.</p>
+<h3 id="what-jfr-records-categories-worth-knowing">What JFR Records — Categories Worth Knowing<a class="anchor" href="#what-jfr-records-categories-worth-knowing" aria-hidden="true">#</a></h3>
+<p>Beyond the event table earlier, it helps to think in <em>categories</em>, because that's how you decide what a recording can answer:</p>
+<ul>
+<li><strong>Execution / CPU</strong> — <code>jdk.ExecutionSample</code>, <code>jdk.NativeMethodSample</code> (the method profile).</li>
+<li><strong>Memory / allocation</strong> — <code>jdk.ObjectAllocationInNewTLAB</code>, <code>jdk.ObjectAllocationOutsideTLAB</code>, <code>jdk.ObjectAllocationSample</code> (JDK 16+, a unified, rate-limited allocation event), <code>jdk.OldObjectSample</code> (the <strong>leak candidate</strong> event — samples objects that survive, the JFR counterpart to a heap dump from L3/C02/T10).</li>
+<li><strong>GC</strong> — <code>jdk.GarbageCollection</code>, <code>jdk.GCPhasePause</code>, <code>jdk.GCHeapSummary</code>, <code>jdk.G1HeapRegionTypeChange</code>.</li>
+<li><strong>Locks / threads</strong> — <code>jdk.JavaMonitorEnter</code> (contention), <code>jdk.JavaMonitorWait</code>, <code>jdk.ThreadPark</code>.</li>
+<li><strong>I/O</strong> — <code>jdk.SocketRead/Write</code>, <code>jdk.FileRead/Write</code> — each with duration, so you can find <em>slow</em> I/O, not just frequent.</li>
+<li><strong>Exceptions</strong> — <code>jdk.JavaExceptionThrow</code>, <code>jdk.JavaErrorThrow</code> — a surprising perf sink when exceptions are used for control flow in a hot path (stack-trace fill-in is expensive).</li>
+<li><strong>Compiler</strong> — <code>jdk.JITCompilation</code>, <code>jdk.Deoptimization</code> — deopt storms (links to JIT, L3/C02/T04) show up here.</li>
+</ul>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>The <strong>I/O and exception</strong> events are JFR's standout advantage over a pure CPU sampler: a slow <code>jdk.SocketRead</code> of 800 ms shows up as one heavy event with its stack, even though it spent ~0 CPU — invisible to a CPU flame graph. This is the same blind spot the wall-clock profile fixes, but JFR gives it to you for free in the always-on recording.</p></div></div>
+<h3 id="analyzing-jfr-from-the-command-line-the-jfr-tool">Analyzing JFR from the Command Line — the <code>jfr</code> Tool<a class="anchor" href="#analyzing-jfr-from-the-command-line-the-jfr-tool" aria-hidden="true">#</a></h3>
+<p>You do not need JMC. The JDK ships a <strong><code>jfr</code></strong> command-line tool (since JDK 9) that prints, summarizes, and queries a recording — perfect when you're SSH'd into a box or scripting a CI gate:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># One-line overview: which event types fired, how many, total size:
+jfr summary /tmp/spike.jfr
+
+# Print just the CPU samples (the method profile), with stack traces:
+jfr print --events jdk.ExecutionSample /tmp/spike.jfr
+
+# The most useful built-in VIEWS (JDK 17+) — pre-aggregated, like a mini-JMC in the terminal:
+jfr view hot-methods        /tmp/spike.jfr   # top methods by sample count
+jfr view allocation-by-site /tmp/spike.jfr   # where allocations came from
+jfr view contention-by-site /tmp/spike.jfr   # lock contention hot spots
+jfr view gc                 /tmp/spike.jfr   # GC pause summary
+jfr view jvm-information     /tmp/spike.jfr   # flags, version, uptime
+
+# Filter to a time window and a single thread:
+jfr print --events jdk.JavaMonitorEnter \
+  --stack-depth 32 /tmp/spike.jfr
+</code></pre></div>
+<p><code>jfr view</code> (JDK 17+) is the unsung hero: it renders the same aggregations JMC shows, as text tables, in milliseconds — no GUI, no file transfer. For a quick "what's hot?" on a prod recording, it often beats opening JMC.</p>
+<h3 id="jfr-event-streaming-live-consumption-jdk-14">JFR Event Streaming — Live Consumption (JDK 14+)<a class="anchor" href="#jfr-event-streaming-live-consumption-jdk-14" aria-hidden="true">#</a></h3>
+<p>Classic JFR is <strong>record now, analyze later</strong> (write a file, open it in JMC). <strong>JFR event streaming</strong> (<code>jdk.management.jfr</code>, JEP 349, JDK 14+) flips that: your application — or an external process — subscribes to events <strong>as they happen</strong> and reacts in real time, with the same near-zero overhead. No file, no round trip.</p>
+<p>In-process, with <code>RecordingStream</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">import jdk.jfr.consumer.RecordingStream;
+import java.time.Duration;
+
+try (var rs = new RecordingStream()) {
+    // React to GC pauses longer than 50 ms, live:
+    rs.enable(&quot;jdk.GCPhasePause&quot;);
+    rs.onEvent(&quot;jdk.GCPhasePause&quot;, event -&gt; {
+        var pause = event.getDuration();
+        if (pause.toMillis() &gt; 50) {
+            metrics.recordLongGcPause(pause);          // push to Micrometer/Prometheus
+            log.warn(&quot;Long GC pause: {} ms&quot;, pause.toMillis());
+        }
+    });
+
+    // Sample CPU and watch allocation pressure too:
+    rs.enable(&quot;jdk.ExecutionSample&quot;).withPeriod(Duration.ofMillis(10));
+    rs.enable(&quot;jdk.ObjectAllocationSample&quot;);
+    rs.onEvent(&quot;jdk.ObjectAllocationSample&quot;,
+        e -&gt; allocationMeter.mark(e.getLong(&quot;weight&quot;)));
+
+    rs.startAsync();   // non-blocking; events stream on a background thread
+    // ... application keeps running; handlers fire as events occur ...
+}
+</code></pre></div>
+<p>Out-of-process, you can attach a <code>RemoteRecordingStream</code> over JMX to a <em>different</em> JVM and consume its events live. This is the foundation many continuous-profiling and observability agents build on: instead of polling MBeans or shelling out to <code>jcmd</code>, they subscribe to the JFR stream and forward events to a backend. It turns JFR from a black-box flight recorder into a real-time telemetry source — bridging the always-on JFR recording and the Prometheus/OpenTelemetry streams in the observability-stack diagram earlier.</p>
+<h2 id="real-world-scenario-the-profile-that-lied-until-we-changed-the-event">Real-World Scenario — The Profile That Lied (Until We Changed the Event)<a class="anchor" href="#real-world-scenario-the-profile-that-lied-until-we-changed-the-event" aria-hidden="true">#</a></h2>
+<p>A relatable story that ties the deep dives together.</p>
+<p>A team owns an order-confirmation service. Alert: <strong>p99 latency = 1.4 s</strong>, SLO is 300 ms. The on-call engineer attaches async-profiler in CPU mode — the obvious first move:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprof -e cpu -d 60 -f /tmp/cpu.html 4711
+</code></pre></div>
+<p>The CPU flame graph is <strong>boring</strong>: ~85% of it is GC threads and the JVM's own idle loop. Total app CPU is 6%. By the "widest box" rule there's nothing to fix — the service is barely using the CPU. A junior profiler concludes "the box isn't the bottleneck, we need a bigger instance" and almost files a scale-up ticket.</p>
+<p>The senior engineer recognizes the tell: <strong>high latency + low CPU = the time is being spent off-CPU, waiting.</strong> A CPU profiler is structurally blind to waiting — a blocked thread contributes zero CPU samples. So they switch the <em>event</em>, not the tool:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">asprof -e wall -t -d 60 -f /tmp/wall.html 4711
+</code></pre></div>
+<p>Now the wall-clock flame graph tells the truth: a <strong>wide tower under <code>HttpClient.send → Socket.read</code></strong>, ~70% of wall time, all of it in the call to a downstream <code>inventory-service</code>. The order service wasn't slow — it was <em>blocked</em> on a slow dependency, holding a request thread idle for over a second per call. The CPU profile literally could not show this; the wall-clock profile made it the widest bar on the page.</p>
+<p>The fix had nothing to do with CPU: add a timeout + circuit breaker on the inventory call, and parallelize two independent downstream calls that were running sequentially. p99 dropped to 240 ms. The JFR continuous recording, queried after the fact with <code>jfr view</code>, corroborated it — wide <code>jdk.SocketRead</code> events with 900 ms durations pointing at the same downstream:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jfr print --events jdk.SocketRead --stack-depth 16 /var/jfr/last.jfr | head -40
+</code></pre></div>
+<p>The lesson, and the through-line of this whole topic: <strong>match the profile event to the question.</strong> The same tool, the same PID, the same 60 seconds — but the CPU event hid the problem and the wall event revealed it. Reaching for "a bigger instance" because the CPU profile looked empty would have burned money and fixed nothing.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p><strong>Q: "Your service has p99 of 1.5 s but CPU sits at 5%. You take a CPU flame graph and it shows almost nothing but GC. What's going on and what do you do next?"</strong></p><p>Strong answer hits four beats: <strong>(1) Diagnose the mismatch</strong> — high latency with low CPU means time is spent <em>off-CPU</em> (blocked on I/O, locks, or downstream calls); a CPU profiler is structurally blind to waiting because a blocked thread emits no CPU samples. <strong>(2) Switch the event, not the tool</strong> — capture a <strong>wall-clock</strong> profile (<code>asprof -e wall</code>) so blocked time counts; the wide towers will be <code>Socket.read</code>/<code>parkNanos</code>/<code>Object.wait</code>. <strong>(3) Corroborate with JFR</strong> — the always-on recording's <code>jdk.SocketRead</code>/<code>jdk.JavaMonitorEnter</code> events carry durations, so <code>jfr view contention-by-site</code> or filtering slow socket reads confirms the culprit without re-running anything. <strong>(4) Note the safepoint angle</strong> — if you <em>were</em> CPU-bound and a JFR flame graph looked wrong (hot time on an innocent caller), suspect <strong>safepoint bias</strong> and re-profile with async-profiler, which samples via <code>perf_events</code> + <code>AsyncGetCallTrace</code> and lands inside poll-free loops. Bonus credit: mention that "scale up the instance" is the trap answer — more CPU does nothing for a thread blocked on a slow dependency.</p></div></div>
+<h2 id="safe-production-profiling">Safe Production Profiling<a class="anchor" href="#safe-production-profiling" aria-hidden="true">#</a></h2>
+<p>A consolidated note on profiling <em>in production</em> without becoming the incident:</p>
+<ul>
+<li><strong>Lead with the always-on recording.</strong> Continuous JFR at <code>default</code> settings (~1% overhead, rolling <code>maxage</code>/<code>maxsize</code> window) should already be running on every prod JVM. Most investigations start by <em>dumping what's already there</em> — no attach, no risk.</li>
+<li><strong>async-profiler is production-safe too.</strong> Sub-1% overhead, attach-and-detach in seconds, no restart. The main caveat is the <code>perf_event_paranoid</code>/<code>CAP_PERFMON</code> permission in containers — if denied, it falls back to <code>itimer</code> (still safe, slightly less precise).</li>
+<li><strong>Prefer <code>default</code> over <code>profile</code> JFR settings under heavy load.</strong> The <code>profile</code> config adds allocation and contention sampling (~2-3%); fine for a bounded 60 s capture, but <code>default</code> is the right always-on baseline.</li>
+<li><strong>Bound your captures.</strong> Use <code>-d &lt;seconds&gt;</code> (async-profiler) and <code>duration=</code> (JFR) so a profiler can never run away if you forget to stop it.</li>
+<li><strong>Aggregate across the fleet with continuous-profiling backends</strong> rather than profiling instances by hand — see the APM Integration and Production Observability Stack sections above (Grafana <strong>Pyroscope</strong>, Datadog/New Relic/Dynatrace continuous profilers). These run a low-overhead agent (often async-profiler under the hood, frequently consuming the <strong>JFR event stream</strong> from the previous section) and give you fleet-wide, deploy-over-deploy flame graphs — the production-scale generalization of the differential flame graph.</li>
+<li><strong>eBPF-based profilers</strong> (e.g. Parca, Grafana Beyla, Pyroscope's eBPF mode) profile from <em>outside</em> the JVM at the kernel level, with no agent inside the process at all — useful for whole-host, mixed-language profiling. For deep JVM-internal questions, in-JVM JFR/async-profiler still see more (Java frames, allocation sites, lock identities). A blended host-eBPF + in-JVM-JFR setup is increasingly the 2026 default. (See also the JVM performance lab in L3/C05/T01 for a hands-on harness.)</li>
+</ul>
+<h2 id="profiling-pitfalls">Profiling Pitfalls<a class="anchor" href="#profiling-pitfalls" aria-hidden="true">#</a></h2>
+<h3 id="profiling-in-dev-with-synthetic-load">Profiling in dev with synthetic load<a class="anchor" href="#profiling-in-dev-with-synthetic-load" aria-hidden="true">#</a></h3>
+<p>Dev workloads rarely match prod hot paths. Profile in prod (or production-equivalent) or accept noisy results.</p>
+<h3 id="reading-absolute-numbers-vs-relative">Reading absolute numbers vs relative<a class="anchor" href="#reading-absolute-numbers-vs-relative" aria-hidden="true">#</a></h3>
+<p>"This method took 100 ms" — meaningless without context. "30% of profile time" — actionable.</p>
+<h3 id="optimizing-the-cold-path">Optimizing the cold path<a class="anchor" href="#optimizing-the-cold-path" aria-hidden="true">#</a></h3>
+<p>A method that takes 1% of CPU isn't where to invest tuning time. Focus on the top 3 widest boxes.</p>
+<h3 id="not-running-long-enough">Not running long enough<a class="anchor" href="#not-running-long-enough" aria-hidden="true">#</a></h3>
+<p>Transient spikes don't show in a 10-second profile. Capture for at least minutes; ideally tens of minutes to hours for slow regressions.</p>
+<h3 id="safepoint-bias-jfr">Safepoint bias (JFR)<a class="anchor" href="#safepoint-bias-jfr" aria-hidden="true">#</a></h3>
+<p>Discussed above. Use async-profiler when you suspect JFR is missing data — typically tight loops, native code-heavy paths.</p>
+<h3 id="reading-the-wrong-profile-type">Reading the wrong profile type<a class="anchor" href="#reading-the-wrong-profile-type" aria-hidden="true">#</a></h3>
+<p>A wall-clock profile of an I/O-bound service is dominated by <code>Socket.read()</code> — useful. A CPU profile of the same is dominated by GC (because that's all that's on-CPU). Match the profile type to the question.</p>
+<h2 id="the-8020-of-profiling">The 80/20 of Profiling<a class="anchor" href="#the-8020-of-profiling" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart LR
+  Profile["Flame graph"]
+  Top3["Top 3 widest boxes near top"]
+  Win["~80% of bottlenecks"]
+  Profile --> Top3 --> Win
+  Note["The rest is fine-tuning."]
+</div>
+<p>In practice: glance at the flame graph; the top 3 widest top-boxes usually point to the issue. Drill into "why is this hot?" Don't get distracted by deeper micro-optimizations.</p>
+<h2 id="when-to-and-not-to-profile">When to (and Not to) Profile<a class="anchor" href="#when-to-and-not-to-profile" aria-hidden="true">#</a></h2>
+<h3 id="when-to-profile">When to profile<a class="anchor" href="#when-to-profile" aria-hidden="true">#</a></h3>
+<ul>
+<li>p99 latency increased.</li>
+<li>Throughput dropped.</li>
+<li>CPU utilization unexpectedly high.</li>
+<li>Suspect inefficient algorithm.</li>
+<li>Before claiming "we need more cores."</li>
+</ul>
+<h3 id="when-not-to-profile">When NOT to profile<a class="anchor" href="#when-not-to-profile" aria-hidden="true">#</a></h3>
+<ul>
+<li>App already meets requirements.</li>
+<li>Symptoms unrelated to JVM (network, DB latency, downstream services).</li>
+<li>No baseline.</li>
+<li>Without a specific hypothesis.</li>
+</ul>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="profile-in-production-without-continuous-recording-enabled">Profile in production without continuous recording enabled<a class="anchor" href="#profile-in-production-without-continuous-recording-enabled" aria-hidden="true">#</a></h3>
+<p>You can't profile an issue that already happened. Enable continuous JFR.</p>
+<h3 id="read-flame-graphs-without-zooming">Read flame graphs without zooming<a class="anchor" href="#read-flame-graphs-without-zooming" aria-hidden="true">#</a></h3>
+<p>The full graph is overwhelming; zoom into the hot region.</p>
+<h3 id="mix-cpu-and-wall-clock-profiles">Mix CPU and wall-clock profiles<a class="anchor" href="#mix-cpu-and-wall-clock-profiles" aria-hidden="true">#</a></h3>
+<p>They answer different questions. Be deliberate.</p>
+<h3 id="optimize-without-baseline">Optimize without baseline<a class="anchor" href="#optimize-without-baseline" aria-hidden="true">#</a></h3>
+<p>You can't say "30% faster" without a baseline.</p>
+<h3 id="ignore-allocation-profiling">Ignore allocation profiling<a class="anchor" href="#ignore-allocation-profiling" aria-hidden="true">#</a></h3>
+<p>Hot allocation paths = GC pressure source. Reducing allocations often helps more than optimizing CPU code.</p>
+<h3 id="trust-dev-profiles-in-prod">Trust dev profiles in prod<a class="anchor" href="#trust-dev-profiles-in-prod" aria-hidden="true">#</a></h3>
+<p>The JIT, GC, and workload differ. Profile prod.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Continuous JFR setup.</strong> Enable rolling-window continuous recording on a service. After a load test, dump and open in JMC.</li>
+<li><strong>JFR method profile.</strong> Identify the top 5 CPU-consuming methods in JMC. Drill into the call tree.</li>
+<li><strong>async-profiler CPU flame graph.</strong> Profile a Spring Boot app for 60s. Open the flame graph HTML. Identify hot self-time methods.</li>
+<li><strong>JFR vs async-profiler comparison.</strong> Profile the same workload with both. Look for differences (safepoint bias).</li>
+<li><strong>Wall-clock vs CPU profile.</strong> Profile an I/O-bound service both ways. Compare what's hot.</li>
+<li><strong>Allocation profile.</strong> Profile an allocation-heavy app; identify the top allocation sites; fix one; re-profile.</li>
+<li><strong>Lock contention profile.</strong> Build a contended-lock benchmark. Profile with <code>-e lock</code>. Identify the contention.</li>
+<li><strong>Differential flame graph.</strong> Profile before and after a code change. Generate diff flame graph.</li>
+<li><strong>Common pattern: logging hot path.</strong> Build a service with non-parameterized <code>logger.debug</code> in a hot loop. Profile; identify; fix with parameterized; re-profile.</li>
+<li><strong>Common pattern: reflection in loop.</strong> Same workflow.</li>
+<li><strong>Container profiling.</strong> Run a JVM in Docker; capture JFR via <code>docker exec jcmd</code>.</li>
+<li><strong>APM continuous profiler.</strong> Set up Pyroscope (open-source); view aggregated flame graphs across a workload.</li>
+<li><strong>Provoke safepoint bias.</strong> Write a tight <code>long</code>-counted numeric loop (sum of a large <code>double[]</code>) with no method calls inside. Profile with JFR (<code>settings=profile</code>) and with async-profiler CPU mode. Compare: JFR likely attributes the time to the caller; async-profiler lands inside the loop. Confirm by toggling <code>-XX:+UseCountedLoopSafepoints</code> and re-profiling.</li>
+<li><strong>Same capture, three formats.</strong> Run <code>asprof -e cpu -d 30</code> against a Spring Boot app once each as <code>-f out.html</code>, <code>-o jfr -f out.jfr</code>, and <code>-o collapsed -f out.txt</code>. Open the <code>.jfr</code> in JMC; render the collapsed file with <code>flamegraph.pl</code>. Verify all three describe the same hot path.</li>
+<li><strong>Agent-at-launch vs attach.</strong> Profile a cold JVM start with <code>-agentpath:libasyncProfiler.so=start,event=cpu,...</code>; separately attach to the same app <em>after</em> warm-up. Compare flame graphs — find the warm-up-only frames (class loading, C2 compilation) that the attach-later run misses.</li>
+<li><strong><code>jfr</code> CLI, no GUI.</strong> Take a <code>.jfr</code> recording and, without opening JMC, run <code>jfr summary</code>, <code>jfr view hot-methods</code>, <code>jfr view allocation-by-site</code>, and <code>jfr view contention-by-site</code>. Then <code>jfr print --events jdk.SocketRead</code> to find slow I/O.</li>
+<li><strong>JFR event streaming.</strong> Write a small <code>RecordingStream</code> program that subscribes to <code>jdk.GCPhasePause</code> and <code>jdk.ObjectAllocationSample</code> and logs/exports any GC pause over 50 ms live (no file). Run it against an allocation-heavy workload.</li>
+<li><strong>The wall-vs-CPU diagnosis drill.</strong> Build a service that calls a deliberately slow downstream (sleep 1 s). Profile in CPU mode (should look empty) then wall mode (should show the blocking <code>Socket.read</code>/<code>sleep</code> tower). Reproduce the "profile that lied" scenario end to end.</li>
+<li><strong>Differential flame graph for real.</strong> Capture collapsed stacks before and after adding non-parameterized <code>logger.debug</code> to a hot loop; run <code>difffolded.pl before.txt after.txt | flamegraph.pl</code> and confirm the regressed (red) <code>Logger.format</code>/<code>StringBuilder</code> tower.</li>
+<li><strong>Container permission gotcha.</strong> Run async-profiler inside a restricted container with <code>perf_event_paranoid=3</code>; observe the empty/failed <code>perf</code> profile, then confirm <code>itimer</code> fallback (or grant <code>CAP_PERFMON</code>) produces a usable CPU profile.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Distinguish <strong>sampling</strong> (low overhead, statistical) from <strong>instrumentation</strong> (high overhead, precise); modern Java profiling is sampling-based.</li>
+<li>Apply the <strong>systematic profiling workflow</strong>: define question → choose tool → capture realistic load → analyze → identify hot path → diagnose why → fix → re-profile.</li>
+<li>Use <strong>JFR (Java Flight Recorder)</strong> as the production-default profiler: built into JDK 11+, ~1-3% overhead, ~140 event types; continuous recording with rolling window or on-demand capture via <code>jcmd JFR.start</code>; settings <code>default</code> vs <code>profile</code>.</li>
+<li>Analyze JFR in <strong>JMC (JDK Mission Control)</strong>: method profiler (self vs total time), Hot Threads, allocation profiling, memory utilization, GC pauses, lock contention, outliers.</li>
+<li>Recognize JFR's <strong>safepoint bias</strong>: samples at JVM safepoints; under-samples tight loops without polls and long native calls; use async-profiler when this matters.</li>
+<li>Use <strong>async-profiler</strong> as the modern complement: Linux <code>perf_event_open</code>-based, no safepoint bias, &lt; 1% overhead; flame graph as the canonical output; CPU/wall/alloc/lock event modes.</li>
+<li><strong>Read flame graphs</strong>: X-axis = aggregated samples (NOT time), Y-axis = call depth, width = % of samples; <strong>look at the top — wide flat box near top = hot self-time</strong>; narrow stacks = not interesting.</li>
+<li>Apply <strong>differential flame graphs</strong> for before/after comparison (red grew, blue shrank).</li>
+<li>Use <strong>VisualVM</strong> for quick dev-time triage; JMX inspection; basic heap dump capture; never for production profiling (instrumentation overhead).</li>
+<li>Differentiate <strong>profile types</strong> by question: CPU (on-CPU time, CPU-bound workloads), <strong>wall-clock (on-CPU + blocked, critical for I/O-heavy)</strong>, allocation (GC pressure sources), lock contention (synchronization bottlenecks).</li>
+<li>Recognize <strong>common performance patterns</strong> found via profiling: non-parameterized logging, reflection in tight loops, pre-JDK-9 StringBuilder churn, LinkedList.get(i), JDBC ResultSet metadata per-row, ObjectMapper-per-call, autoboxing in loops (fix via primitive collections like Eclipse Collections / fastutil).</li>
+<li>Profile in <strong>containers</strong> via <code>kubectl exec</code> to invoke <code>jcmd</code>, or via side-car continuous profilers (Pyroscope, etc.).</li>
+<li>Build a <strong>production observability stack</strong>: continuous JFR + Prometheus + OpenTelemetry traces + APM continuous profiler + on-demand async-profiler.</li>
+<li>Integrate with <strong>APM continuous profilers</strong> (Datadog, New Relic, Pyroscope) for fleet-wide flame graph aggregation.</li>
+<li>Avoid the <strong>6 profiling pitfalls</strong>: synthetic dev load, absolute vs relative readings, optimizing cold paths, short capture windows, ignoring safepoint bias when relevant, mismatched profile type to question.</li>
+<li>Apply the <strong>80/20</strong>: top 3 widest top-boxes usually point to the issue.</li>
+<li>Know <strong>when NOT to profile</strong>: already meets requirements, symptoms elsewhere (network, DB), no baseline, no hypothesis.</li>
+<li>Explain <strong>how async-profiler works</strong>: <code>perf_events</code> (<code>perf_event_open</code>) decides <em>when</em> to sample (so the kernel can interrupt a thread anywhere, defeating safepoint bias), and <code>AsyncGetCallTrace</code> captures <em>what</em> the Java stack is from a signal handler — producing mixed-mode (Java + native) stacks; distinguish safepoint <strong>bias</strong> from <strong>time-to-safepoint (TTSP)</strong>.</li>
+<li>Choose the right async-profiler <strong>mode/event</strong>: <code>cpu</code> (and <code>itimer</code> fallback when <code>perf_event_paranoid</code>/<code>CAP_PERFMON</code> blocks <code>perf</code>), <code>wall</code> (on-CPU + blocked), <code>alloc</code> (GC pressure by bytes), <code>lock</code> (monitor contention), plus HW counters (<code>cache-misses</code>, <code>branch-misses</code>).</li>
+<li>Decide <strong>agent-at-launch</strong> (<code>-agentpath:libasyncProfiler.so=start,...</code>, captures startup/warm-up) vs <strong>attach-to-PID</strong> (dynamic attach, zero restart, for live incidents).</li>
+<li>Pick the right <strong>output format</strong>: interactive flame-graph HTML, a real <code>.jfr</code> (open in JMC alongside JFR's own data), or <strong>collapsed</strong> stacks (for <code>flamegraph.pl</code> and differential graphs).</li>
+<li><strong>Read a flame graph as a procedure</strong>: x-axis is aggregated samples (never time/order), width is the only horizontal signal; hunt for the <strong>hot leaf</strong>, the <strong>wide plateau</strong>, and recognize a <strong>wide base with a splintered top</strong> as "no single hot spot"; climb to the top of the widest tower; use zoom + search to sum a class's total width.</li>
+<li>Know that <strong>CPU vs allocation vs off-CPU/wall flame graphs look different</strong> (cycles vs allocated bytes vs blocked time) and must be labeled by event — an allocation graph shows what's <em>hungry</em>, not what's <em>slow</em>.</li>
+<li>Distinguish <strong>flame</strong> (root at bottom, grows up) from <strong>icicle</strong> (root at top, hangs down — JMC's default) orientation.</li>
+<li>Generate a <strong>differential flame graph</strong> from before/after collapsed stacks (<code>difffolded.pl | flamegraph.pl</code>): red = regressed, blue = improved.</li>
+<li>Explain <strong>why JFR is near-free</strong> (in-VM instrumentation, thread-local lock-free buffers, sampling for the expensive events) and therefore always-on-able, so incident evidence is already on disk.</li>
+<li>Reason about JFR <strong>by event category</strong> (execution, allocation incl. <code>jdk.ObjectAllocationSample</code> and the <code>jdk.OldObjectSample</code> leak-candidate event, GC, locks, I/O with durations, exceptions, JIT/deopt) — and why I/O and exception events catch what a CPU sampler can't.</li>
+<li>Analyze JFR <strong>from the command line</strong> with the <code>jfr</code> tool: <code>jfr summary</code>, <code>jfr print --events</code>, and the <code>jfr view</code> aggregations (<code>hot-methods</code>, <code>allocation-by-site</code>, <code>contention-by-site</code>, <code>gc</code>) — no GUI required.</li>
+<li>Use <strong>JFR event streaming</strong> (JEP 349, JDK 14+): <code>RecordingStream</code> to consume events live in-process (and <code>RemoteRecordingStream</code> over JMX out-of-process), the basis for real-time telemetry and continuous-profiling agents.</li>
+<li>Diagnose the <strong>high-latency / low-CPU</strong> case: switch the <em>event</em> (CPU → wall-clock) rather than the tool, because a CPU profiler is structurally blind to blocked time; corroborate with JFR <code>jdk.SocketRead</code>/contention events; resist the "scale up the box" trap.</li>
+<li>Apply <strong>safe production profiling</strong>: always-on JFR <code>default</code> baseline + bounded (<code>-d</code>/<code>duration=</code>) on-demand async-profiler captures; aggregate fleet-wide via continuous-profiling backends (Pyroscope/Datadog/etc., often consuming the JFR stream); know where <strong>eBPF</strong> profilers (Parca, Beyla) fit for whole-host, agentless profiling.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t12-benchmarking-with-jmh.html">Benchmarking with JMH</a> — <em>the</em> tool for measuring Java code performance correctly. We'll cover the <strong>JMH (Java Microbenchmark Harness)</strong> — designed by Doug Lea and Aleksey Shipilëv specifically to handle the JIT, dead code elimination, GC, and statistical noise that defeat naive <code>System.nanoTime()</code> benchmarks; <strong>warmup phases</strong>, <strong>measurement iterations</strong>, <strong>forks</strong>, <strong>black holes</strong> to prevent dead-code-elimination, <strong>modes</strong> (throughput vs average time vs sample time vs single shot); reading JMH output (operations per second, percentiles); the common benchmark anti-patterns and how JMH neutralizes them; integration with profiling tools to find <em>why</em> a microbenchmark is slow.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Profiling (JFR, async-profiler, VisualVM)&quot;
+slug: profiling-jfr-async-profiler-visualvm
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 11
+tags: [profiling, sampling-profiler, instrumentation-profiler, performance-bottleneck, jfr, java-flight-recorder, jfr-event-types, jfr-continuous-recording, jfr-default-settings, jfr-profile-settings, jcmd-jfr-start, jcmd-jfr-dump, jdk-mission-control, jmc, method-profiler, hot-threads, allocation-events, gc-events, lock-contention-events, jfr-safepoint-bias, async-profiler, perf-events, perf-event-open, flame-graph, brendan-gregg, differential-flame-graph, wall-clock-profile, cpu-profile, off-cpu-profile, allocation-profile, visualvm, jprofiler-commercial, yourkit-commercial, honest-profiler, linux-perf, profile-workflow, hot-method, hot-allocation, hot-lock, logging-hot-path, reflection-tight-loop, string-concat-jdk9, linkedlist-get-on, jdbc-resultset-metadata, jackson-objectmapper, autoboxing-loop, primitive-collections, eclipse-collections, fastutil, container-profiling, kubectl-exec-jcmd, side-car-profiler, datadog-continuous-profiling, newrelic-pyroscope, opentelemetry-profiling, apm-profiler, prod-profiling, observability-stack, performance-question, allocation-profiling, wall-clock-profiling, lock-profiling, jfr-event-streaming, safepoint-bias, asyncgetcalltrace, async-profiler-agent, async-profiler-attach, collapsed-stacks, icicle-graph, off-cpu-profiling, jfr-cli, jfr-print, jfr-view, ttsp, time-to-safepoint, frame-pointer, perf-map-agent, ap-loader, monitor-contention, differential-flamegraph, jdk-flight-recorder-streaming, recordingstream]
+prerequisites: [memory-leaks-and-heap-dump-analysis, gc-tuning-and-monitoring, jit-compilation-c1-c2-tiered, jvm-architecture-and-runtime-data-areas]
+status: complete
+estimated_minutes: 175
+last_updated: 2026-06-15
+---
+
+# Profiling (JFR, async-profiler, VisualVM)
+
+T10 covered *memory* diagnosis. This topic covers *CPU* diagnosis: where time is spent in the running JVM, which methods are hot, where allocations happen, where threads block. Profiling is the bridge from &quot;the service is slow&quot; to &quot;we know exactly what to fix.&quot; In 2026 the two essential profilers are **JFR (Java Flight Recorder)** — built into the JDK, ~1-3% overhead, the production-default choice — and **async-profiler** — external tool with **flame graphs** as its specialty, no safepoint bias, the modern alternative for the cases JFR&#x27;s safepoint sampling misses.
+
+The depth-bar requirement isn&#x27;t &quot;use JFR.&quot; At the **methodology** layer, profiling follows a disciplined workflow — define the performance question, choose the right tool, capture under realistic load, analyze, identify the hot path, make a targeted change, re-profile to verify — and most profiling failures are violations of this discipline (capturing dev workload, optimizing the cold path, reading absolute numbers instead of relative). At the **tooling** layer, **JFR** is the *production default* (always-on continuous recording is feasible at 1-3% overhead), records ~140 event types covering CPU samples / allocation / GC / lock contention / I/O / thread states / JIT / exceptions, and is analyzed in **JMC (JDK Mission Control)** — but suffers a **safepoint bias** that under-samples tight loops and long native calls. **async-profiler** complements JFR by sampling via Linux perf events (no safepoint bias) and producing **flame graphs** that visualize sampling data as wide-box-near-top = hot self-time. At the **interpretation** layer, **flame graphs** (Brendan Gregg, 2011) are the canonical visualization — X-axis aggregated samples (*not* time), Y-axis call depth, width = relative sampling count; reading them is its own learnable skill. At the **profile-type** layer, **CPU profiling** (time on-CPU) is different from **wall-clock profiling** (time on-CPU + blocked time), which is critical for I/O-heavy services where blocked time dominates; **allocation profiling** finds GC-pressure sources; **lock contention profiling** finds synchronization bottlenecks. We will cover all four layers, with practical examples for the canonical performance patterns (logging hot path, reflection in tight loops, autoboxing) and a production observability stack (continuous JFR + on-demand async-profiler + Prometheus + OpenTelemetry traces + APM continuous-profiling backends).
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Memory leaks &amp; heap dump analysis](./T10-memory-leaks-and-heap-dump-analysis.md) (L3/C02/T10) — the parallel topic for memory diagnosis; [GC tuning &amp; monitoring](./T09-gc-tuning-and-monitoring.md) (L3/C02/T09) — GC events overlap with profiling data; [JIT compilation](./T04-jit-compilation-c1-c2-tiered.md) (L3/C02/T04) — JIT events visible in JFR; [JVM architecture](./T01-jvm-architecture-and-runtime-data-areas.md) (L3/C02/T01) — runtime areas profilers observe.
+
+## What Profiling Is
+
+**Profiling** is measuring where time and resources are spent in a running program. Two main approaches:
+
+| Approach | How it works | Overhead | Accuracy |
+|----------|--------------|----------|----------|
+| **Sampling** | Periodically snapshot the call stack | Low (~1-5%) | Statistically valid; misses brief events |
+| **Instrumentation** | Insert measurement code into every method | High (10-50%+) | Precise; biases results |
+
+Production profiling almost always uses sampling. Modern Java tools (JFR, async-profiler) are sampling profilers; legacy ones (older VisualVM CPU profiling) used instrumentation.
+
+The basic logic: &quot;if 30% of stack-trace samples show `method X`, then X took ~30% of CPU time.&quot; Over enough samples, this converges to a useful approximation.
+
+## The Systematic Profiling Workflow
+
+```mermaid
+flowchart TB
+  Q[&quot;1. Define the performance question&lt;br/&gt;(&#x27;p99 latency increased; why?&#x27;)&quot;]
+  Tool[&quot;2. Choose the tool (JFR / async-profiler / VisualVM)&quot;]
+  Cap[&quot;3. Capture under realistic load&lt;br/&gt;(prod or prod-like)&quot;]
+  Analyze[&quot;4. Analyze (flame graph / method profiler)&quot;]
+  Hot[&quot;5. Identify hot methods&lt;br/&gt;or hot allocation paths&quot;]
+  Why[&quot;6. Diagnose WHY hot&lt;br/&gt;(algorithm? allocation? IO? sync?)&quot;]
+  Fix[&quot;7. Make targeted change&quot;]
+  Verify[&quot;8. Re-profile to verify&quot;]
+  Q --&gt; Tool --&gt; Cap --&gt; Analyze --&gt; Hot --&gt; Why --&gt; Fix --&gt; Verify
+  Verify -- &quot;not fixed&quot; --&gt; Tool
+```
+
+The rules:
+
+- **Always have a performance question.** &quot;Profile this app&quot; with no goal yields noise.
+- **Capture realistic load.** Dev workloads don&#x27;t match production hot paths.
+- **Look at relative cost, not absolute.** &quot;30% of time in X&quot; matters; &quot;X took 100 ms&quot; depends on the load.
+- **Verify the fix.** Most &quot;improvements&quot; are noise.
+
+## JFR (Java Flight Recorder) — the Production Default
+
+JFR is built into the JDK since JDK 11 (and Oracle JDK 7+). It&#x27;s the *production-grade* profiler:
+
+- **~1-3% overhead** with `profile` settings.
+- **Continuous recording** with rolling window — always-on.
+- **~140 event types** covering nearly every JVM subsystem.
+- **No special permissions** needed in modern JDKs.
+
+### Starting JFR
+
+**Continuous recording with rolling window** (the production default):
+
+```bash
+java -XX:StartFlightRecording=disk=true,maxage=24h,maxsize=200m,filename=/tmp/jfr ...
+```
+
+Captures the last 24 hours into a 200 MB rotating file. When something goes wrong, the data is already there.
+
+**On-demand for a specific window**:
+
+```bash
+jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/spike.jfr
+# ... reproduce the issue ...
+jcmd &lt;pid&gt; JFR.dump filename=/tmp/snapshot.jfr   # also works without duration
+```
+
+**Stop and dump**:
+
+```bash
+jcmd &lt;pid&gt; JFR.dump filename=/tmp/now.jfr
+jcmd &lt;pid&gt; JFR.stop
+```
+
+### JFR settings
+
+Two built-in configurations:
+
+- **`default`**: ~1% overhead. Excludes some heavy events (e.g., allocation sampling). Good for always-on.
+- **`profile`**: ~2-3% overhead. Includes allocation, lock contention, more detail. Good for diagnosis.
+
+```bash
+jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/p.jfr
+```
+
+Custom `.jfc` files let you enable specific events:
+
+```bash
+jcmd &lt;pid&gt; JFR.start settings=custom.jfc filename=/tmp/c.jfr
+```
+
+### JFR event types (sample)
+
+| Event | Records |
+|-------|---------|
+| `jdk.CPULoad` | system + process CPU |
+| `jdk.ThreadCPULoad` | per-thread CPU |
+| `jdk.ExecutionSample` | sampled stack traces (the CPU profile) |
+| `jdk.ObjectAllocationInNewTLAB` | TLAB allocation sample |
+| `jdk.ObjectAllocationOutsideTLAB` | slow-path allocation sample |
+| `jdk.GarbageCollection` | every GC |
+| `jdk.GCPhasePause` | STW phase pause |
+| `jdk.JavaMonitorEnter` | monitor contention |
+| `jdk.JavaMonitorWait` | wait() blocking |
+| `jdk.ThreadPark` | LockSupport.park blocking |
+| `jdk.FileRead` / `jdk.FileWrite` | file I/O |
+| `jdk.SocketRead` / `jdk.SocketWrite` | network I/O |
+| `jdk.ThreadStart` / `jdk.ThreadEnd` | thread lifecycle |
+| `jdk.JITCompilation` | every method compiled |
+| `jdk.MethodSample` | method-level sampling |
+| `jdk.VirtualThreadStart` / `jdk.VirtualThreadPinned` | virtual thread lifecycle (T14 from C01) |
+| `jdk.JavaErrorThrow` / `jdk.JavaExceptionThrow` | exceptions thrown |
+
+Per-event filtering, sampling rates, and stack-trace depth are configurable.
+
+### Analyzing JFR with JDK Mission Control (JMC)
+
+JMC is the GUI for JFR files. Download from https://www.oracle.com/java/technologies/jdk-mission-control.html (Adoptium has builds too).
+
+Key views:
+
+- **Method Profiling**: hot methods by sample count. Self-time vs total-time. Drill into call tree.
+- **Hot Threads**: which threads use most CPU.
+- **Allocation Profiling**: where allocations happen (by class, by stack).
+- **Memory**: heap usage, GC pauses over time.
+- **Lock Contention**: which monitors are contended.
+- **Outliers**: long method invocations, slow disk reads, etc.
+
+### JFR&#x27;s safepoint bias
+
+JFR samples at JVM safepoints (T07 — safepoint polls inserted by JIT). This means:
+
+- **Methods called from a safepoint** (most code) are accurately sampled.
+- **Methods between safepoints** (tight loops without poll insertion, long native calls) are *under-sampled*.
+
+JFR&#x27;s profile is biased toward &quot;where the JIT was happy to put a poll.&quot; It misses:
+
+- Tight numeric loops with `-XX:-EliminateBackedgeInTracedLoop` not generating polls.
+- Long JNI calls (no safepoints inside native code).
+- Synthetic methods, lambdas, certain compiler-generated frames.
+
+The fix: **async-profiler**.
+
+## async-profiler — No Safepoint Bias
+
+[async-profiler](https://github.com/async-profiler/async-profiler) (Andrei Pangin et al.) is the modern alternative to JFR for low-bias CPU profiling. Uses Linux `perf_event_open` (or `AsyncGetCallTrace` on other platforms) — sampling at the OS level, *not* at JVM safepoints.
+
+```bash
+# Download from GitHub releases
+# Unpack into /opt/async-profiler
+
+# CPU profile, 60 seconds, flame graph output:
+/opt/async-profiler/profiler.sh -d 60 -f /tmp/cpu.html &lt;pid&gt;
+
+# Allocation profile:
+/opt/async-profiler/profiler.sh -e alloc -d 60 -f /tmp/alloc.html &lt;pid&gt;
+
+# Wall-clock profile (CPU + blocked time):
+/opt/async-profiler/profiler.sh -e wall -d 60 -f /tmp/wall.html &lt;pid&gt;
+
+# Lock profile (Java monitor contention):
+/opt/async-profiler/profiler.sh -e lock -d 60 -f /tmp/lock.html &lt;pid&gt;
+```
+
+### async-profiler vs JFR
+
+| Aspect | JFR | async-profiler |
+|--------|-----|----------------|
+| **Safepoint bias** | Yes | **No** |
+| **Overhead** | 1-3% | &lt; 1% |
+| **Default** | Yes (built-in) | Requires install |
+| **Output** | Binary .jfr file | Flame graph HTML, .jfr, others |
+| **Event variety** | ~140 types | CPU, alloc, wall, lock, perf events |
+| **Production-safe** | Yes | Yes |
+| **Continuous recording** | Yes | Not its strength |
+| **Visualization** | JMC (full-featured) | Flame graphs (focused) |
+
+The 2026 stack: **continuous JFR for everything; on-demand async-profiler for accurate flame graphs**. They complement each other.
+
+## Flame Graphs — Reading and Interpretation
+
+Invented by [Brendan Gregg](https://www.brendangregg.com/flamegraphs.html) (2011). The canonical visualization for sampling profiler data.
+
+```text
+       width = % of samples (NOT time)
+   ┌──────────────────────────────────────────────────┐
+   │              Socket.read()                          │ ← top of stack (most recent call)
+   ├──────────────────────────────────────────────────┤
+   │           JDBC.executeQuery()                       │
+   ├──────────────────────────────────────────────────┤
+   │       DB.fetchUser()                                │
+   ├──────────────────────────────────────────────────┤
+   │   Service.handleRequest()                           │
+   ├──────────────────────────────────────────────────┤
+   │              main()                                  │ ← bottom (entry point)
+   └──────────────────────────────────────────────────┘
+```
+
+- **X-axis**: aggregated stack-trace samples, alphabetical by frame name (NOT time).
+- **Y-axis**: call depth. Caller at bottom; callee on top.
+- **Box width**: percentage of total samples this frame appears in. *The wider, the hotter.*
+- **Box color**: usually arbitrary (helps distinguish frames); some tools encode special info (e.g., red for inlined).
+
+### How to read
+
+1. **Look at the top.** The frames at the top are the *self-time* hot spots — where time was actually spent.
+2. **Wide flat box near top** = lots of self-time. This is what to optimize.
+3. **Narrow tall stack** = deep but rarely sampled — usually not interesting.
+4. **Wide narrow stack** (wide at bottom, narrow at top) = a hot top-level method, but actual work elsewhere.
+
+### Example flame graph reading
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│             Pattern.matcher()             │   String.intern() │  ← hot self-time
+├────────────────────────────────────────────────────────────┤
+│             String.matches()              │     Service.cache() │
+├────────────────────────────────────────────────────────────┤
+│                   Validator.validate()                          │
+├────────────────────────────────────────────────────────────┤
+│                   handler.handle()                               │
+└────────────────────────────────────────────────────────────┘
+```
+
+Reading: validator.validate() is the parent, but the *hot work* is `Pattern.matcher()` — regex compilation. Likely fix: pre-compile the pattern (cache the `Pattern` instance) instead of re-compiling per request.
+
+### Differential flame graphs
+
+Compare two profiles (before vs after a deploy):
+
+- **Red** boxes = grew between the two profiles (regressed).
+- **Blue** boxes = shrank (improved).
+- **Gray** = unchanged.
+
+Tells you exactly what got worse (or better) between two runs.
+
+## VisualVM — Quick Triage
+
+[VisualVM](https://visualvm.github.io/) is the lighter alternative — separate download since JDK 9 (was bundled before). Best for quick dev-time investigations.
+
+Features:
+
+- CPU profiling (instrumentation-based; heavier than JFR/async-profiler).
+- Memory profiling.
+- Thread visualization with state colors.
+- JMX MBean inspector.
+- Heap dump capture and basic analysis.
+- Plugins (Visual GC, MBeans extensions, etc.).
+
+When to use:
+
+- Dev-time debugging.
+- Quick checks of a running JVM (&quot;what&#x27;s it doing right now?&quot;).
+- JMX inspection.
+
+When NOT to use:
+
+- Production CPU profiling (heavier than JFR/async-profiler).
+- Heap dump analysis at scale (use Eclipse MAT, T10).
+
+## Other Tools
+
+### JProfiler / YourKit (commercial)
+
+Rich UIs, real-time JDBC query profiling, distributed tracing integration. Enterprise teams often deploy them. Expensive licenses; powerful features.
+
+### honest-profiler
+
+Historical low-overhead sampling profiler. Largely superseded by async-profiler. Mentioned for completeness.
+
+### Linux `perf`
+
+Kernel-level profiler — useful with `--frame-pointer` for native code. For Java code, use async-profiler (which uses `perf` internally on Linux but adds Java symbol resolution).
+
+## Profile Types — CPU vs Wall vs Allocation vs Lock
+
+Different questions need different profiles:
+
+### CPU profile
+
+Samples when threads are **on-CPU**. Best for CPU-bound workloads (computation, parsing, encryption).
+
+```bash
+asprofiler.sh -e cpu -d 60 -f /tmp/cpu.html &lt;pid&gt;
+```
+
+### Wall-clock profile
+
+Samples regardless of thread state (on-CPU or blocked). **Critical for I/O-heavy services** where most time is spent blocked.
+
+```bash
+asprofiler.sh -e wall -d 60 -f /tmp/wall.html &lt;pid&gt;
+```
+
+For a service whose p99 is 500 ms and CPU is at 5%, **the CPU profile shows almost nothing useful** — most time isn&#x27;t on CPU. The wall-clock profile shows where the time actually went (waiting on DB, network, lock).
+
+### Allocation profile
+
+Samples allocations. Shows where GC pressure comes from.
+
+```bash
+asprofiler.sh -e alloc -d 60 -f /tmp/alloc.html &lt;pid&gt;
+# Or JFR: jdk.ObjectAllocationInNewTLAB / jdk.ObjectAllocationOutsideTLAB
+```
+
+Useful when GC pauses are too frequent or too long — reducing allocation reduces GC work.
+
+### Lock contention profile
+
+Samples threads blocked on monitor enter or LockSupport.park.
+
+```bash
+asprofiler.sh -e lock -d 60 -f /tmp/lock.html &lt;pid&gt;
+# Or JFR: jdk.JavaMonitorEnter / jdk.ThreadPark
+```
+
+Reveals synchronization bottlenecks — the canonical fix is reducing critical-section duration or switching to lock-free structures.
+
+## Common Performance Patterns Found via Profiling
+
+### Logging in hot path with non-parameterized strings
+
+```java
+// ✗ Always formats the string, even at INFO level when DEBUG is disabled:
+logger.debug(&quot;processing &quot; + request.toString() + &quot; with config &quot; + config);
+
+// ✓ Parameterized — string only built if DEBUG is enabled:
+logger.debug(&quot;processing {} with config {}&quot;, request, config);
+```
+
+Visible as `String.concat`/`StringBuilder.append` high in CPU profile.
+
+### Reflection in tight loops
+
+```java
+// ✗ Reflective lookup every iteration:
+for (var x : items) {
+    Method m = x.getClass().getMethod(&quot;process&quot;);
+    m.invoke(x);
+}
+
+// ✓ Cache the Method:
+Method m = Item.class.getMethod(&quot;process&quot;);
+for (var x : items) m.invoke(x);
+```
+
+Or better: use a proper interface instead of reflection.
+
+### Pre-JDK-9 StringBuilder churn
+
+```java
+// ✗ Pre-JDK-9 — StringBuilder per iteration:
+for (var x : items) {
+    String s = &quot;prefix&quot; + x + &quot;suffix&quot;;   // StringBuilder churn
+    process(s);
+}
+```
+
+JDK 9+ uses invokedynamic (T03) and is usually fine. Profile to confirm.
+
+### LinkedList.get(i) — O(n)
+
+```java
+List&lt;X&gt; list = new LinkedList&lt;&gt;();
+for (int i = 0; i &lt; list.size(); i++) {
+    process(list.get(i));   // ✗ O(n^2) — get(i) walks the list
+}
+```
+
+Fix: ArrayList (O(1) indexed access), or use iterator/for-each.
+
+### JDBC ResultSet metadata lookup per row
+
+```java
+while (rs.next()) {
+    int id = rs.getInt(rs.findColumn(&quot;id&quot;));   // ✗ string lookup per row
+    String name = rs.getString(rs.findColumn(&quot;name&quot;));
+}
+
+// ✓ Cache the column indices once:
+int idCol = rs.findColumn(&quot;id&quot;);
+int nameCol = rs.findColumn(&quot;name&quot;);
+while (rs.next()) {
+    int id = rs.getInt(idCol);
+    String name = rs.getString(nameCol);
+}
+```
+
+### JSON serialization reflection
+
+```java
+// ✗ ObjectMapper created per request (re-discovers all classes):
+String json = new ObjectMapper().writeValueAsString(obj);
+
+// ✓ Shared, immutable, thread-safe:
+private static final ObjectMapper MAPPER = new ObjectMapper();
+String json = MAPPER.writeValueAsString(obj);
+```
+
+### Autoboxing in loops
+
+```java
+// ✗ Autoboxes every iteration:
+Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+for (int i = 0; i &lt; 1_000_000; i++) {
+    map.merge(i, 1, Integer::sum);   // Integer.valueOf(i) per call
+}
+
+// ✓ Primitive map (Eclipse Collections, fastutil):
+IntIntHashMap map = new IntIntHashMap();
+for (int i = 0; i &lt; 1_000_000; i++) {
+    map.addToValue(i, 1);
+}
+```
+
+Eclipse Collections, fastutil, HPPC offer primitive-typed collections with massive allocation reductions.
+
+## Container Profiling
+
+Profilers work in containers, but with some setup:
+
+```bash
+# JFR — output to a volume:
+kubectl exec &lt;pod&gt; -- jcmd 1 JFR.start duration=60s filename=/tmp/p.jfr
+kubectl cp &lt;pod&gt;:/tmp/p.jfr ./local.jfr
+
+# async-profiler — needs to be present in container:
+# Either bake into the image, or use a side-car
+kubectl exec &lt;pod&gt; -- /opt/async-profiler/profiler.sh -d 60 -f /tmp/cpu.html 1
+```
+
+For Kubernetes, side-car patterns (e.g., Pyroscope agent) handle continuous profiling without code changes.
+
+## Production Observability Stack
+
+A complete observability stack combines:
+
+```mermaid
+flowchart TB
+  JVM[&quot;JVM (production)&quot;]
+  JFR[&quot;Continuous JFR&lt;br/&gt;(24h rolling window)&quot;]
+  Met[&quot;Micrometer → Prometheus&lt;br/&gt;(real-time metrics)&quot;]
+  Trace[&quot;OpenTelemetry → Jaeger&lt;br/&gt;(distributed traces)&quot;]
+  APM[&quot;APM continuous profiler&lt;br/&gt;(Datadog/NewRelic/Dynatrace/Pyroscope)&quot;]
+  Adhoc[&quot;async-profiler&lt;br/&gt;(on-demand investigation)&quot;]
+  JVM --&gt; JFR
+  JVM --&gt; Met
+  JVM --&gt; Trace
+  JVM --&gt; APM
+  JVM --&gt; Adhoc
+```
+
+Each stream answers a different question:
+
+- **JFR**: deep JVM internals (always-on, post-mortem).
+- **Prometheus**: real-time alerts and dashboards.
+- **OpenTelemetry traces**: per-request flow across services.
+- **APM continuous profiler**: aggregated flame graphs across the fleet.
+- **async-profiler**: precise on-demand investigation.
+
+## APM Integration
+
+Continuous profiling has become a feature of every major APM platform:
+
+- **Datadog Continuous Profiler** — Java agent, aggregates flame graphs.
+- **New Relic / AppDynamics / Dynatrace** — similar offerings.
+- **Pyroscope** (now Grafana Pyroscope) — open-source continuous profiling, integrates with Grafana.
+- **Sentry Profiling** — focused on slow request investigation.
+
+All use sampling underneath (often async-profiler or similar). The differentiator is the *aggregation* — viewing flame graphs across services, deploys, and instances.
+
+## async-profiler — How It Actually Works (Deep Dive)
+
+The sections above introduced async-profiler as &quot;the no-safepoint-bias alternative.&quot; Now we go under the hood: *why* it has no safepoint bias, *how* it captures Java stacks from an arbitrary point in time, and the full menu of profiling modes with the exact commands a 2026 engineer types.
+
+### The Two Engines: `perf_events` + `AsyncGetCallTrace`
+
+async-profiler is really two cooperating mechanisms stitched together:
+
+1. **The trigger (when to sample).** On Linux, async-profiler asks the kernel&#x27;s **`perf_events`** subsystem (via the `perf_event_open(2)` syscall) to deliver a signal every N CPU cycles (or N nanoseconds of wall time, or every M bytes allocated — depending on mode). Because the *kernel* decides when to interrupt the thread, the sample can land **anywhere** — inside a tight loop, in JIT-compiled code with no safepoint poll, mid-way through a method. This is the crucial difference from JFR&#x27;s `jdk.ExecutionSample`, which can only capture a stack when a thread voluntarily reaches a **safepoint**.
+2. **The capture (what the stack is).** When the signal handler fires, async-profiler calls **`AsyncGetCallTrace`** — an undocumented but stable HotSpot internal function (the &quot;Async&quot; in the name) that walks the Java stack of the *currently interrupted* thread without requiring it to be at a safepoint. `AsyncGetCallTrace` is signal-async-safe: it can run inside a signal handler. It returns the JVM-level Java frames; async-profiler then stitches them together with native frames (resolved via the frame pointer or DWARF unwinding) to produce a **mixed-mode** stack — Java + JNI + kernel — in one trace.
+
+```text
+  perf_events timer fires  ───►  SIGPROF delivered to a running thread
+            (kernel decides the instant — no safepoint needed)
+                                          │
+                                          ▼
+                          async-profiler signal handler
+                                          │
+                    ┌─────────────────────┴─────────────────────┐
+                    ▼                                             ▼
+        AsyncGetCallTrace (Java frames)            frame-pointer / DWARF unwind
+        — walks the interpreter &amp; JIT               (native libs, kernel,
+          stack of the interrupted thread)            JNI, malloc, syscalls)
+                    └─────────────────────┬─────────────────────┘
+                                          ▼
+                         one mixed-mode stack trace (Java + native)
+                                          │
+                                          ▼
+                       aggregated into the flame graph / .jfr / collapsed file
+```
+
+### Why This Beats the Safepoint-Bias Problem
+
+Recall the safepoint-bias problem (covered above for JFR, and again here from the *sampler* angle): a safepoint-based sampler can only photograph a thread when that thread parks at a poll point. The JIT inserts polls at method entry/exit and (sometimes) loop back-edges — but a hot, fully-inlined numeric loop may run for microseconds with **no poll inside it**. A safepoint sampler asked to take a snapshot during that loop must *wait* until the thread leaves the loop, then records the stack at the next poll — systematically attributing the loop&#x27;s time to whatever method comes after it. The classic symptom: a profiler that swears the hot method is some innocent caller, while the real CPU burner (the inlined loop) is invisible.
+
+Older VisualVM CPU sampling and many legacy commercial samplers were safepoint-based and suffered exactly this. async-profiler sidesteps it entirely because the kernel interrupts the thread *in place* — the snapshot is of wherever the program counter genuinely was. This is the single biggest reason to reach for async-profiler when a JFR flame graph &quot;smells wrong.&quot;
+
+&gt; [!NOTE]
+&gt; There is a related but distinct metric called **time-to-safepoint (TTSP)** — how long it takes *all* threads to reach a safepoint once one is requested (e.g. for a GC or a `jstack`). A thread stuck in a long counted loop or a slow JNI call inflates TTSP and can stall the whole VM. JFR&#x27;s safepoint *bias* (a sampling-accuracy problem) and TTSP (a pause-latency problem) share the same root cause — poll placement — but are different concerns. async-profiler can help diagnose long-TTSP culprits because it *can* sample inside the offending loop.
+
+### The Profiling Modes — and When Each One Earns Its Keep
+
+async-profiler is not &quot;a CPU profiler.&quot; It is a sampler with interchangeable **events**. The `-e &lt;event&gt;` flag selects what the kernel counts down to before firing the sampling signal. Choosing the wrong event is the most common reason a profile &quot;shows nothing&quot; — the deeper sections below pair each mode with the question it answers.
+
+| Mode (`-e`) | Samples when… | The question it answers | Reach for it when |
+|-------------|---------------|-------------------------|-------------------|
+| `cpu` | a thread is burning a CPU (HW perf counter) | &quot;What is consuming CPU cycles?&quot; | CPU is pegged; throughput-bound compute |
+| `itimer` | wall-clock timer fires (CPU-time, no `perf`) | same as `cpu`, fallback where `perf_events` is unavailable (locked-down containers, macOS) | `perf_event_open` denied (`perf_event_paranoid`), no `CAP_PERFMON` |
+| `wall` | every thread, on-CPU **or blocked** | &quot;Where is *wall-clock* latency going, including waiting?&quot; | I/O-bound service; p99 high but CPU low |
+| `alloc` | the JVM allocates ~N bytes (TLAB-driven) | &quot;What is creating GC pressure / allocating the most?&quot; | frequent GC, allocation-rate alarms |
+| `lock` | a thread blocks on a monitor / `ReentrantLock` | &quot;Which lock is contended, and who waits on it?&quot; | high context-switch rate; sync bottleneck suspected |
+| `cache-misses`, `branch-misses`, `LLC-load-misses`, … | the named HW perf counter overflows | &quot;Is this loop memory-bound? branch-mispredicting?&quot; | micro-arch tuning of a known hot kernel |
+
+Some real invocations beyond the basics already shown:
+
+```bash
+# CPU profile, sample every 1 ms of CPU time (-i = sampling interval):
+asprof -e cpu -i 1ms -d 30 -f /tmp/cpu.html &lt;pid&gt;
+
+# Allocation profile — sample every 512 KB allocated; flame graph by allocated bytes:
+asprof -e alloc --alloc 512k -d 60 -f /tmp/alloc.html &lt;pid&gt;
+
+# Wall-clock profile of ONLY the request-handler threads (filter by name):
+asprof -e wall -t -d 60 -f /tmp/wall.html &lt;pid&gt;   # -t = split by thread
+
+# Lock/monitor contention, ignoring locks held &lt; 250 us (--lock threshold):
+asprof -e lock --lock 250us -d 60 -f /tmp/lock.html &lt;pid&gt;
+
+# Hardware cache-miss profile of a memory-bound kernel:
+asprof -e cache-misses -d 30 -f /tmp/cache.html &lt;pid&gt;
+```
+
+&gt; The modern launcher is `asprof` (renamed from `profiler.sh` in async-profiler 3.0, 2023). Older docs and the examples earlier in this topic use `profiler.sh`/`asprofiler.sh`; the flags are the same. There is also **`ap-loader`** — a single fat-jar that bundles native libraries for every platform, handy in CI and containers where you can&#x27;t pre-install binaries.
+
+### Agent-at-Launch vs Attach-to-Live-PID
+
+There are two fundamentally different ways to get async-profiler into a JVM, and the choice has real consequences:
+
+**1. Attach to a live PID (the common case).** The `asprof` launcher uses the JVM&#x27;s **dynamic attach** mechanism (the same channel `jcmd` uses) to inject `libasyncProfiler.so` into an already-running process. Zero restart, zero config — perfect for &quot;production is slow *right now*.&quot;
+
+```bash
+# Attach, profile 30s, detach automatically:
+asprof -d 30 -f /tmp/now.html 12345
+```
+
+**2. Load as a `-agentpath` at JVM launch.** Start the profiler with the process so you capture **startup and warm-up** — the JIT compiling, classes loading, the first requests — which an attach-later approach misses entirely.
+
+```bash
+java -agentpath:/opt/async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=/tmp/startup.jfr,jfr \
+     -jar app.jar
+```
+
+When to pick which:
+- **Attach** for incident response, ad-hoc investigation, and when you cannot (or don&#x27;t want to) restart the process.
+- **Agent-at-launch** for benchmarking cold-start, GraalVM-vs-JIT warm-up comparisons (see L3/C02/T05), and CI performance gates where you control the launch.
+
+&gt; [!NOTE]
+&gt; On Linux, attach mode needs the kernel to allow `perf_events`: check `/proc/sys/kernel/perf_event_paranoid` (a value of `1` or lower, or granting `CAP_PERFMON`/`CAP_SYS_ADMIN`, lets async-profiler use hardware CPU counters). In a restricted container where that&#x27;s denied, async-profiler automatically falls back to `itimer` mode — still useful, just without hardware-counter precision. This is the single most common &quot;why is my container CPU profile empty?&quot; gotcha.
+
+### Output Formats — Flame Graph, JFR, or Collapsed
+
+The `-o` / `-f` flags pick the output. The same captured samples can be rendered three ways:
+
+| Format | Flag | What it is | Use it to… |
+|--------|------|------------|-----------|
+| **Flame graph** | `-f out.html` | self-contained interactive HTML (zoom, search, click) | eyeball the hot path in a browser, share with the team |
+| **JFR** | `-f out.jfr -o jfr` | a real `.jfr` file async-profiler wrote itself | open in **JMC** alongside JFR&#x27;s own recordings; merge both tools&#x27; data |
+| **Collapsed** | `-f out.txt -o collapsed` | one folded stack per line + a count | feed to Brendan Gregg&#x27;s `flamegraph.pl`, build **differential** graphs, or post-process with scripts |
+
+```bash
+# Capture once as collapsed stacks, render a flame graph from them later:
+asprof -e cpu -d 30 -o collapsed -f /tmp/prof.txt &lt;pid&gt;
+flamegraph.pl /tmp/prof.txt &gt; /tmp/prof.svg     # Brendan Gregg&#x27;s script
+```
+
+That async-profiler can emit `.jfr` is the quiet superpower of the 2026 stack: you can run a low-bias async-profiler capture and then analyze it in **JMC** with the same rich tooling you&#x27;d use for a native JFR recording — getting JFR&#x27;s analysis UI *and* async-profiler&#x27;s sampling accuracy at once.
+
+## Reading a Flame Graph — The Full Method
+
+The earlier &quot;Flame Graphs — Reading and Interpretation&quot; section gave the rules. This section turns those rules into a *diagnostic procedure* and clears up the visual conventions that trip people up.
+
+### The One-Sentence Mental Model
+
+&gt; A flame graph is a heat map of where your program spent its day. The **widest bars are where the hours went.** You don&#x27;t read it left-to-right like a timeline — you scan for *width*, then climb to the *top* of the widest tower to find the method actually doing the work.
+
+### x-axis is Samples, Not Time — Internalize This
+
+This is the single most misread property, so it&#x27;s worth restating with teeth: **the horizontal position of a box means nothing.** Frames are sorted alphabetically and merged, *not* laid out in execution order. A box on the far left did not run &quot;before&quot; a box on the right. Width is the *only* horizontal signal — it is the fraction of collected samples in which that exact frame appeared on the stack. If `parseJson()` is 40% of the width, ~40% of your samples caught a thread somewhere inside `parseJson()` (or its callees). With enough samples, that ≈ 40% of whatever the event measures (CPU time, blocked time, allocated bytes).
+
+### The Three Shapes You Are Hunting For
+
+```mermaid
+flowchart TB
+  subgraph S1[&quot;A — Hot LEAF (a tall tower topped by one wide box)&quot;]
+    direction TB
+    a1[&quot;handleRequest()&quot;] --&gt; a2[&quot;serialize()&quot;] --&gt; a3[&quot;gzip.deflate()  ← WIDE leaf = real CPU sink&quot;]
+  end
+  subgraph S2[&quot;B — Wide PLATEAU (one frame wide across the top)&quot;]
+    direction TB
+    b1[&quot;eventLoop()&quot;] --&gt; b2[&quot;String.intern()  ← wide &amp; shallow = self-time hog&quot;]
+  end
+  subgraph S3[&quot;C — Wide BASE, splintered top (dispatcher, work elsewhere)&quot;]
+    direction TB
+    c1[&quot;dispatch()  (wide)&quot;] --&gt; c2[&quot;...many thin children...&quot;]
+  end
+```
+
+- **A — Hot leaf.** A tower whose *topmost* box is wide. That leaf is where self-time is spent. This is your prime optimization target — e.g. `gzip.deflate()` eating CPU suggests turning off compression for small payloads or caching results.
+- **B — Wide plateau.** A single frame stretched wide at or near the top, with little above it. Classic self-time hog — `String.intern()`, a regex `Pattern.matcher()`, an `equals()` on a huge object. Fix the algorithm or cache the result.
+- **C — Wide base, splintered top.** A wide low frame (a dispatcher, an event loop, `main`) whose children fan out into many thin slivers means the time is *spread* — no single hot spot. Don&#x27;t optimize the wide base; it&#x27;s just the funnel everything flows through.
+
+### Climbing the Graph — The Procedure
+
+1. **Zoom out, find the widest top-row regions.** Ignore everything narrower than a few percent.
+2. **For each wide region, climb to its top.** The topmost wide box is the self-time culprit; everything below it is just &quot;how we got here.&quot;
+3. **Click to zoom** (the HTML graphs are interactive) into that subtree to read the now-magnified children.
+4. **Use search/highlight.** Typing a class name (e.g. `GC` or `java/util/regex`) highlights every matching frame and sums their combined width across the whole graph — instantly answering &quot;how much total time is in regex / in GC / in JSON?&quot;
+5. **Ask &quot;why is this hot?&quot;** — algorithmic (O(n²)?), allocation (feeding GC?), I/O (should be a wall profile?), or contention (should be a lock profile?).
+
+### CPU vs Allocation vs Off-CPU Flame Graphs Look Different
+
+The *shape* you should expect depends on the event — and confusing them leads to wrong conclusions:
+
+- **CPU flame graph.** Width = CPU cycles. Dominated by compute, parsing, crypto, and — on an idle-ish but GC-churny app — by GC threads and `arraycopy`. A blocked thread contributes **nothing** here (it&#x27;s off-CPU).
+- **Allocation flame graph.** Width = *bytes allocated* (or allocation samples), not time. A method that allocates a giant `byte[]` once can dominate even though it costs almost no CPU. Reading it like a CPU graph (&quot;this is slow!&quot;) is the classic mistake — it&#x27;s not slow, it&#x27;s *hungry*, and the cost is paid later as GC.
+- **Off-CPU / wall-clock flame graph.** Width = wall time including *blocked* time. Here the wide towers are `Socket.read()`, `parkNanos`, `Object.wait()`, `Unsafe.park` — places the thread sat idle. A CPU profile of the same workload would show these as nearly nothing.
+
+&gt; [!IMPORTANT]
+&gt; Always label and date your flame graphs with the **event type**. A flame graph SVG with no caption is ambiguous: a wide `Socket.read()` box means &quot;we&#x27;re I/O-bound and that&#x27;s expected&quot; in a wall profile, but would be alarming (and impossible) in a CPU profile. Half of all flame-graph misreadings come from not knowing which event produced the picture.
+
+### Flame vs Icicle (Orientation)
+
+The orientation is purely cosmetic but the names matter in tools and docs:
+
+- **Flame graph** — root (entry point) at the **bottom**, leaves at the **top**, growing *upward* like flames. The default; what every example above uses.
+- **Icicle graph** — root at the **top**, callees hanging *downward* like icicles. JMC&#x27;s &quot;Flame View&quot; and many APM UIs default to icicle orientation. Same data, flipped. The reading rules are identical — just remember &quot;widest box, then travel *toward the leaves*&quot; (up for flames, down for icicles).
+
+### Differential Flame Graphs — Before vs After, Concretely
+
+The earlier section noted red=grew, blue=shrank. Here&#x27;s how you actually generate one and what it buys you. Because async-profiler emits **collapsed** stacks, you can diff two captures with a standard script:
+
+```bash
+# Capture baseline, deploy a change, capture again — both as collapsed stacks:
+asprof -e cpu -d 60 -o collapsed -f /tmp/before.txt &lt;pid_before&gt;
+asprof -e cpu -d 60 -o collapsed -f /tmp/after.txt  &lt;pid_after&gt;
+
+# Brendan Gregg&#x27;s differential script (from the FlameGraph repo):
+difffolded.pl /tmp/before.txt /tmp/after.txt | flamegraph.pl &gt; /tmp/diff.svg
+```
+
+The diff graph colors each frame by how its width *changed*: **red = wider after (regressed)**, **blue = narrower after (improved)**, gray = unchanged. This is the fastest way to answer &quot;the p99 jumped after Tuesday&#x27;s deploy — *what* got slower?&quot; without staring at two graphs side by side. A wide red tower over `Logger.format` after a deploy that &quot;just added some debug logging&quot; tells the whole story in one glance.
+
+## JFR — Deeper Than the GUI (Events, CLI, Streaming)
+
+The earlier JFR section covered starting recordings and opening them in JMC. This section goes deeper on *what JFR records and how cheap it is*, the **command-line** analysis path (no GUI needed — ideal in a terminal-only prod box or CI), and **event streaming** for live, in-process consumption.
+
+### Why JFR Is Nearly Free — and Always-On-able
+
+JFR&#x27;s defining trait is overhead so low that you can leave it **running continuously in production**. The reasons:
+
+- **It is built into the VM, not bolted on.** Events are emitted from instrumentation *already present* in HotSpot (allocation hits a TLAB boundary, a GC phase ends, a monitor inflates) — JFR just records the data the VM was already producing, into a thread-local buffer with no locking on the hot path.
+- **Thread-local buffers, batched to disk.** Each thread writes events to its own buffer; full buffers flush to a global buffer and then to the chunked `.jfr` file. No synchronization per event.
+- **Sampling, not tracing, for the expensive stuff.** CPU stacks (`jdk.ExecutionSample`) and allocations are *sampled*, so cost scales with sample rate, not with how busy the app is.
+
+The payoff is the production posture already shown (`maxage`/`maxsize` rolling window): when an incident hits, **the evidence is already on disk** — you `JFR.dump` the last N minutes that were being recorded all along. You don&#x27;t have to reproduce the problem with a profiler attached.
+
+### What JFR Records — Categories Worth Knowing
+
+Beyond the event table earlier, it helps to think in *categories*, because that&#x27;s how you decide what a recording can answer:
+
+- **Execution / CPU** — `jdk.ExecutionSample`, `jdk.NativeMethodSample` (the method profile).
+- **Memory / allocation** — `jdk.ObjectAllocationInNewTLAB`, `jdk.ObjectAllocationOutsideTLAB`, `jdk.ObjectAllocationSample` (JDK 16+, a unified, rate-limited allocation event), `jdk.OldObjectSample` (the **leak candidate** event — samples objects that survive, the JFR counterpart to a heap dump from L3/C02/T10).
+- **GC** — `jdk.GarbageCollection`, `jdk.GCPhasePause`, `jdk.GCHeapSummary`, `jdk.G1HeapRegionTypeChange`.
+- **Locks / threads** — `jdk.JavaMonitorEnter` (contention), `jdk.JavaMonitorWait`, `jdk.ThreadPark`.
+- **I/O** — `jdk.SocketRead/Write`, `jdk.FileRead/Write` — each with duration, so you can find *slow* I/O, not just frequent.
+- **Exceptions** — `jdk.JavaExceptionThrow`, `jdk.JavaErrorThrow` — a surprising perf sink when exceptions are used for control flow in a hot path (stack-trace fill-in is expensive).
+- **Compiler** — `jdk.JITCompilation`, `jdk.Deoptimization` — deopt storms (links to JIT, L3/C02/T04) show up here.
+
+&gt; [!NOTE]
+&gt; The **I/O and exception** events are JFR&#x27;s standout advantage over a pure CPU sampler: a slow `jdk.SocketRead` of 800 ms shows up as one heavy event with its stack, even though it spent ~0 CPU — invisible to a CPU flame graph. This is the same blind spot the wall-clock profile fixes, but JFR gives it to you for free in the always-on recording.
+
+### Analyzing JFR from the Command Line — the `jfr` Tool
+
+You do not need JMC. The JDK ships a **`jfr`** command-line tool (since JDK 9) that prints, summarizes, and queries a recording — perfect when you&#x27;re SSH&#x27;d into a box or scripting a CI gate:
+
+```bash
+# One-line overview: which event types fired, how many, total size:
+jfr summary /tmp/spike.jfr
+
+# Print just the CPU samples (the method profile), with stack traces:
+jfr print --events jdk.ExecutionSample /tmp/spike.jfr
+
+# The most useful built-in VIEWS (JDK 17+) — pre-aggregated, like a mini-JMC in the terminal:
+jfr view hot-methods        /tmp/spike.jfr   # top methods by sample count
+jfr view allocation-by-site /tmp/spike.jfr   # where allocations came from
+jfr view contention-by-site /tmp/spike.jfr   # lock contention hot spots
+jfr view gc                 /tmp/spike.jfr   # GC pause summary
+jfr view jvm-information     /tmp/spike.jfr   # flags, version, uptime
+
+# Filter to a time window and a single thread:
+jfr print --events jdk.JavaMonitorEnter \
+  --stack-depth 32 /tmp/spike.jfr
+```
+
+`jfr view` (JDK 17+) is the unsung hero: it renders the same aggregations JMC shows, as text tables, in milliseconds — no GUI, no file transfer. For a quick &quot;what&#x27;s hot?&quot; on a prod recording, it often beats opening JMC.
+
+### JFR Event Streaming — Live Consumption (JDK 14+)
+
+Classic JFR is **record now, analyze later** (write a file, open it in JMC). **JFR event streaming** (`jdk.management.jfr`, JEP 349, JDK 14+) flips that: your application — or an external process — subscribes to events **as they happen** and reacts in real time, with the same near-zero overhead. No file, no round trip.
+
+In-process, with `RecordingStream`:
+
+```java
+import jdk.jfr.consumer.RecordingStream;
+import java.time.Duration;
+
+try (var rs = new RecordingStream()) {
+    // React to GC pauses longer than 50 ms, live:
+    rs.enable(&quot;jdk.GCPhasePause&quot;);
+    rs.onEvent(&quot;jdk.GCPhasePause&quot;, event -&gt; {
+        var pause = event.getDuration();
+        if (pause.toMillis() &gt; 50) {
+            metrics.recordLongGcPause(pause);          // push to Micrometer/Prometheus
+            log.warn(&quot;Long GC pause: {} ms&quot;, pause.toMillis());
+        }
+    });
+
+    // Sample CPU and watch allocation pressure too:
+    rs.enable(&quot;jdk.ExecutionSample&quot;).withPeriod(Duration.ofMillis(10));
+    rs.enable(&quot;jdk.ObjectAllocationSample&quot;);
+    rs.onEvent(&quot;jdk.ObjectAllocationSample&quot;,
+        e -&gt; allocationMeter.mark(e.getLong(&quot;weight&quot;)));
+
+    rs.startAsync();   // non-blocking; events stream on a background thread
+    // ... application keeps running; handlers fire as events occur ...
+}
+```
+
+Out-of-process, you can attach a `RemoteRecordingStream` over JMX to a *different* JVM and consume its events live. This is the foundation many continuous-profiling and observability agents build on: instead of polling MBeans or shelling out to `jcmd`, they subscribe to the JFR stream and forward events to a backend. It turns JFR from a black-box flight recorder into a real-time telemetry source — bridging the always-on JFR recording and the Prometheus/OpenTelemetry streams in the observability-stack diagram earlier.
+
+## Real-World Scenario — The Profile That Lied (Until We Changed the Event)
+
+A relatable story that ties the deep dives together.
+
+A team owns an order-confirmation service. Alert: **p99 latency = 1.4 s**, SLO is 300 ms. The on-call engineer attaches async-profiler in CPU mode — the obvious first move:
+
+```bash
+asprof -e cpu -d 60 -f /tmp/cpu.html 4711
+```
+
+The CPU flame graph is **boring**: ~85% of it is GC threads and the JVM&#x27;s own idle loop. Total app CPU is 6%. By the &quot;widest box&quot; rule there&#x27;s nothing to fix — the service is barely using the CPU. A junior profiler concludes &quot;the box isn&#x27;t the bottleneck, we need a bigger instance&quot; and almost files a scale-up ticket.
+
+The senior engineer recognizes the tell: **high latency + low CPU = the time is being spent off-CPU, waiting.** A CPU profiler is structurally blind to waiting — a blocked thread contributes zero CPU samples. So they switch the *event*, not the tool:
+
+```bash
+asprof -e wall -t -d 60 -f /tmp/wall.html 4711
+```
+
+Now the wall-clock flame graph tells the truth: a **wide tower under `HttpClient.send → Socket.read`**, ~70% of wall time, all of it in the call to a downstream `inventory-service`. The order service wasn&#x27;t slow — it was *blocked* on a slow dependency, holding a request thread idle for over a second per call. The CPU profile literally could not show this; the wall-clock profile made it the widest bar on the page.
+
+The fix had nothing to do with CPU: add a timeout + circuit breaker on the inventory call, and parallelize two independent downstream calls that were running sequentially. p99 dropped to 240 ms. The JFR continuous recording, queried after the fact with `jfr view`, corroborated it — wide `jdk.SocketRead` events with 900 ms durations pointing at the same downstream:
+
+```bash
+jfr print --events jdk.SocketRead --stack-depth 16 /var/jfr/last.jfr | head -40
+```
+
+The lesson, and the through-line of this whole topic: **match the profile event to the question.** The same tool, the same PID, the same 60 seconds — but the CPU event hid the problem and the wall event revealed it. Reaching for &quot;a bigger instance&quot; because the CPU profile looked empty would have burned money and fixed nothing.
+
+&gt; [!INTERVIEW]
+&gt; **Q: &quot;Your service has p99 of 1.5 s but CPU sits at 5%. You take a CPU flame graph and it shows almost nothing but GC. What&#x27;s going on and what do you do next?&quot;**
+&gt;
+&gt; Strong answer hits four beats: **(1) Diagnose the mismatch** — high latency with low CPU means time is spent *off-CPU* (blocked on I/O, locks, or downstream calls); a CPU profiler is structurally blind to waiting because a blocked thread emits no CPU samples. **(2) Switch the event, not the tool** — capture a **wall-clock** profile (`asprof -e wall`) so blocked time counts; the wide towers will be `Socket.read`/`parkNanos`/`Object.wait`. **(3) Corroborate with JFR** — the always-on recording&#x27;s `jdk.SocketRead`/`jdk.JavaMonitorEnter` events carry durations, so `jfr view contention-by-site` or filtering slow socket reads confirms the culprit without re-running anything. **(4) Note the safepoint angle** — if you *were* CPU-bound and a JFR flame graph looked wrong (hot time on an innocent caller), suspect **safepoint bias** and re-profile with async-profiler, which samples via `perf_events` + `AsyncGetCallTrace` and lands inside poll-free loops. Bonus credit: mention that &quot;scale up the instance&quot; is the trap answer — more CPU does nothing for a thread blocked on a slow dependency.
+
+## Safe Production Profiling
+
+A consolidated note on profiling *in production* without becoming the incident:
+
+- **Lead with the always-on recording.** Continuous JFR at `default` settings (~1% overhead, rolling `maxage`/`maxsize` window) should already be running on every prod JVM. Most investigations start by *dumping what&#x27;s already there* — no attach, no risk.
+- **async-profiler is production-safe too.** Sub-1% overhead, attach-and-detach in seconds, no restart. The main caveat is the `perf_event_paranoid`/`CAP_PERFMON` permission in containers — if denied, it falls back to `itimer` (still safe, slightly less precise).
+- **Prefer `default` over `profile` JFR settings under heavy load.** The `profile` config adds allocation and contention sampling (~2-3%); fine for a bounded 60 s capture, but `default` is the right always-on baseline.
+- **Bound your captures.** Use `-d &lt;seconds&gt;` (async-profiler) and `duration=` (JFR) so a profiler can never run away if you forget to stop it.
+- **Aggregate across the fleet with continuous-profiling backends** rather than profiling instances by hand — see the APM Integration and Production Observability Stack sections above (Grafana **Pyroscope**, Datadog/New Relic/Dynatrace continuous profilers). These run a low-overhead agent (often async-profiler under the hood, frequently consuming the **JFR event stream** from the previous section) and give you fleet-wide, deploy-over-deploy flame graphs — the production-scale generalization of the differential flame graph.
+- **eBPF-based profilers** (e.g. Parca, Grafana Beyla, Pyroscope&#x27;s eBPF mode) profile from *outside* the JVM at the kernel level, with no agent inside the process at all — useful for whole-host, mixed-language profiling. For deep JVM-internal questions, in-JVM JFR/async-profiler still see more (Java frames, allocation sites, lock identities). A blended host-eBPF + in-JVM-JFR setup is increasingly the 2026 default. (See also the JVM performance lab in L3/C05/T01 for a hands-on harness.)
+
+## Profiling Pitfalls
+
+### Profiling in dev with synthetic load
+
+Dev workloads rarely match prod hot paths. Profile in prod (or production-equivalent) or accept noisy results.
+
+### Reading absolute numbers vs relative
+
+&quot;This method took 100 ms&quot; — meaningless without context. &quot;30% of profile time&quot; — actionable.
+
+### Optimizing the cold path
+
+A method that takes 1% of CPU isn&#x27;t where to invest tuning time. Focus on the top 3 widest boxes.
+
+### Not running long enough
+
+Transient spikes don&#x27;t show in a 10-second profile. Capture for at least minutes; ideally tens of minutes to hours for slow regressions.
+
+### Safepoint bias (JFR)
+
+Discussed above. Use async-profiler when you suspect JFR is missing data — typically tight loops, native code-heavy paths.
+
+### Reading the wrong profile type
+
+A wall-clock profile of an I/O-bound service is dominated by `Socket.read()` — useful. A CPU profile of the same is dominated by GC (because that&#x27;s all that&#x27;s on-CPU). Match the profile type to the question.
+
+## The 80/20 of Profiling
+
+```mermaid
+flowchart LR
+  Profile[&quot;Flame graph&quot;]
+  Top3[&quot;Top 3 widest boxes near top&quot;]
+  Win[&quot;~80% of bottlenecks&quot;]
+  Profile --&gt; Top3 --&gt; Win
+  Note[&quot;The rest is fine-tuning.&quot;]
+```
+
+In practice: glance at the flame graph; the top 3 widest top-boxes usually point to the issue. Drill into &quot;why is this hot?&quot; Don&#x27;t get distracted by deeper micro-optimizations.
+
+## When to (and Not to) Profile
+
+### When to profile
+
+- p99 latency increased.
+- Throughput dropped.
+- CPU utilization unexpectedly high.
+- Suspect inefficient algorithm.
+- Before claiming &quot;we need more cores.&quot;
+
+### When NOT to profile
+
+- App already meets requirements.
+- Symptoms unrelated to JVM (network, DB latency, downstream services).
+- No baseline.
+- Without a specific hypothesis.
+
+## Common Mistakes
+
+### Profile in production without continuous recording enabled
+
+You can&#x27;t profile an issue that already happened. Enable continuous JFR.
+
+### Read flame graphs without zooming
+
+The full graph is overwhelming; zoom into the hot region.
+
+### Mix CPU and wall-clock profiles
+
+They answer different questions. Be deliberate.
+
+### Optimize without baseline
+
+You can&#x27;t say &quot;30% faster&quot; without a baseline.
+
+### Ignore allocation profiling
+
+Hot allocation paths = GC pressure source. Reducing allocations often helps more than optimizing CPU code.
+
+### Trust dev profiles in prod
+
+The JIT, GC, and workload differ. Profile prod.
+
+## Practice
+
+1. **Continuous JFR setup.** Enable rolling-window continuous recording on a service. After a load test, dump and open in JMC.
+2. **JFR method profile.** Identify the top 5 CPU-consuming methods in JMC. Drill into the call tree.
+3. **async-profiler CPU flame graph.** Profile a Spring Boot app for 60s. Open the flame graph HTML. Identify hot self-time methods.
+4. **JFR vs async-profiler comparison.** Profile the same workload with both. Look for differences (safepoint bias).
+5. **Wall-clock vs CPU profile.** Profile an I/O-bound service both ways. Compare what&#x27;s hot.
+6. **Allocation profile.** Profile an allocation-heavy app; identify the top allocation sites; fix one; re-profile.
+7. **Lock contention profile.** Build a contended-lock benchmark. Profile with `-e lock`. Identify the contention.
+8. **Differential flame graph.** Profile before and after a code change. Generate diff flame graph.
+9. **Common pattern: logging hot path.** Build a service with non-parameterized `logger.debug` in a hot loop. Profile; identify; fix with parameterized; re-profile.
+10. **Common pattern: reflection in loop.** Same workflow.
+11. **Container profiling.** Run a JVM in Docker; capture JFR via `docker exec jcmd`.
+12. **APM continuous profiler.** Set up Pyroscope (open-source); view aggregated flame graphs across a workload.
+13. **Provoke safepoint bias.** Write a tight `long`-counted numeric loop (sum of a large `double[]`) with no method calls inside. Profile with JFR (`settings=profile`) and with async-profiler CPU mode. Compare: JFR likely attributes the time to the caller; async-profiler lands inside the loop. Confirm by toggling `-XX:+UseCountedLoopSafepoints` and re-profiling.
+14. **Same capture, three formats.** Run `asprof -e cpu -d 30` against a Spring Boot app once each as `-f out.html`, `-o jfr -f out.jfr`, and `-o collapsed -f out.txt`. Open the `.jfr` in JMC; render the collapsed file with `flamegraph.pl`. Verify all three describe the same hot path.
+15. **Agent-at-launch vs attach.** Profile a cold JVM start with `-agentpath:libasyncProfiler.so=start,event=cpu,...`; separately attach to the same app *after* warm-up. Compare flame graphs — find the warm-up-only frames (class loading, C2 compilation) that the attach-later run misses.
+16. **`jfr` CLI, no GUI.** Take a `.jfr` recording and, without opening JMC, run `jfr summary`, `jfr view hot-methods`, `jfr view allocation-by-site`, and `jfr view contention-by-site`. Then `jfr print --events jdk.SocketRead` to find slow I/O.
+17. **JFR event streaming.** Write a small `RecordingStream` program that subscribes to `jdk.GCPhasePause` and `jdk.ObjectAllocationSample` and logs/exports any GC pause over 50 ms live (no file). Run it against an allocation-heavy workload.
+18. **The wall-vs-CPU diagnosis drill.** Build a service that calls a deliberately slow downstream (sleep 1 s). Profile in CPU mode (should look empty) then wall mode (should show the blocking `Socket.read`/`sleep` tower). Reproduce the &quot;profile that lied&quot; scenario end to end.
+19. **Differential flame graph for real.** Capture collapsed stacks before and after adding non-parameterized `logger.debug` to a hot loop; run `difffolded.pl before.txt after.txt | flamegraph.pl` and confirm the regressed (red) `Logger.format`/`StringBuilder` tower.
+20. **Container permission gotcha.** Run async-profiler inside a restricted container with `perf_event_paranoid=3`; observe the empty/failed `perf` profile, then confirm `itimer` fallback (or grant `CAP_PERFMON`) produces a usable CPU profile.
+
+## Recap
+
+You should now be able to:
+
+- Distinguish **sampling** (low overhead, statistical) from **instrumentation** (high overhead, precise); modern Java profiling is sampling-based.
+- Apply the **systematic profiling workflow**: define question → choose tool → capture realistic load → analyze → identify hot path → diagnose why → fix → re-profile.
+- Use **JFR (Java Flight Recorder)** as the production-default profiler: built into JDK 11+, ~1-3% overhead, ~140 event types; continuous recording with rolling window or on-demand capture via `jcmd JFR.start`; settings `default` vs `profile`.
+- Analyze JFR in **JMC (JDK Mission Control)**: method profiler (self vs total time), Hot Threads, allocation profiling, memory utilization, GC pauses, lock contention, outliers.
+- Recognize JFR&#x27;s **safepoint bias**: samples at JVM safepoints; under-samples tight loops without polls and long native calls; use async-profiler when this matters.
+- Use **async-profiler** as the modern complement: Linux `perf_event_open`-based, no safepoint bias, &lt; 1% overhead; flame graph as the canonical output; CPU/wall/alloc/lock event modes.
+- **Read flame graphs**: X-axis = aggregated samples (NOT time), Y-axis = call depth, width = % of samples; **look at the top — wide flat box near top = hot self-time**; narrow stacks = not interesting.
+- Apply **differential flame graphs** for before/after comparison (red grew, blue shrank).
+- Use **VisualVM** for quick dev-time triage; JMX inspection; basic heap dump capture; never for production profiling (instrumentation overhead).
+- Differentiate **profile types** by question: CPU (on-CPU time, CPU-bound workloads), **wall-clock (on-CPU + blocked, critical for I/O-heavy)**, allocation (GC pressure sources), lock contention (synchronization bottlenecks).
+- Recognize **common performance patterns** found via profiling: non-parameterized logging, reflection in tight loops, pre-JDK-9 StringBuilder churn, LinkedList.get(i), JDBC ResultSet metadata per-row, ObjectMapper-per-call, autoboxing in loops (fix via primitive collections like Eclipse Collections / fastutil).
+- Profile in **containers** via `kubectl exec` to invoke `jcmd`, or via side-car continuous profilers (Pyroscope, etc.).
+- Build a **production observability stack**: continuous JFR + Prometheus + OpenTelemetry traces + APM continuous profiler + on-demand async-profiler.
+- Integrate with **APM continuous profilers** (Datadog, New Relic, Pyroscope) for fleet-wide flame graph aggregation.
+- Avoid the **6 profiling pitfalls**: synthetic dev load, absolute vs relative readings, optimizing cold paths, short capture windows, ignoring safepoint bias when relevant, mismatched profile type to question.
+- Apply the **80/20**: top 3 widest top-boxes usually point to the issue.
+- Know **when NOT to profile**: already meets requirements, symptoms elsewhere (network, DB), no baseline, no hypothesis.
+- Explain **how async-profiler works**: `perf_events` (`perf_event_open`) decides *when* to sample (so the kernel can interrupt a thread anywhere, defeating safepoint bias), and `AsyncGetCallTrace` captures *what* the Java stack is from a signal handler — producing mixed-mode (Java + native) stacks; distinguish safepoint **bias** from **time-to-safepoint (TTSP)**.
+- Choose the right async-profiler **mode/event**: `cpu` (and `itimer` fallback when `perf_event_paranoid`/`CAP_PERFMON` blocks `perf`), `wall` (on-CPU + blocked), `alloc` (GC pressure by bytes), `lock` (monitor contention), plus HW counters (`cache-misses`, `branch-misses`).
+- Decide **agent-at-launch** (`-agentpath:libasyncProfiler.so=start,...`, captures startup/warm-up) vs **attach-to-PID** (dynamic attach, zero restart, for live incidents).
+- Pick the right **output format**: interactive flame-graph HTML, a real `.jfr` (open in JMC alongside JFR&#x27;s own data), or **collapsed** stacks (for `flamegraph.pl` and differential graphs).
+- **Read a flame graph as a procedure**: x-axis is aggregated samples (never time/order), width is the only horizontal signal; hunt for the **hot leaf**, the **wide plateau**, and recognize a **wide base with a splintered top** as &quot;no single hot spot&quot;; climb to the top of the widest tower; use zoom + search to sum a class&#x27;s total width.
+- Know that **CPU vs allocation vs off-CPU/wall flame graphs look different** (cycles vs allocated bytes vs blocked time) and must be labeled by event — an allocation graph shows what&#x27;s *hungry*, not what&#x27;s *slow*.
+- Distinguish **flame** (root at bottom, grows up) from **icicle** (root at top, hangs down — JMC&#x27;s default) orientation.
+- Generate a **differential flame graph** from before/after collapsed stacks (`difffolded.pl | flamegraph.pl`): red = regressed, blue = improved.
+- Explain **why JFR is near-free** (in-VM instrumentation, thread-local lock-free buffers, sampling for the expensive events) and therefore always-on-able, so incident evidence is already on disk.
+- Reason about JFR **by event category** (execution, allocation incl. `jdk.ObjectAllocationSample` and the `jdk.OldObjectSample` leak-candidate event, GC, locks, I/O with durations, exceptions, JIT/deopt) — and why I/O and exception events catch what a CPU sampler can&#x27;t.
+- Analyze JFR **from the command line** with the `jfr` tool: `jfr summary`, `jfr print --events`, and the `jfr view` aggregations (`hot-methods`, `allocation-by-site`, `contention-by-site`, `gc`) — no GUI required.
+- Use **JFR event streaming** (JEP 349, JDK 14+): `RecordingStream` to consume events live in-process (and `RemoteRecordingStream` over JMX out-of-process), the basis for real-time telemetry and continuous-profiling agents.
+- Diagnose the **high-latency / low-CPU** case: switch the *event* (CPU → wall-clock) rather than the tool, because a CPU profiler is structurally blind to blocked time; corroborate with JFR `jdk.SocketRead`/contention events; resist the &quot;scale up the box&quot; trap.
+- Apply **safe production profiling**: always-on JFR `default` baseline + bounded (`-d`/`duration=`) on-demand async-profiler captures; aggregate fleet-wide via continuous-profiling backends (Pyroscope/Datadog/etc., often consuming the JFR stream); know where **eBPF** profilers (Parca, Beyla) fit for whole-host, agentless profiling.
+
+## Next
+
+Continue to [Benchmarking with JMH](./T12-benchmarking-with-jmh.md) — *the* tool for measuring Java code performance correctly. We&#x27;ll cover the **JMH (Java Microbenchmark Harness)** — designed by Doug Lea and Aleksey Shipilëv specifically to handle the JIT, dead code elimination, GC, and statistical noise that defeat naive `System.nanoTime()` benchmarks; **warmup phases**, **measurement iterations**, **forks**, **black holes** to prevent dead-code-elimination, **modes** (throughput vs average time vs sample time vs single shot); reading JMH output (operations per second, percentiles); the common benchmark anti-patterns and how JMH neutralizes them; integration with profiling tools to find *why* a microbenchmark is slow.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><div class="lbl">← Previous</div><div class="ttl">T10-memory-leaks-and-heap-dump-analysis</div><div class="sub">Memory Leaks &amp; Heap Dump Analysis</div></a><a class="next" href="../l3/c02-t12-benchmarking-with-jmh.html"><div class="lbl">Next →</div><div class="ttl">T12-benchmarking-with-jmh</div><div class="sub">Benchmarking with JMH</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-profiling-is" data-toc-link>What Profiling Is</a></li><li class="lvl-2"><a href="#the-systematic-profiling-workflow" data-toc-link>The Systematic Profiling Workflow</a></li><li class="lvl-2"><a href="#jfr-java-flight-recorder-the-production-default" data-toc-link>JFR (Java Flight Recorder) — the Production Default</a></li><li class="lvl-3"><a href="#starting-jfr" data-toc-link>Starting JFR</a></li><li class="lvl-3"><a href="#jfr-settings" data-toc-link>JFR settings</a></li><li class="lvl-3"><a href="#jfr-event-types-sample" data-toc-link>JFR event types (sample)</a></li><li class="lvl-3"><a href="#analyzing-jfr-with-jdk-mission-control-jmc" data-toc-link>Analyzing JFR with JDK Mission Control (JMC)</a></li><li class="lvl-3"><a href="#jfrs-safepoint-bias" data-toc-link>JFR&#x27;s safepoint bias</a></li><li class="lvl-2"><a href="#async-profiler-no-safepoint-bias" data-toc-link>async-profiler — No Safepoint Bias</a></li><li class="lvl-3"><a href="#async-profiler-vs-jfr" data-toc-link>async-profiler vs JFR</a></li><li class="lvl-2"><a href="#flame-graphs-reading-and-interpretation" data-toc-link>Flame Graphs — Reading and Interpretation</a></li><li class="lvl-3"><a href="#how-to-read" data-toc-link>How to read</a></li><li class="lvl-3"><a href="#example-flame-graph-reading" data-toc-link>Example flame graph reading</a></li><li class="lvl-3"><a href="#differential-flame-graphs" data-toc-link>Differential flame graphs</a></li><li class="lvl-2"><a href="#visualvm-quick-triage" data-toc-link>VisualVM — Quick Triage</a></li><li class="lvl-2"><a href="#other-tools" data-toc-link>Other Tools</a></li><li class="lvl-3"><a href="#jprofiler-yourkit-commercial" data-toc-link>JProfiler / YourKit (commercial)</a></li><li class="lvl-3"><a href="#honest-profiler" data-toc-link>honest-profiler</a></li><li class="lvl-3"><a href="#linux-perf" data-toc-link>Linux perf</a></li><li class="lvl-2"><a href="#profile-types-cpu-vs-wall-vs-allocation-vs-lock" data-toc-link>Profile Types — CPU vs Wall vs Allocation vs Lock</a></li><li class="lvl-3"><a href="#cpu-profile" data-toc-link>CPU profile</a></li><li class="lvl-3"><a href="#wall-clock-profile" data-toc-link>Wall-clock profile</a></li><li class="lvl-3"><a href="#allocation-profile" data-toc-link>Allocation profile</a></li><li class="lvl-3"><a href="#lock-contention-profile" data-toc-link>Lock contention profile</a></li><li class="lvl-2"><a href="#common-performance-patterns-found-via-profiling" data-toc-link>Common Performance Patterns Found via Profiling</a></li><li class="lvl-3"><a href="#logging-in-hot-path-with-non-parameterized-strings" data-toc-link>Logging in hot path with non-parameterized strings</a></li><li class="lvl-3"><a href="#reflection-in-tight-loops" data-toc-link>Reflection in tight loops</a></li><li class="lvl-3"><a href="#pre-jdk-9-stringbuilder-churn" data-toc-link>Pre-JDK-9 StringBuilder churn</a></li><li class="lvl-3"><a href="#linkedlistgeti-on" data-toc-link>LinkedList.get(i) — O(n)</a></li><li class="lvl-3"><a href="#jdbc-resultset-metadata-lookup-per-row" data-toc-link>JDBC ResultSet metadata lookup per row</a></li><li class="lvl-3"><a href="#json-serialization-reflection" data-toc-link>JSON serialization reflection</a></li><li class="lvl-3"><a href="#autoboxing-in-loops" data-toc-link>Autoboxing in loops</a></li><li class="lvl-2"><a href="#container-profiling" data-toc-link>Container Profiling</a></li><li class="lvl-2"><a href="#production-observability-stack" data-toc-link>Production Observability Stack</a></li><li class="lvl-2"><a href="#apm-integration" data-toc-link>APM Integration</a></li><li class="lvl-2"><a href="#async-profiler-how-it-actually-works-deep-dive" data-toc-link>async-profiler — How It Actually Works (Deep Dive)</a></li><li class="lvl-3"><a href="#the-two-engines-perf_events-asyncgetcalltrace" data-toc-link>The Two Engines: perf_events + AsyncGetCallTrace</a></li><li class="lvl-3"><a href="#why-this-beats-the-safepoint-bias-problem" data-toc-link>Why This Beats the Safepoint-Bias Problem</a></li><li class="lvl-3"><a href="#the-profiling-modes-and-when-each-one-earns-its-keep" data-toc-link>The Profiling Modes — and When Each One Earns Its Keep</a></li><li class="lvl-3"><a href="#agent-at-launch-vs-attach-to-live-pid" data-toc-link>Agent-at-Launch vs Attach-to-Live-PID</a></li><li class="lvl-3"><a href="#output-formats-flame-graph-jfr-or-collapsed" data-toc-link>Output Formats — Flame Graph, JFR, or Collapsed</a></li><li class="lvl-2"><a href="#reading-a-flame-graph-the-full-method" data-toc-link>Reading a Flame Graph — The Full Method</a></li><li class="lvl-3"><a href="#the-one-sentence-mental-model" data-toc-link>The One-Sentence Mental Model</a></li><li class="lvl-3"><a href="#x-axis-is-samples-not-time-internalize-this" data-toc-link>x-axis is Samples, Not Time — Internalize This</a></li><li class="lvl-3"><a href="#the-three-shapes-you-are-hunting-for" data-toc-link>The Three Shapes You Are Hunting For</a></li><li class="lvl-3"><a href="#climbing-the-graph-the-procedure" data-toc-link>Climbing the Graph — The Procedure</a></li><li class="lvl-3"><a href="#cpu-vs-allocation-vs-off-cpu-flame-graphs-look-different" data-toc-link>CPU vs Allocation vs Off-CPU Flame Graphs Look Different</a></li><li class="lvl-3"><a href="#flame-vs-icicle-orientation" data-toc-link>Flame vs Icicle (Orientation)</a></li><li class="lvl-3"><a href="#differential-flame-graphs-before-vs-after-concretely" data-toc-link>Differential Flame Graphs — Before vs After, Concretely</a></li><li class="lvl-2"><a href="#jfr-deeper-than-the-gui-events-cli-streaming" data-toc-link>JFR — Deeper Than the GUI (Events, CLI, Streaming)</a></li><li class="lvl-3"><a href="#why-jfr-is-nearly-free-and-always-on-able" data-toc-link>Why JFR Is Nearly Free — and Always-On-able</a></li><li class="lvl-3"><a href="#what-jfr-records-categories-worth-knowing" data-toc-link>What JFR Records — Categories Worth Knowing</a></li><li class="lvl-3"><a href="#analyzing-jfr-from-the-command-line-the-jfr-tool" data-toc-link>Analyzing JFR from the Command Line — the jfr Tool</a></li><li class="lvl-3"><a href="#jfr-event-streaming-live-consumption-jdk-14" data-toc-link>JFR Event Streaming — Live Consumption (JDK 14+)</a></li><li class="lvl-2"><a href="#real-world-scenario-the-profile-that-lied-until-we-changed-the-event" data-toc-link>Real-World Scenario — The Profile That Lied (Until We Changed the Event)</a></li><li class="lvl-2"><a href="#safe-production-profiling" data-toc-link>Safe Production Profiling</a></li><li class="lvl-2"><a href="#profiling-pitfalls" data-toc-link>Profiling Pitfalls</a></li><li class="lvl-3"><a href="#profiling-in-dev-with-synthetic-load" data-toc-link>Profiling in dev with synthetic load</a></li><li class="lvl-3"><a href="#reading-absolute-numbers-vs-relative" data-toc-link>Reading absolute numbers vs relative</a></li><li class="lvl-3"><a href="#optimizing-the-cold-path" data-toc-link>Optimizing the cold path</a></li><li class="lvl-3"><a href="#not-running-long-enough" data-toc-link>Not running long enough</a></li><li class="lvl-3"><a href="#safepoint-bias-jfr" data-toc-link>Safepoint bias (JFR)</a></li><li class="lvl-3"><a href="#reading-the-wrong-profile-type" data-toc-link>Reading the wrong profile type</a></li><li class="lvl-2"><a href="#the-8020-of-profiling" data-toc-link>The 80/20 of Profiling</a></li><li class="lvl-2"><a href="#when-to-and-not-to-profile" data-toc-link>When to (and Not to) Profile</a></li><li class="lvl-3"><a href="#when-to-profile" data-toc-link>When to profile</a></li><li class="lvl-3"><a href="#when-not-to-profile" data-toc-link>When NOT to profile</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#profile-in-production-without-continuous-recording-enabled" data-toc-link>Profile in production without continuous recording enabled</a></li><li class="lvl-3"><a href="#read-flame-graphs-without-zooming" data-toc-link>Read flame graphs without zooming</a></li><li class="lvl-3"><a href="#mix-cpu-and-wall-clock-profiles" data-toc-link>Mix CPU and wall-clock profiles</a></li><li class="lvl-3"><a href="#optimize-without-baseline" data-toc-link>Optimize without baseline</a></li><li class="lvl-3"><a href="#ignore-allocation-profiling" data-toc-link>Ignore allocation profiling</a></li><li class="lvl-3"><a href="#trust-dev-profiles-in-prod" data-toc-link>Trust dev profiles in prod</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

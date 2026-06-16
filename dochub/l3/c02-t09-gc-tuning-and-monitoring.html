@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GC Tuning &amp; Monitoring — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="active" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>GC Tuning &amp; Monitoring</span></div>
+        <h1>GC Tuning &amp; Monitoring</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T09-gc-tuning-and-monitoring.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~145 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "GC Tuning &amp; Monitoring"
+slug: gc-tuning-and-monitoring
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 9
+tags: [gc-tuning, gc-monitoring, tuning-methodology, measure-baseline, identify-bottleneck, change-one-thing, performance-metrics, p99-latency, throughput, gc-pause-time, gc-frequency, heap-occupancy, allocation-rate, promotion-rate, live-set, heap-sizing, 2x-live-set, gc-log, xlog-gc, gc-log-format, young-gc-frequency, mixed-gc, full-gc-indicator, to-space-exhaustion, concurrent-mark-abort, gc-easy, gceasy-anti-patterns, gc-anti-pattern, high-allocation-rate, premature-promotion, old-gen-pressure, humongous-object-pressure, long-mixed-gc, allocation-outside-tlab, the-four-flags, xmx-most-important, max-gc-pause-millis, heap-dump-on-oome, container-tuning, max-ram-percentage, jfr-continuous-recording, prometheus-grafana, micrometer, spring-boot-actuator, jvm-memory-used-bytes, jvm-gc-pause-seconds, before-after-tuning, tuning-fallacy, gc-tuning-doesnt-fix-leak, 80-20-tuning, web-service-tuning, batch-etl-tuning, low-latency-tuning]
+prerequisites: [gc-algorithms-serial-parallel-g1-zgc-shenandoah, garbage-collection-fundamentals, memory-model-heap-stack-metaspace]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="gc-tuning-monitoring">GC Tuning &amp; Monitoring</h1>
+<p>T07 covered GC theory; T08 covered the specific collectors. This topic covers the <strong>production application</strong>: how to read GC logs, identify bottlenecks, apply targeted fixes, and monitor over time. GC tuning is one of the highest-stakes / lowest-feedback activities in JVM performance work — the wrong "fix" can make things worse silently, and the <em>right</em> fix is usually boring (right heap size + right collector). This topic teaches the <strong>disciplined methodology</strong> that separates engineers who can actually improve GC behavior from those who copy-paste flags from blog posts.</p>
+<p>The depth-bar requirement isn't "use these flags." At the <strong>methodology</strong> layer, GC tuning follows a strict loop — <strong>measure baseline, identify bottleneck, change one thing, re-measure, iterate</strong> — and <em>most</em> "tuning" mistakes are violations of this discipline (changing multiple flags at once, tuning without baseline, copying flag sets from a different workload). At the <strong>diagnostic</strong> layer, reading GC logs (modern <code>-Xlog:gc*</code> format) is the central skill — each log entry encodes the GC event, heap occupancy before/after, pause time, and the <em>reason</em> the GC ran; six canonical anti-patterns (high allocation rate, premature promotion, Old gen pressure, humongous object pressure in G1, long mixed GC times, allocation outside TLAB) cover ~90% of production GC problems. At the <strong>flags</strong> layer, the <strong>four flags that actually move the needle</strong> are <code>-Xmx</code>, the collector selection, <code>-XX:MaxGCPauseMillis</code> (for G1), and <code>-XX:+HeapDumpOnOutOfMemoryError</code> — everything else is fine-tuning that rarely outweighs careful application-level work. At the <strong>observability</strong> layer, production monitoring combines <strong>GC logs</strong> (persistent record), <strong>JFR continuous recording</strong> (low-overhead rolling window with detailed events), and <strong>Prometheus/Grafana</strong> dashboards (real-time metrics via Spring Boot Actuator + Micrometer) — together giving the visibility needed to detect regressions before they cause outages. We will cover all four layers, with concrete tuning examples for three canonical workloads (web service, batch ETL, low-latency trading).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html">GC algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</a> (L3/C02/T08) — the collectors this topic tunes; <a href="c02-t07-garbage-collection-fundamentals.html">Garbage collection fundamentals</a> (L3/C02/T07) — the theory; <a href="c02-t06-memory-model-heap-stack-metaspace.html">Memory model: heap, stack, metaspace</a> (L3/C02/T06) — heap sizing context.</p></div></div>
+<h2 id="the-tuning-methodology">The Tuning Methodology<a class="anchor" href="#the-tuning-methodology" aria-hidden="true">#</a></h2>
+<p>Five steps, in strict order:</p>
+<div class="mermaid">flowchart TB
+  M1["1. Measure baseline<br/>(at least 1 day of production)"]
+  ID["2. Identify bottleneck<br/>(GC pause? throughput? memory?)"]
+  CH["3. Change ONE thing<br/>(not five flags at once)"]
+  M2["4. Re-measure<br/>(same workload, same duration)"]
+  CMP["5. Compare<br/>(better? worse? noise?)"]
+  M1 --> ID --> CH --> M2 --> CMP
+  CMP -- "better" --> CH
+  CMP -- "worse" --> Revert["revert + try different change"]
+  CMP -- "noise" --> Bigger["measure longer or pick different change"]
+</div>
+<p>The rules:</p>
+<ul>
+<li><strong>Always have a baseline.</strong> Without it, you don't know if your change helped.</li>
+<li><strong>Change one thing.</strong> Multi-variable changes prevent attribution.</li>
+<li><strong>Re-measure long enough to be statistically meaningful</strong> — at least the same duration as baseline.</li>
+<li><strong>Be willing to revert.</strong> Most "improvements" turn out to be noise or regressions.</li>
+</ul>
+<p>The biggest tuning mistake: skipping baselining. The second biggest: copy-pasting flags from a blog post optimized for a different workload.</p>
+<h2 id="performance-metrics-to-track">Performance Metrics to Track<a class="anchor" href="#performance-metrics-to-track" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  Lat["Latency<br/>p50 / p95 / p99 / p999<br/>(user-facing)"]
+  Thr["Throughput<br/>req/sec or work/sec"]
+  Pause["GC pause<br/>max / p99 / p999"]
+  Freq["GC frequency<br/>collections per minute"]
+  Heap["Heap occupancy<br/>after GC (live set)"]
+  Alloc["Allocation rate<br/>MB/sec"]
+  Promo["Promotion rate<br/>MB/sec from Young to Old"]
+</div>
+<p>Each metric tells you something different:</p>
+<ul>
+<li><strong>Latency</strong> is what users feel. p99 / p999 are the canary metrics.</li>
+<li><strong>Throughput</strong> is your capacity ceiling.</li>
+<li><strong>GC pause</strong> is the contributor to latency tail.</li>
+<li><strong>GC frequency</strong> indicates how busy GC is.</li>
+<li><strong>Heap occupancy after GC</strong> is the live set — the floor of memory you actually need.</li>
+<li><strong>Allocation rate</strong> drives GC frequency.</li>
+<li><strong>Promotion rate</strong> drives Old generation pressure.</li>
+</ul>
+<p>A well-tuned service has stable values for all of these; spikes or drift indicate problems.</p>
+<h2 id="step-1-understand-the-workload">Step 1 — Understand the Workload<a class="anchor" href="#step-1-understand-the-workload" aria-hidden="true">#</a></h2>
+<p>Before tuning, characterize:</p>
+<ul>
+<li><strong>User-facing or batch?</strong> User-facing → minimize pauses; batch → maximize throughput.</li>
+<li><strong>Memory growth pattern?</strong> Stable (long-lived cache), slow growth (data accumulating), transient (mostly garbage)?</li>
+<li><strong>Allocation rate?</strong> Low constant or bursty?</li>
+<li><strong>Object lifetime?</strong> Mostly request-scoped (die young), mostly long-lived (cached), mixed?</li>
+</ul>
+<p>Use JFR's allocation events (<code>jdk.ObjectAllocationInNewTLAB</code>, <code>jdk.ObjectAllocationOutsideTLAB</code>) to characterize. The shape of your workload determines what to tune.</p>
+<h2 id="step-2-size-the-heap">Step 2 — Size the Heap<a class="anchor" href="#step-2-size-the-heap" aria-hidden="true">#</a></h2>
+<p><strong>Heap sizing is the single highest-leverage tuning decision.</strong> Get it right and most other tuning becomes unnecessary.</p>
+<h3 id="find-the-live-set">Find the live set<a class="anchor" href="#find-the-live-set" aria-hidden="true">#</a></h3>
+<p>Run the application under normal load; after a Full GC (or several Major GCs), look at heap occupancy. That's your <strong>live set</strong> — the floor of memory the application actually needs.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; GC.heap_info     # snapshot
+</code></pre></div>
+<h3 id="size-for-throughput">Size for throughput<a class="anchor" href="#size-for-throughput" aria-hidden="true">#</a></h3>
+<p>For G1, rule of thumb: <strong>heap = 2–3 × live set</strong>. So if live set is 1 GB, set <code>-Xmx2g</code> or <code>-Xmx3g</code>.</p>
+<ul>
+<li><strong>Smaller</strong> (heap = 1.5× live set): more frequent GCs, possibly Full GCs, throughput suffers.</li>
+<li><strong>Larger</strong> (heap = 5× live set): infrequent GCs, but each pause longer; memory wasted.</li>
+</ul>
+<p>For ZGC: heap can be tighter (~1.5× live set) because concurrent collection handles pressure better.</p>
+<h3 id="container-aware-sizing-t06-recap">Container-aware sizing (T06 recap)<a class="anchor" href="#container-aware-sizing-t06-recap" aria-hidden="true">#</a></h3>
+<p>In a container, allow headroom for non-heap memory:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Container memory: 4 GB
+  -Xmx: 2 GB (50%)
+  Other (Metaspace + code cache + direct + stacks + native): ~1.5 GB
+  Headroom: 0.5 GB
+</code></pre></div>
+<p><code>-XX:MaxRAMPercentage=50</code> automates this — default is 25%, which is conservative; tune to 50–75% for dedicated JVM containers.</p>
+<h2 id="step-3-pick-the-collector">Step 3 — Pick the Collector<a class="anchor" href="#step-3-pick-the-collector" aria-hidden="true">#</a></h2>
+<p>T08's decision tree:</p>
+<ul>
+<li><strong>Heap &lt; 100 MB / embedded</strong>: Serial.</li>
+<li><strong>Batch / throughput</strong>: Parallel.</li>
+<li><strong>General-purpose service</strong>: G1 (default).</li>
+<li><strong>Low latency (p99 &lt; 10 ms)</strong>: ZGC (generational, JDK 21+).</li>
+<li><strong>Huge heap (&gt; 100 GB)</strong>: ZGC.</li>
+<li><strong>Benchmark / allocation cost study</strong>: Epsilon.</li>
+</ul>
+<p>When in doubt: <strong>G1</strong> (it's already the default; only switch with evidence).</p>
+<h2 id="step-4-tune-the-collector">Step 4 — Tune the Collector<a class="anchor" href="#step-4-tune-the-collector" aria-hidden="true">#</a></h2>
+<p>After heap sizing + collector choice, fine-tuning. The flags that actually matter:</p>
+<h3 id="g1">G1<a class="anchor" href="#g1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>When to tune</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-XX:MaxGCPauseMillis</code></td>
+<td>200 ms</td>
+<td>If pauses too long: lower to 100. If throughput needed: raise to 500.</td>
+</tr>
+<tr>
+<td><code>-XX:InitiatingHeapOccupancyPercent</code> (IHOP)</td>
+<td>45%</td>
+<td>Lower (30%) if Old fills before concurrent cycle completes</td>
+</tr>
+<tr>
+<td><code>-XX:G1NewSizePercent</code> / <code>G1MaxNewSizePercent</code></td>
+<td>5% / 60%</td>
+<td>Lower if Young GCs are too long</td>
+</tr>
+<tr>
+<td><code>-XX:G1MixedGCCountTarget</code></td>
+<td>8</td>
+<td>Spread Old collection over more Mixed GCs</td>
+</tr>
+<tr>
+<td><code>-XX:G1HeapRegionSize</code></td>
+<td>auto</td>
+<td>Only tune if humongous-object pressure</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="zgc">ZGC<a class="anchor" href="#zgc" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>When to tune</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-XX:SoftMaxHeapSize</code></td>
+<td>Hint for memory return when low usage</td>
+</tr>
+<tr>
+<td><code>-XX:ConcGCThreads</code></td>
+<td>Defaults to ~12.5% of CPU; rarely tune</td>
+</tr>
+<tr>
+<td><code>-XX:+UseLargePages</code></td>
+<td><strong>Always enable for ZGC on large heaps</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="parallel">Parallel<a class="anchor" href="#parallel" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>When to tune</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-XX:ParallelGCThreads</code></td>
+<td>Default = cores; rarely tune</td>
+</tr>
+<tr>
+<td><code>-XX:GCTimeRatio</code></td>
+<td>Target throughput (default 99 = ≤1% in GC)</td>
+</tr>
+<tr>
+<td><code>-XX:MaxGCPauseMillis</code></td>
+<td>Advisory; rarely respected for Old</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="reading-gc-logs-the-central-skill">Reading GC Logs — the Central Skill<a class="anchor" href="#reading-gc-logs-the-central-skill" aria-hidden="true">#</a></h2>
+<p>Modern format (<code>-Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags</code>):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">[2024-01-15T10:23:14.123-0800][2.456s][info][gc      ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 256M-&gt;32M(2048M) 15.234ms
+</code></pre></div>
+<p>Decoded:</p>
+<ul>
+<li><code>[2024-01-15T10:23:14.123-0800]</code> — wall-clock timestamp.</li>
+<li><code>[2.456s]</code> — uptime.</li>
+<li><code>[info][gc      ]</code> — log level + category.</li>
+<li><code>GC(0)</code> — collection number (0 = first).</li>
+<li><code>Pause Young (Normal)</code> — pause type: Young GC, normal (not triggered by failed allocation).</li>
+<li><code>(G1 Evacuation Pause)</code> — G1's specific name for Young GC.</li>
+<li><code>256M-&gt;32M</code> — heap occupancy before → after.</li>
+<li><code>(2048M)</code> — total heap size.</li>
+<li><code>15.234ms</code> — pause duration.</li>
+</ul>
+<h3 id="key-entries-to-look-for">Key entries to look for<a class="anchor" href="#key-entries-to-look-for" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">GC(123) Pause Young (Normal) 800M-&gt;400M(2g) 50ms        ← Young GC; 400 MB live young
+GC(124) Concurrent Cycle                                 ← Concurrent mark cycle begins
+GC(125) Pause Remark 800M-&gt;800M(2g) 5ms                  ← Mark phase finished (STW)
+GC(126) Concurrent Sweep                                  ← Concurrent cleanup
+GC(127) Pause Mixed 1g-&gt;600M(2g) 80ms                    ← Mixed GC (Young + some Old)
+GC(128) Pause Full (Allocation Failure) 2g-&gt;1.5g(2g) 3s  ← FULL GC — investigate!
+</code></pre></div>
+<h3 id="red-flags">Red flags<a class="anchor" href="#red-flags" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Full GCs</strong> — should be very rare. Frequent = tuning failure (heap too small, leak, allocation spike).</li>
+<li><strong><code>to-space exhausted</code></strong> — Young GC couldn't find space in Survivor. Tune Young size or <code>MaxTenuringThreshold</code>.</li>
+<li><strong><code>Concurrent Mark Abort</code></strong> — concurrent mark ran out of time. Lower IHOP.</li>
+<li><strong><code>Allocation Failure</code></strong> — couldn't allocate; full GC triggered.</li>
+<li><strong>Long pauses (&gt; MaxGCPauseMillis * 2)</strong> — G1's pause target not met. Reduce target or tune.</li>
+</ul>
+<h2 id="calculating-allocation-and-promotion-rates">Calculating Allocation and Promotion Rates<a class="anchor" href="#calculating-allocation-and-promotion-rates" aria-hidden="true">#</a></h2>
+<h3 id="allocation-rate">Allocation rate<a class="anchor" href="#allocation-rate" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">allocation_rate = (eden_size_before_young_gc) / (time_between_young_gcs)
+</code></pre></div>
+<p>If Eden is 200 MB and YGCs happen every 2 seconds: allocation rate = 100 MB/s.</p>
+<p>Healthy: 10–500 MB/s for typical web services. Higher: investigate.</p>
+<h3 id="promotion-rate">Promotion rate<a class="anchor" href="#promotion-rate" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">promotion_rate = (heap_used_after_ygc) - (survivor_used_after_ygc) - (old_used_before_ygc)
+</code></pre></div>
+<p>The difference between Old occupancy before and after — what got promoted in this YGC. Sustained high promotion → Old fills quickly → Mixed/Full GCs.</p>
+<h2 id="gceasyio-for-anti-pattern-detection">GCEasy.io for Anti-Pattern Detection<a class="anchor" href="#gceasyio-for-anti-pattern-detection" aria-hidden="true">#</a></h2>
+<p>Upload GC log → instant analysis:</p>
+<ul>
+<li>Throughput summary (% time not in GC).</li>
+<li>Pause time distribution (p50, p99, p999, max).</li>
+<li>Per-cause GC counts.</li>
+<li><strong>Performance anti-patterns</strong> — automated detection of the patterns below.</li>
+</ul>
+<p>The single highest-leverage tool for GC log analysis. Free for moderate-sized logs.</p>
+<h2 id="six-common-anti-patterns">Six Common Anti-Patterns<a class="anchor" href="#six-common-anti-patterns" aria-hidden="true">#</a></h2>
+<h3 id="1-high-allocation-rate">1. High allocation rate<a class="anchor" href="#1-high-allocation-rate" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: YGCs every &lt;500ms; throughput &lt; 95%.
+<strong>Cause</strong>: Application allocates faster than GC can collect.
+<strong>Fix</strong>: Profile allocations (JFR + JMC's allocation profiler); refactor hot allocation paths (object pooling, primitive arrays, reuse).</p>
+<h3 id="2-premature-promotion">2. Premature promotion<a class="anchor" href="#2-premature-promotion" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: Objects promoting to Old after just 1–2 YGCs; Old grows fast.
+<strong>Cause</strong>: Survivor space too small to hold them.
+<strong>Fix</strong>: Increase <code>-XX:G1NewSizePercent</code> or <code>-XX:SurvivorRatio</code>; or increase <code>-XX:MaxTenuringThreshold</code>.</p>
+<h3 id="3-old-generation-pressure">3. Old generation pressure<a class="anchor" href="#3-old-generation-pressure" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: Mixed GCs frequent; Old growth high; occasional Full GCs.
+<strong>Cause</strong>: Heap too small relative to live set; or leak; or high promotion rate.
+<strong>Fix</strong>: Increase <code>-Xmx</code>; investigate leak with heap dump (T10); reduce IHOP for earlier collection.</p>
+<h3 id="4-humongous-object-pressure-g1">4. Humongous object pressure (G1)<a class="anchor" href="#4-humongous-object-pressure-g1" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: Frequent humongous allocations; Full GCs to defragment.
+<strong>Cause</strong>: Object size &gt; 50% of region size.
+<strong>Fix</strong>: Increase <code>-XX:G1HeapRegionSize</code> (default auto-sizes); refactor application to use smaller objects.</p>
+<h3 id="5-long-mixed-gc-times">5. Long mixed GC times<a class="anchor" href="#5-long-mixed-gc-times" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: Mixed GCs taking 500ms+.
+<strong>Cause</strong>: Too many Old regions evacuated per Mixed GC.
+<strong>Fix</strong>: Tune <code>-XX:G1MixedGCCountTarget</code> (default 8 — more Mixed GCs, each shorter).</p>
+<h3 id="6-allocation-outside-tlab">6. Allocation outside TLAB<a class="anchor" href="#6-allocation-outside-tlab" aria-hidden="true">#</a></h3>
+<p><strong>Symptom</strong>: JFR's <code>jdk.ObjectAllocationOutsideTLAB</code> events frequent.
+<strong>Cause</strong>: Large allocations bypassing TLAB; CAS contention on Eden top.
+<strong>Fix</strong>: Profile to find large allocations; resize TLAB via <code>-XX:TLABSize</code>; refactor large allocations.</p>
+<h2 id="the-four-flags-that-actually-matter">The Four Flags That Actually Matter<a class="anchor" href="#the-four-flags-that-actually-matter" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java \
+    -Xmx2g \                                  # 1. Heap size (most important)
+    -XX:+UseG1GC \                            # 2. Collector (default; specify anyway)
+    -XX:MaxGCPauseMillis=200 \                # 3. Pause target
+    -XX:+HeapDumpOnOutOfMemoryError \         # 4. Always set
+    -XX:HeapDumpPath=/tmp/heap.hprof \
+    -Xlog:gc*:file=/tmp/gc.log:time,uptime:filecount=10,filesize=10M \
+    -jar myapp.jar
+</code></pre></div>
+<p><strong>These four cover 90% of production needs.</strong> Other flags are fine-tuning that usually doesn't matter or hurts.</p>
+<p>The flags to <em>avoid</em>:</p>
+<ul>
+<li><code>-XX:+UseParallelOldGC</code> (was a thing pre-JDK 9; obsolete).</li>
+<li><code>-XX:+DisableExplicitGC</code> (treats <code>System.gc()</code> as no-op; usually fine but framework-dependent).</li>
+<li><code>-XX:NewRatio</code> / <code>-XX:SurvivorRatio</code> (let G1 size automatically).</li>
+<li>Most flags ending in <code>Threshold</code> — defaults are well-researched.</li>
+</ul>
+<h2 id="container-specific-tuning">Container-Specific Tuning<a class="anchor" href="#container-specific-tuning" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># For a dedicated JVM in a 4 GB container:
+-XX:+UseContainerSupport                     # default since JDK 8u131
+-XX:MaxRAMPercentage=50                       # = -Xmx2g for 4 GB container
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=200
+</code></pre></div>
+<p><code>-XX:MaxRAMPercentage=50</code> is more flexible than <code>-Xmx2g</code> — adjusts automatically as the container limit changes. Use percentage flags in containers, not absolute sizes.</p>
+<h2 id="jfr-for-production-gc-monitoring">JFR for Production GC Monitoring<a class="anchor" href="#jfr-for-production-gc-monitoring" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Continuous recording with rolling window
+java -XX:StartFlightRecording=disk=true,maxage=24h,maxsize=200m,filename=/tmp/jfr ...
+
+# Or trigger on-demand:
+jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/spike.jfr
+</code></pre></div>
+<p><strong>Continuous recording</strong> captures the last 24 hours into a rotating file. When something goes wrong, you have the data.</p>
+<p>JFR's GC events:</p>
+<ul>
+<li><strong><code>jdk.GarbageCollection</code></strong> — every GC, with type and duration.</li>
+<li><strong><code>jdk.GCPhasePause</code></strong> — STW phase pauses.</li>
+<li><strong><code>jdk.YoungGarbageCollection</code></strong> / <strong><code>jdk.OldGarbageCollection</code></strong> — per-generation.</li>
+<li><strong><code>jdk.ObjectAllocationInNewTLAB</code></strong> — TLAB allocations sampled.</li>
+<li><strong><code>jdk.ObjectAllocationOutsideTLAB</code></strong> — slow-path allocations.</li>
+</ul>
+<p>Open in JDK Mission Control for visual analysis.</p>
+<h2 id="prometheus-grafana-for-real-time-monitoring">Prometheus / Grafana for Real-Time Monitoring<a class="anchor" href="#prometheus-grafana-for-real-time-monitoring" aria-hidden="true">#</a></h2>
+<p>Spring Boot Actuator + Micrometer expose key JVM metrics natively:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># application.yml
+management.endpoints.web.exposure.include: health,metrics,prometheus
+management.metrics.export.prometheus.enabled: true
+</code></pre></div>
+<p>Key metrics:</p>
+<ul>
+<li><strong><code>jvm_memory_used_bytes{area="heap"}</code></strong> — current heap usage.</li>
+<li><strong><code>jvm_memory_used_bytes{area="nonheap"}</code></strong> — non-heap (Metaspace, code cache).</li>
+<li><strong><code>jvm_gc_pause_seconds</code></strong> (histogram) — pause time distribution.</li>
+<li><strong><code>jvm_gc_collection_seconds_count</code></strong> — GC count.</li>
+<li><strong><code>jvm_gc_memory_promoted_bytes_total</code></strong> — promotion rate.</li>
+</ul>
+<p>Grafana dashboards: stock dashboards for Java / Spring Boot exist; customize for your workload.</p>
+<h2 id="the-production-observability-stack">The Production Observability Stack<a class="anchor" href="#the-production-observability-stack" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  JVM["JVM (production)"]
+  GCLog["-Xlog:gc* → file<br/>(persistent log)"]
+  JFR["JFR continuous → file<br/>(24h rolling window)"]
+  Met["Micrometer → /actuator/prometheus<br/>(real-time metrics)"]
+  Prom["Prometheus<br/>(time-series DB)"]
+  Graf["Grafana<br/>(dashboards + alerts)"]
+  HD["Heap dump<br/>(triggered on OOM)"]
+  JVM --> GCLog
+  JVM --> JFR
+  JVM --> Met
+  JVM --> HD
+  Met --> Prom --> Graf
+  GCLog --> Analyze["GCEasy / GCViewer<br/>(post-mortem)"]
+  JFR --> JMC["JDK Mission Control<br/>(deep dive)"]
+</div>
+<p>All four streams together:</p>
+<ul>
+<li><strong>GC log</strong> — persistent record of every GC event.</li>
+<li><strong>JFR</strong> — high-detail rolling window for deep analysis.</li>
+<li><strong>Prometheus</strong> — real-time dashboards and alerts.</li>
+<li><strong>Heap dump</strong> — automatic on OOM for post-mortem (T10).</li>
+</ul>
+<h2 id="tuning-fallacies">Tuning Fallacies<a class="anchor" href="#tuning-fallacies" aria-hidden="true">#</a></h2>
+<h3 id="bigger-heap-fewer-gc-pauses">"Bigger heap = fewer GC pauses"<a class="anchor" href="#bigger-heap-fewer-gc-pauses" aria-hidden="true">#</a></h3>
+<p>Not always. Bigger heap means longer pauses for Full GC (Parallel) or longer mark cycles (G1, ZGC). Up to ~2–3× live set, bigger is better; beyond that, returns diminish.</p>
+<h3 id="more-gc-threads-faster-gc">"More GC threads = faster GC"<a class="anchor" href="#more-gc-threads-faster-gc" aria-hidden="true">#</a></h3>
+<p>Default is usually right. Adding threads can <em>increase</em> synchronization overhead.</p>
+<h3 id="use-parallelgc-for-performance">"Use ParallelGC for performance"<a class="anchor" href="#use-parallelgc-for-performance" aria-hidden="true">#</a></h3>
+<p>Throughput-focused yes; but its pauses make it unsuitable for any user-facing service. Always G1 or ZGC for user-facing.</p>
+<h3 id="gc-tuning-fixes-memory-leaks">"GC tuning fixes memory leaks"<a class="anchor" href="#gc-tuning-fixes-memory-leaks" aria-hidden="true">#</a></h3>
+<p>It doesn't. Leaks need code fixes (T10). GC tuning can hide a leak temporarily (bigger heap → leak takes longer to OOM) but never solves it.</p>
+<h3 id="newer-jdk-automatically-faster">"Newer JDK = automatically faster"<a class="anchor" href="#newer-jdk-automatically-faster" aria-hidden="true">#</a></h3>
+<p>Mostly true but not universally. Upgrade with testing. The JIT and GC improve substantially across versions, but workload-specific regressions happen.</p>
+<h3 id="set-xms-xmx-for-performance">"Set <code>-Xms = -Xmx</code> for performance"<a class="anchor" href="#set-xms-xmx-for-performance" aria-hidden="true">#</a></h3>
+<p>Marginally helpful for very-long-lived servers (avoids heap resize). For most cases, the default initial size + growth is fine.</p>
+<h2 id="when-not-to-tune">When NOT to Tune<a class="anchor" href="#when-not-to-tune" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>No baseline measurement.</strong> Measure first.</li>
+<li><strong>Pauses &lt; 200ms p99.</strong> Already good enough for most workloads.</li>
+<li><strong>You haven't profiled allocation.</strong> Reducing allocation often beats tuning GC.</li>
+<li><strong>The bottleneck is elsewhere.</strong> CPU saturation, DB latency, network — these aren't GC problems.</li>
+</ul>
+<p>The most common GC tuning win: realizing the GC was fine and the bottleneck was somewhere else.</p>
+<h2 id="the-8020-of-tuning">The 80/20 of Tuning<a class="anchor" href="#the-8020-of-tuning" aria-hidden="true">#</a></h2>
+<p><strong>80% of tuning wins come from:</strong></p>
+<ol>
+<li><strong>Right heap size</strong> (2–3× live set).</li>
+<li><strong>Right collector</strong> (G1 default; ZGC for low-latency).</li>
+<li><strong>HeapDumpOnOutOfMemoryError</strong> (catch OOMs).</li>
+</ol>
+<p><strong>20% from fine-tuning</strong> specific flags after measurement.</p>
+<p>Almost every "tuning project" in production resolves to those three items. Engineers who chase exotic flags miss the easy wins.</p>
+<h2 id="real-production-case-studies">Real Production Case Studies<a class="anchor" href="#real-production-case-studies" aria-hidden="true">#</a></h2>
+<h3 id="web-service-spring-boot-4-gb-container">Web service (Spring Boot, 4 GB container)<a class="anchor" href="#web-service-spring-boot-4-gb-container" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">-Xmx2g                                        # 50% of container
+-XX:+UseG1GC -XX:MaxGCPauseMillis=200         # defaults
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time,uptime
+</code></pre></div>
+<p>p99 &lt; 50 ms; throughput 95%+. Mostly default; works.</p>
+<h3 id="batch-etl-16-gb-heap-throughput-critical">Batch ETL (16 GB heap, throughput-critical)<a class="anchor" href="#batch-etl-16-gb-heap-throughput-critical" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">-Xmx16g
+-XX:+UseParallelGC                            # max throughput
+-XX:GCTimeRatio=99                             # target 99% non-GC time
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time
+</code></pre></div>
+<p>Pauses up to 2s acceptable; throughput maximized.</p>
+<h3 id="low-latency-trading-32-gb-heap-sub-ms-p99">Low-latency trading (32 GB heap, sub-ms p99)<a class="anchor" href="#low-latency-trading-32-gb-heap-sub-ms-p99" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">-Xmx32g
+-XX:+UseZGC -XX:+ZGenerational                 # JDK 21+ generational ZGC
+-XX:+UseLargePages                              # essential for ZGC at scale
+-XX:+UseTransparentHugePages
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time
+</code></pre></div>
+<p>p999 GC pause &lt; 5 ms; throughput 88%. The latency win justifies the throughput cost.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="multi-flag-tuning">Multi-flag tuning<a class="anchor" href="#multi-flag-tuning" aria-hidden="true">#</a></h3>
+<p>Changing 5 flags at once → can't attribute the change. <strong>One at a time.</strong></p>
+<h3 id="tuning-in-dev-deploying-to-prod">Tuning in dev, deploying to prod<a class="anchor" href="#tuning-in-dev-deploying-to-prod" aria-hidden="true">#</a></h3>
+<p>Workloads differ. Always validate in a production-equivalent environment.</p>
+<h3 id="ignoring-container-limits">Ignoring container limits<a class="anchor" href="#ignoring-container-limits" aria-hidden="true">#</a></h3>
+<p>A "tuned" <code>-Xmx4g</code> JVM in a 4 GB container OOM-kills. Plan for all memory.</p>
+<h3 id="not-exporting-metrics">Not exporting metrics<a class="anchor" href="#not-exporting-metrics" aria-hidden="true">#</a></h3>
+<p>If you can't observe GC pauses, you can't detect regressions. Set up Prometheus from day 1.</p>
+<h3 id="treating-gc-like-cpu-tuning">Treating GC like CPU tuning<a class="anchor" href="#treating-gc-like-cpu-tuning" aria-hidden="true">#</a></h3>
+<p>GC tuning has long feedback cycles (minutes to hours of data). Don't iterate in 60-second windows.</p>
+<h2 id="deeper-dive-workload-specific-tuning-recipes">Deeper Dive — Workload-Specific Tuning Recipes<a class="anchor" href="#deeper-dive-workload-specific-tuning-recipes" aria-hidden="true">#</a></h2>
+<h3 id="recipe-1-general-web-service-rest-api-p99-200ms-target">Recipe 1: General Web Service (REST API, p99 &lt; 200ms target)<a class="anchor" href="#recipe-1-general-web-service-rest-api-p99-200ms-target" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -Xms2g -Xmx2g \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=100 \
+     -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/log/jvm/heapdump.hprof \
+     -Xlog:gc*:file=/var/log/jvm/gc.log:time,level,tags:filecount=10,filesize=10M \
+     -XX:+FlightRecorder \
+     -XX:StartFlightRecording=name=cont,settings=default,maxsize=200M,disk=true \
+     -jar app.jar
+</code></pre></div>
+<p><strong>Why these</strong>:
+- G1 default since Java 9; sweet spot for most web workloads.
+- 2GB heap typical for Spring Boot service handling 1-2k RPS.
+- MaxGCPauseMillis=100: tighter than default 200; usually achievable.
+- Heap dump + JFR auto-armed for the inevitable 3 AM call.</p>
+<h3 id="recipe-2-low-latency-trading-pricing-p99-10ms-target">Recipe 2: Low-Latency Trading / Pricing (p99 &lt; 10ms target)<a class="anchor" href="#recipe-2-low-latency-trading-pricing-p99-10ms-target" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -Xms16g -Xmx16g \
+     -XX:+UseZGC -XX:+ZGenerational \
+     -XX:+UseLargePages -XX:+UseTransparentHugePages \
+     -XX:ConcGCThreads=4 \
+     -XX:ParallelGCThreads=8 \
+     -XX:-UsePerfData \
+     -XX:+AlwaysPreTouch \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar app.jar
+</code></pre></div>
+<p><strong>Why these</strong>:
+- ZGC: sub-millisecond pauses. Generational (Java 21+) reduces CPU overhead vs single-gen ZGC.
+- 16GB heap pre-touched (<code>AlwaysPreTouch</code>) so all pages allocated at startup — no page-fault pauses.
+- Large pages (2MB) reduce TLB pressure for big heaps.
+- <code>-UsePerfData</code> disables <code>hsperfdata_*</code> files (small but eliminates one source of pauses).
+- ZGC trade-off: ~10-15% throughput hit vs G1.</p>
+<h3 id="recipe-3-batch-etl-throughput-oriented-no-latency-slo">Recipe 3: Batch ETL (throughput-oriented, no latency SLO)<a class="anchor" href="#recipe-3-batch-etl-throughput-oriented-no-latency-slo" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -Xms32g -Xmx32g \
+     -XX:+UseParallelGC \
+     -XX:ParallelGCThreads=32 \
+     -XX:NewRatio=1 \
+     -XX:+UseCompressedOops \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar etl-job.jar
+</code></pre></div>
+<p><strong>Why these</strong>:
+- ParallelGC: highest throughput; pause duration not critical for batch.
+- Large heap; many parallel GC threads.
+- <code>NewRatio=1</code> gives equal young/old space — appropriate for object-graph-building workloads.
+- Skip ZGC/G1 — concurrent collection adds CPU overhead with no benefit when throughput matters.</p>
+<h3 id="recipe-4-container-kubernetes-deployment-cgroup-aware">Recipe 4: Container Kubernetes Deployment (cgroup-aware)<a class="anchor" href="#recipe-4-container-kubernetes-deployment-cgroup-aware" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># K8s Deployment
+spec:
+  containers:
+  - name: app
+    resources:
+      requests:
+        memory: &quot;1.5Gi&quot;
+        cpu: &quot;1&quot;
+      limits:
+        memory: &quot;2Gi&quot;
+        cpu: &quot;2&quot;
+    env:
+    - name: JAVA_TOOL_OPTIONS
+      value: &gt;-
+        -XX:+UseG1GC
+        -XX:MaxRAMPercentage=70
+        -XX:MaxGCPauseMillis=150
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/tmp
+        -Xlog:gc*:stdout:time,level,tags
+        -XX:ActiveProcessorCount=2
+</code></pre></div>
+<p><strong>Why these</strong>:
+- <code>MaxRAMPercentage=70</code> of 2GB limit = 1.4GB heap. Leaves room for metaspace + code cache + thread stacks + native.
+- <code>ActiveProcessorCount=2</code> matches CPU limit so ForkJoinPool / GC threads size correctly.
+- HeapDumpPath=/tmp + a PVC mount → preserves dump across restarts.
+- gc log to stdout → captured by K8s log aggregation.</p>
+<h3 id="recipe-5-microservice-with-virtual-threads-java-21">Recipe 5: Microservice with Virtual Threads (Java 21+)<a class="anchor" href="#recipe-5-microservice-with-virtual-threads-java-21" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -Xms1g -Xmx1g \
+     -XX:+UseG1GC \
+     --enable-preview \
+     -Dspring.threads.virtual.enabled=true \
+     -XX:MaxGCPauseMillis=100 \
+     -jar service.jar
+</code></pre></div>
+<p><strong>Why these</strong>:
+- Smaller heap fine because virtual threads use ~1KB heap vs 1MB stack per platform thread.
+- Same web-service GC config — virtual threads change the thread model, not GC needs.</p>
+<h2 id="deeper-dive-gc-algorithm-decision-tree">Deeper Dive — GC Algorithm Decision Tree<a class="anchor" href="#deeper-dive-gc-algorithm-decision-tree" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Pause time critical (p99 &lt; 20ms)?
+├── YES → ZGC (or Shenandoah)
+│   ├── Heap &gt; 1TB? → Vanilla ZGC
+│   └── Heap 4-100GB + standard workload? → ZGenerational (Java 21+, better CPU)
+│
+└── NO
+    ├── Throughput most important + can afford pauses?
+    │   └── Parallel GC — batch jobs, ETL, offline processing
+    │
+    └── Balanced (web service, microservice, default case)
+        ├── Heap ≤ 32GB? → G1 (default since Java 9)
+        ├── Heap &gt; 32GB?
+        │   ├── Latency tolerant? → G1 (still works; longer pauses)
+        │   └── Latency sensitive? → ZGenerational (Java 21+)
+</code></pre></div>
+<p><strong>Avoid</strong>: SerialGC (only for ≤100MB heaps), CMS (removed Java 14), Shenandoah (smaller installed base than ZGC).</p>
+<h2 id="deeper-dive-how-to-diagnose-suddenly-slower-service">Deeper Dive — How to Diagnose "Suddenly Slower Service"<a class="anchor" href="#deeper-dive-how-to-diagnose-suddenly-slower-service" aria-hidden="true">#</a></h2>
+<p>Your service was 50ms p99 yesterday. Today it's 500ms. GC suspect?</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># 1. Take JFR snapshot of last 5 min
+jcmd &lt;pid&gt; JFR.dump filename=now.jfr maxage=5m
+
+# 2. Quickly check: any GC pauses &gt; 200ms?
+jfr print --events GarbageCollection now.jfr | grep -E &quot;duration|name&quot;
+
+# 3. Allocation rate now vs baseline
+jcmd &lt;pid&gt; GC.class_histogram | head -20
+# Compare with yesterday's snapshot
+</code></pre></div>
+<p><strong>Common causes ranked by frequency</strong>:</p>
+<ol>
+<li>
+<p><strong>Hot endpoint started returning bigger responses</strong> → allocation rate spike → more frequent young GC → more promotion → more old GC. Fix: profile the endpoint; reduce response size or paginate.</p>
+</li>
+<li>
+<p><strong>Cache invalidated en masse</strong> → entire cache being re-populated → allocation burst. Fix: cache warm-up; staggered invalidation.</p>
+</li>
+<li>
+<p><strong>Memory leak slow-burning into old gen</strong> → old gen filling → mixed GC trigger → longer pauses. Fix: heap dump + Eclipse MAT.</p>
+</li>
+<li>
+<p><strong>JIT decompilation</strong> → method recompiling at low optimization tier → bad code generated → more allocation. Check <code>-XX:+PrintCompilation</code> for "made not entrant" patterns.</p>
+</li>
+<li>
+<p><strong>Tail-latency from minor GC growing in frequency</strong> → CPU contention, more GC threads needed.</p>
+</li>
+<li>
+<p><strong>Container CPU throttling</strong> → not GC at all; check <code>container_cpu_cfs_throttled_seconds_total</code>.</p>
+</li>
+</ol>
+<h2 id="deeper-dive-allocation-rate-investigation">Deeper Dive — Allocation Rate Investigation<a class="anchor" href="#deeper-dive-allocation-rate-investigation" aria-hidden="true">#</a></h2>
+<p>Allocation rate = bytes allocated per second. Compute from GC log:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>[3.500s][info][gc] GC(0) Pause Young (G1 Evacuation Pause) 100M-&gt;20M(2G) 50ms
+[6.500s][info][gc] GC(1) Pause Young (G1 Evacuation Pause) 100M-&gt;22M(2G) 60ms
+</code></pre></div>
+<p>Between GC 0 and GC 1: eden filled from 20M to 100M in 3 seconds.
+Allocation rate = (100 - 20) MB / 3 sec = <strong>27 MB/sec</strong>.</p>
+<p><strong>Healthy ranges</strong>:
+- Web service: <strong>5-50 MB/sec</strong>
+- Stream processing: <strong>50-200 MB/sec</strong>
+- Batch ETL: <strong>100-500 MB/sec</strong>
+- Concerning: <strong>&gt; 1 GB/sec</strong> (something allocating wildly)</p>
+<p><strong>Find allocation sources</strong> with async-profiler:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">async-profiler -e alloc -d 30 -f alloc.html &lt;pid&gt;
+</code></pre></div>
+<p>Generates flame graph of allocation sites. The hot frames are where your bytes are coming from. Typical findings:
+- String concatenation in a loop → switch to StringBuilder.
+- <code>new HashMap&lt;&gt;()</code> per request → reuse via ThreadLocal or cache.
+- Boxing in hot path → use primitive collections (<code>int[]</code>).
+- Stream operations creating intermediate collections → consider for-loop in hot path.</p>
+<h2 id="deeper-dive-production-gc-log-analysis-workflow">Deeper Dive — Production GC Log Analysis Workflow<a class="anchor" href="#deeper-dive-production-gc-log-analysis-workflow" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># 1. Tail GC log live
+tail -f /var/log/jvm/gc.log
+
+# 2. Pause duration histogram (last 10k events)
+grep &quot;Pause&quot; /var/log/jvm/gc.log | awk '{print $NF}' | sort -n | awk '
+    BEGIN{count=0}
+    {a[count++]=$1}
+    END{
+        n=count
+        print &quot;min:&quot;, a[0]
+        print &quot;p50:&quot;, a[int(n*0.5)]
+        print &quot;p90:&quot;, a[int(n*0.9)]
+        print &quot;p99:&quot;, a[int(n*0.99)]
+        print &quot;max:&quot;, a[n-1]
+    }'
+
+# 3. GC frequency over time
+grep &quot;Pause&quot; /var/log/jvm/gc.log | awk -F'[][]' '{print $2}' | sort | uniq -c
+
+# 4. Upload to GCEasy.io for full analysis
+curl -X POST --data-binary @gc.log https://api.gceasy.io/analyzeGC
+</code></pre></div>
+<p><strong>Red flags in GCEasy report</strong>:
+- "Long GC pauses" (any &gt; target)
+- "Allocation/Promotion rate high"
+- "Premature object promotion" (objects dying in old gen quickly = should have stayed young)
+- "Full GC happening" with G1/ZGC = critical, indicates tuning failure or memory leak</p>
+<h2 id="deeper-dive-gc-tuning-anti-patterns-quick-list">Deeper Dive — GC Tuning Anti-Patterns Quick List<a class="anchor" href="#deeper-dive-gc-tuning-anti-patterns-quick-list" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Anti-pattern</th>
+<th>Why bad</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setting <code>-XX:NewRatio=8</code> from old advice</td>
+<td>Forces tiny young gen; bumps promotion rate</td>
+<td>Let G1 auto-tune; or <code>G1NewSizePercent</code></td>
+</tr>
+<tr>
+<td><code>-XX:ParallelGCThreads=64</code> on 8-core</td>
+<td>More threads ≠ faster; thread contention hurts</td>
+<td>Default = <code>cores</code>; rarely override</td>
+</tr>
+<tr>
+<td><code>-Xmx=16g</code> on 16g container</td>
+<td>OOM-killed by container; need overhead</td>
+<td><code>-XX:MaxRAMPercentage=70</code> (leaves ~30% for non-heap)</td>
+</tr>
+<tr>
+<td>Long pause tuning without measuring</td>
+<td>"Tune to taste"; no baseline</td>
+<td>Always measure before, change one, measure after</td>
+</tr>
+<tr>
+<td>Reusing JVM args across services</td>
+<td>Different workloads, different needs</td>
+<td>Per-service config; review quarterly</td>
+</tr>
+<tr>
+<td>Disabling compressed oops on small heap</td>
+<td>8GB heap doesn't need it but default is on</td>
+<td>Leave default; only relevant for &gt;32GB</td>
+</tr>
+<tr>
+<td>Manual <code>System.gc()</code></td>
+<td>Forces full GC; wastes time</td>
+<td>Never; remove from code</td>
+</tr>
+<tr>
+<td><code>-Xss=8m</code> because "stack overflow"</td>
+<td>8M × 1000 threads = 8GB just on stacks</td>
+<td>Default 1M usually fine; find recursion bug instead</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deeper-dive-jvm-crash-investigation">Deeper Dive — JVM Crash Investigation<a class="anchor" href="#deeper-dive-jvm-crash-investigation" aria-hidden="true">#</a></h2>
+<p>When the JVM itself crashes (not OOM, not exception — actual crash):</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code># /tmp/hs_err_pid12345.log file generated automatically
+</code></pre></div>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code># A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f8b3c3f1234, pid=12345, tid=0x00007f8b3c4567
+#
+# JRE version: OpenJDK Runtime Environment (21.0.1+12) (...)
+# Problematic frame:
+# V  [libjvm.so+0x9f1234]  ParallelTaskTerminator::offer_termination+0x123
+</code></pre></div>
+<p><strong>Look at</strong>:
+1. <strong>Problematic frame</strong>: <code>V</code> = VM internal, <code>J</code> = JIT, <code>C</code> = native, <code>j</code> = interpreted Java.
+2. <strong>Stack</strong>: backtrace.
+3. <strong>Register state</strong>: registers at crash.
+4. <strong>JVM args</strong>: <code># Command Line:</code> line shows the actual flags.
+5. <strong>Memory map</strong>: <code># /proc/self/maps</code>.
+6. <strong>Native libraries loaded</strong>: identifies third-party native code.</p>
+<p><strong>Common causes</strong>:
+- <strong>JIT bug</strong>: rare; usually triggered by specific bytecode. Workaround: <code>-XX:CompileCommand=exclude,com.example.Class,methodName</code>.
+- <strong>JNI bug</strong>: native code corrupting heap. Identify the .so file in the stack.
+- <strong>GC bug</strong>: very rare; usually JDK Early Access or experimental flags.
+- <strong>OS-level</strong>: kernel issue, hardware fault, OOM-kill arriving as SIGSEGV.</p>
+<p>File JBS bug if reproducible with stock JDK and no JNI.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Baseline a service.</strong> Run a Spring Boot app under load for 1 hour with <code>-Xlog:gc*</code>. Upload to GCEasy. Identify the throughput, pause stats, anti-patterns.</li>
+<li><strong>Heap sizing experiment.</strong> Run the same service with <code>-Xmx1g</code>, <code>-Xmx2g</code>, <code>-Xmx4g</code>. Compare throughput and p99 pause time. Plot the curve.</li>
+<li><strong>G1 pause-time tuning.</strong> Vary <code>-XX:MaxGCPauseMillis</code> from 50, 100, 200, 500. Measure throughput vs pause trade-off.</li>
+<li><strong>Anti-pattern reproduction.</strong> Write a service with deliberately high allocation rate. Observe in logs / JFR.</li>
+<li><strong>Premature promotion.</strong> Allocate medium-lifetime objects; observe their promotion to Old via JFR. Tune Survivor size to keep them in Young longer.</li>
+<li><strong>Mixed GC inspection.</strong> With G1, run a service that accumulates Old data; observe Mixed GC entries; tune <code>G1MixedGCCountTarget</code>.</li>
+<li><strong>Humongous object reproduction.</strong> Allocate 50% region size objects; observe humongous allocation messages.</li>
+<li><strong>Prometheus integration.</strong> Add Spring Actuator + Micrometer to a service. Verify Prometheus scrapes JVM metrics.</li>
+<li><strong>Grafana dashboard.</strong> Build a custom dashboard with heap occupancy, GC pause histogram, allocation rate.</li>
+<li><strong>JFR continuous recording.</strong> Enable on a service; trigger a load spike; analyze the JFR file in JMC.</li>
+<li><strong>Container OOM-kill investigation.</strong> Deliberately set <code>-Xmx</code> too close to container limit; cause OOM; trace via <code>dmesg</code> and <code>kubectl describe pod</code>.</li>
+<li><strong>GC log comparison.</strong> Take 3 different workload types (web, batch, low-latency); identify which GC anti-patterns each shows.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Apply the <strong>5-step tuning methodology</strong>: measure baseline → identify bottleneck → change ONE thing → re-measure → compare and decide.</li>
+<li>Track the <strong>7 performance metrics</strong>: p50/p95/p99/p999 latency, throughput, GC pause max/p99/p999, GC frequency, heap occupancy, allocation rate, promotion rate.</li>
+<li>Apply the <strong>4-step tuning process</strong>: understand workload → size heap → pick collector → tune collector.</li>
+<li>Size the heap correctly: live set (occupancy after Full GC) × 2–3 for G1; tighter for ZGC; container-aware via <code>-XX:MaxRAMPercentage</code>.</li>
+<li><strong>Read GC logs</strong>: parse the modern <code>-Xlog:gc*</code> format (timestamp, uptime, GC number, type, heap before/after, total, pause duration); recognize Young / Mixed / Full / Concurrent Cycle / Remark / Sweep entries.</li>
+<li>Recognize <strong>red flags</strong>: frequent Full GCs (tuning failure), to-space exhausted, concurrent mark abort, allocation failure, long pauses exceeding target.</li>
+<li>Calculate <strong>allocation rate</strong> (eden-before-YGC / time-between-YGCs) and <strong>promotion rate</strong> (Old growth per YGC).</li>
+<li>Use <strong>GCEasy.io</strong> as the primary GC log analysis tool for anti-pattern detection.</li>
+<li>Diagnose the <strong>6 common anti-patterns</strong>: high allocation rate, premature promotion, Old gen pressure, humongous object pressure, long mixed GC times, allocation outside TLAB.</li>
+<li>Apply the <strong>4 flags that actually move the needle</strong>: <code>-Xmx</code>, collector selection, <code>-XX:MaxGCPauseMillis</code>, <code>-XX:+HeapDumpOnOutOfMemoryError</code>.</li>
+<li>Tune <strong>container-aware</strong> with <code>-XX:MaxRAMPercentage</code> (50–75% for dedicated JVM containers).</li>
+<li>Set up <strong>JFR continuous recording</strong> with 24h rolling window for production observability.</li>
+<li>Wire <strong>Prometheus + Grafana</strong> via Spring Boot Actuator + Micrometer: <code>jvm_memory_used_bytes</code>, <code>jvm_gc_pause_seconds</code> histogram, <code>jvm_gc_collection_seconds_count</code>, <code>jvm_gc_memory_promoted_bytes_total</code>.</li>
+<li>Combine the <strong>production observability stack</strong>: GC log (persistent) + JFR (rolling window) + Prometheus (real-time) + heap dump (post-mortem on OOM).</li>
+<li>Avoid <strong>6 tuning fallacies</strong>: bigger heap ≠ always fewer pauses; more GC threads ≠ faster; ParallelGC for user-facing; GC tuning fixes leaks; newer JDK = automatically faster; <code>-Xms = -Xmx</code> always helps.</li>
+<li>Know <strong>when NOT to tune</strong>: no baseline, pauses already &lt; 200ms, not having profiled allocation, bottleneck elsewhere.</li>
+<li>Apply the <strong>80/20</strong>: right heap + right collector + HeapDumpOnOOM = 80% of wins; fine-tuning = 20%.</li>
+<li>Diagnose <strong>3 production case studies</strong>: web service (G1 defaults), batch ETL (Parallel max throughput), low-latency trading (ZGC + large pages).</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t10-memory-leaks-and-heap-dump-analysis.html">Memory leaks &amp; heap dump analysis</a> — when GC tuning isn't enough because <em>the leak is the problem</em>. We'll cover how to take heap dumps (jmap, jcmd, automatic on OOM); the heap dump file format (HPROF); analysis tools (Eclipse MAT, JDK Mission Control, jhat); the canonical leak patterns (static collection growth, listener registration, ThreadLocal in pool workers, ClassLoader leaks); the Eclipse MAT <em>Leak Suspects Report</em> methodology; using <strong>retained heap</strong> vs <strong>shallow heap</strong> to find dominator objects; and the systematic process from "service is OOMing" to "found and fixed the leak."</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;GC Tuning &amp; Monitoring&quot;
+slug: gc-tuning-and-monitoring
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 9
+tags: [gc-tuning, gc-monitoring, tuning-methodology, measure-baseline, identify-bottleneck, change-one-thing, performance-metrics, p99-latency, throughput, gc-pause-time, gc-frequency, heap-occupancy, allocation-rate, promotion-rate, live-set, heap-sizing, 2x-live-set, gc-log, xlog-gc, gc-log-format, young-gc-frequency, mixed-gc, full-gc-indicator, to-space-exhaustion, concurrent-mark-abort, gc-easy, gceasy-anti-patterns, gc-anti-pattern, high-allocation-rate, premature-promotion, old-gen-pressure, humongous-object-pressure, long-mixed-gc, allocation-outside-tlab, the-four-flags, xmx-most-important, max-gc-pause-millis, heap-dump-on-oome, container-tuning, max-ram-percentage, jfr-continuous-recording, prometheus-grafana, micrometer, spring-boot-actuator, jvm-memory-used-bytes, jvm-gc-pause-seconds, before-after-tuning, tuning-fallacy, gc-tuning-doesnt-fix-leak, 80-20-tuning, web-service-tuning, batch-etl-tuning, low-latency-tuning]
+prerequisites: [gc-algorithms-serial-parallel-g1-zgc-shenandoah, garbage-collection-fundamentals, memory-model-heap-stack-metaspace]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08
+---
+
+# GC Tuning &amp; Monitoring
+
+T07 covered GC theory; T08 covered the specific collectors. This topic covers the **production application**: how to read GC logs, identify bottlenecks, apply targeted fixes, and monitor over time. GC tuning is one of the highest-stakes / lowest-feedback activities in JVM performance work — the wrong &quot;fix&quot; can make things worse silently, and the *right* fix is usually boring (right heap size + right collector). This topic teaches the **disciplined methodology** that separates engineers who can actually improve GC behavior from those who copy-paste flags from blog posts.
+
+The depth-bar requirement isn&#x27;t &quot;use these flags.&quot; At the **methodology** layer, GC tuning follows a strict loop — **measure baseline, identify bottleneck, change one thing, re-measure, iterate** — and *most* &quot;tuning&quot; mistakes are violations of this discipline (changing multiple flags at once, tuning without baseline, copying flag sets from a different workload). At the **diagnostic** layer, reading GC logs (modern `-Xlog:gc*` format) is the central skill — each log entry encodes the GC event, heap occupancy before/after, pause time, and the *reason* the GC ran; six canonical anti-patterns (high allocation rate, premature promotion, Old gen pressure, humongous object pressure in G1, long mixed GC times, allocation outside TLAB) cover ~90% of production GC problems. At the **flags** layer, the **four flags that actually move the needle** are `-Xmx`, the collector selection, `-XX:MaxGCPauseMillis` (for G1), and `-XX:+HeapDumpOnOutOfMemoryError` — everything else is fine-tuning that rarely outweighs careful application-level work. At the **observability** layer, production monitoring combines **GC logs** (persistent record), **JFR continuous recording** (low-overhead rolling window with detailed events), and **Prometheus/Grafana** dashboards (real-time metrics via Spring Boot Actuator + Micrometer) — together giving the visibility needed to detect regressions before they cause outages. We will cover all four layers, with concrete tuning examples for three canonical workloads (web service, batch ETL, low-latency trading).
+
+&gt; [!NOTE]
+&gt; Prerequisites: [GC algorithms (Serial, Parallel, G1, ZGC, Shenandoah)](./T08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md) (L3/C02/T08) — the collectors this topic tunes; [Garbage collection fundamentals](./T07-garbage-collection-fundamentals.md) (L3/C02/T07) — the theory; [Memory model: heap, stack, metaspace](./T06-memory-model-heap-stack-metaspace.md) (L3/C02/T06) — heap sizing context.
+
+## The Tuning Methodology
+
+Five steps, in strict order:
+
+```mermaid
+flowchart TB
+  M1[&quot;1. Measure baseline&lt;br/&gt;(at least 1 day of production)&quot;]
+  ID[&quot;2. Identify bottleneck&lt;br/&gt;(GC pause? throughput? memory?)&quot;]
+  CH[&quot;3. Change ONE thing&lt;br/&gt;(not five flags at once)&quot;]
+  M2[&quot;4. Re-measure&lt;br/&gt;(same workload, same duration)&quot;]
+  CMP[&quot;5. Compare&lt;br/&gt;(better? worse? noise?)&quot;]
+  M1 --&gt; ID --&gt; CH --&gt; M2 --&gt; CMP
+  CMP -- &quot;better&quot; --&gt; CH
+  CMP -- &quot;worse&quot; --&gt; Revert[&quot;revert + try different change&quot;]
+  CMP -- &quot;noise&quot; --&gt; Bigger[&quot;measure longer or pick different change&quot;]
+```
+
+The rules:
+
+- **Always have a baseline.** Without it, you don&#x27;t know if your change helped.
+- **Change one thing.** Multi-variable changes prevent attribution.
+- **Re-measure long enough to be statistically meaningful** — at least the same duration as baseline.
+- **Be willing to revert.** Most &quot;improvements&quot; turn out to be noise or regressions.
+
+The biggest tuning mistake: skipping baselining. The second biggest: copy-pasting flags from a blog post optimized for a different workload.
+
+## Performance Metrics to Track
+
+```mermaid
+flowchart TB
+  Lat[&quot;Latency&lt;br/&gt;p50 / p95 / p99 / p999&lt;br/&gt;(user-facing)&quot;]
+  Thr[&quot;Throughput&lt;br/&gt;req/sec or work/sec&quot;]
+  Pause[&quot;GC pause&lt;br/&gt;max / p99 / p999&quot;]
+  Freq[&quot;GC frequency&lt;br/&gt;collections per minute&quot;]
+  Heap[&quot;Heap occupancy&lt;br/&gt;after GC (live set)&quot;]
+  Alloc[&quot;Allocation rate&lt;br/&gt;MB/sec&quot;]
+  Promo[&quot;Promotion rate&lt;br/&gt;MB/sec from Young to Old&quot;]
+```
+
+Each metric tells you something different:
+
+- **Latency** is what users feel. p99 / p999 are the canary metrics.
+- **Throughput** is your capacity ceiling.
+- **GC pause** is the contributor to latency tail.
+- **GC frequency** indicates how busy GC is.
+- **Heap occupancy after GC** is the live set — the floor of memory you actually need.
+- **Allocation rate** drives GC frequency.
+- **Promotion rate** drives Old generation pressure.
+
+A well-tuned service has stable values for all of these; spikes or drift indicate problems.
+
+## Step 1 — Understand the Workload
+
+Before tuning, characterize:
+
+- **User-facing or batch?** User-facing → minimize pauses; batch → maximize throughput.
+- **Memory growth pattern?** Stable (long-lived cache), slow growth (data accumulating), transient (mostly garbage)?
+- **Allocation rate?** Low constant or bursty?
+- **Object lifetime?** Mostly request-scoped (die young), mostly long-lived (cached), mixed?
+
+Use JFR&#x27;s allocation events (`jdk.ObjectAllocationInNewTLAB`, `jdk.ObjectAllocationOutsideTLAB`) to characterize. The shape of your workload determines what to tune.
+
+## Step 2 — Size the Heap
+
+**Heap sizing is the single highest-leverage tuning decision.** Get it right and most other tuning becomes unnecessary.
+
+### Find the live set
+
+Run the application under normal load; after a Full GC (or several Major GCs), look at heap occupancy. That&#x27;s your **live set** — the floor of memory the application actually needs.
+
+```bash
+jcmd &lt;pid&gt; GC.heap_info     # snapshot
+```
+
+### Size for throughput
+
+For G1, rule of thumb: **heap = 2–3 × live set**. So if live set is 1 GB, set `-Xmx2g` or `-Xmx3g`.
+
+- **Smaller** (heap = 1.5× live set): more frequent GCs, possibly Full GCs, throughput suffers.
+- **Larger** (heap = 5× live set): infrequent GCs, but each pause longer; memory wasted.
+
+For ZGC: heap can be tighter (~1.5× live set) because concurrent collection handles pressure better.
+
+### Container-aware sizing (T06 recap)
+
+In a container, allow headroom for non-heap memory:
+
+```text
+Container memory: 4 GB
+  -Xmx: 2 GB (50%)
+  Other (Metaspace + code cache + direct + stacks + native): ~1.5 GB
+  Headroom: 0.5 GB
+```
+
+`-XX:MaxRAMPercentage=50` automates this — default is 25%, which is conservative; tune to 50–75% for dedicated JVM containers.
+
+## Step 3 — Pick the Collector
+
+T08&#x27;s decision tree:
+
+- **Heap &lt; 100 MB / embedded**: Serial.
+- **Batch / throughput**: Parallel.
+- **General-purpose service**: G1 (default).
+- **Low latency (p99 &lt; 10 ms)**: ZGC (generational, JDK 21+).
+- **Huge heap (&gt; 100 GB)**: ZGC.
+- **Benchmark / allocation cost study**: Epsilon.
+
+When in doubt: **G1** (it&#x27;s already the default; only switch with evidence).
+
+## Step 4 — Tune the Collector
+
+After heap sizing + collector choice, fine-tuning. The flags that actually matter:
+
+### G1
+
+| Flag | Default | When to tune |
+|------|---------|--------------|
+| `-XX:MaxGCPauseMillis` | 200 ms | If pauses too long: lower to 100. If throughput needed: raise to 500. |
+| `-XX:InitiatingHeapOccupancyPercent` (IHOP) | 45% | Lower (30%) if Old fills before concurrent cycle completes |
+| `-XX:G1NewSizePercent` / `G1MaxNewSizePercent` | 5% / 60% | Lower if Young GCs are too long |
+| `-XX:G1MixedGCCountTarget` | 8 | Spread Old collection over more Mixed GCs |
+| `-XX:G1HeapRegionSize` | auto | Only tune if humongous-object pressure |
+
+### ZGC
+
+| Flag | When to tune |
+|------|--------------|
+| `-XX:SoftMaxHeapSize` | Hint for memory return when low usage |
+| `-XX:ConcGCThreads` | Defaults to ~12.5% of CPU; rarely tune |
+| `-XX:+UseLargePages` | **Always enable for ZGC on large heaps** |
+
+### Parallel
+
+| Flag | When to tune |
+|------|--------------|
+| `-XX:ParallelGCThreads` | Default = cores; rarely tune |
+| `-XX:GCTimeRatio` | Target throughput (default 99 = ≤1% in GC) |
+| `-XX:MaxGCPauseMillis` | Advisory; rarely respected for Old |
+
+## Reading GC Logs — the Central Skill
+
+Modern format (`-Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags`):
+
+```text
+[2024-01-15T10:23:14.123-0800][2.456s][info][gc      ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 256M-&gt;32M(2048M) 15.234ms
+```
+
+Decoded:
+
+- `[2024-01-15T10:23:14.123-0800]` — wall-clock timestamp.
+- `[2.456s]` — uptime.
+- `[info][gc      ]` — log level + category.
+- `GC(0)` — collection number (0 = first).
+- `Pause Young (Normal)` — pause type: Young GC, normal (not triggered by failed allocation).
+- `(G1 Evacuation Pause)` — G1&#x27;s specific name for Young GC.
+- `256M-&gt;32M` — heap occupancy before → after.
+- `(2048M)` — total heap size.
+- `15.234ms` — pause duration.
+
+### Key entries to look for
+
+```text
+GC(123) Pause Young (Normal) 800M-&gt;400M(2g) 50ms        ← Young GC; 400 MB live young
+GC(124) Concurrent Cycle                                 ← Concurrent mark cycle begins
+GC(125) Pause Remark 800M-&gt;800M(2g) 5ms                  ← Mark phase finished (STW)
+GC(126) Concurrent Sweep                                  ← Concurrent cleanup
+GC(127) Pause Mixed 1g-&gt;600M(2g) 80ms                    ← Mixed GC (Young + some Old)
+GC(128) Pause Full (Allocation Failure) 2g-&gt;1.5g(2g) 3s  ← FULL GC — investigate!
+```
+
+### Red flags
+
+- **Full GCs** — should be very rare. Frequent = tuning failure (heap too small, leak, allocation spike).
+- **`to-space exhausted`** — Young GC couldn&#x27;t find space in Survivor. Tune Young size or `MaxTenuringThreshold`.
+- **`Concurrent Mark Abort`** — concurrent mark ran out of time. Lower IHOP.
+- **`Allocation Failure`** — couldn&#x27;t allocate; full GC triggered.
+- **Long pauses (&gt; MaxGCPauseMillis * 2)** — G1&#x27;s pause target not met. Reduce target or tune.
+
+## Calculating Allocation and Promotion Rates
+
+### Allocation rate
+
+```text
+allocation_rate = (eden_size_before_young_gc) / (time_between_young_gcs)
+```
+
+If Eden is 200 MB and YGCs happen every 2 seconds: allocation rate = 100 MB/s.
+
+Healthy: 10–500 MB/s for typical web services. Higher: investigate.
+
+### Promotion rate
+
+```text
+promotion_rate = (heap_used_after_ygc) - (survivor_used_after_ygc) - (old_used_before_ygc)
+```
+
+The difference between Old occupancy before and after — what got promoted in this YGC. Sustained high promotion → Old fills quickly → Mixed/Full GCs.
+
+## GCEasy.io for Anti-Pattern Detection
+
+Upload GC log → instant analysis:
+
+- Throughput summary (% time not in GC).
+- Pause time distribution (p50, p99, p999, max).
+- Per-cause GC counts.
+- **Performance anti-patterns** — automated detection of the patterns below.
+
+The single highest-leverage tool for GC log analysis. Free for moderate-sized logs.
+
+## Six Common Anti-Patterns
+
+### 1. High allocation rate
+
+**Symptom**: YGCs every &lt;500ms; throughput &lt; 95%.
+**Cause**: Application allocates faster than GC can collect.
+**Fix**: Profile allocations (JFR + JMC&#x27;s allocation profiler); refactor hot allocation paths (object pooling, primitive arrays, reuse).
+
+### 2. Premature promotion
+
+**Symptom**: Objects promoting to Old after just 1–2 YGCs; Old grows fast.
+**Cause**: Survivor space too small to hold them.
+**Fix**: Increase `-XX:G1NewSizePercent` or `-XX:SurvivorRatio`; or increase `-XX:MaxTenuringThreshold`.
+
+### 3. Old generation pressure
+
+**Symptom**: Mixed GCs frequent; Old growth high; occasional Full GCs.
+**Cause**: Heap too small relative to live set; or leak; or high promotion rate.
+**Fix**: Increase `-Xmx`; investigate leak with heap dump (T10); reduce IHOP for earlier collection.
+
+### 4. Humongous object pressure (G1)
+
+**Symptom**: Frequent humongous allocations; Full GCs to defragment.
+**Cause**: Object size &gt; 50% of region size.
+**Fix**: Increase `-XX:G1HeapRegionSize` (default auto-sizes); refactor application to use smaller objects.
+
+### 5. Long mixed GC times
+
+**Symptom**: Mixed GCs taking 500ms+.
+**Cause**: Too many Old regions evacuated per Mixed GC.
+**Fix**: Tune `-XX:G1MixedGCCountTarget` (default 8 — more Mixed GCs, each shorter).
+
+### 6. Allocation outside TLAB
+
+**Symptom**: JFR&#x27;s `jdk.ObjectAllocationOutsideTLAB` events frequent.
+**Cause**: Large allocations bypassing TLAB; CAS contention on Eden top.
+**Fix**: Profile to find large allocations; resize TLAB via `-XX:TLABSize`; refactor large allocations.
+
+## The Four Flags That Actually Matter
+
+```bash
+java \
+    -Xmx2g \                                  # 1. Heap size (most important)
+    -XX:+UseG1GC \                            # 2. Collector (default; specify anyway)
+    -XX:MaxGCPauseMillis=200 \                # 3. Pause target
+    -XX:+HeapDumpOnOutOfMemoryError \         # 4. Always set
+    -XX:HeapDumpPath=/tmp/heap.hprof \
+    -Xlog:gc*:file=/tmp/gc.log:time,uptime:filecount=10,filesize=10M \
+    -jar myapp.jar
+```
+
+**These four cover 90% of production needs.** Other flags are fine-tuning that usually doesn&#x27;t matter or hurts.
+
+The flags to *avoid*:
+
+- `-XX:+UseParallelOldGC` (was a thing pre-JDK 9; obsolete).
+- `-XX:+DisableExplicitGC` (treats `System.gc()` as no-op; usually fine but framework-dependent).
+- `-XX:NewRatio` / `-XX:SurvivorRatio` (let G1 size automatically).
+- Most flags ending in `Threshold` — defaults are well-researched.
+
+## Container-Specific Tuning
+
+```bash
+# For a dedicated JVM in a 4 GB container:
+-XX:+UseContainerSupport                     # default since JDK 8u131
+-XX:MaxRAMPercentage=50                       # = -Xmx2g for 4 GB container
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=200
+```
+
+`-XX:MaxRAMPercentage=50` is more flexible than `-Xmx2g` — adjusts automatically as the container limit changes. Use percentage flags in containers, not absolute sizes.
+
+## JFR for Production GC Monitoring
+
+```bash
+# Continuous recording with rolling window
+java -XX:StartFlightRecording=disk=true,maxage=24h,maxsize=200m,filename=/tmp/jfr ...
+
+# Or trigger on-demand:
+jcmd &lt;pid&gt; JFR.start duration=60s settings=profile filename=/tmp/spike.jfr
+```
+
+**Continuous recording** captures the last 24 hours into a rotating file. When something goes wrong, you have the data.
+
+JFR&#x27;s GC events:
+
+- **`jdk.GarbageCollection`** — every GC, with type and duration.
+- **`jdk.GCPhasePause`** — STW phase pauses.
+- **`jdk.YoungGarbageCollection`** / **`jdk.OldGarbageCollection`** — per-generation.
+- **`jdk.ObjectAllocationInNewTLAB`** — TLAB allocations sampled.
+- **`jdk.ObjectAllocationOutsideTLAB`** — slow-path allocations.
+
+Open in JDK Mission Control for visual analysis.
+
+## Prometheus / Grafana for Real-Time Monitoring
+
+Spring Boot Actuator + Micrometer expose key JVM metrics natively:
+
+```yaml
+# application.yml
+management.endpoints.web.exposure.include: health,metrics,prometheus
+management.metrics.export.prometheus.enabled: true
+```
+
+Key metrics:
+
+- **`jvm_memory_used_bytes{area=&quot;heap&quot;}`** — current heap usage.
+- **`jvm_memory_used_bytes{area=&quot;nonheap&quot;}`** — non-heap (Metaspace, code cache).
+- **`jvm_gc_pause_seconds`** (histogram) — pause time distribution.
+- **`jvm_gc_collection_seconds_count`** — GC count.
+- **`jvm_gc_memory_promoted_bytes_total`** — promotion rate.
+
+Grafana dashboards: stock dashboards for Java / Spring Boot exist; customize for your workload.
+
+## The Production Observability Stack
+
+```mermaid
+flowchart TB
+  JVM[&quot;JVM (production)&quot;]
+  GCLog[&quot;-Xlog:gc* → file&lt;br/&gt;(persistent log)&quot;]
+  JFR[&quot;JFR continuous → file&lt;br/&gt;(24h rolling window)&quot;]
+  Met[&quot;Micrometer → /actuator/prometheus&lt;br/&gt;(real-time metrics)&quot;]
+  Prom[&quot;Prometheus&lt;br/&gt;(time-series DB)&quot;]
+  Graf[&quot;Grafana&lt;br/&gt;(dashboards + alerts)&quot;]
+  HD[&quot;Heap dump&lt;br/&gt;(triggered on OOM)&quot;]
+  JVM --&gt; GCLog
+  JVM --&gt; JFR
+  JVM --&gt; Met
+  JVM --&gt; HD
+  Met --&gt; Prom --&gt; Graf
+  GCLog --&gt; Analyze[&quot;GCEasy / GCViewer&lt;br/&gt;(post-mortem)&quot;]
+  JFR --&gt; JMC[&quot;JDK Mission Control&lt;br/&gt;(deep dive)&quot;]
+```
+
+All four streams together:
+
+- **GC log** — persistent record of every GC event.
+- **JFR** — high-detail rolling window for deep analysis.
+- **Prometheus** — real-time dashboards and alerts.
+- **Heap dump** — automatic on OOM for post-mortem (T10).
+
+## Tuning Fallacies
+
+### &quot;Bigger heap = fewer GC pauses&quot;
+
+Not always. Bigger heap means longer pauses for Full GC (Parallel) or longer mark cycles (G1, ZGC). Up to ~2–3× live set, bigger is better; beyond that, returns diminish.
+
+### &quot;More GC threads = faster GC&quot;
+
+Default is usually right. Adding threads can *increase* synchronization overhead.
+
+### &quot;Use ParallelGC for performance&quot;
+
+Throughput-focused yes; but its pauses make it unsuitable for any user-facing service. Always G1 or ZGC for user-facing.
+
+### &quot;GC tuning fixes memory leaks&quot;
+
+It doesn&#x27;t. Leaks need code fixes (T10). GC tuning can hide a leak temporarily (bigger heap → leak takes longer to OOM) but never solves it.
+
+### &quot;Newer JDK = automatically faster&quot;
+
+Mostly true but not universally. Upgrade with testing. The JIT and GC improve substantially across versions, but workload-specific regressions happen.
+
+### &quot;Set `-Xms = -Xmx` for performance&quot;
+
+Marginally helpful for very-long-lived servers (avoids heap resize). For most cases, the default initial size + growth is fine.
+
+## When NOT to Tune
+
+- **No baseline measurement.** Measure first.
+- **Pauses &lt; 200ms p99.** Already good enough for most workloads.
+- **You haven&#x27;t profiled allocation.** Reducing allocation often beats tuning GC.
+- **The bottleneck is elsewhere.** CPU saturation, DB latency, network — these aren&#x27;t GC problems.
+
+The most common GC tuning win: realizing the GC was fine and the bottleneck was somewhere else.
+
+## The 80/20 of Tuning
+
+**80% of tuning wins come from:**
+
+1. **Right heap size** (2–3× live set).
+2. **Right collector** (G1 default; ZGC for low-latency).
+3. **HeapDumpOnOutOfMemoryError** (catch OOMs).
+
+**20% from fine-tuning** specific flags after measurement.
+
+Almost every &quot;tuning project&quot; in production resolves to those three items. Engineers who chase exotic flags miss the easy wins.
+
+## Real Production Case Studies
+
+### Web service (Spring Boot, 4 GB container)
+
+```bash
+-Xmx2g                                        # 50% of container
+-XX:+UseG1GC -XX:MaxGCPauseMillis=200         # defaults
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time,uptime
+```
+
+p99 &lt; 50 ms; throughput 95%+. Mostly default; works.
+
+### Batch ETL (16 GB heap, throughput-critical)
+
+```bash
+-Xmx16g
+-XX:+UseParallelGC                            # max throughput
+-XX:GCTimeRatio=99                             # target 99% non-GC time
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time
+```
+
+Pauses up to 2s acceptable; throughput maximized.
+
+### Low-latency trading (32 GB heap, sub-ms p99)
+
+```bash
+-Xmx32g
+-XX:+UseZGC -XX:+ZGenerational                 # JDK 21+ generational ZGC
+-XX:+UseLargePages                              # essential for ZGC at scale
+-XX:+UseTransparentHugePages
+-XX:+HeapDumpOnOutOfMemoryError
+-Xlog:gc*:file=/var/log/gc.log:time
+```
+
+p999 GC pause &lt; 5 ms; throughput 88%. The latency win justifies the throughput cost.
+
+## Common Mistakes
+
+### Multi-flag tuning
+
+Changing 5 flags at once → can&#x27;t attribute the change. **One at a time.**
+
+### Tuning in dev, deploying to prod
+
+Workloads differ. Always validate in a production-equivalent environment.
+
+### Ignoring container limits
+
+A &quot;tuned&quot; `-Xmx4g` JVM in a 4 GB container OOM-kills. Plan for all memory.
+
+### Not exporting metrics
+
+If you can&#x27;t observe GC pauses, you can&#x27;t detect regressions. Set up Prometheus from day 1.
+
+### Treating GC like CPU tuning
+
+GC tuning has long feedback cycles (minutes to hours of data). Don&#x27;t iterate in 60-second windows.
+
+## Deeper Dive — Workload-Specific Tuning Recipes
+
+### Recipe 1: General Web Service (REST API, p99 &lt; 200ms target)
+
+```bash
+java -Xms2g -Xmx2g \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=100 \
+     -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/log/jvm/heapdump.hprof \
+     -Xlog:gc*:file=/var/log/jvm/gc.log:time,level,tags:filecount=10,filesize=10M \
+     -XX:+FlightRecorder \
+     -XX:StartFlightRecording=name=cont,settings=default,maxsize=200M,disk=true \
+     -jar app.jar
+```
+
+**Why these**:
+- G1 default since Java 9; sweet spot for most web workloads.
+- 2GB heap typical for Spring Boot service handling 1-2k RPS.
+- MaxGCPauseMillis=100: tighter than default 200; usually achievable.
+- Heap dump + JFR auto-armed for the inevitable 3 AM call.
+
+### Recipe 2: Low-Latency Trading / Pricing (p99 &lt; 10ms target)
+
+```bash
+java -Xms16g -Xmx16g \
+     -XX:+UseZGC -XX:+ZGenerational \
+     -XX:+UseLargePages -XX:+UseTransparentHugePages \
+     -XX:ConcGCThreads=4 \
+     -XX:ParallelGCThreads=8 \
+     -XX:-UsePerfData \
+     -XX:+AlwaysPreTouch \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar app.jar
+```
+
+**Why these**:
+- ZGC: sub-millisecond pauses. Generational (Java 21+) reduces CPU overhead vs single-gen ZGC.
+- 16GB heap pre-touched (`AlwaysPreTouch`) so all pages allocated at startup — no page-fault pauses.
+- Large pages (2MB) reduce TLB pressure for big heaps.
+- `-UsePerfData` disables `hsperfdata_*` files (small but eliminates one source of pauses).
+- ZGC trade-off: ~10-15% throughput hit vs G1.
+
+### Recipe 3: Batch ETL (throughput-oriented, no latency SLO)
+
+```bash
+java -Xms32g -Xmx32g \
+     -XX:+UseParallelGC \
+     -XX:ParallelGCThreads=32 \
+     -XX:NewRatio=1 \
+     -XX:+UseCompressedOops \
+     -Xlog:gc*:file=/var/log/jvm/gc.log \
+     -jar etl-job.jar
+```
+
+**Why these**:
+- ParallelGC: highest throughput; pause duration not critical for batch.
+- Large heap; many parallel GC threads.
+- `NewRatio=1` gives equal young/old space — appropriate for object-graph-building workloads.
+- Skip ZGC/G1 — concurrent collection adds CPU overhead with no benefit when throughput matters.
+
+### Recipe 4: Container Kubernetes Deployment (cgroup-aware)
+
+```yaml
+# K8s Deployment
+spec:
+  containers:
+  - name: app
+    resources:
+      requests:
+        memory: &quot;1.5Gi&quot;
+        cpu: &quot;1&quot;
+      limits:
+        memory: &quot;2Gi&quot;
+        cpu: &quot;2&quot;
+    env:
+    - name: JAVA_TOOL_OPTIONS
+      value: &gt;-
+        -XX:+UseG1GC
+        -XX:MaxRAMPercentage=70
+        -XX:MaxGCPauseMillis=150
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/tmp
+        -Xlog:gc*:stdout:time,level,tags
+        -XX:ActiveProcessorCount=2
+```
+
+**Why these**:
+- `MaxRAMPercentage=70` of 2GB limit = 1.4GB heap. Leaves room for metaspace + code cache + thread stacks + native.
+- `ActiveProcessorCount=2` matches CPU limit so ForkJoinPool / GC threads size correctly.
+- HeapDumpPath=/tmp + a PVC mount → preserves dump across restarts.
+- gc log to stdout → captured by K8s log aggregation.
+
+### Recipe 5: Microservice with Virtual Threads (Java 21+)
+
+```bash
+java -Xms1g -Xmx1g \
+     -XX:+UseG1GC \
+     --enable-preview \
+     -Dspring.threads.virtual.enabled=true \
+     -XX:MaxGCPauseMillis=100 \
+     -jar service.jar
+```
+
+**Why these**:
+- Smaller heap fine because virtual threads use ~1KB heap vs 1MB stack per platform thread.
+- Same web-service GC config — virtual threads change the thread model, not GC needs.
+
+## Deeper Dive — GC Algorithm Decision Tree
+
+```
+Pause time critical (p99 &lt; 20ms)?
+├── YES → ZGC (or Shenandoah)
+│   ├── Heap &gt; 1TB? → Vanilla ZGC
+│   └── Heap 4-100GB + standard workload? → ZGenerational (Java 21+, better CPU)
+│
+└── NO
+    ├── Throughput most important + can afford pauses?
+    │   └── Parallel GC — batch jobs, ETL, offline processing
+    │
+    └── Balanced (web service, microservice, default case)
+        ├── Heap ≤ 32GB? → G1 (default since Java 9)
+        ├── Heap &gt; 32GB?
+        │   ├── Latency tolerant? → G1 (still works; longer pauses)
+        │   └── Latency sensitive? → ZGenerational (Java 21+)
+```
+
+**Avoid**: SerialGC (only for ≤100MB heaps), CMS (removed Java 14), Shenandoah (smaller installed base than ZGC).
+
+## Deeper Dive — How to Diagnose &quot;Suddenly Slower Service&quot;
+
+Your service was 50ms p99 yesterday. Today it&#x27;s 500ms. GC suspect?
+
+```bash
+# 1. Take JFR snapshot of last 5 min
+jcmd &lt;pid&gt; JFR.dump filename=now.jfr maxage=5m
+
+# 2. Quickly check: any GC pauses &gt; 200ms?
+jfr print --events GarbageCollection now.jfr | grep -E &quot;duration|name&quot;
+
+# 3. Allocation rate now vs baseline
+jcmd &lt;pid&gt; GC.class_histogram | head -20
+# Compare with yesterday&#x27;s snapshot
+```
+
+**Common causes ranked by frequency**:
+
+1. **Hot endpoint started returning bigger responses** → allocation rate spike → more frequent young GC → more promotion → more old GC. Fix: profile the endpoint; reduce response size or paginate.
+
+2. **Cache invalidated en masse** → entire cache being re-populated → allocation burst. Fix: cache warm-up; staggered invalidation.
+
+3. **Memory leak slow-burning into old gen** → old gen filling → mixed GC trigger → longer pauses. Fix: heap dump + Eclipse MAT.
+
+4. **JIT decompilation** → method recompiling at low optimization tier → bad code generated → more allocation. Check `-XX:+PrintCompilation` for &quot;made not entrant&quot; patterns.
+
+5. **Tail-latency from minor GC growing in frequency** → CPU contention, more GC threads needed.
+
+6. **Container CPU throttling** → not GC at all; check `container_cpu_cfs_throttled_seconds_total`.
+
+## Deeper Dive — Allocation Rate Investigation
+
+Allocation rate = bytes allocated per second. Compute from GC log:
+
+```
+[3.500s][info][gc] GC(0) Pause Young (G1 Evacuation Pause) 100M-&gt;20M(2G) 50ms
+[6.500s][info][gc] GC(1) Pause Young (G1 Evacuation Pause) 100M-&gt;22M(2G) 60ms
+```
+
+Between GC 0 and GC 1: eden filled from 20M to 100M in 3 seconds.
+Allocation rate = (100 - 20) MB / 3 sec = **27 MB/sec**.
+
+**Healthy ranges**:
+- Web service: **5-50 MB/sec**
+- Stream processing: **50-200 MB/sec**
+- Batch ETL: **100-500 MB/sec**
+- Concerning: **&gt; 1 GB/sec** (something allocating wildly)
+
+**Find allocation sources** with async-profiler:
+```bash
+async-profiler -e alloc -d 30 -f alloc.html &lt;pid&gt;
+```
+
+Generates flame graph of allocation sites. The hot frames are where your bytes are coming from. Typical findings:
+- String concatenation in a loop → switch to StringBuilder.
+- `new HashMap&lt;&gt;()` per request → reuse via ThreadLocal or cache.
+- Boxing in hot path → use primitive collections (`int[]`).
+- Stream operations creating intermediate collections → consider for-loop in hot path.
+
+## Deeper Dive — Production GC Log Analysis Workflow
+
+```bash
+# 1. Tail GC log live
+tail -f /var/log/jvm/gc.log
+
+# 2. Pause duration histogram (last 10k events)
+grep &quot;Pause&quot; /var/log/jvm/gc.log | awk &#x27;{print $NF}&#x27; | sort -n | awk &#x27;
+    BEGIN{count=0}
+    {a[count++]=$1}
+    END{
+        n=count
+        print &quot;min:&quot;, a[0]
+        print &quot;p50:&quot;, a[int(n*0.5)]
+        print &quot;p90:&quot;, a[int(n*0.9)]
+        print &quot;p99:&quot;, a[int(n*0.99)]
+        print &quot;max:&quot;, a[n-1]
+    }&#x27;
+
+# 3. GC frequency over time
+grep &quot;Pause&quot; /var/log/jvm/gc.log | awk -F&#x27;[][]&#x27; &#x27;{print $2}&#x27; | sort | uniq -c
+
+# 4. Upload to GCEasy.io for full analysis
+curl -X POST --data-binary @gc.log https://api.gceasy.io/analyzeGC
+```
+
+**Red flags in GCEasy report**:
+- &quot;Long GC pauses&quot; (any &gt; target)
+- &quot;Allocation/Promotion rate high&quot;
+- &quot;Premature object promotion&quot; (objects dying in old gen quickly = should have stayed young)
+- &quot;Full GC happening&quot; with G1/ZGC = critical, indicates tuning failure or memory leak
+
+## Deeper Dive — GC Tuning Anti-Patterns Quick List
+
+| Anti-pattern | Why bad | Fix |
+|---|---|---|
+| Setting `-XX:NewRatio=8` from old advice | Forces tiny young gen; bumps promotion rate | Let G1 auto-tune; or `G1NewSizePercent` |
+| `-XX:ParallelGCThreads=64` on 8-core | More threads ≠ faster; thread contention hurts | Default = `cores`; rarely override |
+| `-Xmx=16g` on 16g container | OOM-killed by container; need overhead | `-XX:MaxRAMPercentage=70` (leaves ~30% for non-heap) |
+| Long pause tuning without measuring | &quot;Tune to taste&quot;; no baseline | Always measure before, change one, measure after |
+| Reusing JVM args across services | Different workloads, different needs | Per-service config; review quarterly |
+| Disabling compressed oops on small heap | 8GB heap doesn&#x27;t need it but default is on | Leave default; only relevant for &gt;32GB |
+| Manual `System.gc()` | Forces full GC; wastes time | Never; remove from code |
+| `-Xss=8m` because &quot;stack overflow&quot; | 8M × 1000 threads = 8GB just on stacks | Default 1M usually fine; find recursion bug instead |
+
+## Deeper Dive — JVM Crash Investigation
+
+When the JVM itself crashes (not OOM, not exception — actual crash):
+
+```
+# /tmp/hs_err_pid12345.log file generated automatically
+```
+
+```
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f8b3c3f1234, pid=12345, tid=0x00007f8b3c4567
+#
+# JRE version: OpenJDK Runtime Environment (21.0.1+12) (...)
+# Problematic frame:
+# V  [libjvm.so+0x9f1234]  ParallelTaskTerminator::offer_termination+0x123
+```
+
+**Look at**:
+1. **Problematic frame**: `V` = VM internal, `J` = JIT, `C` = native, `j` = interpreted Java.
+2. **Stack**: backtrace.
+3. **Register state**: registers at crash.
+4. **JVM args**: `# Command Line:` line shows the actual flags.
+5. **Memory map**: `# /proc/self/maps`.
+6. **Native libraries loaded**: identifies third-party native code.
+
+**Common causes**:
+- **JIT bug**: rare; usually triggered by specific bytecode. Workaround: `-XX:CompileCommand=exclude,com.example.Class,methodName`.
+- **JNI bug**: native code corrupting heap. Identify the .so file in the stack.
+- **GC bug**: very rare; usually JDK Early Access or experimental flags.
+- **OS-level**: kernel issue, hardware fault, OOM-kill arriving as SIGSEGV.
+
+File JBS bug if reproducible with stock JDK and no JNI.
+
+## Practice
+
+1. **Baseline a service.** Run a Spring Boot app under load for 1 hour with `-Xlog:gc*`. Upload to GCEasy. Identify the throughput, pause stats, anti-patterns.
+2. **Heap sizing experiment.** Run the same service with `-Xmx1g`, `-Xmx2g`, `-Xmx4g`. Compare throughput and p99 pause time. Plot the curve.
+3. **G1 pause-time tuning.** Vary `-XX:MaxGCPauseMillis` from 50, 100, 200, 500. Measure throughput vs pause trade-off.
+4. **Anti-pattern reproduction.** Write a service with deliberately high allocation rate. Observe in logs / JFR.
+5. **Premature promotion.** Allocate medium-lifetime objects; observe their promotion to Old via JFR. Tune Survivor size to keep them in Young longer.
+6. **Mixed GC inspection.** With G1, run a service that accumulates Old data; observe Mixed GC entries; tune `G1MixedGCCountTarget`.
+7. **Humongous object reproduction.** Allocate 50% region size objects; observe humongous allocation messages.
+8. **Prometheus integration.** Add Spring Actuator + Micrometer to a service. Verify Prometheus scrapes JVM metrics.
+9. **Grafana dashboard.** Build a custom dashboard with heap occupancy, GC pause histogram, allocation rate.
+10. **JFR continuous recording.** Enable on a service; trigger a load spike; analyze the JFR file in JMC.
+11. **Container OOM-kill investigation.** Deliberately set `-Xmx` too close to container limit; cause OOM; trace via `dmesg` and `kubectl describe pod`.
+12. **GC log comparison.** Take 3 different workload types (web, batch, low-latency); identify which GC anti-patterns each shows.
+
+## Recap
+
+You should now be able to:
+
+- Apply the **5-step tuning methodology**: measure baseline → identify bottleneck → change ONE thing → re-measure → compare and decide.
+- Track the **7 performance metrics**: p50/p95/p99/p999 latency, throughput, GC pause max/p99/p999, GC frequency, heap occupancy, allocation rate, promotion rate.
+- Apply the **4-step tuning process**: understand workload → size heap → pick collector → tune collector.
+- Size the heap correctly: live set (occupancy after Full GC) × 2–3 for G1; tighter for ZGC; container-aware via `-XX:MaxRAMPercentage`.
+- **Read GC logs**: parse the modern `-Xlog:gc*` format (timestamp, uptime, GC number, type, heap before/after, total, pause duration); recognize Young / Mixed / Full / Concurrent Cycle / Remark / Sweep entries.
+- Recognize **red flags**: frequent Full GCs (tuning failure), to-space exhausted, concurrent mark abort, allocation failure, long pauses exceeding target.
+- Calculate **allocation rate** (eden-before-YGC / time-between-YGCs) and **promotion rate** (Old growth per YGC).
+- Use **GCEasy.io** as the primary GC log analysis tool for anti-pattern detection.
+- Diagnose the **6 common anti-patterns**: high allocation rate, premature promotion, Old gen pressure, humongous object pressure, long mixed GC times, allocation outside TLAB.
+- Apply the **4 flags that actually move the needle**: `-Xmx`, collector selection, `-XX:MaxGCPauseMillis`, `-XX:+HeapDumpOnOutOfMemoryError`.
+- Tune **container-aware** with `-XX:MaxRAMPercentage` (50–75% for dedicated JVM containers).
+- Set up **JFR continuous recording** with 24h rolling window for production observability.
+- Wire **Prometheus + Grafana** via Spring Boot Actuator + Micrometer: `jvm_memory_used_bytes`, `jvm_gc_pause_seconds` histogram, `jvm_gc_collection_seconds_count`, `jvm_gc_memory_promoted_bytes_total`.
+- Combine the **production observability stack**: GC log (persistent) + JFR (rolling window) + Prometheus (real-time) + heap dump (post-mortem on OOM).
+- Avoid **6 tuning fallacies**: bigger heap ≠ always fewer pauses; more GC threads ≠ faster; ParallelGC for user-facing; GC tuning fixes leaks; newer JDK = automatically faster; `-Xms = -Xmx` always helps.
+- Know **when NOT to tune**: no baseline, pauses already &lt; 200ms, not having profiled allocation, bottleneck elsewhere.
+- Apply the **80/20**: right heap + right collector + HeapDumpOnOOM = 80% of wins; fine-tuning = 20%.
+- Diagnose **3 production case studies**: web service (G1 defaults), batch ETL (Parallel max throughput), low-latency trading (ZGC + large pages).
+
+## Next
+
+Continue to [Memory leaks &amp; heap dump analysis](./T10-memory-leaks-and-heap-dump-analysis.md) — when GC tuning isn&#x27;t enough because *the leak is the problem*. We&#x27;ll cover how to take heap dumps (jmap, jcmd, automatic on OOM); the heap dump file format (HPROF); analysis tools (Eclipse MAT, JDK Mission Control, jhat); the canonical leak patterns (static collection growth, listener registration, ThreadLocal in pool workers, ClassLoader leaks); the Eclipse MAT *Leak Suspects Report* methodology; using **retained heap** vs **shallow heap** to find dominator objects; and the systematic process from &quot;service is OOMing&quot; to &quot;found and fixed the leak.&quot;
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><div class="lbl">← Previous</div><div class="ttl">T08-gc-algorithms-serial-parallel-g1-zgc-shenandoah</div><div class="sub">GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</div></a><a class="next" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><div class="lbl">Next →</div><div class="ttl">T10-memory-leaks-and-heap-dump-analysis</div><div class="sub">Memory Leaks &amp; Heap Dump Analysis</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-tuning-methodology" data-toc-link>The Tuning Methodology</a></li><li class="lvl-2"><a href="#performance-metrics-to-track" data-toc-link>Performance Metrics to Track</a></li><li class="lvl-2"><a href="#step-1-understand-the-workload" data-toc-link>Step 1 — Understand the Workload</a></li><li class="lvl-2"><a href="#step-2-size-the-heap" data-toc-link>Step 2 — Size the Heap</a></li><li class="lvl-3"><a href="#find-the-live-set" data-toc-link>Find the live set</a></li><li class="lvl-3"><a href="#size-for-throughput" data-toc-link>Size for throughput</a></li><li class="lvl-3"><a href="#container-aware-sizing-t06-recap" data-toc-link>Container-aware sizing (T06 recap)</a></li><li class="lvl-2"><a href="#step-3-pick-the-collector" data-toc-link>Step 3 — Pick the Collector</a></li><li class="lvl-2"><a href="#step-4-tune-the-collector" data-toc-link>Step 4 — Tune the Collector</a></li><li class="lvl-3"><a href="#g1" data-toc-link>G1</a></li><li class="lvl-3"><a href="#zgc" data-toc-link>ZGC</a></li><li class="lvl-3"><a href="#parallel" data-toc-link>Parallel</a></li><li class="lvl-2"><a href="#reading-gc-logs-the-central-skill" data-toc-link>Reading GC Logs — the Central Skill</a></li><li class="lvl-3"><a href="#key-entries-to-look-for" data-toc-link>Key entries to look for</a></li><li class="lvl-3"><a href="#red-flags" data-toc-link>Red flags</a></li><li class="lvl-2"><a href="#calculating-allocation-and-promotion-rates" data-toc-link>Calculating Allocation and Promotion Rates</a></li><li class="lvl-3"><a href="#allocation-rate" data-toc-link>Allocation rate</a></li><li class="lvl-3"><a href="#promotion-rate" data-toc-link>Promotion rate</a></li><li class="lvl-2"><a href="#gceasyio-for-anti-pattern-detection" data-toc-link>GCEasy.io for Anti-Pattern Detection</a></li><li class="lvl-2"><a href="#six-common-anti-patterns" data-toc-link>Six Common Anti-Patterns</a></li><li class="lvl-3"><a href="#1-high-allocation-rate" data-toc-link>1. High allocation rate</a></li><li class="lvl-3"><a href="#2-premature-promotion" data-toc-link>2. Premature promotion</a></li><li class="lvl-3"><a href="#3-old-generation-pressure" data-toc-link>3. Old generation pressure</a></li><li class="lvl-3"><a href="#4-humongous-object-pressure-g1" data-toc-link>4. Humongous object pressure (G1)</a></li><li class="lvl-3"><a href="#5-long-mixed-gc-times" data-toc-link>5. Long mixed GC times</a></li><li class="lvl-3"><a href="#6-allocation-outside-tlab" data-toc-link>6. Allocation outside TLAB</a></li><li class="lvl-2"><a href="#the-four-flags-that-actually-matter" data-toc-link>The Four Flags That Actually Matter</a></li><li class="lvl-2"><a href="#container-specific-tuning" data-toc-link>Container-Specific Tuning</a></li><li class="lvl-2"><a href="#jfr-for-production-gc-monitoring" data-toc-link>JFR for Production GC Monitoring</a></li><li class="lvl-2"><a href="#prometheus-grafana-for-real-time-monitoring" data-toc-link>Prometheus / Grafana for Real-Time Monitoring</a></li><li class="lvl-2"><a href="#the-production-observability-stack" data-toc-link>The Production Observability Stack</a></li><li class="lvl-2"><a href="#tuning-fallacies" data-toc-link>Tuning Fallacies</a></li><li class="lvl-3"><a href="#bigger-heap-fewer-gc-pauses" data-toc-link>&quot;Bigger heap = fewer GC pauses&quot;</a></li><li class="lvl-3"><a href="#more-gc-threads-faster-gc" data-toc-link>&quot;More GC threads = faster GC&quot;</a></li><li class="lvl-3"><a href="#use-parallelgc-for-performance" data-toc-link>&quot;Use ParallelGC for performance&quot;</a></li><li class="lvl-3"><a href="#gc-tuning-fixes-memory-leaks" data-toc-link>&quot;GC tuning fixes memory leaks&quot;</a></li><li class="lvl-3"><a href="#newer-jdk-automatically-faster" data-toc-link>&quot;Newer JDK = automatically faster&quot;</a></li><li class="lvl-3"><a href="#set-xms-xmx-for-performance" data-toc-link>&quot;Set -Xms = -Xmx for performance&quot;</a></li><li class="lvl-2"><a href="#when-not-to-tune" data-toc-link>When NOT to Tune</a></li><li class="lvl-2"><a href="#the-8020-of-tuning" data-toc-link>The 80/20 of Tuning</a></li><li class="lvl-2"><a href="#real-production-case-studies" data-toc-link>Real Production Case Studies</a></li><li class="lvl-3"><a href="#web-service-spring-boot-4-gb-container" data-toc-link>Web service (Spring Boot, 4 GB container)</a></li><li class="lvl-3"><a href="#batch-etl-16-gb-heap-throughput-critical" data-toc-link>Batch ETL (16 GB heap, throughput-critical)</a></li><li class="lvl-3"><a href="#low-latency-trading-32-gb-heap-sub-ms-p99" data-toc-link>Low-latency trading (32 GB heap, sub-ms p99)</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#multi-flag-tuning" data-toc-link>Multi-flag tuning</a></li><li class="lvl-3"><a href="#tuning-in-dev-deploying-to-prod" data-toc-link>Tuning in dev, deploying to prod</a></li><li class="lvl-3"><a href="#ignoring-container-limits" data-toc-link>Ignoring container limits</a></li><li class="lvl-3"><a href="#not-exporting-metrics" data-toc-link>Not exporting metrics</a></li><li class="lvl-3"><a href="#treating-gc-like-cpu-tuning" data-toc-link>Treating GC like CPU tuning</a></li><li class="lvl-2"><a href="#deeper-dive-workload-specific-tuning-recipes" data-toc-link>Deeper Dive — Workload-Specific Tuning Recipes</a></li><li class="lvl-3"><a href="#recipe-1-general-web-service-rest-api-p99-200ms-target" data-toc-link>Recipe 1: General Web Service (REST API, p99 &amp;lt; 200ms target)</a></li><li class="lvl-3"><a href="#recipe-2-low-latency-trading-pricing-p99-10ms-target" data-toc-link>Recipe 2: Low-Latency Trading / Pricing (p99 &amp;lt; 10ms target)</a></li><li class="lvl-3"><a href="#recipe-3-batch-etl-throughput-oriented-no-latency-slo" data-toc-link>Recipe 3: Batch ETL (throughput-oriented, no latency SLO)</a></li><li class="lvl-3"><a href="#recipe-4-container-kubernetes-deployment-cgroup-aware" data-toc-link>Recipe 4: Container Kubernetes Deployment (cgroup-aware)</a></li><li class="lvl-3"><a href="#recipe-5-microservice-with-virtual-threads-java-21" data-toc-link>Recipe 5: Microservice with Virtual Threads (Java 21+)</a></li><li class="lvl-2"><a href="#deeper-dive-gc-algorithm-decision-tree" data-toc-link>Deeper Dive — GC Algorithm Decision Tree</a></li><li class="lvl-2"><a href="#deeper-dive-how-to-diagnose-suddenly-slower-service" data-toc-link>Deeper Dive — How to Diagnose &quot;Suddenly Slower Service&quot;</a></li><li class="lvl-2"><a href="#deeper-dive-allocation-rate-investigation" data-toc-link>Deeper Dive — Allocation Rate Investigation</a></li><li class="lvl-2"><a href="#deeper-dive-production-gc-log-analysis-workflow" data-toc-link>Deeper Dive — Production GC Log Analysis Workflow</a></li><li class="lvl-2"><a href="#deeper-dive-gc-tuning-anti-patterns-quick-list" data-toc-link>Deeper Dive — GC Tuning Anti-Patterns Quick List</a></li><li class="lvl-2"><a href="#deeper-dive-jvm-crash-investigation" data-toc-link>Deeper Dive — JVM Crash Investigation</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

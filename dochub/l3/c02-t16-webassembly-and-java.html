@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="active" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span></div>
+        <h1>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T16-webassembly-and-java.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~120 min</span><span class="meta-pill date">updated 2026-06-15</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere"
+slug: webassembly-and-java
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 16
+tags: [webassembly, wasm, wasi, graalwasm, teavm, cheerpj, component-model, edge, sandboxing, portability, jvm]
+prerequisites: [aot-and-graalvm-native-image, bytecode-basics, jvm-architecture-and-runtime-data-areas, garbage-collection-fundamentals]
+status: complete
+estimated_minutes: 120
+last_updated: 2026-06-15</p>
+<hr>
+<h1 id="webassembly-java-wasm-wasi-and-running-the-jvm-everywhere">WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</h1>
+<p>T05 showed how GraalVM native-image trades flexibility for a single native binary that starts instantly. <strong>WebAssembly (WASM)</strong> asks a related but different question: instead of one binary per CPU/OS, what if there were <em>one portable bytecode</em> that any host — browser, edge node, plugin sandbox, serverless runtime — could run at near-native speed inside a tight security box? Think of WASM as <strong>a universal shipping container for code</strong>: the same sealed box gets lifted by any crane (any host runtime) at any port (any OS/CPU) without re-packing the contents. That promise — portable, sandboxed, near-native — is why backend engineers who never write a line of browser code now care about WASM.</p>
+<p>The honest 2026 framing the rest of this topic defends: <strong>WASM as a target <em>for</em> Java is still largely emerging and experimental</strong>, while <strong>WASM as a <em>capability the JVM ecosystem can host and exploit</em> is real and shipping</strong>. Those are two very different sentences and conflating them is the most common mistake. At the <strong>format</strong> layer, WASM is a compact stack-machine bytecode with a <em>linear memory</em> model and a deliberately minimal instruction set, designed for fast validation and ahead-of-time/just-in-time host compilation. At the <strong>system-interface</strong> layer, <strong>WASI</strong> (the WebAssembly System Interface) is what lets a <code>.wasm</code> module do I/O <em>outside</em> the browser — files, sockets, clocks, randomness — via a capability-based API; <strong>WASI Preview 1</strong> is widely deployed, while <strong>WASI Preview 2</strong> and the <strong>Component Model</strong> (typed, language-agnostic module composition) are newer and maturing rather than fully settled. At the <strong>fit</strong> layer, Java is genuinely hard to compile to WASM because the JVM leans on a <em>managed heap with GC</em>, <em>threads</em>, and <em>reflection</em> — none of which WASM's original linear-memory, single-threaded, static model offered; the <strong>WASM GC proposal</strong> (managed reference types, now shipping in major engines) is the single biggest reason "Java on WASM" went from "basically impossible" to "emerging." At the <strong>options</strong> layer, the practical routes in 2026 — TeaVM, CheerpJ, GraalWasm, and the various JVM-targets-WASM efforts — each work in a narrow band and fail outside it; we will label each honestly. At the <strong>why-it-matters</strong> layer, the killer use-cases are <strong>sandboxed plugins</strong> (run untrusted user code safely), <strong>edge compute</strong>, and <strong>portable polyglot functions</strong> — and the sandbox itself, <strong>a padded room with only the doors you are handed</strong>, is a real isolation primitive worth contrasting with containers.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t05-aot-and-graalvm-native-image.html">AOT &amp; GraalVM native-image</a> (L3/C02/T05) — the closed-world / build-time-compilation mindset transfers directly to WASM; <a href="c02-t03-bytecode-basics.html">Bytecode basics</a> (L3/C02/T03) — WASM is <em>another</em> bytecode, and the contrast with JVM bytecode is instructive; <a href="c02-t01-jvm-architecture-and-runtime-data-areas.html">JVM architecture</a> (L3/C02/T01) — to see why GC/threads/reflection make Java a poor native fit for WASM; <a href="c02-t07-garbage-collection-fundamentals.html">Garbage collection fundamentals</a> (L3/C02/T07) — to understand what the WASM GC proposal does and does not give you.</p></div></div>
+<h2 id="what-webassembly-actually-is">What WebAssembly Actually Is<a class="anchor" href="#what-webassembly-actually-is" aria-hidden="true">#</a></h2>
+<p>WebAssembly is a <strong>binary instruction format for a stack-based virtual machine</strong>. A <code>.wasm</code> module is <em>not</em> tied to a CPU — like a JVM <code>.class</code> file, it is an intermediate target that a host engine compiles to real machine code. Unlike JVM bytecode, it was designed from the start to be (a) trivially fast to validate, (b) compiled ahead-of-time or quickly JIT-ed by the host, and (c) executed inside a <strong>mandatory sandbox</strong>.</p>
+<p>Four properties define it, and each maps to a backend concern:</p>
+<ul>
+<li><strong>Portable.</strong> One module runs on x86-64, ARM64, 32-bit, big-endian or little-endian hosts — the <em>engine</em> hides the CPU. (Contrast with T05's native-image, which produces <em>one binary per target triple</em>.)</li>
+<li><strong>Near-native speed.</strong> Because the format is low-level and statically typed, host engines (V8, Wasmtime, Wasmer, GraalWasm) produce good machine code. "Near-native" is real but not magic — typical numbers I would hedge at <em>roughly</em> 0.8–1.5× native for compute-bound code, worse for memory-indirection-heavy or call-heavy code.</li>
+<li><strong>Sandboxed by construction.</strong> A module starts with <em>no</em> ambient authority: it cannot open a file, make a syscall, or read host memory unless the host explicitly <em>imports</em> a function granting that. This is the "padded room" — and it is the property backend engineers should care about most.</li>
+<li><strong>Language-agnostic.</strong> C, C++, Rust, Go, C#, and (with caveats) Java all target it. The host doesn't know or care what language produced the module.</li>
+</ul>
+<h3 id="linear-memory-the-model-that-makes-java-hard">Linear Memory: The Model That Makes Java Hard<a class="anchor" href="#linear-memory-the-model-that-makes-java-hard" aria-hidden="true">#</a></h3>
+<p>A classic WASM module owns a single contiguous, byte-addressable <strong>linear memory</strong> — essentially a growable <code>byte[]</code> (a sandboxed <code>ArrayBuffer</code>). Pointers are just <em>offsets</em> into that array. There is no host-visible pointer arithmetic outside it; a load at offset <code>i</code> that exceeds the memory length traps rather than reading host RAM. This is wonderful for C/Rust (which already think in flat memory) and <em>terrible</em> for the JVM, which expects a managed heap of object references the collector can move and trace. We will return to why this hurts Java in <a href="#why-wasm-is-hard-for-java-specifically">Why WASM Is Hard for Java Specifically</a>.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">wat</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-wat">;; A minimal WASM module in the text format (.wat).
+;; It declares one linear memory and an exported add function.
+(module
+  (memory (export &quot;mem&quot;) 1)              ;; 1 page = 64 KiB of linear memory
+  (func (export &quot;add&quot;) (param $a i32) (param $b i32) (result i32)
+    local.get $a
+    local.get $b
+    i32.add)                            ;; stack machine: push a, push b, add
+  (func (export &quot;load&quot;) (param $off i32) (result i32)
+    local.get $off
+    i32.load))                          ;; load from linear memory at offset
+</code></pre></div>
+<p>Note the deliberately tiny type system: <code>i32</code>, <code>i64</code>, <code>f32</code>, <code>f64</code>, plus reference types in newer versions. There is no built-in <code>String</code>, no <code>Object</code>, no class — everything richer must be <em>built on top of</em> linear memory by the source language's runtime.</p>
+<p>A few byte-level facts that matter when you actually move data across the boundary:</p>
+<ul>
+<li><strong>Linear memory grows in 64 KiB pages.</strong> <code>memory.grow</code> adds whole pages; the module declares an initial and (optionally) maximum size. A 32-bit address space caps a single classic memory at 4 GiB (the <code>memory64</code> proposal lifts this to 64-bit addressing, but it is <em>newer</em> — verify support before relying on it).</li>
+<li><strong>Loads/stores are little-endian, always.</strong> WASM fixes endianness in the spec, so a <code>.wasm</code> module behaves identically on a big-endian host — the engine does the swapping. This is part of what makes the "same box on any crane" claim true at the bit level, and it is a sharp contrast with raw native code, which inherits the CPU's endianness.</li>
+<li><strong>Marshalling is your problem (in the classic model).</strong> To pass a Java/JS string into a linear-memory module you copy its bytes into the module's memory at an agreed offset and pass the <code>(offset, length)</code> pair as two <code>i32</code>s. There is no automatic object graph transfer. The <strong>Component Model</strong> exists precisely to replace this hand-marshalling with typed interfaces — which is why its maturity (hedged below) matters so much for ergonomic polyglot work.</li>
+</ul>
+<p>The standard toolchain you will actually touch lives in the <strong>WABT</strong> (WebAssembly Binary Toolkit) and runtime CLIs. A backend engineer's first hour with WASM usually looks like this:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Convert human-readable text format to a binary module, and back again.
+wat2wasm add.wat -o add.wasm        # assemble .wat -&gt; .wasm
+wasm2wat add.wasm -o roundtrip.wat  # disassemble to inspect what an engine sees
+
+# Validate and inspect a module without running it.
+wasm-validate add.wasm              # single-pass spec validation
+wasm-objdump -x add.wasm            # dump sections: types, imports, exports, memory
+
+# Run a WASI module in a standalone runtime, granting ONE directory only.
+wasmtime run --dir=./data plugin.wasm     # plugin sees ./data and nothing else
+
+# Inspect what the module demands from the host (its &quot;doors&quot;).
+wasm-objdump -j Import -x plugin.wasm
+</code></pre></div>
+<p>The <code>--dir</code> flag is the capability model made concrete: omit it and the module's <code>fd_read</code>/<code>path_open</code> calls have nothing to operate on. This is the same "hand it exactly one door" idea you wire up programmatically from Java with GraalWasm.</p>
+<h3 id="how-wasm-bytecode-differs-from-jvm-bytecode">How WASM Bytecode Differs From JVM Bytecode<a class="anchor" href="#how-wasm-bytecode-differs-from-jvm-bytecode" aria-hidden="true">#</a></h3>
+<p>Because <a href="c02-t03-bytecode-basics.html">bytecode basics</a> (L3/C02/T03) is a prerequisite, the contrast is worth making explicit — it explains a lot of WASM's design:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>JVM bytecode</th>
+<th>WebAssembly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Machine model</td>
+<td>Stack machine</td>
+<td>Stack machine (similar feel)</td>
+</tr>
+<tr>
+<td>Object model</td>
+<td>First-class: <code>new</code>, <code>invokevirtual</code>, references, GC built in</td>
+<td>None in core: only numbers + (later) opaque refs; objects are a <em>source-language convention over linear memory</em></td>
+</tr>
+<tr>
+<td>Dynamic dispatch</td>
+<td><code>invokevirtual</code> / <code>invokeinterface</code> / <code>invokedynamic</code></td>
+<td>Indirect calls through a typed function table; no language-level vtables</td>
+</tr>
+<tr>
+<td>Verification</td>
+<td>Bytecode verifier, fairly involved</td>
+<td>Single-pass, near-linear validation by design</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>Managed heap, hidden from program</td>
+<td>Explicit linear memory the program addresses by offset</td>
+</tr>
+<tr>
+<td>Strings/types</td>
+<td>Rich constant pool, <code>String</code>, descriptors</td>
+<td><code>i32/i64/f32/f64</code> (+ refs); no strings, no rich type metadata</td>
+</tr>
+</tbody>
+</table></div>
+<p>The headline: <strong>JVM bytecode encodes a managed object-oriented runtime; WASM encodes a minimal abstract CPU.</strong> Everything object-shaped on WASM is something a compiler <em>synthesized</em>. That is exactly why a managed language like Java needs either a giant runtime baked into the module or the WASM GC proposal to feel native.</p>
+<h3 id="execution-model-validate-compile-run">Execution Model: Validate, Compile, Run<a class="anchor" href="#execution-model-validate-compile-run" aria-hidden="true">#</a></h3>
+<p>A host engine does not interpret <code>.wasm</code> byte-by-byte for long. The lifecycle is: <strong>decode → validate (single pass, type-checks the stack discipline) → compile (AOT or baseline-JIT to host machine code) → instantiate (allocate the memory/tables, run the start function) → execute.</strong> Engines like Wasmtime (Cranelift backend) and GraalWasm (Truffle) can do tiered compilation much like the JVM's C1/C2 you saw in T04 — a fast baseline first, optimizing later for hot code. This is why startup can be very fast (validation is cheap) <em>and</em> steady-state can approach native (the optimizing tier kicks in). The cost knobs you will tune in production are exactly compile-strategy, memory limits, and fuel.</p>
+<h2 id="wasi-webassembly-beyond-the-browser">WASI: WebAssembly Beyond the Browser<a class="anchor" href="#wasi-webassembly-beyond-the-browser" aria-hidden="true">#</a></h2>
+<p>WASM alone is pure computation in a box with no doors. <strong>WASI — the WebAssembly System Interface — is the standardized set of doors.</strong> It is the reason WASM matters on servers, edge, and plugins rather than only in browsers.</p>
+<ul>
+<li><strong>WASI Preview 1 (<code>wasi_snapshot_preview1</code>)</strong> — mature and widely deployed. Provides a POSIX-flavored, <em>capability-based</em> API: file descriptors, clocks, random bytes, env vars, args. The capability twist: a module gets a directory only if the host <strong>pre-opens</strong> it and hands the descriptor in. No path means no access — you cannot escape to <code>/etc/passwd</code> because the door was never installed.</li>
+<li><strong>WASI Preview 2 + the Component Model</strong> — <em>newer and still maturing as of 2026</em>. Preview 2 reorganizes WASI around the <strong>Component Model</strong>: instead of passing raw integers and linear-memory offsets across the boundary, components describe their imports/exports with <strong>WIT</strong> (WASM Interface Types) — typed, language-agnostic interfaces. This is what would eventually let a Java component call a Rust component passing real <code>string</code>/<code>list&lt;record&gt;</code> values without hand-rolled marshalling. I would explicitly hedge here: the Component Model's <em>spec</em> is stabilizing and tooling is improving, but treating it as a finished, ubiquitous foundation in 2026 would overstate it. Verify the exact maturity for your target runtime before betting on it.</li>
+</ul>
+<div class="mermaid">flowchart LR
+  subgraph Host["Host runtime (Wasmtime / GraalWasm / browser)"]
+    Mod["WASM module<br/>(pure compute + linear memory)"]
+    Imp["Imported functions<br/>(the only doors)"]
+  end
+  WASI["WASI APIs<br/>(files, clock, random, sockets)"]
+  CAP["Capabilities granted<br/>by the host, explicitly"]
+  Mod -->|"calls imported fn"| Imp
+  Imp -->|"mediated by"| WASI
+  WASI -->|"only what was<br/>pre-opened / handed in"| CAP
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p>The mental model that prevents 90% of confusion: <strong>WASM is the engine and the cage; WASI is the (capability-gated) set of system calls.</strong> A module with <em>no</em> WASI imports literally cannot touch the outside world — which is exactly why it makes a great sandbox for untrusted code.</p></div></div>
+<p>In Practice: the capability model is the opposite of the POSIX/JVM default you are used to. A normal Java process inherits <em>ambient</em> authority — it can open any file the OS user can, dial any socket, read the wall clock — and you claw that back with a <code>SecurityManager</code> (now deprecated/removed), seccomp, AppArmor, or containers. A WASM module inherits <em>nothing</em> and you hand it precisely the descriptors it needs. "Default deny, grant explicitly" is structurally easier to reason about than "default allow, sandbox after the fact," which is the deeper reason this model is attractive for untrusted code even before you count the speed.</p>
+<h2 id="why-wasm-is-hard-for-java-specifically">Why WASM Is Hard for Java Specifically<a class="anchor" href="#why-wasm-is-hard-for-java-specifically" aria-hidden="true">#</a></h2>
+<p>Compiling C or Rust to WASM is comparatively straightforward — those languages already match WASM's flat-memory, manual-or-static model. Java fights the format in three places that map directly to the JVM internals you have studied in this chapter.</p>
+<ol>
+<li>
+<p><strong>Garbage collection and the managed heap.</strong> The JVM's whole identity (T01, T07) is a tracing collector over a heap of movable object references. Classic WASM had <em>only</em> linear memory and <strong>no GC</strong>. To run Java you had two bad choices: ship an <em>entire GC implementation compiled into the module's linear memory</em> (bloated, and a GC running inside a single flat byte array, blind to the host) — or radically restrict the language. The <strong>WASM GC proposal</strong> changes this: it adds first-class managed <em>struct</em> and <em>array</em> reference types that the <strong>host engine's own collector</strong> manages. That means a Java object can (in principle) become a host-managed GC reference instead of a hand-rolled blob in linear memory — dramatically better for a managed language. As of 2026 WASM GC is shipping in major engines, and it is the single development that makes "real Java on WASM" plausible rather than a stunt. It is still <em>young</em>, and full JVM semantics on top of it are an active research/engineering frontier — hedge accordingly.</p>
+</li>
+<li>
+<p><strong>Threads.</strong> Java's memory model and <code>java.util.concurrent</code> assume real shared-memory threads (see L3/C01). Core WASM was single-threaded; the <strong>threads + shared-memory proposal</strong> (shared linear memory + atomics) exists and ships in places, but it is not the universal baseline, and on the edge/serverless side many hosts deliberately run modules single-threaded for isolation. A Java program that spins up a thread pool may simply have nowhere to put the threads.</p>
+</li>
+<li>
+<p><strong>Reflection, dynamic class loading, and <code>invokedynamic</code>.</strong> Java's runtime dynamism — <code>Class.forName</code>, reflection, proxies, lambda/string-concat via <code>invokedynamic</code> — is exactly what T05's closed-world AOT also struggles with. Whole-program compilers to WASM inherit the <em>same</em> closed-world constraint: code that loads classes by name at runtime, or reflects over arbitrary members, generally does not survive the trip unless explicitly accounted for.</p>
+</li>
+</ol>
+<div class="mermaid">flowchart TB
+  JVM["JVM expectation"]
+  GCneed["Tracing GC over<br/>movable references"]
+  Thr["Real shared-memory<br/>threads + JMM"]
+  Refl["Reflection / dynamic<br/>class loading / indy"]
+  WASMcore["Classic WASM core"]
+  Lin["Only linear memory,<br/>no GC"]
+  Single["Single-threaded<br/>by default"]
+  Closed["Closed-world,<br/>static call graph"]
+  GCprop["WASM GC proposal<br/>(host-managed refs)"]
+
+  JVM --> GCneed --> WASMcore
+  JVM --> Thr --> WASMcore
+  JVM --> Refl --> WASMcore
+  WASMcore --> Lin
+  WASMcore --> Single
+  WASMcore --> Closed
+  GCneed -. "now bridgeable via" .-> GCprop
+</div>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p>If you internalized T05's closed-world reachability analysis, you already understand 70% of why "compile Java to WASM" is hard: it is <em>the same closed-world problem</em> (no runtime class loading, reflection needs hints), <strong>plus</strong> the extra mismatch of GC and threads against the WASM core model.</p></div></div>
+<h4 id="a-closer-look-at-the-gc-mismatch">A Closer Look at the GC Mismatch<a class="anchor" href="#a-closer-look-at-the-gc-mismatch" aria-hidden="true">#</a></h4>
+<p>It is worth being precise about <em>why</em> "ship the GC inside linear memory" is so bad, because it sharpens the value of the WASM GC proposal (and connects to <a href="c02-t07-garbage-collection-fundamentals.html">GC fundamentals</a>, L3/C02/T07). If Java objects live as hand-laid-out blobs in the module's flat <code>byte[]</code>:</p>
+<ul>
+<li>The collector you bundle must trace <em>that byte array</em> with no help from the host. It cannot use the host's write barriers, card tables, or generational support — you are reimplementing a GC on top of a sandboxed array.</li>
+<li>The host engine's <em>own</em> collector sees the entire linear memory as one opaque live blob. It cannot reclaim a single dead Java object; it can only grow or free the whole memory. So you get <em>two</em> memory managers that do not cooperate, and the outer one is blind.</li>
+<li>Compaction/relocation (what makes modern collectors like G1/ZGC cheap, per T07/T08) is something you must implement yourself inside the array, fixing up every offset-pointer by hand.</li>
+</ul>
+<p>The <strong>WASM GC proposal</strong> dissolves this by giving the module real <code>(ref $struct)</code> / <code>(ref $array)</code> values that the <strong>host's</strong> collector traces and reclaims natively. Now a Java object <em>is</em> a host-managed reference, and the engine's mature collector does the work — no nested GC, no opaque blob. That is precisely why it is the enabling technology, and also why "real Java on WASM" is still young: building full JVM object/class semantics on these primitives is non-trivial, ongoing engineering.</p>
+<h2 id="the-real-options-today-with-honest-maturity-labels">The Real Options Today (With Honest Maturity Labels)<a class="anchor" href="#the-real-options-today-with-honest-maturity-labels" aria-hidden="true">#</a></h2>
+<p>There is no single blessed "javac --target wasm" in 2026. There are four families, each useful in a narrow band. Treat the maturity labels as the load-bearing part of this section.</p>
+<h3 id="teavm-javajvm-bytecode-wasm-and-js">TeaVM — Java/JVM-bytecode → WASM (and JS)<a class="anchor" href="#teavm-javajvm-bytecode-wasm-and-js" aria-hidden="true">#</a></h3>
+<p><strong>What it is.</strong> TeaVM is an ahead-of-time compiler that takes <em>JVM bytecode</em> (so any JVM language that compiles to it) and emits JavaScript or WASM. It does its own whole-program analysis and ships a small runtime.</p>
+<p><strong>Maturity / honest take.</strong> Real, used in production for <em>front-end-ish</em> and embedded scenarios, actively maintained. But it is <strong>not the full JVM</strong>: it supports a curated subset of the class library, reflection is limited, and you target <em>its</em> model, not "run any JAR." Best when you control the code and it is reasonably self-contained. Maturity: <strong>usable today, with constraints.</strong></p>
+<p>The kind of Java that compiles cleanly is plain, self-contained, library-light code:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Compiles well to WASM via TeaVM: pure logic, standard arithmetic,
+// no reflection, no dynamic class loading, no thread pools, minimal library.
+public final class Fnv1aHash {
+    private static final int OFFSET_BASIS = 0x811c9dc5;
+    private static final int PRIME        = 0x01000193;
+
+    public static int hash(byte[] data) {
+        int h = OFFSET_BASIS;
+        for (byte b : data) {
+            h ^= (b &amp; 0xff);
+            h *= PRIME;
+        }
+        return h;
+    }
+}
+</code></pre></div>
+<p>The moment you add <code>Class.forName(...)</code>, a <code>ServiceLoader</code>, an <code>ExecutorService</code>, or a heavy framework, you leave the supported band — the same closed-world wall as T05. Treat "compile <em>this</em> Java to WASM" as a question about <em>which</em> Java, not Java in general.</p>
+<h3 id="cheerpj-a-jvm-in-wasm-browser">CheerpJ — a JVM-in-WASM (browser)<a class="anchor" href="#cheerpj-a-jvm-in-wasm-browser" aria-hidden="true">#</a></h3>
+<p><strong>What it is.</strong> CheerpJ runs an actual JVM (and large parts of the Java class library, AWT/Swing included) <em>compiled to WASM</em>, so existing Java apps and applets can run in the browser unmodified. The JVM is the WASM module; your bytecode is data it interprets/JITs.</p>
+<p><strong>Maturity / honest take.</strong> Impressive and genuinely shipping for the "legacy Java app in the browser" use-case. The trade-off is exactly what you would expect from shipping a whole JVM as a WASM payload: a large initial download (the runtime + class library, fetched and cached) and a model where your bytecode is <em>interpreted/JIT-ed by a JVM-in-the-page</em> rather than compiled to lean WASM. That is the opposite end of the spectrum from TeaVM's tiny self-contained output — CheerpJ maximizes <em>compatibility</em> (run existing apps unchanged, AWT/Swing and all) at the cost of <em>footprint</em>, while TeaVM maximizes leanness at the cost of <em>coverage</em>. Maturity: <strong>production for its niche (browser-side Java), not a backend tool.</strong> If your problem is "modernize a desktop Java app's delivery without rewriting it," it is excellent; if your problem is anything server-side, it is the wrong tool.</p>
+<h3 id="graalwasm-run-wasm-inside-graalvm">GraalWasm — run WASM <em>inside</em> GraalVM<a class="anchor" href="#graalwasm-run-wasm-inside-graalvm" aria-hidden="true">#</a></h3>
+<p><strong>What it is.</strong> The mirror image of the others: GraalWasm is a WASM engine <em>implemented on Truffle inside GraalVM</em>. It lets a <strong>Java host application execute <code>.wasm</code> modules</strong> as guests — so your backend stays Java, and you embed WASM as the sandbox for untrusted/polyglot code.</p>
+<p><strong>Maturity / honest take.</strong> This is the option most relevant to <em>backend Java engineers</em>, and the one I would reach for first. You are not compiling Java to WASM at all — you are using Java as the host and WASM as a safe extension point (plugins, user scripts). It interoperates with GraalVM's polyglot story (the same <code>Context</code>/<code>Value</code> API you would use to embed JavaScript or Python). Maturity: <strong>real and improving; supported WASM proposals (e.g. GC, threads) vary by version, so check before relying on a specific feature.</strong> Note also that GraalWasm runs at its best <em>on GraalVM</em>; on a stock HotSpot JVM the experience and performance characteristics differ, so confirm your deployment runtime.</p>
+<p>There is a second backend-relevant embedding path worth naming: <strong>lightweight standalone WASM runtimes with Java bindings</strong> — e.g. the Chicory pure-Java WASM interpreter/runtime, or JNI/FFM bindings to native engines like Wasmtime/Wasmer. Chicory's pitch is "no native dependency, runs anywhere a JVM runs," which is attractive for portability though it trades away the raw speed of a native JIT engine. The landscape here moves quickly; treat specific projects as <em>check-current-status</em> rather than settled.</p>
+<h3 id="jvm-targets-wasm-efforts-incl-wasm-as-a-native-image-backend">JVM-targets-WASM efforts (incl. WASM-as-a-native-image-backend)<a class="anchor" href="#jvm-targets-wasm-efforts-incl-wasm-as-a-native-image-backend" aria-hidden="true">#</a></h3>
+<p><strong>What it is.</strong> Ongoing work to make GraalVM native-image (and related toolchains) emit <strong>WASM</strong> as an output backend — i.e. the AOT pipeline from T05, but producing a <code>.wasm</code> instead of an ELF/Mach-O binary, leaning on WASM GC for the managed heap.</p>
+<p><strong>Maturity / honest take.</strong> <strong>Experimental / emerging as of 2026.</strong> This is the most exciting long-term path (it would make "Java to portable sandboxed module" a first-class AOT target) but it is exactly where you should hedge hardest: feature coverage, performance, and stability are moving targets. Do not architect production systems around it yet without verifying current state.</p>
+<div class="mermaid">flowchart LR
+  subgraph CompileTo["Java → WASM (compile Java into a module)"]
+    TeaVM["TeaVM<br/>bytecode → WASM/JS<br/>(subset, usable)"]
+    NIwasm["native-image → WASM backend<br/>(experimental)"]
+  end
+  subgraph RunInside["JVM hosts/runs WASM"]
+    Graal["GraalWasm<br/>Java host runs .wasm guests<br/>(backend-relevant)"]
+  end
+  subgraph JVMinWasm["JVM compiled to WASM"]
+    Cheerp["CheerpJ<br/>whole JVM in WASM<br/>(browser)"]
+  end
+  Src["Java source / bytecode"]
+  Src --> TeaVM
+  Src --> NIwasm
+  Src --> Cheerp
+  Plugin["Untrusted plugin<br/>(any language → WASM)"] --> Graal
+</div>
+<p>In Practice: a backend team that wants "safe user-supplied extensions in our Java service" should <strong>not</strong> start by compiling their Java to WASM. They should use <strong>GraalWasm to host WASM plugins</strong> authored in whatever language, keeping the trusted host in ordinary, fully-supported JVM code. Compiling Java <em>to</em> WASM is the interesting-but-immature direction; hosting WASM <em>from</em> Java is the boring-but-shipping one.</p>
+<p>The directional summary to carry out of this section:</p>
+<ul>
+<li><strong>Java → WASM</strong> (TeaVM, native-image WASM backend): pick when you <em>must</em> ship Java logic as a portable module and you control the (constrained) code. Expect to fight the closed-world/GC/threads walls. Emerging.</li>
+<li><strong>JVM-in-WASM</strong> (CheerpJ): pick only for <em>browser delivery</em> of existing Java apps. Niche, mature.</li>
+<li><strong>WASM in JVM</strong> (GraalWasm, Chicory, FFM-to-native-engine): pick for <em>plugins, untrusted extensions, polyglot embedding</em> in a Java backend. This is the mainstream, shipping path — and the one to default to.</li>
+</ul>
+<h2 id="use-cases-where-it-matters-and-where-it-doesnt">Use-Cases Where It Matters (and Where It Doesn't)<a class="anchor" href="#use-cases-where-it-matters-and-where-it-doesnt" aria-hidden="true">#</a></h2>
+<h3 id="sandboxed-plugins-and-extensions-the-strongest-case">Sandboxed Plugins and Extensions — the strongest case<a class="anchor" href="#sandboxed-plugins-and-extensions-the-strongest-case" aria-hidden="true">#</a></h3>
+<p>The flagship backend use-case: <strong>run untrusted, user-supplied code safely inside your process.</strong> A customer uploads a data-transformation script, a fraud rule, a custom serializer. You must run it without letting it read your secrets, exhaust your host, or call out to the network. WASM's zero-ambient-authority sandbox is purpose-built for this, and from Java you embed it via <strong>GraalWasm</strong>.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Sketch: a Java backend hosting an untrusted WASM plugin via GraalVM's
+// polyglot Context API. The plugin gets NO file/network/clock access unless
+// we explicitly wire it in — the &quot;padded room with only the doors we hand it.&quot;
+import org.graalvm.polyglot.*;
+import org.graalvm.polyglot.io.IOAccess;
+
+public final class PluginHost {
+
+    public int runUntrustedTransform(byte[] wasmModuleBytes, int input) {
+        // Deny all host I/O by default; grant nothing the module can abuse.
+        try (Context ctx = Context.newBuilder(&quot;wasm&quot;)
+                .allowIO(IOAccess.NONE)          // no files
+                .allowHostAccess(HostAccess.NONE) // no Java callbacks
+                .allowCreateThread(false)         // no threads
+                .build()) {
+
+            Source src = Source.newBuilder(&quot;wasm&quot;, ByteSequence.create(wasmModuleBytes), &quot;plugin&quot;)
+                                .build();
+            ctx.eval(src);
+
+            // Call an exported function; if it traps or escapes, it fails here,
+            // not in our host. We can also bound fuel/time/memory via engine options.
+            Value transform = ctx.getBindings(&quot;wasm&quot;).getMember(&quot;transform&quot;);
+            return transform.execute(input).asInt();
+        }
+    }
+}
+</code></pre></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p><strong>Q: "Why might you choose a WASM sandbox over a container to run untrusted user code inside a Java backend?"</strong>
+A strong answer distinguishes the <em>isolation boundary and granularity</em>. A container isolates a <em>process</em> via Linux namespaces/cgroups — heavyweight, OS-level, and the code inside still runs with whatever syscalls the kernel exposes (you harden it with seccomp/gVisor/Kata). A WASM module isolates a <em>function-sized unit of code</em> with <strong>deny-by-default, capability-based</strong> access <em>in-process</em>: it has no syscalls at all unless the host imports them, memory accesses are bounds-checked into linear memory so it cannot read host RAM, and you can spin one up in microseconds rather than the tens-to-hundreds of milliseconds a container costs. Trade-offs to name: WASM's ecosystem and language/library support are narrower, the security model is only as good as the engine's correctness (a sandbox-escape bug is catastrophic), and side-channel/resource-exhaustion concerns still need fuel/memory limits. Bonus points for noting they are <strong>complementary</strong> — WASM-in-container is common — and for being honest that for <em>full untrusted OS-level workloads</em> a microVM (Firecracker) is still the safer boundary.</p></div></div>
+<h3 id="edge-compute-and-portable-polyglot-functions">Edge Compute and Portable Polyglot Functions<a class="anchor" href="#edge-compute-and-portable-polyglot-functions" aria-hidden="true">#</a></h3>
+<p>Edge platforms want code that starts in <em>single-digit milliseconds</em>, weighs little, and runs identically across heterogeneous edge hardware — precisely WASM's portability + fast-start pitch (and a sibling concern to the CDN/edge material elsewhere in the curriculum). The honest Java caveat: today the edge-WASM story is dominated by Rust/Go/JS because compiling Java to a <em>small, fast-starting</em> WASM module is exactly the emerging-and-heavy part. So the edge case "matters" conceptually but, for <em>Java specifically</em>, is more aspiration than production in 2026.</p>
+<p>Concretely, the edge platforms that lean hardest on WASM today (e.g. Fastly's Compute and Cloudflare Workers' WASM support, among others) optimize for cold-starts in the low-millisecond range by instantiating a <em>pre-compiled</em> module rather than booting a runtime — closer to T05's native-image startup than to a cold JVM. The reason Java is underrepresented there is the same triangle from earlier: a small, fast-starting Java WASM module is the part that is still emerging. I would not assert any specific platform's current Java support without checking; the pattern (WASM = fast edge starts) is durable, the <em>Java-on-it</em> part is the hedge.</p>
+<p><strong>Portable polyglot functions</strong> ride on the Component Model: a single typed interface (in WIT) implemented once, callable across languages — a Java host composing a Rust crypto component and a Go parsing component without FFI glue. Powerful in principle; gated on Component-Model maturity (hedged above).</p>
+<h3 id="browser-side-java">Browser-Side Java<a class="anchor" href="#browser-side-java" aria-hidden="true">#</a></h3>
+<p>CheerpJ's domain: keep a legacy Swing/applet Java app alive in the browser by shipping the JVM as WASM. Real, but a <em>migration/legacy</em> use-case, not new backend architecture.</p>
+<h3 id="where-it-does-not-yet-make-sense">Where It Does NOT Yet Make Sense<a class="anchor" href="#where-it-does-not-yet-make-sense" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Your main production microservice.</strong> A normal, long-running Spring Boot service has none of WASM's pain points solved better by WASM — use the JVM (or native-image for cold-start). Do not rewrite it to WASM.</li>
+<li><strong>Heavily threaded / reflection-heavy / large-class-library Java</strong>, compiled <em>to</em> WASM. You will hit the GC/threads/dynamism walls above.</li>
+<li><strong>Anything depending on bleeding-edge proposals (Component Model, WASM threads) as a stable foundation</strong> without verifying current engine support.</li>
+</ul>
+<p>In Practice: a useful rule of thumb — <strong>host WASM from Java (mature) for untrusted-plugin and polyglot-extension problems; be cautious about compiling Java to WASM (emerging) for everything else.</strong></p>
+<h2 id="the-sandbox-model-as-a-first-class-security-primitive">The Sandbox Model as a First-Class Security Primitive<a class="anchor" href="#the-sandbox-model-as-a-first-class-security-primitive" aria-hidden="true">#</a></h2>
+<p>It is worth stating the security argument cleanly because it is the durable reason WASM survives the hype. The WASM sandbox gives you, by construction:</p>
+<ul>
+<li><strong>No ambient authority.</strong> A module begins with zero capabilities; every external power is an explicitly imported function. The padded room ships with no doors — you install exactly the ones you intend.</li>
+<li><strong>Memory safety against the host.</strong> Loads/stores are bounds-checked into linear memory (or are host-managed GC refs); a buggy or malicious module cannot stray into host process memory. Contrast a JNI/native library in a normal JVM, which shares the process address space with <em>no</em> such guarantee.</li>
+<li><strong>Deterministic, enforceable resource limits.</strong> Engines support "fuel"/instruction metering, memory caps, and timeouts, so an infinite loop or memory bomb is bounded rather than fatal to the host.</li>
+<li><strong>Tiny, auditable trusted-computing base</strong> compared to "trust the whole OS + container runtime."</li>
+</ul>
+<p>Set against the alternatives, the granularity and cost differences are the whole story:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Boundary</th>
+<th>Isolation unit</th>
+<th>Mechanism</th>
+<th>Startup</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>WASM module</strong></td>
+<td>A function / module, in-process</td>
+<td>Bounds-checked memory + zero ambient authority + fuel limits</td>
+<td>microseconds</td>
+<td>Embedding <em>untrusted logic</em> inside a trusted host</td>
+</tr>
+<tr>
+<td><strong>Container</strong></td>
+<td>A process + filesystem</td>
+<td>Linux namespaces + cgroups (+ seccomp)</td>
+<td>tens–hundreds of ms</td>
+<td>Shipping and isolating whole <em>applications</em></td>
+</tr>
+<tr>
+<td><strong>MicroVM (Firecracker)</strong></td>
+<td>A guest kernel</td>
+<td>Hardware virtualization</td>
+<td>~100+ ms</td>
+<td>Strong isolation of fully <em>untrusted workloads</em></td>
+</tr>
+<tr>
+<td><strong>In-JVM (classic)</strong></td>
+<td>A thread / class loader</td>
+<td>Was <code>SecurityManager</code> (deprecated/removed)</td>
+<td>~0</td>
+<td><em>Trusted</em> code only — weak against malicious code</td>
+</tr>
+</tbody>
+</table></div>
+<p>The takeaway: WASM fills a real gap — <em>in-process, sub-millisecond, default-deny</em> isolation that the JVM itself no longer offers now that <code>SecurityManager</code> is gone. They are layers, not rivals — running WASM modules inside a container is a perfectly normal defense-in-depth posture, and is increasingly the recommended one for high-stakes untrusted code.</p>
+<p>In Practice: a payments company lets merchants upload custom "risk rules" that score each transaction. Running those as raw Java (reflection, classpath, full filesystem) would be reckless; running each in its own container adds tens of milliseconds and real orchestration cost per rule. Compiling each rule to a WASM module hosted in the existing Java service gives microsecond instantiation, a hard memory cap, a fuel limit so a runaway rule cannot stall the scoring path, and — crucially — <em>no</em> way for a rule to read another merchant's data or call out to the network, because those doors were never installed. That is the shape of the problem WASM-from-Java is genuinely good at in 2026.</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p>The sandbox is only as trustworthy as the engine implementing it. A correctness bug in the WASM runtime is a sandbox escape, and history shows engines do ship such bugs. Treat the engine as security-critical: keep it patched, prefer mature engines, and still impose memory/fuel limits and (for high-stakes untrusted code) an <em>outer</em> boundary like a container or microVM. Defense in depth, not a single magic wall. Two more caveats engineers forget: WASM's memory-safety guarantee protects the <em>host</em> from the guest, but it does <strong>not</strong> make a memory-unsafe <em>source language</em> (C/C++) safe <em>within</em> its own linear memory — a buffer overflow inside the module can still corrupt that module's own state. And timing/side-channel isolation is <em>not</em> something the WASM sandbox promises; if you are defending against Spectre-class attacks you need the engine's and platform's specific mitigations, not WASM's bounds checks alone.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Host a WASM module from Java.</strong> Add GraalVM/GraalWasm; compile a tiny Rust or C function (<code>add</code>, <code>fib</code>) to <code>.wasm</code>; load and call it from a Java host via the polyglot <code>Context</code> API. Confirm it runs with no I/O granted.</li>
+<li><strong>Prove the sandbox.</strong> Inside the hosted module, attempt a file open or out-of-bounds linear-memory load; observe the trap/denial. Then explicitly grant one directory via WASI pre-open and show <em>only</em> that path is reachable.</li>
+<li><strong>Enforce limits.</strong> Configure memory and fuel/timeout limits on the engine; feed it an infinite-loop module and a memory-bomb module; verify the host survives and the guest is terminated.</li>
+<li><strong>TeaVM smoke test.</strong> Take a small, self-contained Java class (no reflection, minimal library use); compile it to WASM with TeaVM; run it; then deliberately add a reflective call and observe what breaks. Write down the constraint you hit.</li>
+<li><strong>Read the bytecode.</strong> Hand-write or generate a <code>.wat</code> module, convert to <code>.wasm</code> (<code>wat2wasm</code>), disassemble it back (<code>wasm2wat</code>), and map each instruction to what the JVM equivalent would be — note where WASM has <em>no</em> equivalent (e.g. objects, <code>invokevirtual</code>).</li>
+<li><strong>Marshal a string.</strong> Write a <code>.wat</code> module exporting a <code>len(offset)</code> function over linear memory; from a Java host, copy a string's UTF-8 bytes into the module's memory and call it with the <code>(offset, length)</code> convention. Feel firsthand why the Component Model exists.</li>
+<li><strong>Maturity audit.</strong> For your chosen runtime (Wasmtime, GraalWasm, a browser engine), look up which proposals it supports <em>today</em>: WASM GC, threads, Component Model. Document exactly what is on vs. off — this is the verification habit this whole topic is built around.</li>
+<li><strong>Architecture memo.</strong> Write a one-page decision note for a hypothetical "let customers upload data-transform scripts" feature: WASM-plugin-in-Java vs. container-per-script vs. microVM. State the isolation boundary, startup cost, and failure mode of each, and recommend one.</li>
+<li><strong>Native-image vs. WASM thought experiment.</strong> Re-read T05's closed-world section; list which of native-image's reachability/reflection constraints would <em>also</em> apply to a hypothetical Java→WASM AOT path, and which extra (GC, threads) ones are new.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Define <strong>WebAssembly</strong> as a portable, sandboxed, near-native, language-agnostic <em>stack-machine bytecode</em> with a <em>linear-memory</em> model — and explain why that model (a flat, little-endian <code>byte[]</code> of offsets, page-granular growth) suits C/Rust and fights the JVM.</li>
+<li>Explain <strong>WASI</strong> as the <em>capability-based system interface</em> that takes WASM beyond the browser to servers/edge/plugins, and correctly label maturity: <strong>Preview 1 mature/deployed; Preview 2 + Component Model (WIT) newer and still maturing in 2026</strong>.</li>
+<li>Articulate <strong>why Java specifically is hard on WASM</strong> — managed GC heap vs. linear memory (the classic blocker, including the "nested GC over an opaque blob" problem), threads/JMM vs. single-threaded core, and reflection/dynamic loading/<code>invokedynamic</code> vs. closed-world compilation — and identify the <strong>WASM GC proposal</strong> as the development that makes real Java-on-WASM plausible (shipping but young).</li>
+<li>Contrast <strong>WASM bytecode with JVM bytecode</strong>: both stack machines, but WASM encodes a minimal abstract CPU (no objects, no vtables, explicit memory) while JVM bytecode encodes a managed OO runtime.</li>
+<li>Compare the four real option families with honest maturity: <strong>TeaVM</strong> (bytecode→WASM/JS, usable subset), <strong>CheerpJ</strong> (whole JVM in WASM, production for <em>browser-side</em> Java), <strong>GraalWasm</strong> (Java <em>hosts/runs</em> WASM guests — the backend-relevant, shipping choice), and <strong>JVM-targets-WASM / native-image WASM backend</strong> (<em>experimental/emerging</em>).</li>
+<li>Pick correct use-cases: <strong>sandboxed untrusted plugins</strong> (strongest, via GraalWasm), <strong>edge compute / portable polyglot functions</strong> (conceptually strong, Java-specifically immature), <strong>browser-side legacy Java</strong> (CheerpJ) — and reject WASM for your ordinary production microservice or heavily-threaded/reflective Java compiled <em>to</em> WASM.</li>
+<li>Argue the <strong>sandbox as a security primitive</strong>: zero ambient authority, host-memory safety, enforceable fuel/memory limits, small TCB — and place it against containers (OS-process granularity) and microVMs as complementary layers, while respecting that the engine itself is security-critical and that WASM does not promise side-channel or in-module memory safety.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>This is the final concept topic in <strong>JVM Internals &amp; Performance (C02)</strong> — you have gone from JVM architecture and bytecode (T01–T03), through JIT and AOT/native-image (T04–T05), memory and garbage collection (T06–T10), profiling/benchmarking/tuning (T11–T13), flags/ergonomics (T14), and out to the JVM's emerging portability frontier in WASM (this topic). The natural continuation is the chapter's hands-on and best-practices material, and — since WASM-from-Java's flagship use-case is <em>safe untrusted execution</em> — the security and sandboxing themes you will meet in the backend-engineering and architecture levels, where WASM resurfaces as a plugin and edge-isolation primitive rather than a JVM internal.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere&quot;
+slug: webassembly-and-java
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 16
+tags: [webassembly, wasm, wasi, graalwasm, teavm, cheerpj, component-model, edge, sandboxing, portability, jvm]
+prerequisites: [aot-and-graalvm-native-image, bytecode-basics, jvm-architecture-and-runtime-data-areas, garbage-collection-fundamentals]
+status: complete
+estimated_minutes: 120
+last_updated: 2026-06-15
+---
+
+# WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere
+
+T05 showed how GraalVM native-image trades flexibility for a single native binary that starts instantly. **WebAssembly (WASM)** asks a related but different question: instead of one binary per CPU/OS, what if there were *one portable bytecode* that any host — browser, edge node, plugin sandbox, serverless runtime — could run at near-native speed inside a tight security box? Think of WASM as **a universal shipping container for code**: the same sealed box gets lifted by any crane (any host runtime) at any port (any OS/CPU) without re-packing the contents. That promise — portable, sandboxed, near-native — is why backend engineers who never write a line of browser code now care about WASM.
+
+The honest 2026 framing the rest of this topic defends: **WASM as a target *for* Java is still largely emerging and experimental**, while **WASM as a *capability the JVM ecosystem can host and exploit* is real and shipping**. Those are two very different sentences and conflating them is the most common mistake. At the **format** layer, WASM is a compact stack-machine bytecode with a *linear memory* model and a deliberately minimal instruction set, designed for fast validation and ahead-of-time/just-in-time host compilation. At the **system-interface** layer, **WASI** (the WebAssembly System Interface) is what lets a `.wasm` module do I/O *outside* the browser — files, sockets, clocks, randomness — via a capability-based API; **WASI Preview 1** is widely deployed, while **WASI Preview 2** and the **Component Model** (typed, language-agnostic module composition) are newer and maturing rather than fully settled. At the **fit** layer, Java is genuinely hard to compile to WASM because the JVM leans on a *managed heap with GC*, *threads*, and *reflection* — none of which WASM&#x27;s original linear-memory, single-threaded, static model offered; the **WASM GC proposal** (managed reference types, now shipping in major engines) is the single biggest reason &quot;Java on WASM&quot; went from &quot;basically impossible&quot; to &quot;emerging.&quot; At the **options** layer, the practical routes in 2026 — TeaVM, CheerpJ, GraalWasm, and the various JVM-targets-WASM efforts — each work in a narrow band and fail outside it; we will label each honestly. At the **why-it-matters** layer, the killer use-cases are **sandboxed plugins** (run untrusted user code safely), **edge compute**, and **portable polyglot functions** — and the sandbox itself, **a padded room with only the doors you are handed**, is a real isolation primitive worth contrasting with containers.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [AOT &amp; GraalVM native-image](./T05-aot-and-graalvm-native-image.md) (L3/C02/T05) — the closed-world / build-time-compilation mindset transfers directly to WASM; [Bytecode basics](./T03-bytecode-basics.md) (L3/C02/T03) — WASM is *another* bytecode, and the contrast with JVM bytecode is instructive; [JVM architecture](./T01-jvm-architecture-and-runtime-data-areas.md) (L3/C02/T01) — to see why GC/threads/reflection make Java a poor native fit for WASM; [Garbage collection fundamentals](./T07-garbage-collection-fundamentals.md) (L3/C02/T07) — to understand what the WASM GC proposal does and does not give you.
+
+## What WebAssembly Actually Is
+
+WebAssembly is a **binary instruction format for a stack-based virtual machine**. A `.wasm` module is *not* tied to a CPU — like a JVM `.class` file, it is an intermediate target that a host engine compiles to real machine code. Unlike JVM bytecode, it was designed from the start to be (a) trivially fast to validate, (b) compiled ahead-of-time or quickly JIT-ed by the host, and (c) executed inside a **mandatory sandbox**.
+
+Four properties define it, and each maps to a backend concern:
+
+- **Portable.** One module runs on x86-64, ARM64, 32-bit, big-endian or little-endian hosts — the *engine* hides the CPU. (Contrast with T05&#x27;s native-image, which produces *one binary per target triple*.)
+- **Near-native speed.** Because the format is low-level and statically typed, host engines (V8, Wasmtime, Wasmer, GraalWasm) produce good machine code. &quot;Near-native&quot; is real but not magic — typical numbers I would hedge at *roughly* 0.8–1.5× native for compute-bound code, worse for memory-indirection-heavy or call-heavy code.
+- **Sandboxed by construction.** A module starts with *no* ambient authority: it cannot open a file, make a syscall, or read host memory unless the host explicitly *imports* a function granting that. This is the &quot;padded room&quot; — and it is the property backend engineers should care about most.
+- **Language-agnostic.** C, C++, Rust, Go, C#, and (with caveats) Java all target it. The host doesn&#x27;t know or care what language produced the module.
+
+### Linear Memory: The Model That Makes Java Hard
+
+A classic WASM module owns a single contiguous, byte-addressable **linear memory** — essentially a growable `byte[]` (a sandboxed `ArrayBuffer`). Pointers are just *offsets* into that array. There is no host-visible pointer arithmetic outside it; a load at offset `i` that exceeds the memory length traps rather than reading host RAM. This is wonderful for C/Rust (which already think in flat memory) and *terrible* for the JVM, which expects a managed heap of object references the collector can move and trace. We will return to why this hurts Java in [Why WASM Is Hard for Java Specifically](#why-wasm-is-hard-for-java-specifically).
+
+```wat
+;; A minimal WASM module in the text format (.wat).
+;; It declares one linear memory and an exported add function.
+(module
+  (memory (export &quot;mem&quot;) 1)              ;; 1 page = 64 KiB of linear memory
+  (func (export &quot;add&quot;) (param $a i32) (param $b i32) (result i32)
+    local.get $a
+    local.get $b
+    i32.add)                            ;; stack machine: push a, push b, add
+  (func (export &quot;load&quot;) (param $off i32) (result i32)
+    local.get $off
+    i32.load))                          ;; load from linear memory at offset
+```
+
+Note the deliberately tiny type system: `i32`, `i64`, `f32`, `f64`, plus reference types in newer versions. There is no built-in `String`, no `Object`, no class — everything richer must be *built on top of* linear memory by the source language&#x27;s runtime.
+
+A few byte-level facts that matter when you actually move data across the boundary:
+
+- **Linear memory grows in 64 KiB pages.** `memory.grow` adds whole pages; the module declares an initial and (optionally) maximum size. A 32-bit address space caps a single classic memory at 4 GiB (the `memory64` proposal lifts this to 64-bit addressing, but it is *newer* — verify support before relying on it).
+- **Loads/stores are little-endian, always.** WASM fixes endianness in the spec, so a `.wasm` module behaves identically on a big-endian host — the engine does the swapping. This is part of what makes the &quot;same box on any crane&quot; claim true at the bit level, and it is a sharp contrast with raw native code, which inherits the CPU&#x27;s endianness.
+- **Marshalling is your problem (in the classic model).** To pass a Java/JS string into a linear-memory module you copy its bytes into the module&#x27;s memory at an agreed offset and pass the `(offset, length)` pair as two `i32`s. There is no automatic object graph transfer. The **Component Model** exists precisely to replace this hand-marshalling with typed interfaces — which is why its maturity (hedged below) matters so much for ergonomic polyglot work.
+
+The standard toolchain you will actually touch lives in the **WABT** (WebAssembly Binary Toolkit) and runtime CLIs. A backend engineer&#x27;s first hour with WASM usually looks like this:
+
+```bash
+# Convert human-readable text format to a binary module, and back again.
+wat2wasm add.wat -o add.wasm        # assemble .wat -&gt; .wasm
+wasm2wat add.wasm -o roundtrip.wat  # disassemble to inspect what an engine sees
+
+# Validate and inspect a module without running it.
+wasm-validate add.wasm              # single-pass spec validation
+wasm-objdump -x add.wasm            # dump sections: types, imports, exports, memory
+
+# Run a WASI module in a standalone runtime, granting ONE directory only.
+wasmtime run --dir=./data plugin.wasm     # plugin sees ./data and nothing else
+
+# Inspect what the module demands from the host (its &quot;doors&quot;).
+wasm-objdump -j Import -x plugin.wasm
+```
+
+The `--dir` flag is the capability model made concrete: omit it and the module&#x27;s `fd_read`/`path_open` calls have nothing to operate on. This is the same &quot;hand it exactly one door&quot; idea you wire up programmatically from Java with GraalWasm.
+
+### How WASM Bytecode Differs From JVM Bytecode
+
+Because [bytecode basics](./T03-bytecode-basics.md) (L3/C02/T03) is a prerequisite, the contrast is worth making explicit — it explains a lot of WASM&#x27;s design:
+
+| Aspect | JVM bytecode | WebAssembly |
+| --- | --- | --- |
+| Machine model | Stack machine | Stack machine (similar feel) |
+| Object model | First-class: `new`, `invokevirtual`, references, GC built in | None in core: only numbers + (later) opaque refs; objects are a *source-language convention over linear memory* |
+| Dynamic dispatch | `invokevirtual` / `invokeinterface` / `invokedynamic` | Indirect calls through a typed function table; no language-level vtables |
+| Verification | Bytecode verifier, fairly involved | Single-pass, near-linear validation by design |
+| Memory | Managed heap, hidden from program | Explicit linear memory the program addresses by offset |
+| Strings/types | Rich constant pool, `String`, descriptors | `i32/i64/f32/f64` (+ refs); no strings, no rich type metadata |
+
+The headline: **JVM bytecode encodes a managed object-oriented runtime; WASM encodes a minimal abstract CPU.** Everything object-shaped on WASM is something a compiler *synthesized*. That is exactly why a managed language like Java needs either a giant runtime baked into the module or the WASM GC proposal to feel native.
+
+### Execution Model: Validate, Compile, Run
+
+A host engine does not interpret `.wasm` byte-by-byte for long. The lifecycle is: **decode → validate (single pass, type-checks the stack discipline) → compile (AOT or baseline-JIT to host machine code) → instantiate (allocate the memory/tables, run the start function) → execute.** Engines like Wasmtime (Cranelift backend) and GraalWasm (Truffle) can do tiered compilation much like the JVM&#x27;s C1/C2 you saw in T04 — a fast baseline first, optimizing later for hot code. This is why startup can be very fast (validation is cheap) *and* steady-state can approach native (the optimizing tier kicks in). The cost knobs you will tune in production are exactly compile-strategy, memory limits, and fuel.
+
+## WASI: WebAssembly Beyond the Browser
+
+WASM alone is pure computation in a box with no doors. **WASI — the WebAssembly System Interface — is the standardized set of doors.** It is the reason WASM matters on servers, edge, and plugins rather than only in browsers.
+
+- **WASI Preview 1 (`wasi_snapshot_preview1`)** — mature and widely deployed. Provides a POSIX-flavored, *capability-based* API: file descriptors, clocks, random bytes, env vars, args. The capability twist: a module gets a directory only if the host **pre-opens** it and hands the descriptor in. No path means no access — you cannot escape to `/etc/passwd` because the door was never installed.
+- **WASI Preview 2 + the Component Model** — *newer and still maturing as of 2026*. Preview 2 reorganizes WASI around the **Component Model**: instead of passing raw integers and linear-memory offsets across the boundary, components describe their imports/exports with **WIT** (WASM Interface Types) — typed, language-agnostic interfaces. This is what would eventually let a Java component call a Rust component passing real `string`/`list&lt;record&gt;` values without hand-rolled marshalling. I would explicitly hedge here: the Component Model&#x27;s *spec* is stabilizing and tooling is improving, but treating it as a finished, ubiquitous foundation in 2026 would overstate it. Verify the exact maturity for your target runtime before betting on it.
+
+```mermaid
+flowchart LR
+  subgraph Host[&quot;Host runtime (Wasmtime / GraalWasm / browser)&quot;]
+    Mod[&quot;WASM module&lt;br/&gt;(pure compute + linear memory)&quot;]
+    Imp[&quot;Imported functions&lt;br/&gt;(the only doors)&quot;]
+  end
+  WASI[&quot;WASI APIs&lt;br/&gt;(files, clock, random, sockets)&quot;]
+  CAP[&quot;Capabilities granted&lt;br/&gt;by the host, explicitly&quot;]
+  Mod --&gt;|&quot;calls imported fn&quot;| Imp
+  Imp --&gt;|&quot;mediated by&quot;| WASI
+  WASI --&gt;|&quot;only what was&lt;br/&gt;pre-opened / handed in&quot;| CAP
+```
+
+&gt; [!IMPORTANT]
+&gt; The mental model that prevents 90% of confusion: **WASM is the engine and the cage; WASI is the (capability-gated) set of system calls.** A module with *no* WASI imports literally cannot touch the outside world — which is exactly why it makes a great sandbox for untrusted code.
+
+In Practice: the capability model is the opposite of the POSIX/JVM default you are used to. A normal Java process inherits *ambient* authority — it can open any file the OS user can, dial any socket, read the wall clock — and you claw that back with a `SecurityManager` (now deprecated/removed), seccomp, AppArmor, or containers. A WASM module inherits *nothing* and you hand it precisely the descriptors it needs. &quot;Default deny, grant explicitly&quot; is structurally easier to reason about than &quot;default allow, sandbox after the fact,&quot; which is the deeper reason this model is attractive for untrusted code even before you count the speed.
+
+## Why WASM Is Hard for Java Specifically
+
+Compiling C or Rust to WASM is comparatively straightforward — those languages already match WASM&#x27;s flat-memory, manual-or-static model. Java fights the format in three places that map directly to the JVM internals you have studied in this chapter.
+
+1. **Garbage collection and the managed heap.** The JVM&#x27;s whole identity (T01, T07) is a tracing collector over a heap of movable object references. Classic WASM had *only* linear memory and **no GC**. To run Java you had two bad choices: ship an *entire GC implementation compiled into the module&#x27;s linear memory* (bloated, and a GC running inside a single flat byte array, blind to the host) — or radically restrict the language. The **WASM GC proposal** changes this: it adds first-class managed *struct* and *array* reference types that the **host engine&#x27;s own collector** manages. That means a Java object can (in principle) become a host-managed GC reference instead of a hand-rolled blob in linear memory — dramatically better for a managed language. As of 2026 WASM GC is shipping in major engines, and it is the single development that makes &quot;real Java on WASM&quot; plausible rather than a stunt. It is still *young*, and full JVM semantics on top of it are an active research/engineering frontier — hedge accordingly.
+
+2. **Threads.** Java&#x27;s memory model and `java.util.concurrent` assume real shared-memory threads (see L3/C01). Core WASM was single-threaded; the **threads + shared-memory proposal** (shared linear memory + atomics) exists and ships in places, but it is not the universal baseline, and on the edge/serverless side many hosts deliberately run modules single-threaded for isolation. A Java program that spins up a thread pool may simply have nowhere to put the threads.
+
+3. **Reflection, dynamic class loading, and `invokedynamic`.** Java&#x27;s runtime dynamism — `Class.forName`, reflection, proxies, lambda/string-concat via `invokedynamic` — is exactly what T05&#x27;s closed-world AOT also struggles with. Whole-program compilers to WASM inherit the *same* closed-world constraint: code that loads classes by name at runtime, or reflects over arbitrary members, generally does not survive the trip unless explicitly accounted for.
+
+```mermaid
+flowchart TB
+  JVM[&quot;JVM expectation&quot;]
+  GCneed[&quot;Tracing GC over&lt;br/&gt;movable references&quot;]
+  Thr[&quot;Real shared-memory&lt;br/&gt;threads + JMM&quot;]
+  Refl[&quot;Reflection / dynamic&lt;br/&gt;class loading / indy&quot;]
+  WASMcore[&quot;Classic WASM core&quot;]
+  Lin[&quot;Only linear memory,&lt;br/&gt;no GC&quot;]
+  Single[&quot;Single-threaded&lt;br/&gt;by default&quot;]
+  Closed[&quot;Closed-world,&lt;br/&gt;static call graph&quot;]
+  GCprop[&quot;WASM GC proposal&lt;br/&gt;(host-managed refs)&quot;]
+
+  JVM --&gt; GCneed --&gt; WASMcore
+  JVM --&gt; Thr --&gt; WASMcore
+  JVM --&gt; Refl --&gt; WASMcore
+  WASMcore --&gt; Lin
+  WASMcore --&gt; Single
+  WASMcore --&gt; Closed
+  GCneed -. &quot;now bridgeable via&quot; .-&gt; GCprop
+```
+
+&gt; [!TIP]
+&gt; If you internalized T05&#x27;s closed-world reachability analysis, you already understand 70% of why &quot;compile Java to WASM&quot; is hard: it is *the same closed-world problem* (no runtime class loading, reflection needs hints), **plus** the extra mismatch of GC and threads against the WASM core model.
+
+#### A Closer Look at the GC Mismatch
+
+It is worth being precise about *why* &quot;ship the GC inside linear memory&quot; is so bad, because it sharpens the value of the WASM GC proposal (and connects to [GC fundamentals](./T07-garbage-collection-fundamentals.md), L3/C02/T07). If Java objects live as hand-laid-out blobs in the module&#x27;s flat `byte[]`:
+
+- The collector you bundle must trace *that byte array* with no help from the host. It cannot use the host&#x27;s write barriers, card tables, or generational support — you are reimplementing a GC on top of a sandboxed array.
+- The host engine&#x27;s *own* collector sees the entire linear memory as one opaque live blob. It cannot reclaim a single dead Java object; it can only grow or free the whole memory. So you get *two* memory managers that do not cooperate, and the outer one is blind.
+- Compaction/relocation (what makes modern collectors like G1/ZGC cheap, per T07/T08) is something you must implement yourself inside the array, fixing up every offset-pointer by hand.
+
+The **WASM GC proposal** dissolves this by giving the module real `(ref $struct)` / `(ref $array)` values that the **host&#x27;s** collector traces and reclaims natively. Now a Java object *is* a host-managed reference, and the engine&#x27;s mature collector does the work — no nested GC, no opaque blob. That is precisely why it is the enabling technology, and also why &quot;real Java on WASM&quot; is still young: building full JVM object/class semantics on these primitives is non-trivial, ongoing engineering.
+
+## The Real Options Today (With Honest Maturity Labels)
+
+There is no single blessed &quot;javac --target wasm&quot; in 2026. There are four families, each useful in a narrow band. Treat the maturity labels as the load-bearing part of this section.
+
+### TeaVM — Java/JVM-bytecode → WASM (and JS)
+
+**What it is.** TeaVM is an ahead-of-time compiler that takes *JVM bytecode* (so any JVM language that compiles to it) and emits JavaScript or WASM. It does its own whole-program analysis and ships a small runtime.
+
+**Maturity / honest take.** Real, used in production for *front-end-ish* and embedded scenarios, actively maintained. But it is **not the full JVM**: it supports a curated subset of the class library, reflection is limited, and you target *its* model, not &quot;run any JAR.&quot; Best when you control the code and it is reasonably self-contained. Maturity: **usable today, with constraints.**
+
+The kind of Java that compiles cleanly is plain, self-contained, library-light code:
+
+```java
+// Compiles well to WASM via TeaVM: pure logic, standard arithmetic,
+// no reflection, no dynamic class loading, no thread pools, minimal library.
+public final class Fnv1aHash {
+    private static final int OFFSET_BASIS = 0x811c9dc5;
+    private static final int PRIME        = 0x01000193;
+
+    public static int hash(byte[] data) {
+        int h = OFFSET_BASIS;
+        for (byte b : data) {
+            h ^= (b &amp; 0xff);
+            h *= PRIME;
+        }
+        return h;
+    }
+}
+```
+
+The moment you add `Class.forName(...)`, a `ServiceLoader`, an `ExecutorService`, or a heavy framework, you leave the supported band — the same closed-world wall as T05. Treat &quot;compile *this* Java to WASM&quot; as a question about *which* Java, not Java in general.
+
+### CheerpJ — a JVM-in-WASM (browser)
+
+**What it is.** CheerpJ runs an actual JVM (and large parts of the Java class library, AWT/Swing included) *compiled to WASM*, so existing Java apps and applets can run in the browser unmodified. The JVM is the WASM module; your bytecode is data it interprets/JITs.
+
+**Maturity / honest take.** Impressive and genuinely shipping for the &quot;legacy Java app in the browser&quot; use-case. The trade-off is exactly what you would expect from shipping a whole JVM as a WASM payload: a large initial download (the runtime + class library, fetched and cached) and a model where your bytecode is *interpreted/JIT-ed by a JVM-in-the-page* rather than compiled to lean WASM. That is the opposite end of the spectrum from TeaVM&#x27;s tiny self-contained output — CheerpJ maximizes *compatibility* (run existing apps unchanged, AWT/Swing and all) at the cost of *footprint*, while TeaVM maximizes leanness at the cost of *coverage*. Maturity: **production for its niche (browser-side Java), not a backend tool.** If your problem is &quot;modernize a desktop Java app&#x27;s delivery without rewriting it,&quot; it is excellent; if your problem is anything server-side, it is the wrong tool.
+
+### GraalWasm — run WASM *inside* GraalVM
+
+**What it is.** The mirror image of the others: GraalWasm is a WASM engine *implemented on Truffle inside GraalVM*. It lets a **Java host application execute `.wasm` modules** as guests — so your backend stays Java, and you embed WASM as the sandbox for untrusted/polyglot code.
+
+**Maturity / honest take.** This is the option most relevant to *backend Java engineers*, and the one I would reach for first. You are not compiling Java to WASM at all — you are using Java as the host and WASM as a safe extension point (plugins, user scripts). It interoperates with GraalVM&#x27;s polyglot story (the same `Context`/`Value` API you would use to embed JavaScript or Python). Maturity: **real and improving; supported WASM proposals (e.g. GC, threads) vary by version, so check before relying on a specific feature.** Note also that GraalWasm runs at its best *on GraalVM*; on a stock HotSpot JVM the experience and performance characteristics differ, so confirm your deployment runtime.
+
+There is a second backend-relevant embedding path worth naming: **lightweight standalone WASM runtimes with Java bindings** — e.g. the Chicory pure-Java WASM interpreter/runtime, or JNI/FFM bindings to native engines like Wasmtime/Wasmer. Chicory&#x27;s pitch is &quot;no native dependency, runs anywhere a JVM runs,&quot; which is attractive for portability though it trades away the raw speed of a native JIT engine. The landscape here moves quickly; treat specific projects as *check-current-status* rather than settled.
+
+### JVM-targets-WASM efforts (incl. WASM-as-a-native-image-backend)
+
+**What it is.** Ongoing work to make GraalVM native-image (and related toolchains) emit **WASM** as an output backend — i.e. the AOT pipeline from T05, but producing a `.wasm` instead of an ELF/Mach-O binary, leaning on WASM GC for the managed heap.
+
+**Maturity / honest take.** **Experimental / emerging as of 2026.** This is the most exciting long-term path (it would make &quot;Java to portable sandboxed module&quot; a first-class AOT target) but it is exactly where you should hedge hardest: feature coverage, performance, and stability are moving targets. Do not architect production systems around it yet without verifying current state.
+
+```mermaid
+flowchart LR
+  subgraph CompileTo[&quot;Java → WASM (compile Java into a module)&quot;]
+    TeaVM[&quot;TeaVM&lt;br/&gt;bytecode → WASM/JS&lt;br/&gt;(subset, usable)&quot;]
+    NIwasm[&quot;native-image → WASM backend&lt;br/&gt;(experimental)&quot;]
+  end
+  subgraph RunInside[&quot;JVM hosts/runs WASM&quot;]
+    Graal[&quot;GraalWasm&lt;br/&gt;Java host runs .wasm guests&lt;br/&gt;(backend-relevant)&quot;]
+  end
+  subgraph JVMinWasm[&quot;JVM compiled to WASM&quot;]
+    Cheerp[&quot;CheerpJ&lt;br/&gt;whole JVM in WASM&lt;br/&gt;(browser)&quot;]
+  end
+  Src[&quot;Java source / bytecode&quot;]
+  Src --&gt; TeaVM
+  Src --&gt; NIwasm
+  Src --&gt; Cheerp
+  Plugin[&quot;Untrusted plugin&lt;br/&gt;(any language → WASM)&quot;] --&gt; Graal
+```
+
+In Practice: a backend team that wants &quot;safe user-supplied extensions in our Java service&quot; should **not** start by compiling their Java to WASM. They should use **GraalWasm to host WASM plugins** authored in whatever language, keeping the trusted host in ordinary, fully-supported JVM code. Compiling Java *to* WASM is the interesting-but-immature direction; hosting WASM *from* Java is the boring-but-shipping one.
+
+The directional summary to carry out of this section:
+
+- **Java → WASM** (TeaVM, native-image WASM backend): pick when you *must* ship Java logic as a portable module and you control the (constrained) code. Expect to fight the closed-world/GC/threads walls. Emerging.
+- **JVM-in-WASM** (CheerpJ): pick only for *browser delivery* of existing Java apps. Niche, mature.
+- **WASM in JVM** (GraalWasm, Chicory, FFM-to-native-engine): pick for *plugins, untrusted extensions, polyglot embedding* in a Java backend. This is the mainstream, shipping path — and the one to default to.
+
+## Use-Cases Where It Matters (and Where It Doesn&#x27;t)
+
+### Sandboxed Plugins and Extensions — the strongest case
+
+The flagship backend use-case: **run untrusted, user-supplied code safely inside your process.** A customer uploads a data-transformation script, a fraud rule, a custom serializer. You must run it without letting it read your secrets, exhaust your host, or call out to the network. WASM&#x27;s zero-ambient-authority sandbox is purpose-built for this, and from Java you embed it via **GraalWasm**.
+
+```java
+// Sketch: a Java backend hosting an untrusted WASM plugin via GraalVM&#x27;s
+// polyglot Context API. The plugin gets NO file/network/clock access unless
+// we explicitly wire it in — the &quot;padded room with only the doors we hand it.&quot;
+import org.graalvm.polyglot.*;
+import org.graalvm.polyglot.io.IOAccess;
+
+public final class PluginHost {
+
+    public int runUntrustedTransform(byte[] wasmModuleBytes, int input) {
+        // Deny all host I/O by default; grant nothing the module can abuse.
+        try (Context ctx = Context.newBuilder(&quot;wasm&quot;)
+                .allowIO(IOAccess.NONE)          // no files
+                .allowHostAccess(HostAccess.NONE) // no Java callbacks
+                .allowCreateThread(false)         // no threads
+                .build()) {
+
+            Source src = Source.newBuilder(&quot;wasm&quot;, ByteSequence.create(wasmModuleBytes), &quot;plugin&quot;)
+                                .build();
+            ctx.eval(src);
+
+            // Call an exported function; if it traps or escapes, it fails here,
+            // not in our host. We can also bound fuel/time/memory via engine options.
+            Value transform = ctx.getBindings(&quot;wasm&quot;).getMember(&quot;transform&quot;);
+            return transform.execute(input).asInt();
+        }
+    }
+}
+```
+
+&gt; [!INTERVIEW]
+&gt; **Q: &quot;Why might you choose a WASM sandbox over a container to run untrusted user code inside a Java backend?&quot;**
+&gt; A strong answer distinguishes the *isolation boundary and granularity*. A container isolates a *process* via Linux namespaces/cgroups — heavyweight, OS-level, and the code inside still runs with whatever syscalls the kernel exposes (you harden it with seccomp/gVisor/Kata). A WASM module isolates a *function-sized unit of code* with **deny-by-default, capability-based** access *in-process*: it has no syscalls at all unless the host imports them, memory accesses are bounds-checked into linear memory so it cannot read host RAM, and you can spin one up in microseconds rather than the tens-to-hundreds of milliseconds a container costs. Trade-offs to name: WASM&#x27;s ecosystem and language/library support are narrower, the security model is only as good as the engine&#x27;s correctness (a sandbox-escape bug is catastrophic), and side-channel/resource-exhaustion concerns still need fuel/memory limits. Bonus points for noting they are **complementary** — WASM-in-container is common — and for being honest that for *full untrusted OS-level workloads* a microVM (Firecracker) is still the safer boundary.
+
+### Edge Compute and Portable Polyglot Functions
+
+Edge platforms want code that starts in *single-digit milliseconds*, weighs little, and runs identically across heterogeneous edge hardware — precisely WASM&#x27;s portability + fast-start pitch (and a sibling concern to the CDN/edge material elsewhere in the curriculum). The honest Java caveat: today the edge-WASM story is dominated by Rust/Go/JS because compiling Java to a *small, fast-starting* WASM module is exactly the emerging-and-heavy part. So the edge case &quot;matters&quot; conceptually but, for *Java specifically*, is more aspiration than production in 2026.
+
+Concretely, the edge platforms that lean hardest on WASM today (e.g. Fastly&#x27;s Compute and Cloudflare Workers&#x27; WASM support, among others) optimize for cold-starts in the low-millisecond range by instantiating a *pre-compiled* module rather than booting a runtime — closer to T05&#x27;s native-image startup than to a cold JVM. The reason Java is underrepresented there is the same triangle from earlier: a small, fast-starting Java WASM module is the part that is still emerging. I would not assert any specific platform&#x27;s current Java support without checking; the pattern (WASM = fast edge starts) is durable, the *Java-on-it* part is the hedge.
+
+**Portable polyglot functions** ride on the Component Model: a single typed interface (in WIT) implemented once, callable across languages — a Java host composing a Rust crypto component and a Go parsing component without FFI glue. Powerful in principle; gated on Component-Model maturity (hedged above).
+
+### Browser-Side Java
+
+CheerpJ&#x27;s domain: keep a legacy Swing/applet Java app alive in the browser by shipping the JVM as WASM. Real, but a *migration/legacy* use-case, not new backend architecture.
+
+### Where It Does NOT Yet Make Sense
+
+- **Your main production microservice.** A normal, long-running Spring Boot service has none of WASM&#x27;s pain points solved better by WASM — use the JVM (or native-image for cold-start). Do not rewrite it to WASM.
+- **Heavily threaded / reflection-heavy / large-class-library Java**, compiled *to* WASM. You will hit the GC/threads/dynamism walls above.
+- **Anything depending on bleeding-edge proposals (Component Model, WASM threads) as a stable foundation** without verifying current engine support.
+
+In Practice: a useful rule of thumb — **host WASM from Java (mature) for untrusted-plugin and polyglot-extension problems; be cautious about compiling Java to WASM (emerging) for everything else.**
+
+## The Sandbox Model as a First-Class Security Primitive
+
+It is worth stating the security argument cleanly because it is the durable reason WASM survives the hype. The WASM sandbox gives you, by construction:
+
+- **No ambient authority.** A module begins with zero capabilities; every external power is an explicitly imported function. The padded room ships with no doors — you install exactly the ones you intend.
+- **Memory safety against the host.** Loads/stores are bounds-checked into linear memory (or are host-managed GC refs); a buggy or malicious module cannot stray into host process memory. Contrast a JNI/native library in a normal JVM, which shares the process address space with *no* such guarantee.
+- **Deterministic, enforceable resource limits.** Engines support &quot;fuel&quot;/instruction metering, memory caps, and timeouts, so an infinite loop or memory bomb is bounded rather than fatal to the host.
+- **Tiny, auditable trusted-computing base** compared to &quot;trust the whole OS + container runtime.&quot;
+
+Set against the alternatives, the granularity and cost differences are the whole story:
+
+| Boundary | Isolation unit | Mechanism | Startup | Best for |
+| --- | --- | --- | --- | --- |
+| **WASM module** | A function / module, in-process | Bounds-checked memory + zero ambient authority + fuel limits | microseconds | Embedding *untrusted logic* inside a trusted host |
+| **Container** | A process + filesystem | Linux namespaces + cgroups (+ seccomp) | tens–hundreds of ms | Shipping and isolating whole *applications* |
+| **MicroVM (Firecracker)** | A guest kernel | Hardware virtualization | ~100+ ms | Strong isolation of fully *untrusted workloads* |
+| **In-JVM (classic)** | A thread / class loader | Was `SecurityManager` (deprecated/removed) | ~0 | *Trusted* code only — weak against malicious code |
+
+The takeaway: WASM fills a real gap — *in-process, sub-millisecond, default-deny* isolation that the JVM itself no longer offers now that `SecurityManager` is gone. They are layers, not rivals — running WASM modules inside a container is a perfectly normal defense-in-depth posture, and is increasingly the recommended one for high-stakes untrusted code.
+
+In Practice: a payments company lets merchants upload custom &quot;risk rules&quot; that score each transaction. Running those as raw Java (reflection, classpath, full filesystem) would be reckless; running each in its own container adds tens of milliseconds and real orchestration cost per rule. Compiling each rule to a WASM module hosted in the existing Java service gives microsecond instantiation, a hard memory cap, a fuel limit so a runaway rule cannot stall the scoring path, and — crucially — *no* way for a rule to read another merchant&#x27;s data or call out to the network, because those doors were never installed. That is the shape of the problem WASM-from-Java is genuinely good at in 2026.
+
+&gt; [!WARNING]
+&gt; The sandbox is only as trustworthy as the engine implementing it. A correctness bug in the WASM runtime is a sandbox escape, and history shows engines do ship such bugs. Treat the engine as security-critical: keep it patched, prefer mature engines, and still impose memory/fuel limits and (for high-stakes untrusted code) an *outer* boundary like a container or microVM. Defense in depth, not a single magic wall. Two more caveats engineers forget: WASM&#x27;s memory-safety guarantee protects the *host* from the guest, but it does **not** make a memory-unsafe *source language* (C/C++) safe *within* its own linear memory — a buffer overflow inside the module can still corrupt that module&#x27;s own state. And timing/side-channel isolation is *not* something the WASM sandbox promises; if you are defending against Spectre-class attacks you need the engine&#x27;s and platform&#x27;s specific mitigations, not WASM&#x27;s bounds checks alone.
+
+## Practice
+
+1. **Host a WASM module from Java.** Add GraalVM/GraalWasm; compile a tiny Rust or C function (`add`, `fib`) to `.wasm`; load and call it from a Java host via the polyglot `Context` API. Confirm it runs with no I/O granted.
+2. **Prove the sandbox.** Inside the hosted module, attempt a file open or out-of-bounds linear-memory load; observe the trap/denial. Then explicitly grant one directory via WASI pre-open and show *only* that path is reachable.
+3. **Enforce limits.** Configure memory and fuel/timeout limits on the engine; feed it an infinite-loop module and a memory-bomb module; verify the host survives and the guest is terminated.
+4. **TeaVM smoke test.** Take a small, self-contained Java class (no reflection, minimal library use); compile it to WASM with TeaVM; run it; then deliberately add a reflective call and observe what breaks. Write down the constraint you hit.
+5. **Read the bytecode.** Hand-write or generate a `.wat` module, convert to `.wasm` (`wat2wasm`), disassemble it back (`wasm2wat`), and map each instruction to what the JVM equivalent would be — note where WASM has *no* equivalent (e.g. objects, `invokevirtual`).
+6. **Marshal a string.** Write a `.wat` module exporting a `len(offset)` function over linear memory; from a Java host, copy a string&#x27;s UTF-8 bytes into the module&#x27;s memory and call it with the `(offset, length)` convention. Feel firsthand why the Component Model exists.
+7. **Maturity audit.** For your chosen runtime (Wasmtime, GraalWasm, a browser engine), look up which proposals it supports *today*: WASM GC, threads, Component Model. Document exactly what is on vs. off — this is the verification habit this whole topic is built around.
+8. **Architecture memo.** Write a one-page decision note for a hypothetical &quot;let customers upload data-transform scripts&quot; feature: WASM-plugin-in-Java vs. container-per-script vs. microVM. State the isolation boundary, startup cost, and failure mode of each, and recommend one.
+9. **Native-image vs. WASM thought experiment.** Re-read T05&#x27;s closed-world section; list which of native-image&#x27;s reachability/reflection constraints would *also* apply to a hypothetical Java→WASM AOT path, and which extra (GC, threads) ones are new.
+
+## Recap
+
+You should now be able to:
+
+- Define **WebAssembly** as a portable, sandboxed, near-native, language-agnostic *stack-machine bytecode* with a *linear-memory* model — and explain why that model (a flat, little-endian `byte[]` of offsets, page-granular growth) suits C/Rust and fights the JVM.
+- Explain **WASI** as the *capability-based system interface* that takes WASM beyond the browser to servers/edge/plugins, and correctly label maturity: **Preview 1 mature/deployed; Preview 2 + Component Model (WIT) newer and still maturing in 2026**.
+- Articulate **why Java specifically is hard on WASM** — managed GC heap vs. linear memory (the classic blocker, including the &quot;nested GC over an opaque blob&quot; problem), threads/JMM vs. single-threaded core, and reflection/dynamic loading/`invokedynamic` vs. closed-world compilation — and identify the **WASM GC proposal** as the development that makes real Java-on-WASM plausible (shipping but young).
+- Contrast **WASM bytecode with JVM bytecode**: both stack machines, but WASM encodes a minimal abstract CPU (no objects, no vtables, explicit memory) while JVM bytecode encodes a managed OO runtime.
+- Compare the four real option families with honest maturity: **TeaVM** (bytecode→WASM/JS, usable subset), **CheerpJ** (whole JVM in WASM, production for *browser-side* Java), **GraalWasm** (Java *hosts/runs* WASM guests — the backend-relevant, shipping choice), and **JVM-targets-WASM / native-image WASM backend** (*experimental/emerging*).
+- Pick correct use-cases: **sandboxed untrusted plugins** (strongest, via GraalWasm), **edge compute / portable polyglot functions** (conceptually strong, Java-specifically immature), **browser-side legacy Java** (CheerpJ) — and reject WASM for your ordinary production microservice or heavily-threaded/reflective Java compiled *to* WASM.
+- Argue the **sandbox as a security primitive**: zero ambient authority, host-memory safety, enforceable fuel/memory limits, small TCB — and place it against containers (OS-process granularity) and microVMs as complementary layers, while respecting that the engine itself is security-critical and that WASM does not promise side-channel or in-module memory safety.
+
+## Next
+
+This is the final concept topic in **JVM Internals &amp; Performance (C02)** — you have gone from JVM architecture and bytecode (T01–T03), through JIT and AOT/native-image (T04–T05), memory and garbage collection (T06–T10), profiling/benchmarking/tuning (T11–T13), flags/ergonomics (T14), and out to the JVM&#x27;s emerging portability frontier in WASM (this topic). The natural continuation is the chapter&#x27;s hands-on and best-practices material, and — since WASM-from-Java&#x27;s flagship use-case is *safe untrusted execution* — the security and sandboxing themes you will meet in the backend-engineering and architecture levels, where WASM resurfaces as a plugin and edge-isolation primitive rather than a JVM internal.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t15-project-valhalla-value-classes.html"><div class="lbl">← Previous</div><div class="ttl">T15-project-valhalla-value-classes</div><div class="sub">Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</div></a><a class="next" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><div class="lbl">Next →</div><div class="ttl">T17-tail-latency-engineering-and-load-testing</div><div class="sub">Tail-Latency Engineering &amp; Load Testing</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-webassembly-actually-is" data-toc-link>What WebAssembly Actually Is</a></li><li class="lvl-3"><a href="#linear-memory-the-model-that-makes-java-hard" data-toc-link>Linear Memory: The Model That Makes Java Hard</a></li><li class="lvl-3"><a href="#how-wasm-bytecode-differs-from-jvm-bytecode" data-toc-link>How WASM Bytecode Differs From JVM Bytecode</a></li><li class="lvl-3"><a href="#execution-model-validate-compile-run" data-toc-link>Execution Model: Validate, Compile, Run</a></li><li class="lvl-2"><a href="#wasi-webassembly-beyond-the-browser" data-toc-link>WASI: WebAssembly Beyond the Browser</a></li><li class="lvl-2"><a href="#why-wasm-is-hard-for-java-specifically" data-toc-link>Why WASM Is Hard for Java Specifically</a></li><li class="lvl-2"><a href="#the-real-options-today-with-honest-maturity-labels" data-toc-link>The Real Options Today (With Honest Maturity Labels)</a></li><li class="lvl-3"><a href="#teavm-javajvm-bytecode-wasm-and-js" data-toc-link>TeaVM — Java/JVM-bytecode → WASM (and JS)</a></li><li class="lvl-3"><a href="#cheerpj-a-jvm-in-wasm-browser" data-toc-link>CheerpJ — a JVM-in-WASM (browser)</a></li><li class="lvl-3"><a href="#graalwasm-run-wasm-inside-graalvm" data-toc-link>GraalWasm — run WASM inside GraalVM</a></li><li class="lvl-3"><a href="#jvm-targets-wasm-efforts-incl-wasm-as-a-native-image-backend" data-toc-link>JVM-targets-WASM efforts (incl. WASM-as-a-native-image-backend)</a></li><li class="lvl-2"><a href="#use-cases-where-it-matters-and-where-it-doesnt" data-toc-link>Use-Cases Where It Matters (and Where It Doesn&#x27;t)</a></li><li class="lvl-3"><a href="#sandboxed-plugins-and-extensions-the-strongest-case" data-toc-link>Sandboxed Plugins and Extensions — the strongest case</a></li><li class="lvl-3"><a href="#edge-compute-and-portable-polyglot-functions" data-toc-link>Edge Compute and Portable Polyglot Functions</a></li><li class="lvl-3"><a href="#browser-side-java" data-toc-link>Browser-Side Java</a></li><li class="lvl-3"><a href="#where-it-does-not-yet-make-sense" data-toc-link>Where It Does NOT Yet Make Sense</a></li><li class="lvl-2"><a href="#the-sandbox-model-as-a-first-class-security-primitive" data-toc-link>The Sandbox Model as a First-Class Security Primitive</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

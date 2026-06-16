@@ -22,4 +22,4 @@ Cheatsheets and quick-reference material.
 
 - [L3 Cheatsheets](T01-l3-cheatsheets.md)
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -1,0 +1,1644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 02 — Build a Memory Leak (then fix it) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="active" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>Lab 02 — Build a Memory Leak (then fix it)</span></div>
+        <h1>Lab 02 — Build a Memory Leak (then fix it)</h1>
+        <div><span class="source-path">examples/labs/lab-02-build-a-memory-leak</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><p><strong>Backs: L3/C02/T10 Memory Leaks &amp; Heap Dump Analysis (hands-on lab)</strong></p>
+<p>A diagnostic lab. You will deliberately build three classic JVM memory leaks,
+watch each one OOM under a small heap, capture and read a heap dump, then apply
+the fix and prove (with tests) that the fixed version stays bounded.</p>
+<p>The mantra of this lab: <strong>a Java memory leak is an unintended strong reference
+from a GC root to objects you no longer need.</strong> Every leak here is a different
+disguise for that one idea, and every fix is a different way to drop that
+reference.</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>JDK 21 or newer</strong> to <em>run</em> the demos. The classes are compiled to Java 21
+  bytecode (class file version 65). A Java 17 runtime will refuse them with
+  <code>UnsupportedClassVersionError</code>. Check with <code>java -version</code>.</li>
+<li><strong>Maven 3.9+</strong> to build and run the tests.</li>
+<li>For heap-dump analysis, one of:</li>
+<li><strong>Eclipse MAT</strong> (Memory Analyzer Tool) — best dominator tree + Leak Suspects.</li>
+<li><strong>VisualVM</strong> — bundled-ish, good "Objects" histogram and references view.</li>
+<li>Command-line <strong><code>jmap</code></strong> / <strong><code>jcmd</code></strong> (ships with the JDK) to capture dumps,
+    and <strong><code>jhat</code></strong>/MAT to read them.</li>
+</ul>
+<blockquote>
+<p>The JDK that <em>builds</em> this project (whatever Maven uses) may be newer than 21;
+that's fine — we cross-compile to 21 via <code>maven.compiler.release</code>. The JDK that
+<em>runs</em> the leak demos must be 21+.</p>
+</blockquote>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<ol>
+<li><a href="src/main/java/com/javamastery/examples/leak/Payload.java"><code>src/main/java/.../leak/Payload.java</code></a>
+   — the chunky value object every leak retains; explains the byte-level cost of one entry.</li>
+<li><a href="src/main/java/com/javamastery/examples/leak/UnboundedCacheLeak.java"><code>UnboundedCacheLeak.java</code></a>
+   — leak #1, the <code>static</code> cache. Start here; it's the canonical case.</li>
+<li><a href="src/main/java/com/javamastery/examples/leak/ListenerRegistryLeak.java"><code>ListenerRegistryLeak.java</code></a>
+   and <a href="src/main/java/com/javamastery/examples/leak/ThreadLocalLeak.java"><code>ThreadLocalLeak.java</code></a>
+   — leak #2 (never-deregistered listeners) and #2b (ThreadLocal on a pooled thread).</li>
+<li><a href="src/main/java/com/javamastery/examples/leak/BrokenKeyLeak.java"><code>BrokenKeyLeak.java</code></a>
+   — leak #3, the key missing <code>equals</code>/<code>hashCode</code>.</li>
+<li>The fixes in <a href="src/main/java/com/javamastery/examples/leak/fixed/"><code>src/main/java/.../leak/fixed/</code></a>
+   and the tests in <a href="src/test/java/com/javamastery/examples/leak/"><code>src/test/java/.../leak/</code></a>.</li>
+</ol>
+<hr>
+<h2 id="build-test">Build &amp; test<a class="anchor" href="#build-test" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># From this directory:
+mvn test          # compiles to Java 21 bytecode, runs the (green, non-OOM) tests
+</code></pre></div>
+<p>The tests assert the <strong>fixed</strong> versions are bounded. They are deterministic and
+<strong>never</strong> trigger an OutOfMemoryError — the test JVM runs with a fixed <code>-Xmx256m</code>
+and every test pushes only a small, fixed amount of work through the fixed code.</p>
+<p><code>mvn test</code> should print <code>Tests run: 10, Failures: 0, Errors: 0, Skipped: 0</code>.</p>
+<hr>
+<h2 id="how-to-run-a-leak-to-oom">How to RUN a leak to OOM<a class="anchor" href="#how-to-run-a-leak-to-oom" aria-hidden="true">#</a></h2>
+<p>Each leak has its own <code>main</code>. Compile first (<code>mvn -q compile</code>), then launch with a
+<strong>small, explicit heap</strong> so the OOM arrives in seconds, plus the flag that dumps
+the heap on the way down:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q compile
+
+# Leak #1 — unbounded static cache
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak1.hprof \
+     -cp target/classes com.javamastery.examples.leak.UnboundedCacheLeak
+
+# Leak #2 — listener registry that never unregisters
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2.hprof \
+     -cp target/classes com.javamastery.examples.leak.ListenerRegistryLeak
+
+# Leak #2b — ThreadLocal set on a pooled thread, never remove()d
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2b.hprof \
+     -cp target/classes com.javamastery.examples.leak.ThreadLocalLeak
+
+# Leak #3 — HashSet key missing equals/hashCode
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak3.hprof \
+     -cp target/classes com.javamastery.examples.leak.BrokenKeyLeak
+</code></pre></div>
+<p>Each prints a heap heartbeat (<code>used / total / max</code>) so you can watch <code>used</code> climb
+toward <code>max</code> right before the crash:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>iter=1,500,000 retained=1,500,001  heap used=58MiB / total=64MiB / max=64MiB
+java.lang.OutOfMemoryError: Java heap space
+Dumping heap to ./leak1.hprof ...
+</code></pre></div>
+<p>You can also launch via the exec plugin (no classpath typing), though for the OOM
+you'll want the explicit <code>-Xmx</code> above:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn -q compile exec:java -Dexec.mainClass=com.javamastery.examples.leak.UnboundedCacheLeak
+</code></pre></div>
+<blockquote>
+<p>Use <code>-Xmx32m</code> if you want the OOM even faster, or <code>-Xmx128m</code> if you want more
+time to attach VisualVM and watch the heap graph grow live.</p>
+</blockquote>
+<hr>
+<h2 id="how-to-capture-a-heap-dump">How to capture a heap dump<a class="anchor" href="#how-to-capture-a-heap-dump" aria-hidden="true">#</a></h2>
+<p>Three ways, in order of convenience:</p>
+<ol>
+<li><strong>Automatic, on the OOM</strong> (used above): <code>-XX:+HeapDumpOnOutOfMemoryError</code>
+   <code>-XX:HeapDumpPath=./leak1.hprof</code>. The JVM writes a full dump the instant it
+   throws the OOM — the dump captures the heap at its fullest, which is exactly
+   what you want.</li>
+<li><strong>On demand, from a running process</strong> — find the PID and dump live:
+   <code>bash
+   jps -l                                  # find the PID of the leak demo
+   jmap -dump:live,format=b,file=live.hprof &lt;PID&gt;
+   # or, modern:
+   jcmd &lt;PID&gt; GC.heap_dump ./live.hprof</code>
+   <code>live</code> triggers a GC first, so the dump shows only <em>reachable</em> objects — the
+   leak's retained set survives a GC (that's what makes it a leak), so it's still
+   there.</li>
+<li><strong>Histogram without a full dump</strong> (quick triage): <code>jmap -histo:live &lt;PID&gt;</code> or
+   <code>jcmd &lt;PID&gt; GC.class_histogram</code> prints instance counts per class. A class whose
+   count climbs every time you re-run it is your prime suspect.</li>
+</ol>
+<hr>
+<h2 id="how-to-read-the-dump-what-to-look-for">How to READ the dump (what to look for)<a class="anchor" href="#how-to-read-the-dump-what-to-look-for" aria-hidden="true">#</a></h2>
+<p>Open the <code>.hprof</code> in <strong>Eclipse MAT</strong> (or VisualVM → <em>File → Load</em>):</p>
+<ul>
+<li><strong>Leak Suspects report</strong> (MAT runs it automatically): for these labs it points
+  straight at the offending collection and names the GC root holding it.</li>
+<li><strong>Dominator tree</strong> (the most important view): sorts objects by <strong>retained
+  size</strong> — the total memory that would be freed if that object were collected. The
+  leak's container (a <code>HashMap</code>, an <code>ArrayList</code>, a thread's <code>ThreadLocalMap</code>) sits
+  at the top with a huge retained size.</li>
+<li><strong>Path to GC Roots → exclude weak/soft references</strong>: right-click the suspect and
+  ask "why is this alive?" MAT walks the strong-reference chain back to the GC
+  root. That chain <em>is</em> the bug.</li>
+</ul>
+<p>Per leak, the smoking gun is:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Leak</th>
+<th>Dominator tree shows</th>
+<th>GC root holding it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#1 Static cache</td>
+<td>one <code>HashMap</code> retaining millions of <code>Payload</code>→<code>byte[]</code></td>
+<td><code>UnboundedCacheLeak.CACHE</code> (a static field → system-class GC root)</td>
+</tr>
+<tr>
+<td>#2 Listener registry</td>
+<td>an <code>ArrayList</code> of lambda listeners, each retaining a <code>Payload</code></td>
+<td>the <code>EventBus</code> instance, reachable from the app's roots</td>
+</tr>
+<tr>
+<td>#2b ThreadLocal</td>
+<td>each worker <code>Thread</code>'s <code>ThreadLocalMap</code> → an ever-growing <code>ArrayList</code></td>
+<td>the live pool <code>Thread</code> (a thread is a GC root)</td>
+</tr>
+<tr>
+<td>#3 Broken key</td>
+<td>a <code>HashMap</code>/<code>HashSet</code> with millions of <code>OrderKey</code> but only ~100 distinct <code>id</code> values</td>
+<td>the <code>seen</code> set; the tell is <em>count ≫ distinct ids</em></td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="why-each-one-leaks-gc-roots-strong-references">Why each one leaks (GC roots &amp; strong references)<a class="anchor" href="#why-each-one-leaks-gc-roots-strong-references" aria-hidden="true">#</a></h2>
+<p>The unifying rule: <strong>the garbage collector frees an object only when no chain of
+strong references reaches it from a GC root.</strong> GC roots include <code>static</code> fields of
+loaded classes, live thread stacks, live <code>Thread</code> objects (and their
+<code>ThreadLocalMap</code>s), and JNI references. A leak is an <em>accidental</em> such chain.</p>
+<ul>
+<li><strong>#1 Unbounded static cache</strong> — the cache is a <code>static</code> field, i.e. a GC root
+  that lives as long as the class is loaded (forever, for an app class). The
+  <code>HashMap</code> strongly references every key/value, so nothing put in it is ever
+  collectible. The <em>working set</em> may be tiny; the <em>retained set</em> grows without
+  bound. <strong>Fix:</strong> bound the cache (see <code>BoundedCache</code>).</li>
+<li><strong>#2 Listener registry</strong> — a long-lived publisher's <code>List</code> strongly references
+  every listener. A lambda listener captures its enclosing object, so the whole
+  subscriber graph is pinned. "I'm done with this subscriber" does <strong>not</strong> remove
+  the reference. <strong>Fix:</strong> deregister (see <code>ListenerRegistryFixed</code>).</li>
+<li><strong>#2b ThreadLocal on a pooled thread</strong> — a live worker thread is a GC root; its
+  <code>ThreadLocalMap</code> strongly references the <em>values</em> you <code>set</code> (the keys are weak,
+  the values are <strong>strong</strong>). In a pool the thread is reused forever, so a value
+  that is never <code>remove()</code>d is pinned indefinitely. This is the mechanism behind
+  the classic webapp-redeploy classloader leak. <strong>Fix:</strong> <code>try { set } finally {
+  remove() }</code> (see <code>ThreadLocalFixed</code>).</li>
+<li><strong>#3 Broken key</strong> — the key inherits identity <code>equals</code>/<code>hashCode</code> from <code>Object</code>,
+  so a <code>HashSet</code> that was meant to dedup never does: every logically-equal key is a
+  distinct object, and the set grows by one per <code>add</code>. A structure the author
+  believed bounded (one entry per distinct id) is actually unbounded (one entry per
+  add). <strong>Fix:</strong> give the key correct, immutable value semantics — a <code>record</code> (see
+  <code>CorrectKey</code>).</li>
+</ul>
+<hr>
+<h2 id="the-fixes-and-how-the-tests-prove-them">The fixes (and how the tests prove them)<a class="anchor" href="#the-fixes-and-how-the-tests-prove-them" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Leak</th>
+<th>Fix class</th>
+<th>What the test asserts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#1</td>
+<td><a href="src/main/java/com/javamastery/examples/leak/fixed/BoundedCache.java"><code>fixed/BoundedCache</code></a> — LRU via <code>LinkedHashMap.removeEldestEntry</code> (Caffeine in real life)</td>
+<td>size never exceeds capacity even after 100× more distinct keys; LRU keeps recently-used entries</td>
+</tr>
+<tr>
+<td>#2</td>
+<td><a href="src/main/java/com/javamastery/examples/leak/fixed/ListenerRegistryFixed.java"><code>fixed/ListenerRegistryFixed</code></a> — <code>AutoCloseable</code> <code>Subscription</code> + <code>unregister</code></td>
+<td>count returns to 0 after each close; a <code>WeakReference</code> to a deregistered listener <strong>clears after GC</strong> (proves it's collectible)</td>
+</tr>
+<tr>
+<td>#2b</td>
+<td><a href="src/main/java/com/javamastery/examples/leak/fixed/ThreadLocalFixed.java"><code>fixed/ThreadLocalFixed</code></a> — <code>try/finally</code> + <code>remove()</code></td>
+<td>a reused single-thread-pool worker holds <strong>no</strong> residual value between tasks</td>
+</tr>
+<tr>
+<td>#3</td>
+<td><a href="src/main/java/com/javamastery/examples/leak/fixed/CorrectKey.java"><code>fixed/CorrectKey</code></a> — a <code>record</code> (auto <code>equals</code>/<code>hashCode</code>)</td>
+<td>a <code>HashSet</code> seeing only 100 distinct ids stabilizes at exactly 100; the broken key, by contrast, grows by one per add</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>WeakReference</code>-clears-after-GC technique (in <code>ListenerRegistryFixedTest</code>) is
+the deterministic, OOM-free way to assert "this object is now collectible": a weak
+ref does not prevent collection, so once the last strong reference is dropped, the
+referent clears after a GC. If the fix had leaked, the strong reference would
+remain and the weak ref would never clear.</p>
+<hr>
+<h2 id="cleanup">Cleanup<a class="anchor" href="#cleanup" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn clean             # remove target/
+rm -f *.hprof         # remove any heap dumps you captured
+</code></pre></div>
+<p>Heap dumps can be large (tens of MB to many GB on a real app) — don't commit them.</p>
+<h2 id="source-files">Source files<a class="anchor" href="#source-files" aria-hidden="true">#</a></h2>
+<p><em>15 key file(s) from <code>examples/labs/lab-02-build-a-memory-leak/</code>. Truncated files are marked; see the repo for the full source.</em></p>
+<h3 id="pomxml"><code>pom.xml</code><a class="anchor" href="#pomxml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!--
+      Plain Java lab — NO Spring, NO parent POM. The whole point is to keep the
+      classpath tiny so the heap dumps you capture are dominated by *your* leak,
+      not framework noise. Just JUnit 5 for the (green, non-OOM) tests.
+    --&gt;
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;lab-02-build-a-memory-leak&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;lab-02-build-a-memory-leak&lt;/name&gt;
+    &lt;description&gt;Diagnostic lab: deliberately build three classic JVM memory leaks, observe them OOM, then fix them. Backs L3/C02/T10.&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;!--
+          Compile and target Java 21. We use the javac `release` flag (set via the
+          compiler plugin below) so the bytecode is valid on a real Java 21 runtime
+          even if the JDK running Maven is newer (e.g. 25). This is the modern,
+          cross-compilation-safe way to pin a language/bytecode level.
+        --&gt;
+        &lt;maven.compiler.release&gt;21&lt;/maven.compiler.release&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;junit.version&gt;5.11.3&lt;/junit.version&gt;
+        &lt;surefire.version&gt;3.5.2&lt;/surefire.version&gt;
+        &lt;compiler.plugin.version&gt;3.13.0&lt;/compiler.plugin.version&gt;
+        &lt;exec.plugin.version&gt;3.5.0&lt;/exec.plugin.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;!--
+              The JUnit 5 BOM keeps the jupiter-api, jupiter-engine and platform
+              artifacts on mutually-compatible versions, so we omit &lt;version&gt; on the
+              individual test deps below.
+            --&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.junit&lt;/groupId&gt;
+                &lt;artifactId&gt;junit-bom&lt;/artifactId&gt;
+                &lt;version&gt;${junit.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;dependencies&gt;
+        &lt;!--
+          JUnit Jupiter (API + engine). test scope only — none of this is on the
+          runtime classpath of the leak demos you launch with `java -cp target/classes`.
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+            &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;!--
+              Compiler plugin pinned + `release 21` (driven by maven.compiler.release).
+              `release` is stronger than source/target: it also forbids APIs that did
+              not exist in Java 21, so you cannot accidentally depend on a newer JDK.
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${compiler.plugin.version}&lt;/version&gt;
+            &lt;/plugin&gt;
+
+            &lt;!--
+              Surefire runs the JUnit 5 tests during `mvn test`. The tests assert the
+              FIXED versions are bounded; they never trigger a real OOM. We give the
+              test JVM a modest, FIXED heap so behaviour is deterministic across
+              machines, and -XX:+AlwaysPreTouch is intentionally NOT set.
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${surefire.version}&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;argLine&gt;-Xmx256m&lt;/argLine&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+
+            &lt;!--
+              exec-maven-plugin: convenience launcher for the leak/fixed demos without
+              hand-typing a classpath. Examples (see README):
+                mvn -q compile exec:java -Dexec.mainClass=com.javamastery.examples.leak.UnboundedCacheLeak
+              For the *real* OOM experience you want a small, explicit heap, so the
+              README prefers a raw `java -Xmx64m -cp target/classes ...` invocation.
+            --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+                &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;
+                &lt;version&gt;${exec.plugin.version}&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;!-- No default mainClass: every demo has its own, pass it via -Dexec.mainClass --&gt;
+                    &lt;classpathScope&gt;compile&lt;/classpathScope&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakbrokenkeyleakjava"><code>src/main/java/com/javamastery/examples/leak/BrokenKeyLeak.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakbrokenkeyleakjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * LEAK #3 — a key with NO {@code equals}/{@code hashCode}, deduped into a
+ * {@link HashSet} that therefore never actually dedupes.
+ *
+ * &lt;p&gt;The intent of the code is benign and looks bounded: &quot;track the set of seen
+ * order ids; the same id is added repeatedly but a Set should collapse
+ * duplicates.&quot; The author expects the set to stabilize at the number of DISTINCT
+ * ids. But because the key class does not override {@code equals}/{@code hashCode},
+ * the {@link Set} uses &lt;b&gt;identity&lt;/b&gt; equality — so two {@code OrderKey} objects
+ * that are logically the same id are treated as different. The &quot;dedup&quot; never
+ * happens and the set grows by one on every add, forever.
+ *
+ * &lt;h2&gt;Why it leaks&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@link HashSet} locates an element by {@code hashCode()} (which bucket) and
+ *       then {@code equals()} (is it already present). With the inherited
+ *       {@code Object} implementations, {@code hashCode} is the identity hash and
+ *       {@code equals} is {@code ==}.&lt;/li&gt;
+ *   &lt;li&gt;Every {@code new OrderKey(42)} is a different object → different identity
+ *       hash → {@code contains} is always false → {@code add} always inserts.&lt;/li&gt;
+ *   &lt;li&gt;So a structure the author believed was bounded (one entry per distinct id)
+ *       is actually unbounded (one entry per &lt;i&gt;add call&lt;/i&gt;). Classic &quot;my set
+ *       won't stop growing even though I only have 100 real ids&quot; bug.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;What you'll see in a heap dump&lt;/h2&gt;
+ * A {@code HashMap}/{@code HashSet} with millions of {@code OrderKey} instances
+ * that, if you sample them, contain only a handful of distinct {@code id} values —
+ * the tell-tale sign of a broken-equality dedup leak.
+ *
+ * @see com.javamastery.examples.leak.fixed.CorrectKey for the corrected key
+ */
+public final class BrokenKeyLeak {
+
+    /**
+     * THE BUG: a value-semantics key with NO {@code equals}/{@code hashCode}
+     * override. It inherits identity equality from {@link Object}, so it is unfit
+     * to be a {@code HashSet}/{@code HashMap} key.
+     */
+    public static final class OrderKey {
+        private final long id;
+        @SuppressWarnings(&quot;unused&quot;) // retained payload so each leaked key costs real bytes
+        private final Payload payload;
+
+        public OrderKey(long id) {
+            this.id = id;
+            this.payload = new Payload(&quot;order-&quot; + id, Demos.PAYLOAD_BYTES);
+        }
+
+        public long id() {
+            return id;
+        }
+        // No equals(). No hashCode(). That is the bug.
+    }
+
+    private BrokenKeyLeak() {
+    }
+
+    /**
+     * Runnable leak. We &quot;see&quot; only a few distinct ids (cycling 0..99) but add a
+     * fresh {@code OrderKey} object for each, so the set that should cap at 100
+     * grows without bound.
+     *
+     * &lt;pre&gt;{@code
+     * java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak3.hprof \
+     *      -cp target/classes com.javamastery.examples.leak.BrokenKeyLeak
+     * }&lt;/pre&gt;
+     */
+    public static void main(String[] args) {
+        Demos.banner(
+                &quot;LEAK #3: HashSet key missing equals/hashCode (dedup never happens)&quot;,
+                &quot;java -Xmx64m -cp target/classes com.javamastery.examples.leak.BrokenKeyLeak&quot;);
+
+        Set&lt;OrderKey&gt; seen = new HashSet&lt;&gt;();
+        for (long i = 0; ; i++) {
+            long logicalId = i % 100;            // only 100 DISTINCT ids ever
+            seen.add(new OrderKey(logicalId));   // but a new object each time → set grows forever
+            if (i % Demos.REPORT_EVERY == 0) {
+                Demos.reportHeap(i, seen.size()); // size climbs way past 100 → the smoking gun
+            }
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakdemosjava"><code>src/main/java/com/javamastery/examples/leak/Demos.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakdemosjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+/**
+ * Tiny helper shared by the runnable {@code main} demos.
+ *
+ * &lt;p&gt;&lt;b&gt;Why a &quot;gate&quot;?&lt;/b&gt; Every leak demo allocates in an unbounded loop and is
+ * meant to be run by hand with a small heap so it OOMs. We must guarantee these
+ * loops NEVER run during {@code mvn test} (Surefire only invokes {@code @Test}
+ * methods, so a stray {@code main} would not run anyway — but to be safe and to
+ * make intent explicit, the demos read a small step count and print progress so
+ * they are obviously interactive, not test code).
+ */
+final class Demos {
+
+    private Demos() {
+    }
+
+    /** 1 KiB payloads: small enough to watch the heap fill gradually, big enough to OOM fast at -Xmx64m. */
+    static final int PAYLOAD_BYTES = 1024;
+
+    /** How often to print a heartbeat line so you can watch growth before the OOM. */
+    static final int REPORT_EVERY = 50_000;
+
+    /**
+     * Prints a heap heartbeat: used / total / max in MiB. Call this periodically
+     * from a leaking loop so you can watch &quot;used&quot; climb toward &quot;max&quot; right before
+     * the {@link OutOfMemoryError}.
+     */
+    static void reportHeap(long iteration, long retainedEntries) {
+        Runtime rt = Runtime.getRuntime();
+        long used = rt.totalMemory() - rt.freeMemory();
+        long total = rt.totalMemory();
+        long max = rt.maxMemory();
+        System.out.printf(
+                &quot;iter=%,d retained=%,d  heap used=%,dMiB / total=%,dMiB / max=%,dMiB%n&quot;,
+                iteration, retainedEntries, mib(used), mib(total), mib(max));
+    }
+
+    private static long mib(long bytes) {
+        return bytes / (1024 * 1024);
+    }
+
+    /** Header banner so console runs are self-documenting. */
+    static void banner(String title, String howToOom) {
+        System.out.println(&quot;================================================================&quot;);
+        System.out.println(title);
+        System.out.println(&quot;Run to OOM with a small heap, e.g.:&quot;);
+        System.out.println(&quot;  &quot; + howToOom);
+        System.out.println(&quot;Capture a dump: add -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak.hprof&quot;);
+        System.out.println(&quot;Press Ctrl-C to stop early.&quot;);
+        System.out.println(&quot;================================================================&quot;);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleaklistenerregistryleakjava"><code>src/main/java/com/javamastery/examples/leak/ListenerRegistryLeak.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleaklistenerregistryleakjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * LEAK #2 — the observer/listener registry that never deregisters.
+ *
+ * &lt;p&gt;The pattern: a long-lived publisher (event bus, UI model, config service)
+ * holds a list of listeners. Short-lived subscribers (request-scoped objects,
+ * dialogs, sessions) call {@code register(...)} but no one ever calls
+ * {@code unregister(...)}. Each subscriber typically closes over a chunk of
+ * state. Because the long-lived publisher strongly references every listener
+ * forever, none of those subscribers (or the state they capture) can be
+ * collected — even after the subscriber is &quot;done&quot;.
+ *
+ * &lt;h2&gt;Why it leaks (GC roots and strong references)&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;The publisher is long-lived and reachable from a GC root (here, the demo's
+ *       stack; in real apps it's a singleton/static or a Spring bean).&lt;/li&gt;
+ *   &lt;li&gt;The publisher's {@code List&lt;listener&gt;} &lt;b&gt;strongly&lt;/b&gt; references each
+ *       listener. A lambda/anonymous listener captures its enclosing object, so
+ *       the whole subscriber graph stays reachable.&lt;/li&gt;
+ *   &lt;li&gt;&quot;I'm finished with this subscriber&quot; does NOT remove it from the list, so
+ *       the strong reference outlives the subscriber's usefulness → leak.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;What you'll see in a heap dump&lt;/h2&gt;
+ * The publisher's backing {@code ArrayList} dominates, retaining thousands of
+ * listener lambdas, each retaining a {@link Payload}. The dominator tree shows
+ * {@code ListenerRegistryLeak$EventBus} → {@code ArrayList} → lambda → Payload.
+ *
+ * @see com.javamastery.examples.leak.fixed.ListenerRegistryFixed for the fix
+ */
+public final class ListenerRegistryLeak {
+
+    /**
+     * A long-lived publisher. It only ever ADDS listeners — there is no
+     * {@code unregister} and no auto-cleanup, so the list grows forever.
+     */
+    public static final class EventBus {
+        private final List&lt;Consumer&lt;String&gt;&gt; listeners = new ArrayList&lt;&gt;();
+
+        /** THE BUG: register with no matching unregister anywhere in the lifecycle. */
+        public void register(Consumer&lt;String&gt; listener) {
+            listeners.add(listener);
+        }
+
+        public void publish(String event) {
+            for (Consumer&lt;String&gt; l : listeners) {
+                l.accept(event);
+            }
+        }
+
+        public int listenerCount() {
+            return listeners.size();
+        }
+    }
+
+    private ListenerRegistryLeak() {
+    }
+
+    /**
+     * Runnable leak. Each &quot;session&quot; subscribes a listener that captures a
+     * {@link Payload}, then is discarded — but the bus keeps the listener
+     * (and its captured Payload) alive forever.
+     *
+     * &lt;pre&gt;{@code
+     * java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2.hprof \
+     *      -cp target/classes com.javamastery.examples.leak.ListenerRegistryLeak
+     * }&lt;/pre&gt;
+     */
+    public static void main(String[] args) {
+        Demos.banner(
+                &quot;LEAK #2: listener registry that never unregisters&quot;,
+                &quot;java -Xmx64m -cp target/classes com.javamastery.examples.leak.ListenerRegistryLeak&quot;);
+
+        EventBus bus = new EventBus();
+        for (long session = 0; ; session++) {
+            // A short-lived subscriber captures some state and registers a listener.
+            Payload captured = new Payload(&quot;session-&quot; + session, Demos.PAYLOAD_BYTES);
+            bus.register(event -&gt; {
+                // The lambda CAPTURES `captured`, pinning that Payload for as long
+                // as the bus keeps this listener — i.e. forever.
+                if (event.isEmpty()) {
+                    System.out.println(captured.label());
+                }
+            });
+            // The subscriber goes &quot;out of scope&quot; here, but the bus still holds it.
+            if (session % Demos.REPORT_EVERY == 0) {
+                Demos.reportHeap(session, bus.listenerCount());
+            }
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakpayloadjava"><code>src/main/java/com/javamastery/examples/leak/Payload.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakpayloadjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import java.util.Arrays;
+
+/**
+ * A deliberately chunky value object so each leaked entry retains a meaningful
+ * number of bytes — this makes the leak show up fast under a small {@code -Xmx}
+ * and makes the retained set obvious in a heap dump's dominator tree.
+ *
+ * &lt;p&gt;Each instance owns a {@code byte[]} of {@code sizeBytes}. On a 64-bit HotSpot
+ * with compressed oops, the object header is 12 bytes, the {@code byte[]} field is
+ * a 4-byte compressed reference, and the array itself is a 16-byte header
+ * (mark + klass + length, padded) plus {@code sizeBytes} payload bytes rounded up
+ * to the 8-byte alignment. So a &quot;1 KiB&quot; payload retains roughly 1 KiB + ~32 bytes
+ * of bookkeeping — the array dominates, which is exactly what you want when
+ * reasoning about a leak's growth rate.
+ */
+public final class Payload {
+
+    /** The bytes this payload retains. The array is what dominates retained size. */
+    private final byte[] data;
+
+    /** A label, handy for spotting these objects by class+field in a heap dump. */
+    private final String label;
+
+    public Payload(String label, int sizeBytes) {
+        this.label = label;
+        this.data = new byte[sizeBytes];
+        // Touch the array so it is not optimized away and actually occupies pages.
+        Arrays.fill(this.data, (byte) 1);
+    }
+
+    public int sizeBytes() {
+        return data.length;
+    }
+
+    public String label() {
+        return label;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Payload[&quot; + label + &quot;, &quot; + data.length + &quot;B]&quot;;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakthreadlocalleakjava"><code>src/main/java/com/javamastery/examples/leak/ThreadLocalLeak.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakthreadlocalleakjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * LEAK #2b — a {@link ThreadLocal} set on a POOLED thread and never removed.
+ *
+ * &lt;p&gt;This is the most insidious variant of the &quot;never released&quot; family because it
+ * is invisible in normal code review: nobody wrote a {@code Map.put} that grows.
+ * The growth lives inside each worker thread's {@code ThreadLocalMap}.
+ *
+ * &lt;h2&gt;Why it leaks (GC roots and strong references)&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;Every {@link Thread} has a {@code ThreadLocal.ThreadLocalMap threadLocals}
+ *       field. A live thread is a &lt;b&gt;GC root&lt;/b&gt;, so its {@code ThreadLocalMap}
+ *       (and the VALUES inside it) are reachable as long as the thread is alive.&lt;/li&gt;
+ *   &lt;li&gt;In a thread &lt;b&gt;pool&lt;/b&gt;, worker threads are reused for the lifetime of the
+ *       pool. If a task does {@code TL.set(bigValue)} but never
+ *       {@code TL.remove()}, that {@code bigValue} stays pinned on the worker
+ *       thread between tasks — and the next task overwrites it with ANOTHER big
+ *       value that also never gets removed in some code paths.&lt;/li&gt;
+ *   &lt;li&gt;Subtlety: the {@code ThreadLocalMap} &lt;i&gt;key&lt;/i&gt; is a {@code WeakReference}
+ *       to the {@code ThreadLocal} object, but the &lt;b&gt;value is a strong
+ *       reference&lt;/b&gt;. So even when the {@code ThreadLocal} field itself is
+ *       collectible, the value lingers until the slot is reused or the thread
+ *       dies. On a pool, the thread never dies, so the value leaks. This is the
+ *       same mechanism behind the classic webapp redeploy leak (a thread-pool
+ *       thread pins the old webapp's classloader via a ThreadLocal value).&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;This demo holds a reference to each value in an external counter list ONLY so
+ * the heartbeat can report growth deterministically; the real leak is the per-task
+ * {@code TL.set(...)} with no {@code remove()} on a reused worker thread.
+ *
+ * @see com.javamastery.examples.leak.fixed.ThreadLocalFixed for the try/finally remove() fix
+ */
+public final class ThreadLocalLeak {
+
+    /** THE BUG SITE: every task sets this but the leaking task never removes it. */
+    private static final ThreadLocal&lt;Payload&gt; SCRATCH = new ThreadLocal&lt;&gt;();
+
+    private ThreadLocalLeak() {
+    }
+
+    /**
+     * One unit of work that allocates a big scratch value into the thread-local
+     * and &quot;forgets&quot; to remove it. On a pooled (reused) thread this value is pinned
+     * until the slot is overwritten by the next task — but it is NEVER nulled, so
+     * the cumulative high-water mark of retained scratch values climbs.
+     */
+    static void leakyTask(long id) {
+        SCRATCH.set(new Payload(&quot;scratch-&quot; + id, Demos.PAYLOAD_BYTES * 8));
+        // ... do work using SCRATCH.get() ...
+        // BUG: no SCRATCH.remove() — the value stays attached to this worker thread.
+    }
+
+    /**
+     * Runnable leak. A small fixed pool (threads are reused). Each task pins a
+     * large scratch payload to its worker thread via the ThreadLocal and never
+     * removes it. Combined with many distinct ThreadLocals this OOMs; with a single
+     * ThreadLocal the value is at least overwritten, so we deliberately allocate a
+     * fresh ThreadLocal per batch to make the unbounded growth obvious.
+     *
+     * &lt;pre&gt;{@code
+     * java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2b.hprof \
+     *      -cp target/classes com.javamastery.examples.leak.ThreadLocalLeak
+     * }&lt;/pre&gt;
+     */
+    public static void main(String[] args) throws InterruptedException {
+        Demos.banner(
+                &quot;LEAK #2b: ThreadLocal set on a pooled thread, never remove()d&quot;,
+                &quot;java -Xmx64m -cp target/classes com.javamastery.examples.leak.ThreadLocalLeak&quot;);
+
+        int poolSize = 4;
+        ExecutorService pool = Executors.newFixedThreadPool(poolSize);
+        try {
+            for (long id = 0; ; id++) {
+                final long taskId = id;
+                // Each task pins a value to whichever pooled worker runs it, and
+                // never removes it. To make growth unbounded (not just a constant
+                // 4 pinned values), the worker accumulates into a per-thread list.
+                pool.submit(() -&gt; {
+                    leakyTask(taskId);
+                    PerThreadAccumulator.ACCUM.get().add(SCRATCH.get());
+                });
+                if (id % 10_000 == 0) {
+                    Demos.reportHeap(id, -1);
+                }
+            }
+        } finally {
+            pool.shutdownNow();
+            pool.awaitTermination(1, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * A second ThreadLocal whose VALUE is an ever-growing list, pinned to each
+     * pooled worker thread. This is the unbounded part: a live worker thread (a GC
+     * root) holds a {@code ThreadLocalMap} whose value is a list that only grows.
+     */
+    static final class PerThreadAccumulator {
+        static final ThreadLocal&lt;java.util.List&lt;Payload&gt;&gt; ACCUM =
+                ThreadLocal.withInitial(java.util.ArrayList::new);
+
+        private PerThreadAccumulator() {
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakunboundedcacheleakjava"><code>src/main/java/com/javamastery/examples/leak/UnboundedCacheLeak.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakunboundedcacheleakjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * LEAK #1 — the unbounded {@code static} cache.
+ *
+ * &lt;p&gt;This is the single most common Java memory leak in production code: a cache
+ * that only ever {@code put}s and never evicts, anchored to a {@code static}
+ * field. The classic story: &quot;We added a cache to speed up lookups; six weeks
+ * later the service started OOMing every few days.&quot;
+ *
+ * &lt;h2&gt;Why it leaks (GC roots and strong references)&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;A {@code static} field is a &lt;b&gt;GC root&lt;/b&gt;: it lives in the class's
+ *       metadata, which is reachable for the entire life of the loaded class
+ *       (effectively forever for an app class loaded by the system classloader).&lt;/li&gt;
+ *   &lt;li&gt;The {@link HashMap} held by that field strongly references every key and
+ *       value. As long as the map is reachable (it always is — it's a GC root),
+ *       &lt;b&gt;nothing it contains can ever be collected.&lt;/b&gt;&lt;/li&gt;
+ *   &lt;li&gt;So every {@link Payload} you {@code put} is pinned for the lifetime of the
+ *       JVM. The &quot;working set&quot; you actually need might be tiny, but the
+ *       &lt;b&gt;retained set&lt;/b&gt; grows without bound.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;What you'll see in a heap dump&lt;/h2&gt;
+ * In Eclipse MAT's &lt;b&gt;dominator tree&lt;/b&gt;, a single {@code HashMap} (reached from
+ * {@code UnboundedCacheLeak.CACHE}, a &quot;GC root: system class&quot;) will dominate the
+ * heap, with a huge &lt;b&gt;retained size&lt;/b&gt; made of {@code HashMap$Node} entries →
+ * {@link Payload} → {@code byte[]}. MAT's &lt;b&gt;&quot;Leak Suspects&quot;&lt;/b&gt; report points
+ * straight at it.
+ */
+public final class UnboundedCacheLeak {
+
+    /**
+     * THE BUG. A {@code static} {@link Map} that is only ever written to. Because
+     * the field is static, the map is a GC root and everything in it is retained
+     * forever. There is no size cap, no eviction, no TTL.
+     */
+    private static final Map&lt;Long, Payload&gt; CACHE = new HashMap&lt;&gt;();
+
+    private UnboundedCacheLeak() {
+    }
+
+    /** Simulates &quot;cache this computed/fetched value&quot;, keyed by id. Never evicts. */
+    public static Payload cacheAndGet(long id) {
+        return CACHE.computeIfAbsent(id, key -&gt; new Payload(&quot;cache-&quot; + key, Demos.PAYLOAD_BYTES));
+    }
+
+    /** Exposed only so a demo/observer can read the growing size. */
+    public static int cacheSize() {
+        return CACHE.size();
+    }
+
+    /**
+     * Runnable leak. Keeps inserting NEW keys forever, so the map grows without
+     * bound and eventually throws {@link OutOfMemoryError} under a small heap.
+     *
+     * &lt;pre&gt;{@code
+     * java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak1.hprof \
+     *      -cp target/classes com.javamastery.examples.leak.UnboundedCacheLeak
+     * }&lt;/pre&gt;
+     */
+    public static void main(String[] args) {
+        Demos.banner(
+                &quot;LEAK #1: unbounded static HashMap cache (never evicts)&quot;,
+                &quot;java -Xmx64m -cp target/classes com.javamastery.examples.leak.UnboundedCacheLeak&quot;);
+
+        for (long id = 0; ; id++) {           // brand-new key every iteration → unbounded growth
+            cacheAndGet(id);
+            if (id % Demos.REPORT_EVERY == 0) {
+                Demos.reportHeap(id, cacheSize());
+            }
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakfixedboundedcachejava"><code>src/main/java/com/javamastery/examples/leak/fixed/BoundedCache.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakfixedboundedcachejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak.fixed;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.javamastery.examples.leak.Payload;
+
+/**
+ * FIX for LEAK #1 — a size-bounded LRU cache.
+ *
+ * &lt;p&gt;The leak was an unbounded {@code static HashMap}: a GC root holding strong
+ * references to everything, forever. The fix is to &lt;b&gt;cap the retained set&lt;/b&gt; so
+ * the cache can never retain more than {@code capacity} entries, no matter how
+ * many distinct keys flow through it.
+ *
+ * &lt;p&gt;We use the classic JDK idiom: a {@link LinkedHashMap} in access-order mode
+ * that overrides {@link #removeEldestEntry}. When the map exceeds {@code capacity},
+ * the eldest (least-recently-accessed) entry is evicted on the next {@code put}.
+ * That eviction drops the only strong reference the cache held to that entry's key
+ * and value, making them eligible for GC. The cache's retained size is therefore
+ * &lt;b&gt;O(capacity)&lt;/b&gt;, not O(number of distinct keys).
+ *
+ * &lt;p&gt;Production note: in a real service you would usually reach for Caffeine
+ * ({@code com.github.ben-manes.caffeine}) for concurrency, TTL, weighed sizes and
+ * frequency-based eviction (TinyLFU). This {@code LinkedHashMap} version is the
+ * dependency-free demonstration of the same principle: &lt;b&gt;bound the cache&lt;/b&gt;.
+ *
+ * &lt;p&gt;Not thread-safe by itself (matching {@code LinkedHashMap}); wrap with
+ * {@code Collections.synchronizedMap} or use Caffeine if shared across threads.
+ */
+public final class BoundedCache {
+
+    private final int capacity;
+    private final Map&lt;Long, Payload&gt; cache;
+
+    public BoundedCache(int capacity) {
+        if (capacity &lt;= 0) {
+            throw new IllegalArgumentException(&quot;capacity must be positive: &quot; + capacity);
+        }
+        this.capacity = capacity;
+        // accessOrder=true → most-recently-accessed entries move to the tail, so
+        // removeEldestEntry evicts the LEAST-recently-used entry (true LRU).
+        this.cache = new LinkedHashMap&lt;&gt;(16, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry&lt;Long, Payload&gt; eldest) {
+                return size() &gt; BoundedCache.this.capacity; // evict once over capacity
+            }
+        };
+    }
+
+    /** Look up by id, computing-and-caching on miss. The cache self-evicts to stay bounded. */
+    public Payload getOrLoad(long id) {
+        Payload existing = cache.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        Payload loaded = new Payload(&quot;cache-&quot; + id, 1024);
+        cache.put(id, loaded); // may trigger eviction of the eldest entry
+        return loaded;
+    }
+
+    public int size() {
+        return cache.size();
+    }
+
+    public int capacity() {
+        return capacity;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakfixedcorrectkeyjava"><code>src/main/java/com/javamastery/examples/leak/fixed/CorrectKey.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakfixedcorrectkeyjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak.fixed;
+
+/**
+ * FIX for LEAK #3 — a key with correct, consistent {@code equals}/{@code hashCode}
+ * (here, a {@code record}, which generates both for you).
+ *
+ * &lt;p&gt;The leak was a key class that inherited identity equality from {@link Object},
+ * so a {@code HashSet} of these keys never deduplicated: every logically-equal key
+ * was a distinct object and the set grew on every {@code add}. The fix is to give
+ * the key &lt;b&gt;value semantics&lt;/b&gt; consistent with the {@code Map}/{@code Set}
+ * contract:
+ * &lt;ul&gt;
+ *   &lt;li&gt;Equal keys must have equal {@code hashCode()} (so they land in the same
+ *       bucket).&lt;/li&gt;
+ *   &lt;li&gt;{@code equals} must be reflexive, symmetric, transitive and consistent.&lt;/li&gt;
+ *   &lt;li&gt;Fields used in {@code equals}/{@code hashCode} should be immutable (so a
+ *       key's hash never changes while it sits in a bucket — mutating a live key is
+ *       its own classic bug).&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;A {@code record} is the most foolproof fix in modern Java: the compiler
+ * derives {@code equals}, {@code hashCode} and {@code toString} from the components
+ * and they are automatically consistent. With this key, a {@code HashSet} that sees
+ * only 100 distinct ids stabilizes at exactly 100 entries — bounded, as intended.
+ *
+ * @param id the logical order id; the sole identity component
+ */
+public record CorrectKey(long id) {
+    // record auto-generates equals(Object) and hashCode() over `id`.
+    // Two CorrectKey(42) instances are now .equals() and share a hashCode,
+    // so a HashSet/HashMap deduplicates them correctly.
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakfixedlistenerregistryfixedjava"><code>src/main/java/com/javamastery/examples/leak/fixed/ListenerRegistryFixed.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakfixedlistenerregistryfixedjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak.fixed;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
+/**
+ * FIX for LEAK #2 — a registry you can (and must) deregister from, plus a
+ * {@link AutoCloseable} subscription so cleanup is hard to forget.
+ *
+ * &lt;p&gt;Two complementary fixes are shown:
+ * &lt;ol&gt;
+ *   &lt;li&gt;&lt;b&gt;Explicit lifecycle:&lt;/b&gt; {@link #register} returns a {@link Subscription}
+ *       whose {@link Subscription#close()} removes the listener. Used with
+ *       try-with-resources, deregistration becomes automatic and exception-safe —
+ *       the strong reference from the bus to the listener is dropped as soon as the
+ *       subscriber is done, so the listener (and anything it captured) can be GC'd.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Symmetric API:&lt;/b&gt; {@link #unregister} exists, so even callers that
+ *       hold the listener reference directly can remove it.&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * &lt;p&gt;(An alternative fix is a registry of {@link java.lang.ref.WeakReference}s to
+ * listeners, so an un-deregistered listener can still be collected once nothing
+ * else references it. That trades a clear lifecycle for &quot;best effort&quot; cleanup and
+ * surprising &quot;my listener stopped firing&quot; bugs, so an explicit
+ * subscription/unregister is usually the better design — we demonstrate that here.)
+ */
+public final class ListenerRegistryFixed {
+
+    /** {@code CopyOnWriteArrayList} so publish can iterate while subscribers come and go. */
+    private final List&lt;Consumer&lt;String&gt;&gt; listeners = new CopyOnWriteArrayList&lt;&gt;();
+
+    /** A handle whose close() deregisters the listener. AutoCloseable → try-with-resources. */
+    public final class Subscription implements AutoCloseable {
+        // Non-final so close() can null it: otherwise a still-referenced Subscription
+        // would itself pin the listener after close(), which is its own subtle leak.
+        private Consumer&lt;String&gt; listener;
+
+        private Subscription(Consumer&lt;String&gt; listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void close() {
+            if (listener != null) {
+                listeners.remove(listener); // drops the bus's strong ref to this listener
+                listener = null;            // and drop the Subscription's own ref
+            }
+        }
+    }
+
+    /** Register and get back a Subscription you can close to deregister. */
+    public Subscription register(Consumer&lt;String&gt; listener) {
+        listeners.add(listener);
+        return new Subscription(listener);
+    }
+
+    /** Symmetric explicit removal for callers that kept the listener reference. */
+    public void unregister(Consumer&lt;String&gt; listener) {
+        listeners.remove(listener);
+    }
+
+    public void publish(String event) {
+        for (Consumer&lt;String&gt; l : listeners) {
+            l.accept(event);
+        }
+    }
+
+    public int listenerCount() {
+        return listeners.size();
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesleakfixedthreadlocalfixedjava"><code>src/main/java/com/javamastery/examples/leak/fixed/ThreadLocalFixed.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesleakfixedthreadlocalfixedjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak.fixed;
+
+import com.javamastery.examples.leak.Payload;
+
+/**
+ * FIX for LEAK #2b — set a {@link ThreadLocal} only inside a {@code try}, and
+ * ALWAYS {@code remove()} it in the matching {@code finally}.
+ *
+ * &lt;p&gt;The leak was: a task on a POOLED (reused) worker thread does {@code TL.set(big)}
+ * and never removes it, so the value stays pinned to the long-lived thread (a GC
+ * root) between tasks. The fix is the canonical scoped-usage idiom: bound the
+ * thread-local's lifetime to the unit of work with try/finally so the slot is
+ * cleared before the worker thread is returned to the pool.
+ *
+ * &lt;pre&gt;{@code
+ * SCRATCH.set(value);
+ * try {
+ *     // ... use SCRATCH.get() ...
+ * } finally {
+ *     SCRATCH.remove();   // &lt;-- the fix: clears the value off the pooled thread
+ * }
+ * }&lt;/pre&gt;
+ *
+ * &lt;p&gt;{@link #processWithScopedThreadLocal} demonstrates the idiom and returns
+ * whether the thread-local was empty afterward, so a test can assert the value was
+ * actually released ({@code get()} returns {@code null} once removed). On Java 21+
+ * a forward-looking alternative for the same &quot;scoped, auto-cleaned&quot; goal is a
+ * {@code ScopedValue} (JEP 446, preview), which is immutable and structurally
+ * bounded — but try/finally + {@code remove()} is the universally available fix.
+ */
+public final class ThreadLocalFixed {
+
+    private static final ThreadLocal&lt;Payload&gt; SCRATCH = new ThreadLocal&lt;&gt;();
+
+    private ThreadLocalFixed() {
+    }
+
+    /**
+     * Runs one unit of work using a thread-local scratch value, then removes it.
+     *
+     * @return {@code true} if the thread-local was empty (released) after the call,
+     *         which it always should be — that's the property the fix guarantees.
+     */
+    public static boolean processWithScopedThreadLocal(long id) {
+        SCRATCH.set(new Payload(&quot;scratch-&quot; + id, 8 * 1024));
+        try {
+            // ... real work would read SCRATCH.get() here ...
+            return SCRATCH.get() != null; // present DURING the work
+        } finally {
+            SCRATCH.remove(); // THE FIX: clear the value off this (possibly pooled) thread
+        }
+    }
+
+    /** Exposed for tests: is the scratch slot empty on the current thread right now? */
+    public static boolean isScratchEmpty() {
+        return SCRATCH.get() == null;
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesleakboundedcachetestjava"><code>src/test/java/com/javamastery/examples/leak/BoundedCacheTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesleakboundedcachetestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.javamastery.examples.leak.fixed.BoundedCache;
+
+/**
+ * Asserts the FIX for leak #1: a {@link BoundedCache} stays bounded no matter how
+ * many distinct keys flow through it. This is the property the leaking
+ * {@code UnboundedCacheLeak} violated.
+ *
+ * &lt;p&gt;These tests are fast, deterministic, and never approach the heap limit — they
+ * push a small, fixed number of keys through a tiny cache and assert the size cap.
+ */
+class BoundedCacheTest {
+
+    @Test
+    @DisplayName(&quot;cache never exceeds its capacity even after far more distinct keys&quot;)
+    void cacheStaysBounded() {
+        int capacity = 100;
+        BoundedCache cache = new BoundedCache(capacity);
+
+        // Push 100x more distinct keys than the capacity. The leaking version would
+        // retain all 10_000; the bounded version must cap at `capacity`.
+        for (long id = 0; id &lt; 10_000; id++) {
+            cache.getOrLoad(id);
+            assertTrue(cache.size() &lt;= capacity,
+                    &quot;cache exceeded capacity at id=&quot; + id + &quot;: size=&quot; + cache.size());
+        }
+
+        assertEquals(capacity, cache.size(),
+                &quot;after many distinct keys the cache should sit exactly at capacity&quot;);
+    }
+
+    @Test
+    @DisplayName(&quot;recently-accessed entries survive eviction (LRU semantics)&quot;)
+    void recentlyUsedEntriesSurvive() {
+        BoundedCache cache = new BoundedCache(3);
+        Payload a = cache.getOrLoad(1);
+        cache.getOrLoad(2);
+        cache.getOrLoad(3);
+
+        // Touch key 1 so it becomes most-recently-used, then overflow with key 4.
+        Payload a2 = cache.getOrLoad(1);
+        assertSame(a, a2, &quot;key 1 should still be cached (same instance), not reloaded&quot;);
+
+        cache.getOrLoad(4); // evicts the LRU entry, which is now key 2 (not key 1)
+
+        assertEquals(3, cache.size());
+        // key 1 was recently used, so it must still be present (same instance).
+        assertSame(a, cache.getOrLoad(1), &quot;recently-used key 1 must not have been evicted&quot;);
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesleakcorrectkeytestjava"><code>src/test/java/com/javamastery/examples/leak/CorrectKeyTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesleakcorrectkeytestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.javamastery.examples.leak.BrokenKeyLeak.OrderKey;
+import com.javamastery.examples.leak.fixed.CorrectKey;
+
+/**
+ * Asserts the FIX for leak #3: with correct {@code equals}/{@code hashCode}, a
+ * {@link HashSet} deduplicates logically-equal keys and stays bounded at the number
+ * of DISTINCT ids — and demonstrates that the BROKEN key does not.
+ */
+class CorrectKeyTest {
+
+    @Test
+    @DisplayName(&quot;FIXED key: set of equal-valued keys collapses to the distinct count&quot;)
+    void correctKeyDeduplicates() {
+        Set&lt;CorrectKey&gt; seen = new HashSet&lt;&gt;();
+        int distinctIds = 100;
+
+        // Add 100_000 keys but only 100 DISTINCT ids. A correct key dedups to 100.
+        for (long i = 0; i &lt; 100_000; i++) {
+            seen.add(new CorrectKey(i % distinctIds));
+            assertTrue(seen.size() &lt;= distinctIds,
+                    &quot;set grew past the distinct id count at i=&quot; + i + &quot;: size=&quot; + seen.size());
+        }
+        assertEquals(distinctIds, seen.size(),
+                &quot;with correct equals/hashCode the set must cap at the distinct id count&quot;);
+    }
+
+    @Test
+    @DisplayName(&quot;FIXED key: equal value ⇒ equal and same hashCode (the contract)&quot;)
+    void correctKeyHonoursContract() {
+        CorrectKey a = new CorrectKey(42);
+        CorrectKey b = new CorrectKey(42);
+        assertEquals(a, b, &quot;records with equal components must be equal&quot;);
+        assertEquals(a.hashCode(), b.hashCode(), &quot;equal keys must share a hashCode&quot;);
+    }
+
+    @Test
+    @DisplayName(&quot;BROKEN key: identity equality ⇒ set grows unbounded (the leak, in miniature)&quot;)
+    void brokenKeyDoesNotDeduplicate() {
+        Set&lt;OrderKey&gt; seen = new HashSet&lt;&gt;();
+        int distinctIds = 100;
+        int adds = 5_000;
+
+        for (long i = 0; i &lt; adds; i++) {
+            seen.add(new OrderKey(i % distinctIds)); // new object each time, no equals/hashCode
+        }
+        // The author EXPECTED 100; identity equality means the set grew by one per add.
+        assertEquals(adds, seen.size(),
+                &quot;broken key uses identity equality, so the set never dedups (this is the bug)&quot;);
+        assertNotEquals(distinctIds, seen.size(),
+                &quot;if this were equal to the distinct count, the key would (wrongly) be fine&quot;);
+
+        OrderKey a = new OrderKey(7);
+        OrderKey b = new OrderKey(7);
+        assertNotEquals(a, b, &quot;without overrides, two logically-equal keys are NOT equal (==)&quot;);
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesleaklistenerregistryfixedtestjava"><code>src/test/java/com/javamastery/examples/leak/ListenerRegistryFixedTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesleaklistenerregistryfixedtestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.lang.ref.WeakReference;
+import java.util.function.Consumer;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.javamastery.examples.leak.fixed.ListenerRegistryFixed;
+
+/**
+ * Asserts the FIX for leak #2: deregistering a listener actually RELEASES it, so it
+ * (and anything it captured) becomes eligible for garbage collection.
+ *
+ * &lt;p&gt;The key assertion uses a {@link WeakReference}: a weak ref does not prevent
+ * collection, so once the only STRONG references to the listener are gone (the
+ * local variable is nulled AND the registry deregistered it), the weak ref's
+ * referent must clear after a GC. If deregistration had leaked (the buggy
+ * behaviour), the registry would still strongly reference the listener and the
+ * weak ref would NOT clear.
+ */
+class ListenerRegistryFixedTest {
+
+    @Test
+    @DisplayName(&quot;count returns to zero after deregistration; listener count stays bounded&quot;)
+    void countStaysBoundedAcrossManySubscriptions() {
+        ListenerRegistryFixed bus = new ListenerRegistryFixed();
+
+        // Simulate many short-lived subscribers that each clean up via try-with-resources.
+        for (int i = 0; i &lt; 10_000; i++) {
+            try (var subscription = bus.register(event -&gt; { /* no-op */ })) {
+                bus.publish(&quot;e&quot; + i);
+            } // close() deregisters here
+            assertEquals(0, bus.listenerCount(),
+                    &quot;every subscription must be fully removed when closed&quot;);
+        }
+        assertEquals(0, bus.listenerCount());
+    }
+
+    @Test
+    @DisplayName(&quot;deregistered listener is GC-eligible (WeakReference clears after GC)&quot;)
+    void deregisteredListenerIsCollectable() {
+        ListenerRegistryFixed bus = new ListenerRegistryFixed();
+
+        // Register + deregister inside a helper so NO strong reference to the listener
+        // (local var, Subscription, captured object) survives on this stack frame into
+        // the GC-await region below. After this returns, only the bus *could* still
+        // reach the listener — and a correct deregistration means it does not.
+        WeakReference&lt;Consumer&lt;String&gt;&gt; weak = registerThenDeregister(bus);
+        assertEquals(0, bus.listenerCount());
+
+        assertNull(awaitCleared(weak),
+                &quot;after deregistration the listener must be collectable; &quot;
+                        + &quot;if it is still reachable the registry leaked it&quot;);
+    }
+
+    /** Registers a capturing listener and immediately deregisters it; returns a weak ref to it. */
+    private static WeakReference&lt;Consumer&lt;String&gt;&gt; registerThenDeregister(ListenerRegistryFixed bus) {
+        Consumer&lt;String&gt; listener = makeCapturingListener(new byte[64 * 1024]);
+        try (var subscription = bus.register(listener)) {
+            assertEquals(1, bus.listenerCount());
+        } // close() deregisters AND nulls the Subscription's own reference
+        return new WeakReference&lt;&gt;(listener);
+    }
+
+    @Test
+    @DisplayName(&quot;UN-deregistered listener stays alive (demonstrates what the LEAK looked like)&quot;)
+    void retainedListenerIsNotCollected() {
+        ListenerRegistryFixed bus = new ListenerRegistryFixed();
+
+        Consumer&lt;String&gt; listener = makeCapturingListener(new byte[64 * 1024]);
+        WeakReference&lt;Consumer&lt;String&gt;&gt; weak = new WeakReference&lt;&gt;(listener);
+
+        bus.register(listener); // intentionally NEVER closed/unregistered (the leak)
+        listener = null;        // drop our local, but the bus still holds it
+
+        // The bus still strongly references the listener, so it must NOT be collected.
+        // We give GC a chance and assert the referent is still alive.
+        System.gc();
+        System.gc();
+        assertNotNull(weak.get(),
+                &quot;a listener that was never deregistered must remain reachable via the bus&quot;);
+    }
+
+    /** Factory so the captured object is referenced only by the returned lambda. */
+    private static Consumer&lt;String&gt; makeCapturingListener(Object captured) {
+        return event -&gt; {
+            if (event == null) {
+                System.out.println(captured); // use `captured` so it is genuinely captured
+            }
+        };
+    }
+
+    /**
+     * Encourages the collector and waits (bounded) for the weak ref to clear.
+     * Deterministic in practice: the referent is unreachable, so a few GC cycles
+     * clear it well within the loop. Returns the (now-null) referent.
+     */
+    private static &lt;T&gt; T awaitCleared(WeakReference&lt;T&gt; ref) {
+        for (int attempt = 0; attempt &lt; 50 &amp;&amp; ref.get() != null; attempt++) {
+            System.gc();
+            // Allocate pressure to nudge the collector without risking OOM.
+            byte[] pressure = new byte[1 &lt;&lt; 20];
+            pressure[0] = 1; // keep the allocation from being elided
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        return ref.get();
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesleakthreadlocalfixedtestjava"><code>src/test/java/com/javamastery/examples/leak/ThreadLocalFixedTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesleakthreadlocalfixedtestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.leak;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.javamastery.examples.leak.fixed.ThreadLocalFixed;
+
+/**
+ * Asserts the FIX for leak #2b: a {@link ThreadLocal} used with try/finally +
+ * {@code remove()} leaves NO value pinned to a pooled worker thread between tasks.
+ */
+class ThreadLocalFixedTest {
+
+    @Test
+    @DisplayName(&quot;scratch value is removed from the current thread after each scoped use&quot;)
+    void scratchIsReleasedAfterUse() {
+        for (long id = 0; id &lt; 1_000; id++) {
+            boolean presentDuringWork = ThreadLocalFixed.processWithScopedThreadLocal(id);
+            assertTrue(presentDuringWork, &quot;value must be present DURING the work&quot;);
+            assertTrue(ThreadLocalFixed.isScratchEmpty(),
+                    &quot;value must be REMOVED after the work (finally { remove() })&quot;);
+        }
+    }
+
+    @Test
+    @DisplayName(&quot;on a reused pooled thread, no scratch value lingers between tasks&quot;)
+    void noResidueOnPooledThreadBetweenTasks() throws InterruptedException, ExecutionException {
+        // A single-thread pool guarantees the SAME worker runs every task, which is
+        // exactly the scenario where a missing remove() would accumulate residue.
+        ExecutorService pool = Executors.newSingleThreadExecutor();
+        try {
+            for (long id = 0; id &lt; 1_000; id++) {
+                final long taskId = id;
+                pool.submit(() -&gt; ThreadLocalFixed.processWithScopedThreadLocal(taskId)).get();
+                // Submit a probe task on the same worker: it must observe an EMPTY slot,
+                // proving the previous task cleaned up after itself.
+                boolean empty = pool.submit(ThreadLocalFixed::isScratchEmpty).get();
+                assertTrue(empty,
+                        &quot;pooled worker still held a scratch value from the previous task (leak!)&quot;);
+            }
+        } finally {
+            pool.shutdownNow();
+            pool.awaitTermination(2, TimeUnit.SECONDS);
+        }
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># Lab 02 — Build a Memory Leak (then fix it)
+
+**Backs: L3/C02/T10 Memory Leaks &amp; Heap Dump Analysis (hands-on lab)**
+
+A diagnostic lab. You will deliberately build three classic JVM memory leaks,
+watch each one OOM under a small heap, capture and read a heap dump, then apply
+the fix and prove (with tests) that the fixed version stays bounded.
+
+The mantra of this lab: **a Java memory leak is an unintended strong reference
+from a GC root to objects you no longer need.** Every leak here is a different
+disguise for that one idea, and every fix is a different way to drop that
+reference.
+
+---
+
+## Prerequisites
+
+- **JDK 21 or newer** to *run* the demos. The classes are compiled to Java 21
+  bytecode (class file version 65). A Java 17 runtime will refuse them with
+  `UnsupportedClassVersionError`. Check with `java -version`.
+- **Maven 3.9+** to build and run the tests.
+- For heap-dump analysis, one of:
+  - **Eclipse MAT** (Memory Analyzer Tool) — best dominator tree + Leak Suspects.
+  - **VisualVM** — bundled-ish, good &quot;Objects&quot; histogram and references view.
+  - Command-line **`jmap`** / **`jcmd`** (ships with the JDK) to capture dumps,
+    and **`jhat`**/MAT to read them.
+
+&gt; The JDK that *builds* this project (whatever Maven uses) may be newer than 21;
+&gt; that&#x27;s fine — we cross-compile to 21 via `maven.compiler.release`. The JDK that
+&gt; *runs* the leak demos must be 21+.
+
+---
+
+## Files to read first
+
+1. [`src/main/java/.../leak/Payload.java`](src/main/java/com/javamastery/examples/leak/Payload.java)
+   — the chunky value object every leak retains; explains the byte-level cost of one entry.
+2. [`UnboundedCacheLeak.java`](src/main/java/com/javamastery/examples/leak/UnboundedCacheLeak.java)
+   — leak #1, the `static` cache. Start here; it&#x27;s the canonical case.
+3. [`ListenerRegistryLeak.java`](src/main/java/com/javamastery/examples/leak/ListenerRegistryLeak.java)
+   and [`ThreadLocalLeak.java`](src/main/java/com/javamastery/examples/leak/ThreadLocalLeak.java)
+   — leak #2 (never-deregistered listeners) and #2b (ThreadLocal on a pooled thread).
+4. [`BrokenKeyLeak.java`](src/main/java/com/javamastery/examples/leak/BrokenKeyLeak.java)
+   — leak #3, the key missing `equals`/`hashCode`.
+5. The fixes in [`src/main/java/.../leak/fixed/`](src/main/java/com/javamastery/examples/leak/fixed/)
+   and the tests in [`src/test/java/.../leak/`](src/test/java/com/javamastery/examples/leak/).
+
+---
+
+## Build &amp; test
+
+```bash
+# From this directory:
+mvn test          # compiles to Java 21 bytecode, runs the (green, non-OOM) tests
+```
+
+The tests assert the **fixed** versions are bounded. They are deterministic and
+**never** trigger an OutOfMemoryError — the test JVM runs with a fixed `-Xmx256m`
+and every test pushes only a small, fixed amount of work through the fixed code.
+
+`mvn test` should print `Tests run: 10, Failures: 0, Errors: 0, Skipped: 0`.
+
+---
+
+## How to RUN a leak to OOM
+
+Each leak has its own `main`. Compile first (`mvn -q compile`), then launch with a
+**small, explicit heap** so the OOM arrives in seconds, plus the flag that dumps
+the heap on the way down:
+
+```bash
+mvn -q compile
+
+# Leak #1 — unbounded static cache
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak1.hprof \
+     -cp target/classes com.javamastery.examples.leak.UnboundedCacheLeak
+
+# Leak #2 — listener registry that never unregisters
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2.hprof \
+     -cp target/classes com.javamastery.examples.leak.ListenerRegistryLeak
+
+# Leak #2b — ThreadLocal set on a pooled thread, never remove()d
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak2b.hprof \
+     -cp target/classes com.javamastery.examples.leak.ThreadLocalLeak
+
+# Leak #3 — HashSet key missing equals/hashCode
+java -Xmx64m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./leak3.hprof \
+     -cp target/classes com.javamastery.examples.leak.BrokenKeyLeak
+```
+
+Each prints a heap heartbeat (`used / total / max`) so you can watch `used` climb
+toward `max` right before the crash:
+
+```
+iter=1,500,000 retained=1,500,001  heap used=58MiB / total=64MiB / max=64MiB
+java.lang.OutOfMemoryError: Java heap space
+Dumping heap to ./leak1.hprof ...
+```
+
+You can also launch via the exec plugin (no classpath typing), though for the OOM
+you&#x27;ll want the explicit `-Xmx` above:
+
+```bash
+mvn -q compile exec:java -Dexec.mainClass=com.javamastery.examples.leak.UnboundedCacheLeak
+```
+
+&gt; Use `-Xmx32m` if you want the OOM even faster, or `-Xmx128m` if you want more
+&gt; time to attach VisualVM and watch the heap graph grow live.
+
+---
+
+## How to capture a heap dump
+
+Three ways, in order of convenience:
+
+1. **Automatic, on the OOM** (used above): `-XX:+HeapDumpOnOutOfMemoryError`
+   `-XX:HeapDumpPath=./leak1.hprof`. The JVM writes a full dump the instant it
+   throws the OOM — the dump captures the heap at its fullest, which is exactly
+   what you want.
+2. **On demand, from a running process** — find the PID and dump live:
+   ```bash
+   jps -l                                  # find the PID of the leak demo
+   jmap -dump:live,format=b,file=live.hprof &lt;PID&gt;
+   # or, modern:
+   jcmd &lt;PID&gt; GC.heap_dump ./live.hprof
+   ```
+   `live` triggers a GC first, so the dump shows only *reachable* objects — the
+   leak&#x27;s retained set survives a GC (that&#x27;s what makes it a leak), so it&#x27;s still
+   there.
+3. **Histogram without a full dump** (quick triage): `jmap -histo:live &lt;PID&gt;` or
+   `jcmd &lt;PID&gt; GC.class_histogram` prints instance counts per class. A class whose
+   count climbs every time you re-run it is your prime suspect.
+
+---
+
+## How to READ the dump (what to look for)
+
+Open the `.hprof` in **Eclipse MAT** (or VisualVM → *File → Load*):
+
+- **Leak Suspects report** (MAT runs it automatically): for these labs it points
+  straight at the offending collection and names the GC root holding it.
+- **Dominator tree** (the most important view): sorts objects by **retained
+  size** — the total memory that would be freed if that object were collected. The
+  leak&#x27;s container (a `HashMap`, an `ArrayList`, a thread&#x27;s `ThreadLocalMap`) sits
+  at the top with a huge retained size.
+- **Path to GC Roots → exclude weak/soft references**: right-click the suspect and
+  ask &quot;why is this alive?&quot; MAT walks the strong-reference chain back to the GC
+  root. That chain *is* the bug.
+
+Per leak, the smoking gun is:
+
+| Leak | Dominator tree shows | GC root holding it |
+|------|----------------------|--------------------|
+| #1 Static cache | one `HashMap` retaining millions of `Payload`→`byte[]` | `UnboundedCacheLeak.CACHE` (a static field → system-class GC root) |
+| #2 Listener registry | an `ArrayList` of lambda listeners, each retaining a `Payload` | the `EventBus` instance, reachable from the app&#x27;s roots |
+| #2b ThreadLocal | each worker `Thread`&#x27;s `ThreadLocalMap` → an ever-growing `ArrayList` | the live pool `Thread` (a thread is a GC root) |
+| #3 Broken key | a `HashMap`/`HashSet` with millions of `OrderKey` but only ~100 distinct `id` values | the `seen` set; the tell is *count ≫ distinct ids* |
+
+---
+
+## Why each one leaks (GC roots &amp; strong references)
+
+The unifying rule: **the garbage collector frees an object only when no chain of
+strong references reaches it from a GC root.** GC roots include `static` fields of
+loaded classes, live thread stacks, live `Thread` objects (and their
+`ThreadLocalMap`s), and JNI references. A leak is an *accidental* such chain.
+
+- **#1 Unbounded static cache** — the cache is a `static` field, i.e. a GC root
+  that lives as long as the class is loaded (forever, for an app class). The
+  `HashMap` strongly references every key/value, so nothing put in it is ever
+  collectible. The *working set* may be tiny; the *retained set* grows without
+  bound. **Fix:** bound the cache (see `BoundedCache`).
+- **#2 Listener registry** — a long-lived publisher&#x27;s `List` strongly references
+  every listener. A lambda listener captures its enclosing object, so the whole
+  subscriber graph is pinned. &quot;I&#x27;m done with this subscriber&quot; does **not** remove
+  the reference. **Fix:** deregister (see `ListenerRegistryFixed`).
+- **#2b ThreadLocal on a pooled thread** — a live worker thread is a GC root; its
+  `ThreadLocalMap` strongly references the *values* you `set` (the keys are weak,
+  the values are **strong**). In a pool the thread is reused forever, so a value
+  that is never `remove()`d is pinned indefinitely. This is the mechanism behind
+  the classic webapp-redeploy classloader leak. **Fix:** `try { set } finally {
+  remove() }` (see `ThreadLocalFixed`).
+- **#3 Broken key** — the key inherits identity `equals`/`hashCode` from `Object`,
+  so a `HashSet` that was meant to dedup never does: every logically-equal key is a
+  distinct object, and the set grows by one per `add`. A structure the author
+  believed bounded (one entry per distinct id) is actually unbounded (one entry per
+  add). **Fix:** give the key correct, immutable value semantics — a `record` (see
+  `CorrectKey`).
+
+---
+
+## The fixes (and how the tests prove them)
+
+| Leak | Fix class | What the test asserts |
+|------|-----------|------------------------|
+| #1 | [`fixed/BoundedCache`](src/main/java/com/javamastery/examples/leak/fixed/BoundedCache.java) — LRU via `LinkedHashMap.removeEldestEntry` (Caffeine in real life) | size never exceeds capacity even after 100× more distinct keys; LRU keeps recently-used entries |
+| #2 | [`fixed/ListenerRegistryFixed`](src/main/java/com/javamastery/examples/leak/fixed/ListenerRegistryFixed.java) — `AutoCloseable` `Subscription` + `unregister` | count returns to 0 after each close; a `WeakReference` to a deregistered listener **clears after GC** (proves it&#x27;s collectible) |
+| #2b | [`fixed/ThreadLocalFixed`](src/main/java/com/javamastery/examples/leak/fixed/ThreadLocalFixed.java) — `try/finally` + `remove()` | a reused single-thread-pool worker holds **no** residual value between tasks |
+| #3 | [`fixed/CorrectKey`](src/main/java/com/javamastery/examples/leak/fixed/CorrectKey.java) — a `record` (auto `equals`/`hashCode`) | a `HashSet` seeing only 100 distinct ids stabilizes at exactly 100; the broken key, by contrast, grows by one per add |
+
+The `WeakReference`-clears-after-GC technique (in `ListenerRegistryFixedTest`) is
+the deterministic, OOM-free way to assert &quot;this object is now collectible&quot;: a weak
+ref does not prevent collection, so once the last strong reference is dropped, the
+referent clears after a GC. If the fix had leaked, the strong reference would
+remain and the weak ref would never clear.
+
+---
+
+## Cleanup
+
+```bash
+mvn clean             # remove target/
+rm -f *.hprof         # remove any heap dumps you captured
+```
+
+Heap dumps can be large (tens of MB to many GB on a real app) — don&#x27;t commit them.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><div class="lbl">← Previous</div><div class="ttl">lab-01-url-shortener-in-4-hours</div><div class="sub">Lab 01 — Build a URL Shortener in 4 Hours</div></a><a class="next" href="../examples/labs--lab-03-build-a-deadlock.html"><div class="lbl">Next →</div><div class="ttl">lab-03-build-a-deadlock</div><div class="sub">Lab 03 — Build a Deadlock (then observe it, then fix it)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-2"><a href="#build-test" data-toc-link>Build &amp;amp; test</a></li><li class="lvl-2"><a href="#how-to-run-a-leak-to-oom" data-toc-link>How to RUN a leak to OOM</a></li><li class="lvl-2"><a href="#how-to-capture-a-heap-dump" data-toc-link>How to capture a heap dump</a></li><li class="lvl-2"><a href="#how-to-read-the-dump-what-to-look-for" data-toc-link>How to READ the dump (what to look for)</a></li><li class="lvl-2"><a href="#why-each-one-leaks-gc-roots-strong-references" data-toc-link>Why each one leaks (GC roots &amp;amp; strong references)</a></li><li class="lvl-2"><a href="#the-fixes-and-how-the-tests-prove-them" data-toc-link>The fixes (and how the tests prove them)</a></li><li class="lvl-2"><a href="#cleanup" data-toc-link>Cleanup</a></li><li class="lvl-2"><a href="#source-files" data-toc-link>Source files</a></li><li class="lvl-3"><a href="#pomxml" data-toc-link>pom.xml</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakbrokenkeyleakjava" data-toc-link>src/main/java/com/javamastery/examples/leak/BrokenKeyLeak.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakdemosjava" data-toc-link>src/main/java/com/javamastery/examples/leak/Demos.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleaklistenerregistryleakjava" data-toc-link>src/main/java/com/javamastery/examples/leak/ListenerRegistryLeak.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakpayloadjava" data-toc-link>src/main/java/com/javamastery/examples/leak/Payload.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakthreadlocalleakjava" data-toc-link>src/main/java/com/javamastery/examples/leak/ThreadLocalLeak.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakunboundedcacheleakjava" data-toc-link>src/main/java/com/javamastery/examples/leak/UnboundedCacheLeak.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakfixedboundedcachejava" data-toc-link>src/main/java/com/javamastery/examples/leak/fixed/BoundedCache.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakfixedcorrectkeyjava" data-toc-link>src/main/java/com/javamastery/examples/leak/fixed/CorrectKey.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakfixedlistenerregistryfixedjava" data-toc-link>src/main/java/com/javamastery/examples/leak/fixed/ListenerRegistryFixed.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesleakfixedthreadlocalfixedjava" data-toc-link>src/main/java/com/javamastery/examples/leak/fixed/ThreadLocalFixed.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesleakboundedcachetestjava" data-toc-link>src/test/java/com/javamastery/examples/leak/BoundedCacheTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesleakcorrectkeytestjava" data-toc-link>src/test/java/com/javamastery/examples/leak/CorrectKeyTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesleaklistenerregistryfixedtestjava" data-toc-link>src/test/java/com/javamastery/examples/leak/ListenerRegistryFixedTest.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesleakthreadlocalfixedtestjava" data-toc-link>src/test/java/com/javamastery/examples/leak/ThreadLocalFixedTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

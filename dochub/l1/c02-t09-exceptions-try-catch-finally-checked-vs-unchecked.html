@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Exceptions: try/catch/finally, checked vs unchecked — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link active" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧬</span><span>Ch. 3 · L1 — Core Java &amp; OOP</span></div><div class="chapter-path">content/L1-core-java/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l1/overview.html" data-q="l1 — core java &amp; oop content/l1-core-java/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · oop content/l1-core-java/c01-oop/readme.md content/l1-core-java/c01-oop/t01-classes-and-objects.md content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md content/l1-core-java/c01-oop/t04-inheritance-and-super.md content/l1-core-java/c01-oop/t05-method-overriding.md content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md content/l1-core-java/c01-oop/t14-record-types.md content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md content/l1-core-java/c01-oop/t16-packages-and-imports.md content/l1-core-java/c01-oop/t17-java-module-system-jpms.md content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md content/l1-core-java/c01-oop/t20-modern-java-and-the-java-25-lts-landscape.md"><summary><span class="caret">▶</span><span>C01 · OOP</span></summary><ul class="pages"><li data-q="core java &amp; oop — object-oriented programming content/l1-core-java/c01-oop/readme.md"><a class="" href="../l1/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="classes &amp; objects content/l1-core-java/c01-oop/t01-classes-and-objects.md"><a class="" href="../l1/c01-t01-classes-and-objects.html"><span>Classes &amp; Objects</span><span class="kind-pill "></span></a></li><li data-q="fields, methods, constructors, this content/l1-core-java/c01-oop/t02-fields-methods-constructors-this.md"><a class="" href="../l1/c01-t02-fields-methods-constructors-this.html"><span>Fields, methods, constructors, this</span><span class="kind-pill "></span></a></li><li data-q="encapsulation &amp; access modifiers content/l1-core-java/c01-oop/t03-encapsulation-and-access-modifiers.md"><a class="" href="../l1/c01-t03-encapsulation-and-access-modifiers.html"><span>Encapsulation &amp; access modifiers</span><span class="kind-pill "></span></a></li><li data-q="inheritance &amp; super content/l1-core-java/c01-oop/t04-inheritance-and-super.md"><a class="" href="../l1/c01-t04-inheritance-and-super.html"><span>Inheritance &amp; super</span><span class="kind-pill "></span></a></li><li data-q="method overriding content/l1-core-java/c01-oop/t05-method-overriding.md"><a class="" href="../l1/c01-t05-method-overriding.html"><span>Method overriding</span><span class="kind-pill "></span></a></li><li data-q="polymorphism (compile-time vs runtime) content/l1-core-java/c01-oop/t06-polymorphism-compile-time-vs-runtime.md"><a class="" href="../l1/c01-t06-polymorphism-compile-time-vs-runtime.html"><span>Polymorphism (compile-time vs runtime)</span><span class="kind-pill "></span></a></li><li data-q="abstraction &amp; abstract classes content/l1-core-java/c01-oop/t07-abstraction-and-abstract-classes.md"><a class="" href="../l1/c01-t07-abstraction-and-abstract-classes.html"><span>Abstraction &amp; abstract classes</span><span class="kind-pill "></span></a></li><li data-q="interfaces (default, static, private methods) content/l1-core-java/c01-oop/t08-interfaces-default-static-private-methods.md"><a class="" href="../l1/c01-t08-interfaces-default-static-private-methods.html"><span>Interfaces (default, static, private methods)</span><span class="kind-pill "></span></a></li><li data-q="object class &amp; its methods content/l1-core-java/c01-oop/t09-object-class-and-its-methods.md"><a class="" href="../l1/c01-t09-object-class-and-its-methods.html"><span>Object class &amp; its methods</span><span class="kind-pill "></span></a></li><li data-q="equals, hashcode, tostring contracts content/l1-core-java/c01-oop/t10-equals-hashcode-tostring-contracts.md"><a class="" href="../l1/c01-t10-equals-hashcode-tostring-contracts.html"><span>equals, hashCode, toString contracts</span><span class="kind-pill "></span></a></li><li data-q="static members, blocks &amp; nested classes content/l1-core-java/c01-oop/t11-static-members-blocks-and-nested-classes.md"><a class="" href="../l1/c01-t11-static-members-blocks-and-nested-classes.html"><span>static members, blocks &amp; nested classes</span><span class="kind-pill "></span></a></li><li data-q="inner, local &amp; anonymous classes content/l1-core-java/c01-oop/t12-inner-local-and-anonymous-classes.md"><a class="" href="../l1/c01-t12-inner-local-and-anonymous-classes.html"><span>Inner, local &amp; anonymous classes</span><span class="kind-pill "></span></a></li><li data-q="enum types (with fields/methods) content/l1-core-java/c01-oop/t13-enum-types-with-fields-methods.md"><a class="" href="../l1/c01-t13-enum-types-with-fields-methods.html"><span>enum types (with fields/methods)</span><span class="kind-pill "></span></a></li><li data-q="record types content/l1-core-java/c01-oop/t14-record-types.md"><a class="" href="../l1/c01-t14-record-types.html"><span>record types</span><span class="kind-pill "></span></a></li><li data-q="sealed classes &amp; interfaces content/l1-core-java/c01-oop/t15-sealed-classes-and-interfaces.md"><a class="" href="../l1/c01-t15-sealed-classes-and-interfaces.html"><span>Sealed classes &amp; interfaces</span><span class="kind-pill "></span></a></li><li data-q="packages &amp; imports content/l1-core-java/c01-oop/t16-packages-and-imports.md"><a class="" href="../l1/c01-t16-packages-and-imports.html"><span>Packages &amp; imports</span><span class="kind-pill "></span></a></li><li data-q="java module system (jpms) content/l1-core-java/c01-oop/t17-java-module-system-jpms.md"><a class="" href="../l1/c01-t17-java-module-system-jpms.html"><span>Java Module System (JPMS)</span><span class="kind-pill "></span></a></li><li data-q="object cloning &amp; cloneable content/l1-core-java/c01-oop/t18-object-cloning-and-cloneable.md"><a class="" href="../l1/c01-t18-object-cloning-and-cloneable.html"><span>Object cloning &amp; Cloneable</span><span class="kind-pill "></span></a></li><li data-q="immutability &amp; immutable class design content/l1-core-java/c01-oop/t19-immutability-and-immutable-class-design.md"><a class="" href="../l1/c01-t19-immutability-and-immutable-class-design.html"><span>Immutability &amp; immutable class design</span><span class="kind-pill "></span></a></li><li data-q="modern java &amp; the java 25 lts landscape content/l1-core-java/c01-oop/t20-modern-java-and-the-java-25-lts-landscape.md"><a class="" href="../l1/c01-t20-modern-java-and-the-java-25-lts-landscape.html"><span>Modern Java &amp; the Java 25 LTS Landscape</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · collections and core apis content/l1-core-java/c02-collections-and-core-apis/readme.md content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md content/l1-core-java/c02-collections-and-core-apis/t19-optional.md content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><summary><span class="caret">▶</span><span>C02 · Collections And Core APIs</span></summary><ul class="pages"><li data-q="core java &amp; oop — collections &amp; core apis content/l1-core-java/c02-collections-and-core-apis/readme.md"><a class="" href="../l1/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="collections framework overview content/l1-core-java/c02-collections-and-core-apis/t01-collections-framework-overview.md"><a class="" href="../l1/c02-t01-collections-framework-overview.html"><span>Collections framework overview</span><span class="kind-pill "></span></a></li><li data-q="list (arraylist, linkedlist) content/l1-core-java/c02-collections-and-core-apis/t02-list-arraylist-linkedlist.md"><a class="" href="../l1/c02-t02-list-arraylist-linkedlist.html"><span>List (ArrayList, LinkedList)</span><span class="kind-pill "></span></a></li><li data-q="set (hashset, linkedhashset, treeset) content/l1-core-java/c02-collections-and-core-apis/t03-set-hashset-linkedhashset-treeset.md"><a class="" href="../l1/c02-t03-set-hashset-linkedhashset-treeset.html"><span>Set (HashSet, LinkedHashSet, TreeSet)</span><span class="kind-pill "></span></a></li><li data-q="map (hashmap, linkedhashmap, treemap) content/l1-core-java/c02-collections-and-core-apis/t04-map-hashmap-linkedhashmap-treemap.md"><a class="" href="../l1/c02-t04-map-hashmap-linkedhashmap-treemap.html"><span>Map (HashMap, LinkedHashMap, TreeMap)</span><span class="kind-pill "></span></a></li><li data-q="queue, deque, priorityqueue, stack content/l1-core-java/c02-collections-and-core-apis/t05-queue-deque-priorityqueue-stack.md"><a class="" href="../l1/c02-t05-queue-deque-priorityqueue-stack.html"><span>Queue, Deque, PriorityQueue, Stack</span><span class="kind-pill "></span></a></li><li data-q="iterators &amp; iterable content/l1-core-java/c02-collections-and-core-apis/t06-iterators-and-iterable.md"><a class="" href="../l1/c02-t06-iterators-and-iterable.html"><span>Iterators &amp; Iterable</span><span class="kind-pill "></span></a></li><li data-q="comparable vs comparator content/l1-core-java/c02-collections-and-core-apis/t07-comparable-vs-comparator.md"><a class="" href="../l1/c02-t07-comparable-vs-comparator.html"><span>Comparable vs Comparator</span><span class="kind-pill "></span></a></li><li data-q="collection performance characteristics (big-o) content/l1-core-java/c02-collections-and-core-apis/t08-collection-performance-characteristics-big-o.md"><a class="" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><span>Collection Performance Characteristics (Big-O)</span><span class="kind-pill "></span></a></li><li data-q="exceptions: try/catch/finally, checked vs unchecked content/l1-core-java/c02-collections-and-core-apis/t09-exceptions-try-catch-finally-checked-vs-unchecked.md"><a class="active" href="../l1/c02-t09-exceptions-try-catch-finally-checked-vs-unchecked.html"><span>Exceptions: try/catch/finally, checked vs unchecked</span><span class="kind-pill "></span></a></li><li data-q="custom exceptions &amp; try-with-resources content/l1-core-java/c02-collections-and-core-apis/t10-custom-exceptions-and-try-with-resources.md"><a class="" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><span>Custom exceptions &amp; try-with-resources</span><span class="kind-pill "></span></a></li><li data-q="generics — basics content/l1-core-java/c02-collections-and-core-apis/t11-generics-basics.md"><a class="" href="../l1/c02-t11-generics-basics.html"><span>Generics — basics</span><span class="kind-pill "></span></a></li><li data-q="generics — bounded types, wildcards, type erasure content/l1-core-java/c02-collections-and-core-apis/t12-generics-bounded-types-wildcards-type-erasure.md"><a class="" href="../l1/c02-t12-generics-bounded-types-wildcards-type-erasure.html"><span>Generics — bounded types, wildcards, type erasure</span><span class="kind-pill "></span></a></li><li data-q="i/o streams (byte &amp; character) content/l1-core-java/c02-collections-and-core-apis/t13-i-o-streams-byte-and-character.md"><a class="" href="../l1/c02-t13-i-o-streams-byte-and-character.html"><span>I/O streams (byte &amp; character)</span><span class="kind-pill "></span></a></li><li data-q="nio.2 (path, files, channels) content/l1-core-java/c02-collections-and-core-apis/t14-nio-2-path-files-channels.md"><a class="" href="../l1/c02-t14-nio-2-path-files-channels.html"><span>NIO.2 (Path, Files, channels)</span><span class="kind-pill "></span></a></li><li data-q="date/time api (java.time) content/l1-core-java/c02-collections-and-core-apis/t15-date-time-api-java-time.md"><a class="" href="../l1/c02-t15-date-time-api-java-time.html"><span>Date/Time API (java.time)</span><span class="kind-pill "></span></a></li><li data-q="regular expressions content/l1-core-java/c02-collections-and-core-apis/t16-regular-expressions.md"><a class="" href="../l1/c02-t16-regular-expressions.html"><span>Regular expressions</span><span class="kind-pill "></span></a></li><li data-q="reflection content/l1-core-java/c02-collections-and-core-apis/t17-reflection.md"><a class="" href="../l1/c02-t17-reflection.html"><span>Reflection</span><span class="kind-pill "></span></a></li><li data-q="annotations (using &amp; writing meta-annotations) content/l1-core-java/c02-collections-and-core-apis/t18-annotations-using-and-writing-meta-annotations.md"><a class="" href="../l1/c02-t18-annotations-using-and-writing-meta-annotations.html"><span>Annotations (using &amp; writing meta-annotations)</span><span class="kind-pill "></span></a></li><li data-q="optional content/l1-core-java/c02-collections-and-core-apis/t19-optional.md"><a class="" href="../l1/c02-t19-optional.html"><span>Optional</span><span class="kind-pill "></span></a></li><li data-q="math, bigdecimal / biginteger, random content/l1-core-java/c02-collections-and-core-apis/t20-math-bigdecimal-biginteger-random.md"><a class="" href="../l1/c02-t20-math-bigdecimal-biginteger-random.html"><span>Math, BigDecimal / BigInteger, Random</span><span class="kind-pill "></span></a></li><li data-q="serialization &amp; deserialization content/l1-core-java/c02-collections-and-core-apis/t21-serialization-and-deserialization.md"><a class="" href="../l1/c02-t21-serialization-and-deserialization.html"><span>Serialization &amp; deserialization</span><span class="kind-pill "></span></a></li><li data-q="networking (socket, httpclient) content/l1-core-java/c02-collections-and-core-apis/t22-networking-socket-httpclient.md"><a class="" href="../l1/c02-t22-networking-socket-httpclient.html"><span>Networking (Socket, HttpClient)</span><span class="kind-pill "></span></a></li><li data-q="internationalization (i18n) &amp; formatting content/l1-core-java/c02-collections-and-core-apis/t23-internationalization-i18n-and-formatting.md"><a class="" href="../l1/c02-t23-internationalization-i18n-and-formatting.html"><span>Internationalization (i18n) &amp; formatting</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md content/l1-core-java/c03-testing-fundamentals/t02-assertions-assertj-hamcrest.md content/l1-core-java/c03-testing-fundamentals/t03-mocking-with-mockito.md content/l1-core-java/c03-testing-fundamentals/t04-test-doubles-stub-mock-spy-fake.md content/l1-core-java/c03-testing-fundamentals/t05-testng-alternative.md content/l1-core-java/c03-testing-fundamentals/t06-test-driven-development-tdd.md content/l1-core-java/c03-testing-fundamentals/t07-test-coverage-jacoco.md"><summary><span class="caret">▶</span><span>C03 · Testing Fundamentals</span></summary><ul class="pages"><li data-q="core java &amp; oop — testing fundamentals content/l1-core-java/c03-testing-fundamentals/readme.md"><a class="" href="../l1/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="unit testing with junit 5 content/l1-core-java/c03-testing-fundamentals/t01-unit-testing-with-junit-5.md"><a class="" href="../l1/c03-t01-unit-testing-with-junit-5.html"><span>Unit testing with JUnit 5</span><span class="kind-pill "></span></a></li><li data-q="assertions (assertj, hamcrest) content/l1-core-java/c03-testing-fundamentals/t02-assertions-assertj-hamcrest.md"><a class="" href="../l1/c03-t02-assertions-assertj-hamcrest.html"><span>Assertions (AssertJ, Hamcrest)</span><span class="kind-pill "></span></a></li><li data-q="mocking with mockito content/l1-core-java/c03-testing-fundamentals/t03-mocking-with-mockito.md"><a class="" href="../l1/c03-t03-mocking-with-mockito.html"><span>Mocking with Mockito</span><span class="kind-pill "></span></a></li><li data-q="test doubles (stub, mock, spy, fake) content/l1-core-java/c03-testing-fundamentals/t04-test-doubles-stub-mock-spy-fake.md"><a class="" href="../l1/c03-t04-test-doubles-stub-mock-spy-fake.html"><span>Test doubles (stub, mock, spy, fake)</span><span class="kind-pill "></span></a></li><li data-q="testng (alternative) content/l1-core-java/c03-testing-fundamentals/t05-testng-alternative.md"><a class="" href="../l1/c03-t05-testng-alternative.html"><span>TestNG (alternative)</span><span class="kind-pill "></span></a></li><li data-q="test-driven development (tdd) content/l1-core-java/c03-testing-fundamentals/t06-test-driven-development-tdd.md"><a class="" href="../l1/c03-t06-test-driven-development-tdd.html"><span>Test-Driven Development (TDD)</span><span class="kind-pill "></span></a></li><li data-q="test coverage (jacoco) content/l1-core-java/c03-testing-fundamentals/t07-test-coverage-jacoco.md"><a class="" href="../l1/c03-t07-test-coverage-jacoco.html"><span>Test coverage (JaCoCo)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l1-core-java/c04-tools-and-environment/readme.md content/l1-core-java/c04-tools-and-environment/t01-build-dependencies-and-project-tooling.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="core java &amp; oop — tools &amp; environment content/l1-core-java/c04-tools-and-environment/readme.md"><a class="" href="../l1/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="build, dependencies &amp; project tooling content/l1-core-java/c04-tools-and-environment/t01-build-dependencies-and-project-tooling.md"><a class="" href="../l1/c04-t01-build-dependencies-and-project-tooling.html"><span>Build, Dependencies &amp; Project Tooling</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l1-core-java/c05-hands-on/readme.md content/l1-core-java/c05-hands-on/t01-exercises.md content/l1-core-java/c05-hands-on/t02-project-library-management-system.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="core java &amp; oop — hands-on content/l1-core-java/c05-hands-on/readme.md"><a class="" href="../l1/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="exercises content/l1-core-java/c05-hands-on/t01-exercises.md"><a class="" href="../l1/c05-t01-exercises.html"><span>Exercises</span><span class="kind-pill "></span></a></li><li data-q="level project — library management system content/l1-core-java/c05-hands-on/t02-project-library-management-system.md"><a class="" href="../l1/c05-t02-project-library-management-system.html"><span>Level Project — Library Management System</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l1-core-java/c06-best-practices/readme.md content/l1-core-java/c06-best-practices/t01-l1-idioms.md content/l1-core-java/c06-best-practices/t02-l1-pitfalls-catalogue.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="core java &amp; oop — best practices &amp; pitfalls content/l1-core-java/c06-best-practices/readme.md"><a class="" href="../l1/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 idioms content/l1-core-java/c06-best-practices/t01-l1-idioms.md"><a class="" href="../l1/c06-t01-l1-idioms.html"><span>L1 Idioms</span><span class="kind-pill "></span></a></li><li data-q="l1 pitfalls catalogue content/l1-core-java/c06-best-practices/t02-l1-pitfalls-catalogue.md"><a class="" href="../l1/c06-t02-l1-pitfalls-catalogue.html"><span>L1 Pitfalls Catalogue</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l1-core-java/c07-interview-prep/readme.md content/l1-core-java/c07-interview-prep/t01-core-java-and-oop-questions.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="core java &amp; oop — interview prep content/l1-core-java/c07-interview-prep/readme.md"><a class="" href="../l1/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="core java &amp; oop interview questions content/l1-core-java/c07-interview-prep/t01-core-java-and-oop-questions.md"><a class="" href="../l1/c07-t01-core-java-and-oop-questions.html"><span>Core Java &amp; OOP Interview Questions</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l1-core-java/c08-qa-faq/readme.md content/l1-core-java/c08-qa-faq/t01-faq.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="core java &amp; oop — q&amp;a / faq content/l1-core-java/c08-qa-faq/readme.md"><a class="" href="../l1/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 faq content/l1-core-java/c08-qa-faq/t01-faq.md"><a class="" href="../l1/c08-t01-faq.html"><span>L1 FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l1-core-java/c09-cheatsheets/readme.md content/l1-core-java/c09-cheatsheets/t01-l1-cheatsheet.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="core java &amp; oop — cheatsheets &amp; reference content/l1-core-java/c09-cheatsheets/readme.md"><a class="" href="../l1/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 cheatsheet content/l1-core-java/c09-cheatsheets/t01-l1-cheatsheet.md"><a class="" href="../l1/c09-t01-l1-cheatsheet.html"><span>L1 Cheatsheet</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l1-core-java/c10-resources/readme.md content/l1-core-java/c10-resources/t01-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="core java &amp; oop — resources content/l1-core-java/c10-resources/readme.md"><a class="" href="../l1/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l1 resources content/l1-core-java/c10-resources/t01-resources.md"><a class="" href="../l1/c10-t01-resources.html"><span>L1 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l1/index.html">L1 — Core Java &amp; OOP</a><span class="sep">/</span><span>Exceptions: try/catch/finally, checked vs unchecked</span></div>
+        <h1>Exceptions: try/catch/finally, checked vs unchecked</h1>
+        <div><span class="source-path">content/L1-core-java/C02-collections-and-core-apis/T09-exceptions-try-catch-finally-checked-vs-unchecked.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">beginner</span><span class="meta-pill mins">~60 min</span><span class="meta-pill date">updated 2026-06-04</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Exceptions: try/catch/finally, checked vs unchecked"
+slug: exceptions-try-catch-finally-checked-vs-unchecked
+level: L1
+module: "Core Java &amp; OOP"
+section: "Collections &amp; Core APIs"
+type: concept
+difficulty: beginner
+order: 9
+tags: [exceptions, throwable, error, runtimeexception, checked, unchecked, try-catch-finally, multi-catch, exception-chaining, fillinstacktrace, stack-unwinding, exception-table, zero-cost-try, result-type]
+prerequisites: [iterators-and-iterable, comparable-vs-comparator, object-class-and-its-methods, interfaces-default-static-private-methods, inheritance-and-super]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04</p>
+<hr>
+<h1 id="exceptions-trycatchfinally-checked-vs-unchecked">Exceptions: try/catch/finally, checked vs unchecked</h1>
+<p>The chapter now turns from data structures to the <strong>language facilities and core APIs</strong> every program leans on, starting with the one that underlies all of them: <strong>error handling</strong>. You have already met exceptions thrown by the collections — <code>ConcurrentModificationException</code> from a fail-fast iterator (<a href="c02-t06-iterators-and-iterable.html">T06</a>), <code>NoSuchElementException</code> from an empty queue (<a href="c02-t05-queue-deque-priorityqueue-stack.html">T05</a>), <code>ClassCastException</code> from a missing comparator (<a href="c02-t07-comparable-vs-comparator.html">T07</a>). This topic opens the mechanism itself: how a thrown exception transfers control, the <code>Throwable</code> hierarchy that classifies what went wrong, the <code>try</code>/<code>catch</code>/<code>finally</code> construct that handles it, and Java's distinctive — and controversial — split between <strong>checked</strong> exceptions (the compiler forces you to handle or declare them) and <strong>unchecked</strong> ones (it does not).</p>
+<p>The depth bar is <strong>what an exception physically costs and why</strong>. An exception is an object, and the surprising fact is that <em>throwing and catching are cheap while constructing is expensive</em>: the <code>Throwable</code> constructor calls the native <code>fillInStackTrace()</code>, which walks the entire call stack and allocates a <code>StackTraceElement[]</code> — microseconds for a deep stack. The <code>try</code> block itself, by contrast, is <strong>free on the happy path</strong>: <code>try</code>/<code>catch</code> compiles to an <strong>exception table</strong> in the bytecode that the JVM consults <em>only when an exception is actually thrown</em>, so a <code>try</code> that never throws adds zero instructions to the normal flow ("zero-cost try"). Those two facts explain the central rule — exceptions are for <em>exceptional</em> conditions, never for control flow — and why HotSpot has a "fast throw" optimization that strips stack traces from hot implicit exceptions. By the end you will read the <code>Throwable</code> hierarchy fluently, use <code>try</code>/<code>catch</code>/<code>finally</code> and multi-catch correctly, avoid the <code>return</code>-in-<code>finally</code> trap that silently swallows exceptions, chain a low-level cause into a domain exception without losing its stack trace, and explain why Rust's <code>Result</code> type is widely seen as the checked-exception idea done right.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t09-object-class-and-its-methods.html">Object class</a> (<code>L1/C01/T09</code>) — an exception is an ordinary object with a header and fields; <a href="c01-t04-inheritance-and-super.html">Inheritance</a> (<code>L1/C01/T04</code>) — the <code>Throwable</code> hierarchy and <code>catch</code> matching by supertype; <a href="c01-t08-interfaces-default-static-private-methods.html">Interfaces</a> (<code>L1/C01/T08</code>) — checked exceptions and the lambda/functional-interface friction. Forward: <a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a> (writing your own exceptions + <code>try</code>-with-resources + suppressed exceptions), which continues directly from here.</p></div></div>
+<h2 id="the-throwable-hierarchy">The <code>Throwable</code> Hierarchy<a class="anchor" href="#the-throwable-hierarchy" aria-hidden="true">#</a></h2>
+<p>Only an instance of <strong><code>Throwable</code></strong> can be thrown or caught. Its hierarchy splits everything that can go wrong into two fundamentally different categories:</p>
+<div class="mermaid">flowchart TB
+  T["Throwable (the only throwable/catchable root)"]
+  T --> Err["Error — unrecoverable JVM/system problems"]
+  T --> Ex["Exception"]
+  Err --> Err2["OutOfMemoryError, StackOverflowError, AssertionError — DON'T catch"]
+  Ex --> RE["RuntimeException — UNCHECKED (programming bugs)"]
+  Ex --> CK["other Exception subtypes — CHECKED (recoverable conditions)"]
+  RE --> RE2["NullPointerException, IllegalArgumentException, IndexOutOfBounds, ClassCast, ArithmeticException…"]
+  CK --> CK2["IOException, SQLException, InterruptedException, ClassNotFoundException…"]
+</div>
+<ul>
+<li><strong><code>Error</code></strong> signals a problem so serious that a reasonable application should not try to handle it — the JVM is out of memory (<code>OutOfMemoryError</code>), the stack overflowed (<code>StackOverflowError</code>), a class failed to load (<code>NoClassDefFoundError</code>). These are <strong>unchecked</strong>. Don't catch them.</li>
+<li><strong><code>Exception</code></strong> is the recoverable family, itself split in two:</li>
+<li><strong><code>RuntimeException</code></strong> and its subclasses are <strong>unchecked</strong> — they represent <strong>programming errors</strong> (a <code>null</code> dereference, a bad index, an illegal argument). The right fix is usually to <em>fix the bug</em>, not to catch.</li>
+<li><strong>Every other <code>Exception</code></strong> is <strong>checked</strong> — <code>IOException</code>, <code>SQLException</code>, <code>InterruptedException</code> — representing <strong>recoverable external conditions</strong> (a file is missing, the network dropped) that a well-written caller should be forced to consider.</li>
+</ul>
+<p>This three-way split — <code>Error</code> / unchecked <code>RuntimeException</code> / checked <code>Exception</code> — is the entire taxonomy, and which branch a type lives in determines whether the compiler polices it.</p>
+<h2 id="try-catch-finally-and-multi-catch"><code>try</code> / <code>catch</code> / <code>finally</code> and Multi-Catch<a class="anchor" href="#try-catch-finally-and-multi-catch" aria-hidden="true">#</a></h2>
+<p>The handling construct has three parts. The <code>try</code> block holds the risky code; <code>catch</code> blocks handle specific <code>Throwable</code> types; the optional <code>finally</code> block runs no matter what:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try {
+    var data = readFile(path);        // may throw IOException
+    process(data);                    // may throw a RuntimeException
+} catch (IOException e) {              // checked — most specific first
+    log.error(&quot;read failed&quot;, e);
+} catch (RuntimeException e) {         // unchecked
+    log.error(&quot;processing bug&quot;, e);
+} finally {
+    releaseLock();                     // ALWAYS runs (see semantics below)
+}
+</code></pre></div>
+<p><code>catch</code> blocks are tested <strong>top to bottom</strong>, and the <strong>first matching type wins</strong> — so a more specific type must precede a more general one, or the compiler rejects the unreachable later block. When two <code>catch</code> blocks would do the same thing, <strong>multi-catch</strong> collapses them; the caught variable is <strong>effectively final</strong> and typed as the common supertype:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try { risky(); }
+catch (IOException | SQLException e) {     // one handler for both
+    log.error(&quot;io or db failure&quot;, e);      // e cannot be reassigned
+}
+</code></pre></div>
+<div class="mermaid">flowchart TB
+  Try["try block executes"]
+  Try -->|"no exception"| Fin["run finally → continue normally"]
+  Try -->|"throws X"| Match{"first catch whose<br/>type ⊇ X?"}
+  Match -->|"found"| H["run that catch block"] --> Fin
+  Match -->|"none in this method"| Unwind["run finally → propagate X to caller (unwind)"]
+</div>
+<h2 id="checked-vs-unchecked-the-compilers-rule">Checked vs Unchecked — The Compiler's Rule<a class="anchor" href="#checked-vs-unchecked-the-compilers-rule" aria-hidden="true">#</a></h2>
+<p>The practical difference is a <strong>compile-time rule</strong> that applies only to checked exceptions: <strong>"catch or declare."</strong> If a method can throw a checked exception, it must either handle it (<code>try</code>/<code>catch</code>) or announce it in its signature (<code>throws</code>), and that obligation propagates up the call chain until someone handles it. Unchecked exceptions carry no such obligation.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// CHECKED — won't compile unless you catch or declare:
+void load() throws IOException {        // declared → callers must handle/declare too
+    Files.readString(path);              // throws checked IOException
+}
+
+// UNCHECKED — compiles with no annotation:
+int parse(String s) {
+    return Integer.parseInt(s);          // throws unchecked NumberFormatException — no 'throws' needed
+}
+</code></pre></div>
+<div class="mermaid">flowchart TB
+  M["a method body can throw E"]
+  M --> Q{"is E checked?<br/>(Exception, not RuntimeException/Error)"}
+  Q -->|"yes"| CD["MUST 'catch' it or declare 'throws E' — compiler-enforced, propagates up"]
+  Q -->|"no (unchecked)"| Free["no obligation — compiles silently, propagates until caught or thread dies"]
+</div>
+<p>The design intent (Bloch, <em>Effective Java</em> Item 70): <strong>use checked exceptions for recoverable conditions and unchecked (runtime) exceptions for programming errors</strong>. A missing file is recoverable → checked; a <code>null</code> argument is a bug → unchecked. In practice many modern Java codebases lean heavily on unchecked exceptions (and frameworks like Spring wrap checked ones) for reasons the next section unpacks.</p>
+<h2 id="the-great-checked-exception-debate">The Great Checked-Exception Debate<a class="anchor" href="#the-great-checked-exception-debate" aria-hidden="true">#</a></h2>
+<p>Checked exceptions are <strong>Java's unique experiment</strong> — no other mainstream language enforces them at compile time, and the industry's verdict has been mixed-to-negative. Knowing both sides is interview-relevant and design-relevant.</p>
+<p><strong>The case for:</strong> a checked exception puts the failure mode <em>in the method's signature</em>. The caller cannot forget that <code>readFile</code> may fail — the compiler insists they handle or propagate it. The set of failures becomes part of the documented contract, not a runtime surprise.</p>
+<p><strong>The case against</strong> (Anders Hejlsberg, who omitted them from C#; Bruce Eckel; and the Kotlin designers, who also omitted them):</p>
+<ul>
+<li><strong>They don't scale.</strong> As code composes, <code>throws</code> clauses accumulate; developers widen them to <code>throws Exception</code>, which throws away all the information the feature was supposed to provide.</li>
+<li><strong>They encourage swallowing.</strong> The path of least resistance to silence the compiler is an empty <code>catch</code> block — the single worst thing you can do with an exception, and checked exceptions actively nudge you toward it.</li>
+<li><strong>They break with lambdas and streams.</strong> A <code>Function&lt;T,R&gt;</code> (<a href="c01-t08-interfaces-default-static-private-methods.html">T08</a>) cannot throw a checked exception, so any checked exception inside a <code>stream().map(...)</code> must be caught and wrapped right there — boilerplate that a language without checked exceptions never needs.</li>
+</ul>
+<div class="mermaid">flowchart LR
+  For["FOR: failure is in the signature — caller can't forget it (compiler-enforced contract)"]
+  Against["AGAINST: don't scale / 'throws Exception' / swallowing / break lambdas & streams"]
+  Verdict["C# and Kotlin dropped them; Rust moves the idea into the type system (Result)"]
+  For --> Verdict
+  Against --> Verdict
+</div>
+<p>The honest summary: checked exceptions were a well-intentioned attempt to make failure a first-class part of an API's contract, judged by most of the industry as a net negative for large codebases — <em>but the underlying idea is sound</em>, and Rust's <code>Result</code> type (cross-language section) realizes it without the drawbacks.</p>
+<h2 id="exception-chaining-preserving-the-cause">Exception Chaining — Preserving the Cause<a class="anchor" href="#exception-chaining-preserving-the-cause" aria-hidden="true">#</a></h2>
+<p>When you catch a low-level exception and throw a more meaningful one, <strong>wrap the original as the cause</strong> so its stack trace is not lost (<em>Effective Java</em> Item 73: throw exceptions appropriate to the abstraction):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try {
+    return jdbc.query(sql);
+} catch (SQLException e) {
+    throw new DataAccessException(&quot;Could not load user &quot; + id, e);   // 'e' becomes the cause
+}
+</code></pre></div>
+<p>The <code>Throwable(String, Throwable)</code> constructor (or <code>initCause</code>) stores the cause; <code>getCause()</code> retrieves it; and <code>printStackTrace()</code> renders it as a <strong>"Caused by:"</strong> section showing both stack traces. This translates the exception to the right abstraction level (callers of a data-access layer should not see raw <code>SQLException</code>s) <strong>without discarding the diagnostic trail</strong> — the original failure point is still in the chained trace.</p>
+<div class="mermaid">flowchart LR
+  Low["SQLException (low level): real failure point + stack trace"]
+  Low -->|"wrapped as cause"| High["DataAccessException (domain): meaningful message"]
+  High -->|"printStackTrace()"| Out["High's trace + 'Caused by:' Low's trace — nothing lost"]
+</div>
+<h2 id="finally-semantics-and-the-return-in-finally-trap"><code>finally</code> Semantics and the <code>return</code>-in-<code>finally</code> Trap<a class="anchor" href="#finally-semantics-and-the-return-in-finally-trap" aria-hidden="true">#</a></h2>
+<p>A <code>finally</code> block <strong>always runs</strong> — whether the <code>try</code> completed normally, threw and was caught, or threw and is propagating uncaught (it runs <em>during</em> the unwind, before the exception leaves the method). The only escapes are <code>System.exit()</code> (the JVM terminates outright), a JVM crash, or an infinite loop / killed daemon thread.</p>
+<p>That guarantee makes <code>finally</code> the classic place for cleanup — but it has a sharp edge:</p>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Never <code>return</code> or <code>throw</code> from a <code>finally</code> block.</strong> A <code>finally</code> that returns or throws <strong>overrides</strong> whatever the <code>try</code>/<code>catch</code> was returning or throwing — including a pending exception, which is <strong>silently swallowed</strong>. <code>try { return 1; } finally { return 2; }</code> returns <strong>2</strong>; <code>try { throw new IllegalStateException(); } finally { return 0; }</code> discards the exception entirely and returns <strong>0</strong>. The bug is invisible at the call site. Keep <code>finally</code> to side-effecting cleanup only — and prefer <code>try</code>-with-resources (<a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>), which handles resource cleanup correctly and avoids the trap.</p></div></div>
+<div class="mermaid">flowchart TB
+  Try["try: return 1 / throw E"]
+  Try --> Fin{"finally also<br/>returns or throws?"}
+  Fin -->|"no — just side effects"| Ok["try's return/throw stands ✓"]
+  Fin -->|"yes (return 2 / throw F)"| Bad["finally WINS — try's value or exception E is SWALLOWED ✗"]
+</div>
+<h2 id="memory-an-exception-is-an-object-and-the-stack-trace-costs">Memory — An Exception Is an Object, and the Stack Trace Costs<a class="anchor" href="#memory-an-exception-is-an-object-and-the-stack-trace-costs" aria-hidden="true">#</a></h2>
+<p>A <code>Throwable</code> is an ordinary heap object (<a href="c01-t09-object-class-and-its-methods.html">T09-C01</a>) with a handful of fields:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Throwable {
+    private String detailMessage;                 // the message — ref (4 B)
+    private Throwable cause = this;                // chained cause; 'this' means &quot;not yet set&quot; — ref (4 B)
+    private StackTraceElement[] stackTrace;        // the captured trace — ref (4 B)
+    private List&lt;Throwable&gt; suppressedExceptions;  // try-with-resources (T10) — ref (4 B)
+    // + a transient native 'backtrace' holding the raw stack snapshot
+}
+</code></pre></div>
+<p>The expensive field is <code>stackTrace</code>, and the crucial fact is <strong>when</strong> it is filled: the <code>Throwable</code> <strong>constructor</strong> calls the native <strong><code>fillInStackTrace()</code></strong>, which walks the current thread's entire call stack and records every frame. So the cost is paid at <strong><code>new</code>-time, not throw-time</strong> — <code>new IOException()</code> has already walked the stack even if you never throw it. Each frame becomes a <code>StackTraceElement</code> (declaring class, method, file name, line number — ~40 bytes each), so a 30-frame-deep stack materializes a ~1 KB array of trace objects.</p>
+<div class="mermaid">flowchart LR
+  New["new SomeException(msg)"]
+  New --> Ctor["Throwable constructor → fillInStackTrace() (native)"]
+  Ctor --> Walk["walk EVERY frame on the call stack now"]
+  Walk --> Arr["allocate StackTraceElement[] (~40 B/frame) — the expensive part"]
+  Arr --> Note["paid at construction, NOT at throw — so 'new' is the cost, not 'throw'"]
+</div>
+<h2 id="architecture-zero-cost-try-expensive-construction-and-unwinding">Architecture — Zero-Cost <code>try</code>, Expensive Construction, and Unwinding<a class="anchor" href="#architecture-zero-cost-try-expensive-construction-and-unwinding" aria-hidden="true">#</a></h2>
+<p>Three mechanisms explain exception performance, and together they justify the "exceptions are not control flow" rule.</p>
+<p><strong>The <code>try</code> block is free on the happy path.</strong> When <code>javac</code> compiles <code>try</code>/<code>catch</code>, it does <strong>not</strong> emit per-instruction "am I inside a try?" checks. Instead it records an <strong>exception table</strong> in the method's <code>Code</code> attribute — a list of <code>(start_pc, end_pc, handler_pc, catch_type)</code> entries. The normal path runs the <code>try</code>-block bytecode with zero added instructions. <strong>Only when an exception is actually thrown</strong> does the JVM consult the table: find an entry whose bytecode range covers the throwing instruction and whose <code>catch_type</code> matches the thrown class, then jump to its handler. This is the <strong>"zero-cost try"</strong> model — you can wrap code in <code>try</code>/<code>catch</code> as liberally as you like without slowing the case where nothing throws.</p>
+<div class="mermaid">flowchart TB
+  Compile["javac compiles try/catch"]
+  Compile --> Tab["emits an EXCEPTION TABLE: (start_pc, end_pc, handler_pc, catch_type)"]
+  Tab --> Happy["NO throw → table never consulted → ZERO overhead on the normal path"]
+  Tab --> Throw["athrow → JVM searches the table for a covering, type-matching entry → jump to handler"]
+</div>
+<p><strong>Throwing is cheap; constructing is expensive.</strong> The <code>athrow</code> + table lookup + unwind is a controlled non-local jump — fast. The expense is the <code>fillInStackTrace()</code> walk done in the constructor (previous section). <strong>This is the real reason "exceptions are slow"</strong> — it is the stack capture, not the throw/catch. Hence two consequences:</p>
+<ul>
+<li><strong>Exceptions-as-control-flow is an anti-pattern</strong> — a <code>try</code>/<code>catch</code> in a hot loop that throws every iteration pays the stack-walk cost each time. Use a boolean check or an <code>Optional</code> (<a href="c02-t19-optional.html">T19</a>) instead.</li>
+<li><strong>HotSpot's "fast throw"</strong>: for certain hot, repeatedly-thrown implicit exceptions (<code>NullPointerException</code>, <code>ArithmeticException</code>, …), after enough throws at the same site the JIT throws a <strong>pre-allocated, stack-trace-less</strong> instance — which is why production logs sometimes show an NPE <em>with no stack trace</em>. The flag <strong><code>-XX:-OmitStackTraceInFastThrow</code></strong> disables this to always capture traces (essential when debugging those traceless NPEs).</li>
+</ul>
+<p><strong>Stack unwinding</strong> is how propagation works: if the current method's exception table has no matching handler, the JVM <strong>pops the frame</strong> — running any <code>finally</code> blocks and releasing any <code>synchronized</code> monitors as it goes — then checks the <em>caller's</em> table, repeating up the stack until a handler is found or the top is reached (an uncaught exception → the thread's <code>UncaughtExceptionHandler</code>, then the thread dies). The <code>finally</code>-always-runs guarantee is implemented precisely by this unwind walk.</p>
+<div class="mermaid">flowchart TB
+  C["c() throws E — no matching handler"]
+  C -->|"run c's finally, release monitors, POP frame"| B["b() — search its exception table"]
+  B -->|"no match → run b's finally, POP frame"| A["a() — search its exception table"]
+  A -->|"match found"| H["jump to a()'s handler — done"]
+  A -->|"no match anywhere → top of stack"| Die["UncaughtExceptionHandler → thread dies"]
+</div>
+<h2 id="cross-language-perspective">Cross-Language Perspective<a class="anchor" href="#cross-language-perspective" aria-hidden="true">#</a></h2>
+<p>Error handling is where languages diverge most sharply — and Java's checked exceptions sit at one extreme:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Checked exceptions?</th>
+<th>Cleanup mechanism</th>
+<th>Recoverable-error model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td><strong>yes</strong> (unique)</td>
+<td><code>finally</code> / try-with-resources (<a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a>)</td>
+<td>exceptions (checked + unchecked)</td>
+</tr>
+<tr>
+<td><strong>C++</strong></td>
+<td>no (specs removed in C++17)</td>
+<td><strong>RAII</strong> — destructors run on unwind</td>
+<td>exceptions (zero-cost, table-based)</td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>no</td>
+<td><code>finally</code> / <code>with</code></td>
+<td>exceptions (idiomatic — <strong>EAFP</strong>)</td>
+</tr>
+<tr>
+<td><strong>C#</strong></td>
+<td>no (rejected deliberately)</td>
+<td><code>using</code></td>
+<td>exceptions</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>n/a</td>
+<td><code>Drop</code> (RAII)</td>
+<td><strong><code>Result&lt;T,E&gt;</code> + <code>?</code></strong>; <code>panic!</code> for bugs</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td>n/a</td>
+<td><code>defer</code></td>
+<td>explicit <code>error</code> returns; <code>panic</code>/<code>recover</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Three deep contrasts. <strong>C++</strong> has the same zero-cost table-based exception model as the JVM but <strong>no <code>finally</code></strong> — cleanup is automatic via <strong>RAII</strong> (a stack object's destructor runs deterministically during unwinding), and its <code>throw()</code> exception specifications were <em>removed</em> in C++17, the same retreat from compile-time exception declarations that Java's critics point to. <strong>Python</strong> treats exceptions as ordinary control flow — the <strong>EAFP</strong> style ("Easier to Ask Forgiveness than Permission") deliberately <em>tries</em> and catches rather than checking first, and <code>StopIteration</code> even drives iteration (<a href="c02-t06-iterators-and-iterable.html">T06</a>). <strong>Rust</strong> abolishes exceptions for recoverable errors entirely: a fallible function returns <strong><code>Result&lt;T, E&gt;</code></strong> (an <code>Ok</code>/<code>Err</code> enum), and the <strong><code>?</code> operator</strong> propagates an <code>Err</code> up with one character — the ergonomics of checked exceptions, but the error is a <strong>value in the return type</strong>, visible in the signature, composable through generics and closures (no lambda-leakage problem), and impossible to silently ignore. <code>panic!</code> is reserved for unrecoverable bugs (like an <code>Error</code>). Rust's <code>Result</code> is widely regarded as <strong>"checked exceptions done right"</strong> — it achieves the original goal (failure is part of the contract, the caller must deal with it) without the drawbacks that sank Java's version. Go takes the explicit route: errors are ordinary return values checked with <code>if err != nil</code>, verbose but impossible to overlook.</p>
+<div class="mermaid">flowchart LR
+  Exc["EXCEPTIONS (out-of-band control flow): Java, C++, Python, C#"]
+  Val["ERRORS-AS-VALUES (in the return type): Rust Result, Go error, Haskell Either"]
+  Exc -->|"Java checked = forced handling via signature"| Bridge["the same goal: don't let failures be forgotten"]
+  Val -->|"Rust ? = forced handling via the type system"| Bridge
+</div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<div class="callout callout-warning"><div class="callout-head"><span class="callout-ic">⚠</span><span class="callout-kind">Warning</span></div><div class="callout-body"><p><strong>Swallowing exceptions.</strong> An empty <code>catch (Exception e) {}</code> discards the failure and its diagnostics — the single worst exception anti-pattern. At minimum log it with its stack trace; better, handle or rethrow it.</p><p>[!WARNING]
+<strong>Catching too broadly.</strong> <code>catch (Throwable t)</code> or <code>catch (Exception e)</code> around a wide block hides bugs and catches things you cannot handle (<code>OutOfMemoryError</code>, <code>NullPointerException</code>). Catch the <strong>narrowest</strong> type you can actually recover from.</p>
+<p>[!WARNING]
+<strong><code>return</code>/<code>throw</code> in <code>finally</code>.</strong> It overrides — and silently swallows — any pending return value or exception from the <code>try</code>/<code>catch</code>. Keep <code>finally</code> to side effects only.</p>
+<p>[!WARNING]
+<strong>Losing the cause.</strong> <code>throw new MyException("failed")</code> inside a <code>catch</code> without passing the caught exception as the cause discards the original stack trace. Always chain: <code>throw new MyException("failed", e)</code>.</p>
+<p>[!WARNING]
+<strong>Exceptions for control flow.</strong> Catching <code>NumberFormatException</code> to test whether a string is a number (instead of validating) pays the <code>fillInStackTrace</code> cost on every non-number and obscures intent. Use a check, an <code>Optional</code>, or a <code>tryParse</code>-style API.</p>
+<p>[!WARNING]
+<strong>Catch-log-rethrow at every level.</strong> Logging an exception and rethrowing it at each layer produces the same stack trace many times in the log. Log <strong>once</strong>, at the boundary where you handle it; otherwise just let it propagate.</p></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>Common interview questions for this topic:
+1. <strong>Checked vs unchecked exceptions?</strong> Checked = compiler-enforced "catch or declare" (<code>Exception</code> minus <code>RuntimeException</code>); unchecked = <code>RuntimeException</code> + <code>Error</code>, no enforcement.
+2. <strong>The <code>Throwable</code> hierarchy?</strong> <code>Throwable</code> → <code>Error</code> (unrecoverable, don't catch) + <code>Exception</code> → <code>RuntimeException</code> (unchecked / bugs) + other checked exceptions.
+3. <strong>When use checked vs unchecked?</strong> Checked for recoverable external conditions the caller should handle; unchecked for programming errors (EJ Item 70).
+4. <strong>What does <code>finally</code> guarantee?</strong> It always runs except on <code>System.exit</code>/JVM death — used for cleanup (superseded by try-with-resources for resources, T10).
+5. <strong>The <code>return</code>-in-<code>finally</code> trap?</strong> A <code>return</code>/<code>throw</code> in <code>finally</code> overrides the <code>try</code>/<code>catch</code> and silently swallows a pending exception — never do it.
+6. <strong>Multi-catch?</strong> <code>catch (A | B e)</code> — one handler for several types; <code>e</code> is effectively final, typed as the common supertype.
+7. <strong>Exception chaining and why?</strong> Wrap a low-level cause in a domain exception (cause constructor / <code>initCause</code>) to translate the abstraction without losing the stack trace; <code>getCause</code> / "Caused by:".
+8. <strong>Are exceptions expensive?</strong> Throwing/catching is cheap; <em>constructing</em> is expensive because <code>fillInStackTrace</code> walks the stack — so exceptions-as-control-flow is the anti-pattern.
+9. <strong>What is the zero-cost try?</strong> <code>try</code>/<code>catch</code> compiles to an exception table consulted only on a throw, so the happy path has zero overhead.
+10. <strong>Why do some production NPEs have no stack trace?</strong> HotSpot "fast throw" reuses a pre-allocated traceless exception for hot implicit throws; <code>-XX:-OmitStackTraceInFastThrow</code> restores traces.
+11. <strong>The checked-exception debate?</strong> Pro: failure is in the signature; con: doesn't scale, encourages swallowing, breaks lambdas/streams — C#/Kotlin dropped them.
+12. <strong>How does Rust handle recoverable errors?</strong> <code>Result&lt;T,E&gt;</code> + <code>?</code> — errors as values in the return type, the checked-exception idea without the drawbacks.
+13. <strong>Risk of <code>catch (Throwable)</code>?</strong> It catches <code>Error</code>s (e.g. <code>OutOfMemoryError</code>) you cannot handle; catch the narrowest type you can recover from.</p></div></div>
+<ol>
+<li>
+<p><strong>Map the hierarchy.</strong> Write out <code>Error</code>, <code>Exception</code>, and <code>RuntimeException</code> with two real examples each, and label which are checked vs unchecked.</p>
+</li>
+<li>
+<p><strong>Catch or declare.</strong> Write a method calling <code>Files.readString</code> (checked <code>IOException</code>); show it won't compile until you <code>catch</code> or add <code>throws</code>. Then call <code>Integer.parseInt</code> (unchecked) and confirm no annotation is needed.</p>
+</li>
+<li>
+<p><strong>Multi-catch.</strong> Combine two <code>catch</code> blocks that handle <code>IOException</code> and <code>SQLException</code> identically into one multi-catch; confirm the variable is effectively final (try to reassign it → compile error).</p>
+</li>
+<li>
+<p><strong>Catch order.</strong> Put <code>catch (Exception e)</code> before <code>catch (IOException e)</code>; observe the "unreachable catch block" compile error; fix the order.</p>
+</li>
+<li>
+<p><strong><code>finally</code> always runs.</strong> Print from <code>finally</code> in three scenarios: a normal return from <code>try</code>, a caught exception, and an uncaught exception propagating out. Confirm it runs in all three.</p>
+</li>
+<li>
+<p><strong>The <code>return</code>-in-<code>finally</code> trap.</strong> Verify <code>try { return 1; } finally { return 2; }</code> returns 2, and <code>try { throw new RuntimeException(); } finally { return 0; }</code> swallows the exception and returns 0. Explain why this is dangerous.</p>
+</li>
+<li>
+<p><strong>Exception chaining.</strong> Catch an <code>SQLException</code> (or any low-level exception), wrap it in a custom domain exception with the cause, and print the stack trace; identify the "Caused by:" section and call <code>getCause()</code>.</p>
+</li>
+<li>
+<p><strong>Measure construction cost.</strong> Benchmark throwing-and-catching a normal exception in a tight loop vs a custom exception that overrides <code>fillInStackTrace()</code> to return <code>this</code> (skipping the walk). Quantify how much of the cost is the stack capture.</p>
+</li>
+<li>
+<p><strong>Zero-cost try.</strong> Benchmark a loop body wrapped in a <code>try</code>/<code>catch</code> that never throws vs the same body without the <code>try</code>. Confirm no measurable difference, and explain via the exception table.</p>
+</li>
+<li>
+<p><strong>Fast throw.</strong> In a loop, repeatedly trigger an NPE at the same line; after warmup, observe the stack trace become empty (HotSpot fast throw). Re-run with <code>-XX:-OmitStackTraceInFastThrow</code> and confirm the trace returns.</p>
+</li>
+<li>
+<p><strong>Stack unwinding + <code>finally</code> order.</strong> Nest three methods each with a <code>try</code>/<code>finally</code>; throw from the innermost; print in each <code>finally</code> and confirm they run innermost-first during the unwind.</p>
+</li>
+<li>
+<p><strong>Appropriate type.</strong> Take a failure (e.g. "config value missing") and implement it once as a checked exception and once as an unchecked one; argue which is appropriate and how it changes the callers.</p>
+</li>
+<li>
+<p><strong>Result vs exception (cross-language).</strong> Sketch (in Java pseudocode or Rust) a fallible operation as an exception-throwing method and as a <code>Result</code>-returning function; discuss the lambda/stream difference.</p>
+</li>
+<li>
+<p><strong>No swallowing.</strong> Take a code snippet with an empty <code>catch</code> block; show the failure it hides; rewrite it three ways (log, handle, rethrow-wrapped) and discuss when each is right.</p>
+</li>
+<li>
+<p><strong>End-to-end explain-it-back.</strong> Trace <code>throw new IOException("disk full")</code> from a method three frames deep: (a) what the constructor does (<code>fillInStackTrace</code> walks the stack, allocates the <code>StackTraceElement[]</code>) and <em>when</em>; (b) what <code>athrow</code> does; (c) how the JVM searches each frame's exception table during unwinding and runs <code>finally</code> blocks; (d) what happens if no handler is found; (e) why the surrounding <code>try</code> blocks that did <em>not</em> match cost nothing on the happy path. Twelve sentences max.</p>
+</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<p><strong>Language layer.</strong></p>
+<ul>
+<li>Read the <code>Throwable</code> hierarchy (<code>Error</code> / <code>RuntimeException</code>-unchecked / other-<code>Exception</code>-checked) and know which branch to catch and which to let propagate.</li>
+<li>Use <code>try</code>/<code>catch</code>/<code>finally</code> with correct (most-specific-first) catch order and multi-catch, and state the "catch or declare" rule for checked exceptions.</li>
+<li>Chain a cause to translate an exception to the right abstraction without losing its stack trace, and avoid the <code>return</code>-in-<code>finally</code> trap.</li>
+<li>Argue both sides of the checked-exception debate and state Bloch's recoverable-vs-programming-error guideline.</li>
+</ul>
+<p><strong>Memory layer.</strong></p>
+<ul>
+<li>Describe a <code>Throwable</code> as an object (message, cause, <code>stackTrace</code>, suppressed list) whose <code>StackTraceElement[]</code> is captured by <code>fillInStackTrace()</code> at <strong>construction</strong>, ~40 bytes per frame.</li>
+</ul>
+<p><strong>Architecture layer.</strong></p>
+<ul>
+<li>Explain the <strong>zero-cost try</strong>: <code>try</code>/<code>catch</code> compiles to an exception table consulted only on a throw, so the happy path is free.</li>
+<li>Explain why <strong>throwing is cheap but constructing is expensive</strong> (the <code>fillInStackTrace</code> stack walk), why that makes exceptions-as-control-flow an anti-pattern, and what HotSpot "fast throw" / <code>-XX:-OmitStackTraceInFastThrow</code> do.</li>
+<li>Describe stack unwinding (pop frames, run <code>finally</code>/release monitors, search each caller's table) and place Java's checked exceptions against C++ RAII, Python EAFP, C# <code>using</code>, and Rust's <code>Result</code>/<code>?</code>.</li>
+</ul>
+<p>The next topic completes the error-handling foundation: <a href="c02-t10-custom-exceptions-and-try-with-resources.html">T10</a> — designing your own exception types and the <code>try</code>-with-resources statement that makes resource cleanup leak-proof (and finally retires the <code>finally</code>-block-for-cleanup pattern, with the suppressed-exceptions machinery that supports it).</p>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t10-custom-exceptions-and-try-with-resources.html">Custom exceptions &amp; try-with-resources</a> — the practical other half of error handling. T09 covered the mechanism; T10 covers using it well: when (and how) to define your own exception class versus reusing a standard one (<code>IllegalArgumentException</code>, <code>IllegalStateException</code>), the <code>AutoCloseable</code>/<code>Closeable</code> interface and the <code>try</code>-with-resources statement that closes resources automatically in reverse order of acquisition, the <strong>suppressed-exceptions</strong> mechanism that solves the classic "exception in <code>finally</code> masks the real exception" bug, and why <code>try</code>-with-resources is strictly better than the <code>try</code>/<code>finally</code>-close idiom this topic warned about.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Exceptions: try/catch/finally, checked vs unchecked&quot;
+slug: exceptions-try-catch-finally-checked-vs-unchecked
+level: L1
+module: &quot;Core Java &amp; OOP&quot;
+section: &quot;Collections &amp; Core APIs&quot;
+type: concept
+difficulty: beginner
+order: 9
+tags: [exceptions, throwable, error, runtimeexception, checked, unchecked, try-catch-finally, multi-catch, exception-chaining, fillinstacktrace, stack-unwinding, exception-table, zero-cost-try, result-type]
+prerequisites: [iterators-and-iterable, comparable-vs-comparator, object-class-and-its-methods, interfaces-default-static-private-methods, inheritance-and-super]
+status: complete
+estimated_minutes: 60
+last_updated: 2026-06-04
+---
+
+# Exceptions: try/catch/finally, checked vs unchecked
+
+The chapter now turns from data structures to the **language facilities and core APIs** every program leans on, starting with the one that underlies all of them: **error handling**. You have already met exceptions thrown by the collections — `ConcurrentModificationException` from a fail-fast iterator ([T06](./T06-iterators-and-iterable.md)), `NoSuchElementException` from an empty queue ([T05](./T05-queue-deque-priorityqueue-stack.md)), `ClassCastException` from a missing comparator ([T07](./T07-comparable-vs-comparator.md)). This topic opens the mechanism itself: how a thrown exception transfers control, the `Throwable` hierarchy that classifies what went wrong, the `try`/`catch`/`finally` construct that handles it, and Java&#x27;s distinctive — and controversial — split between **checked** exceptions (the compiler forces you to handle or declare them) and **unchecked** ones (it does not).
+
+The depth bar is **what an exception physically costs and why**. An exception is an object, and the surprising fact is that *throwing and catching are cheap while constructing is expensive*: the `Throwable` constructor calls the native `fillInStackTrace()`, which walks the entire call stack and allocates a `StackTraceElement[]` — microseconds for a deep stack. The `try` block itself, by contrast, is **free on the happy path**: `try`/`catch` compiles to an **exception table** in the bytecode that the JVM consults *only when an exception is actually thrown*, so a `try` that never throws adds zero instructions to the normal flow (&quot;zero-cost try&quot;). Those two facts explain the central rule — exceptions are for *exceptional* conditions, never for control flow — and why HotSpot has a &quot;fast throw&quot; optimization that strips stack traces from hot implicit exceptions. By the end you will read the `Throwable` hierarchy fluently, use `try`/`catch`/`finally` and multi-catch correctly, avoid the `return`-in-`finally` trap that silently swallows exceptions, chain a low-level cause into a domain exception without losing its stack trace, and explain why Rust&#x27;s `Result` type is widely seen as the checked-exception idea done right.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Object class](../C01-oop/T09-object-class-and-its-methods.md) (`L1/C01/T09`) — an exception is an ordinary object with a header and fields; [Inheritance](../C01-oop/T04-inheritance-and-super.md) (`L1/C01/T04`) — the `Throwable` hierarchy and `catch` matching by supertype; [Interfaces](../C01-oop/T08-interfaces-default-static-private-methods.md) (`L1/C01/T08`) — checked exceptions and the lambda/functional-interface friction. Forward: [T10](./T10-custom-exceptions-and-try-with-resources.md) (writing your own exceptions + `try`-with-resources + suppressed exceptions), which continues directly from here.
+
+## The `Throwable` Hierarchy
+
+Only an instance of **`Throwable`** can be thrown or caught. Its hierarchy splits everything that can go wrong into two fundamentally different categories:
+
+```mermaid
+flowchart TB
+  T[&quot;Throwable (the only throwable/catchable root)&quot;]
+  T --&gt; Err[&quot;Error — unrecoverable JVM/system problems&quot;]
+  T --&gt; Ex[&quot;Exception&quot;]
+  Err --&gt; Err2[&quot;OutOfMemoryError, StackOverflowError, AssertionError — DON&#x27;T catch&quot;]
+  Ex --&gt; RE[&quot;RuntimeException — UNCHECKED (programming bugs)&quot;]
+  Ex --&gt; CK[&quot;other Exception subtypes — CHECKED (recoverable conditions)&quot;]
+  RE --&gt; RE2[&quot;NullPointerException, IllegalArgumentException, IndexOutOfBounds, ClassCast, ArithmeticException…&quot;]
+  CK --&gt; CK2[&quot;IOException, SQLException, InterruptedException, ClassNotFoundException…&quot;]
+```
+
+- **`Error`** signals a problem so serious that a reasonable application should not try to handle it — the JVM is out of memory (`OutOfMemoryError`), the stack overflowed (`StackOverflowError`), a class failed to load (`NoClassDefFoundError`). These are **unchecked**. Don&#x27;t catch them.
+- **`Exception`** is the recoverable family, itself split in two:
+  - **`RuntimeException`** and its subclasses are **unchecked** — they represent **programming errors** (a `null` dereference, a bad index, an illegal argument). The right fix is usually to *fix the bug*, not to catch.
+  - **Every other `Exception`** is **checked** — `IOException`, `SQLException`, `InterruptedException` — representing **recoverable external conditions** (a file is missing, the network dropped) that a well-written caller should be forced to consider.
+
+This three-way split — `Error` / unchecked `RuntimeException` / checked `Exception` — is the entire taxonomy, and which branch a type lives in determines whether the compiler polices it.
+
+## `try` / `catch` / `finally` and Multi-Catch
+
+The handling construct has three parts. The `try` block holds the risky code; `catch` blocks handle specific `Throwable` types; the optional `finally` block runs no matter what:
+
+```java
+try {
+    var data = readFile(path);        // may throw IOException
+    process(data);                    // may throw a RuntimeException
+} catch (IOException e) {              // checked — most specific first
+    log.error(&quot;read failed&quot;, e);
+} catch (RuntimeException e) {         // unchecked
+    log.error(&quot;processing bug&quot;, e);
+} finally {
+    releaseLock();                     // ALWAYS runs (see semantics below)
+}
+```
+
+`catch` blocks are tested **top to bottom**, and the **first matching type wins** — so a more specific type must precede a more general one, or the compiler rejects the unreachable later block. When two `catch` blocks would do the same thing, **multi-catch** collapses them; the caught variable is **effectively final** and typed as the common supertype:
+
+```java
+try { risky(); }
+catch (IOException | SQLException e) {     // one handler for both
+    log.error(&quot;io or db failure&quot;, e);      // e cannot be reassigned
+}
+```
+
+```mermaid
+flowchart TB
+  Try[&quot;try block executes&quot;]
+  Try --&gt;|&quot;no exception&quot;| Fin[&quot;run finally → continue normally&quot;]
+  Try --&gt;|&quot;throws X&quot;| Match{&quot;first catch whose&lt;br/&gt;type ⊇ X?&quot;}
+  Match --&gt;|&quot;found&quot;| H[&quot;run that catch block&quot;] --&gt; Fin
+  Match --&gt;|&quot;none in this method&quot;| Unwind[&quot;run finally → propagate X to caller (unwind)&quot;]
+```
+
+## Checked vs Unchecked — The Compiler&#x27;s Rule
+
+The practical difference is a **compile-time rule** that applies only to checked exceptions: **&quot;catch or declare.&quot;** If a method can throw a checked exception, it must either handle it (`try`/`catch`) or announce it in its signature (`throws`), and that obligation propagates up the call chain until someone handles it. Unchecked exceptions carry no such obligation.
+
+```java
+// CHECKED — won&#x27;t compile unless you catch or declare:
+void load() throws IOException {        // declared → callers must handle/declare too
+    Files.readString(path);              // throws checked IOException
+}
+
+// UNCHECKED — compiles with no annotation:
+int parse(String s) {
+    return Integer.parseInt(s);          // throws unchecked NumberFormatException — no &#x27;throws&#x27; needed
+}
+```
+
+```mermaid
+flowchart TB
+  M[&quot;a method body can throw E&quot;]
+  M --&gt; Q{&quot;is E checked?&lt;br/&gt;(Exception, not RuntimeException/Error)&quot;}
+  Q --&gt;|&quot;yes&quot;| CD[&quot;MUST &#x27;catch&#x27; it or declare &#x27;throws E&#x27; — compiler-enforced, propagates up&quot;]
+  Q --&gt;|&quot;no (unchecked)&quot;| Free[&quot;no obligation — compiles silently, propagates until caught or thread dies&quot;]
+```
+
+The design intent (Bloch, *Effective Java* Item 70): **use checked exceptions for recoverable conditions and unchecked (runtime) exceptions for programming errors**. A missing file is recoverable → checked; a `null` argument is a bug → unchecked. In practice many modern Java codebases lean heavily on unchecked exceptions (and frameworks like Spring wrap checked ones) for reasons the next section unpacks.
+
+## The Great Checked-Exception Debate
+
+Checked exceptions are **Java&#x27;s unique experiment** — no other mainstream language enforces them at compile time, and the industry&#x27;s verdict has been mixed-to-negative. Knowing both sides is interview-relevant and design-relevant.
+
+**The case for:** a checked exception puts the failure mode *in the method&#x27;s signature*. The caller cannot forget that `readFile` may fail — the compiler insists they handle or propagate it. The set of failures becomes part of the documented contract, not a runtime surprise.
+
+**The case against** (Anders Hejlsberg, who omitted them from C#; Bruce Eckel; and the Kotlin designers, who also omitted them):
+
+- **They don&#x27;t scale.** As code composes, `throws` clauses accumulate; developers widen them to `throws Exception`, which throws away all the information the feature was supposed to provide.
+- **They encourage swallowing.** The path of least resistance to silence the compiler is an empty `catch` block — the single worst thing you can do with an exception, and checked exceptions actively nudge you toward it.
+- **They break with lambdas and streams.** A `Function&lt;T,R&gt;` ([T08](../C01-oop/T08-interfaces-default-static-private-methods.md)) cannot throw a checked exception, so any checked exception inside a `stream().map(...)` must be caught and wrapped right there — boilerplate that a language without checked exceptions never needs.
+
+```mermaid
+flowchart LR
+  For[&quot;FOR: failure is in the signature — caller can&#x27;t forget it (compiler-enforced contract)&quot;]
+  Against[&quot;AGAINST: don&#x27;t scale / &#x27;throws Exception&#x27; / swallowing / break lambdas &amp; streams&quot;]
+  Verdict[&quot;C# and Kotlin dropped them; Rust moves the idea into the type system (Result)&quot;]
+  For --&gt; Verdict
+  Against --&gt; Verdict
+```
+
+The honest summary: checked exceptions were a well-intentioned attempt to make failure a first-class part of an API&#x27;s contract, judged by most of the industry as a net negative for large codebases — *but the underlying idea is sound*, and Rust&#x27;s `Result` type (cross-language section) realizes it without the drawbacks.
+
+## Exception Chaining — Preserving the Cause
+
+When you catch a low-level exception and throw a more meaningful one, **wrap the original as the cause** so its stack trace is not lost (*Effective Java* Item 73: throw exceptions appropriate to the abstraction):
+
+```java
+try {
+    return jdbc.query(sql);
+} catch (SQLException e) {
+    throw new DataAccessException(&quot;Could not load user &quot; + id, e);   // &#x27;e&#x27; becomes the cause
+}
+```
+
+The `Throwable(String, Throwable)` constructor (or `initCause`) stores the cause; `getCause()` retrieves it; and `printStackTrace()` renders it as a **&quot;Caused by:&quot;** section showing both stack traces. This translates the exception to the right abstraction level (callers of a data-access layer should not see raw `SQLException`s) **without discarding the diagnostic trail** — the original failure point is still in the chained trace.
+
+```mermaid
+flowchart LR
+  Low[&quot;SQLException (low level): real failure point + stack trace&quot;]
+  Low --&gt;|&quot;wrapped as cause&quot;| High[&quot;DataAccessException (domain): meaningful message&quot;]
+  High --&gt;|&quot;printStackTrace()&quot;| Out[&quot;High&#x27;s trace + &#x27;Caused by:&#x27; Low&#x27;s trace — nothing lost&quot;]
+```
+
+## `finally` Semantics and the `return`-in-`finally` Trap
+
+A `finally` block **always runs** — whether the `try` completed normally, threw and was caught, or threw and is propagating uncaught (it runs *during* the unwind, before the exception leaves the method). The only escapes are `System.exit()` (the JVM terminates outright), a JVM crash, or an infinite loop / killed daemon thread.
+
+That guarantee makes `finally` the classic place for cleanup — but it has a sharp edge:
+
+&gt; [!WARNING]
+&gt; **Never `return` or `throw` from a `finally` block.** A `finally` that returns or throws **overrides** whatever the `try`/`catch` was returning or throwing — including a pending exception, which is **silently swallowed**. `try { return 1; } finally { return 2; }` returns **2**; `try { throw new IllegalStateException(); } finally { return 0; }` discards the exception entirely and returns **0**. The bug is invisible at the call site. Keep `finally` to side-effecting cleanup only — and prefer `try`-with-resources ([T10](./T10-custom-exceptions-and-try-with-resources.md)), which handles resource cleanup correctly and avoids the trap.
+
+```mermaid
+flowchart TB
+  Try[&quot;try: return 1 / throw E&quot;]
+  Try --&gt; Fin{&quot;finally also&lt;br/&gt;returns or throws?&quot;}
+  Fin --&gt;|&quot;no — just side effects&quot;| Ok[&quot;try&#x27;s return/throw stands ✓&quot;]
+  Fin --&gt;|&quot;yes (return 2 / throw F)&quot;| Bad[&quot;finally WINS — try&#x27;s value or exception E is SWALLOWED ✗&quot;]
+```
+
+## Memory — An Exception Is an Object, and the Stack Trace Costs
+
+A `Throwable` is an ordinary heap object ([T09-C01](../C01-oop/T09-object-class-and-its-methods.md)) with a handful of fields:
+
+```java
+public class Throwable {
+    private String detailMessage;                 // the message — ref (4 B)
+    private Throwable cause = this;                // chained cause; &#x27;this&#x27; means &quot;not yet set&quot; — ref (4 B)
+    private StackTraceElement[] stackTrace;        // the captured trace — ref (4 B)
+    private List&lt;Throwable&gt; suppressedExceptions;  // try-with-resources (T10) — ref (4 B)
+    // + a transient native &#x27;backtrace&#x27; holding the raw stack snapshot
+}
+```
+
+The expensive field is `stackTrace`, and the crucial fact is **when** it is filled: the `Throwable` **constructor** calls the native **`fillInStackTrace()`**, which walks the current thread&#x27;s entire call stack and records every frame. So the cost is paid at **`new`-time, not throw-time** — `new IOException()` has already walked the stack even if you never throw it. Each frame becomes a `StackTraceElement` (declaring class, method, file name, line number — ~40 bytes each), so a 30-frame-deep stack materializes a ~1 KB array of trace objects.
+
+```mermaid
+flowchart LR
+  New[&quot;new SomeException(msg)&quot;]
+  New --&gt; Ctor[&quot;Throwable constructor → fillInStackTrace() (native)&quot;]
+  Ctor --&gt; Walk[&quot;walk EVERY frame on the call stack now&quot;]
+  Walk --&gt; Arr[&quot;allocate StackTraceElement[] (~40 B/frame) — the expensive part&quot;]
+  Arr --&gt; Note[&quot;paid at construction, NOT at throw — so &#x27;new&#x27; is the cost, not &#x27;throw&#x27;&quot;]
+```
+
+## Architecture — Zero-Cost `try`, Expensive Construction, and Unwinding
+
+Three mechanisms explain exception performance, and together they justify the &quot;exceptions are not control flow&quot; rule.
+
+**The `try` block is free on the happy path.** When `javac` compiles `try`/`catch`, it does **not** emit per-instruction &quot;am I inside a try?&quot; checks. Instead it records an **exception table** in the method&#x27;s `Code` attribute — a list of `(start_pc, end_pc, handler_pc, catch_type)` entries. The normal path runs the `try`-block bytecode with zero added instructions. **Only when an exception is actually thrown** does the JVM consult the table: find an entry whose bytecode range covers the throwing instruction and whose `catch_type` matches the thrown class, then jump to its handler. This is the **&quot;zero-cost try&quot;** model — you can wrap code in `try`/`catch` as liberally as you like without slowing the case where nothing throws.
+
+```mermaid
+flowchart TB
+  Compile[&quot;javac compiles try/catch&quot;]
+  Compile --&gt; Tab[&quot;emits an EXCEPTION TABLE: (start_pc, end_pc, handler_pc, catch_type)&quot;]
+  Tab --&gt; Happy[&quot;NO throw → table never consulted → ZERO overhead on the normal path&quot;]
+  Tab --&gt; Throw[&quot;athrow → JVM searches the table for a covering, type-matching entry → jump to handler&quot;]
+```
+
+**Throwing is cheap; constructing is expensive.** The `athrow` + table lookup + unwind is a controlled non-local jump — fast. The expense is the `fillInStackTrace()` walk done in the constructor (previous section). **This is the real reason &quot;exceptions are slow&quot;** — it is the stack capture, not the throw/catch. Hence two consequences:
+
+- **Exceptions-as-control-flow is an anti-pattern** — a `try`/`catch` in a hot loop that throws every iteration pays the stack-walk cost each time. Use a boolean check or an `Optional` ([T19](./T19-optional.md)) instead.
+- **HotSpot&#x27;s &quot;fast throw&quot;**: for certain hot, repeatedly-thrown implicit exceptions (`NullPointerException`, `ArithmeticException`, …), after enough throws at the same site the JIT throws a **pre-allocated, stack-trace-less** instance — which is why production logs sometimes show an NPE *with no stack trace*. The flag **`-XX:-OmitStackTraceInFastThrow`** disables this to always capture traces (essential when debugging those traceless NPEs).
+
+**Stack unwinding** is how propagation works: if the current method&#x27;s exception table has no matching handler, the JVM **pops the frame** — running any `finally` blocks and releasing any `synchronized` monitors as it goes — then checks the *caller&#x27;s* table, repeating up the stack until a handler is found or the top is reached (an uncaught exception → the thread&#x27;s `UncaughtExceptionHandler`, then the thread dies). The `finally`-always-runs guarantee is implemented precisely by this unwind walk.
+
+```mermaid
+flowchart TB
+  C[&quot;c() throws E — no matching handler&quot;]
+  C --&gt;|&quot;run c&#x27;s finally, release monitors, POP frame&quot;| B[&quot;b() — search its exception table&quot;]
+  B --&gt;|&quot;no match → run b&#x27;s finally, POP frame&quot;| A[&quot;a() — search its exception table&quot;]
+  A --&gt;|&quot;match found&quot;| H[&quot;jump to a()&#x27;s handler — done&quot;]
+  A --&gt;|&quot;no match anywhere → top of stack&quot;| Die[&quot;UncaughtExceptionHandler → thread dies&quot;]
+```
+
+## Cross-Language Perspective
+
+Error handling is where languages diverge most sharply — and Java&#x27;s checked exceptions sit at one extreme:
+
+| Language | Checked exceptions? | Cleanup mechanism | Recoverable-error model |
+|---|---|---|---|
+| **Java** | **yes** (unique) | `finally` / try-with-resources ([T10](./T10-custom-exceptions-and-try-with-resources.md)) | exceptions (checked + unchecked) |
+| **C++** | no (specs removed in C++17) | **RAII** — destructors run on unwind | exceptions (zero-cost, table-based) |
+| **Python** | no | `finally` / `with` | exceptions (idiomatic — **EAFP**) |
+| **C#** | no (rejected deliberately) | `using` | exceptions |
+| **Rust** | n/a | `Drop` (RAII) | **`Result&lt;T,E&gt;` + `?`**; `panic!` for bugs |
+| **Go** | n/a | `defer` | explicit `error` returns; `panic`/`recover` |
+
+Three deep contrasts. **C++** has the same zero-cost table-based exception model as the JVM but **no `finally`** — cleanup is automatic via **RAII** (a stack object&#x27;s destructor runs deterministically during unwinding), and its `throw()` exception specifications were *removed* in C++17, the same retreat from compile-time exception declarations that Java&#x27;s critics point to. **Python** treats exceptions as ordinary control flow — the **EAFP** style (&quot;Easier to Ask Forgiveness than Permission&quot;) deliberately *tries* and catches rather than checking first, and `StopIteration` even drives iteration ([T06](./T06-iterators-and-iterable.md)). **Rust** abolishes exceptions for recoverable errors entirely: a fallible function returns **`Result&lt;T, E&gt;`** (an `Ok`/`Err` enum), and the **`?` operator** propagates an `Err` up with one character — the ergonomics of checked exceptions, but the error is a **value in the return type**, visible in the signature, composable through generics and closures (no lambda-leakage problem), and impossible to silently ignore. `panic!` is reserved for unrecoverable bugs (like an `Error`). Rust&#x27;s `Result` is widely regarded as **&quot;checked exceptions done right&quot;** — it achieves the original goal (failure is part of the contract, the caller must deal with it) without the drawbacks that sank Java&#x27;s version. Go takes the explicit route: errors are ordinary return values checked with `if err != nil`, verbose but impossible to overlook.
+
+```mermaid
+flowchart LR
+  Exc[&quot;EXCEPTIONS (out-of-band control flow): Java, C++, Python, C#&quot;]
+  Val[&quot;ERRORS-AS-VALUES (in the return type): Rust Result, Go error, Haskell Either&quot;]
+  Exc --&gt;|&quot;Java checked = forced handling via signature&quot;| Bridge[&quot;the same goal: don&#x27;t let failures be forgotten&quot;]
+  Val --&gt;|&quot;Rust ? = forced handling via the type system&quot;| Bridge
+```
+
+## Common Mistakes
+
+&gt; [!WARNING]
+&gt; **Swallowing exceptions.** An empty `catch (Exception e) {}` discards the failure and its diagnostics — the single worst exception anti-pattern. At minimum log it with its stack trace; better, handle or rethrow it.
+
+&gt; [!WARNING]
+&gt; **Catching too broadly.** `catch (Throwable t)` or `catch (Exception e)` around a wide block hides bugs and catches things you cannot handle (`OutOfMemoryError`, `NullPointerException`). Catch the **narrowest** type you can actually recover from.
+
+&gt; [!WARNING]
+&gt; **`return`/`throw` in `finally`.** It overrides — and silently swallows — any pending return value or exception from the `try`/`catch`. Keep `finally` to side effects only.
+
+&gt; [!WARNING]
+&gt; **Losing the cause.** `throw new MyException(&quot;failed&quot;)` inside a `catch` without passing the caught exception as the cause discards the original stack trace. Always chain: `throw new MyException(&quot;failed&quot;, e)`.
+
+&gt; [!WARNING]
+&gt; **Exceptions for control flow.** Catching `NumberFormatException` to test whether a string is a number (instead of validating) pays the `fillInStackTrace` cost on every non-number and obscures intent. Use a check, an `Optional`, or a `tryParse`-style API.
+
+&gt; [!WARNING]
+&gt; **Catch-log-rethrow at every level.** Logging an exception and rethrowing it at each layer produces the same stack trace many times in the log. Log **once**, at the boundary where you handle it; otherwise just let it propagate.
+
+## Practice
+
+&gt; [!INTERVIEW]
+&gt; Common interview questions for this topic:
+&gt; 1. **Checked vs unchecked exceptions?** Checked = compiler-enforced &quot;catch or declare&quot; (`Exception` minus `RuntimeException`); unchecked = `RuntimeException` + `Error`, no enforcement.
+&gt; 2. **The `Throwable` hierarchy?** `Throwable` → `Error` (unrecoverable, don&#x27;t catch) + `Exception` → `RuntimeException` (unchecked / bugs) + other checked exceptions.
+&gt; 3. **When use checked vs unchecked?** Checked for recoverable external conditions the caller should handle; unchecked for programming errors (EJ Item 70).
+&gt; 4. **What does `finally` guarantee?** It always runs except on `System.exit`/JVM death — used for cleanup (superseded by try-with-resources for resources, T10).
+&gt; 5. **The `return`-in-`finally` trap?** A `return`/`throw` in `finally` overrides the `try`/`catch` and silently swallows a pending exception — never do it.
+&gt; 6. **Multi-catch?** `catch (A | B e)` — one handler for several types; `e` is effectively final, typed as the common supertype.
+&gt; 7. **Exception chaining and why?** Wrap a low-level cause in a domain exception (cause constructor / `initCause`) to translate the abstraction without losing the stack trace; `getCause` / &quot;Caused by:&quot;.
+&gt; 8. **Are exceptions expensive?** Throwing/catching is cheap; *constructing* is expensive because `fillInStackTrace` walks the stack — so exceptions-as-control-flow is the anti-pattern.
+&gt; 9. **What is the zero-cost try?** `try`/`catch` compiles to an exception table consulted only on a throw, so the happy path has zero overhead.
+&gt; 10. **Why do some production NPEs have no stack trace?** HotSpot &quot;fast throw&quot; reuses a pre-allocated traceless exception for hot implicit throws; `-XX:-OmitStackTraceInFastThrow` restores traces.
+&gt; 11. **The checked-exception debate?** Pro: failure is in the signature; con: doesn&#x27;t scale, encourages swallowing, breaks lambdas/streams — C#/Kotlin dropped them.
+&gt; 12. **How does Rust handle recoverable errors?** `Result&lt;T,E&gt;` + `?` — errors as values in the return type, the checked-exception idea without the drawbacks.
+&gt; 13. **Risk of `catch (Throwable)`?** It catches `Error`s (e.g. `OutOfMemoryError`) you cannot handle; catch the narrowest type you can recover from.
+
+1. **Map the hierarchy.** Write out `Error`, `Exception`, and `RuntimeException` with two real examples each, and label which are checked vs unchecked.
+
+2. **Catch or declare.** Write a method calling `Files.readString` (checked `IOException`); show it won&#x27;t compile until you `catch` or add `throws`. Then call `Integer.parseInt` (unchecked) and confirm no annotation is needed.
+
+3. **Multi-catch.** Combine two `catch` blocks that handle `IOException` and `SQLException` identically into one multi-catch; confirm the variable is effectively final (try to reassign it → compile error).
+
+4. **Catch order.** Put `catch (Exception e)` before `catch (IOException e)`; observe the &quot;unreachable catch block&quot; compile error; fix the order.
+
+5. **`finally` always runs.** Print from `finally` in three scenarios: a normal return from `try`, a caught exception, and an uncaught exception propagating out. Confirm it runs in all three.
+
+6. **The `return`-in-`finally` trap.** Verify `try { return 1; } finally { return 2; }` returns 2, and `try { throw new RuntimeException(); } finally { return 0; }` swallows the exception and returns 0. Explain why this is dangerous.
+
+7. **Exception chaining.** Catch an `SQLException` (or any low-level exception), wrap it in a custom domain exception with the cause, and print the stack trace; identify the &quot;Caused by:&quot; section and call `getCause()`.
+
+8. **Measure construction cost.** Benchmark throwing-and-catching a normal exception in a tight loop vs a custom exception that overrides `fillInStackTrace()` to return `this` (skipping the walk). Quantify how much of the cost is the stack capture.
+
+9. **Zero-cost try.** Benchmark a loop body wrapped in a `try`/`catch` that never throws vs the same body without the `try`. Confirm no measurable difference, and explain via the exception table.
+
+10. **Fast throw.** In a loop, repeatedly trigger an NPE at the same line; after warmup, observe the stack trace become empty (HotSpot fast throw). Re-run with `-XX:-OmitStackTraceInFastThrow` and confirm the trace returns.
+
+11. **Stack unwinding + `finally` order.** Nest three methods each with a `try`/`finally`; throw from the innermost; print in each `finally` and confirm they run innermost-first during the unwind.
+
+12. **Appropriate type.** Take a failure (e.g. &quot;config value missing&quot;) and implement it once as a checked exception and once as an unchecked one; argue which is appropriate and how it changes the callers.
+
+13. **Result vs exception (cross-language).** Sketch (in Java pseudocode or Rust) a fallible operation as an exception-throwing method and as a `Result`-returning function; discuss the lambda/stream difference.
+
+14. **No swallowing.** Take a code snippet with an empty `catch` block; show the failure it hides; rewrite it three ways (log, handle, rethrow-wrapped) and discuss when each is right.
+
+15. **End-to-end explain-it-back.** Trace `throw new IOException(&quot;disk full&quot;)` from a method three frames deep: (a) what the constructor does (`fillInStackTrace` walks the stack, allocates the `StackTraceElement[]`) and *when*; (b) what `athrow` does; (c) how the JVM searches each frame&#x27;s exception table during unwinding and runs `finally` blocks; (d) what happens if no handler is found; (e) why the surrounding `try` blocks that did *not* match cost nothing on the happy path. Twelve sentences max.
+
+## Recap
+
+You should now be able to:
+
+**Language layer.**
+
+- Read the `Throwable` hierarchy (`Error` / `RuntimeException`-unchecked / other-`Exception`-checked) and know which branch to catch and which to let propagate.
+- Use `try`/`catch`/`finally` with correct (most-specific-first) catch order and multi-catch, and state the &quot;catch or declare&quot; rule for checked exceptions.
+- Chain a cause to translate an exception to the right abstraction without losing its stack trace, and avoid the `return`-in-`finally` trap.
+- Argue both sides of the checked-exception debate and state Bloch&#x27;s recoverable-vs-programming-error guideline.
+
+**Memory layer.**
+
+- Describe a `Throwable` as an object (message, cause, `stackTrace`, suppressed list) whose `StackTraceElement[]` is captured by `fillInStackTrace()` at **construction**, ~40 bytes per frame.
+
+**Architecture layer.**
+
+- Explain the **zero-cost try**: `try`/`catch` compiles to an exception table consulted only on a throw, so the happy path is free.
+- Explain why **throwing is cheap but constructing is expensive** (the `fillInStackTrace` stack walk), why that makes exceptions-as-control-flow an anti-pattern, and what HotSpot &quot;fast throw&quot; / `-XX:-OmitStackTraceInFastThrow` do.
+- Describe stack unwinding (pop frames, run `finally`/release monitors, search each caller&#x27;s table) and place Java&#x27;s checked exceptions against C++ RAII, Python EAFP, C# `using`, and Rust&#x27;s `Result`/`?`.
+
+The next topic completes the error-handling foundation: [T10](./T10-custom-exceptions-and-try-with-resources.md) — designing your own exception types and the `try`-with-resources statement that makes resource cleanup leak-proof (and finally retires the `finally`-block-for-cleanup pattern, with the suppressed-exceptions machinery that supports it).
+
+## Next
+
+Continue to [Custom exceptions &amp; try-with-resources](./T10-custom-exceptions-and-try-with-resources.md) — the practical other half of error handling. T09 covered the mechanism; T10 covers using it well: when (and how) to define your own exception class versus reusing a standard one (`IllegalArgumentException`, `IllegalStateException`), the `AutoCloseable`/`Closeable` interface and the `try`-with-resources statement that closes resources automatically in reverse order of acquisition, the **suppressed-exceptions** mechanism that solves the classic &quot;exception in `finally` masks the real exception&quot; bug, and why `try`-with-resources is strictly better than the `try`/`finally`-close idiom this topic warned about.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l1/c02-t08-collection-performance-characteristics-big-o.html"><div class="lbl">← Previous</div><div class="ttl">T08-collection-performance-characteristics-big-o</div><div class="sub">Collection Performance Characteristics (Big-O)</div></a><a class="next" href="../l1/c02-t10-custom-exceptions-and-try-with-resources.html"><div class="lbl">Next →</div><div class="ttl">T10-custom-exceptions-and-try-with-resources</div><div class="sub">Custom exceptions &amp; try-with-resources</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-throwable-hierarchy" data-toc-link>The Throwable Hierarchy</a></li><li class="lvl-2"><a href="#try-catch-finally-and-multi-catch" data-toc-link>try / catch / finally and Multi-Catch</a></li><li class="lvl-2"><a href="#checked-vs-unchecked-the-compilers-rule" data-toc-link>Checked vs Unchecked — The Compiler&#x27;s Rule</a></li><li class="lvl-2"><a href="#the-great-checked-exception-debate" data-toc-link>The Great Checked-Exception Debate</a></li><li class="lvl-2"><a href="#exception-chaining-preserving-the-cause" data-toc-link>Exception Chaining — Preserving the Cause</a></li><li class="lvl-2"><a href="#finally-semantics-and-the-return-in-finally-trap" data-toc-link>finally Semantics and the return-in-finally Trap</a></li><li class="lvl-2"><a href="#memory-an-exception-is-an-object-and-the-stack-trace-costs" data-toc-link>Memory — An Exception Is an Object, and the Stack Trace Costs</a></li><li class="lvl-2"><a href="#architecture-zero-cost-try-expensive-construction-and-unwinding" data-toc-link>Architecture — Zero-Cost try, Expensive Construction, and Unwinding</a></li><li class="lvl-2"><a href="#cross-language-perspective" data-toc-link>Cross-Language Perspective</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

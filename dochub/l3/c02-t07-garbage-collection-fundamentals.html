@@ -1,0 +1,1280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Garbage Collection Fundamentals — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="active" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Garbage Collection Fundamentals</span></div>
+        <h1>Garbage Collection Fundamentals</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T07-garbage-collection-fundamentals.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~150 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Garbage Collection Fundamentals"
+slug: garbage-collection-fundamentals
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 7
+tags: [garbage-collection, gc, automatic-memory-management, reachability, gc-roots, local-variable-roots, static-field-roots, jni-global-roots, active-monitor-roots, thread-object-roots, classloader-roots, strong-reference, soft-reference, weak-reference, phantom-reference, reference-queue, mark-sweep, mark-compact, copying-collector, semi-space, tri-color-invariant, white-gray-black, concurrent-marking, write-barrier, satb-barrier, snapshot-at-the-beginning, incremental-update-barrier, dijkstra-barrier, safepoint, safepoint-poll, time-to-safepoint, ttsp, stop-the-world, stw, card-table, dirty-card, remembered-set, rset, generational-hypothesis, throughput-metric, pause-time-metric, footprint-metric, promptness-metric, gc-tuning-triangle, parallel-gc, concurrent-gc, allocation-rate, collection-rate, headroom, reference-processing, cleaner-replacement, finalize-deprecated, jep-421, mutator, collector, initial-mark, concurrent-mark, final-mark, evacuation, sweep]
+prerequisites: [memory-model-heap-stack-metaspace, jvm-architecture-and-runtime-data-areas, synchronized-monitors-and-intrinsic-locks]
+status: complete
+estimated_minutes: 150
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="garbage-collection-fundamentals">Garbage Collection Fundamentals</h1>
+<p>T06 placed objects in the heap; T01 introduced the heap's role in the JVM. This topic covers the central question of every managed runtime: <strong>how does the JVM decide which objects to reclaim, and how does it do so without breaking the running application?</strong> Garbage collection (GC) is one of the most-studied areas of computer science, with 60+ years of literature; HotSpot's GCs (Serial, Parallel, G1, ZGC, Shenandoah — T08) are all variations on a small number of <em>fundamental</em> algorithms covered here. Understanding the fundamentals is what makes choosing and tuning a specific GC tractable.</p>
+<p>The depth-bar requirement isn't "GC frees memory." At the <strong>theory</strong> layer, garbage = unreachable, which is the <em>computable approximation</em> of "no longer needed" — every collector traces reachability from a fixed set of <strong>GC roots</strong> (local variables on active thread stacks, static fields, JNI globals, active monitors, thread objects, ClassLoaders). At the <strong>algorithm</strong> layer, three classical mechanisms underlie <em>every</em> production collector — <strong>mark-sweep</strong> (mark live from roots, sweep dead in the rest of the heap; fast, fragmented), <strong>mark-compact</strong> (mark live, slide together to eliminate fragmentation; expensive pointer updates), and <strong>copying</strong> (two equal-sized spaces, copy live to the other; fast and unfragmented but 50% memory overhead — the basis of every Young Generation collector). At the <strong>concurrency</strong> layer, modern collectors run <em>alongside</em> the application via the <strong>tri-color invariant</strong> (white/gray/black marking) maintained by <strong>write barriers</strong> — code emitted at every reference write that prevents the GC from missing newly-created references; SATB (Snapshot-At-The-Beginning) for G1, more sophisticated variants for Shenandoah and ZGC, each costing ~5–15% throughput in exchange for sub-millisecond pause times. At the <strong>synchronization</strong> layer, <strong>safepoints</strong> are the JVM's mechanism for stopping application threads coherently: the compiler inserts cheap safepoint polls at method entries and loop back-edges; <strong>time-to-safepoint (TTSP)</strong> is the critical quietest-loudest measurement that bounds the JVM's worst-case pause; <strong>card tables</strong> (and G1's <strong>remembered sets</strong>) track inter-generational/inter-region references via write barriers so young collections don't have to scan the entire old generation. At the <strong>metric</strong> layer, the tuning game has <em>four</em> dimensions — <strong>throughput</strong> (% time not in GC), <strong>pause time</strong> (longest STW), <strong>footprint</strong> (memory used), <strong>promptness</strong> (delay between unreachable and reclaimed) — and the <strong>unattainable triangle</strong> says you can have any two but not all three. We will cover all five layers as the foundation for T08's specific-collector comparison.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t06-memory-model-heap-stack-metaspace.html">Memory model: heap, stack, metaspace</a> (L3/C02/T06) — generational structure GC operates on; <a href="c02-t01-jvm-architecture-and-runtime-data-areas.html">JVM architecture</a> (L3/C02/T01) — heap + stack data areas; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized, monitors &amp; intrinsic locks</a> (L3/C01/T03) — active monitors are GC roots.</p></div></div>
+<h2 id="what-gc-is-and-why">What GC Is — and Why<a class="anchor" href="#what-gc-is-and-why" aria-hidden="true">#</a></h2>
+<p>Manual memory management (<code>malloc</code>/<code>free</code> in C/C++) is <em>the</em> source of most security vulnerabilities in those languages: <strong>use-after-free</strong>, <strong>double-free</strong>, <strong>memory leaks</strong>, <strong>dangling pointers</strong>. Garbage collection eliminates these systematically by making allocation explicit and reclamation automatic — the program <em>allocates</em> (creates references); the runtime <em>frees</em> (reclaims unreachable memory) without programmer intervention.</p>
+<p>The trade:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>What you get</th>
+<th>What you pay</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No use-after-free</td>
+<td>GC pauses (or concurrency overhead)</td>
+</tr>
+<tr>
+<td>No double-free</td>
+<td>Throughput tax (write barriers, etc.)</td>
+</tr>
+<tr>
+<td>No memory leaks (from forgotten frees)</td>
+<td>Memory footprint overhead (card tables, marking state)</td>
+</tr>
+<tr>
+<td>Simpler code</td>
+<td>Less control over exact reclaim timing</td>
+</tr>
+</tbody>
+</table></div>
+<p>Modern Java GCs make the trade <em>very</em> favorable for most workloads — sub-millisecond pauses (ZGC/Shenandoah), single-digit % throughput overhead. Hand-written <code>malloc</code>/<code>free</code> is <em>no longer faster</em> for typical workloads when you measure total system throughput including allocation cost.</p>
+<h2 id="the-reachability-problem">The Reachability Problem<a class="anchor" href="#the-reachability-problem" aria-hidden="true">#</a></h2>
+<p>Garbage is <em>not</em> "objects the program is done with" — that's not computable. Garbage is <strong>unreachable</strong> — no chain of references from any <strong>GC root</strong> leads to it. The collector computes reachability, treats unreachable as garbage, and reclaims it.</p>
+<div class="mermaid">flowchart LR
+  subgraph Roots["GC Roots"]
+    LV["Local vars on active stacks"]
+    SF["Static fields"]
+    JG["JNI globals"]
+    AM["Active monitors"]
+    TO["Thread objects"]
+  end
+  subgraph Heap
+    A["A (reachable)"]
+    B["B (reachable from A)"]
+    C["C (reachable from B)"]
+    D["D (orphan — no incoming ref)"]
+    E["E (only D points to it)"]
+  end
+  Roots --> A
+  A --> B
+  B --> C
+  D --> E
+  Note["A, B, C: reachable → live<br/>D, E: unreachable → garbage<br/>(even though D points to E,<br/>nothing reachable points to D)"]
+</div>
+<p>The key property: <strong>reachability is transitive</strong>. If A is reachable and A→B, B is reachable. The collector traces the graph from roots and marks everything it reaches.</p>
+<h2 id="gc-roots-where-tracing-starts">GC Roots — Where Tracing Starts<a class="anchor" href="#gc-roots-where-tracing-starts" aria-hidden="true">#</a></h2>
+<p>Every GC starts from a known set of "roots" — references the JVM guarantees are live. The canonical set:</p>
+<ul>
+<li><strong>Local variables on active thread stacks</strong> — every frame's locals array (T01) holds references that count as roots.</li>
+<li><strong>Static fields</strong> — class-level variables in Klass structures in Metaspace.</li>
+<li><strong>JNI globals</strong> — references held by native code via <code>NewGlobalRef</code>.</li>
+<li><strong>Active monitors</strong> — objects currently being <code>synchronized</code> on (T03 from C01).</li>
+<li><strong>Thread objects themselves</strong> — every running <code>Thread</code> is a root.</li>
+<li><strong>System ClassLoader and Bootstrap ClassLoader</strong> — keep the JDK alive.</li>
+<li><strong>JVM internal references</strong> — interned strings, code-cache references, etc.</li>
+</ul>
+<p>Heap dumps (T10) show GC roots prominently in their "leak suspect" analysis — finding a long-retained object always starts by tracing its reachability path back to a root.</p>
+<h2 id="reference-types-soft-weak-phantom">Reference Types — Soft, Weak, Phantom<a class="anchor" href="#reference-types-soft-weak-phantom" aria-hidden="true">#</a></h2>
+<p>By default, every reference is <strong>strong</strong> — if reachable through strong refs, the object lives. Java provides three additional reference types for finer control:</p>
+<h3 id="softreferencet-cleared-under-memory-pressure"><code>SoftReference&lt;T&gt;</code> — cleared under memory pressure<a class="anchor" href="#softreferencet-cleared-under-memory-pressure" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">SoftReference&lt;Image&gt; cache = new SoftReference&lt;&gt;(loadImage(path));
+
+// later:
+Image img = cache.get();      // may return null if GC cleared it under memory pressure
+</code></pre></div>
+<p>The GC will clear soft references <strong>before throwing OOM</strong>. Good for caches: "keep this if you can; throw it away if memory is tight."</p>
+<h3 id="weakreferencet-cleared-at-the-next-gc"><code>WeakReference&lt;T&gt;</code> — cleared at the next GC<a class="anchor" href="#weakreferencet-cleared-at-the-next-gc" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">WeakHashMap&lt;Key, Value&gt; map = new WeakHashMap&lt;&gt;();   // uses WeakReference internally
+</code></pre></div>
+<p>Cleared at the next GC after the referent becomes unreachable through strong refs. Used for: weakly-keyed maps (entries disappear when keys do), ClassLoader leak prevention, listener lists.</p>
+<h3 id="phantomreferencet-cleanup-notification"><code>PhantomReference&lt;T&gt;</code> — cleanup notification<a class="anchor" href="#phantomreferencet-cleanup-notification" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">PhantomReference&lt;Resource&gt; ref = new PhantomReference&lt;&gt;(resource, queue);
+// queue.poll() returns this ref *after* resource is finalized and ready to reclaim
+// — but ref.get() ALWAYS returns null
+</code></pre></div>
+<p>Doesn't keep the object alive; instead, the reference is enqueued in a <code>ReferenceQueue</code> after the object is finalized and ready for reclamation. Use for cleanup actions that need to know "this object is gone now."</p>
+<p><code>Cleaner</code> (JDK 9+) is the modern replacement for <code>finalize()</code>, built on phantom references — runs cleanup code without the dangers of finalization (T17 from C01 — finalization deprecated).</p>
+<div class="mermaid">flowchart LR
+  S["Strong<br/>(default)"]
+  So["Soft<br/>cleared under memory pressure"]
+  W["Weak<br/>cleared at next GC"]
+  P["Phantom<br/>cleanup notification"]
+  S --> Hold["keeps object reachable"]
+  So --> Cache["caches that yield under pressure"]
+  W --> Map["WeakHashMap, listener cleanup"]
+  P --> Clean["Cleaner — replacement for finalize"]
+</div>
+<h2 id="the-three-classical-algorithms">The Three Classical Algorithms<a class="anchor" href="#the-three-classical-algorithms" aria-hidden="true">#</a></h2>
+<p>Every production GC variant is built on (combinations of) three fundamental algorithms.</p>
+<h3 id="mark-sweep">Mark-Sweep<a class="anchor" href="#mark-sweep" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PHASE 1 — Mark:
+  stack = [all GC roots]
+  while stack not empty:
+    obj = pop stack
+    if obj.mark is unset:
+      set obj.mark
+      for each child of obj: push child onto stack
+
+PHASE 2 — Sweep:
+  for each address in heap:
+    if obj at address is not marked: free obj
+    else: clear obj.mark for next cycle
+</code></pre></div>
+<div class="mermaid">flowchart LR
+  Before["Before: heap with live (•) and dead (×) interspersed"]
+  Mark["Mark: walk live graph from roots"]
+  Sweep["Sweep: free unmarked, leave marked"]
+  After["After: heap has FRAGMENTATION — live + holes interleaved"]
+  Before --> Mark --> Sweep --> After
+</div>
+<p><strong>Pros</strong>: simple; no copying overhead; runs in place.
+<strong>Cons</strong>:
+- <strong>Fragmentation</strong> — free memory becomes scattered; large allocations may fail even if total free space is large.
+- <strong>Sweep cost</strong> — must walk entire heap, even dead regions.</p>
+<p>Used as the base by CMS (now removed) and as a component of larger algorithms.</p>
+<h3 id="mark-compact">Mark-Compact<a class="anchor" href="#mark-compact" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>PHASE 1 — Mark (same as mark-sweep)
+
+PHASE 2 — Compact:
+  next_free = heap_start
+  for each obj in heap (in address order):
+    if obj is marked:
+      memmove(obj, next_free, sizeof(obj))
+      update all references to obj → next_free
+      next_free += sizeof(obj)
+</code></pre></div>
+<div class="mermaid">flowchart LR
+  Before["Before mark"]
+  Mark["Mark live"]
+  Compact["Compact: slide live objects together"]
+  After["After: live at low end, contiguous free at high end"]
+  Before --> Mark --> Compact --> After
+</div>
+<p><strong>Pros</strong>: no fragmentation; contiguous free space enables fast bump-pointer allocation.
+<strong>Cons</strong>:
+- <strong>Expensive moves</strong> — copies every live object.
+- <strong>Pointer updates</strong> — every reference to a moved object must be updated. Expensive (multiple passes over the heap).</p>
+<p>Used by Serial Old, Parallel Old. The basis of full GCs in most collectors.</p>
+<h3 id="copying-semi-space">Copying (Semi-Space)<a class="anchor" href="#copying-semi-space" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Two equal-sized spaces: from-space (current), to-space (empty)
+
+PHASE — Copy:
+  next_free = to-space start
+  for each root:
+    copy root's target to to-space at next_free
+    update root → next_free
+    next_free += sizeof(obj)
+  for each obj in to-space (BFS):
+    for each child:
+      if child in from-space (not yet copied):
+        copy child to to-space
+        update obj's reference
+      else: update obj's reference to child's new location
+
+After copying:
+  from-space = entirely garbage → reset to empty
+  swap roles: new &quot;from-space&quot; is the old &quot;to-space&quot;
+</code></pre></div>
+<div class="mermaid">flowchart LR
+  subgraph Before
+    From["From-space (live + garbage)"]
+    To["To-space (empty)"]
+  end
+  subgraph After
+    From2["From-space (empty)"]
+    To2["To-space (live, compact)"]
+  end
+  Before --> After
+  Note["Only live objects touched.<br/>Garbage 'collected' by abandoning from-space.<br/>Time proportional to LIVE size, not heap size."]
+</div>
+<p><strong>Pros</strong>:
+- <strong>Fast</strong> — time proportional to live data, not heap size. Generational hypothesis says young has 5% live, so YGC is ~5% of full-heap-walk cost.
+- <strong>No fragmentation</strong> — copying produces contiguous output.
+- <strong>Bump-pointer allocation</strong> — the next free spot is just <code>to-space.next</code>.</p>
+<p><strong>Cons</strong>:
+- <strong>50% wasted space</strong> — only half the heap is usable for allocation at any time.
+- <strong>Survivor space tax</strong> — needs reserved space for survivor copies.</p>
+<p>This is the <strong>algorithm of every Young Generation collector</strong> in HotSpot. Combined with two Survivor spaces + Eden (T06) to amortize the 50% overhead.</p>
+<h2 id="the-tri-color-invariant-concurrent-marking">The Tri-Color Invariant — Concurrent Marking<a class="anchor" href="#the-tri-color-invariant-concurrent-marking" aria-hidden="true">#</a></h2>
+<p>Modern collectors <strong>mark concurrently</strong> — application threads run alongside GC mark threads. This is essential for sub-millisecond pause times (G1, ZGC, Shenandoah).</p>
+<p>The challenge: while GC is marking, the application can <em>create new references</em> between objects. Without care, the GC may <strong>miss</strong> a newly-reachable object and reclaim it — a <em>use-after-free</em>.</p>
+<p>The <strong>tri-color invariant</strong> is the formal property that prevents this. Every object is in one of three colors:</p>
+<ul>
+<li><strong>White</strong>: not yet visited; potentially garbage.</li>
+<li><strong>Gray</strong>: visited; some children not yet visited.</li>
+<li><strong>Black</strong>: visited; all children visited.</li>
+</ul>
+<p>Marking proceeds: roots start gray; a gray object is processed by marking its white children gray, then it turns black. Repeat until no gray remains. Then <strong>white = garbage</strong>.</p>
+<div class="mermaid">flowchart LR
+  W["WHITE<br/>(unvisited)"]
+  G["GRAY<br/>(visited, children pending)"]
+  B["BLACK<br/>(visited, children done)"]
+  W -- "marked as child of gray" --> G
+  G -- "all children processed" --> B
+  Note["At end of marking:<br/>white = garbage, black + gray = live<br/>(no gray left when done)"]
+</div>
+<h3 id="the-invariant-what-concurrent-marking-must-maintain">The invariant — what concurrent marking must maintain<a class="anchor" href="#the-invariant-what-concurrent-marking-must-maintain" aria-hidden="true">#</a></h3>
+<p><strong>A black object must never directly point to a white object.</strong></p>
+<p>If a black object pointed to white, the GC would <em>not</em> visit that white object (black is "done"), and the white object would be (incorrectly) reclaimed even though it's reachable.</p>
+<p>While the application runs, it might create exactly such a reference:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">black_obj.field = white_obj;     // application creates BLACK → WHITE — invariant broken!
+</code></pre></div>
+<p>The fix: a <strong>write barrier</strong> that runs on every reference write to maintain the invariant.</p>
+<h2 id="write-barriers-maintaining-the-invariant">Write Barriers — Maintaining the Invariant<a class="anchor" href="#write-barriers-maintaining-the-invariant" aria-hidden="true">#</a></h2>
+<p>A <strong>write barrier</strong> is a tiny piece of code emitted by the JIT (or interpreter) at every assignment to a reference field. Two main strategies:</p>
+<h3 id="satb-snapshot-at-the-beginning-g1s-default">SATB — Snapshot-At-The-Beginning (G1's default)<a class="anchor" href="#satb-snapshot-at-the-beginning-g1s-default" aria-hidden="true">#</a></h3>
+<p>Recorded what <em>was</em> there before the write — preserving the "snapshot at the start of marking":</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>write_barrier_SATB(object, field, new_value):
+    old_value = object.field
+    if (marking_in_progress &amp;&amp; old_value != null):
+        push old_value to GC mark queue   // &quot;I might have been the only path to that&quot;
+    object.field = new_value
+</code></pre></div>
+<p>Result: if the application overwrites a reference (potentially making something unreachable), the <em>old</em> reference is recorded — the GC will visit it during this cycle and mark it (potentially "live by snapshot"). May keep more garbage live for one cycle but never misses anything.</p>
+<h3 id="incremental-update-dijkstra-style">Incremental Update (Dijkstra-style)<a class="anchor" href="#incremental-update-dijkstra-style" aria-hidden="true">#</a></h3>
+<p>Recorded what's <em>being</em> added — preserving "no black → white":</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>write_barrier_incremental(object, field, new_value):
+    if (object is black &amp;&amp; new_value is white):
+        mark new_value gray   // re-grays a black object's new target
+    object.field = new_value
+</code></pre></div>
+<p>Result: if a black object gets a new white reference, the new white is marked gray (the GC will visit it). Precise; doesn't keep garbage extra cycles.</p>
+<h3 id="trade-offs">Trade-offs<a class="anchor" href="#trade-offs" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>SATB (G1)</th>
+<th>Incremental (others)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Memory pressure</strong></td>
+<td>Keeps snapshot until end → may retain some garbage one cycle</td>
+<td>More precise; less retention</td>
+</tr>
+<tr>
+<td><strong>Throughput cost</strong></td>
+<td>Lower per-write cost</td>
+<td>Slightly higher per-write</td>
+</tr>
+<tr>
+<td><strong>Termination guarantee</strong></td>
+<td>Easier (process the snapshot queue)</td>
+<td>Requires re-scanning</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both work; both add ~5–15% throughput overhead at every reference write. The cost of concurrent marking.</p>
+<h2 id="safepoints-how-the-gc-stops-threads">Safepoints — How the GC Stops Threads<a class="anchor" href="#safepoints-how-the-gc-stops-threads" aria-hidden="true">#</a></h2>
+<p>The GC sometimes <em>must</em> pause application threads (e.g., to compute root sets coherently). The JVM's mechanism: <strong>safepoints</strong>.</p>
+<p>A safepoint is a place in the bytecode (or compiled code) where the JVM can safely freeze a thread:</p>
+<ul>
+<li>All Java state is consistent (no half-mutated objects).</li>
+<li>The thread's stack is in a known shape.</li>
+<li>Pointers in registers are observable.</li>
+</ul>
+<p>The compiler <strong>inserts safepoint polls</strong> at:</p>
+<ul>
+<li><strong>Method entry</strong> (every call enters at a safepoint).</li>
+<li><strong>Loop back-edges</strong> (every loop iteration can be paused at the top of the next iteration).</li>
+<li><strong>Allocation sites</strong> (after every <code>new</code>).</li>
+<li><strong>Method return</strong> (before returning).</li>
+</ul>
+<p>Each poll is a cheap check (~1–2 cycles): "is there a global safepoint request?" If yes, the thread descends into the GC.</p>
+<h3 id="time-to-safepoint-ttsp">Time-to-Safepoint (TTSP)<a class="anchor" href="#time-to-safepoint-ttsp" aria-hidden="true">#</a></h3>
+<p>When the GC requests a safepoint, every thread <em>eventually</em> reaches a poll. The longest a thread takes to reach is the <strong>time-to-safepoint</strong> (TTSP). The actual GC pause includes:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>total_pause = max_TTSP + GC_work_time
+</code></pre></div>
+<p>If <code>max_TTSP</code> is 50 ms (a thread in a tight loop without poll insertion), the pause is <em>at least</em> 50 ms — even if the GC takes microseconds.</p>
+<p>Modern compilers insert polls aggressively to keep TTSP low. <strong>Long-running native code (JNI), tight loops without proper poll insertion, and class initialization can spike TTSP</strong> — visible in <code>-Xlog:safepoint</code>.</p>
+<div class="mermaid">sequenceDiagram
+  participant T1 as thread 1
+  participant T2 as thread 2
+  participant GC as GC
+  GC->>GC: request safepoint
+  T1->>T1: hit poll quickly (next loop back-edge)
+  T2->>T2: still running native code; takes 50 ms to return
+  T2->>T1: T2 finally reaches a safe point
+  GC->>GC: all threads stopped, BEGIN GC WORK
+  Note over T1,T2: total pause = max TTSP (50 ms) + GC work
+</div>
+<h2 id="card-tables-tracking-inter-generational-references">Card Tables — Tracking Inter-Generational References<a class="anchor" href="#card-tables-tracking-inter-generational-references" aria-hidden="true">#</a></h2>
+<p><strong>Young GC</strong> wants to be fast (frequent, small). But it must consider references from <strong>Old → Young</strong> — those keep young objects alive.</p>
+<p>Naive: scan all of Old to find Old→Young references. Tomato when Old is 100× Young — Young GC takes forever.</p>
+<p><strong>Solution: the card table.</strong> Divide Old into "cards" of typically 512 bytes each; maintain a 1-byte array (1 byte per card) indicating which cards are "dirty" — have potentially been modified since last YGC.</p>
+<div class="mermaid">flowchart LR
+  Old["Old Gen (large)"]
+  CT["Card Table<br/>(1 byte per 512 bytes of Old)<br/>most clean, few dirty"]
+  WB["Write barrier:<br/>every reference write in Old<br/>marks the containing card dirty"]
+  YGC["Young GC:<br/>scan only dirty cards from Old"]
+  Old --> CT
+  WB --> CT
+  CT --> YGC
+  Note["Sparse coverage:<br/>Young GC scans 1% of Old, not 100%."]
+</div>
+<p>The write barrier maintains the card table:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>write_barrier_card(old_object, field, new_value):
+    if (old_object is in Old &amp;&amp; new_value is in Young):
+        card_table[card_of(old_object)] = DIRTY
+    old_object.field = new_value
+</code></pre></div>
+<p>Young GC then scans <strong>only dirty cards</strong> for Old→Young references. The card table is typically 1/512 the size of Old — for a 1 GB Old gen, that's 2 MB. Cheap.</p>
+<h3 id="remembered-sets-g1s-more-precise-variant">Remembered Sets — G1's More-Precise Variant<a class="anchor" href="#remembered-sets-g1s-more-precise-variant" aria-hidden="true">#</a></h3>
+<p>G1 divides the heap into regions; each region maintains a <strong>remembered set</strong> (RSet) — a per-region list of "from which regions do references into me come from?"</p>
+<div class="mermaid">flowchart LR
+  R1["Region 1<br/>RSet: {R5, R7}<br/>(R5 and R7 have refs into R1)"]
+  R5["Region 5"]
+  R7["Region 7"]
+  R5 -- ref --> R1
+  R7 -- ref --> R1
+  Note["G1 can collect Region 1 without<br/>scanning all of Old —<br/>only scan R5 and R7 for refs into R1."]
+</div>
+<p>RSets are more memory-expensive than card tables (typically 1–5% of heap) but enable <strong>region-level garbage collection</strong> — G1's fundamental capability.</p>
+<h2 id="gc-metrics-the-four-dimensions">GC Metrics — the Four Dimensions<a class="anchor" href="#gc-metrics-the-four-dimensions" aria-hidden="true">#</a></h2>
+<p>Every GC tuning decision trades among four metrics:</p>
+<h3 id="throughput">Throughput<a class="anchor" href="#throughput" aria-hidden="true">#</a></h3>
+<p>% of total time spent <em>not</em> in GC. A program running 10 minutes with 30 seconds of GC pauses has 95% throughput.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">throughput = (total_time - gc_time) / total_time
+</code></pre></div>
+<p>Affected by: allocation rate, heap size, GC algorithm choice, application behavior.</p>
+<h3 id="pause-time-latency">Pause Time (Latency)<a class="anchor" href="#pause-time-latency" aria-hidden="true">#</a></h3>
+<p>Longest single STW pause. The user-facing latency floor. A web service with a 2-second GC pause is unusable.</p>
+<p>For p99 latency-sensitive workloads, this is <em>the</em> metric. ZGC and Shenandoah target sub-millisecond pauses; classical Parallel GC tolerates 100ms–1s pauses for higher throughput.</p>
+<h3 id="footprint">Footprint<a class="anchor" href="#footprint" aria-hidden="true">#</a></h3>
+<p>Memory used by the JVM, including GC metadata (card tables, remembered sets, marking state). A GC with low footprint overhead leaves more heap for application data.</p>
+<p>ZGC's metadata overhead is ~3% of heap. G1's is ~5–10%. Old serial collectors: &lt;1%.</p>
+<h3 id="promptness">Promptness<a class="anchor" href="#promptness" aria-hidden="true">#</a></h3>
+<p>Time between an object becoming unreachable and being reclaimed. Higher promptness → lower steady-state footprint.</p>
+<p>Concurrent collectors trade promptness for throughput (a Soft reference held by an unreachable object cleared at the <em>next</em> GC, not immediately).</p>
+<h2 id="the-unattainable-triangle">The Unattainable Triangle<a class="anchor" href="#the-unattainable-triangle" aria-hidden="true">#</a></h2>
+<p><strong>You can't have all four.</strong> Concrete trade-offs:</p>
+<div class="mermaid">flowchart TB
+  T["Throughput"]
+  L["Low Pause"]
+  F["Low Footprint"]
+  T --- L
+  L --- F
+  F --- T
+  Note["Pick at most TWO.<br/>The third (and any extras) will suffer."]
+</div>
+<ul>
+<li><strong>Parallel GC</strong>: high throughput + low footprint, but high pauses (100ms–seconds). Default in headless server before JDK 9.</li>
+<li><strong>G1</strong>: balanced — moderate throughput, moderate pauses (10–100ms), moderate footprint. Default since JDK 9.</li>
+<li><strong>ZGC</strong>: low pauses + good throughput, but higher footprint (more metadata). Default candidate for low-latency.</li>
+<li><strong>Shenandoah</strong>: low pauses + good throughput, similar footprint to ZGC.</li>
+</ul>
+<p>T08 covers each in depth and helps pick.</p>
+<h2 id="object-lifecycle-through-gc">Object Lifecycle Through GC<a class="anchor" href="#object-lifecycle-through-gc" aria-hidden="true">#</a></h2>
+<p>A typical object's journey:</p>
+<div class="mermaid">flowchart LR
+  N["new T()"]
+  TLAB["Eden via TLAB"]
+  S0["Survivor 0<br/>(age 1)"]
+  S1["Survivor 1<br/>(age 2)"]
+  Sn["Survivor 0<br/>(age 15)"]
+  Old["Old Gen"]
+  GC["YGC determines reachability"]
+  GCO["OGC determines reachability"]
+  Reclaim["reclaimed (eventually)"]
+  N --> TLAB
+  TLAB --> GC
+  GC -- live, age 1 --> S0
+  S0 --> GC
+  GC -- live, age 2 --> S1
+  S1 --> GC
+  GC -. "ages++" .-> Sn
+  Sn -- age >= 15 --> Old
+  Old --> GCO
+  GCO -- unreachable --> Reclaim
+</div>
+<p>Most objects die in Eden — collected on first Young GC. Survivors get re-copied each cycle until promotion at <code>MaxTenuringThreshold</code> (default 15). Old objects sit until a Major or Full GC reclaims them.</p>
+<h2 id="concurrent-vs-parallel-and-stw">Concurrent vs Parallel — and STW<a class="anchor" href="#concurrent-vs-parallel-and-stw" aria-hidden="true">#</a></h2>
+<p>Three orthogonal terms often confused:</p>
+<ul>
+<li><strong>Stop-the-world (STW)</strong>: all application threads paused; only GC runs.</li>
+<li><strong>Parallel</strong>: multiple GC threads working in parallel (still possibly STW).</li>
+<li><strong>Concurrent</strong>: GC runs <em>alongside</em> application threads (not STW).</li>
+</ul>
+<p>Modern collectors mix these phases:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th style="text-align: center;">STW?</th>
+<th style="text-align: center;">Parallel?</th>
+<th style="text-align: center;">Concurrent?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Initial mark</strong></td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">usually</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr>
+<td><strong>Concurrent mark</strong></td>
+<td style="text-align: center;">no</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr>
+<td><strong>Final mark</strong></td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr>
+<td><strong>Concurrent sweep / evacuate</strong></td>
+<td style="text-align: center;">no</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>The STW phases are <em>brief</em> (microseconds to single milliseconds in modern GCs); the bulk of work runs concurrently.</p>
+<h2 id="reference-processing-cleaner-replacing-finalize">Reference Processing — <code>Cleaner</code> Replacing <code>finalize</code><a class="anchor" href="#reference-processing-cleaner-replacing-finalize" aria-hidden="true">#</a></h2>
+<p>Reference processing happens in a dedicated phase:</p>
+<ol>
+<li><strong>Strong</strong>: handled by normal marking.</li>
+<li><strong>Soft</strong>: cleared if memory is tight; otherwise kept.</li>
+<li><strong>Weak</strong>: cleared if no strong refs remain; enqueued in <code>ReferenceQueue</code>.</li>
+<li><strong>Phantom</strong>: enqueued <em>after</em> finalization (or <code>Cleaner</code> callback) runs.</li>
+</ol>
+<h3 id="objectfinalize-deprecated"><code>Object.finalize()</code> — deprecated<a class="anchor" href="#objectfinalize-deprecated" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Override
+protected void finalize() throws Throwable {
+    // run cleanup before GC reclaims
+}
+</code></pre></div>
+<p>Deprecated in JDK 9; for removal in a future release. Reasons:</p>
+<ul>
+<li>Unpredictable timing.</li>
+<li>Performance hit (GC has to track finalizable objects separately).</li>
+<li>Resurrection (finalize can make objects reachable again).</li>
+<li>Errors swallowed silently.</li>
+</ul>
+<h3 id="cleaner-the-modern-replacement"><code>Cleaner</code> — the modern replacement<a class="anchor" href="#cleaner-the-modern-replacement" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Resource implements AutoCloseable {
+    private static final Cleaner CLEANER = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+
+    public Resource() {
+        // cleanup action runs after the Resource becomes phantom-reachable
+        this.cleanable = CLEANER.register(this, () -&gt; {
+            // free native handle, etc.
+        });
+    }
+
+    @Override
+    public void close() { cleanable.clean(); }
+}
+</code></pre></div>
+<p>Built on PhantomReferences. The cleanup runs on a dedicated thread <em>after</em> the object is unreachable — not in the middle of GC, no resurrection, no silent errors. Pair with <code>AutoCloseable</code> for try-with-resources.</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="believing-gc-is-free">Believing GC is "free"<a class="anchor" href="#believing-gc-is-free" aria-hidden="true">#</a></h3>
+<p>Allocation isn't free; GC work scales with allocation rate. Reducing allocations = reducing GC = better throughput and pauses.</p>
+<h3 id="tuning-for-a-metric-without-measurement">Tuning for a metric without measurement<a class="anchor" href="#tuning-for-a-metric-without-measurement" aria-hidden="true">#</a></h3>
+<p>"Increase heap to reduce GC" — measure throughput and pauses first; the relationship isn't linear.</p>
+<h3 id="holding-softreference-cached-data-on-the-critical-path">Holding <code>SoftReference</code>-cached data on the critical path<a class="anchor" href="#holding-softreference-cached-data-on-the-critical-path" aria-hidden="true">#</a></h3>
+<p><code>SoftReference.get()</code> can return null under memory pressure. Don't cache request-critical data softly.</p>
+<h3 id="using-finalize-for-resource-cleanup">Using <code>finalize()</code> for resource cleanup<a class="anchor" href="#using-finalize-for-resource-cleanup" aria-hidden="true">#</a></h3>
+<p>It's deprecated, slow, unreliable. Use try-with-resources + <code>Cleaner</code>.</p>
+<h3 id="ignoring-ttsp">Ignoring TTSP<a class="anchor" href="#ignoring-ttsp" aria-hidden="true">#</a></h3>
+<p>Long-running native code can hold up GC. Profile with <code>-Xlog:safepoint</code> if pauses are surprisingly long.</p>
+<h3 id="setting-heap-too-small">Setting heap too small<a class="anchor" href="#setting-heap-too-small" aria-hidden="true">#</a></h3>
+<p>GC frequency increases with smaller heap; pause times can grow.</p>
+<h2 id="observability">Observability<a class="anchor" href="#observability" aria-hidden="true">#</a></h2>
+<h3 id="-xloggc-modern-logging-jdk-9"><code>-Xlog:gc*</code> — modern logging (JDK 9+)<a class="anchor" href="#-xloggc-modern-logging-jdk-9" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags ...
+</code></pre></div>
+<p>Replaces the old <code>-XX:+PrintGCDetails</code>. Pluggable verbosity per category.</p>
+<h3 id="jstat-gc-pid-1s"><code>jstat -gc &lt;pid&gt; 1s</code><a class="anchor" href="#jstat-gc-pid-1s" aria-hidden="true">#</a></h3>
+<p>Real-time GC stats: Eden/Survivor/Old occupancy, GC counts, GC time.</p>
+<h3 id="jcmd-pid-gcheap_info"><code>jcmd &lt;pid&gt; GC.heap_info</code><a class="anchor" href="#jcmd-pid-gcheap_info" aria-hidden="true">#</a></h3>
+<p>Snapshot heap layout and occupancy.</p>
+<h3 id="jfr-jdkgcconfiguration-jdkgcheapsummary-jdkpromoteobjectinnewplab-etc">JFR — <code>jdk.GCConfiguration</code>, <code>jdk.GCHeapSummary</code>, <code>jdk.PromoteObjectInNewPLAB</code>, etc.<a class="anchor" href="#jfr-jdkgcconfiguration-jdkgcheapsummary-jdkpromoteobjectinnewplab-etc" aria-hidden="true">#</a></h3>
+<p>The production-grade tool. Full GC visibility with low overhead.</p>
+<h3 id="-xlogsafepoint"><code>-Xlog:safepoint</code><a class="anchor" href="#-xlogsafepoint" aria-hidden="true">#</a></h3>
+<p>Shows safepoint requests, TTSP, total pause. Essential when diagnosing pause spikes.</p>
+<h3 id="gceasy-gcviewer">GCEasy, GCViewer<a class="anchor" href="#gceasy-gcviewer" aria-hidden="true">#</a></h3>
+<p>Web tools for visualizing GC logs.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Identify GC roots.</strong> In a small Java app, write a method that holds references in locals, statics, and threads. Take a heap dump; trace each object's path back to its root.</li>
+<li><strong>Soft cache.</strong> Implement an image cache with <code>SoftReference</code>. Allocate enough objects to trigger soft-reference clearing; verify cache entries are gone after.</li>
+<li><strong>WeakHashMap behavior.</strong> Put entries with String keys; GC; verify only entries whose key reference is dropped disappear.</li>
+<li><strong>Cleaner cleanup.</strong> Implement a <code>Resource</code> with <code>Cleaner</code>; let go of all references; observe the cleanup runs.</li>
+<li><strong>Mark-sweep simulation.</strong> Code a toy mark-sweep collector for a tree of <code>Node</code> objects in pure Java. Walk roots, mark, then "free" unmarked.</li>
+<li><strong>Card table effect.</strong> With <code>-XX:+PrintGC -Xlog:gc*:stderr</code>, observe Young GC time for a workload with lots of Old→Young writes vs few.</li>
+<li><strong>Force a Young GC.</strong> Allocate enough to fill Eden; observe Young GC in logs.</li>
+<li><strong>Force an Old GC.</strong> Hold long-lived objects until they promote; observe Old/Major GC.</li>
+<li><strong>Compare GC throughput.</strong> Run a CPU-bound app with <code>-XX:+UseParallelGC</code> and <code>-XX:+UseG1GC</code>. Compare throughput and pause times.</li>
+<li><strong>TTSP investigation.</strong> Write a tight loop with no method calls; enable <code>-Xlog:safepoint</code>; observe slow TTSP. Add a <code>Thread.onSpinWait()</code> or method call; observe TTSP improvement.</li>
+<li><strong>Reference processing inspection.</strong> Enable <code>-Xlog:ref+gc</code>; observe reference processing for soft/weak/phantom refs.</li>
+<li><strong>Heap allocation profiling.</strong> Use JFR's <code>jdk.ObjectAllocationInNewTLAB</code> and <code>jdk.ObjectAllocationOutsideTLAB</code> to find allocation hotspots.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Defend <strong>why GC exists</strong>: eliminates manual-memory bugs (use-after-free, double-free, leaks); trade is pause time + throughput overhead + footprint.</li>
+<li>Define <strong>garbage</strong> as <em>unreachable</em> from any <strong>GC root</strong>: local variables on active stacks, static fields, JNI globals, active monitors, thread objects, ClassLoaders.</li>
+<li>Distinguish <strong>strong / soft / weak / phantom references</strong> and their use cases (default reachability / pressure-sensitive cache / weak-key map / cleanup notification).</li>
+<li>Walk through the <strong>three classical algorithms</strong>:</li>
+<li><strong>Mark-Sweep</strong>: mark live from roots, sweep dead; simple but fragmenting.</li>
+<li><strong>Mark-Compact</strong>: mark + slide live together; no fragmentation but expensive moves + pointer updates.</li>
+<li><strong>Copying / Semi-space</strong>: copy live to other space; time proportional to live data; basis of every Young Generation collector; 50% memory overhead (amortized by Eden + Survivor design).</li>
+<li>Apply the <strong>tri-color invariant</strong> for concurrent marking: white (unvisited) / gray (visited, children pending) / black (done). The invariant: <strong>no black → white reference</strong> — maintained by write barriers.</li>
+<li>Compare <strong>SATB (Snapshot-At-The-Beginning)</strong> vs <strong>incremental update</strong> write barriers: SATB records the old value (preserves snapshot); incremental records the new value (precise but slightly costlier).</li>
+<li>Recognize the <strong>~5–15% throughput cost</strong> of write barriers and accept it as the price of concurrent marking.</li>
+<li>Walk through <strong>safepoints</strong>: compiler-inserted polls at method entry / loop back-edge / allocation; cheap (~1–2 cycles per poll); JVM requests; threads converge.</li>
+<li>Identify <strong>time-to-safepoint (TTSP)</strong> as the worst-case quietest thread; long native calls or poll-less tight loops spike it.</li>
+<li>Explain <strong>card tables</strong>: 512-byte cards in Old; write barrier marks dirty on Old→Young write; Young GC scans only dirty cards. Trade: small memory (~1/512 of Old), enables fast YGC.</li>
+<li>Explain <strong>remembered sets (G1)</strong>: per-region inbound reference tracking; more precise than card tables; enables region-level collection.</li>
+<li>Recite the <strong>four GC metrics</strong>: throughput (% not in GC) / pause time (longest STW) / footprint (memory used inc. GC metadata) / promptness (reclaim delay).</li>
+<li>Apply the <strong>unattainable triangle</strong>: pick at most two of (high throughput, low pause, low footprint).</li>
+<li>Walk through an <strong>object's lifecycle</strong>: TLAB → Eden → Survivor (aged) → Old → eventually reclaimed.</li>
+<li>Distinguish <strong>STW</strong> (all app threads paused), <strong>parallel</strong> (multiple GC threads), <strong>concurrent</strong> (GC runs alongside app). Modern collectors mix all three across phases.</li>
+<li>Use <strong><code>Cleaner</code></strong> as the modern replacement for <code>finalize</code>: built on PhantomReferences; cleanup runs on a dedicated thread after the object is phantom-reachable; pair with <code>AutoCloseable</code>.</li>
+<li>Diagnose via <code>-Xlog:gc*</code>, <code>-Xlog:safepoint</code>, <code>jstat -gc</code>, JFR's GC events, and GC log analysis tools (GCEasy, GCViewer).</li>
+<li>Avoid the <strong>6 common mistakes</strong>: believing GC is free, tuning without measuring, soft-caching critical data, using <code>finalize</code>, ignoring TTSP, undersized heap.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html">GC algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</a> — applying the fundamentals to specific collectors. We'll dissect <strong>Serial GC</strong> (single-threaded, low footprint, embedded use); <strong>Parallel GC</strong> (multi-threaded throughput collector, pre-JDK-9 default); <strong>G1</strong> (region-based, balanced, default since JDK 9 — pause-time-focused with predictable behavior); <strong>ZGC</strong> (colored pointers, sub-millisecond pauses regardless of heap size — the modern low-latency choice); <strong>Shenandoah</strong> (Red Hat's low-latency variant, similar profile to ZGC but different implementation); pick-the-right-collector decision matrix; how each algorithm uses (or combines) the mark-sweep / mark-compact / copying / tri-color / write-barrier fundamentals from this topic.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Garbage Collection Fundamentals&quot;
+slug: garbage-collection-fundamentals
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 7
+tags: [garbage-collection, gc, automatic-memory-management, reachability, gc-roots, local-variable-roots, static-field-roots, jni-global-roots, active-monitor-roots, thread-object-roots, classloader-roots, strong-reference, soft-reference, weak-reference, phantom-reference, reference-queue, mark-sweep, mark-compact, copying-collector, semi-space, tri-color-invariant, white-gray-black, concurrent-marking, write-barrier, satb-barrier, snapshot-at-the-beginning, incremental-update-barrier, dijkstra-barrier, safepoint, safepoint-poll, time-to-safepoint, ttsp, stop-the-world, stw, card-table, dirty-card, remembered-set, rset, generational-hypothesis, throughput-metric, pause-time-metric, footprint-metric, promptness-metric, gc-tuning-triangle, parallel-gc, concurrent-gc, allocation-rate, collection-rate, headroom, reference-processing, cleaner-replacement, finalize-deprecated, jep-421, mutator, collector, initial-mark, concurrent-mark, final-mark, evacuation, sweep]
+prerequisites: [memory-model-heap-stack-metaspace, jvm-architecture-and-runtime-data-areas, synchronized-monitors-and-intrinsic-locks]
+status: complete
+estimated_minutes: 150
+last_updated: 2026-06-08
+---
+
+# Garbage Collection Fundamentals
+
+T06 placed objects in the heap; T01 introduced the heap&#x27;s role in the JVM. This topic covers the central question of every managed runtime: **how does the JVM decide which objects to reclaim, and how does it do so without breaking the running application?** Garbage collection (GC) is one of the most-studied areas of computer science, with 60+ years of literature; HotSpot&#x27;s GCs (Serial, Parallel, G1, ZGC, Shenandoah — T08) are all variations on a small number of *fundamental* algorithms covered here. Understanding the fundamentals is what makes choosing and tuning a specific GC tractable.
+
+The depth-bar requirement isn&#x27;t &quot;GC frees memory.&quot; At the **theory** layer, garbage = unreachable, which is the *computable approximation* of &quot;no longer needed&quot; — every collector traces reachability from a fixed set of **GC roots** (local variables on active thread stacks, static fields, JNI globals, active monitors, thread objects, ClassLoaders). At the **algorithm** layer, three classical mechanisms underlie *every* production collector — **mark-sweep** (mark live from roots, sweep dead in the rest of the heap; fast, fragmented), **mark-compact** (mark live, slide together to eliminate fragmentation; expensive pointer updates), and **copying** (two equal-sized spaces, copy live to the other; fast and unfragmented but 50% memory overhead — the basis of every Young Generation collector). At the **concurrency** layer, modern collectors run *alongside* the application via the **tri-color invariant** (white/gray/black marking) maintained by **write barriers** — code emitted at every reference write that prevents the GC from missing newly-created references; SATB (Snapshot-At-The-Beginning) for G1, more sophisticated variants for Shenandoah and ZGC, each costing ~5–15% throughput in exchange for sub-millisecond pause times. At the **synchronization** layer, **safepoints** are the JVM&#x27;s mechanism for stopping application threads coherently: the compiler inserts cheap safepoint polls at method entries and loop back-edges; **time-to-safepoint (TTSP)** is the critical quietest-loudest measurement that bounds the JVM&#x27;s worst-case pause; **card tables** (and G1&#x27;s **remembered sets**) track inter-generational/inter-region references via write barriers so young collections don&#x27;t have to scan the entire old generation. At the **metric** layer, the tuning game has *four* dimensions — **throughput** (% time not in GC), **pause time** (longest STW), **footprint** (memory used), **promptness** (delay between unreachable and reclaimed) — and the **unattainable triangle** says you can have any two but not all three. We will cover all five layers as the foundation for T08&#x27;s specific-collector comparison.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Memory model: heap, stack, metaspace](./T06-memory-model-heap-stack-metaspace.md) (L3/C02/T06) — generational structure GC operates on; [JVM architecture](./T01-jvm-architecture-and-runtime-data-areas.md) (L3/C02/T01) — heap + stack data areas; [synchronized, monitors &amp; intrinsic locks](../C01-concurrency/T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — active monitors are GC roots.
+
+## What GC Is — and Why
+
+Manual memory management (`malloc`/`free` in C/C++) is *the* source of most security vulnerabilities in those languages: **use-after-free**, **double-free**, **memory leaks**, **dangling pointers**. Garbage collection eliminates these systematically by making allocation explicit and reclamation automatic — the program *allocates* (creates references); the runtime *frees* (reclaims unreachable memory) without programmer intervention.
+
+The trade:
+
+| What you get | What you pay |
+|--------------|--------------|
+| No use-after-free | GC pauses (or concurrency overhead) |
+| No double-free | Throughput tax (write barriers, etc.) |
+| No memory leaks (from forgotten frees) | Memory footprint overhead (card tables, marking state) |
+| Simpler code | Less control over exact reclaim timing |
+
+Modern Java GCs make the trade *very* favorable for most workloads — sub-millisecond pauses (ZGC/Shenandoah), single-digit % throughput overhead. Hand-written `malloc`/`free` is *no longer faster* for typical workloads when you measure total system throughput including allocation cost.
+
+## The Reachability Problem
+
+Garbage is *not* &quot;objects the program is done with&quot; — that&#x27;s not computable. Garbage is **unreachable** — no chain of references from any **GC root** leads to it. The collector computes reachability, treats unreachable as garbage, and reclaims it.
+
+```mermaid
+flowchart LR
+  subgraph Roots[&quot;GC Roots&quot;]
+    LV[&quot;Local vars on active stacks&quot;]
+    SF[&quot;Static fields&quot;]
+    JG[&quot;JNI globals&quot;]
+    AM[&quot;Active monitors&quot;]
+    TO[&quot;Thread objects&quot;]
+  end
+  subgraph Heap
+    A[&quot;A (reachable)&quot;]
+    B[&quot;B (reachable from A)&quot;]
+    C[&quot;C (reachable from B)&quot;]
+    D[&quot;D (orphan — no incoming ref)&quot;]
+    E[&quot;E (only D points to it)&quot;]
+  end
+  Roots --&gt; A
+  A --&gt; B
+  B --&gt; C
+  D --&gt; E
+  Note[&quot;A, B, C: reachable → live&lt;br/&gt;D, E: unreachable → garbage&lt;br/&gt;(even though D points to E,&lt;br/&gt;nothing reachable points to D)&quot;]
+```
+
+The key property: **reachability is transitive**. If A is reachable and A→B, B is reachable. The collector traces the graph from roots and marks everything it reaches.
+
+## GC Roots — Where Tracing Starts
+
+Every GC starts from a known set of &quot;roots&quot; — references the JVM guarantees are live. The canonical set:
+
+- **Local variables on active thread stacks** — every frame&#x27;s locals array (T01) holds references that count as roots.
+- **Static fields** — class-level variables in Klass structures in Metaspace.
+- **JNI globals** — references held by native code via `NewGlobalRef`.
+- **Active monitors** — objects currently being `synchronized` on (T03 from C01).
+- **Thread objects themselves** — every running `Thread` is a root.
+- **System ClassLoader and Bootstrap ClassLoader** — keep the JDK alive.
+- **JVM internal references** — interned strings, code-cache references, etc.
+
+Heap dumps (T10) show GC roots prominently in their &quot;leak suspect&quot; analysis — finding a long-retained object always starts by tracing its reachability path back to a root.
+
+## Reference Types — Soft, Weak, Phantom
+
+By default, every reference is **strong** — if reachable through strong refs, the object lives. Java provides three additional reference types for finer control:
+
+### `SoftReference&lt;T&gt;` — cleared under memory pressure
+
+```java
+SoftReference&lt;Image&gt; cache = new SoftReference&lt;&gt;(loadImage(path));
+
+// later:
+Image img = cache.get();      // may return null if GC cleared it under memory pressure
+```
+
+The GC will clear soft references **before throwing OOM**. Good for caches: &quot;keep this if you can; throw it away if memory is tight.&quot;
+
+### `WeakReference&lt;T&gt;` — cleared at the next GC
+
+```java
+WeakHashMap&lt;Key, Value&gt; map = new WeakHashMap&lt;&gt;();   // uses WeakReference internally
+```
+
+Cleared at the next GC after the referent becomes unreachable through strong refs. Used for: weakly-keyed maps (entries disappear when keys do), ClassLoader leak prevention, listener lists.
+
+### `PhantomReference&lt;T&gt;` — cleanup notification
+
+```java
+PhantomReference&lt;Resource&gt; ref = new PhantomReference&lt;&gt;(resource, queue);
+// queue.poll() returns this ref *after* resource is finalized and ready to reclaim
+// — but ref.get() ALWAYS returns null
+```
+
+Doesn&#x27;t keep the object alive; instead, the reference is enqueued in a `ReferenceQueue` after the object is finalized and ready for reclamation. Use for cleanup actions that need to know &quot;this object is gone now.&quot;
+
+`Cleaner` (JDK 9+) is the modern replacement for `finalize()`, built on phantom references — runs cleanup code without the dangers of finalization (T17 from C01 — finalization deprecated).
+
+```mermaid
+flowchart LR
+  S[&quot;Strong&lt;br/&gt;(default)&quot;]
+  So[&quot;Soft&lt;br/&gt;cleared under memory pressure&quot;]
+  W[&quot;Weak&lt;br/&gt;cleared at next GC&quot;]
+  P[&quot;Phantom&lt;br/&gt;cleanup notification&quot;]
+  S --&gt; Hold[&quot;keeps object reachable&quot;]
+  So --&gt; Cache[&quot;caches that yield under pressure&quot;]
+  W --&gt; Map[&quot;WeakHashMap, listener cleanup&quot;]
+  P --&gt; Clean[&quot;Cleaner — replacement for finalize&quot;]
+```
+
+## The Three Classical Algorithms
+
+Every production GC variant is built on (combinations of) three fundamental algorithms.
+
+### Mark-Sweep
+
+```
+PHASE 1 — Mark:
+  stack = [all GC roots]
+  while stack not empty:
+    obj = pop stack
+    if obj.mark is unset:
+      set obj.mark
+      for each child of obj: push child onto stack
+
+PHASE 2 — Sweep:
+  for each address in heap:
+    if obj at address is not marked: free obj
+    else: clear obj.mark for next cycle
+```
+
+```mermaid
+flowchart LR
+  Before[&quot;Before: heap with live (•) and dead (×) interspersed&quot;]
+  Mark[&quot;Mark: walk live graph from roots&quot;]
+  Sweep[&quot;Sweep: free unmarked, leave marked&quot;]
+  After[&quot;After: heap has FRAGMENTATION — live + holes interleaved&quot;]
+  Before --&gt; Mark --&gt; Sweep --&gt; After
+```
+
+**Pros**: simple; no copying overhead; runs in place.
+**Cons**:
+- **Fragmentation** — free memory becomes scattered; large allocations may fail even if total free space is large.
+- **Sweep cost** — must walk entire heap, even dead regions.
+
+Used as the base by CMS (now removed) and as a component of larger algorithms.
+
+### Mark-Compact
+
+```
+PHASE 1 — Mark (same as mark-sweep)
+
+PHASE 2 — Compact:
+  next_free = heap_start
+  for each obj in heap (in address order):
+    if obj is marked:
+      memmove(obj, next_free, sizeof(obj))
+      update all references to obj → next_free
+      next_free += sizeof(obj)
+```
+
+```mermaid
+flowchart LR
+  Before[&quot;Before mark&quot;]
+  Mark[&quot;Mark live&quot;]
+  Compact[&quot;Compact: slide live objects together&quot;]
+  After[&quot;After: live at low end, contiguous free at high end&quot;]
+  Before --&gt; Mark --&gt; Compact --&gt; After
+```
+
+**Pros**: no fragmentation; contiguous free space enables fast bump-pointer allocation.
+**Cons**:
+- **Expensive moves** — copies every live object.
+- **Pointer updates** — every reference to a moved object must be updated. Expensive (multiple passes over the heap).
+
+Used by Serial Old, Parallel Old. The basis of full GCs in most collectors.
+
+### Copying (Semi-Space)
+
+```
+Two equal-sized spaces: from-space (current), to-space (empty)
+
+PHASE — Copy:
+  next_free = to-space start
+  for each root:
+    copy root&#x27;s target to to-space at next_free
+    update root → next_free
+    next_free += sizeof(obj)
+  for each obj in to-space (BFS):
+    for each child:
+      if child in from-space (not yet copied):
+        copy child to to-space
+        update obj&#x27;s reference
+      else: update obj&#x27;s reference to child&#x27;s new location
+
+After copying:
+  from-space = entirely garbage → reset to empty
+  swap roles: new &quot;from-space&quot; is the old &quot;to-space&quot;
+```
+
+```mermaid
+flowchart LR
+  subgraph Before
+    From[&quot;From-space (live + garbage)&quot;]
+    To[&quot;To-space (empty)&quot;]
+  end
+  subgraph After
+    From2[&quot;From-space (empty)&quot;]
+    To2[&quot;To-space (live, compact)&quot;]
+  end
+  Before --&gt; After
+  Note[&quot;Only live objects touched.&lt;br/&gt;Garbage &#x27;collected&#x27; by abandoning from-space.&lt;br/&gt;Time proportional to LIVE size, not heap size.&quot;]
+```
+
+**Pros**:
+- **Fast** — time proportional to live data, not heap size. Generational hypothesis says young has 5% live, so YGC is ~5% of full-heap-walk cost.
+- **No fragmentation** — copying produces contiguous output.
+- **Bump-pointer allocation** — the next free spot is just `to-space.next`.
+
+**Cons**:
+- **50% wasted space** — only half the heap is usable for allocation at any time.
+- **Survivor space tax** — needs reserved space for survivor copies.
+
+This is the **algorithm of every Young Generation collector** in HotSpot. Combined with two Survivor spaces + Eden (T06) to amortize the 50% overhead.
+
+## The Tri-Color Invariant — Concurrent Marking
+
+Modern collectors **mark concurrently** — application threads run alongside GC mark threads. This is essential for sub-millisecond pause times (G1, ZGC, Shenandoah).
+
+The challenge: while GC is marking, the application can *create new references* between objects. Without care, the GC may **miss** a newly-reachable object and reclaim it — a *use-after-free*.
+
+The **tri-color invariant** is the formal property that prevents this. Every object is in one of three colors:
+
+- **White**: not yet visited; potentially garbage.
+- **Gray**: visited; some children not yet visited.
+- **Black**: visited; all children visited.
+
+Marking proceeds: roots start gray; a gray object is processed by marking its white children gray, then it turns black. Repeat until no gray remains. Then **white = garbage**.
+
+```mermaid
+flowchart LR
+  W[&quot;WHITE&lt;br/&gt;(unvisited)&quot;]
+  G[&quot;GRAY&lt;br/&gt;(visited, children pending)&quot;]
+  B[&quot;BLACK&lt;br/&gt;(visited, children done)&quot;]
+  W -- &quot;marked as child of gray&quot; --&gt; G
+  G -- &quot;all children processed&quot; --&gt; B
+  Note[&quot;At end of marking:&lt;br/&gt;white = garbage, black + gray = live&lt;br/&gt;(no gray left when done)&quot;]
+```
+
+### The invariant — what concurrent marking must maintain
+
+**A black object must never directly point to a white object.**
+
+If a black object pointed to white, the GC would *not* visit that white object (black is &quot;done&quot;), and the white object would be (incorrectly) reclaimed even though it&#x27;s reachable.
+
+While the application runs, it might create exactly such a reference:
+
+```java
+black_obj.field = white_obj;     // application creates BLACK → WHITE — invariant broken!
+```
+
+The fix: a **write barrier** that runs on every reference write to maintain the invariant.
+
+## Write Barriers — Maintaining the Invariant
+
+A **write barrier** is a tiny piece of code emitted by the JIT (or interpreter) at every assignment to a reference field. Two main strategies:
+
+### SATB — Snapshot-At-The-Beginning (G1&#x27;s default)
+
+Recorded what *was* there before the write — preserving the &quot;snapshot at the start of marking&quot;:
+
+```
+write_barrier_SATB(object, field, new_value):
+    old_value = object.field
+    if (marking_in_progress &amp;&amp; old_value != null):
+        push old_value to GC mark queue   // &quot;I might have been the only path to that&quot;
+    object.field = new_value
+```
+
+Result: if the application overwrites a reference (potentially making something unreachable), the *old* reference is recorded — the GC will visit it during this cycle and mark it (potentially &quot;live by snapshot&quot;). May keep more garbage live for one cycle but never misses anything.
+
+### Incremental Update (Dijkstra-style)
+
+Recorded what&#x27;s *being* added — preserving &quot;no black → white&quot;:
+
+```
+write_barrier_incremental(object, field, new_value):
+    if (object is black &amp;&amp; new_value is white):
+        mark new_value gray   // re-grays a black object&#x27;s new target
+    object.field = new_value
+```
+
+Result: if a black object gets a new white reference, the new white is marked gray (the GC will visit it). Precise; doesn&#x27;t keep garbage extra cycles.
+
+### Trade-offs
+
+| | SATB (G1) | Incremental (others) |
+|---|---|---|
+| **Memory pressure** | Keeps snapshot until end → may retain some garbage one cycle | More precise; less retention |
+| **Throughput cost** | Lower per-write cost | Slightly higher per-write |
+| **Termination guarantee** | Easier (process the snapshot queue) | Requires re-scanning |
+
+Both work; both add ~5–15% throughput overhead at every reference write. The cost of concurrent marking.
+
+## Safepoints — How the GC Stops Threads
+
+The GC sometimes *must* pause application threads (e.g., to compute root sets coherently). The JVM&#x27;s mechanism: **safepoints**.
+
+A safepoint is a place in the bytecode (or compiled code) where the JVM can safely freeze a thread:
+
+- All Java state is consistent (no half-mutated objects).
+- The thread&#x27;s stack is in a known shape.
+- Pointers in registers are observable.
+
+The compiler **inserts safepoint polls** at:
+
+- **Method entry** (every call enters at a safepoint).
+- **Loop back-edges** (every loop iteration can be paused at the top of the next iteration).
+- **Allocation sites** (after every `new`).
+- **Method return** (before returning).
+
+Each poll is a cheap check (~1–2 cycles): &quot;is there a global safepoint request?&quot; If yes, the thread descends into the GC.
+
+### Time-to-Safepoint (TTSP)
+
+When the GC requests a safepoint, every thread *eventually* reaches a poll. The longest a thread takes to reach is the **time-to-safepoint** (TTSP). The actual GC pause includes:
+
+```
+total_pause = max_TTSP + GC_work_time
+```
+
+If `max_TTSP` is 50 ms (a thread in a tight loop without poll insertion), the pause is *at least* 50 ms — even if the GC takes microseconds.
+
+Modern compilers insert polls aggressively to keep TTSP low. **Long-running native code (JNI), tight loops without proper poll insertion, and class initialization can spike TTSP** — visible in `-Xlog:safepoint`.
+
+```mermaid
+sequenceDiagram
+  participant T1 as thread 1
+  participant T2 as thread 2
+  participant GC as GC
+  GC-&gt;&gt;GC: request safepoint
+  T1-&gt;&gt;T1: hit poll quickly (next loop back-edge)
+  T2-&gt;&gt;T2: still running native code; takes 50 ms to return
+  T2-&gt;&gt;T1: T2 finally reaches a safe point
+  GC-&gt;&gt;GC: all threads stopped, BEGIN GC WORK
+  Note over T1,T2: total pause = max TTSP (50 ms) + GC work
+```
+
+## Card Tables — Tracking Inter-Generational References
+
+**Young GC** wants to be fast (frequent, small). But it must consider references from **Old → Young** — those keep young objects alive.
+
+Naive: scan all of Old to find Old→Young references. Tomato when Old is 100× Young — Young GC takes forever.
+
+**Solution: the card table.** Divide Old into &quot;cards&quot; of typically 512 bytes each; maintain a 1-byte array (1 byte per card) indicating which cards are &quot;dirty&quot; — have potentially been modified since last YGC.
+
+```mermaid
+flowchart LR
+  Old[&quot;Old Gen (large)&quot;]
+  CT[&quot;Card Table&lt;br/&gt;(1 byte per 512 bytes of Old)&lt;br/&gt;most clean, few dirty&quot;]
+  WB[&quot;Write barrier:&lt;br/&gt;every reference write in Old&lt;br/&gt;marks the containing card dirty&quot;]
+  YGC[&quot;Young GC:&lt;br/&gt;scan only dirty cards from Old&quot;]
+  Old --&gt; CT
+  WB --&gt; CT
+  CT --&gt; YGC
+  Note[&quot;Sparse coverage:&lt;br/&gt;Young GC scans 1% of Old, not 100%.&quot;]
+```
+
+The write barrier maintains the card table:
+
+```
+write_barrier_card(old_object, field, new_value):
+    if (old_object is in Old &amp;&amp; new_value is in Young):
+        card_table[card_of(old_object)] = DIRTY
+    old_object.field = new_value
+```
+
+Young GC then scans **only dirty cards** for Old→Young references. The card table is typically 1/512 the size of Old — for a 1 GB Old gen, that&#x27;s 2 MB. Cheap.
+
+### Remembered Sets — G1&#x27;s More-Precise Variant
+
+G1 divides the heap into regions; each region maintains a **remembered set** (RSet) — a per-region list of &quot;from which regions do references into me come from?&quot;
+
+```mermaid
+flowchart LR
+  R1[&quot;Region 1&lt;br/&gt;RSet: {R5, R7}&lt;br/&gt;(R5 and R7 have refs into R1)&quot;]
+  R5[&quot;Region 5&quot;]
+  R7[&quot;Region 7&quot;]
+  R5 -- ref --&gt; R1
+  R7 -- ref --&gt; R1
+  Note[&quot;G1 can collect Region 1 without&lt;br/&gt;scanning all of Old —&lt;br/&gt;only scan R5 and R7 for refs into R1.&quot;]
+```
+
+RSets are more memory-expensive than card tables (typically 1–5% of heap) but enable **region-level garbage collection** — G1&#x27;s fundamental capability.
+
+## GC Metrics — the Four Dimensions
+
+Every GC tuning decision trades among four metrics:
+
+### Throughput
+
+% of total time spent *not* in GC. A program running 10 minutes with 30 seconds of GC pauses has 95% throughput.
+
+```text
+throughput = (total_time - gc_time) / total_time
+```
+
+Affected by: allocation rate, heap size, GC algorithm choice, application behavior.
+
+### Pause Time (Latency)
+
+Longest single STW pause. The user-facing latency floor. A web service with a 2-second GC pause is unusable.
+
+For p99 latency-sensitive workloads, this is *the* metric. ZGC and Shenandoah target sub-millisecond pauses; classical Parallel GC tolerates 100ms–1s pauses for higher throughput.
+
+### Footprint
+
+Memory used by the JVM, including GC metadata (card tables, remembered sets, marking state). A GC with low footprint overhead leaves more heap for application data.
+
+ZGC&#x27;s metadata overhead is ~3% of heap. G1&#x27;s is ~5–10%. Old serial collectors: &lt;1%.
+
+### Promptness
+
+Time between an object becoming unreachable and being reclaimed. Higher promptness → lower steady-state footprint.
+
+Concurrent collectors trade promptness for throughput (a Soft reference held by an unreachable object cleared at the *next* GC, not immediately).
+
+## The Unattainable Triangle
+
+**You can&#x27;t have all four.** Concrete trade-offs:
+
+```mermaid
+flowchart TB
+  T[&quot;Throughput&quot;]
+  L[&quot;Low Pause&quot;]
+  F[&quot;Low Footprint&quot;]
+  T --- L
+  L --- F
+  F --- T
+  Note[&quot;Pick at most TWO.&lt;br/&gt;The third (and any extras) will suffer.&quot;]
+```
+
+- **Parallel GC**: high throughput + low footprint, but high pauses (100ms–seconds). Default in headless server before JDK 9.
+- **G1**: balanced — moderate throughput, moderate pauses (10–100ms), moderate footprint. Default since JDK 9.
+- **ZGC**: low pauses + good throughput, but higher footprint (more metadata). Default candidate for low-latency.
+- **Shenandoah**: low pauses + good throughput, similar footprint to ZGC.
+
+T08 covers each in depth and helps pick.
+
+## Object Lifecycle Through GC
+
+A typical object&#x27;s journey:
+
+```mermaid
+flowchart LR
+  N[&quot;new T()&quot;]
+  TLAB[&quot;Eden via TLAB&quot;]
+  S0[&quot;Survivor 0&lt;br/&gt;(age 1)&quot;]
+  S1[&quot;Survivor 1&lt;br/&gt;(age 2)&quot;]
+  Sn[&quot;Survivor 0&lt;br/&gt;(age 15)&quot;]
+  Old[&quot;Old Gen&quot;]
+  GC[&quot;YGC determines reachability&quot;]
+  GCO[&quot;OGC determines reachability&quot;]
+  Reclaim[&quot;reclaimed (eventually)&quot;]
+  N --&gt; TLAB
+  TLAB --&gt; GC
+  GC -- live, age 1 --&gt; S0
+  S0 --&gt; GC
+  GC -- live, age 2 --&gt; S1
+  S1 --&gt; GC
+  GC -. &quot;ages++&quot; .-&gt; Sn
+  Sn -- age &gt;= 15 --&gt; Old
+  Old --&gt; GCO
+  GCO -- unreachable --&gt; Reclaim
+```
+
+Most objects die in Eden — collected on first Young GC. Survivors get re-copied each cycle until promotion at `MaxTenuringThreshold` (default 15). Old objects sit until a Major or Full GC reclaims them.
+
+## Concurrent vs Parallel — and STW
+
+Three orthogonal terms often confused:
+
+- **Stop-the-world (STW)**: all application threads paused; only GC runs.
+- **Parallel**: multiple GC threads working in parallel (still possibly STW).
+- **Concurrent**: GC runs *alongside* application threads (not STW).
+
+Modern collectors mix these phases:
+
+| Phase | STW? | Parallel? | Concurrent? |
+|-------|:----:|:---------:|:-----------:|
+| **Initial mark** | yes | usually | no |
+| **Concurrent mark** | no | yes | yes |
+| **Final mark** | yes | yes | no |
+| **Concurrent sweep / evacuate** | no | yes | yes |
+
+The STW phases are *brief* (microseconds to single milliseconds in modern GCs); the bulk of work runs concurrently.
+
+## Reference Processing — `Cleaner` Replacing `finalize`
+
+Reference processing happens in a dedicated phase:
+
+1. **Strong**: handled by normal marking.
+2. **Soft**: cleared if memory is tight; otherwise kept.
+3. **Weak**: cleared if no strong refs remain; enqueued in `ReferenceQueue`.
+4. **Phantom**: enqueued *after* finalization (or `Cleaner` callback) runs.
+
+### `Object.finalize()` — deprecated
+
+```java
+@Override
+protected void finalize() throws Throwable {
+    // run cleanup before GC reclaims
+}
+```
+
+Deprecated in JDK 9; for removal in a future release. Reasons:
+
+- Unpredictable timing.
+- Performance hit (GC has to track finalizable objects separately).
+- Resurrection (finalize can make objects reachable again).
+- Errors swallowed silently.
+
+### `Cleaner` — the modern replacement
+
+```java
+public class Resource implements AutoCloseable {
+    private static final Cleaner CLEANER = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+
+    public Resource() {
+        // cleanup action runs after the Resource becomes phantom-reachable
+        this.cleanable = CLEANER.register(this, () -&gt; {
+            // free native handle, etc.
+        });
+    }
+
+    @Override
+    public void close() { cleanable.clean(); }
+}
+```
+
+Built on PhantomReferences. The cleanup runs on a dedicated thread *after* the object is unreachable — not in the middle of GC, no resurrection, no silent errors. Pair with `AutoCloseable` for try-with-resources.
+
+## Common Mistakes
+
+### Believing GC is &quot;free&quot;
+
+Allocation isn&#x27;t free; GC work scales with allocation rate. Reducing allocations = reducing GC = better throughput and pauses.
+
+### Tuning for a metric without measurement
+
+&quot;Increase heap to reduce GC&quot; — measure throughput and pauses first; the relationship isn&#x27;t linear.
+
+### Holding `SoftReference`-cached data on the critical path
+
+`SoftReference.get()` can return null under memory pressure. Don&#x27;t cache request-critical data softly.
+
+### Using `finalize()` for resource cleanup
+
+It&#x27;s deprecated, slow, unreliable. Use try-with-resources + `Cleaner`.
+
+### Ignoring TTSP
+
+Long-running native code can hold up GC. Profile with `-Xlog:safepoint` if pauses are surprisingly long.
+
+### Setting heap too small
+
+GC frequency increases with smaller heap; pause times can grow.
+
+## Observability
+
+### `-Xlog:gc*` — modern logging (JDK 9+)
+
+```bash
+java -Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags ...
+```
+
+Replaces the old `-XX:+PrintGCDetails`. Pluggable verbosity per category.
+
+### `jstat -gc &lt;pid&gt; 1s`
+
+Real-time GC stats: Eden/Survivor/Old occupancy, GC counts, GC time.
+
+### `jcmd &lt;pid&gt; GC.heap_info`
+
+Snapshot heap layout and occupancy.
+
+### JFR — `jdk.GCConfiguration`, `jdk.GCHeapSummary`, `jdk.PromoteObjectInNewPLAB`, etc.
+
+The production-grade tool. Full GC visibility with low overhead.
+
+### `-Xlog:safepoint`
+
+Shows safepoint requests, TTSP, total pause. Essential when diagnosing pause spikes.
+
+### GCEasy, GCViewer
+
+Web tools for visualizing GC logs.
+
+## Practice
+
+1. **Identify GC roots.** In a small Java app, write a method that holds references in locals, statics, and threads. Take a heap dump; trace each object&#x27;s path back to its root.
+2. **Soft cache.** Implement an image cache with `SoftReference`. Allocate enough objects to trigger soft-reference clearing; verify cache entries are gone after.
+3. **WeakHashMap behavior.** Put entries with String keys; GC; verify only entries whose key reference is dropped disappear.
+4. **Cleaner cleanup.** Implement a `Resource` with `Cleaner`; let go of all references; observe the cleanup runs.
+5. **Mark-sweep simulation.** Code a toy mark-sweep collector for a tree of `Node` objects in pure Java. Walk roots, mark, then &quot;free&quot; unmarked.
+6. **Card table effect.** With `-XX:+PrintGC -Xlog:gc*:stderr`, observe Young GC time for a workload with lots of Old→Young writes vs few.
+7. **Force a Young GC.** Allocate enough to fill Eden; observe Young GC in logs.
+8. **Force an Old GC.** Hold long-lived objects until they promote; observe Old/Major GC.
+9. **Compare GC throughput.** Run a CPU-bound app with `-XX:+UseParallelGC` and `-XX:+UseG1GC`. Compare throughput and pause times.
+10. **TTSP investigation.** Write a tight loop with no method calls; enable `-Xlog:safepoint`; observe slow TTSP. Add a `Thread.onSpinWait()` or method call; observe TTSP improvement.
+11. **Reference processing inspection.** Enable `-Xlog:ref+gc`; observe reference processing for soft/weak/phantom refs.
+12. **Heap allocation profiling.** Use JFR&#x27;s `jdk.ObjectAllocationInNewTLAB` and `jdk.ObjectAllocationOutsideTLAB` to find allocation hotspots.
+
+## Recap
+
+You should now be able to:
+
+- Defend **why GC exists**: eliminates manual-memory bugs (use-after-free, double-free, leaks); trade is pause time + throughput overhead + footprint.
+- Define **garbage** as *unreachable* from any **GC root**: local variables on active stacks, static fields, JNI globals, active monitors, thread objects, ClassLoaders.
+- Distinguish **strong / soft / weak / phantom references** and their use cases (default reachability / pressure-sensitive cache / weak-key map / cleanup notification).
+- Walk through the **three classical algorithms**:
+  - **Mark-Sweep**: mark live from roots, sweep dead; simple but fragmenting.
+  - **Mark-Compact**: mark + slide live together; no fragmentation but expensive moves + pointer updates.
+  - **Copying / Semi-space**: copy live to other space; time proportional to live data; basis of every Young Generation collector; 50% memory overhead (amortized by Eden + Survivor design).
+- Apply the **tri-color invariant** for concurrent marking: white (unvisited) / gray (visited, children pending) / black (done). The invariant: **no black → white reference** — maintained by write barriers.
+- Compare **SATB (Snapshot-At-The-Beginning)** vs **incremental update** write barriers: SATB records the old value (preserves snapshot); incremental records the new value (precise but slightly costlier).
+- Recognize the **~5–15% throughput cost** of write barriers and accept it as the price of concurrent marking.
+- Walk through **safepoints**: compiler-inserted polls at method entry / loop back-edge / allocation; cheap (~1–2 cycles per poll); JVM requests; threads converge.
+- Identify **time-to-safepoint (TTSP)** as the worst-case quietest thread; long native calls or poll-less tight loops spike it.
+- Explain **card tables**: 512-byte cards in Old; write barrier marks dirty on Old→Young write; Young GC scans only dirty cards. Trade: small memory (~1/512 of Old), enables fast YGC.
+- Explain **remembered sets (G1)**: per-region inbound reference tracking; more precise than card tables; enables region-level collection.
+- Recite the **four GC metrics**: throughput (% not in GC) / pause time (longest STW) / footprint (memory used inc. GC metadata) / promptness (reclaim delay).
+- Apply the **unattainable triangle**: pick at most two of (high throughput, low pause, low footprint).
+- Walk through an **object&#x27;s lifecycle**: TLAB → Eden → Survivor (aged) → Old → eventually reclaimed.
+- Distinguish **STW** (all app threads paused), **parallel** (multiple GC threads), **concurrent** (GC runs alongside app). Modern collectors mix all three across phases.
+- Use **`Cleaner`** as the modern replacement for `finalize`: built on PhantomReferences; cleanup runs on a dedicated thread after the object is phantom-reachable; pair with `AutoCloseable`.
+- Diagnose via `-Xlog:gc*`, `-Xlog:safepoint`, `jstat -gc`, JFR&#x27;s GC events, and GC log analysis tools (GCEasy, GCViewer).
+- Avoid the **6 common mistakes**: believing GC is free, tuning without measuring, soft-caching critical data, using `finalize`, ignoring TTSP, undersized heap.
+
+## Next
+
+Continue to [GC algorithms (Serial, Parallel, G1, ZGC, Shenandoah)](./T08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md) — applying the fundamentals to specific collectors. We&#x27;ll dissect **Serial GC** (single-threaded, low footprint, embedded use); **Parallel GC** (multi-threaded throughput collector, pre-JDK-9 default); **G1** (region-based, balanced, default since JDK 9 — pause-time-focused with predictable behavior); **ZGC** (colored pointers, sub-millisecond pauses regardless of heap size — the modern low-latency choice); **Shenandoah** (Red Hat&#x27;s low-latency variant, similar profile to ZGC but different implementation); pick-the-right-collector decision matrix; how each algorithm uses (or combines) the mark-sweep / mark-compact / copying / tri-color / write-barrier fundamentals from this topic.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><div class="lbl">← Previous</div><div class="ttl">T06-memory-model-heap-stack-metaspace</div><div class="sub">Memory Model: Heap, Stack, Metaspace</div></a><a class="next" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><div class="lbl">Next →</div><div class="ttl">T08-gc-algorithms-serial-parallel-g1-zgc-shenandoah</div><div class="sub">GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-gc-is-and-why" data-toc-link>What GC Is — and Why</a></li><li class="lvl-2"><a href="#the-reachability-problem" data-toc-link>The Reachability Problem</a></li><li class="lvl-2"><a href="#gc-roots-where-tracing-starts" data-toc-link>GC Roots — Where Tracing Starts</a></li><li class="lvl-2"><a href="#reference-types-soft-weak-phantom" data-toc-link>Reference Types — Soft, Weak, Phantom</a></li><li class="lvl-3"><a href="#softreferencet-cleared-under-memory-pressure" data-toc-link>SoftReference&amp;lt;T&amp;gt; — cleared under memory pressure</a></li><li class="lvl-3"><a href="#weakreferencet-cleared-at-the-next-gc" data-toc-link>WeakReference&amp;lt;T&amp;gt; — cleared at the next GC</a></li><li class="lvl-3"><a href="#phantomreferencet-cleanup-notification" data-toc-link>PhantomReference&amp;lt;T&amp;gt; — cleanup notification</a></li><li class="lvl-2"><a href="#the-three-classical-algorithms" data-toc-link>The Three Classical Algorithms</a></li><li class="lvl-3"><a href="#mark-sweep" data-toc-link>Mark-Sweep</a></li><li class="lvl-3"><a href="#mark-compact" data-toc-link>Mark-Compact</a></li><li class="lvl-3"><a href="#copying-semi-space" data-toc-link>Copying (Semi-Space)</a></li><li class="lvl-2"><a href="#the-tri-color-invariant-concurrent-marking" data-toc-link>The Tri-Color Invariant — Concurrent Marking</a></li><li class="lvl-3"><a href="#the-invariant-what-concurrent-marking-must-maintain" data-toc-link>The invariant — what concurrent marking must maintain</a></li><li class="lvl-2"><a href="#write-barriers-maintaining-the-invariant" data-toc-link>Write Barriers — Maintaining the Invariant</a></li><li class="lvl-3"><a href="#satb-snapshot-at-the-beginning-g1s-default" data-toc-link>SATB — Snapshot-At-The-Beginning (G1&#x27;s default)</a></li><li class="lvl-3"><a href="#incremental-update-dijkstra-style" data-toc-link>Incremental Update (Dijkstra-style)</a></li><li class="lvl-3"><a href="#trade-offs" data-toc-link>Trade-offs</a></li><li class="lvl-2"><a href="#safepoints-how-the-gc-stops-threads" data-toc-link>Safepoints — How the GC Stops Threads</a></li><li class="lvl-3"><a href="#time-to-safepoint-ttsp" data-toc-link>Time-to-Safepoint (TTSP)</a></li><li class="lvl-2"><a href="#card-tables-tracking-inter-generational-references" data-toc-link>Card Tables — Tracking Inter-Generational References</a></li><li class="lvl-3"><a href="#remembered-sets-g1s-more-precise-variant" data-toc-link>Remembered Sets — G1&#x27;s More-Precise Variant</a></li><li class="lvl-2"><a href="#gc-metrics-the-four-dimensions" data-toc-link>GC Metrics — the Four Dimensions</a></li><li class="lvl-3"><a href="#throughput" data-toc-link>Throughput</a></li><li class="lvl-3"><a href="#pause-time-latency" data-toc-link>Pause Time (Latency)</a></li><li class="lvl-3"><a href="#footprint" data-toc-link>Footprint</a></li><li class="lvl-3"><a href="#promptness" data-toc-link>Promptness</a></li><li class="lvl-2"><a href="#the-unattainable-triangle" data-toc-link>The Unattainable Triangle</a></li><li class="lvl-2"><a href="#object-lifecycle-through-gc" data-toc-link>Object Lifecycle Through GC</a></li><li class="lvl-2"><a href="#concurrent-vs-parallel-and-stw" data-toc-link>Concurrent vs Parallel — and STW</a></li><li class="lvl-2"><a href="#reference-processing-cleaner-replacing-finalize" data-toc-link>Reference Processing — Cleaner Replacing finalize</a></li><li class="lvl-3"><a href="#objectfinalize-deprecated" data-toc-link>Object.finalize() — deprecated</a></li><li class="lvl-3"><a href="#cleaner-the-modern-replacement" data-toc-link>Cleaner — the modern replacement</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#believing-gc-is-free" data-toc-link>Believing GC is &quot;free&quot;</a></li><li class="lvl-3"><a href="#tuning-for-a-metric-without-measurement" data-toc-link>Tuning for a metric without measurement</a></li><li class="lvl-3"><a href="#holding-softreference-cached-data-on-the-critical-path" data-toc-link>Holding SoftReference-cached data on the critical path</a></li><li class="lvl-3"><a href="#using-finalize-for-resource-cleanup" data-toc-link>Using finalize() for resource cleanup</a></li><li class="lvl-3"><a href="#ignoring-ttsp" data-toc-link>Ignoring TTSP</a></li><li class="lvl-3"><a href="#setting-heap-too-small" data-toc-link>Setting heap too small</a></li><li class="lvl-2"><a href="#observability" data-toc-link>Observability</a></li><li class="lvl-3"><a href="#-xloggc-modern-logging-jdk-9" data-toc-link>-Xlog:gc* — modern logging (JDK 9+)</a></li><li class="lvl-3"><a href="#jstat-gc-pid-1s" data-toc-link>jstat -gc &amp;lt;pid&amp;gt; 1s</a></li><li class="lvl-3"><a href="#jcmd-pid-gcheap_info" data-toc-link>jcmd &amp;lt;pid&amp;gt; GC.heap_info</a></li><li class="lvl-3"><a href="#jfr-jdkgcconfiguration-jdkgcheapsummary-jdkpromoteobjectinnewplab-etc" data-toc-link>JFR — jdk.GCConfiguration, jdk.GCHeapSummary, jdk.PromoteObjectInNewPLAB, etc.</a></li><li class="lvl-3"><a href="#-xlogsafepoint" data-toc-link>-Xlog:safepoint</a></li><li class="lvl-3"><a href="#gceasy-gcviewer" data-toc-link>GCEasy, GCViewer</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

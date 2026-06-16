@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — Staff-Level Interview Question Banks
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -34,4 +34,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 12 | Agile, Scrum & Team Practices — Q&A bank | `T12-agile-scrum-and-team-practices-q-and-a-bank.md` | planned |
 | 13 | Engineering Tools (Jira, Confluence, Git, IDE, Monitoring) — Q&A bank | `T13-engineering-tools-jira-confluence-git-ide-monitoring-q-and-a-bank.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

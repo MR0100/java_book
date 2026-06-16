@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>URL Shortener — a worked system design, made runnable — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link active" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">▶</span><span>Ch. 9 · Examples</span></div><div class="chapter-path">examples/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><details class="mod" data-q="🚀 starter templates examples/starter-templates/spring-boot-3-java-21 examples/starter-templates/spring-boot-3-native-image examples/starter-templates/spring-boot-3-virtual-threads"><summary><span class="caret">▶</span><span>🚀 Starter Templates</span></summary><ul class="pages"><li data-q="spring boot 3 + java 21 — starter template examples/starter-templates/spring-boot-3-java-21"><a class="" href="../examples/starter-templates--spring-boot-3-java-21.html"><span>Spring Boot 3 + Java 21 — Starter Template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3 + graalvm native image — starter template examples/starter-templates/spring-boot-3-native-image"><a class="" href="../examples/starter-templates--spring-boot-3-native-image.html"><span>Spring Boot 3 + GraalVM Native Image — starter template</span><span class="kind-pill "></span></a></li><li data-q="spring boot 3.3 + java 21 virtual threads — starter examples/starter-templates/spring-boot-3-virtual-threads"><a class="" href="../examples/starter-templates--spring-boot-3-virtual-threads.html"><span>Spring Boot 3.3 + Java 21 Virtual Threads — Starter</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="🧩 system designs examples/system-designs/cqrs-with-axon examples/system-designs/distributed-lock-fenced examples/system-designs/event-sourced-wallet examples/system-designs/outbox-pattern examples/system-designs/rate-limiter-redis-lua examples/system-designs/saga-orchestrator examples/system-designs/url-shortener"><summary><span class="caret">▶</span><span>🧩 System Designs</span></summary><ul class="pages"><li data-q="cqrs — command query responsibility segregation (hand-rolled, no axon) examples/system-designs/cqrs-with-axon"><a class="" href="../examples/system-designs--cqrs-with-axon.html"><span>CQRS — Command Query Responsibility Segregation (hand-rolled, no Axon)</span><span class="kind-pill "></span></a></li><li data-q="distributed lock with fencing tokens (redis) examples/system-designs/distributed-lock-fenced"><a class="" href="../examples/system-designs--distributed-lock-fenced.html"><span>Distributed Lock WITH Fencing Tokens (Redis)</span><span class="kind-pill "></span></a></li><li data-q="event-sourced wallet — balance derived by replaying an append-only log examples/system-designs/event-sourced-wallet"><a class="" href="../examples/system-designs--event-sourced-wallet.html"><span>Event-Sourced Wallet — balance derived by replaying an append-only log</span><span class="kind-pill "></span></a></li><li data-q="transactional outbox — reliable event publication without distributed transactions examples/system-designs/outbox-pattern"><a class="" href="../examples/system-designs--outbox-pattern.html"><span>Transactional Outbox — reliable event publication without distributed transactions</span><span class="kind-pill "></span></a></li><li data-q="distributed rate limiter — redis + atomic lua script examples/system-designs/rate-limiter-redis-lua"><a class="" href="../examples/system-designs--rate-limiter-redis-lua.html"><span>Distributed Rate Limiter — Redis + atomic Lua script</span><span class="kind-pill "></span></a></li><li data-q="saga orchestrator (orchestration-based, with compensation) examples/system-designs/saga-orchestrator"><a class="" href="../examples/system-designs--saga-orchestrator.html"><span>Saga Orchestrator (orchestration-based, with compensation)</span><span class="kind-pill "></span></a></li><li data-q="url shortener — a worked system design, made runnable examples/system-designs/url-shortener"><a class="active" href="../examples/system-designs--url-shortener.html"><span>URL Shortener — a worked system design, made runnable</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="🔬 hands-on labs examples/labs/lab-01-url-shortener-in-4-hours examples/labs/lab-02-build-a-memory-leak examples/labs/lab-03-build-a-deadlock examples/labs/lab-04-jmh-microbenchmark examples/labs/lab-05-profile-with-async-profiler examples/labs/lab-06-distributed-tracing-from-scratch examples/labs/lab-07-build-a-rate-limiter"><summary><span class="caret">▶</span><span>🔬 Hands-on Labs</span></summary><ul class="pages"><li data-q="lab 01 — build a url shortener in 4 hours examples/labs/lab-01-url-shortener-in-4-hours"><a class="" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><span>Lab 01 — Build a URL Shortener in 4 Hours</span><span class="kind-pill "></span></a></li><li data-q="lab 02 — build a memory leak (then fix it) examples/labs/lab-02-build-a-memory-leak"><a class="" href="../examples/labs--lab-02-build-a-memory-leak.html"><span>Lab 02 — Build a Memory Leak (then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 03 — build a deadlock (then observe it, then fix it) examples/labs/lab-03-build-a-deadlock"><a class="" href="../examples/labs--lab-03-build-a-deadlock.html"><span>Lab 03 — Build a Deadlock (then observe it, then fix it)</span><span class="kind-pill "></span></a></li><li data-q="lab 04 — jmh microbenchmarking examples/labs/lab-04-jmh-microbenchmark"><a class="" href="../examples/labs--lab-04-jmh-microbenchmark.html"><span>Lab 04 — JMH Microbenchmarking</span><span class="kind-pill "></span></a></li><li data-q="lab 05 — profile with async-profiler / jfr examples/labs/lab-05-profile-with-async-profiler"><a class="" href="../examples/labs--lab-05-profile-with-async-profiler.html"><span>Lab 05 — Profile with async-profiler / JFR</span><span class="kind-pill "></span></a></li><li data-q="lab 06 — distributed tracing from scratch examples/labs/lab-06-distributed-tracing-from-scratch"><a class="" href="../examples/labs--lab-06-distributed-tracing-from-scratch.html"><span>Lab 06 — Distributed Tracing From Scratch</span><span class="kind-pill "></span></a></li><li data-q="lab 07 — build a rate limiter (in-jvm, from first principles) examples/labs/lab-07-build-a-rate-limiter"><a class="" href="../examples/labs--lab-07-build-a-rate-limiter.html"><span>Lab 07 — Build a Rate Limiter (in-JVM, from first principles)</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="☸ kubernetes manifests examples/k8s-manifests/istio-canary examples/k8s-manifests/istio-circuit-breaker examples/k8s-manifests/observability-stack examples/k8s-manifests/spring-boot-3-deployment"><summary><span class="caret">▶</span><span>☸ Kubernetes Manifests</span></summary><ul class="pages"><li data-q="istio-canary/ — canary traffic splitting with istio examples/k8s-manifests/istio-canary"><a class="" href="../examples/k8s-manifests--istio-canary.html"><span>istio-canary/ — Canary traffic splitting with Istio</span><span class="kind-pill "></span></a></li><li data-q="istio-circuit-breaker/ — mesh-level circuit breaking &amp; fault injection examples/k8s-manifests/istio-circuit-breaker"><a class="" href="../examples/k8s-manifests--istio-circuit-breaker.html"><span>istio-circuit-breaker/ — Mesh-level circuit breaking &amp; fault injection</span><span class="kind-pill "></span></a></li><li data-q="observability-stack/ — metrics + tracing for the url-shortener examples/k8s-manifests/observability-stack"><a class="" href="../examples/k8s-manifests--observability-stack.html"><span>observability-stack/ — Metrics + tracing for the url-shortener</span><span class="kind-pill "></span></a></li><li data-q="spring-boot-3-deployment/ — hardened deployment, service, hpa, configmap examples/k8s-manifests/spring-boot-3-deployment"><a class="" href="../examples/k8s-manifests--spring-boot-3-deployment.html"><span>spring-boot-3-deployment/ — Hardened Deployment, Service, HPA, ConfigMap</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../examples/index.html">Examples</a><span class="sep">/</span><span>URL Shortener — a worked system design, made runnable</span></div>
+        <h1>URL Shortener — a worked system design, made runnable</h1>
+        <div><span class="source-path">examples/system-designs/url-shortener</span></div>
+        
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><p><strong>Backs: L5/C02/T17 Worked Design — URL Shortener</strong></p>
+<p>This is the canonical system-design interview question turned into a real, running
+service. It takes the whiteboard design from the L5 topic and implements it as a tiny
+Spring Boot app backed by an <strong>in-memory H2 database</strong>, so the entire thing starts and
+serves traffic with <strong>zero external infrastructure</strong> — no Postgres, no Redis, no Docker.</p>
+<p>You shorten a URL, follow the short link (which redirects), and read click stats — the
+same three operations every real shortener (bit.ly, TinyURL, t.co) exposes.</p>
+<hr>
+<h2 id="what-it-demonstrates">What it demonstrates<a class="anchor" href="#what-it-demonstrates" aria-hidden="true">#</a></h2>
+<ul>
+<li>The <strong>base62-of-the-auto-increment-id</strong> code-generation strategy — the standard,
+  collision-free approach — implemented in a small, unit-tested utility.</li>
+<li>The <strong>read-heavy</strong> shape of a shortener (far more redirects than creates) and where a
+  cache / CDN would slot in at scale.</li>
+<li>The <strong>301-vs-302 redirect trade-off</strong> and why a shortener that wants click analytics
+  picks <strong>302</strong>.</li>
+<li>Clean layering: <code>controller → service → repository → entity</code>, DTOs as records,
+  input validation with <code>@Valid</code>, and centralized error handling.</li>
+</ul>
+<p>It is intentionally minimal but complete: everything compiles, every endpoint works,
+and the tests prove the full shorten → redirect → stats flow.</p>
+<hr>
+<h2 id="the-design-decisions-the-interesting-part">The design decisions (the interesting part)<a class="anchor" href="#the-design-decisions-the-interesting-part" aria-hidden="true">#</a></h2>
+<h3 id="1-short-code-generation-base62-of-the-auto-increment-id">1. Short-code generation: base62 of the auto-increment id<a class="anchor" href="#1-short-code-generation-base62-of-the-auto-increment-id" aria-hidden="true">#</a></h3>
+<p>The short code is just the database primary key rendered in base62 (<code>[0-9A-Za-z]</code>,
+62 symbols). Row id <code>1</code> → <code>"1"</code>, id <code>62</code> → <code>"10"</code>, and so on. See
+<a href="src/main/java/com/javamastery/examples/urlshortener/util/Base62.java"><code>Base62.java</code></a>.</p>
+<p>Why this beats the alternatives:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Collisions?</th>
+<th>Extra DB round trip on create?</th>
+<th>Code length</th>
+<th>Enumerable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>base62-of-id</strong> (this app)</td>
+<td><strong>None</strong> — id is unique by construction</td>
+<td>No</td>
+<td>Short, grows with id (6 chars ≈ 56.8 B ids)</td>
+<td>Yes (<code>/1</code>, <code>/2</code>, …)</td>
+</tr>
+<tr>
+<td>Random code + uniqueness check</td>
+<td>Possible (birthday paradox) → retry loop</td>
+<td>Yes (must check for clash)</td>
+<td>Fixed; size for load</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Hash the URL (e.g. SHA, take first <em>k</em> chars)</td>
+<td>Possible → must still handle</td>
+<td>Maybe (de-dupes identical URLs)</td>
+<td>Tunable via <em>k</em></td>
+<td>No</td>
+</tr>
+</tbody>
+</table></div>
+<p>The one downside of base62-of-id is that codes are <strong>enumerable</strong> — anyone can guess that
+<code>/1</code> exists and walk the keyspace. If you need unguessable codes you keep the
+collision-free property but scramble the id before encoding (multiply by a large coprime
+modulo the keyspace, or run a small Feistel/format-preserving permutation), so the
+sequence still never collides but is not walkable. This demo keeps the plain id for
+clarity. (The full discussion lives in the comments of <code>Base62.java</code>.)</p>
+<p><strong>Implementation note — the two-phase insert.</strong> With an <code>IDENTITY</code> (auto-increment) key,
+you don't know the id until the row is inserted. So the service: (1) inserts the row to
+get the id, then (2) encodes that id and updates the row's <code>code</code>. Both happen inside one
+transaction. That's why the <code>code</code> column is nullable at the schema level — it's null only
+for the microseconds between the two writes. See
+<a href="src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java"><code>UrlShortenerService.shorten</code></a>.</p>
+<h3 id="2-redirect-semantics-302-not-301">2. Redirect semantics: 302, not 301<a class="anchor" href="#2-redirect-semantics-302-not-301" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>301 Moved Permanently</strong> → browsers/proxies/CDNs cache the redirect and stop asking us.
+  Fast and cheap, but <strong>our hit counter never increments again</strong> — we go blind on analytics.</li>
+<li><strong>302 Found (temporary)</strong> → not cached by default, so every click comes back through us
+  and is counted.</li>
+</ul>
+<p>A shortener whose value proposition includes click analytics chooses <strong>302</strong> and pays for
+it with a round trip per click. See
+<a href="src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java"><code>RedirectController.java</code></a>.</p>
+<h3 id="3-read-heavy-where-the-cachecdn-goes">3. Read-heavy → where the cache/CDN goes<a class="anchor" href="#3-read-heavy-where-the-cachecdn-goes" aria-hidden="true">#</a></h3>
+<p>Creates are rare; redirects are constant and bursty (a link goes viral). The redirect path
+is a single indexed lookup on <code>code</code>. At scale you put a <strong>cache in front of that lookup</strong>
+(hot codes live in Redis/an in-process cache) and/or terminate redirects at the <strong>edge/CDN</strong>.
+The catch: caching at the edge reintroduces the same "we can't see the click" problem as a
+301 — which is why real systems move counting <strong>off the request path</strong> (fire-and-forget
+events into a log/stream, aggregate asynchronously). See "How this scales" below.</p>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Java 21</strong> (the project targets Java 21 bytecode; it runs on any JDK 21+).</li>
+<li><strong>Maven 3.9+</strong> (or use the system <code>mvn</code>).</li>
+</ul>
+<p>No database or other services to install — H2 runs in-memory inside the app's JVM.</p>
+<hr>
+<h2 id="run-it">Run it<a class="anchor" href="#run-it" aria-hidden="true">#</a></h2>
+<h3 id="tests-fastest-way-to-see-it-work">Tests (fastest way to see it work)<a class="anchor" href="#tests-fastest-way-to-see-it-work" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn test
+</code></pre></div>
+<p>Runs the Base62 round-trip unit tests and the <code>@SpringBootTest</code>/MockMvc integration test
+(shorten → 302 redirect with <code>Location</code> → stats with <code>hitCount</code>). Expect:</p>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+</code></pre></div>
+<h3 id="start-the-server">Start the server<a class="anchor" href="#start-the-server" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">mvn spring-boot:run
+</code></pre></div>
+<p>It listens on <code>http://localhost:8080</code>.</p>
+<h3 id="curl-the-endpoints">curl the endpoints<a class="anchor" href="#curl-the-endpoints" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># 1) Shorten a URL  -&gt;  201 Created
+curl -s -X POST http://localhost:8080/api/shorten \
+  -H 'Content-Type: application/json' \
+  -d '{&quot;url&quot;:&quot;https://example.com/a/very/long/path?x=1&quot;}'
+# {&quot;code&quot;:&quot;1&quot;,&quot;shortUrl&quot;:&quot;http://localhost:8080/1&quot;,&quot;longUrl&quot;:&quot;https://example.com/a/very/long/path?x=1&quot;}
+
+# 2) Follow the short link  -&gt;  302 Found with Location header
+curl -s -i http://localhost:8080/1 | head -5
+# HTTP/1.1 302
+# Location: https://example.com/a/very/long/path?x=1
+
+# 3) Read stats (this does NOT count as a hit)
+curl -s http://localhost:8080/api/stats/1
+# {&quot;code&quot;:&quot;1&quot;,&quot;longUrl&quot;:&quot;https://example.com/...&quot;,&quot;hitCount&quot;:2,&quot;createdAt&quot;:&quot;...Z&quot;}
+
+# Unknown code  -&gt;  404
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080/zzzzzz   # 404
+
+# Non-http(s) URL is rejected  -&gt;  400
+curl -s -o /dev/null -w '%{http_code}\n' \
+  -X POST http://localhost:8080/api/shorten \
+  -H 'Content-Type: application/json' -d '{&quot;url&quot;:&quot;ftp://nope&quot;}'          # 400
+</code></pre></div>
+<p>You can also browse the data at the H2 console: <code>http://localhost:8080/h2-console</code>
+(JDBC URL <code>jdbc:h2:mem:urlshortener</code>, user <code>sa</code>, empty password).</p>
+<h3 id="expected-output">Expected output<a class="anchor" href="#expected-output" aria-hidden="true">#</a></h3>
+<ul>
+<li><code>POST /api/shorten</code> → <strong>201</strong> with <code>{code, shortUrl, longUrl}</code>.</li>
+<li><code>GET /{code}</code> → <strong>302</strong> with a <code>Location</code> header equal to the original URL; each call
+  bumps the hit counter.</li>
+<li><code>GET /api/stats/{code}</code> → <strong>200</strong> with <code>{code, longUrl, hitCount, createdAt}</code>;
+  <code>hitCount</code> equals the number of redirects served.</li>
+<li>Unknown code → <strong>404</strong>; blank or non-http(s) URL → <strong>400</strong>.</li>
+</ul>
+<hr>
+<h2 id="how-this-scales-pointing-back-to-the-l5-topic">How this scales (pointing back to the L5 topic)<a class="anchor" href="#how-this-scales-pointing-back-to-the-l5-topic" aria-hidden="true">#</a></h2>
+<p>This single-node H2 app is the <em>correct small version</em> of the design. The path from here
+to internet scale is exactly the L5 discussion:</p>
+<ul>
+<li><strong>Swap H2 for a real RDBMS</strong> (Postgres/MySQL) and add migrations (Flyway/Liquibase)
+  instead of <code>ddl-auto=create-drop</code>.</li>
+<li><strong>Shard the id generator.</strong> A single <code>IDENTITY</code> counter is a write bottleneck and a
+  single point of failure. Replace it with <strong>range/segment allocation</strong> (each app node
+  leases a block of ids, e.g. 1–10000, and hands them out locally) or a distributed id
+  service (Twitter Snowflake-style). The base62 encoding is unchanged — you're only
+  changing where the unique number comes from. This is the same <strong>partitioning</strong> problem
+  covered in the L5 case studies (see the <strong>Discord / partitioning</strong> material): pick a
+  partition key, avoid hot shards, keep id generation contention-free.</li>
+<li><strong>Cache hot codes.</strong> Put Redis (or an in-process cache like Caffeine) in front of the
+  <code>findByCode</code> lookup; a tiny fraction of codes serve the vast majority of redirects.
+  Terminate or cache redirects at the <strong>CDN/edge</strong> for the hottest links.</li>
+<li><strong>Get counting off the request path.</strong> Edge caching and 301s both break the in-band
+  hit counter. Real systems emit a click <strong>event</strong> (fire-and-forget to a queue/stream/log)
+  and aggregate counts <strong>asynchronously</strong>, so analytics survive caching and the redirect
+  stays sub-millisecond. The <strong>301-vs-302 trade</strong> is really "synchronous accurate counts
+  vs. cacheable speed" — async counting lets you have both.</li>
+</ul>
+<p>For the full treatment — capacity estimates, the partitioning case studies, and the
+trade-off tables — see <strong>L5/C02/T17 Worked Design — URL Shortener</strong> and the L5
+Discord/partitioning case studies.</p>
+<hr>
+<h2 id="files-to-read-first">Files to read first<a class="anchor" href="#files-to-read-first" aria-hidden="true">#</a></h2>
+<ol>
+<li><a href="src/main/java/com/javamastery/examples/urlshortener/util/Base62.java"><code>util/Base62.java</code></a>
+   — the core idea and the full why-base62-of-id rationale, with the alternatives.</li>
+<li><a href="src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java"><code>service/UrlShortenerService.java</code></a>
+   — the two-phase insert, hit counting, URL validation, transactions.</li>
+<li><a href="src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java"><code>controller/RedirectController.java</code></a>
+   — the 301-vs-302 decision, in code and comments.</li>
+<li><a href="src/main/java/com/javamastery/examples/urlshortener/entity/UrlMapping.java"><code>entity/UrlMapping.java</code></a>
+   — the data model (<code>id, code, longUrl, createdAt, hitCount</code>) and indexing.</li>
+<li><a href="src/test/java/com/javamastery/examples/urlshortener/UrlShortenerIntegrationTest.java"><code>UrlShortenerIntegrationTest.java</code></a>
+   — the end-to-end flow asserted: shorten → 302 + Location → stats hitCount.</li>
+</ol>
+<hr>
+<h2 id="project-layout">Project layout<a class="anchor" href="#project-layout" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>url-shortener/
+├── pom.xml                         Spring Boot 3.3.x, Java 21, H2 (runtime)
+├── src/main/resources/
+│   └── application.properties      H2 in-memory config (no external infra)
+└── src/main/java/com/javamastery/examples/urlshortener/
+    ├── UrlShortenerApplication.java        @SpringBootApplication entry point
+    ├── controller/
+    │   ├── UrlApiController.java            POST /api/shorten, GET /api/stats/{code}
+    │   └── RedirectController.java          GET /{code} -&gt; 302
+    ├── service/UrlShortenerService.java     business logic + base62-of-id
+    ├── repository/UrlMappingRepository.java Spring Data JPA repo
+    ├── entity/UrlMapping.java               JPA entity
+    ├── dto/                                 ShortenRequest/Response, StatsResponse (records)
+    ├── util/Base62.java                     base62 encode/decode
+    └── exception/                           CodeNotFoundException, GlobalExceptionHandler
+</code></pre></div>
+<h2 id="source-files">Source files<a class="anchor" href="#source-files" aria-hidden="true">#</a></h2>
+<p><em>15 key file(s) from <code>examples/system-designs/url-shortener/</code>. Truncated files are marked; see the repo for the full source.</em></p>
+<h3 id="pomxml"><code>pom.xml</code><a class="anchor" href="#pomxml" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!--
+      spring-boot-starter-parent gives us:
+        - a curated, conflict-free dependency BOM (we omit versions on the starters below)
+        - sensible compiler/plugin defaults
+        - the spring-boot-maven-plugin (repackage + `spring-boot:run`)
+      3.3.x is the latest Boot 3.3 line; it requires Java 17+ and is happy on 21.
+    --&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.3.5&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- look the parent up from the repository, not a local dir --&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.javamastery.examples&lt;/groupId&gt;
+    &lt;artifactId&gt;url-shortener&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;url-shortener&lt;/name&gt;
+    &lt;description&gt;Worked system-design example: a runnable URL shortener (base62-of-id) on H2.&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;!-- Targets Java 21 bytecode. Boot's compiler config turns this into a release-21 build. --&gt;
+        &lt;java.version&gt;21&lt;/java.version&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Web layer: embedded Tomcat + Spring MVC for the REST controllers. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Persistence: Spring Data JPA (Hibernate) over the UrlMapping entity. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Bean Validation (@Valid, @NotBlank, ...) on the request DTOs. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!--
+          H2 in-memory database, runtime scope. This is what lets the whole app
+          start with ZERO external infrastructure: no Postgres/MySQL to install.
+          At scale you would swap this for a real RDBMS (see README &quot;how this scales&quot;).
+        --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+            &lt;artifactId&gt;h2&lt;/artifactId&gt;
+            &lt;scope&gt;runtime&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- JUnit 5, AssertJ, MockMvc, Spring test slices. --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;!-- Enables `mvn spring-boot:run` and builds an executable fat-jar. --&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerurlshortenerapplicationjava"><code>src/main/java/com/javamastery/examples/urlshortener/UrlShortenerApplication.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerurlshortenerapplicationjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Entry point for the URL shortener.
+ *
+ * &lt;p&gt;This is the canonical &quot;worked design&quot; from L5/C02/T17 made runnable: a tiny
+ * Spring Boot service that turns long URLs into short codes and redirects on
+ * lookup, backed by an in-memory H2 database so it runs with zero external infra.
+ */
+@SpringBootApplication
+public class UrlShortenerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(UrlShortenerApplication.class, args);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenercontrollerredirectcontrollerjava"><code>src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenercontrollerredirectcontrollerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.controller;
+
+import com.javamastery.examples.urlshortener.exception.CodeNotFoundException;
+import com.javamastery.examples.urlshortener.service.UrlShortenerService;
+import java.net.URI;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * The redirect endpoint: {@code GET /{code}} → 302 to the original URL.
+ *
+ * &lt;h2&gt;Why 302 (Found / temporary) and not 301 (Moved Permanently)?&lt;/h2&gt;
+ *
+ * A 301 tells browsers, proxies, and CDNs &quot;this mapping is permanent — cache it and
+ * stop asking.&quot; That makes subsequent clicks blazing fast... but the request never
+ * reaches our server again, so &lt;b&gt;our hit counter stops incrementing&lt;/b&gt; and we lose
+ * the click analytics that are the whole point of {@code /api/stats}. A 302 keeps
+ * the redirect un-cacheable by default, so every click comes back through us and is
+ * counted.
+ *
+ * &lt;p&gt;The trade-off: 302 costs a round trip per click (higher load, slightly slower)
+ * in exchange for accurate analytics; 301 is faster and cheaper but blind. Real
+ * shorteners that want both speed and counts emit a 301/302 with explicit
+ * {@code Cache-Control} tuning, or move counting to an async/log-based pipeline.
+ * See README &quot;how this scales&quot;.
+ */
+@RestController
+public class RedirectController {
+
+    private final UrlShortenerService service;
+
+    public RedirectController(UrlShortenerService service) {
+        this.service = service;
+    }
+
+    /**
+     * Resolve a code and 302-redirect to the long URL, counting the hit.
+     *
+     * &lt;p&gt;The {@code {code:[0-9A-Za-z]+}} regex constrains the path so this mapping
+     * only matches plausible base62 codes — it won't swallow static assets, favicons,
+     * or the {@code /api} and {@code /h2-console} paths.
+     *
+     * @return 302 with a {@code Location} header, or 404 if the code is unknown
+     */
+    @GetMapping(&quot;/{code:[0-9A-Za-z]+}&quot;)
+    public ResponseEntity&lt;Void&gt; redirect(@PathVariable String code) {
+        try {
+            String longUrl = service.resolveAndCountHit(code);
+            // 302 FOUND with Location — see class javadoc for why not 301.
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(longUrl))
+                    .build();
+        } catch (CodeNotFoundException e) {
+            return ResponseEntity.notFound().build(); // bare 404, no body
+        }
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenercontrollerurlapicontrollerjava"><code>src/main/java/com/javamastery/examples/urlshortener/controller/UrlApiController.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenercontrollerurlapicontrollerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.controller;
+
+import com.javamastery.examples.urlshortener.dto.ShortenRequest;
+import com.javamastery.examples.urlshortener.dto.ShortenResponse;
+import com.javamastery.examples.urlshortener.dto.StatsResponse;
+import com.javamastery.examples.urlshortener.service.UrlShortenerService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * JSON API under {@code /api}: create short links and read their stats.
+ *
+ * &lt;p&gt;Kept separate from the redirect controller so that {@code /api/...} can never
+ * collide with the top-level {@code /{code}} redirect namespace.
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class UrlApiController {
+
+    private final UrlShortenerService service;
+
+    public UrlApiController(UrlShortenerService service) {
+        this.service = service;
+    }
+
+    /**
+     * {@code POST /api/shorten} with body {@code {&quot;url&quot;:&quot;https://...&quot;}}.
+     *
+     * &lt;p&gt;{@code @Valid} triggers bean validation on {@link ShortenRequest}; a bad or
+     * missing URL is rejected with 400 before this method body runs (see
+     * {@code GlobalExceptionHandler}). On success returns 201 Created with the code,
+     * the full short URL, and the original URL.
+     */
+    @PostMapping(&quot;/shorten&quot;)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShortenResponse shorten(@Valid @RequestBody ShortenRequest request) {
+        return service.shorten(request.url());
+    }
+
+    /**
+     * {@code GET /api/stats/{code}} → JSON stats (does NOT count as a hit).
+     * Unknown codes yield 404 via the exception handler.
+     */
+    @GetMapping(&quot;/stats/{code}&quot;)
+    public StatsResponse stats(@PathVariable String code) {
+        return service.stats(code);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenrequestjava"><code>src/main/java/com/javamastery/examples/urlshortener/dto/ShortenRequest.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenrequestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+/**
+ * Request body for {@code POST /api/shorten}.
+ *
+ * &lt;p&gt;Validation runs before the controller body via {@code @Valid}:
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@link NotBlank} — reject null/empty/whitespace-only input.&lt;/li&gt;
+ *   &lt;li&gt;{@link Pattern} — reject anything that is not an http(s) URL. This is a
+ *       cheap, defensive first cut (blocks {@code javascript:}, {@code ftp:},
+ *       {@code data:} schemes); the service does a stricter
+ *       {@link java.net.URI} parse as well.&lt;/li&gt;
+ *   &lt;li&gt;{@link Size} — bound the length to what the {@code long_url} column holds.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;DTOs are Java records: immutable, value-based carriers across the API boundary,
+ * deliberately separate from the {@code UrlMapping} entity so the persistence model
+ * can evolve without changing the wire contract.
+ */
+public record ShortenRequest(
+        @NotBlank(message = &quot;url must not be blank&quot;)
+        @Size(max = 2048, message = &quot;url must be at most 2048 characters&quot;)
+        @Pattern(
+                regexp = &quot;^https?://.+&quot;,
+                flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = &quot;url must start with http:// or https://&quot;
+        )
+        String url
+) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenresponsejava"><code>src/main/java/com/javamastery/examples/urlshortener/dto/ShortenResponse.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenresponsejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.dto;
+
+/**
+ * Response body for {@code POST /api/shorten}.
+ *
+ * @param code     the base62 short code (e.g. {@code &quot;1&quot;}, {@code &quot;b&quot;})
+ * @param shortUrl the full clickable short URL ({@code baseUrl + &quot;/&quot; + code})
+ * @param longUrl  the original URL that was shortened (echoed back for convenience)
+ */
+public record ShortenResponse(String code, String shortUrl, String longUrl) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerdtostatsresponsejava"><code>src/main/java/com/javamastery/examples/urlshortener/dto/StatsResponse.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerdtostatsresponsejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.dto;
+
+import java.time.Instant;
+
+/**
+ * Response body for {@code GET /api/stats/{code}}.
+ *
+ * @param code      the short code
+ * @param longUrl   the original URL it points to
+ * @param hitCount  number of redirects served so far
+ * @param createdAt when the mapping was created (UTC)
+ */
+public record StatsResponse(String code, String longUrl, long hitCount, Instant createdAt) {
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerentityurlmappingjava"><code>src/main/java/com/javamastery/examples/urlshortener/entity/UrlMapping.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerentityurlmappingjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import java.time.Instant;
+
+/**
+ * One row = one shortened URL.
+ *
+ * &lt;p&gt;The {@code id} is the monotonically increasing primary key; its base62
+ * encoding is the {@code code} we hand out (see
+ * {@link com.javamastery.examples.urlshortener.util.Base62}). We persist the code
+ * explicitly (rather than always recomputing it from the id) so lookups on the hot
+ * redirect path are a simple indexed read on {@code code} with no decode step, and
+ * so the code column can carry a unique index.
+ */
+@Entity
+@Table(
+        name = &quot;url_mapping&quot;,
+        indexes = {
+                // The redirect path queries by code on every hit, so it must be indexed.
+                @Index(name = &quot;ux_url_mapping_code&quot;, columnList = &quot;code&quot;, unique = true)
+        }
+)
+public class UrlMapping {
+
+    /**
+     * Auto-increment surrogate key. IDENTITY lets the database assign it on INSERT;
+     * we then derive the base62 code from it. (At extreme scale you'd replace a single
+     * IDENTITY counter with a sharded/range-allocated id generator — see README.)
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * The base62 short code.
+     *
+     * &lt;p&gt;Deliberately {@code nullable = true}: with {@code GenerationType.IDENTITY}
+     * the row is INSERTed first (so the DB can hand back the auto-increment id), and
+     * only then can we encode that id into a code and UPDATE the row. The column is
+     * therefore briefly null — for the microseconds between the two writes inside a
+     * single transaction. The {@code unique = true} index still guarantees no two
+     * committed rows share a code. (If you wanted a hard NOT NULL guarantee you'd use
+     * a pre-allocated sequence/range generator to know the id before the first insert.)
+     */
+    @Column(unique = true, length = 16)
+    private String code;
+
+    /** The original long URL we redirect to. */
+    @Column(name = &quot;long_url&quot;, nullable = false, length = 2048)
+    private String longUrl;
+
+    /** When this mapping was created (UTC instant). */
+    @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
+    private Instant createdAt;
+
+    /**
+     * Number of times the short link has been followed.
+     *
+     * &lt;p&gt;Incremented on every redirect. In this single-node demo a read-modify-write
+     * is fine; under real concurrency you'd use an atomic SQL {@code UPDATE ... SET
+     * hit_count = hit_count + 1} (or push analytics to an async pipeline) rather than
+     * load-increment-save. See README &quot;how this scales&quot;.
+     */
+    @Column(name = &quot;hit_count&quot;, nullable = false)
+    private long hitCount;
+
+    /** JPA requires a no-arg constructor. */
+    protected UrlMapping() {
+    }
+
+    public UrlMapping(String longUrl) {
+        this.longUrl = longUrl;
+        this.createdAt = Instant.now();
+        this.hitCount = 0L;
+    }
+
+    public void assignCode(String code) {
+        this.code = code;
+    }
+
+    public void incrementHitCount() {
+        this.hitCount++;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getLongUrl() {
+        return longUrl;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getHitCount() {
+        return hitCount;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerexceptioncodenotfoundexceptionjava"><code>src/main/java/com/javamastery/examples/urlshortener/exception/CodeNotFoundException.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerexceptioncodenotfoundexceptionjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.exception;
+
+/**
+ * Thrown when a short code has no mapping. Translated to HTTP 404 by the
+ * {@link GlobalExceptionHandler} (redirect path) / handled inline where needed.
+ */
+public class CodeNotFoundException extends RuntimeException {
+
+    public CodeNotFoundException(String code) {
+        super(&quot;No URL mapping for code: &quot; + code);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerexceptionglobalexceptionhandlerjava"><code>src/main/java/com/javamastery/examples/urlshortener/exception/GlobalExceptionHandler.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerexceptionglobalexceptionhandlerjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.exception;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * Translates exceptions into clean JSON error responses.
+ *
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@link CodeNotFoundException} → 404 with a small JSON body (used by the
+ *       {@code /api/stats/{code}} path; the redirect path returns a bare 404).&lt;/li&gt;
+ *   &lt;li&gt;{@link MethodArgumentNotValidException} (raised by {@code @Valid}) → 400 with
+ *       a field→message map, so a bad/missing URL gets an actionable error.&lt;/li&gt;
+ * &lt;/ul&gt;
+ */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(CodeNotFoundException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleNotFound(CodeNotFoundException ex) {
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put(&quot;error&quot;, &quot;not_found&quot;);
+        body.put(&quot;message&quot;, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidation(MethodArgumentNotValidException ex) {
+        Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(fe -&gt; fieldErrors.put(fe.getField(), fe.getDefaultMessage()));
+
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put(&quot;error&quot;, &quot;validation_failed&quot;);
+        body.put(&quot;fields&quot;, fieldErrors);
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleIllegalArgument(IllegalArgumentException ex) {
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put(&quot;error&quot;, &quot;bad_request&quot;);
+        body.put(&quot;message&quot;, ex.getMessage());
+        return ResponseEntity.badRequest().body(body);
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerrepositoryurlmappingrepositoryjava"><code>src/main/java/com/javamastery/examples/urlshortener/repository/UrlMappingRepository.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerrepositoryurlmappingrepositoryjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.repository;
+
+import com.javamastery.examples.urlshortener.entity.UrlMapping;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Spring Data JPA repository for {@link UrlMapping}.
+ *
+ * &lt;p&gt;Spring generates the implementation at runtime; {@code findByCode} is derived
+ * from the method name and resolves to a single indexed lookup on the unique
+ * {@code code} column — the query on the hot redirect path.
+ */
+public interface UrlMappingRepository extends JpaRepository&lt;UrlMapping, Long&gt; {
+
+    Optional&lt;UrlMapping&gt; findByCode(String code);
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerserviceurlshortenerservicejava"><code>src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerserviceurlshortenerservicejava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.service;
+
+import com.javamastery.examples.urlshortener.dto.ShortenResponse;
+import com.javamastery.examples.urlshortener.dto.StatsResponse;
+import com.javamastery.examples.urlshortener.entity.UrlMapping;
+import com.javamastery.examples.urlshortener.exception.CodeNotFoundException;
+import com.javamastery.examples.urlshortener.repository.UrlMappingRepository;
+import com.javamastery.examples.urlshortener.util.Base62;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Business logic for shortening, resolving, and reporting on URLs.
+ *
+ * &lt;p&gt;The controller stays thin and delegates here; this class owns the
+ * transactional boundaries and the base62-of-id code-assignment strategy.
+ */
+@Service
+public class UrlShortenerService {
+
+    private final UrlMappingRepository repository;
+    private final String baseUrl;
+
+    public UrlShortenerService(UrlMappingRepository repository,
+                               @Value(&quot;${shortener.base-url}&quot;) String baseUrl) {
+        this.repository = repository;
+        // Trim a trailing slash so we don't build &quot;http://host//code&quot;.
+        this.baseUrl = baseUrl.endsWith(&quot;/&quot;) ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    }
+
+    /**
+     * Shorten a URL.
+     *
+     * &lt;p&gt;&lt;b&gt;The base62-of-id move, in two steps:&lt;/b&gt;
+     * &lt;ol&gt;
+     *   &lt;li&gt;Persist the row first so the database assigns the auto-increment id.&lt;/li&gt;
+     *   &lt;li&gt;Encode that id with base62 and store it back as the {@code code}.&lt;/li&gt;
+     * &lt;/ol&gt;
+     * Because the id is unique by construction, the derived code is unique too — no
+     * collision check, no retry loop. The whole method is one transaction, so the
+     * second save flushes with the first commit.
+     *
+     * @param rawUrl a validated http(s) URL (already passed bean validation)
+     * @return the assigned code, the full short URL, and the original URL
+     */
+    @Transactional
+    public ShortenResponse shorten(String rawUrl) {
+        String normalized = normalizeAndValidate(rawUrl);
+
+        // Step 1: insert to obtain the auto-increment id.
+        UrlMapping mapping = repository.save(new UrlMapping(normalized));
+
+        // Step 2: derive the code from that id and persist it.
+        String code = Base62.encode(mapping.getId());
+        mapping.assignCode(code);
+        // save() within the same TX is an update; the flush happens at commit.
+        repository.save(mapping);
+
+        return new ShortenResponse(code, baseUrl + &quot;/&quot; + code, normalized);
+    }
+
+    /**
+     * Resolve a code to its long URL and count the hit.
+     *
+     * &lt;p&gt;Called on the redirect path. Increments {@code hitCount} as a side effect,
+     * which is why it is {@code @Transactional} (read-modify-write must commit).
+     *
+     * @param code the base62 short code from the path
+     * @return the long URL to redirect to
+     * @throws CodeNotFoundException if the code is unknown (→ 404)
+     */
+    @Transactional
+    public String resolveAndCountHit(String code) {
+        UrlMapping mapping = repository.findByCode(code)
+                .orElseThrow(() -&gt; new CodeNotFoundException(code));
+        // Demo-grade counter. See README: a real system uses an atomic SQL increment
+        // or an async analytics pipeline so the redirect stays fast and contention-free.
+        mapping.incrementHitCount();
+        return mapping.getLongUrl();
+    }
+
+    /**
+     * Fetch stats for a code without affecting the hit counter.
+     *
+     * @param code the base62 short code
+     * @return the stats DTO
+     * @throws CodeNotFoundException if the code is unknown (→ 404)
+     */
+    @Transactional(readOnly = true)
+    public StatsResponse stats(String code) {
+        UrlMapping mapping = repository.findByCode(code)
+                .orElseThrow(() -&gt; new CodeNotFoundException(code));
+        return new StatsResponse(
+                mapping.getCode(),
+                mapping.getLongUrl(),
+                mapping.getHitCount(),
+                mapping.getCreatedAt()
+        );
+    }
+
+    /**
+     * Defence-in-depth beyond the DTO regex: parse the URL and confirm it is an
+     * absolute http/https URI with a host. Rejects e.g. &quot;http://&quot; (no host) and
+     * non-http schemes that might slip past a loose regex.
+     */
+    private String normalizeAndValidate(String rawUrl) {
+        String trimmed = rawUrl.strip();
+        try {
+            URI uri = new URI(trimmed);
+            String scheme = uri.getScheme();
+            if (scheme == null
+                    || !(scheme.equalsIgnoreCase(&quot;http&quot;) || scheme.equalsIgnoreCase(&quot;https&quot;))
+                    || uri.getHost() == null) {
+                throw new IllegalArgumentException(&quot;Only absolute http(s) URLs are allowed: &quot; + rawUrl);
+            }
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(&quot;Malformed URL: &quot; + rawUrl, e);
+        }
+        return trimmed;
+    }
+}
+</code></pre></div>
+<h3 id="srcmainjavacomjavamasteryexamplesurlshortenerutilbase62java"><code>src/main/java/com/javamastery/examples/urlshortener/util/Base62.java</code><a class="anchor" href="#srcmainjavacomjavamasteryexamplesurlshortenerutilbase62java" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener.util;
+
+/**
+ * Base62 encoder/decoder for non-negative {@code long} identifiers.
+ *
+ * &lt;h2&gt;Why base62-of-the-auto-increment-id is the standard approach&lt;/h2&gt;
+ *
+ * The short code is just the database's monotonically increasing primary key,
+ * rendered in base62 (the alphabet {@code [0-9A-Za-z]}, 62 symbols). This is the
+ * design used by bit.ly-style shorteners, and it wins on three axes:
+ *
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;No collisions, ever.&lt;/b&gt; The id is unique by construction (it's a PK),
+ *       so the encoding of distinct ids is distinct. We never have to generate a
+ *       candidate, check the DB, and retry on a clash — that read-before-write
+ *       loop is exactly what the random/hash approaches need.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Short.&lt;/b&gt; Base62 packs ~5.95 bits per character. 6 chars cover
+ *       62^6 ≈ 56.8 billion ids; 7 chars cover ~3.5 trillion. So URLs stay tiny
+ *       for an enormous keyspace, and codes grow in length only as the id grows.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Monotonic &amp;amp; cheap.&lt;/b&gt; Generation is a pure function of an integer
+ *       the database already produced — no entropy source, no extra round trip,
+ *       trivially testable (round-trip property below).&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h2&gt;Alternatives and their trade-offs (see README for the full discussion)&lt;/h2&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;&lt;b&gt;Random code + collision check:&lt;/b&gt; generate N random base62 chars,
+ *       {@code INSERT}, retry on a unique-constraint violation. Pro: codes are
+ *       unguessable / non-enumerable (you can't walk {@code /1,/2,/3...}). Con:
+ *       needs a uniqueness check on every create, and birthday-paradox collisions
+ *       rise as the table fills, so you must size the code length for the load.&lt;/li&gt;
+ *   &lt;li&gt;&lt;b&gt;Hash the URL (e.g. MD5/SHA, take first k chars):&lt;/b&gt; deterministic, and
+ *       de-dupes identical URLs for free. Con: hash collisions are possible and
+ *       must still be handled, and you lose monotonicity. Truncating a hash trades
+ *       collision rate against code length just like the random approach.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;The cost of base62-of-id is that codes are &lt;i&gt;enumerable&lt;/i&gt; — anyone can
+ * guess that {@code /1} exists. If unguessability matters, you &quot;scramble&quot; the id
+ * before encoding (e.g. multiply by a large coprime modulo the keyspace, or run a
+ * Feistel/format-preserving permutation) so the sequence still never collides but
+ * is not walkable. We keep the plain id here for clarity.
+ */
+public final class Base62 {
+
+    /** Index = digit value, char = its base62 symbol. Order matters for round-trip. */
+    private static final char[] ALPHABET =
+            &quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&quot;.toCharArray();
+
+    private static final int BASE = ALPHABET.length; // 62
+
+    /** Reverse lookup: char -&gt; digit value, built once from ALPHABET. */
+    private static final int[] DECODE = new int[128];
+
+    static {
+        java.util.Arrays.fill(DECODE, -1);
+        for (int i = 0; i &lt; ALPHABET.length; i++) {
+            DECODE[ALPHABET[i]] = i;
+        }
+    }
+
+    private Base62() {
+        // utility class — no instances
+    }
+
+    /**
+     * Encode a non-negative long into its base62 string.
+     *
+     * &lt;p&gt;Standard positional-notation conversion: repeatedly take {@code value % 62}
+     * for the least-significant digit and divide by 62. We prepend digits (or reverse
+     * at the end) so the most-significant digit comes first, which keeps the natural
+     * ordering of ids roughly reflected in the codes.
+     *
+     * @param value the id to encode; must be {@code &gt;= 0}
+     * @return the base62 representation (&quot;0&quot; for input 0)
+     * @throws IllegalArgumentException if {@code value} is negative
+     */
+    public static String encode(long value) {
+        if (value &lt; 0) {
+            throw new IllegalArgumentException(&quot;Cannot base62-encode a negative value: &quot; + value);
+        }
+        if (value == 0) {
+            return String.valueOf(ALPHABET[0]); // &quot;0&quot;
+        }
+        StringBuilder sb = new StringBuilder();
+        while (value &gt; 0) {
+            int remainder = (int) (value % BASE);
+            sb.append(ALPHABET[remainder]);
+            value /= BASE;
+        }
+        return sb.reverse().toString(); // most-significant digit first
+    }
+
+    /**
+     * Decode a base62 string back into its long value (inverse of {@link #encode}).
+     *
+     * @param code a non-null, non-empty base62 string
+     * @return the decoded long
+     * @throws IllegalArgumentException if the string is empty or contains a non-base62 char
+     */
+    public static long decode(String code) {
+        if (code == null || code.isEmpty()) {
+            throw new IllegalArgumentException(&quot;Cannot decode null/empty base62 string&quot;);
+        }
+        long value = 0;
+        for (int i = 0; i &lt; code.length(); i++) {
+            char c = code.charAt(i);
+            int digit = (c &lt; 128) ? DECODE[c] : -1;
+            if (digit &lt; 0) {
+                throw new IllegalArgumentException(&quot;Illegal base62 character '&quot; + c + &quot;' in \&quot;&quot; + code + &quot;\&quot;&quot;);
+            }
+            value = value * BASE + digit; // Horner's method
+        }
+        return value;
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesurlshortenerbase62testjava"><code>src/test/java/com/javamastery/examples/urlshortener/Base62Test.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesurlshortenerbase62testjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.javamastery.examples.urlshortener.util.Base62;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+/**
+ * Unit tests for {@link Base62}.
+ *
+ * &lt;p&gt;The headline guarantee is the round-trip property: {@code decode(encode(n)) == n}
+ * for every non-negative id. If that holds, the encoding is a bijection over the id
+ * space, which is precisely what makes &quot;base62-of-id&quot; collision-free.
+ */
+class Base62Test {
+
+    @Test
+    void encodesKnownSmallValues() {
+        assertThat(Base62.encode(0)).isEqualTo(&quot;0&quot;);
+        assertThat(Base62.encode(1)).isEqualTo(&quot;1&quot;);
+        assertThat(Base62.encode(9)).isEqualTo(&quot;9&quot;);
+        assertThat(Base62.encode(10)).isEqualTo(&quot;A&quot;);   // 10 -&gt; 'A'
+        assertThat(Base62.encode(35)).isEqualTo(&quot;Z&quot;);   // 35 -&gt; 'Z'
+        assertThat(Base62.encode(36)).isEqualTo(&quot;a&quot;);   // 36 -&gt; 'a'
+        assertThat(Base62.encode(61)).isEqualTo(&quot;z&quot;);   // 61 -&gt; 'z' (last single digit)
+        assertThat(Base62.encode(62)).isEqualTo(&quot;10&quot;);  // first two-digit code
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {
+            0L, 1L, 61L, 62L, 100L, 12345L, 1_000_000L,
+            56_800_235_583L,           // 62^6 - 1  -&gt; last 6-char code
+            Long.MAX_VALUE             // upper bound of the id space
+    })
+    void roundTripsForRepresentativeValues(long value) {
+        String encoded = Base62.encode(value);
+        assertThat(Base62.decode(encoded))
+                .as(&quot;decode(encode(%d)) must return the original&quot;, value)
+                .isEqualTo(value);
+    }
+
+    @Test
+    void roundTripsAcrossAContiguousRange() {
+        // Exhaustively check the low ids the service hands out first.
+        for (long i = 0; i &lt; 100_000; i++) {
+            assertThat(Base62.decode(Base62.encode(i))).isEqualTo(i);
+        }
+    }
+
+    @Test
+    void codeStaysShortForLargeIds() {
+        // 62^6 distinct codes fit in 6 chars (~56.8 billion ids).
+        assertThat(Base62.encode(56_800_235_582L)).hasSize(6); // 62^6 - 2
+    }
+
+    @Test
+    void rejectsNegativeInput() {
+        assertThatThrownBy(() -&gt; Base62.encode(-1))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void rejectsIllegalCharactersOnDecode() {
+        assertThatThrownBy(() -&gt; Base62.decode(&quot;abc-def&quot;))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -&gt; Base62.decode(&quot;&quot;))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+}
+</code></pre></div>
+<h3 id="srctestjavacomjavamasteryexamplesurlshortenerurlshortenerintegrationtestjava"><code>src/test/java/com/javamastery/examples/urlshortener/UrlShortenerIntegrationTest.java</code><a class="anchor" href="#srctestjavacomjavamasteryexamplesurlshortenerurlshortenerintegrationtestjava" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">package com.javamastery.examples.urlshortener;
+
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+/**
+ * End-to-end test of the full flow on the real (H2-backed) application context:
+ * shorten → redirect (302 + Location) → stats (hitCount).
+ *
+ * &lt;p&gt;{@code @SpringBootTest} boots the whole app; {@code @AutoConfigureMockMvc}
+ * wires a {@link MockMvc} that drives the controllers without a live HTTP port.
+ * No external infrastructure is touched — H2 runs in-memory inside the test JVM.
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
+class UrlShortenerIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    void shorten_thenRedirect_thenStats() throws Exception {
+        String longUrl = &quot;https://www.example.com/some/very/long/path?with=query&amp;and=more&quot;;
+
+        // 1) POST /api/shorten -&gt; 201 with a code and short URL.
+        MvcResult shortenResult = mockMvc.perform(post(&quot;/api/shorten&quot;)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(&quot;{\&quot;url\&quot;:\&quot;&quot; + longUrl + &quot;\&quot;}&quot;))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath(&quot;$.code&quot;).value(matchesPattern(&quot;[0-9A-Za-z]+&quot;)))
+                .andExpect(jsonPath(&quot;$.shortUrl&quot;).value(startsWith(&quot;http://localhost:8080/&quot;)))
+                .andExpect(jsonPath(&quot;$.longUrl&quot;).value(longUrl))
+                .andReturn();
+
+        JsonNode body = objectMapper.readTree(shortenResult.getResponse().getContentAsString());
+        String code = body.get(&quot;code&quot;).asText();
+
+        // 2) GET /{code} -&gt; 302 redirect with the original URL in Location.
+        mockMvc.perform(get(&quot;/&quot; + code))
+                .andExpect(status().isFound()) // 302 (NOT 301 — keeps analytics flowing)
+                .andExpect(header().string(&quot;Location&quot;, longUrl));
+
+        // Hit it a second time to prove the counter accumulates.
+        mockMvc.perform(get(&quot;/&quot; + code))
+                .andExpect(status().isFound())
+                .andExpect(header().string(&quot;Location&quot;, longUrl));
+
+        // 3) GET /api/stats/{code} -&gt; hitCount reflects exactly the 2 redirects.
+        mockMvc.perform(get(&quot;/api/stats/&quot; + code))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(&quot;$.code&quot;).value(code))
+                .andExpect(jsonPath(&quot;$.longUrl&quot;).value(longUrl))
+                .andExpect(jsonPath(&quot;$.hitCount&quot;).value(2));
+    }
+
+    @Test
+    void redirect_unknownCode_returns404() throws Exception {
+        mockMvc.perform(get(&quot;/zzzzzz&quot;))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shorten_rejectsNonHttpUrl_with400() throws Exception {
+        mockMvc.perform(post(&quot;/api/shorten&quot;)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(&quot;{\&quot;url\&quot;:\&quot;ftp://example.com/file\&quot;}&quot;))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shorten_rejectsBlankUrl_with400() throws Exception {
+        mockMvc.perform(post(&quot;/api/shorten&quot;)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(&quot;{\&quot;url\&quot;:\&quot;\&quot;}&quot;))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void stats_unknownCode_returns404() throws Exception {
+        mockMvc.perform(get(&quot;/api/stats/zzzzzz&quot;))
+                .andExpect(status().isNotFound());
+    }
+}
+</code></pre></div></article>
+      <div class="raw-pane"><pre><code># URL Shortener — a worked system design, made runnable
+
+**Backs: L5/C02/T17 Worked Design — URL Shortener**
+
+This is the canonical system-design interview question turned into a real, running
+service. It takes the whiteboard design from the L5 topic and implements it as a tiny
+Spring Boot app backed by an **in-memory H2 database**, so the entire thing starts and
+serves traffic with **zero external infrastructure** — no Postgres, no Redis, no Docker.
+
+You shorten a URL, follow the short link (which redirects), and read click stats — the
+same three operations every real shortener (bit.ly, TinyURL, t.co) exposes.
+
+---
+
+## What it demonstrates
+
+- The **base62-of-the-auto-increment-id** code-generation strategy — the standard,
+  collision-free approach — implemented in a small, unit-tested utility.
+- The **read-heavy** shape of a shortener (far more redirects than creates) and where a
+  cache / CDN would slot in at scale.
+- The **301-vs-302 redirect trade-off** and why a shortener that wants click analytics
+  picks **302**.
+- Clean layering: `controller → service → repository → entity`, DTOs as records,
+  input validation with `@Valid`, and centralized error handling.
+
+It is intentionally minimal but complete: everything compiles, every endpoint works,
+and the tests prove the full shorten → redirect → stats flow.
+
+---
+
+## The design decisions (the interesting part)
+
+### 1. Short-code generation: base62 of the auto-increment id
+
+The short code is just the database primary key rendered in base62 (`[0-9A-Za-z]`,
+62 symbols). Row id `1` → `&quot;1&quot;`, id `62` → `&quot;10&quot;`, and so on. See
+[`Base62.java`](src/main/java/com/javamastery/examples/urlshortener/util/Base62.java).
+
+Why this beats the alternatives:
+
+| Approach | Collisions? | Extra DB round trip on create? | Code length | Enumerable? |
+|---|---|---|---|---|
+| **base62-of-id** (this app) | **None** — id is unique by construction | No | Short, grows with id (6 chars ≈ 56.8 B ids) | Yes (`/1`, `/2`, …) |
+| Random code + uniqueness check | Possible (birthday paradox) → retry loop | Yes (must check for clash) | Fixed; size for load | No |
+| Hash the URL (e.g. SHA, take first *k* chars) | Possible → must still handle | Maybe (de-dupes identical URLs) | Tunable via *k* | No |
+
+The one downside of base62-of-id is that codes are **enumerable** — anyone can guess that
+`/1` exists and walk the keyspace. If you need unguessable codes you keep the
+collision-free property but scramble the id before encoding (multiply by a large coprime
+modulo the keyspace, or run a small Feistel/format-preserving permutation), so the
+sequence still never collides but is not walkable. This demo keeps the plain id for
+clarity. (The full discussion lives in the comments of `Base62.java`.)
+
+**Implementation note — the two-phase insert.** With an `IDENTITY` (auto-increment) key,
+you don&#x27;t know the id until the row is inserted. So the service: (1) inserts the row to
+get the id, then (2) encodes that id and updates the row&#x27;s `code`. Both happen inside one
+transaction. That&#x27;s why the `code` column is nullable at the schema level — it&#x27;s null only
+for the microseconds between the two writes. See
+[`UrlShortenerService.shorten`](src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java).
+
+### 2. Redirect semantics: 302, not 301
+
+- **301 Moved Permanently** → browsers/proxies/CDNs cache the redirect and stop asking us.
+  Fast and cheap, but **our hit counter never increments again** — we go blind on analytics.
+- **302 Found (temporary)** → not cached by default, so every click comes back through us
+  and is counted.
+
+A shortener whose value proposition includes click analytics chooses **302** and pays for
+it with a round trip per click. See
+[`RedirectController.java`](src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java).
+
+### 3. Read-heavy → where the cache/CDN goes
+
+Creates are rare; redirects are constant and bursty (a link goes viral). The redirect path
+is a single indexed lookup on `code`. At scale you put a **cache in front of that lookup**
+(hot codes live in Redis/an in-process cache) and/or terminate redirects at the **edge/CDN**.
+The catch: caching at the edge reintroduces the same &quot;we can&#x27;t see the click&quot; problem as a
+301 — which is why real systems move counting **off the request path** (fire-and-forget
+events into a log/stream, aggregate asynchronously). See &quot;How this scales&quot; below.
+
+---
+
+## Prerequisites
+
+- **Java 21** (the project targets Java 21 bytecode; it runs on any JDK 21+).
+- **Maven 3.9+** (or use the system `mvn`).
+
+No database or other services to install — H2 runs in-memory inside the app&#x27;s JVM.
+
+---
+
+## Run it
+
+### Tests (fastest way to see it work)
+
+```bash
+mvn test
+```
+
+Runs the Base62 round-trip unit tests and the `@SpringBootTest`/MockMvc integration test
+(shorten → 302 redirect with `Location` → stats with `hitCount`). Expect:
+
+```
+Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+### Start the server
+
+```bash
+mvn spring-boot:run
+```
+
+It listens on `http://localhost:8080`.
+
+### curl the endpoints
+
+```bash
+# 1) Shorten a URL  -&gt;  201 Created
+curl -s -X POST http://localhost:8080/api/shorten \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{&quot;url&quot;:&quot;https://example.com/a/very/long/path?x=1&quot;}&#x27;
+# {&quot;code&quot;:&quot;1&quot;,&quot;shortUrl&quot;:&quot;http://localhost:8080/1&quot;,&quot;longUrl&quot;:&quot;https://example.com/a/very/long/path?x=1&quot;}
+
+# 2) Follow the short link  -&gt;  302 Found with Location header
+curl -s -i http://localhost:8080/1 | head -5
+# HTTP/1.1 302
+# Location: https://example.com/a/very/long/path?x=1
+
+# 3) Read stats (this does NOT count as a hit)
+curl -s http://localhost:8080/api/stats/1
+# {&quot;code&quot;:&quot;1&quot;,&quot;longUrl&quot;:&quot;https://example.com/...&quot;,&quot;hitCount&quot;:2,&quot;createdAt&quot;:&quot;...Z&quot;}
+
+# Unknown code  -&gt;  404
+curl -s -o /dev/null -w &#x27;%{http_code}\n&#x27; http://localhost:8080/zzzzzz   # 404
+
+# Non-http(s) URL is rejected  -&gt;  400
+curl -s -o /dev/null -w &#x27;%{http_code}\n&#x27; \
+  -X POST http://localhost:8080/api/shorten \
+  -H &#x27;Content-Type: application/json&#x27; -d &#x27;{&quot;url&quot;:&quot;ftp://nope&quot;}&#x27;          # 400
+```
+
+You can also browse the data at the H2 console: `http://localhost:8080/h2-console`
+(JDBC URL `jdbc:h2:mem:urlshortener`, user `sa`, empty password).
+
+### Expected output
+
+- `POST /api/shorten` → **201** with `{code, shortUrl, longUrl}`.
+- `GET /{code}` → **302** with a `Location` header equal to the original URL; each call
+  bumps the hit counter.
+- `GET /api/stats/{code}` → **200** with `{code, longUrl, hitCount, createdAt}`;
+  `hitCount` equals the number of redirects served.
+- Unknown code → **404**; blank or non-http(s) URL → **400**.
+
+---
+
+## How this scales (pointing back to the L5 topic)
+
+This single-node H2 app is the *correct small version* of the design. The path from here
+to internet scale is exactly the L5 discussion:
+
+- **Swap H2 for a real RDBMS** (Postgres/MySQL) and add migrations (Flyway/Liquibase)
+  instead of `ddl-auto=create-drop`.
+- **Shard the id generator.** A single `IDENTITY` counter is a write bottleneck and a
+  single point of failure. Replace it with **range/segment allocation** (each app node
+  leases a block of ids, e.g. 1–10000, and hands them out locally) or a distributed id
+  service (Twitter Snowflake-style). The base62 encoding is unchanged — you&#x27;re only
+  changing where the unique number comes from. This is the same **partitioning** problem
+  covered in the L5 case studies (see the **Discord / partitioning** material): pick a
+  partition key, avoid hot shards, keep id generation contention-free.
+- **Cache hot codes.** Put Redis (or an in-process cache like Caffeine) in front of the
+  `findByCode` lookup; a tiny fraction of codes serve the vast majority of redirects.
+  Terminate or cache redirects at the **CDN/edge** for the hottest links.
+- **Get counting off the request path.** Edge caching and 301s both break the in-band
+  hit counter. Real systems emit a click **event** (fire-and-forget to a queue/stream/log)
+  and aggregate counts **asynchronously**, so analytics survive caching and the redirect
+  stays sub-millisecond. The **301-vs-302 trade** is really &quot;synchronous accurate counts
+  vs. cacheable speed&quot; — async counting lets you have both.
+
+For the full treatment — capacity estimates, the partitioning case studies, and the
+trade-off tables — see **L5/C02/T17 Worked Design — URL Shortener** and the L5
+Discord/partitioning case studies.
+
+---
+
+## Files to read first
+
+1. [`util/Base62.java`](src/main/java/com/javamastery/examples/urlshortener/util/Base62.java)
+   — the core idea and the full why-base62-of-id rationale, with the alternatives.
+2. [`service/UrlShortenerService.java`](src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java)
+   — the two-phase insert, hit counting, URL validation, transactions.
+3. [`controller/RedirectController.java`](src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java)
+   — the 301-vs-302 decision, in code and comments.
+4. [`entity/UrlMapping.java`](src/main/java/com/javamastery/examples/urlshortener/entity/UrlMapping.java)
+   — the data model (`id, code, longUrl, createdAt, hitCount`) and indexing.
+5. [`UrlShortenerIntegrationTest.java`](src/test/java/com/javamastery/examples/urlshortener/UrlShortenerIntegrationTest.java)
+   — the end-to-end flow asserted: shorten → 302 + Location → stats hitCount.
+
+---
+
+## Project layout
+
+```
+url-shortener/
+├── pom.xml                         Spring Boot 3.3.x, Java 21, H2 (runtime)
+├── src/main/resources/
+│   └── application.properties      H2 in-memory config (no external infra)
+└── src/main/java/com/javamastery/examples/urlshortener/
+    ├── UrlShortenerApplication.java        @SpringBootApplication entry point
+    ├── controller/
+    │   ├── UrlApiController.java            POST /api/shorten, GET /api/stats/{code}
+    │   └── RedirectController.java          GET /{code} -&gt; 302
+    ├── service/UrlShortenerService.java     business logic + base62-of-id
+    ├── repository/UrlMappingRepository.java Spring Data JPA repo
+    ├── entity/UrlMapping.java               JPA entity
+    ├── dto/                                 ShortenRequest/Response, StatsResponse (records)
+    ├── util/Base62.java                     base62 encode/decode
+    └── exception/                           CodeNotFoundException, GlobalExceptionHandler
+```
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../examples/system-designs--saga-orchestrator.html"><div class="lbl">← Previous</div><div class="ttl">saga-orchestrator</div><div class="sub">Saga Orchestrator (orchestration-based, with compensation)</div></a><a class="next" href="../examples/labs--lab-01-url-shortener-in-4-hours.html"><div class="lbl">Next →</div><div class="ttl">lab-01-url-shortener-in-4-hours</div><div class="sub">Lab 01 — Build a URL Shortener in 4 Hours</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-it-demonstrates" data-toc-link>What it demonstrates</a></li><li class="lvl-2"><a href="#the-design-decisions-the-interesting-part" data-toc-link>The design decisions (the interesting part)</a></li><li class="lvl-3"><a href="#1-short-code-generation-base62-of-the-auto-increment-id" data-toc-link>1. Short-code generation: base62 of the auto-increment id</a></li><li class="lvl-3"><a href="#2-redirect-semantics-302-not-301" data-toc-link>2. Redirect semantics: 302, not 301</a></li><li class="lvl-3"><a href="#3-read-heavy-where-the-cachecdn-goes" data-toc-link>3. Read-heavy → where the cache/CDN goes</a></li><li class="lvl-2"><a href="#prerequisites" data-toc-link>Prerequisites</a></li><li class="lvl-2"><a href="#run-it" data-toc-link>Run it</a></li><li class="lvl-3"><a href="#tests-fastest-way-to-see-it-work" data-toc-link>Tests (fastest way to see it work)</a></li><li class="lvl-3"><a href="#start-the-server" data-toc-link>Start the server</a></li><li class="lvl-3"><a href="#curl-the-endpoints" data-toc-link>curl the endpoints</a></li><li class="lvl-3"><a href="#expected-output" data-toc-link>Expected output</a></li><li class="lvl-2"><a href="#how-this-scales-pointing-back-to-the-l5-topic" data-toc-link>How this scales (pointing back to the L5 topic)</a></li><li class="lvl-2"><a href="#files-to-read-first" data-toc-link>Files to read first</a></li><li class="lvl-2"><a href="#project-layout" data-toc-link>Project layout</a></li><li class="lvl-2"><a href="#source-files" data-toc-link>Source files</a></li><li class="lvl-3"><a href="#pomxml" data-toc-link>pom.xml</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerurlshortenerapplicationjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/UrlShortenerApplication.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenercontrollerredirectcontrollerjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/controller/RedirectController.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenercontrollerurlapicontrollerjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/controller/UrlApiController.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenrequestjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/dto/ShortenRequest.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerdtoshortenresponsejava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/dto/ShortenResponse.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerdtostatsresponsejava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/dto/StatsResponse.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerentityurlmappingjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/entity/UrlMapping.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerexceptioncodenotfoundexceptionjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/exception/CodeNotFoundException.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerexceptionglobalexceptionhandlerjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/exception/GlobalExceptionHandler.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerrepositoryurlmappingrepositoryjava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/repository/UrlMappingRepository.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerserviceurlshortenerservicejava" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/service/UrlShortenerService.java</a></li><li class="lvl-3"><a href="#srcmainjavacomjavamasteryexamplesurlshortenerutilbase62java" data-toc-link>src/main/java/com/javamastery/examples/urlshortener/util/Base62.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesurlshortenerbase62testjava" data-toc-link>src/test/java/com/javamastery/examples/urlshortener/Base62Test.java</a></li><li class="lvl-3"><a href="#srctestjavacomjavamasteryexamplesurlshortenerurlshortenerintegrationtestjava" data-toc-link>src/test/java/com/javamastery/examples/urlshortener/UrlShortenerIntegrationTest.java</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

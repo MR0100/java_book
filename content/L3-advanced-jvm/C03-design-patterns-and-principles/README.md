@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Advanced Java & the JVM — Design Patterns & Principles
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -31,4 +31,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 09 | Functional-style patterns in modern Java | `T09-functional-style-patterns-in-modern-java.md` | planned |
 | 10 | Anti-patterns & code smells | `T10-anti-patterns-and-code-smells.md` | planned |
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

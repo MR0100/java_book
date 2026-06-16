@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Backend Engineering — APIs — Advanced
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -32,4 +32,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 10 | Rate limiting & throttling | `T10-rate-limiting-and-throttling.md` | planned |
 | 11 | BFF (Backend for Frontend) | `T11-bff-backend-for-frontend.md` | planned |
 
-[Back to L4 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L4 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

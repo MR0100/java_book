@@ -1,0 +1,1803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Memory Leaks &amp; Heap Dump Analysis — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="active" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Memory Leaks &amp; Heap Dump Analysis</span></div>
+        <h1>Memory Leaks &amp; Heap Dump Analysis</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C02-jvm-internals-and-performance/T10-memory-leaks-and-heap-dump-analysis.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~145 min</span><span class="meta-pill date">updated 2026-06-15</span></div>
+        <div class="example-links"><a class="example-link" href="../examples/labs--lab-02-build-a-memory-leak.html"><span class="example-link-ic" aria-hidden="true">▶</span><span class="example-link-body"><span class="example-link-lbl">Runnable example</span><span class="example-link-name">Lab 02 — Build a Memory Leak (then fix it)</span><span class="example-link-sub">Hands-on Labs · lab-02-build-a-memory-leak</span></span><span class="example-link-arrow" aria-hidden="true">→</span></a></div>
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Memory Leaks &amp; Heap Dump Analysis"
+slug: memory-leaks-and-heap-dump-analysis
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "JVM Internals &amp; Performance"
+type: concept
+difficulty: advanced
+order: 10
+tags: [memory-leak, java-leak, loitering-object, reachable-not-needed, gc-cant-distinguish, leak-symptom, heap-growth-trend, death-spiral, heap-dump, hprof-format, heap-dump-on-out-of-memory-error, jcmd-gc-heap-dump, jmap-dump, jfr-allocation, eclipse-mat, jdk-mission-control, jmc, visualvm, yourkit, jprofiler, jhat-removed, shallow-heap, retained-heap, dominator-tree, dominator-analysis, leak-suspects-report, mat-workflow, oql, object-query-language, delta-analysis, two-dump-comparison, canonical-leak-patterns, unbounded-static-collection, listener-registration-leak, threadlocal-pool-leak, inner-class-outer-capture, jdbc-driver-leak, classloader-leak, native-memory-leak, jni-malloc-leak, direct-bytebuffer-leak, memory-mapped-file-leak, nmt-detail, pmap-analysis, caffeine-bounded-cache, guava-cache, soft-reference-cache, weak-reference-listener, scopedvalue-replacement, tomcat-classloader-leak, spring-di-scope, kafka-consumer-retention, hikaricp-threadlocal, continuous-leak-monitoring, memory-optimization, object-layout, object-header, mark-word, klass-pointer, field-alignment, padding, compressed-oops, compressed-oops-cliff, boxing-cost, wrapper-overhead, compact-strings, latin1-string, allocation-reduction, allocation-rate, escape-analysis, scalar-replacement, buffer-reuse, primitive-collections, eclipse-collections, fastutil, koloboke, streams-vs-loops, stringbuilder, off-heap, direct-bytebuffer, foreign-function-and-memory-api, memorysegment, memory-mapped-files, jol, java-object-layout, native-memory-tracking, valhalla-flat-layout, measure-before-optimizing]
+prerequisites: [gc-tuning-and-monitoring, gc-algorithms-serial-parallel-g1-zgc-shenandoah, garbage-collection-fundamentals, memory-model-heap-stack-metaspace, class-loading-and-class-loaders, thread-safety-patterns]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-15</p>
+<hr>
+<h1 id="memory-leaks-heap-dump-analysis">Memory Leaks &amp; Heap Dump Analysis</h1>
+<p>T09 covered GC tuning — what to do when the GC's behavior is your problem. This topic covers what to do when <em>the leak</em> is your problem. A Java memory leak isn't "forgot to free memory" (the GC handles that); it's "reachable but no longer needed objects accumulating" — and the GC has <em>no way</em> to tell "needed" from "reachable." Every production Java service eventually leaks something; the engineer who can systematically diagnose and fix a leak via heap dump analysis is the engineer who keeps the service running.</p>
+<p>The depth-bar requirement isn't "use Eclipse MAT." At the <strong>conceptual</strong> layer, a Java leak is fundamentally different from a C <code>malloc</code>/<code>free</code> leak — it's about <em>reachability</em> surviving past usefulness, often through one of a small number of canonical patterns (unbounded static collections, listeners not removed, ThreadLocals in long-lived pool workers, inner-class outer-<code>this</code> captures, JDBC driver registration retaining ClassLoaders). At the <strong>capture</strong> layer, <strong>heap dumps</strong> in HPROF format are the snapshot tool — captured via <code>-XX:+HeapDumpOnOutOfMemoryError</code> (automatic on OOM, <em>the</em> essential flag to always enable), <code>jcmd GC.heap_dump</code> (on-demand, pauses the JVM for seconds), or <code>jmap</code> (legacy). At the <strong>analysis</strong> layer, <strong>Eclipse MAT</strong> (Memory Analyzer Tool) is the dominant free tool, built around two key concepts: <strong>shallow heap</strong> (just this object's own fields) vs <strong>retained heap</strong> (all objects only reachable through this one — "how much memory would freeing this reclaim?"), and the <strong>dominator tree</strong> that organizes the heap by retention. The <strong>Leak Suspects Report</strong> automates detection of the canonical patterns. At the <strong>workflow</strong> layer, the systematic process — confirm via heap growth trend, capture dump after GC, open in MAT, read Leak Suspects, drill via histogram + retained heap, trace from suspect to GC root, identify the leak point — turns "service is OOMing" into a tractable engineering problem rather than a panic. We will cover all four layers, including native memory leaks invisible to heap dumps and the prevention patterns that stop most leaks before they ship.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c02-t09-gc-tuning-and-monitoring.html">GC tuning &amp; monitoring</a> (L3/C02/T09) — when tuning isn't enough; <a href="c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html">GC algorithms</a> (L3/C02/T08) — collector behavior under leak; <a href="c02-t07-garbage-collection-fundamentals.html">Garbage collection fundamentals</a> (L3/C02/T07) — reachability; <a href="c02-t06-memory-model-heap-stack-metaspace.html">Memory model</a> (L3/C02/T06) — heap structure + off-heap; <a href="c02-t02-class-loading-and-class-loaders.html">Class loading &amp; class loaders</a> (L3/C02/T02) — ClassLoader leaks; <a href="c01-t17-thread-safety-patterns.html">Thread-safety patterns</a> (L3/C01/T17) — ThreadLocal leak.</p></div></div>
+<h2 id="what-a-java-memory-leak-is">What a Java Memory Leak Is<a class="anchor" href="#what-a-java-memory-leak-is" aria-hidden="true">#</a></h2>
+<p>In C/C++, a leak is "allocated memory never freed" — the program loses the pointer. In Java, the GC reclaims everything unreachable, so that kind of leak is impossible. Instead:</p>
+<blockquote>
+<p><strong>A Java memory leak is an object that is <em>reachable</em> from a GC root but is <em>no longer needed</em> — yet the GC keeps it alive because reachability is all it can compute.</strong></p>
+</blockquote>
+<p>The GC sees "this is reachable, therefore live." It can't know "this is in a cache that should have evicted it" or "this listener was supposed to be removed." Java leaks come from <em>application logic</em> retaining references past their useful life.</p>
+<div class="mermaid">flowchart LR
+  R["GC root"]
+  Active["live, used"]
+  Stale["live, unused<br/>(LEAK)"]
+  Garbage["unreachable<br/>(reclaimed)"]
+  R --> Active
+  R --> Stale
+  Note["GC sees Active and Stale as both 'live'.<br/>Cannot distinguish.<br/>Stale = leak."]
+</div>
+<p>The clinical term: <strong>loitering</strong> — the object is still reachable but no longer being used.</p>
+<h2 id="symptoms-of-a-leak">Symptoms of a Leak<a class="anchor" href="#symptoms-of-a-leak" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>What it suggests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heap occupancy grows linearly over time</td>
+<td>Classic leak</td>
+</tr>
+<tr>
+<td>OOM after N hours/days</td>
+<td>Confirms growth, not capped</td>
+</tr>
+<tr>
+<td>GC frequency increases</td>
+<td>More garbage to reclaim, less reclaim per cycle</td>
+</tr>
+<tr>
+<td>Old generation fills repeatedly</td>
+<td>Long-lived objects accumulating</td>
+</tr>
+<tr>
+<td>"Death spiral": GC time approaches 100%</td>
+<td>GC working harder for less reclaim — terminal</td>
+</tr>
+<tr>
+<td>Container OOM-killed</td>
+<td>Total memory exceeded</td>
+</tr>
+</tbody>
+</table></div>
+<p>The diagnostic clue: <strong>heap occupancy <em>after</em> GC grows over time</strong>. Allocation rate is transient; live heap is structural. A graph of "heap after GC" trending upward over hours is the leak signature.</p>
+<h2 id="the-6-step-diagnostic-workflow">The 6-Step Diagnostic Workflow<a class="anchor" href="#the-6-step-diagnostic-workflow" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  C1["1. Confirm via occupancy trend"]
+  C2["2. Capture heap dump"]
+  C3["3. Open in Eclipse MAT"]
+  C4["4. Identify leak source<br/>(Leak Suspects → histogram → retained heap → path to GC root)"]
+  C5["5. Fix the code"]
+  C6["6. Verify (re-run; growth should stop)"]
+  C1 --> C2 --> C3 --> C4 --> C5 --> C6
+  C6 -- "growth resumes" --> C1
+</div>
+<h2 id="step-1-confirming-a-leak">Step 1 — Confirming a Leak<a class="anchor" href="#step-1-confirming-a-leak" aria-hidden="true">#</a></h2>
+<p>Before diagnosing, distinguish a leak from normal behavior:</p>
+<ul>
+<li><strong>Cache growing to capacity</strong>: not a leak (expected, bounded).</li>
+<li><strong>Heap occupancy stable after warm-up</strong>: not a leak (steady state).</li>
+<li><strong>Heap occupancy stable but high</strong>: not a leak (just live data).</li>
+<li><strong>Heap occupancy grows linearly over many hours</strong>: <strong>leak</strong>.</li>
+</ul>
+<p>Plot heap occupancy after GC over time. If the line is flat (saw-tooth around a stable peak) → no leak. If it climbs → leak.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Capture heap occupancy every minute from JFR:
+jcmd &lt;pid&gt; JFR.start duration=24h filename=/tmp/baseline.jfr
+# Or from Prometheus:
+rate(jvm_memory_used_bytes{area=&quot;heap&quot;}[1m])
+</code></pre></div>
+<p>Run for at least an hour; ideally a full day or two of normal traffic.</p>
+<h2 id="step-2-capturing-heap-dumps">Step 2 — Capturing Heap Dumps<a class="anchor" href="#step-2-capturing-heap-dumps" aria-hidden="true">#</a></h2>
+<p>Four methods:</p>
+<h3 id="automatic-on-oom-the-essential-flag">Automatic on OOM (the essential flag)<a class="anchor" href="#automatic-on-oom-the-essential-flag" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">java -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/dumps \
+     -jar myapp.jar
+</code></pre></div>
+<p>The JVM dumps to <code>/var/dumps/java_pid&lt;n&gt;.hprof</code> right before throwing OOM. <strong>Always enable this in production.</strong> Costs nothing if no OOM happens; saves you when one does.</p>
+<h3 id="on-demand-via-jcmd">On-demand via <code>jcmd</code><a class="anchor" href="#on-demand-via-jcmd" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Runs Full GC first; dumps only live objects
+jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof
+
+# Dump everything (live + dead — rarely useful for leak analysis):
+jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof -all
+</code></pre></div>
+<p><code>jcmd</code> is the modern way (jmap is legacy). <strong>The JVM pauses for several seconds</strong> during the dump — disruptive under load.</p>
+<h3 id="jmap-legacy"><code>jmap</code> (legacy)<a class="anchor" href="#jmap-legacy" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jmap -dump:live,format=b,file=/tmp/heap.hprof &lt;pid&gt;
+</code></pre></div>
+<p>Same effect as <code>jcmd</code>. Older but still works.</p>
+<h3 id="jfr-alternative-no-full-dump">JFR alternative (no full dump)<a class="anchor" href="#jfr-alternative-no-full-dump" aria-hidden="true">#</a></h3>
+<p>JFR samples allocations rather than capturing the whole heap — much lower overhead but less complete:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; JFR.start duration=10m settings=profile filename=/tmp/profile.jfr
+</code></pre></div>
+<p>Open in JDK Mission Control; explore the "Memory" tab. Good for live profiling; not as detailed as a heap dump for leak diagnosis.</p>
+<h2 id="the-hprof-format">The HPROF Format<a class="anchor" href="#the-hprof-format" aria-hidden="true">#</a></h2>
+<p>A binary format originally designed by Sun. Contains:</p>
+<ul>
+<li><strong>Classes</strong> loaded at the moment of the dump (each with its name, fields, parent).</li>
+<li><strong>Objects</strong> on the heap with their fields and references.</li>
+<li><strong>GC roots</strong> — every starting point the GC traces from.</li>
+<li><strong>Thread stacks</strong> at the moment of dump (locals = roots).</li>
+<li><strong>Strings</strong> (sometimes inlined; usually as separate objects).</li>
+</ul>
+<p>File size ≈ current heap size — a 4 GB heap dumps to a ~4 GB file. Compresses well (~5-10× with gzip). Transfer to your laptop for analysis; never try to analyze on production.</p>
+<h2 id="step-3-analysis-tools">Step 3 — Analysis Tools<a class="anchor" href="#step-3-analysis-tools" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Strengths</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Eclipse MAT</strong></td>
+<td>Dominator tree, Leak Suspects Report, OQL — most powerful free tool</td>
+<td>Production leak analysis</td>
+</tr>
+<tr>
+<td><strong>JDK Mission Control (JMC)</strong></td>
+<td>JFR integration; live + post-mortem</td>
+<td>Live profiling + JFR analysis</td>
+</tr>
+<tr>
+<td><strong>VisualVM</strong></td>
+<td>Bundled (historically); quick checks</td>
+<td>Dev / quick triage</td>
+</tr>
+<tr>
+<td><strong>YourKit</strong></td>
+<td>Commercial; sophisticated UI; live integration</td>
+<td>Enterprise teams</td>
+</tr>
+<tr>
+<td><strong>JProfiler</strong></td>
+<td>Commercial; similar to YourKit</td>
+<td>Enterprise teams</td>
+</tr>
+<tr>
+<td><strong>jhat</strong></td>
+<td>Removed JDK 9+; legacy web viewer</td>
+<td>Don't use</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Eclipse MAT</strong> is the workhorse. The rest of this topic assumes you're using it.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Download from https://eclipse.dev/mat/
+# Open the .hprof:
+mat /tmp/heap.hprof
+</code></pre></div>
+<p>Allocate sufficient memory to MAT (<code>mat -vmargs -Xmx8g</code> for a 4 GB dump).</p>
+<h2 id="key-concepts-shallow-vs-retained-heap-dominator-tree">Key Concepts — Shallow vs Retained Heap, Dominator Tree<a class="anchor" href="#key-concepts-shallow-vs-retained-heap-dominator-tree" aria-hidden="true">#</a></h2>
+<h3 id="shallow-heap">Shallow heap<a class="anchor" href="#shallow-heap" aria-hidden="true">#</a></h3>
+<p>The size of <em>just</em> this object's own fields — header + field bytes + alignment. Doesn't count what it references.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">HashMap object: 48 bytes shallow heap
+  (= 16-byte header + ~5 references × 4 bytes + padding)
+</code></pre></div>
+<h3 id="retained-heap">Retained heap<a class="anchor" href="#retained-heap" aria-hidden="true">#</a></h3>
+<p>The total memory that <em>would be freed</em> if this object were collected — including everything only reachable through it.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">HashMap with 1000 entries:
+  shallow heap:  48 bytes
+  retained heap: ~80 KB (includes the entries, keys, values)
+</code></pre></div>
+<p><strong>Retained heap is the metric for leak analysis.</strong> "If I fix this leak, how much memory do I get back?"</p>
+<h3 id="dominator-tree">Dominator tree<a class="anchor" href="#dominator-tree" aria-hidden="true">#</a></h3>
+<p>The most powerful concept in heap analysis. Each object's <strong>dominator</strong> is the closest ancestor through which <em>every</em> path from a root must go. If you remove the dominator, all its <strong>dominees</strong> become unreachable.</p>
+<div class="mermaid">flowchart TB
+  Root["GC Root"]
+  A["A<br/>(dominator of B, C, D)<br/>retained heap = sum of B+C+D"]
+  B["B"]
+  C["C"]
+  D["D"]
+  E["E (reachable via A AND F)"]
+  F["F (not dominator of E)"]
+  Root --> A
+  Root --> F
+  A --> B
+  A --> C
+  A --> D
+  A --> E
+  F --> E
+</div>
+<p>MAT's "Dominator Tree" view sorts by retained heap. The biggest entries are "if I freed this, I'd reclaim X MB." The pattern of large dominators often immediately suggests the leak.</p>
+<h2 id="the-leak-suspects-report">The Leak Suspects Report<a class="anchor" href="#the-leak-suspects-report" aria-hidden="true">#</a></h2>
+<p>MAT's automated analysis — open a .hprof; the first thing offered is "Leak Suspects Report":</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Problem Suspect 1
+  Class loader [com.acme.WebappClassLoader] is retaining 156 MB.
+
+Problem Suspect 2
+  Thread &quot;scheduler-1&quot; is retaining 89 MB through its ThreadLocalMap.
+</code></pre></div>
+<p>The report identifies retention patterns the algorithm recognizes:</p>
+<ul>
+<li>ClassLoaders that should be unloadable but aren't.</li>
+<li>Threads retaining large data via ThreadLocals.</li>
+<li>Very large collections.</li>
+<li>Specific known leak patterns.</li>
+</ul>
+<p><strong>Always start with the Leak Suspects Report.</strong> It catches ~70% of leaks with one click.</p>
+<h2 id="the-6-canonical-leak-patterns">The 6 Canonical Leak Patterns<a class="anchor" href="#the-6-canonical-leak-patterns" aria-hidden="true">#</a></h2>
+<h3 id="1-unbounded-static-collection">1. Unbounded static collection<a class="anchor" href="#1-unbounded-static-collection" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Cache {
+    private static final Map&lt;String, Object&gt; CACHE = new HashMap&lt;&gt;();
+
+    public static void put(String key, Object value) { CACHE.put(key, value); }
+    // ✗ NO eviction; CACHE grows forever
+}
+</code></pre></div>
+<p>Most common leak. The map grows indefinitely; entries are never removed.</p>
+<p><strong>Diagnosis</strong>: <code>CACHE</code> shows huge retained heap in MAT.
+<strong>Fix</strong>: Use a bounded cache library:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private static final Cache&lt;String, Object&gt; CACHE = Caffeine.newBuilder()
+    .maximumSize(10000)
+    .expireAfterAccess(Duration.ofMinutes(10))
+    .build();
+</code></pre></div>
+<p>Or implement an LRU/LFU eviction policy. <strong>Never use a plain <code>HashMap</code> as a cache in production.</strong></p>
+<h3 id="2-listener-registration-without-removal">2. Listener registration without removal<a class="anchor" href="#2-listener-registration-without-removal" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Component {
+    private static final List&lt;Listener&gt; LISTENERS = new ArrayList&lt;&gt;();
+    public static void addListener(Listener l) { LISTENERS.add(l); }
+    // ✗ No removeListener
+}
+
+// Caller:
+component.addListener(this::handleEvent);   // `this` is retained forever
+</code></pre></div>
+<p><code>LISTENERS</code> holds onto <code>this::handleEvent</code>, which captures <code>this</code>. <code>this</code> lives until removed (never).</p>
+<p><strong>Fix</strong>: pair every <code>addListener</code> with a <code>removeListener</code> (lifecycle-aware); or use <code>WeakReference&lt;Listener&gt;</code> to allow GC.</p>
+<h3 id="3-threadlocal-in-long-lived-thread-pool-t17-from-c01">3. ThreadLocal in long-lived thread pool (T17 from C01)<a class="anchor" href="#3-threadlocal-in-long-lived-thread-pool-t17-from-c01" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class RequestContext {
+    private static final ThreadLocal&lt;UserContext&gt; CONTEXT = new ThreadLocal&lt;&gt;();
+
+    public static void set(UserContext c) { CONTEXT.set(c); }
+    // ✗ No remove(); ThreadLocalMap retains UserContext until thread dies
+}
+</code></pre></div>
+<p>A pool worker handles many requests; each call to <code>set()</code> overwrites, but the Map <em>itself</em> grows because every distinct <em>ThreadLocal</em> (different keys) stays. More subtly: a value captured here might reference a <em>webapp</em> class — retaining the <em>entire</em> ClassLoader.</p>
+<p><strong>Fix</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try {
+    CONTEXT.set(c);
+    process();
+} finally {
+    CONTEXT.remove();   // ✓ explicit cleanup
+}
+</code></pre></div>
+<p>Or migrate to <code>ScopedValue</code> (T14 from C01) — auto-cleared on scope exit.</p>
+<h3 id="4-inner-class-capturing-outer-this">4. Inner class capturing outer <code>this</code><a class="anchor" href="#4-inner-class-capturing-outer-this" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Container {
+    private final List&lt;Item&gt; items = new ArrayList&lt;&gt;();   // BIG list
+
+    void scheduleTask() {
+        executor.submit(() -&gt; {
+            doSomething();    // ✗ lambda captures `this`; `this.items` retained
+        });
+    }
+}
+</code></pre></div>
+<p>The lambda implicitly captures <code>Container.this</code>. As long as the executor queue holds the task, <code>Container</code> (and its <code>items</code>) lives.</p>
+<p><strong>Fix</strong>: extract a static nested class or capture only what's needed:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">final List&lt;Item&gt; snapshot = items;   // snapshot the reference
+executor.submit(() -&gt; doSomethingWith(snapshot));   // doesn't capture `this`
+</code></pre></div>
+<h3 id="5-jdbc-driver-classloader-leak">5. JDBC driver ClassLoader leak<a class="anchor" href="#5-jdbc-driver-classloader-leak" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// In a webapp:
+Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);
+// This Driver class is loaded by the webapp ClassLoader.
+// java.sql.DriverManager (loaded by Bootstrap) holds a reference to the Driver.
+// → Webapp ClassLoader can never be GC'd.
+</code></pre></div>
+<p>The canonical Metaspace leak in app servers. Undeploy the webapp, redeploy — the old ClassLoader (and all its classes) stay in Metaspace forever.</p>
+<p><strong>Fix</strong>: in <code>ServletContextListener.contextDestroyed()</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public void contextDestroyed(ServletContextEvent sce) {
+    Enumeration&lt;Driver&gt; drivers = DriverManager.getDrivers();
+    while (drivers.hasMoreElements()) {
+        try {
+            DriverManager.deregisterDriver(drivers.nextElement());
+        } catch (SQLException e) { ... }
+    }
+}
+</code></pre></div>
+<p>Modern servlet containers (Tomcat 7+) do this automatically; old ones don't.</p>
+<h3 id="6-general-classloader-leak">6. General ClassLoader leak<a class="anchor" href="#6-general-classloader-leak" aria-hidden="true">#</a></h3>
+<p>Any reference from a <em>parent</em> ClassLoader's loaded class to a <em>child</em> ClassLoader's loaded class retains the child's ClassLoader.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// In a parent CL:
+static final Map&lt;String, Class&lt;?&gt;&gt; WEBAPP_CLASSES = new HashMap&lt;&gt;();
+
+// In webapp CL:
+WEBAPP_CLASSES.put(&quot;Foo&quot;, SomeWebappClass.class);
+// ✗ Parent CL now references a Class loaded by Webapp CL.
+//   Webapp CL can never be unloaded.
+</code></pre></div>
+<p>Common when:</p>
+<ul>
+<li>Loggers (java.util.logging) loaded by parent retain webapp classes.</li>
+<li>Static caches in shared libraries holding references.</li>
+<li>ThreadLocals (above).</li>
+</ul>
+<p><strong>Diagnosis</strong>: MAT's Leak Suspects Report explicitly flags ClassLoader retention.</p>
+<h2 id="the-mat-workflow">The MAT Workflow<a class="anchor" href="#the-mat-workflow" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  Open["1. Open .hprof in MAT"]
+  LSR["2. Read Leak Suspects Report<br/>(70% of leaks revealed here)"]
+  Hist["3. If unclear: Histogram view<br/>(classes by instance count)"]
+  Ret["4. Sort by retained heap descending"]
+  Path["5. Right-click → Path to GC Roots"]
+  Identify["6. Identify the retaining reference<br/>(usually a static field, ThreadLocal, or listener)"]
+  Open --> LSR --> Hist --> Ret --> Path --> Identify
+</div>
+<h3 id="histogram-view">Histogram view<a class="anchor" href="#histogram-view" aria-hidden="true">#</a></h3>
+<p>Lists every class with: instance count, shallow heap, retained heap. Sort by retained heap to find the biggest cost.</p>
+<p>Surprises in instance counts:</p>
+<ul>
+<li>10,000 <code>HashMap</code> entries when you expected ~100.</li>
+<li>50,000 <code>String</code> instances when you expected ~5,000.</li>
+<li>1,000 instances of a webapp class when you expected ~10.</li>
+</ul>
+<p>Surprises <em>are</em> the leak.</p>
+<h3 id="path-to-gc-roots">Path to GC Roots<a class="anchor" href="#path-to-gc-roots" aria-hidden="true">#</a></h3>
+<p>For a suspected leak object, right-click → "Path to GC Roots" → "exclude weak/soft references" (you want strong-retention only). MAT shows the shortest path back to a root:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Object → ArrayList.elementData[5] → ArrayList → Service.cachedEntries → static field of Service
+</code></pre></div>
+<p>The end of the path is <em>the</em> root retaining your leak. Fix that holder.</p>
+<h3 id="oql-object-query-language">OQL — Object Query Language<a class="anchor" href="#oql-object-query-language" aria-hidden="true">#</a></h3>
+<p>SQL over the heap:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-sql">-- Find all HashMaps with &gt; 1000 entries:
+SELECT * FROM java.util.HashMap WHERE size &gt; 1000
+
+-- Find Strings holding paths:
+SELECT * FROM java.lang.String WHERE toString().startsWith(&quot;/tmp/&quot;)
+
+-- Count instances per ClassLoader:
+SELECT * FROM INSTANCEOF java.lang.ClassLoader
+</code></pre></div>
+<p>Powerful for custom queries when the standard views don't fit.</p>
+<h2 id="comparing-two-heap-dumps-delta-analysis">Comparing Two Heap Dumps — Delta Analysis<a class="anchor" href="#comparing-two-heap-dumps-delta-analysis" aria-hidden="true">#</a></h2>
+<p>Take dumps at time T1 (warm-up complete) and T2 (after some workload). Compare:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># In MAT: Open both dumps, then Compare Class Histograms
+</code></pre></div>
+<p>Classes whose instance counts grew significantly between T1 and T2 are leak candidates. If <code>com.acme.UserSession</code> grew from 100 to 10,000, you found the leak.</p>
+<p>This is <em>the</em> technique for slow leaks invisible in a single dump.</p>
+<h2 id="production-heap-dump-concerns">Production Heap Dump Concerns<a class="anchor" href="#production-heap-dump-concerns" aria-hidden="true">#</a></h2>
+<p>Capturing a heap dump in production:</p>
+<ul>
+<li><strong>Pauses the JVM</strong> for several seconds (writes ~heap size to disk).</li>
+<li><strong>Disrupts traffic</strong> during the pause.</li>
+<li><strong>Generates a huge file</strong> (heap-size; often GBs).</li>
+<li><strong>Reveals data</strong> — full heap contents include user data, credentials. Treat as sensitive.</li>
+</ul>
+<p>Production-safe practices:</p>
+<ol>
+<li><strong>Enable <code>-XX:+HeapDumpOnOutOfMemoryError</code></strong> — dumps only on OOM, when service is going down anyway.</li>
+<li><strong>Direct dumps to a separate disk</strong> with sufficient space — <code>-XX:HeapDumpPath=/var/dumps</code>.</li>
+<li><strong>Don't dump under load</strong> — restart the service if needed; reproduce in staging.</li>
+<li><strong>Encrypt dumps in transit and at rest</strong>.</li>
+<li><strong>Delete dumps after analysis</strong> — they contain production data.</li>
+</ol>
+<p>For <em>live</em> leak diagnosis without disruption: prefer JFR. The detail is less, but the overhead is &lt; 1%.</p>
+<h2 id="native-memory-leaks">Native Memory Leaks<a class="anchor" href="#native-memory-leaks" aria-hidden="true">#</a></h2>
+<p>Heap dumps show only the <em>Java</em> heap. Native memory (T06's off-heap world — JNI, direct ByteBuffers, mmap, Unsafe) leaks invisibly to heap dump tools.</p>
+<h3 id="symptoms">Symptoms<a class="anchor" href="#symptoms" aria-hidden="true">#</a></h3>
+<ul>
+<li>Java heap is stable; process RSS grows.</li>
+<li><code>OutOfMemoryError: Direct buffer memory</code> (direct buffers).</li>
+<li>Container OOM-killed; heap was fine.</li>
+</ul>
+<h3 id="diagnosis-nmt-native-memory-tracking">Diagnosis: NMT (Native Memory Tracking)<a class="anchor" href="#diagnosis-nmt-native-memory-tracking" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash"># Start JVM with NMT:
+java -XX:NativeMemoryTracking=summary -jar myapp.jar
+
+# Take baseline:
+jcmd &lt;pid&gt; VM.native_memory baseline
+
+# After leak suspected:
+jcmd &lt;pid&gt; VM.native_memory summary.diff
+</code></pre></div>
+<p>Shows per-category delta: heap, Metaspace, code cache, thread stacks, GC, internal, symbols, native memory tracking, arena chunk, native heap.</p>
+<p>Growth in "native heap" with no Java-side cause → native leak (JNI, FFM, Unsafe).</p>
+<h3 id="diagnosis-pmap">Diagnosis: <code>pmap</code><a class="anchor" href="#diagnosis-pmap" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">pmap -x &lt;pid&gt;
+</code></pre></div>
+<p>Shows all process memory mappings. Compare baseline vs leaked state — growing <code>[anon]</code> regions are typically C-heap (JNI malloc) leaks.</p>
+<h3 id="direct-bytebuffer-leaks">Direct ByteBuffer leaks<a class="anchor" href="#direct-bytebuffer-leaks" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Direct buffers accumulating in a long-lived list:
+List&lt;ByteBuffer&gt; buffers = new ArrayList&lt;&gt;();
+buffers.add(ByteBuffer.allocateDirect(1024 * 1024));   // 1 MB native
+// Never released; never collected; native memory grows
+</code></pre></div>
+<p>Set <code>-XX:MaxDirectMemorySize=512m</code> to cap; you'll get <code>OutOfMemoryError: Direct buffer memory</code> when the leak hits the cap (early warning).</p>
+<h2 id="prevention-patterns">Prevention Patterns<a class="anchor" href="#prevention-patterns" aria-hidden="true">#</a></h2>
+<h3 id="bounded-caches">Bounded caches<a class="anchor" href="#bounded-caches" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Cache&lt;Key, Value&gt; cache = Caffeine.newBuilder()
+    .maximumSize(10_000)
+    .expireAfterAccess(Duration.ofMinutes(30))
+    .build();
+</code></pre></div>
+<h3 id="try-with-resources-for-autocloseable">try-with-resources for <code>AutoCloseable</code><a class="anchor" href="#try-with-resources-for-autocloseable" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (var stream = Files.newInputStream(path)) {
+    // ...
+}   // auto-close on exit
+</code></pre></div>
+<h3 id="softweak-references-where-appropriate">Soft/Weak references where appropriate<a class="anchor" href="#softweak-references-where-appropriate" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">WeakHashMap&lt;Key, Value&gt; map = new WeakHashMap&lt;&gt;();
+SoftReference&lt;Image&gt; imageCache = new SoftReference&lt;&gt;(loadImage());
+</code></pre></div>
+<h3 id="explicit-lifecycle-management">Explicit lifecycle management<a class="anchor" href="#explicit-lifecycle-management" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Resource implements AutoCloseable {
+    public void close() { releaseNativeHandle(); }
+}
+</code></pre></div>
+<h3 id="scopedvalue-instead-of-threadlocal">ScopedValue instead of ThreadLocal<a class="anchor" href="#scopedvalue-instead-of-threadlocal" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ScopedValue.where(USER, currentUser).run(() -&gt; doWork());
+// Auto-cleared on scope exit
+</code></pre></div>
+<h3 id="listener-registration-discipline">Listener registration discipline<a class="anchor" href="#listener-registration-discipline" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Component implements AutoCloseable {
+    private final Listener listener;
+    public Component(EventBus bus) {
+        this.listener = bus.subscribe(this::onEvent);
+    }
+    public void close() { listener.unsubscribe(); }
+}
+</code></pre></div>
+<h2 id="memory-optimization-patterns">Memory-Optimization Patterns<a class="anchor" href="#memory-optimization-patterns" aria-hidden="true">#</a></h2>
+<p>The whole topic so far has been <em>reactive</em>: a leak shipped, the heap is climbing, you capture a dump and hunt the loitering object. This section is the <em>proactive</em> counterpart. Even with zero leaks, two services with identical functionality can differ 3–5× in heap footprint and 10× in GC pause time purely from how they lay out and allocate objects. A leak is a bug; a fat object graph and a high allocation rate are <em>design choices</em> — and the engineer who understands the JVM's memory model (T06) well enough to make those choices deliberately ships services that run on smaller boxes, pause less, and cost less to operate.</p>
+<p>The mental frame: a leak makes memory grow <em>without bound</em>; poor footprint makes the <em>bound itself</em> needlessly high. Both end at an OOM, but you fix them with completely different tools — heap dumps for the first, object-layout awareness and allocation discipline for the second.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>This section builds directly on <a href="c02-t06-memory-model-heap-stack-metaspace.html">Memory model — heap, stack, Metaspace</a> (L3/C02/T06) for object headers, alignment, compressed oops, and the off-heap world; on <a href="c02-t07-garbage-collection-fundamentals.html">GC fundamentals</a> (L3/C02/T07) for why allocation rate drives collection frequency; and forward to <a href="c02-t15-project-valhalla-value-classes.html">Project Valhalla — value classes</a> (L3/C02/T15) for flat layout that erases much of the wrapper tax described below.</p></div></div>
+<h3 id="object-footprint-what-an-object-actually-costs">Object Footprint — What an Object Actually Costs<a class="anchor" href="#object-footprint-what-an-object-actually-costs" aria-hidden="true">#</a></h3>
+<p>The number you write in a field is not what it costs in RAM. Every Java object on the heap carries overhead the language hides from you. On HotSpot, the layout of an ordinary object is:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Object layout (64-bit HotSpot, compressed oops ON — the default heaps &lt; 32 GB):
+
+  offset  bytes  contents
+  ┌──────┬──────┬───────────────────────────────────────┐
+  │  0   │  8   │ mark word   (hash, GC age, lock bits)   │  ← object header
+  │  8   │  4   │ klass pointer (which class — compressed)│  ← object header
+  ├──────┼──────┼───────────────────────────────────────┤
+  │ 12   │  ?   │ instance fields...                      │
+  │ ...  │      │ (reordered by the JVM for packing)      │
+  ├──────┼──────┼───────────────────────────────────────┤
+  │ end  │ 0-7  │ padding to an 8-byte boundary           │  ← alignment
+  └──────┴──────┴───────────────────────────────────────┘
+</code></pre></div>
+<p>The <strong>mark word</strong> (8 bytes) holds the identity hash code (once computed), the GC age, and biased/lightweight-lock bits. The <strong>klass pointer</strong> (4 bytes when compressed, 8 otherwise) says which class this is. So even an object with <em>no fields at all</em> costs 16 bytes after alignment. An object is always padded up to a multiple of 8 bytes — <code>-XX:ObjectAlignmentInBytes</code>, default 8.</p>
+<p><strong>Field alignment and padding.</strong> The JVM reorders your declared fields to minimize padding (longs and doubles on 8-byte boundaries, ints on 4, etc.), then pads the tail. You don't control declaration order's effect on size — but you <em>do</em> control how many fields and of what type. A class with a single <code>boolean</code> field still costs 16 bytes: 12 bytes header + 1 byte boolean + 3 bytes padding.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">class Flag { boolean on; }     // 16 bytes  (header 12 + 1 + 3 pad)
+class Point { int x, y; }      // 16 bytes  (header 12 + 8 + 0 pad)
+class Point3 { int x, y, z; }  // 24 bytes  (header 12 + 12 + 0 pad)
+</code></pre></div>
+<p><strong>Compressed oops and the 32 GB cliff.</strong> An "oop" is an <em>ordinary object pointer</em> — a reference. On a 64-bit JVM, a raw reference is 8 bytes. HotSpot's <strong>compressed oops</strong> (<code>-XX:+UseCompressedOops</code>, on by default) store references as 32-bit values scaled by the 8-byte alignment, letting them address up to <code>2^32 × 8 = 32 GB</code> of heap. This halves the size of every reference field and the klass pointer — a major footprint win.</p>
+<p>The catch is the famous <strong>32 GB cliff</strong>: the moment your <code>-Xmx</code> crosses ~32 GB, compressed oops can no longer cover the heap, the JVM falls back to 8-byte references, and <em>every reference in the heap doubles</em>. A heap configured at 33 GB can hold <strong>less live data</strong> than one configured at 31 GB, because the per-reference overhead jumped. The relatable version: a 31 GB heap is like a parking garage with short stall numbers (2 digits) — compact signage everywhere; push past 32 GB and every stall needs 4-digit numbers, so the <em>signs</em> eat space that used to hold cars. The rule of thumb: never size a heap between ~32 GB and ~40 GB — either stay under 32 GB, or jump well past 40 GB so the extra capacity outweighs the doubled pointers.</p>
+<p><strong>Why <code>Integer[]</code> is far larger than <code>int[]</code>.</strong> This is the single most important footprint lesson in Java. A primitive array stores values <em>inline</em>; a wrapper array stores <em>references to boxed objects</em>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">int[] of 1000 ints (compressed oops):
+  ┌────────────────────────────────────────────────┐
+  │ array header (16 B) + 1000 × 4 B  = 4016 bytes  │   one contiguous block
+  └────────────────────────────────────────────────┘
+
+Integer[] of 1000 Integers:
+  ┌──────────────────────────────────────────┐
+  │ array header (16 B) + 1000 × 4 B refs     │  = 4016 bytes  (the refs)
+  └───┬──────────────────────────────────────┘
+      │ each ref points to a separate Integer object:
+      └─► Integer { header 12 B + int 4 B } = 16 bytes each
+          1000 × 16 B = 16000 bytes  (the boxes)
+
+  Total: ~20 KB  vs  ~4 KB  →  ~5× larger, plus 1000 extra objects for GC to trace.
+</code></pre></div>
+<p>The <code>int[]</code> is ~4 KB in one cache-friendly block. The <code>Integer[]</code> is ~20 KB scattered across 1001 objects, each with a header, each a separate GC-traceable node, each a potential cache miss when you walk the array. <strong>Wrappers cost roughly 4× the payload in header overhead alone, plus an indirection.</strong></p>
+<blockquote>
+<p><strong>The LEGO analogy.</strong> A primitive <code>int[]</code> is a tray of LEGO bricks sitting loose in one compartment — grab the tray, every brick comes with it, all touching. An <code>Integer[]</code> (or <code>List&lt;Integer&gt;</code>) is the same bricks, but each one shipped in its own cardboard box with a printed label, and the tray now holds <em>slips of paper</em> telling you which shelf each box is on. You pay for every box (the 12-byte header), every label, and the trip to a different shelf (pointer chase / cache miss) each time you want a brick.</p>
+</blockquote>
+<p><strong>Compact Strings (Java 9+).</strong> Before Java 9, every <code>String</code> stored a <code>char[]</code> — 2 bytes per character (UTF-16), even for plain ASCII text where the high byte was always zero. Java 9's <strong>Compact Strings</strong> (JEP 254) changed the backing store to a <code>byte[]</code> plus a 1-byte <code>coder</code> flag: if every character fits in Latin-1 (the common case for IDs, JSON keys, log lines, English text), the string stores <strong>1 byte per character</strong> — half the footprint. If any character needs UTF-16, it transparently uses 2 bytes per character as before. It is on by default (<code>-XX:+CompactStrings</code>) and requires no code change. For a service whose heap is dominated by ASCII strings — most web backends — this single JDK upgrade cut string footprint roughly in half for free.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">String id = &quot;ORD-2026-00417&quot;;   // Latin-1: byte[14] + coder, ~32 B total object
+String ja = &quot;注文番号&quot;;          // needs UTF-16: byte[8] (4 chars × 2), coder=UTF16
+</code></pre></div>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p>Tie this back to the chapter's memory-model material: the header, alignment, and compressed-oop behavior described in T06 are <em>exactly</em> what determines these sizes. Footprint optimization is just applying the memory model on purpose instead of by accident.</p></div></div>
+<h3 id="allocation-reduction-why-cheap-allocation-is-expensive-in-aggregate">Allocation Reduction — Why Cheap Allocation Is Expensive in Aggregate<a class="anchor" href="#allocation-reduction-why-cheap-allocation-is-expensive-in-aggregate" aria-hidden="true">#</a></h3>
+<p>Allocating an object in HotSpot is astonishingly cheap: usually a <strong>bump-the-pointer</strong> in a thread-local allocation buffer (TLAB) — a few instructions, no lock. So why care? Because allocation is cheap <em>per object</em> but the bill comes due collectively: <strong>every byte you allocate is a byte the GC must eventually scan, copy, or reclaim.</strong> Allocation rate, not live-set size, is what drives <em>minor-GC frequency</em>. A service that allocates 2 GB/s churns the young generation far more often than one allocating 200 MB/s for the same useful work — more young collections, more CPU burned on GC, more pause-time jitter (see T07 for why young-gen fills proportionally to allocation rate).</p>
+<p>The relatable version: allocating is like grabbing a fresh paper cup for each sip of water. One cup is free. Ten thousand cups an hour means someone is constantly emptying the bin — and that someone (the GC) competes with your application for the CPU.</p>
+<p><strong>Escape analysis and scalar replacement.</strong> The C2 JIT (T04) can sometimes make allocation <em>vanish entirely</em>. <strong>Escape analysis</strong> proves an object never "escapes" the method that created it — it isn't stored in a field, returned, or passed somewhere that outlives the call. If it can prove that, <strong>scalar replacement</strong> breaks the object into its individual fields and keeps them in registers/stack slots: zero heap allocation, zero GC pressure.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Likely scalar-replaced — the Point never escapes:
+double distance(double x, double y) {
+    Point p = new Point(x, y);   // JIT may elide this allocation entirely
+    return Math.sqrt(p.x * p.x + p.y * p.y);
+}
+
+// Cannot be elided — the object escapes via the return:
+Point makePoint(double x, double y) {
+    return new Point(x, y);      // must live on the heap; caller keeps it
+}
+</code></pre></div>
+<p>When it <em>can't</em> elide: the object is stored in a field, returned, passed to a non-inlined method, captured by a lambda that outlives the frame, or the allocation is inside a megamorphic call site the JIT couldn't inline. Escape analysis is a wonderful optimization but a fragile one — never <em>rely</em> on it for a hot path; verify with <code>-XX:+PrintEscapeAnalysis</code> (debug builds) or by watching allocation profiles in JFR/async-profiler (T11). When in doubt, structure the code so the object obviously doesn't escape.</p>
+<p><strong>Reusing buffers.</strong> In hot loops, allocate the working buffer once and reuse it rather than allocating per iteration:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Allocates a new byte[] every call — high allocation rate
+void copy(InputStream in, OutputStream out) throws IOException {
+    int n;
+    while ((n = in.read(new byte[8192])) != -1) out.write(/*...*/, 0, n); // fresh array each read
+}
+
+// ✓ One buffer, reused
+void copy(InputStream in, OutputStream out) throws IOException {
+    byte[] buf = new byte[8192];
+    int n;
+    while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+}
+</code></pre></div>
+<p>For thread-confined reuse without sharing hazards, a <code>ThreadLocal&lt;byte[]&gt;</code> works — but remember the ThreadLocal-in-pool caveat from earlier in this topic: clear or bound it.</p>
+<p><strong>Avoiding needless autoboxing.</strong> Autoboxing silently allocates <code>Integer</code>/<code>Long</code>/<code>Double</code> objects, and in tight loops it dominates the allocation profile:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Each += autoboxes long → Long → long: millions of throwaway Long objects
+Long sum = 0L;
+for (long v : values) sum += v;     // sum = Long.valueOf(sum.longValue() + v)
+
+// ✓ Primitive accumulator: zero allocation
+long sum = 0L;
+for (long v : values) sum += v;
+</code></pre></div>
+<p>The <code>Integer</code> cache (<code>-128..127</code>, via <code>Integer.valueOf</code>) hides this for small values but not for the general case. A <code>Map&lt;Integer, Integer&gt;</code> autoboxes on every <code>put</code>/<code>get</code>/<code>merge</code>.</p>
+<p><strong>Primitive collections vs <code>HashMap&lt;Integer, Integer&gt;</code>.</strong> A <code>HashMap&lt;Integer, Integer&gt;</code> is a footprint disaster: every entry is a <code>HashMap.Node</code> (32 bytes: header + hash + key ref + value ref + next ref), plus a boxed <code>Integer</code> key (16 B) and a boxed <code>Integer</code> value (16 B) — roughly <strong>64 bytes to store 8 bytes of actual data</strong>, an 8× overhead, before counting the backing array and load-factor slack. Primitive-specialized collections store keys and values in primitive arrays with open addressing — no per-entry node, no boxing:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Type for int→int</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Eclipse Collections</strong></td>
+<td><code>IntIntHashMap</code></td>
+<td>Mature, broad API, GS Collections lineage</td>
+</tr>
+<tr>
+<td><strong>fastutil</strong></td>
+<td><code>Int2IntOpenHashMap</code></td>
+<td>Very fast, huge surface area, big jar</td>
+</tr>
+<tr>
+<td><strong>Koloboke</strong></td>
+<td><code>HashIntIntMap</code></td>
+<td>Generated, very low overhead</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ ~64 B/entry, boxes on every access, extra GC nodes
+Map&lt;Integer, Integer&gt; counts = new HashMap&lt;&gt;();
+counts.merge(key, 1, Integer::sum);
+
+// ✓ Two int[] arrays, no boxing, ~8-16 B/entry, cache-friendly
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+IntIntHashMap counts = new IntIntHashMap();
+counts.addToValue(key, 1);
+</code></pre></div>
+<p>For a large <code>int→int</code> or <code>long→long</code> map this is routinely a <strong>4–8× heap reduction</strong> plus far less GC churn.</p>
+<p><strong>Streams vs loops — allocation, not dogma.</strong> Streams are expressive and usually fine, but on a hot path they can allocate more than the equivalent loop: the stream pipeline itself, lambdas (when they capture), <code>Spliterator</code>s, and especially <strong>boxing in numeric pipelines</strong>. Prefer the primitive stream specializations (<code>IntStream</code>, <code>LongStream</code>, <code>DoubleStream</code>) over <code>Stream&lt;Integer&gt;</code> to avoid boxing, and don't be afraid of a plain <code>for</code> loop in a measured hot path:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ Boxes every element into Integer
+int total = list.stream().reduce(0, Integer::sum);
+
+// ✓ Primitive stream, no boxing
+int total = list.stream().mapToInt(Integer::intValue).sum();
+
+// ✓ Plain loop on a hot path — zero pipeline allocation
+int total = 0;
+for (int v : arr) total += v;
+</code></pre></div>
+<p>This is a <em>measure-then-decide</em> call, not a blanket "avoid streams." Most code is not hot enough to matter.</p>
+<p><strong>String handling.</strong> String concatenation in a loop is the classic allocation trap. <code>a + b</code> compiles to efficient <code>invokedynamic</code>/<code>StringConcatFactory</code> for a <em>single</em> expression, but <code>+=</code> inside a loop creates a new string (and a new backing <code>byte[]</code>) on every iteration — quadratic allocation:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ O(n²) allocation: each += builds a whole new String
+String csv = &quot;&quot;;
+for (String field : fields) csv += field + &quot;,&quot;;
+
+// ✓ One StringBuilder, one resizing buffer
+StringBuilder sb = new StringBuilder(fields.size() * 16);  // pre-size to avoid resizes
+for (String field : fields) sb.append(field).append(',');
+String csv = sb.toString();
+</code></pre></div>
+<p>Pre-sizing the <code>StringBuilder</code> (and likewise <code>new ArrayList&lt;&gt;(expectedSize)</code>, <code>new HashMap&lt;&gt;(expectedCapacity)</code>) avoids repeated grow-and-copy reallocations.</p>
+<h3 id="off-heap-and-specialized-layouts">Off-Heap and Specialized Layouts<a class="anchor" href="#off-heap-and-specialized-layouts" aria-hidden="true">#</a></h3>
+<p>Sometimes the answer is to keep data <em>out of the Java heap entirely</em> — so the GC never has to scan it. This trades GC pressure for manual lifetime management and complexity.</p>
+<p><strong>Direct <code>ByteBuffer</code>.</strong> <code>ByteBuffer.allocateDirect(n)</code> allocates memory outside the Java heap; the GC sees only a small wrapper object. Useful for large, long-lived binary buffers (network/IO, caches of serialized data) that would otherwise bloat the heap and lengthen GC scans. The cost: the memory is reclaimed only when the wrapper is collected (via a <code>Cleaner</code>) — non-deterministic — and it's capped by <code>-XX:MaxDirectMemorySize</code>. (This is exactly the direct-buffer <em>leak</em> hazard described earlier in this topic; off-heap is a tool, not a free lunch.)</p>
+<p><strong>Foreign Function &amp; Memory API (<code>MemorySegment</code>).</strong> The modern, safe successor to <code>Unsafe</code> and raw direct buffers, finalized in Java 22 (JEP 454) and introduced through T06. A <code>MemorySegment</code> is a typed, bounds-checked, deterministically-freed handle to off-heap (or on-heap) memory, scoped by an <code>Arena</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try (Arena arena = Arena.ofConfined()) {
+    MemorySegment seg = arena.allocate(1_000_000L * Long.BYTES);   // off-heap, 8 MB
+    for (long i = 0; i &lt; 1_000_000L; i++) {
+        seg.setAtIndex(ValueLayout.JAVA_LONG, i, i * i);
+    }
+    long v = seg.getAtIndex(ValueLayout.JAVA_LONG, 42);            // bounds-checked read
+}   // arena close → memory freed deterministically, no GC, no Cleaner lag
+</code></pre></div>
+<p>The <code>Arena</code> gives you <strong>deterministic lifetime</strong> (freed at <code>close()</code>, not whenever a <code>Cleaner</code> runs) and bounds-checking the old <code>Unsafe</code> path lacked — the right modern choice when you genuinely need off-heap.</p>
+<p><strong>Memory-mapped files.</strong> <code>FileChannel.map(...)</code> (or <code>Arena.ofShared()</code> with <code>FileChannel.map</code> into a <code>MemorySegment</code>) maps a file into the address space, letting the OS page data in and out on demand. This holds datasets far larger than RAM with no heap cost — the standard technique behind embedded stores, columnar formats, and large read-mostly indexes. The trade-off is that access cost becomes a <em>page fault</em> (disk latency) rather than a memory read, and you again own the lifetime.</p>
+<p><strong>When to go off-heap — the trade-off ledger:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Go off-heap when...</th>
+<th>Stay on-heap when...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data is large, long-lived, and GC scans of it hurt pause times</td>
+<td>Data is small or short-lived (let the young gen handle it)</td>
+</tr>
+<tr>
+<td>Layout is simple (bytes, primitives, fixed records)</td>
+<td>Data is a rich graph of Java objects</td>
+</tr>
+<tr>
+<td>You can manage lifetime deterministically (<code>Arena</code>, explicit free)</td>
+<td>You want the GC to manage lifetime for you</td>
+</tr>
+<tr>
+<td>You need a cache bigger than the heap, or data shared across processes (mmap)</td>
+<td>Complexity/bug-risk of manual memory isn't worth it</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>Forward nod — Project Valhalla.</strong> Much of the wrapper tax above exists because <em>every</em> object today is a heap node with a header and an identity. <a href="c02-t15-project-valhalla-value-classes.html">Project Valhalla — value classes</a> (L3/C02/T15) introduces value classes whose instances have <em>no identity</em> and can be laid out <strong>flat and inline</strong> — a <code>Point[]</code> of value <code>Point</code>s could store the <code>x</code>/<code>y</code> pairs contiguously like a primitive array, with no per-element header and no indirection. When it lands, the "<code>Integer[]</code> is 5× larger than <code>int[]</code>" problem largely dissolves for value types, and many of the primitive-collection workarounds become unnecessary. Until then, the patterns above are how you get flat-layout-like footprint today.</p>
+</blockquote>
+<h3 id="sizing-and-measuring-footprint-measure-before-you-optimize">Sizing and Measuring Footprint — Measure Before You Optimize<a class="anchor" href="#sizing-and-measuring-footprint-measure-before-you-optimize" aria-hidden="true">#</a></h3>
+<p>The cardinal rule of footprint work mirrors all performance work (T13): <strong>measure first.</strong> Object sizes are non-obvious — header overhead, alignment padding, and compressed-oop state make hand-arithmetic unreliable. Use tools.</p>
+<p><strong>JOL — Java Object Layout.</strong> OpenJDK's authoritative tool for "how big is this object, <em>actually</em>, on this JVM, with these flags?" It prints the real field offsets, header, and padding:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// dependency: org.openjdk.jol:jol-core
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.info.GraphLayout;
+
+System.out.println(ClassLayout.parseInstance(new java.util.HashMap&lt;&gt;()).toPrintable());
+// → exact header + field offsets + padding for one object
+
+System.out.println(GraphLayout.parseInstance(myBigGraph).totalSize());
+// → deep retained size of an entire object graph, in bytes
+</code></pre></div>
+<p><code>ClassLayout</code> shows one object's shallow layout (and reveals padding you can sometimes remove by reordering related objects); <code>GraphLayout</code> walks the reachable graph and reports its true deep size — perfect for comparing "boxed map vs primitive map" before committing.</p>
+<p><strong><code>-XX:+UseCompressedOops</code> and the cliff.</strong> Confirm it's on (it is by default under 32 GB) and use it to reason about the cliff: if <code>-Xmx</code> is near 32 GB, check whether dropping below 32 GB actually <em>increases</em> effective capacity. Pair with <code>-XX:+PrintFlagsFinal | grep -i oop</code> to see the resolved settings.</p>
+<p><strong>Native Memory Tracking (NMT).</strong> Already introduced in this topic for native <em>leaks</em> — it's equally useful for footprint <em>accounting</em>. <code>jcmd &lt;pid&gt; VM.native_memory summary</code> attributes process memory across heap, Metaspace, code cache, thread stacks, GC structures, and direct/off-heap, so you can see whether your "memory problem" is even in the Java heap before you start optimizing object layout. If RSS is dominated by thread stacks (too many threads × <code>-Xss</code>) or by off-heap buffers, no amount of object-layout tuning will help.</p>
+<p><strong>Allocation profiling.</strong> To attack allocation <em>rate</em> (not footprint), profile <em>where</em> allocations happen: JFR's <code>jdk.ObjectAllocationSample</code> events or <strong>async-profiler</strong> in <code>alloc</code> mode (both in T11) produce allocation flame graphs that point straight at the hot allocation sites worth fixing. Optimize the top of that flame graph; ignore the rest.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A strong answer to "how would you reduce a Java service's memory footprint?" moves through layers in order: (1) <strong>measure first</strong> — is the pressure even in the Java heap? Use NMT to rule out thread stacks / off-heap, and a heap histogram + JOL to find the dominant object types; (2) <strong>attack the dominant type</strong> — if it's a <code>HashMap&lt;Integer,Integer&gt;</code> or <code>Map&lt;Long,Long&gt;</code>, swap in a primitive collection (Eclipse Collections / fastutil) for a 4–8× reduction; if it's strings, confirm Compact Strings is active (Java 9+) and intern/dedup where appropriate; (3) <strong>cut allocation rate</strong> to ease GC — avoid autoboxing in hot loops, reuse buffers, prefer primitive streams or plain loops on measured hot paths, and let escape analysis elide short-lived objects (but never <em>rely</em> on it); (4) <strong>consider off-heap</strong> (<code>MemorySegment</code> / direct buffers / mmap) only for large, simple, long-lived data where GC scans of the heap are the actual bottleneck, accepting manual lifetime; (5) <strong>mind the 32 GB compressed-oops cliff</strong> when sizing the heap. The senior signal is leading with measurement and naming the <em>trade-offs</em> — off-heap removes GC pressure but reintroduces manual-lifetime bugs (exactly the direct-buffer leak we diagnose earlier in this topic).</p></div></div>
+<h3 id="real-world-scenario-from-maplong-long-to-a-primitive-map">Real-World Scenario — From <code>Map&lt;Long, Long&gt;</code> to a Primitive Map<a class="anchor" href="#real-world-scenario-from-maplong-long-to-a-primitive-map" aria-hidden="true">#</a></h3>
+<p>A real shape of this problem: a recommendation service kept an in-memory index mapping <code>userId (long) → lastSeenItemId (long)</code> for ~40 million users in a <code>HashMap&lt;Long, Long&gt;</code>. The heap sat around 9 GB, <code>-Xmx</code> was 12 GB, and G1 old-gen pauses crept toward 400 ms as the map dominated the live set — every full marking phase had to trace ~120 million objects (one <code>Node</code> + two boxed <code>Long</code>s per entry).</p>
+<p>The footprint math: each entry is roughly a 32-byte <code>HashMap.Node</code> + a 16-byte boxed <code>Long</code> key + a 16-byte boxed <code>Long</code> value = ~64 bytes, plus backing-array slack — about <strong>2.6 GB of node/box overhead</strong> for 640 MB of actual <code>long</code> payload, and ~120M extra GC-traceable objects.</p>
+<p>The fix was a single data-structure swap to an Eclipse Collections <code>LongLongHashMap</code> (two <code>long[]</code> arrays, open addressing, zero boxing). The same 40M mappings dropped to roughly <strong>0.7–0.9 GB</strong> — a ~3–4× reduction — and, because the map was now ~80M <em>fewer</em> objects for the GC to trace, old-gen pause times fell back under 100 ms. No algorithm changed; no leak existed; the service simply stopped shipping each <code>long</code> in its own labeled box and put them loose in two trays.</p>
+<p>When even that wasn't enough for a <em>larger</em> index (hundreds of millions of entries that didn't need to be on-heap at all), the next step was an <strong>off-heap</strong> open-addressed table backed by a <code>MemorySegment</code>/mmap region: the index lived outside the heap, the GC never scanned it, <code>-Xmx</code> shrank dramatically, and lookups paid an off-heap read instead of a heap dereference — the on-heap GC pressure for that structure went to zero, at the cost of owning the segment's lifetime via an <code>Arena</code>.</p>
+<h2 id="real-world-examples">Real-World Examples<a class="anchor" href="#real-world-examples" aria-hidden="true">#</a></h2>
+<h3 id="tomcat-classloader-leak">Tomcat ClassLoader leak<a class="anchor" href="#tomcat-classloader-leak" aria-hidden="true">#</a></h3>
+<p>Webapp registers a JDBC driver; on undeploy, driver isn't deregistered; DriverManager holds the driver class; webapp CL retained.</p>
+<p><strong>Fix</strong>: Tomcat 7+ auto-deregisters; manual deregistration in <code>contextDestroyed</code> for older.</p>
+<h3 id="spring-di-scope-misuse">Spring DI scope misuse<a class="anchor" href="#spring-di-scope-misuse" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service @Scope(&quot;singleton&quot;)
+public class CounterService {
+    @Autowired SessionState state;   // ✗ injects session-scoped bean into singleton
+}
+</code></pre></div>
+<p>The singleton holds a stale reference to a session bean; session never collects.</p>
+<p><strong>Fix</strong>: scoped proxies, or use <code>ObjectProvider&lt;SessionState&gt;</code> for explicit lookup.</p>
+<h3 id="kafka-consumer-record-retention">Kafka consumer record retention<a class="anchor" href="#kafka-consumer-record-retention" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ConsumerRecords&lt;K, V&gt; records = consumer.poll(Duration.ofMillis(100));
+allRecords.addAll(records);   // ✗ growing list of records
+</code></pre></div>
+<p>Consumer holds raw record buffers; the list accumulates them in memory.</p>
+<p><strong>Fix</strong>: process and discard records eagerly; don't accumulate.</p>
+<h3 id="hikaricp-threadlocal-context">HikariCP ThreadLocal context<a class="anchor" href="#hikaricp-threadlocal-context" aria-hidden="true">#</a></h3>
+<p>HikariCP (and other DB pools) attach ThreadLocal context to threads. Pool workers retain these forever. The connection pool itself bounds this, but webapp classes referenced through them can leak.</p>
+<p><strong>Fix</strong>: ensure pool shutdown on app shutdown; modern HikariCP does this correctly.</p>
+<h2 id="continuous-leak-monitoring">Continuous Leak Monitoring<a class="anchor" href="#continuous-leak-monitoring" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># Prometheus alert rule:
+- alert: HeapGrowingOverTime
+  expr: |
+    (
+      avg_over_time(jvm_memory_used_bytes{area=&quot;heap&quot;}[1h])
+      -
+      avg_over_time(jvm_memory_used_bytes{area=&quot;heap&quot;}[1h] offset 24h)
+    ) &gt; 500_000_000     # 500 MB growth in 24h
+  for: 6h
+  labels:
+    severity: warning
+  annotations:
+    summary: &quot;Heap growing over time — potential leak&quot;
+</code></pre></div>
+<p>The alert triggers if heap-after-GC has grown &gt; 500 MB in 24 hours, persisting for 6 hours. Suspends false positives from caches still warming up.</p>
+<p>For high-frequency monitoring: trigger an automatic heap dump on a threshold (rare in practice; usually manual after alert).</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="confusing-caches-with-leaks">Confusing caches with leaks<a class="anchor" href="#confusing-caches-with-leaks" aria-hidden="true">#</a></h3>
+<p>A growing cache that's bounded is not a leak. Look at the <em>trend over time</em>; if it stabilizes, it's a cache.</p>
+<h3 id="taking-dumps-under-load">Taking dumps under load<a class="anchor" href="#taking-dumps-under-load" aria-hidden="true">#</a></h3>
+<p>Disrupts production. Use HeapDumpOnOOM (passive) or reproduce in staging.</p>
+<h3 id="not-using-mat">Not using MAT<a class="anchor" href="#not-using-mat" aria-hidden="true">#</a></h3>
+<p>VisualVM's leak analysis is much weaker than MAT's. Spend the 30 minutes to learn MAT.</p>
+<h3 id="looking-only-at-shallow-heap">Looking only at shallow heap<a class="anchor" href="#looking-only-at-shallow-heap" aria-hidden="true">#</a></h3>
+<p>Shallow heap rarely matches the leak source. Always sort by retained heap.</p>
+<h3 id="fixing-one-leak-missing-the-bigger-one">Fixing one leak, missing the bigger one<a class="anchor" href="#fixing-one-leak-missing-the-bigger-one" aria-hidden="true">#</a></h3>
+<p>Heap analysis reveals one leak; you fix it; the next leak is the new big one. Iterate.</p>
+<h3 id="treating-native-leaks-as-java-leaks">Treating native leaks as Java leaks<a class="anchor" href="#treating-native-leaks-as-java-leaks" aria-hidden="true">#</a></h3>
+<p>Heap dump won't show them. Use NMT + pmap.</p>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Reproduce an unbounded cache.</strong> Build a <code>HashMap</code> accumulating entries; run to OOM; take heap dump; verify the cache is the dominator.</li>
+<li><strong>Listener leak.</strong> Register listeners without removal; observe growth; fix with <code>WeakReference</code>; verify.</li>
+<li><strong>ThreadLocal leak.</strong> Set ThreadLocal in a pool worker without removing; observe growth via JFR + heap dump.</li>
+<li><strong>Inner class capture.</strong> Create an <code>Outer</code> class with a large List; submit a lambda capturing <code>this</code> to a long-lived queue; verify <code>Outer</code> retained.</li>
+<li><strong>JDBC driver leak (Tomcat 6 simulation).</strong> Register a Driver; undeploy webapp; verify ClassLoader retained.</li>
+<li><strong>MAT Leak Suspects Report.</strong> Take a heap dump from any leaking app; run the report; observe the automated finding.</li>
+<li><strong>Dominator tree drill-down.</strong> With a complex heap, sort by retained heap; drill down 3 levels; understand who dominates what.</li>
+<li><strong>OQL query.</strong> Find all HashMaps with &gt; 1000 entries via OQL; identify which ones are suspicious.</li>
+<li><strong>Two-dump comparison.</strong> Take dumps at T1 and T2 with significant intervening load; compare class histograms in MAT; identify growth.</li>
+<li><strong>Native memory leak via direct buffers.</strong> Allocate direct buffers in a loop without releasing; observe <code>OutOfMemoryError: Direct buffer memory</code> with <code>-XX:MaxDirectMemorySize=512m</code>.</li>
+<li><strong>NMT baseline + diff.</strong> Enable NMT; baseline; trigger a leak; observe the category showing growth.</li>
+<li><strong>Prevention pattern migration.</strong> Take a leaky cache; migrate to Caffeine bounded; verify steady-state memory.</li>
+<li><strong>Measure object size with JOL.</strong> Add <code>org.openjdk.jol:jol-core</code>; print <code>ClassLayout.parseInstance(...)</code> for a small class with one <code>boolean</code>, then one with two <code>int</code>s; confirm the 12-byte header and the alignment padding by hand.</li>
+<li><strong><code>int[]</code> vs <code>Integer[]</code> footprint.</strong> Use JOL's <code>GraphLayout.parseInstance(...).totalSize()</code> to measure an <code>int[1000]</code> and an <code>Integer[1000]</code>; confirm the ~5× difference and explain it in terms of headers and indirection.</li>
+<li><strong>Compressed-oops cliff.</strong> Run the same allocation-heavy workload at <code>-Xmx30g</code> and <code>-Xmx33g</code>; with <code>-XX:+PrintFlagsFinal | grep -i oop</code>, observe compressed oops disabling above 32 GB and reason about why effective capacity can <em>drop</em>.</li>
+<li><strong>Compact Strings.</strong> On Java 9+, build a large list of ASCII strings vs strings containing one non-Latin-1 character; compare deep size with JOL and confirm the 1-byte vs 2-byte-per-char backing store.</li>
+<li><strong>Boxing allocation in a loop.</strong> Sum a large <code>long[]</code> first into a <code>Long</code> accumulator, then a primitive <code>long</code>; profile allocation with async-profiler (<code>alloc</code> mode) or JFR and compare the throwaway <code>Long</code> count.</li>
+<li><strong>Escape analysis.</strong> Write a method that creates a short-lived object used only locally; verify with allocation profiling that C2 elides the allocation, then change the method to <em>return</em> the object and confirm the allocation reappears.</li>
+<li><strong>Primitive map migration.</strong> Replace a <code>HashMap&lt;Long, Long&gt;</code> holding ~1M entries with an Eclipse Collections <code>LongLongHashMap</code> (or fastutil <code>Long2LongOpenHashMap</code>); measure heap before/after with a heap histogram and confirm the multi-× reduction.</li>
+<li><strong>Off-heap with <code>MemorySegment</code>.</strong> Store 1M <code>long</code>s in an <code>Arena.ofConfined()</code>-allocated <code>MemorySegment</code>; confirm the Java heap stays flat (it's off-heap) and that memory is freed deterministically at <code>Arena.close()</code>.</li>
+<li><strong>Buffer reuse.</strong> Take a copy loop that allocates a fresh <code>byte[]</code> per read; refactor to reuse one buffer; compare allocation rate via JFR.</li>
+<li><strong>StringBuilder pre-sizing.</strong> Build a large CSV with <code>+=</code> in a loop, then with a pre-sized <code>StringBuilder</code>; measure allocation and time; explain the quadratic behavior of the naive version.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Define a <strong>Java memory leak</strong> as "reachable from a root but no longer needed" — GC can't distinguish needed from reachable; the term "loitering" captures the semantics.</li>
+<li>Recognize <strong>leak symptoms</strong>: heap grows over time, OOM eventually, GC frequency increases, "death spiral" of more GC for less reclaim, container OOM-killed.</li>
+<li>Apply the <strong>6-step diagnostic workflow</strong>: confirm via occupancy trend → capture heap dump → open in MAT → identify source → fix → verify.</li>
+<li>Capture heap dumps via <strong><code>-XX:+HeapDumpOnOutOfMemoryError</code></strong> (always enable in production), <strong><code>jcmd GC.heap_dump</code></strong> (on-demand, pauses JVM), <strong><code>jmap -dump:live</code></strong> (legacy), or <strong>JFR</strong> (lighter alternative for live profiling).</li>
+<li>Understand the <strong>HPROF format</strong>: binary; classes + objects + references + GC roots + thread stacks; file size ~ heap size.</li>
+<li>Use <strong>Eclipse MAT</strong> as the dominant free analysis tool; allocate sufficient memory for analysis.</li>
+<li>Distinguish <strong>shallow heap</strong> (just this object's fields) from <strong>retained heap</strong> (all objects only reachable through this one — "how much memory would freeing this reclaim?"); use retained heap for leak analysis.</li>
+<li>Apply the <strong>dominator tree</strong>: each object's dominator is the closest ancestor through which all paths from roots go; removing a dominator frees all its dominees.</li>
+<li>Use the <strong>Leak Suspects Report</strong> as the first diagnostic step — catches ~70% of leaks automatically.</li>
+<li>Recognize the <strong>6 canonical leak patterns</strong>: unbounded static collection, listener registration without removal, ThreadLocal in pool worker, inner class capturing outer, JDBC driver registration (DriverManager → ClassLoader), general ClassLoader retention.</li>
+<li>Apply the <strong>MAT workflow</strong> for harder leaks: Leak Suspects → Histogram → sort by retained heap → "Path to GC Roots" → identify retaining holder.</li>
+<li>Use <strong>OQL</strong> for custom queries (SQL-like queries over heap).</li>
+<li>Apply <strong>delta analysis</strong> by comparing two heap dumps to find slow leaks.</li>
+<li>Address <strong>production heap dump concerns</strong>: enable HeapDumpOnOOM (passive), dedicated dump disk, never dump under load, encrypt/delete dumps (contain production data).</li>
+<li>Diagnose <strong>native memory leaks</strong> invisible to heap dumps: NMT + pmap; categories like JNI malloc, direct buffers, memory-mapped files; <code>OutOfMemoryError: Direct buffer memory</code>.</li>
+<li>Apply <strong>prevention patterns</strong>: bounded caches (Caffeine), try-with-resources for AutoCloseable, Soft/Weak references where appropriate, explicit lifecycle (<code>close()</code>), ScopedValue replacing ThreadLocal, listener-removal discipline.</li>
+<li>Identify <strong>real-world cases</strong>: Tomcat ClassLoader / Spring DI scope misuse / Kafka consumer record retention / HikariCP ThreadLocal context.</li>
+<li>Set up <strong>continuous leak monitoring</strong> via Prometheus alerts on heap growth trends.</li>
+<li>Distinguish <strong>memory-optimization</strong> (proactively reducing footprint and allocation pressure) from <strong>leak diagnosis</strong> (reactively finding loitering objects): a leak makes memory grow without bound; poor footprint makes the bound needlessly high.</li>
+<li>Reason about <strong>object footprint</strong>: the object header (8-byte mark word + 4-byte compressed klass pointer), 8-byte field alignment/padding (even an empty object is 16 bytes), <strong>compressed oops</strong> and the <strong>32 GB cliff</strong> (cross 32 GB and every reference doubles), why <code>Integer[]</code> is ~5× larger than <code>int[]</code> (per-element header + indirection), the wrapper/boxing tax, and <strong>Compact Strings</strong> (Java 9+ Latin-1 1-byte backing store).</li>
+<li>Reduce <strong>allocation rate</strong> to ease GC: understand that allocation is cheap per object but drives minor-GC frequency in aggregate; lean on <strong>escape analysis + scalar replacement</strong> (without relying on it); reuse buffers; avoid needless autoboxing; prefer <strong>primitive collections</strong> (Eclipse Collections / fastutil / Koloboke) over <code>HashMap&lt;Integer,Integer&gt;</code> for ~4–8× savings; use primitive streams or plain loops on measured hot paths; and use <code>StringBuilder</code> (pre-sized) instead of <code>+=</code> in loops.</li>
+<li>Decide when to go <strong>off-heap</strong>: <code>ByteBuffer.allocateDirect</code>, the <strong>Foreign Function &amp; Memory API</strong> (<code>MemorySegment</code> + <code>Arena</code>, deterministic lifetime, bounds-checked), and memory-mapped files — trading GC pressure for manual lifetime and complexity; with a forward nod to <strong>Project Valhalla</strong> value classes for flat inline layout.</li>
+<li><strong>Measure footprint before optimizing</strong>: <strong>JOL</strong> (<code>ClassLayout</code> / <code>GraphLayout</code>) for real object sizes, <code>-XX:+UseCompressedOops</code> state, <strong>Native Memory Tracking</strong> to attribute process RSS across categories, and allocation profiling (JFR / async-profiler) to find hot allocation sites.</li>
+<li>Recall the <strong>real-world win</strong>: replacing a <code>Map&lt;Long,Long&gt;</code> with a primitive <code>LongLongHashMap</code> (or an off-heap <code>MemorySegment</code> index) cut heap and GC pause time multi-fold with no algorithm change — bricks loose in a tray instead of each in its own labeled box.</li>
+<li>Avoid the <strong>6 common mistakes</strong>: confusing caches with leaks, dumping under load, not using MAT, looking only at shallow heap, fixing only the largest leak, treating native leaks as Java leaks.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t11-profiling-jfr-async-profiler-visualvm.html">Profiling (JFR, async-profiler, VisualVM)</a> — moving from <em>memory</em> diagnosis to <em>CPU</em> diagnosis. We'll cover <strong>Java Flight Recorder (JFR)</strong> in depth (event types, continuous recording, JMC analysis), <strong>async-profiler</strong> (sampling profiler with flame graphs — the modern alternative to safepoint-biased profilers), and <strong>VisualVM</strong> for quick triage. Plus the <strong>systematic CPU profiling workflow</strong> (identify hot methods → analyze allocation → correlate with GC → fix or accept), and how to read <strong>flame graphs</strong> that reveal time spent in each method's call stack.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Memory Leaks &amp; Heap Dump Analysis&quot;
+slug: memory-leaks-and-heap-dump-analysis
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;JVM Internals &amp; Performance&quot;
+type: concept
+difficulty: advanced
+order: 10
+tags: [memory-leak, java-leak, loitering-object, reachable-not-needed, gc-cant-distinguish, leak-symptom, heap-growth-trend, death-spiral, heap-dump, hprof-format, heap-dump-on-out-of-memory-error, jcmd-gc-heap-dump, jmap-dump, jfr-allocation, eclipse-mat, jdk-mission-control, jmc, visualvm, yourkit, jprofiler, jhat-removed, shallow-heap, retained-heap, dominator-tree, dominator-analysis, leak-suspects-report, mat-workflow, oql, object-query-language, delta-analysis, two-dump-comparison, canonical-leak-patterns, unbounded-static-collection, listener-registration-leak, threadlocal-pool-leak, inner-class-outer-capture, jdbc-driver-leak, classloader-leak, native-memory-leak, jni-malloc-leak, direct-bytebuffer-leak, memory-mapped-file-leak, nmt-detail, pmap-analysis, caffeine-bounded-cache, guava-cache, soft-reference-cache, weak-reference-listener, scopedvalue-replacement, tomcat-classloader-leak, spring-di-scope, kafka-consumer-retention, hikaricp-threadlocal, continuous-leak-monitoring, memory-optimization, object-layout, object-header, mark-word, klass-pointer, field-alignment, padding, compressed-oops, compressed-oops-cliff, boxing-cost, wrapper-overhead, compact-strings, latin1-string, allocation-reduction, allocation-rate, escape-analysis, scalar-replacement, buffer-reuse, primitive-collections, eclipse-collections, fastutil, koloboke, streams-vs-loops, stringbuilder, off-heap, direct-bytebuffer, foreign-function-and-memory-api, memorysegment, memory-mapped-files, jol, java-object-layout, native-memory-tracking, valhalla-flat-layout, measure-before-optimizing]
+prerequisites: [gc-tuning-and-monitoring, gc-algorithms-serial-parallel-g1-zgc-shenandoah, garbage-collection-fundamentals, memory-model-heap-stack-metaspace, class-loading-and-class-loaders, thread-safety-patterns]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-15
+---
+
+# Memory Leaks &amp; Heap Dump Analysis
+
+T09 covered GC tuning — what to do when the GC&#x27;s behavior is your problem. This topic covers what to do when *the leak* is your problem. A Java memory leak isn&#x27;t &quot;forgot to free memory&quot; (the GC handles that); it&#x27;s &quot;reachable but no longer needed objects accumulating&quot; — and the GC has *no way* to tell &quot;needed&quot; from &quot;reachable.&quot; Every production Java service eventually leaks something; the engineer who can systematically diagnose and fix a leak via heap dump analysis is the engineer who keeps the service running.
+
+The depth-bar requirement isn&#x27;t &quot;use Eclipse MAT.&quot; At the **conceptual** layer, a Java leak is fundamentally different from a C `malloc`/`free` leak — it&#x27;s about *reachability* surviving past usefulness, often through one of a small number of canonical patterns (unbounded static collections, listeners not removed, ThreadLocals in long-lived pool workers, inner-class outer-`this` captures, JDBC driver registration retaining ClassLoaders). At the **capture** layer, **heap dumps** in HPROF format are the snapshot tool — captured via `-XX:+HeapDumpOnOutOfMemoryError` (automatic on OOM, *the* essential flag to always enable), `jcmd GC.heap_dump` (on-demand, pauses the JVM for seconds), or `jmap` (legacy). At the **analysis** layer, **Eclipse MAT** (Memory Analyzer Tool) is the dominant free tool, built around two key concepts: **shallow heap** (just this object&#x27;s own fields) vs **retained heap** (all objects only reachable through this one — &quot;how much memory would freeing this reclaim?&quot;), and the **dominator tree** that organizes the heap by retention. The **Leak Suspects Report** automates detection of the canonical patterns. At the **workflow** layer, the systematic process — confirm via heap growth trend, capture dump after GC, open in MAT, read Leak Suspects, drill via histogram + retained heap, trace from suspect to GC root, identify the leak point — turns &quot;service is OOMing&quot; into a tractable engineering problem rather than a panic. We will cover all four layers, including native memory leaks invisible to heap dumps and the prevention patterns that stop most leaks before they ship.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [GC tuning &amp; monitoring](./T09-gc-tuning-and-monitoring.md) (L3/C02/T09) — when tuning isn&#x27;t enough; [GC algorithms](./T08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md) (L3/C02/T08) — collector behavior under leak; [Garbage collection fundamentals](./T07-garbage-collection-fundamentals.md) (L3/C02/T07) — reachability; [Memory model](./T06-memory-model-heap-stack-metaspace.md) (L3/C02/T06) — heap structure + off-heap; [Class loading &amp; class loaders](./T02-class-loading-and-class-loaders.md) (L3/C02/T02) — ClassLoader leaks; [Thread-safety patterns](../C01-concurrency/T17-thread-safety-patterns.md) (L3/C01/T17) — ThreadLocal leak.
+
+## What a Java Memory Leak Is
+
+In C/C++, a leak is &quot;allocated memory never freed&quot; — the program loses the pointer. In Java, the GC reclaims everything unreachable, so that kind of leak is impossible. Instead:
+
+&gt; **A Java memory leak is an object that is *reachable* from a GC root but is *no longer needed* — yet the GC keeps it alive because reachability is all it can compute.**
+
+The GC sees &quot;this is reachable, therefore live.&quot; It can&#x27;t know &quot;this is in a cache that should have evicted it&quot; or &quot;this listener was supposed to be removed.&quot; Java leaks come from *application logic* retaining references past their useful life.
+
+```mermaid
+flowchart LR
+  R[&quot;GC root&quot;]
+  Active[&quot;live, used&quot;]
+  Stale[&quot;live, unused&lt;br/&gt;(LEAK)&quot;]
+  Garbage[&quot;unreachable&lt;br/&gt;(reclaimed)&quot;]
+  R --&gt; Active
+  R --&gt; Stale
+  Note[&quot;GC sees Active and Stale as both &#x27;live&#x27;.&lt;br/&gt;Cannot distinguish.&lt;br/&gt;Stale = leak.&quot;]
+```
+
+The clinical term: **loitering** — the object is still reachable but no longer being used.
+
+## Symptoms of a Leak
+
+| Symptom | What it suggests |
+|---------|-------------------|
+| Heap occupancy grows linearly over time | Classic leak |
+| OOM after N hours/days | Confirms growth, not capped |
+| GC frequency increases | More garbage to reclaim, less reclaim per cycle |
+| Old generation fills repeatedly | Long-lived objects accumulating |
+| &quot;Death spiral&quot;: GC time approaches 100% | GC working harder for less reclaim — terminal |
+| Container OOM-killed | Total memory exceeded |
+
+The diagnostic clue: **heap occupancy *after* GC grows over time**. Allocation rate is transient; live heap is structural. A graph of &quot;heap after GC&quot; trending upward over hours is the leak signature.
+
+## The 6-Step Diagnostic Workflow
+
+```mermaid
+flowchart TB
+  C1[&quot;1. Confirm via occupancy trend&quot;]
+  C2[&quot;2. Capture heap dump&quot;]
+  C3[&quot;3. Open in Eclipse MAT&quot;]
+  C4[&quot;4. Identify leak source&lt;br/&gt;(Leak Suspects → histogram → retained heap → path to GC root)&quot;]
+  C5[&quot;5. Fix the code&quot;]
+  C6[&quot;6. Verify (re-run; growth should stop)&quot;]
+  C1 --&gt; C2 --&gt; C3 --&gt; C4 --&gt; C5 --&gt; C6
+  C6 -- &quot;growth resumes&quot; --&gt; C1
+```
+
+## Step 1 — Confirming a Leak
+
+Before diagnosing, distinguish a leak from normal behavior:
+
+- **Cache growing to capacity**: not a leak (expected, bounded).
+- **Heap occupancy stable after warm-up**: not a leak (steady state).
+- **Heap occupancy stable but high**: not a leak (just live data).
+- **Heap occupancy grows linearly over many hours**: **leak**.
+
+Plot heap occupancy after GC over time. If the line is flat (saw-tooth around a stable peak) → no leak. If it climbs → leak.
+
+```bash
+# Capture heap occupancy every minute from JFR:
+jcmd &lt;pid&gt; JFR.start duration=24h filename=/tmp/baseline.jfr
+# Or from Prometheus:
+rate(jvm_memory_used_bytes{area=&quot;heap&quot;}[1m])
+```
+
+Run for at least an hour; ideally a full day or two of normal traffic.
+
+## Step 2 — Capturing Heap Dumps
+
+Four methods:
+
+### Automatic on OOM (the essential flag)
+
+```bash
+java -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/dumps \
+     -jar myapp.jar
+```
+
+The JVM dumps to `/var/dumps/java_pid&lt;n&gt;.hprof` right before throwing OOM. **Always enable this in production.** Costs nothing if no OOM happens; saves you when one does.
+
+### On-demand via `jcmd`
+
+```bash
+# Runs Full GC first; dumps only live objects
+jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof
+
+# Dump everything (live + dead — rarely useful for leak analysis):
+jcmd &lt;pid&gt; GC.heap_dump /tmp/heap.hprof -all
+```
+
+`jcmd` is the modern way (jmap is legacy). **The JVM pauses for several seconds** during the dump — disruptive under load.
+
+### `jmap` (legacy)
+
+```bash
+jmap -dump:live,format=b,file=/tmp/heap.hprof &lt;pid&gt;
+```
+
+Same effect as `jcmd`. Older but still works.
+
+### JFR alternative (no full dump)
+
+JFR samples allocations rather than capturing the whole heap — much lower overhead but less complete:
+
+```bash
+jcmd &lt;pid&gt; JFR.start duration=10m settings=profile filename=/tmp/profile.jfr
+```
+
+Open in JDK Mission Control; explore the &quot;Memory&quot; tab. Good for live profiling; not as detailed as a heap dump for leak diagnosis.
+
+## The HPROF Format
+
+A binary format originally designed by Sun. Contains:
+
+- **Classes** loaded at the moment of the dump (each with its name, fields, parent).
+- **Objects** on the heap with their fields and references.
+- **GC roots** — every starting point the GC traces from.
+- **Thread stacks** at the moment of dump (locals = roots).
+- **Strings** (sometimes inlined; usually as separate objects).
+
+File size ≈ current heap size — a 4 GB heap dumps to a ~4 GB file. Compresses well (~5-10× with gzip). Transfer to your laptop for analysis; never try to analyze on production.
+
+## Step 3 — Analysis Tools
+
+| Tool | Strengths | Use case |
+|------|-----------|----------|
+| **Eclipse MAT** | Dominator tree, Leak Suspects Report, OQL — most powerful free tool | Production leak analysis |
+| **JDK Mission Control (JMC)** | JFR integration; live + post-mortem | Live profiling + JFR analysis |
+| **VisualVM** | Bundled (historically); quick checks | Dev / quick triage |
+| **YourKit** | Commercial; sophisticated UI; live integration | Enterprise teams |
+| **JProfiler** | Commercial; similar to YourKit | Enterprise teams |
+| **jhat** | Removed JDK 9+; legacy web viewer | Don&#x27;t use |
+
+**Eclipse MAT** is the workhorse. The rest of this topic assumes you&#x27;re using it.
+
+```bash
+# Download from https://eclipse.dev/mat/
+# Open the .hprof:
+mat /tmp/heap.hprof
+```
+
+Allocate sufficient memory to MAT (`mat -vmargs -Xmx8g` for a 4 GB dump).
+
+## Key Concepts — Shallow vs Retained Heap, Dominator Tree
+
+### Shallow heap
+
+The size of *just* this object&#x27;s own fields — header + field bytes + alignment. Doesn&#x27;t count what it references.
+
+```text
+HashMap object: 48 bytes shallow heap
+  (= 16-byte header + ~5 references × 4 bytes + padding)
+```
+
+### Retained heap
+
+The total memory that *would be freed* if this object were collected — including everything only reachable through it.
+
+```text
+HashMap with 1000 entries:
+  shallow heap:  48 bytes
+  retained heap: ~80 KB (includes the entries, keys, values)
+```
+
+**Retained heap is the metric for leak analysis.** &quot;If I fix this leak, how much memory do I get back?&quot;
+
+### Dominator tree
+
+The most powerful concept in heap analysis. Each object&#x27;s **dominator** is the closest ancestor through which *every* path from a root must go. If you remove the dominator, all its **dominees** become unreachable.
+
+```mermaid
+flowchart TB
+  Root[&quot;GC Root&quot;]
+  A[&quot;A&lt;br/&gt;(dominator of B, C, D)&lt;br/&gt;retained heap = sum of B+C+D&quot;]
+  B[&quot;B&quot;]
+  C[&quot;C&quot;]
+  D[&quot;D&quot;]
+  E[&quot;E (reachable via A AND F)&quot;]
+  F[&quot;F (not dominator of E)&quot;]
+  Root --&gt; A
+  Root --&gt; F
+  A --&gt; B
+  A --&gt; C
+  A --&gt; D
+  A --&gt; E
+  F --&gt; E
+```
+
+MAT&#x27;s &quot;Dominator Tree&quot; view sorts by retained heap. The biggest entries are &quot;if I freed this, I&#x27;d reclaim X MB.&quot; The pattern of large dominators often immediately suggests the leak.
+
+## The Leak Suspects Report
+
+MAT&#x27;s automated analysis — open a .hprof; the first thing offered is &quot;Leak Suspects Report&quot;:
+
+```text
+Problem Suspect 1
+  Class loader [com.acme.WebappClassLoader] is retaining 156 MB.
+
+Problem Suspect 2
+  Thread &quot;scheduler-1&quot; is retaining 89 MB through its ThreadLocalMap.
+```
+
+The report identifies retention patterns the algorithm recognizes:
+
+- ClassLoaders that should be unloadable but aren&#x27;t.
+- Threads retaining large data via ThreadLocals.
+- Very large collections.
+- Specific known leak patterns.
+
+**Always start with the Leak Suspects Report.** It catches ~70% of leaks with one click.
+
+## The 6 Canonical Leak Patterns
+
+### 1. Unbounded static collection
+
+```java
+public class Cache {
+    private static final Map&lt;String, Object&gt; CACHE = new HashMap&lt;&gt;();
+
+    public static void put(String key, Object value) { CACHE.put(key, value); }
+    // ✗ NO eviction; CACHE grows forever
+}
+```
+
+Most common leak. The map grows indefinitely; entries are never removed.
+
+**Diagnosis**: `CACHE` shows huge retained heap in MAT.
+**Fix**: Use a bounded cache library:
+
+```java
+private static final Cache&lt;String, Object&gt; CACHE = Caffeine.newBuilder()
+    .maximumSize(10000)
+    .expireAfterAccess(Duration.ofMinutes(10))
+    .build();
+```
+
+Or implement an LRU/LFU eviction policy. **Never use a plain `HashMap` as a cache in production.**
+
+### 2. Listener registration without removal
+
+```java
+public class Component {
+    private static final List&lt;Listener&gt; LISTENERS = new ArrayList&lt;&gt;();
+    public static void addListener(Listener l) { LISTENERS.add(l); }
+    // ✗ No removeListener
+}
+
+// Caller:
+component.addListener(this::handleEvent);   // `this` is retained forever
+```
+
+`LISTENERS` holds onto `this::handleEvent`, which captures `this`. `this` lives until removed (never).
+
+**Fix**: pair every `addListener` with a `removeListener` (lifecycle-aware); or use `WeakReference&lt;Listener&gt;` to allow GC.
+
+### 3. ThreadLocal in long-lived thread pool (T17 from C01)
+
+```java
+public class RequestContext {
+    private static final ThreadLocal&lt;UserContext&gt; CONTEXT = new ThreadLocal&lt;&gt;();
+
+    public static void set(UserContext c) { CONTEXT.set(c); }
+    // ✗ No remove(); ThreadLocalMap retains UserContext until thread dies
+}
+```
+
+A pool worker handles many requests; each call to `set()` overwrites, but the Map *itself* grows because every distinct *ThreadLocal* (different keys) stays. More subtly: a value captured here might reference a *webapp* class — retaining the *entire* ClassLoader.
+
+**Fix**:
+
+```java
+try {
+    CONTEXT.set(c);
+    process();
+} finally {
+    CONTEXT.remove();   // ✓ explicit cleanup
+}
+```
+
+Or migrate to `ScopedValue` (T14 from C01) — auto-cleared on scope exit.
+
+### 4. Inner class capturing outer `this`
+
+```java
+class Container {
+    private final List&lt;Item&gt; items = new ArrayList&lt;&gt;();   // BIG list
+
+    void scheduleTask() {
+        executor.submit(() -&gt; {
+            doSomething();    // ✗ lambda captures `this`; `this.items` retained
+        });
+    }
+}
+```
+
+The lambda implicitly captures `Container.this`. As long as the executor queue holds the task, `Container` (and its `items`) lives.
+
+**Fix**: extract a static nested class or capture only what&#x27;s needed:
+
+```java
+final List&lt;Item&gt; snapshot = items;   // snapshot the reference
+executor.submit(() -&gt; doSomethingWith(snapshot));   // doesn&#x27;t capture `this`
+```
+
+### 5. JDBC driver ClassLoader leak
+
+```java
+// In a webapp:
+Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);
+// This Driver class is loaded by the webapp ClassLoader.
+// java.sql.DriverManager (loaded by Bootstrap) holds a reference to the Driver.
+// → Webapp ClassLoader can never be GC&#x27;d.
+```
+
+The canonical Metaspace leak in app servers. Undeploy the webapp, redeploy — the old ClassLoader (and all its classes) stay in Metaspace forever.
+
+**Fix**: in `ServletContextListener.contextDestroyed()`:
+
+```java
+public void contextDestroyed(ServletContextEvent sce) {
+    Enumeration&lt;Driver&gt; drivers = DriverManager.getDrivers();
+    while (drivers.hasMoreElements()) {
+        try {
+            DriverManager.deregisterDriver(drivers.nextElement());
+        } catch (SQLException e) { ... }
+    }
+}
+```
+
+Modern servlet containers (Tomcat 7+) do this automatically; old ones don&#x27;t.
+
+### 6. General ClassLoader leak
+
+Any reference from a *parent* ClassLoader&#x27;s loaded class to a *child* ClassLoader&#x27;s loaded class retains the child&#x27;s ClassLoader.
+
+```java
+// In a parent CL:
+static final Map&lt;String, Class&lt;?&gt;&gt; WEBAPP_CLASSES = new HashMap&lt;&gt;();
+
+// In webapp CL:
+WEBAPP_CLASSES.put(&quot;Foo&quot;, SomeWebappClass.class);
+// ✗ Parent CL now references a Class loaded by Webapp CL.
+//   Webapp CL can never be unloaded.
+```
+
+Common when:
+
+- Loggers (java.util.logging) loaded by parent retain webapp classes.
+- Static caches in shared libraries holding references.
+- ThreadLocals (above).
+
+**Diagnosis**: MAT&#x27;s Leak Suspects Report explicitly flags ClassLoader retention.
+
+## The MAT Workflow
+
+```mermaid
+flowchart TB
+  Open[&quot;1. Open .hprof in MAT&quot;]
+  LSR[&quot;2. Read Leak Suspects Report&lt;br/&gt;(70% of leaks revealed here)&quot;]
+  Hist[&quot;3. If unclear: Histogram view&lt;br/&gt;(classes by instance count)&quot;]
+  Ret[&quot;4. Sort by retained heap descending&quot;]
+  Path[&quot;5. Right-click → Path to GC Roots&quot;]
+  Identify[&quot;6. Identify the retaining reference&lt;br/&gt;(usually a static field, ThreadLocal, or listener)&quot;]
+  Open --&gt; LSR --&gt; Hist --&gt; Ret --&gt; Path --&gt; Identify
+```
+
+### Histogram view
+
+Lists every class with: instance count, shallow heap, retained heap. Sort by retained heap to find the biggest cost.
+
+Surprises in instance counts:
+
+- 10,000 `HashMap` entries when you expected ~100.
+- 50,000 `String` instances when you expected ~5,000.
+- 1,000 instances of a webapp class when you expected ~10.
+
+Surprises *are* the leak.
+
+### Path to GC Roots
+
+For a suspected leak object, right-click → &quot;Path to GC Roots&quot; → &quot;exclude weak/soft references&quot; (you want strong-retention only). MAT shows the shortest path back to a root:
+
+```text
+Object → ArrayList.elementData[5] → ArrayList → Service.cachedEntries → static field of Service
+```
+
+The end of the path is *the* root retaining your leak. Fix that holder.
+
+### OQL — Object Query Language
+
+SQL over the heap:
+
+```sql
+-- Find all HashMaps with &gt; 1000 entries:
+SELECT * FROM java.util.HashMap WHERE size &gt; 1000
+
+-- Find Strings holding paths:
+SELECT * FROM java.lang.String WHERE toString().startsWith(&quot;/tmp/&quot;)
+
+-- Count instances per ClassLoader:
+SELECT * FROM INSTANCEOF java.lang.ClassLoader
+```
+
+Powerful for custom queries when the standard views don&#x27;t fit.
+
+## Comparing Two Heap Dumps — Delta Analysis
+
+Take dumps at time T1 (warm-up complete) and T2 (after some workload). Compare:
+
+```bash
+# In MAT: Open both dumps, then Compare Class Histograms
+```
+
+Classes whose instance counts grew significantly between T1 and T2 are leak candidates. If `com.acme.UserSession` grew from 100 to 10,000, you found the leak.
+
+This is *the* technique for slow leaks invisible in a single dump.
+
+## Production Heap Dump Concerns
+
+Capturing a heap dump in production:
+
+- **Pauses the JVM** for several seconds (writes ~heap size to disk).
+- **Disrupts traffic** during the pause.
+- **Generates a huge file** (heap-size; often GBs).
+- **Reveals data** — full heap contents include user data, credentials. Treat as sensitive.
+
+Production-safe practices:
+
+1. **Enable `-XX:+HeapDumpOnOutOfMemoryError`** — dumps only on OOM, when service is going down anyway.
+2. **Direct dumps to a separate disk** with sufficient space — `-XX:HeapDumpPath=/var/dumps`.
+3. **Don&#x27;t dump under load** — restart the service if needed; reproduce in staging.
+4. **Encrypt dumps in transit and at rest**.
+5. **Delete dumps after analysis** — they contain production data.
+
+For *live* leak diagnosis without disruption: prefer JFR. The detail is less, but the overhead is &lt; 1%.
+
+## Native Memory Leaks
+
+Heap dumps show only the *Java* heap. Native memory (T06&#x27;s off-heap world — JNI, direct ByteBuffers, mmap, Unsafe) leaks invisibly to heap dump tools.
+
+### Symptoms
+
+- Java heap is stable; process RSS grows.
+- `OutOfMemoryError: Direct buffer memory` (direct buffers).
+- Container OOM-killed; heap was fine.
+
+### Diagnosis: NMT (Native Memory Tracking)
+
+```bash
+# Start JVM with NMT:
+java -XX:NativeMemoryTracking=summary -jar myapp.jar
+
+# Take baseline:
+jcmd &lt;pid&gt; VM.native_memory baseline
+
+# After leak suspected:
+jcmd &lt;pid&gt; VM.native_memory summary.diff
+```
+
+Shows per-category delta: heap, Metaspace, code cache, thread stacks, GC, internal, symbols, native memory tracking, arena chunk, native heap.
+
+Growth in &quot;native heap&quot; with no Java-side cause → native leak (JNI, FFM, Unsafe).
+
+### Diagnosis: `pmap`
+
+```bash
+pmap -x &lt;pid&gt;
+```
+
+Shows all process memory mappings. Compare baseline vs leaked state — growing `[anon]` regions are typically C-heap (JNI malloc) leaks.
+
+### Direct ByteBuffer leaks
+
+```java
+// ✗ Direct buffers accumulating in a long-lived list:
+List&lt;ByteBuffer&gt; buffers = new ArrayList&lt;&gt;();
+buffers.add(ByteBuffer.allocateDirect(1024 * 1024));   // 1 MB native
+// Never released; never collected; native memory grows
+```
+
+Set `-XX:MaxDirectMemorySize=512m` to cap; you&#x27;ll get `OutOfMemoryError: Direct buffer memory` when the leak hits the cap (early warning).
+
+## Prevention Patterns
+
+### Bounded caches
+
+```java
+Cache&lt;Key, Value&gt; cache = Caffeine.newBuilder()
+    .maximumSize(10_000)
+    .expireAfterAccess(Duration.ofMinutes(30))
+    .build();
+```
+
+### try-with-resources for `AutoCloseable`
+
+```java
+try (var stream = Files.newInputStream(path)) {
+    // ...
+}   // auto-close on exit
+```
+
+### Soft/Weak references where appropriate
+
+```java
+WeakHashMap&lt;Key, Value&gt; map = new WeakHashMap&lt;&gt;();
+SoftReference&lt;Image&gt; imageCache = new SoftReference&lt;&gt;(loadImage());
+```
+
+### Explicit lifecycle management
+
+```java
+public class Resource implements AutoCloseable {
+    public void close() { releaseNativeHandle(); }
+}
+```
+
+### ScopedValue instead of ThreadLocal
+
+```java
+ScopedValue.where(USER, currentUser).run(() -&gt; doWork());
+// Auto-cleared on scope exit
+```
+
+### Listener registration discipline
+
+```java
+public class Component implements AutoCloseable {
+    private final Listener listener;
+    public Component(EventBus bus) {
+        this.listener = bus.subscribe(this::onEvent);
+    }
+    public void close() { listener.unsubscribe(); }
+}
+```
+
+## Memory-Optimization Patterns
+
+The whole topic so far has been *reactive*: a leak shipped, the heap is climbing, you capture a dump and hunt the loitering object. This section is the *proactive* counterpart. Even with zero leaks, two services with identical functionality can differ 3–5× in heap footprint and 10× in GC pause time purely from how they lay out and allocate objects. A leak is a bug; a fat object graph and a high allocation rate are *design choices* — and the engineer who understands the JVM&#x27;s memory model (T06) well enough to make those choices deliberately ships services that run on smaller boxes, pause less, and cost less to operate.
+
+The mental frame: a leak makes memory grow *without bound*; poor footprint makes the *bound itself* needlessly high. Both end at an OOM, but you fix them with completely different tools — heap dumps for the first, object-layout awareness and allocation discipline for the second.
+
+&gt; [!NOTE]
+&gt; This section builds directly on [Memory model — heap, stack, Metaspace](./T06-memory-model-heap-stack-metaspace.md) (L3/C02/T06) for object headers, alignment, compressed oops, and the off-heap world; on [GC fundamentals](./T07-garbage-collection-fundamentals.md) (L3/C02/T07) for why allocation rate drives collection frequency; and forward to [Project Valhalla — value classes](./T15-project-valhalla-value-classes.md) (L3/C02/T15) for flat layout that erases much of the wrapper tax described below.
+
+### Object Footprint — What an Object Actually Costs
+
+The number you write in a field is not what it costs in RAM. Every Java object on the heap carries overhead the language hides from you. On HotSpot, the layout of an ordinary object is:
+
+```text
+Object layout (64-bit HotSpot, compressed oops ON — the default heaps &lt; 32 GB):
+
+  offset  bytes  contents
+  ┌──────┬──────┬───────────────────────────────────────┐
+  │  0   │  8   │ mark word   (hash, GC age, lock bits)   │  ← object header
+  │  8   │  4   │ klass pointer (which class — compressed)│  ← object header
+  ├──────┼──────┼───────────────────────────────────────┤
+  │ 12   │  ?   │ instance fields...                      │
+  │ ...  │      │ (reordered by the JVM for packing)      │
+  ├──────┼──────┼───────────────────────────────────────┤
+  │ end  │ 0-7  │ padding to an 8-byte boundary           │  ← alignment
+  └──────┴──────┴───────────────────────────────────────┘
+```
+
+The **mark word** (8 bytes) holds the identity hash code (once computed), the GC age, and biased/lightweight-lock bits. The **klass pointer** (4 bytes when compressed, 8 otherwise) says which class this is. So even an object with *no fields at all* costs 16 bytes after alignment. An object is always padded up to a multiple of 8 bytes — `-XX:ObjectAlignmentInBytes`, default 8.
+
+**Field alignment and padding.** The JVM reorders your declared fields to minimize padding (longs and doubles on 8-byte boundaries, ints on 4, etc.), then pads the tail. You don&#x27;t control declaration order&#x27;s effect on size — but you *do* control how many fields and of what type. A class with a single `boolean` field still costs 16 bytes: 12 bytes header + 1 byte boolean + 3 bytes padding.
+
+```text
+class Flag { boolean on; }     // 16 bytes  (header 12 + 1 + 3 pad)
+class Point { int x, y; }      // 16 bytes  (header 12 + 8 + 0 pad)
+class Point3 { int x, y, z; }  // 24 bytes  (header 12 + 12 + 0 pad)
+```
+
+**Compressed oops and the 32 GB cliff.** An &quot;oop&quot; is an *ordinary object pointer* — a reference. On a 64-bit JVM, a raw reference is 8 bytes. HotSpot&#x27;s **compressed oops** (`-XX:+UseCompressedOops`, on by default) store references as 32-bit values scaled by the 8-byte alignment, letting them address up to `2^32 × 8 = 32 GB` of heap. This halves the size of every reference field and the klass pointer — a major footprint win.
+
+The catch is the famous **32 GB cliff**: the moment your `-Xmx` crosses ~32 GB, compressed oops can no longer cover the heap, the JVM falls back to 8-byte references, and *every reference in the heap doubles*. A heap configured at 33 GB can hold **less live data** than one configured at 31 GB, because the per-reference overhead jumped. The relatable version: a 31 GB heap is like a parking garage with short stall numbers (2 digits) — compact signage everywhere; push past 32 GB and every stall needs 4-digit numbers, so the *signs* eat space that used to hold cars. The rule of thumb: never size a heap between ~32 GB and ~40 GB — either stay under 32 GB, or jump well past 40 GB so the extra capacity outweighs the doubled pointers.
+
+**Why `Integer[]` is far larger than `int[]`.** This is the single most important footprint lesson in Java. A primitive array stores values *inline*; a wrapper array stores *references to boxed objects*:
+
+```text
+int[] of 1000 ints (compressed oops):
+  ┌────────────────────────────────────────────────┐
+  │ array header (16 B) + 1000 × 4 B  = 4016 bytes  │   one contiguous block
+  └────────────────────────────────────────────────┘
+
+Integer[] of 1000 Integers:
+  ┌──────────────────────────────────────────┐
+  │ array header (16 B) + 1000 × 4 B refs     │  = 4016 bytes  (the refs)
+  └───┬──────────────────────────────────────┘
+      │ each ref points to a separate Integer object:
+      └─► Integer { header 12 B + int 4 B } = 16 bytes each
+          1000 × 16 B = 16000 bytes  (the boxes)
+
+  Total: ~20 KB  vs  ~4 KB  →  ~5× larger, plus 1000 extra objects for GC to trace.
+```
+
+The `int[]` is ~4 KB in one cache-friendly block. The `Integer[]` is ~20 KB scattered across 1001 objects, each with a header, each a separate GC-traceable node, each a potential cache miss when you walk the array. **Wrappers cost roughly 4× the payload in header overhead alone, plus an indirection.**
+
+&gt; **The LEGO analogy.** A primitive `int[]` is a tray of LEGO bricks sitting loose in one compartment — grab the tray, every brick comes with it, all touching. An `Integer[]` (or `List&lt;Integer&gt;`) is the same bricks, but each one shipped in its own cardboard box with a printed label, and the tray now holds *slips of paper* telling you which shelf each box is on. You pay for every box (the 12-byte header), every label, and the trip to a different shelf (pointer chase / cache miss) each time you want a brick.
+
+**Compact Strings (Java 9+).** Before Java 9, every `String` stored a `char[]` — 2 bytes per character (UTF-16), even for plain ASCII text where the high byte was always zero. Java 9&#x27;s **Compact Strings** (JEP 254) changed the backing store to a `byte[]` plus a 1-byte `coder` flag: if every character fits in Latin-1 (the common case for IDs, JSON keys, log lines, English text), the string stores **1 byte per character** — half the footprint. If any character needs UTF-16, it transparently uses 2 bytes per character as before. It is on by default (`-XX:+CompactStrings`) and requires no code change. For a service whose heap is dominated by ASCII strings — most web backends — this single JDK upgrade cut string footprint roughly in half for free.
+
+```java
+String id = &quot;ORD-2026-00417&quot;;   // Latin-1: byte[14] + coder, ~32 B total object
+String ja = &quot;注文番号&quot;;          // needs UTF-16: byte[8] (4 chars × 2), coder=UTF16
+```
+
+&gt; [!TIP]
+&gt; Tie this back to the chapter&#x27;s memory-model material: the header, alignment, and compressed-oop behavior described in T06 are *exactly* what determines these sizes. Footprint optimization is just applying the memory model on purpose instead of by accident.
+
+### Allocation Reduction — Why Cheap Allocation Is Expensive in Aggregate
+
+Allocating an object in HotSpot is astonishingly cheap: usually a **bump-the-pointer** in a thread-local allocation buffer (TLAB) — a few instructions, no lock. So why care? Because allocation is cheap *per object* but the bill comes due collectively: **every byte you allocate is a byte the GC must eventually scan, copy, or reclaim.** Allocation rate, not live-set size, is what drives *minor-GC frequency*. A service that allocates 2 GB/s churns the young generation far more often than one allocating 200 MB/s for the same useful work — more young collections, more CPU burned on GC, more pause-time jitter (see T07 for why young-gen fills proportionally to allocation rate).
+
+The relatable version: allocating is like grabbing a fresh paper cup for each sip of water. One cup is free. Ten thousand cups an hour means someone is constantly emptying the bin — and that someone (the GC) competes with your application for the CPU.
+
+**Escape analysis and scalar replacement.** The C2 JIT (T04) can sometimes make allocation *vanish entirely*. **Escape analysis** proves an object never &quot;escapes&quot; the method that created it — it isn&#x27;t stored in a field, returned, or passed somewhere that outlives the call. If it can prove that, **scalar replacement** breaks the object into its individual fields and keeps them in registers/stack slots: zero heap allocation, zero GC pressure.
+
+```java
+// Likely scalar-replaced — the Point never escapes:
+double distance(double x, double y) {
+    Point p = new Point(x, y);   // JIT may elide this allocation entirely
+    return Math.sqrt(p.x * p.x + p.y * p.y);
+}
+
+// Cannot be elided — the object escapes via the return:
+Point makePoint(double x, double y) {
+    return new Point(x, y);      // must live on the heap; caller keeps it
+}
+```
+
+When it *can&#x27;t* elide: the object is stored in a field, returned, passed to a non-inlined method, captured by a lambda that outlives the frame, or the allocation is inside a megamorphic call site the JIT couldn&#x27;t inline. Escape analysis is a wonderful optimization but a fragile one — never *rely* on it for a hot path; verify with `-XX:+PrintEscapeAnalysis` (debug builds) or by watching allocation profiles in JFR/async-profiler (T11). When in doubt, structure the code so the object obviously doesn&#x27;t escape.
+
+**Reusing buffers.** In hot loops, allocate the working buffer once and reuse it rather than allocating per iteration:
+
+```java
+// ✗ Allocates a new byte[] every call — high allocation rate
+void copy(InputStream in, OutputStream out) throws IOException {
+    int n;
+    while ((n = in.read(new byte[8192])) != -1) out.write(/*...*/, 0, n); // fresh array each read
+}
+
+// ✓ One buffer, reused
+void copy(InputStream in, OutputStream out) throws IOException {
+    byte[] buf = new byte[8192];
+    int n;
+    while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+}
+```
+
+For thread-confined reuse without sharing hazards, a `ThreadLocal&lt;byte[]&gt;` works — but remember the ThreadLocal-in-pool caveat from earlier in this topic: clear or bound it.
+
+**Avoiding needless autoboxing.** Autoboxing silently allocates `Integer`/`Long`/`Double` objects, and in tight loops it dominates the allocation profile:
+
+```java
+// ✗ Each += autoboxes long → Long → long: millions of throwaway Long objects
+Long sum = 0L;
+for (long v : values) sum += v;     // sum = Long.valueOf(sum.longValue() + v)
+
+// ✓ Primitive accumulator: zero allocation
+long sum = 0L;
+for (long v : values) sum += v;
+```
+
+The `Integer` cache (`-128..127`, via `Integer.valueOf`) hides this for small values but not for the general case. A `Map&lt;Integer, Integer&gt;` autoboxes on every `put`/`get`/`merge`.
+
+**Primitive collections vs `HashMap&lt;Integer, Integer&gt;`.** A `HashMap&lt;Integer, Integer&gt;` is a footprint disaster: every entry is a `HashMap.Node` (32 bytes: header + hash + key ref + value ref + next ref), plus a boxed `Integer` key (16 B) and a boxed `Integer` value (16 B) — roughly **64 bytes to store 8 bytes of actual data**, an 8× overhead, before counting the backing array and load-factor slack. Primitive-specialized collections store keys and values in primitive arrays with open addressing — no per-entry node, no boxing:
+
+| Library | Type for int→int | Notes |
+|---------|------------------|-------|
+| **Eclipse Collections** | `IntIntHashMap` | Mature, broad API, GS Collections lineage |
+| **fastutil** | `Int2IntOpenHashMap` | Very fast, huge surface area, big jar |
+| **Koloboke** | `HashIntIntMap` | Generated, very low overhead |
+
+```java
+// ✗ ~64 B/entry, boxes on every access, extra GC nodes
+Map&lt;Integer, Integer&gt; counts = new HashMap&lt;&gt;();
+counts.merge(key, 1, Integer::sum);
+
+// ✓ Two int[] arrays, no boxing, ~8-16 B/entry, cache-friendly
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+IntIntHashMap counts = new IntIntHashMap();
+counts.addToValue(key, 1);
+```
+
+For a large `int→int` or `long→long` map this is routinely a **4–8× heap reduction** plus far less GC churn.
+
+**Streams vs loops — allocation, not dogma.** Streams are expressive and usually fine, but on a hot path they can allocate more than the equivalent loop: the stream pipeline itself, lambdas (when they capture), `Spliterator`s, and especially **boxing in numeric pipelines**. Prefer the primitive stream specializations (`IntStream`, `LongStream`, `DoubleStream`) over `Stream&lt;Integer&gt;` to avoid boxing, and don&#x27;t be afraid of a plain `for` loop in a measured hot path:
+
+```java
+// ✗ Boxes every element into Integer
+int total = list.stream().reduce(0, Integer::sum);
+
+// ✓ Primitive stream, no boxing
+int total = list.stream().mapToInt(Integer::intValue).sum();
+
+// ✓ Plain loop on a hot path — zero pipeline allocation
+int total = 0;
+for (int v : arr) total += v;
+```
+
+This is a *measure-then-decide* call, not a blanket &quot;avoid streams.&quot; Most code is not hot enough to matter.
+
+**String handling.** String concatenation in a loop is the classic allocation trap. `a + b` compiles to efficient `invokedynamic`/`StringConcatFactory` for a *single* expression, but `+=` inside a loop creates a new string (and a new backing `byte[]`) on every iteration — quadratic allocation:
+
+```java
+// ✗ O(n²) allocation: each += builds a whole new String
+String csv = &quot;&quot;;
+for (String field : fields) csv += field + &quot;,&quot;;
+
+// ✓ One StringBuilder, one resizing buffer
+StringBuilder sb = new StringBuilder(fields.size() * 16);  // pre-size to avoid resizes
+for (String field : fields) sb.append(field).append(&#x27;,&#x27;);
+String csv = sb.toString();
+```
+
+Pre-sizing the `StringBuilder` (and likewise `new ArrayList&lt;&gt;(expectedSize)`, `new HashMap&lt;&gt;(expectedCapacity)`) avoids repeated grow-and-copy reallocations.
+
+### Off-Heap and Specialized Layouts
+
+Sometimes the answer is to keep data *out of the Java heap entirely* — so the GC never has to scan it. This trades GC pressure for manual lifetime management and complexity.
+
+**Direct `ByteBuffer`.** `ByteBuffer.allocateDirect(n)` allocates memory outside the Java heap; the GC sees only a small wrapper object. Useful for large, long-lived binary buffers (network/IO, caches of serialized data) that would otherwise bloat the heap and lengthen GC scans. The cost: the memory is reclaimed only when the wrapper is collected (via a `Cleaner`) — non-deterministic — and it&#x27;s capped by `-XX:MaxDirectMemorySize`. (This is exactly the direct-buffer *leak* hazard described earlier in this topic; off-heap is a tool, not a free lunch.)
+
+**Foreign Function &amp; Memory API (`MemorySegment`).** The modern, safe successor to `Unsafe` and raw direct buffers, finalized in Java 22 (JEP 454) and introduced through T06. A `MemorySegment` is a typed, bounds-checked, deterministically-freed handle to off-heap (or on-heap) memory, scoped by an `Arena`:
+
+```java
+try (Arena arena = Arena.ofConfined()) {
+    MemorySegment seg = arena.allocate(1_000_000L * Long.BYTES);   // off-heap, 8 MB
+    for (long i = 0; i &lt; 1_000_000L; i++) {
+        seg.setAtIndex(ValueLayout.JAVA_LONG, i, i * i);
+    }
+    long v = seg.getAtIndex(ValueLayout.JAVA_LONG, 42);            // bounds-checked read
+}   // arena close → memory freed deterministically, no GC, no Cleaner lag
+```
+
+The `Arena` gives you **deterministic lifetime** (freed at `close()`, not whenever a `Cleaner` runs) and bounds-checking the old `Unsafe` path lacked — the right modern choice when you genuinely need off-heap.
+
+**Memory-mapped files.** `FileChannel.map(...)` (or `Arena.ofShared()` with `FileChannel.map` into a `MemorySegment`) maps a file into the address space, letting the OS page data in and out on demand. This holds datasets far larger than RAM with no heap cost — the standard technique behind embedded stores, columnar formats, and large read-mostly indexes. The trade-off is that access cost becomes a *page fault* (disk latency) rather than a memory read, and you again own the lifetime.
+
+**When to go off-heap — the trade-off ledger:**
+
+| Go off-heap when... | Stay on-heap when... |
+|---------------------|----------------------|
+| Data is large, long-lived, and GC scans of it hurt pause times | Data is small or short-lived (let the young gen handle it) |
+| Layout is simple (bytes, primitives, fixed records) | Data is a rich graph of Java objects |
+| You can manage lifetime deterministically (`Arena`, explicit free) | You want the GC to manage lifetime for you |
+| You need a cache bigger than the heap, or data shared across processes (mmap) | Complexity/bug-risk of manual memory isn&#x27;t worth it |
+
+&gt; **Forward nod — Project Valhalla.** Much of the wrapper tax above exists because *every* object today is a heap node with a header and an identity. [Project Valhalla — value classes](./T15-project-valhalla-value-classes.md) (L3/C02/T15) introduces value classes whose instances have *no identity* and can be laid out **flat and inline** — a `Point[]` of value `Point`s could store the `x`/`y` pairs contiguously like a primitive array, with no per-element header and no indirection. When it lands, the &quot;`Integer[]` is 5× larger than `int[]`&quot; problem largely dissolves for value types, and many of the primitive-collection workarounds become unnecessary. Until then, the patterns above are how you get flat-layout-like footprint today.
+
+### Sizing and Measuring Footprint — Measure Before You Optimize
+
+The cardinal rule of footprint work mirrors all performance work (T13): **measure first.** Object sizes are non-obvious — header overhead, alignment padding, and compressed-oop state make hand-arithmetic unreliable. Use tools.
+
+**JOL — Java Object Layout.** OpenJDK&#x27;s authoritative tool for &quot;how big is this object, *actually*, on this JVM, with these flags?&quot; It prints the real field offsets, header, and padding:
+
+```java
+// dependency: org.openjdk.jol:jol-core
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.info.GraphLayout;
+
+System.out.println(ClassLayout.parseInstance(new java.util.HashMap&lt;&gt;()).toPrintable());
+// → exact header + field offsets + padding for one object
+
+System.out.println(GraphLayout.parseInstance(myBigGraph).totalSize());
+// → deep retained size of an entire object graph, in bytes
+```
+
+`ClassLayout` shows one object&#x27;s shallow layout (and reveals padding you can sometimes remove by reordering related objects); `GraphLayout` walks the reachable graph and reports its true deep size — perfect for comparing &quot;boxed map vs primitive map&quot; before committing.
+
+**`-XX:+UseCompressedOops` and the cliff.** Confirm it&#x27;s on (it is by default under 32 GB) and use it to reason about the cliff: if `-Xmx` is near 32 GB, check whether dropping below 32 GB actually *increases* effective capacity. Pair with `-XX:+PrintFlagsFinal | grep -i oop` to see the resolved settings.
+
+**Native Memory Tracking (NMT).** Already introduced in this topic for native *leaks* — it&#x27;s equally useful for footprint *accounting*. `jcmd &lt;pid&gt; VM.native_memory summary` attributes process memory across heap, Metaspace, code cache, thread stacks, GC structures, and direct/off-heap, so you can see whether your &quot;memory problem&quot; is even in the Java heap before you start optimizing object layout. If RSS is dominated by thread stacks (too many threads × `-Xss`) or by off-heap buffers, no amount of object-layout tuning will help.
+
+**Allocation profiling.** To attack allocation *rate* (not footprint), profile *where* allocations happen: JFR&#x27;s `jdk.ObjectAllocationSample` events or **async-profiler** in `alloc` mode (both in T11) produce allocation flame graphs that point straight at the hot allocation sites worth fixing. Optimize the top of that flame graph; ignore the rest.
+
+&gt; [!INTERVIEW]
+&gt; A strong answer to &quot;how would you reduce a Java service&#x27;s memory footprint?&quot; moves through layers in order: (1) **measure first** — is the pressure even in the Java heap? Use NMT to rule out thread stacks / off-heap, and a heap histogram + JOL to find the dominant object types; (2) **attack the dominant type** — if it&#x27;s a `HashMap&lt;Integer,Integer&gt;` or `Map&lt;Long,Long&gt;`, swap in a primitive collection (Eclipse Collections / fastutil) for a 4–8× reduction; if it&#x27;s strings, confirm Compact Strings is active (Java 9+) and intern/dedup where appropriate; (3) **cut allocation rate** to ease GC — avoid autoboxing in hot loops, reuse buffers, prefer primitive streams or plain loops on measured hot paths, and let escape analysis elide short-lived objects (but never *rely* on it); (4) **consider off-heap** (`MemorySegment` / direct buffers / mmap) only for large, simple, long-lived data where GC scans of the heap are the actual bottleneck, accepting manual lifetime; (5) **mind the 32 GB compressed-oops cliff** when sizing the heap. The senior signal is leading with measurement and naming the *trade-offs* — off-heap removes GC pressure but reintroduces manual-lifetime bugs (exactly the direct-buffer leak we diagnose earlier in this topic).
+
+### Real-World Scenario — From `Map&lt;Long, Long&gt;` to a Primitive Map
+
+A real shape of this problem: a recommendation service kept an in-memory index mapping `userId (long) → lastSeenItemId (long)` for ~40 million users in a `HashMap&lt;Long, Long&gt;`. The heap sat around 9 GB, `-Xmx` was 12 GB, and G1 old-gen pauses crept toward 400 ms as the map dominated the live set — every full marking phase had to trace ~120 million objects (one `Node` + two boxed `Long`s per entry).
+
+The footprint math: each entry is roughly a 32-byte `HashMap.Node` + a 16-byte boxed `Long` key + a 16-byte boxed `Long` value = ~64 bytes, plus backing-array slack — about **2.6 GB of node/box overhead** for 640 MB of actual `long` payload, and ~120M extra GC-traceable objects.
+
+The fix was a single data-structure swap to an Eclipse Collections `LongLongHashMap` (two `long[]` arrays, open addressing, zero boxing). The same 40M mappings dropped to roughly **0.7–0.9 GB** — a ~3–4× reduction — and, because the map was now ~80M *fewer* objects for the GC to trace, old-gen pause times fell back under 100 ms. No algorithm changed; no leak existed; the service simply stopped shipping each `long` in its own labeled box and put them loose in two trays.
+
+When even that wasn&#x27;t enough for a *larger* index (hundreds of millions of entries that didn&#x27;t need to be on-heap at all), the next step was an **off-heap** open-addressed table backed by a `MemorySegment`/mmap region: the index lived outside the heap, the GC never scanned it, `-Xmx` shrank dramatically, and lookups paid an off-heap read instead of a heap dereference — the on-heap GC pressure for that structure went to zero, at the cost of owning the segment&#x27;s lifetime via an `Arena`.
+
+## Real-World Examples
+
+### Tomcat ClassLoader leak
+
+Webapp registers a JDBC driver; on undeploy, driver isn&#x27;t deregistered; DriverManager holds the driver class; webapp CL retained.
+
+**Fix**: Tomcat 7+ auto-deregisters; manual deregistration in `contextDestroyed` for older.
+
+### Spring DI scope misuse
+
+```java
+@Service @Scope(&quot;singleton&quot;)
+public class CounterService {
+    @Autowired SessionState state;   // ✗ injects session-scoped bean into singleton
+}
+```
+
+The singleton holds a stale reference to a session bean; session never collects.
+
+**Fix**: scoped proxies, or use `ObjectProvider&lt;SessionState&gt;` for explicit lookup.
+
+### Kafka consumer record retention
+
+```java
+ConsumerRecords&lt;K, V&gt; records = consumer.poll(Duration.ofMillis(100));
+allRecords.addAll(records);   // ✗ growing list of records
+```
+
+Consumer holds raw record buffers; the list accumulates them in memory.
+
+**Fix**: process and discard records eagerly; don&#x27;t accumulate.
+
+### HikariCP ThreadLocal context
+
+HikariCP (and other DB pools) attach ThreadLocal context to threads. Pool workers retain these forever. The connection pool itself bounds this, but webapp classes referenced through them can leak.
+
+**Fix**: ensure pool shutdown on app shutdown; modern HikariCP does this correctly.
+
+## Continuous Leak Monitoring
+
+```yaml
+# Prometheus alert rule:
+- alert: HeapGrowingOverTime
+  expr: |
+    (
+      avg_over_time(jvm_memory_used_bytes{area=&quot;heap&quot;}[1h])
+      -
+      avg_over_time(jvm_memory_used_bytes{area=&quot;heap&quot;}[1h] offset 24h)
+    ) &gt; 500_000_000     # 500 MB growth in 24h
+  for: 6h
+  labels:
+    severity: warning
+  annotations:
+    summary: &quot;Heap growing over time — potential leak&quot;
+```
+
+The alert triggers if heap-after-GC has grown &gt; 500 MB in 24 hours, persisting for 6 hours. Suspends false positives from caches still warming up.
+
+For high-frequency monitoring: trigger an automatic heap dump on a threshold (rare in practice; usually manual after alert).
+
+## Common Mistakes
+
+### Confusing caches with leaks
+
+A growing cache that&#x27;s bounded is not a leak. Look at the *trend over time*; if it stabilizes, it&#x27;s a cache.
+
+### Taking dumps under load
+
+Disrupts production. Use HeapDumpOnOOM (passive) or reproduce in staging.
+
+### Not using MAT
+
+VisualVM&#x27;s leak analysis is much weaker than MAT&#x27;s. Spend the 30 minutes to learn MAT.
+
+### Looking only at shallow heap
+
+Shallow heap rarely matches the leak source. Always sort by retained heap.
+
+### Fixing one leak, missing the bigger one
+
+Heap analysis reveals one leak; you fix it; the next leak is the new big one. Iterate.
+
+### Treating native leaks as Java leaks
+
+Heap dump won&#x27;t show them. Use NMT + pmap.
+
+## Practice
+
+1. **Reproduce an unbounded cache.** Build a `HashMap` accumulating entries; run to OOM; take heap dump; verify the cache is the dominator.
+2. **Listener leak.** Register listeners without removal; observe growth; fix with `WeakReference`; verify.
+3. **ThreadLocal leak.** Set ThreadLocal in a pool worker without removing; observe growth via JFR + heap dump.
+4. **Inner class capture.** Create an `Outer` class with a large List; submit a lambda capturing `this` to a long-lived queue; verify `Outer` retained.
+5. **JDBC driver leak (Tomcat 6 simulation).** Register a Driver; undeploy webapp; verify ClassLoader retained.
+6. **MAT Leak Suspects Report.** Take a heap dump from any leaking app; run the report; observe the automated finding.
+7. **Dominator tree drill-down.** With a complex heap, sort by retained heap; drill down 3 levels; understand who dominates what.
+8. **OQL query.** Find all HashMaps with &gt; 1000 entries via OQL; identify which ones are suspicious.
+9. **Two-dump comparison.** Take dumps at T1 and T2 with significant intervening load; compare class histograms in MAT; identify growth.
+10. **Native memory leak via direct buffers.** Allocate direct buffers in a loop without releasing; observe `OutOfMemoryError: Direct buffer memory` with `-XX:MaxDirectMemorySize=512m`.
+11. **NMT baseline + diff.** Enable NMT; baseline; trigger a leak; observe the category showing growth.
+12. **Prevention pattern migration.** Take a leaky cache; migrate to Caffeine bounded; verify steady-state memory.
+13. **Measure object size with JOL.** Add `org.openjdk.jol:jol-core`; print `ClassLayout.parseInstance(...)` for a small class with one `boolean`, then one with two `int`s; confirm the 12-byte header and the alignment padding by hand.
+14. **`int[]` vs `Integer[]` footprint.** Use JOL&#x27;s `GraphLayout.parseInstance(...).totalSize()` to measure an `int[1000]` and an `Integer[1000]`; confirm the ~5× difference and explain it in terms of headers and indirection.
+15. **Compressed-oops cliff.** Run the same allocation-heavy workload at `-Xmx30g` and `-Xmx33g`; with `-XX:+PrintFlagsFinal | grep -i oop`, observe compressed oops disabling above 32 GB and reason about why effective capacity can *drop*.
+16. **Compact Strings.** On Java 9+, build a large list of ASCII strings vs strings containing one non-Latin-1 character; compare deep size with JOL and confirm the 1-byte vs 2-byte-per-char backing store.
+17. **Boxing allocation in a loop.** Sum a large `long[]` first into a `Long` accumulator, then a primitive `long`; profile allocation with async-profiler (`alloc` mode) or JFR and compare the throwaway `Long` count.
+18. **Escape analysis.** Write a method that creates a short-lived object used only locally; verify with allocation profiling that C2 elides the allocation, then change the method to *return* the object and confirm the allocation reappears.
+19. **Primitive map migration.** Replace a `HashMap&lt;Long, Long&gt;` holding ~1M entries with an Eclipse Collections `LongLongHashMap` (or fastutil `Long2LongOpenHashMap`); measure heap before/after with a heap histogram and confirm the multi-× reduction.
+20. **Off-heap with `MemorySegment`.** Store 1M `long`s in an `Arena.ofConfined()`-allocated `MemorySegment`; confirm the Java heap stays flat (it&#x27;s off-heap) and that memory is freed deterministically at `Arena.close()`.
+21. **Buffer reuse.** Take a copy loop that allocates a fresh `byte[]` per read; refactor to reuse one buffer; compare allocation rate via JFR.
+22. **StringBuilder pre-sizing.** Build a large CSV with `+=` in a loop, then with a pre-sized `StringBuilder`; measure allocation and time; explain the quadratic behavior of the naive version.
+
+## Recap
+
+You should now be able to:
+
+- Define a **Java memory leak** as &quot;reachable from a root but no longer needed&quot; — GC can&#x27;t distinguish needed from reachable; the term &quot;loitering&quot; captures the semantics.
+- Recognize **leak symptoms**: heap grows over time, OOM eventually, GC frequency increases, &quot;death spiral&quot; of more GC for less reclaim, container OOM-killed.
+- Apply the **6-step diagnostic workflow**: confirm via occupancy trend → capture heap dump → open in MAT → identify source → fix → verify.
+- Capture heap dumps via **`-XX:+HeapDumpOnOutOfMemoryError`** (always enable in production), **`jcmd GC.heap_dump`** (on-demand, pauses JVM), **`jmap -dump:live`** (legacy), or **JFR** (lighter alternative for live profiling).
+- Understand the **HPROF format**: binary; classes + objects + references + GC roots + thread stacks; file size ~ heap size.
+- Use **Eclipse MAT** as the dominant free analysis tool; allocate sufficient memory for analysis.
+- Distinguish **shallow heap** (just this object&#x27;s fields) from **retained heap** (all objects only reachable through this one — &quot;how much memory would freeing this reclaim?&quot;); use retained heap for leak analysis.
+- Apply the **dominator tree**: each object&#x27;s dominator is the closest ancestor through which all paths from roots go; removing a dominator frees all its dominees.
+- Use the **Leak Suspects Report** as the first diagnostic step — catches ~70% of leaks automatically.
+- Recognize the **6 canonical leak patterns**: unbounded static collection, listener registration without removal, ThreadLocal in pool worker, inner class capturing outer, JDBC driver registration (DriverManager → ClassLoader), general ClassLoader retention.
+- Apply the **MAT workflow** for harder leaks: Leak Suspects → Histogram → sort by retained heap → &quot;Path to GC Roots&quot; → identify retaining holder.
+- Use **OQL** for custom queries (SQL-like queries over heap).
+- Apply **delta analysis** by comparing two heap dumps to find slow leaks.
+- Address **production heap dump concerns**: enable HeapDumpOnOOM (passive), dedicated dump disk, never dump under load, encrypt/delete dumps (contain production data).
+- Diagnose **native memory leaks** invisible to heap dumps: NMT + pmap; categories like JNI malloc, direct buffers, memory-mapped files; `OutOfMemoryError: Direct buffer memory`.
+- Apply **prevention patterns**: bounded caches (Caffeine), try-with-resources for AutoCloseable, Soft/Weak references where appropriate, explicit lifecycle (`close()`), ScopedValue replacing ThreadLocal, listener-removal discipline.
+- Identify **real-world cases**: Tomcat ClassLoader / Spring DI scope misuse / Kafka consumer record retention / HikariCP ThreadLocal context.
+- Set up **continuous leak monitoring** via Prometheus alerts on heap growth trends.
+- Distinguish **memory-optimization** (proactively reducing footprint and allocation pressure) from **leak diagnosis** (reactively finding loitering objects): a leak makes memory grow without bound; poor footprint makes the bound needlessly high.
+- Reason about **object footprint**: the object header (8-byte mark word + 4-byte compressed klass pointer), 8-byte field alignment/padding (even an empty object is 16 bytes), **compressed oops** and the **32 GB cliff** (cross 32 GB and every reference doubles), why `Integer[]` is ~5× larger than `int[]` (per-element header + indirection), the wrapper/boxing tax, and **Compact Strings** (Java 9+ Latin-1 1-byte backing store).
+- Reduce **allocation rate** to ease GC: understand that allocation is cheap per object but drives minor-GC frequency in aggregate; lean on **escape analysis + scalar replacement** (without relying on it); reuse buffers; avoid needless autoboxing; prefer **primitive collections** (Eclipse Collections / fastutil / Koloboke) over `HashMap&lt;Integer,Integer&gt;` for ~4–8× savings; use primitive streams or plain loops on measured hot paths; and use `StringBuilder` (pre-sized) instead of `+=` in loops.
+- Decide when to go **off-heap**: `ByteBuffer.allocateDirect`, the **Foreign Function &amp; Memory API** (`MemorySegment` + `Arena`, deterministic lifetime, bounds-checked), and memory-mapped files — trading GC pressure for manual lifetime and complexity; with a forward nod to **Project Valhalla** value classes for flat inline layout.
+- **Measure footprint before optimizing**: **JOL** (`ClassLayout` / `GraphLayout`) for real object sizes, `-XX:+UseCompressedOops` state, **Native Memory Tracking** to attribute process RSS across categories, and allocation profiling (JFR / async-profiler) to find hot allocation sites.
+- Recall the **real-world win**: replacing a `Map&lt;Long,Long&gt;` with a primitive `LongLongHashMap` (or an off-heap `MemorySegment` index) cut heap and GC pause time multi-fold with no algorithm change — bricks loose in a tray instead of each in its own labeled box.
+- Avoid the **6 common mistakes**: confusing caches with leaks, dumping under load, not using MAT, looking only at shallow heap, fixing only the largest leak, treating native leaks as Java leaks.
+
+## Next
+
+Continue to [Profiling (JFR, async-profiler, VisualVM)](./T11-profiling-jfr-async-profiler-visualvm.md) — moving from *memory* diagnosis to *CPU* diagnosis. We&#x27;ll cover **Java Flight Recorder (JFR)** in depth (event types, continuous recording, JMC analysis), **async-profiler** (sampling profiler with flame graphs — the modern alternative to safepoint-biased profilers), and **VisualVM** for quick triage. Plus the **systematic CPU profiling workflow** (identify hot methods → analyze allocation → correlate with GC → fix or accept), and how to read **flame graphs** that reveal time spent in each method&#x27;s call stack.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><div class="lbl">← Previous</div><div class="ttl">T09-gc-tuning-and-monitoring</div><div class="sub">GC Tuning &amp; Monitoring</div></a><a class="next" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><div class="lbl">Next →</div><div class="ttl">T11-profiling-jfr-async-profiler-visualvm</div><div class="sub">Profiling (JFR, async-profiler, VisualVM)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#what-a-java-memory-leak-is" data-toc-link>What a Java Memory Leak Is</a></li><li class="lvl-2"><a href="#symptoms-of-a-leak" data-toc-link>Symptoms of a Leak</a></li><li class="lvl-2"><a href="#the-6-step-diagnostic-workflow" data-toc-link>The 6-Step Diagnostic Workflow</a></li><li class="lvl-2"><a href="#step-1-confirming-a-leak" data-toc-link>Step 1 — Confirming a Leak</a></li><li class="lvl-2"><a href="#step-2-capturing-heap-dumps" data-toc-link>Step 2 — Capturing Heap Dumps</a></li><li class="lvl-3"><a href="#automatic-on-oom-the-essential-flag" data-toc-link>Automatic on OOM (the essential flag)</a></li><li class="lvl-3"><a href="#on-demand-via-jcmd" data-toc-link>On-demand via jcmd</a></li><li class="lvl-3"><a href="#jmap-legacy" data-toc-link>jmap (legacy)</a></li><li class="lvl-3"><a href="#jfr-alternative-no-full-dump" data-toc-link>JFR alternative (no full dump)</a></li><li class="lvl-2"><a href="#the-hprof-format" data-toc-link>The HPROF Format</a></li><li class="lvl-2"><a href="#step-3-analysis-tools" data-toc-link>Step 3 — Analysis Tools</a></li><li class="lvl-2"><a href="#key-concepts-shallow-vs-retained-heap-dominator-tree" data-toc-link>Key Concepts — Shallow vs Retained Heap, Dominator Tree</a></li><li class="lvl-3"><a href="#shallow-heap" data-toc-link>Shallow heap</a></li><li class="lvl-3"><a href="#retained-heap" data-toc-link>Retained heap</a></li><li class="lvl-3"><a href="#dominator-tree" data-toc-link>Dominator tree</a></li><li class="lvl-2"><a href="#the-leak-suspects-report" data-toc-link>The Leak Suspects Report</a></li><li class="lvl-2"><a href="#the-6-canonical-leak-patterns" data-toc-link>The 6 Canonical Leak Patterns</a></li><li class="lvl-3"><a href="#1-unbounded-static-collection" data-toc-link>1. Unbounded static collection</a></li><li class="lvl-3"><a href="#2-listener-registration-without-removal" data-toc-link>2. Listener registration without removal</a></li><li class="lvl-3"><a href="#3-threadlocal-in-long-lived-thread-pool-t17-from-c01" data-toc-link>3. ThreadLocal in long-lived thread pool (T17 from C01)</a></li><li class="lvl-3"><a href="#4-inner-class-capturing-outer-this" data-toc-link>4. Inner class capturing outer this</a></li><li class="lvl-3"><a href="#5-jdbc-driver-classloader-leak" data-toc-link>5. JDBC driver ClassLoader leak</a></li><li class="lvl-3"><a href="#6-general-classloader-leak" data-toc-link>6. General ClassLoader leak</a></li><li class="lvl-2"><a href="#the-mat-workflow" data-toc-link>The MAT Workflow</a></li><li class="lvl-3"><a href="#histogram-view" data-toc-link>Histogram view</a></li><li class="lvl-3"><a href="#path-to-gc-roots" data-toc-link>Path to GC Roots</a></li><li class="lvl-3"><a href="#oql-object-query-language" data-toc-link>OQL — Object Query Language</a></li><li class="lvl-2"><a href="#comparing-two-heap-dumps-delta-analysis" data-toc-link>Comparing Two Heap Dumps — Delta Analysis</a></li><li class="lvl-2"><a href="#production-heap-dump-concerns" data-toc-link>Production Heap Dump Concerns</a></li><li class="lvl-2"><a href="#native-memory-leaks" data-toc-link>Native Memory Leaks</a></li><li class="lvl-3"><a href="#symptoms" data-toc-link>Symptoms</a></li><li class="lvl-3"><a href="#diagnosis-nmt-native-memory-tracking" data-toc-link>Diagnosis: NMT (Native Memory Tracking)</a></li><li class="lvl-3"><a href="#diagnosis-pmap" data-toc-link>Diagnosis: pmap</a></li><li class="lvl-3"><a href="#direct-bytebuffer-leaks" data-toc-link>Direct ByteBuffer leaks</a></li><li class="lvl-2"><a href="#prevention-patterns" data-toc-link>Prevention Patterns</a></li><li class="lvl-3"><a href="#bounded-caches" data-toc-link>Bounded caches</a></li><li class="lvl-3"><a href="#try-with-resources-for-autocloseable" data-toc-link>try-with-resources for AutoCloseable</a></li><li class="lvl-3"><a href="#softweak-references-where-appropriate" data-toc-link>Soft/Weak references where appropriate</a></li><li class="lvl-3"><a href="#explicit-lifecycle-management" data-toc-link>Explicit lifecycle management</a></li><li class="lvl-3"><a href="#scopedvalue-instead-of-threadlocal" data-toc-link>ScopedValue instead of ThreadLocal</a></li><li class="lvl-3"><a href="#listener-registration-discipline" data-toc-link>Listener registration discipline</a></li><li class="lvl-2"><a href="#memory-optimization-patterns" data-toc-link>Memory-Optimization Patterns</a></li><li class="lvl-3"><a href="#object-footprint-what-an-object-actually-costs" data-toc-link>Object Footprint — What an Object Actually Costs</a></li><li class="lvl-3"><a href="#allocation-reduction-why-cheap-allocation-is-expensive-in-aggregate" data-toc-link>Allocation Reduction — Why Cheap Allocation Is Expensive in Aggregate</a></li><li class="lvl-3"><a href="#off-heap-and-specialized-layouts" data-toc-link>Off-Heap and Specialized Layouts</a></li><li class="lvl-3"><a href="#sizing-and-measuring-footprint-measure-before-you-optimize" data-toc-link>Sizing and Measuring Footprint — Measure Before You Optimize</a></li><li class="lvl-3"><a href="#real-world-scenario-from-maplong-long-to-a-primitive-map" data-toc-link>Real-World Scenario — From Map&amp;lt;Long, Long&amp;gt; to a Primitive Map</a></li><li class="lvl-2"><a href="#real-world-examples" data-toc-link>Real-World Examples</a></li><li class="lvl-3"><a href="#tomcat-classloader-leak" data-toc-link>Tomcat ClassLoader leak</a></li><li class="lvl-3"><a href="#spring-di-scope-misuse" data-toc-link>Spring DI scope misuse</a></li><li class="lvl-3"><a href="#kafka-consumer-record-retention" data-toc-link>Kafka consumer record retention</a></li><li class="lvl-3"><a href="#hikaricp-threadlocal-context" data-toc-link>HikariCP ThreadLocal context</a></li><li class="lvl-2"><a href="#continuous-leak-monitoring" data-toc-link>Continuous Leak Monitoring</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#confusing-caches-with-leaks" data-toc-link>Confusing caches with leaks</a></li><li class="lvl-3"><a href="#taking-dumps-under-load" data-toc-link>Taking dumps under load</a></li><li class="lvl-3"><a href="#not-using-mat" data-toc-link>Not using MAT</a></li><li class="lvl-3"><a href="#looking-only-at-shallow-heap" data-toc-link>Looking only at shallow heap</a></li><li class="lvl-3"><a href="#fixing-one-leak-missing-the-bigger-one" data-toc-link>Fixing one leak, missing the bigger one</a></li><li class="lvl-3"><a href="#treating-native-leaks-as-java-leaks" data-toc-link>Treating native leaks as Java leaks</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

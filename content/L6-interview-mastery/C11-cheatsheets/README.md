@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 One-pagers: DSA pattern cheatsheet, Big-O reference, design patterns, system-design checklist, behavioral STAR template, Amazon LP map, negotiation script.
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

@@ -24,4 +24,4 @@ Exercises plus this module's end-of-level project.
 
 - [L3 Level Project: JVM Performance Lab](T01-level-project-jvm-performance-lab.md)
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

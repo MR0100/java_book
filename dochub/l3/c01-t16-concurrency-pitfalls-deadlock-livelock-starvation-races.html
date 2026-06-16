@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concurrency Pitfalls (deadlock, livelock, starvation, races) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="active" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span></div>
+        <h1>Concurrency Pitfalls (deadlock, livelock, starvation, races)</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T16-concurrency-pitfalls-deadlock-livelock-starvation-races.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~145 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Concurrency Pitfalls (deadlock, livelock, starvation, races)"
+slug: concurrency-pitfalls-deadlock-livelock-starvation-races
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 16
+tags: [deadlock, livelock, starvation, race-condition, race, coffman-conditions, mutual-exclusion, hold-and-wait, no-preemption, circular-wait, ordered-lock-acquisition, lock-timeout, trylock-timeout, open-calls, dining-philosophers, thread-dump-deadlock-detection, monitor-cycle, found-one-java-level-deadlock, randomized-backoff, exponential-backoff, jitter, priority-inversion, mars-pathfinder, priority-inheritance, fair-locks, unfair-bias, check-then-act, putifabsent, computeifabsent-atomic, read-modify-write, atomic-int, atomic-cas, publication-race, toctou, time-of-check-time-of-use, iteration-cme, concurrent-modification-exception, compound-api-race, lazy-init-race, double-checked-locking, jcstress, error-prone, spotbugs, jpf, java-pathfinder, jfr-contention, deadlock-prevention, transaction-deadlock, db-deadlock-retry, listener-callback-leak, cancellation-deadlock, lock-leak]
+prerequisites: [structured-concurrency, virtual-threads-project-loom, java-memory-model-happens-before-volatile, atomic-variables, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="concurrency-pitfalls-deadlock-livelock-starvation-races">Concurrency Pitfalls (deadlock, livelock, starvation, races)</h1>
+<p>Every concurrent Java program inherits four classic failure modes from the underlying execution model — and <em>every</em> senior engineer should be able to recognize the shape, the cause, and the cure of each on sight. <strong>Deadlock</strong> (threads waiting for each other forever), <strong>livelock</strong> (threads actively working but making no progress), <strong>starvation</strong> (some thread never gets a turn), and <strong>race conditions</strong> (results depend on interleaving). Together they cover essentially every concurrency bug you'll ever debug — and the same patterns appear at every layer: locks, atomic CAS loops, lock-free data structures, distributed systems, database transactions.</p>
+<p>The depth-bar requirement isn't "use ordered lock acquisition." At the <strong>theoretical</strong> layer, <strong>Coffman et al. (1971)</strong> identified four <em>necessary</em> conditions for deadlock — mutual exclusion, hold-and-wait, no preemption, circular wait — and <em>every</em> deadlock-prevention strategy breaks at least one of them. At the <strong>detection</strong> layer, the JVM auto-detects monitor cycles and emits "Found one Java-level deadlock" in thread dumps (<code>jstack</code>, <code>jcmd Thread.print</code>); for non-monitor primitives (Lock, Semaphore), detection requires reading the dump's <code>parking to wait for</code> lines and tracing held-vs-waited resources manually. At the <strong>prevention</strong> layer, the canonical fixes are <strong>ordered lock acquisition</strong> (acquire by a globally-agreed order — id, name, hash — so a cycle is impossible), <strong>timeouts</strong> (<code>tryLock(t, u)</code> breaks out after a deadline), <strong>open calls</strong> (release locks before calling unknown code), and <strong>lock-free / atomic structures</strong> (CAS can spin, livelock, even starve — but never deadlock). At the <strong>race</strong> layer, three shapes cover ~95% of real races — <strong>check-then-act</strong> (use atomic compound ops), <strong>read-modify-write</strong> (use atomic CAS), <strong>publication race</strong> (use volatile/final/safe-publication) — plus the <strong>TOCTOU</strong> security variant where the interleaving lets an attacker squeeze in privilege escalation between check and use. We will cover all four pitfalls in depth, with detection mechanisms, prevention idioms, and the canonical real-world examples (dining philosophers, the Mars Pathfinder priority inversion, the double-checked locking publication race).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t15-structured-concurrency.html">Structured concurrency</a> (L3/C01/T15) — scope-based cancellation prevents some classic races; <a href="c01-t14-virtual-threads-project-loom.html">Virtual threads</a> (L3/C01/T14) — VT cheap creation eliminates "pool deadlock" T05/T13 talked about; <a href="c01-t12-java-memory-model-happens-before-volatile.html">Java Memory Model</a> (L3/C01/T12) — publication races and visibility; <a href="c01-t11-atomic-variables.html">Atomic variables</a> (L3/C01/T11) — CAS-based fixes for check-then-act and read-modify-write; <a href="c01-t08-locks-reentrantlock-readwritelock-stampedlock.html">Locks</a> (L3/C01/T08) — <code>tryLock(timeout)</code> as the universal deadlock escape valve; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized</a> (L3/C01/T03) — monitor cycles detected by the JVM.</p></div></div>
+<h2 id="the-four-failure-modes-one-line-summaries">The Four Failure Modes — One-Line Summaries<a class="anchor" href="#the-four-failure-modes-one-line-summaries" aria-hidden="true">#</a></h2>
+<div class="mermaid">flowchart TB
+  C["Concurrency failure modes"]
+  C --> D["DEADLOCK<br/>threads wait for each other forever<br/>(zero progress, zero CPU)"]
+  C --> L["LIVELOCK<br/>threads work actively but make no progress<br/>(zero progress, full CPU)"]
+  C --> S["STARVATION<br/>one thread never gets a turn<br/>(progress for others, none for it)"]
+  C --> R["RACE CONDITION<br/>result depends on interleaving<br/>(sometimes right, sometimes wrong)"]
+</div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Symptom</th>
+<th>Root cause</th>
+<th>Canonical cure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deadlock</td>
+<td>Threads stuck in WAITING; zero CPU</td>
+<td>Circular wait for resources</td>
+<td>Ordered lock acquisition + timeouts</td>
+</tr>
+<tr>
+<td>Livelock</td>
+<td>Full CPU, no work done</td>
+<td>Threads keep yielding to each other</td>
+<td>Randomized backoff</td>
+</tr>
+<tr>
+<td>Starvation</td>
+<td>One thread never progresses</td>
+<td>Unfairness, priority inversion</td>
+<td>Fair locks, priority inheritance</td>
+</tr>
+<tr>
+<td>Race condition</td>
+<td>Intermittent wrong results</td>
+<td>Unsynchronized access to shared state</td>
+<td>Atomic ops, locks, immutability</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deadlock-the-coffman-conditions">DEADLOCK — the Coffman Conditions<a class="anchor" href="#deadlock-the-coffman-conditions" aria-hidden="true">#</a></h2>
+<p>In 1971, Coffman, Elphick, and Shoshani identified the four conditions that must <em>all</em> hold for deadlock:</p>
+<ol>
+<li><strong>Mutual exclusion</strong> — at least one resource is held exclusively (only one thread can use it at a time).</li>
+<li><strong>Hold and wait</strong> — a thread holds at least one resource while waiting for additional ones.</li>
+<li><strong>No preemption</strong> — resources can only be released voluntarily by the holding thread; they can't be forcibly taken back.</li>
+<li><strong>Circular wait</strong> — there exists a cycle of threads, each waiting for a resource the next holds.</li>
+</ol>
+<p>All four must be true. Break any one and deadlock is impossible.</p>
+<div class="mermaid">flowchart LR
+  ME["Mutual exclusion<br/>(at least one exclusive resource)"]
+  HW["Hold and wait<br/>(thread holds A, waits for B)"]
+  NP["No preemption<br/>(can't forcibly release)"]
+  CW["Circular wait<br/>(cycle of waiting threads)"]
+  ME --> Deadlock["Deadlock requires<br/>ALL FOUR"]
+  HW --> Deadlock
+  NP --> Deadlock
+  CW --> Deadlock
+  Prevention["break ANY ONE → impossible"]
+  Deadlock --> Prevention
+</div>
+<p>Every deadlock-prevention strategy targets at least one condition:</p>
+<ul>
+<li><strong>Lock-free algorithms</strong> break <em>mutual exclusion</em> (no exclusive resources).</li>
+<li><strong>Acquire all locks atomically</strong> (single critical section) breaks <em>hold and wait</em>.</li>
+<li><strong>Timeouts</strong> simulate <em>preemption</em> (the timer takes the lock back).</li>
+<li><strong>Ordered acquisition</strong> breaks <em>circular wait</em> (no cycle possible).</li>
+</ul>
+<p>The most-used in practice: <strong>ordered acquisition + timeouts</strong>.</p>
+<h3 id="the-classic-two-lock-deadlock">The Classic Two-Lock Deadlock<a class="anchor" href="#the-classic-two-lock-deadlock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class Account {
+    final Object lock = new Object();
+    int balance;
+}
+
+void transfer(Account from, Account to, int amount) {
+    synchronized (from.lock) {
+        synchronized (to.lock) {
+            from.balance -= amount;
+            to.balance += amount;
+        }
+    }
+}
+
+// Thread 1: transfer(A, B, 100)        Thread 2: transfer(B, A, 50)
+//   acquires from.lock = A.lock           acquires from.lock = B.lock
+//   tries to acquire to.lock = B.lock     tries to acquire to.lock = A.lock
+//   ↓ BLOCKED — Thread 2 holds B          ↓ BLOCKED — Thread 1 holds A
+//   ⛔ DEADLOCK
+</code></pre></div>
+<p>All four Coffman conditions hold: locks are exclusive (1), each thread holds one while waiting for the other (2), <code>synchronized</code> can't be preempted (3), and the wait cycle is T1→B→T2→A→T1 (4).</p>
+<h3 id="the-dining-philosophers">The Dining Philosophers<a class="anchor" href="#the-dining-philosophers" aria-hidden="true">#</a></h3>
+<p>Dijkstra's classic illustration: 5 philosophers sit around a table; between each pair of adjacent philosophers is one fork; each needs <em>both</em> adjacent forks to eat. The naïve algorithm — "pick up left fork, then right" — deadlocks if all 5 simultaneously pick up their left fork: each waits for the right fork the next is holding.</p>
+<div class="mermaid">flowchart LR
+  P1["P1: holds F1, wants F2"]
+  P2["P2: holds F2, wants F3"]
+  P3["P3: holds F3, wants F4"]
+  P4["P4: holds F4, wants F5"]
+  P5["P5: holds F5, wants F1"]
+  P1 --> P2 --> P3 --> P4 --> P5 --> P1
+  Note["cycle — perfect deadlock"]
+</div>
+<p>Fixes:</p>
+<ul>
+<li><strong>Asymmetric</strong> — one philosopher (say P5) picks up <em>right</em> fork first. Breaks symmetry → breaks cycle.</li>
+<li><strong>Ordered</strong> — every philosopher picks up the <em>lower-numbered</em> fork first. Forces a consistent ordering.</li>
+<li><strong>Coordinator</strong> — a waiter (semaphore) limits to 4 simultaneous eaters; one is always idle, breaking the cycle.</li>
+</ul>
+<p>The ordered fix maps directly to ordered lock acquisition — the universal Java idiom.</p>
+<h2 id="detecting-deadlock-jstack-auto-detection">Detecting Deadlock — <code>jstack</code> Auto-Detection<a class="anchor" href="#detecting-deadlock-jstack-auto-detection" aria-hidden="true">#</a></h2>
+<p>The JVM detects <em>monitor</em> cycles automatically and prints them at the bottom of thread dumps:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">Found one Java-level deadlock:
+=============================
+&quot;Thread-1&quot;:
+  waiting to lock monitor 0x00007fc4a8 (object 0x00000007155, a Account),
+  which is held by &quot;Thread-0&quot;
+&quot;Thread-0&quot;:
+  waiting to lock monitor 0x00007fc4d0 (object 0x00000007156, a Account),
+  which is held by &quot;Thread-1&quot;
+
+Java stack information for the threads listed above:
+===================================================
+&quot;Thread-1&quot;:
+  at com.x.Bank.transfer(Bank.java:42)
+  ...
+&quot;Thread-0&quot;:
+  at com.x.Bank.transfer(Bank.java:42)
+  ...
+</code></pre></div>
+<p>The report shows:</p>
+<ul>
+<li>Which threads are involved.</li>
+<li>Which monitors each holds vs. waits for.</li>
+<li>The stack traces at the lock acquisition points.</li>
+</ul>
+<p><strong>Caveat</strong>: auto-detection only works for <strong>intrinsic monitors</strong> (<code>synchronized</code>). For <code>ReentrantLock</code>, <code>Semaphore</code>, or other AQS-based primitives, the dump shows <code>parking to wait for &lt;0x...&gt;</code> lines — but the JVM doesn't compose them into a cycle. You must trace manually:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">&quot;Thread-A&quot; ... WAITING (parking)
+  - parking to wait for &lt;0x000000071a&gt; (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+&quot;Thread-B&quot; ... WAITING (parking)
+  - parking to wait for &lt;0x000000071b&gt; (a ...ReentrantLock$NonfairSync)
+  - locked &lt;0x000000071a&gt; (a ...ReentrantLock$NonfairSync)     ← B holds what A waits for
+</code></pre></div>
+<p>To make Lock-based deadlocks detectable, some teams use <code>-Djava.util.concurrent.lock.detection=true</code> (JFR-based, JDK 21+) or instrument with a custom Lock wrapper.</p>
+<div class="callout callout-tip"><div class="callout-head"><span class="callout-ic">💡</span><span class="callout-kind">Tip</span></div><div class="callout-body"><p>Take <strong>two thread dumps a few seconds apart</strong>. Threads stuck at the same stack frames across both are genuinely deadlocked (or starved). Threads that move between dumps are still making progress.</p></div></div>
+<h2 id="prevention-1-ordered-lock-acquisition">Prevention 1 — Ordered Lock Acquisition<a class="anchor" href="#prevention-1-ordered-lock-acquisition" aria-hidden="true">#</a></h2>
+<p>Define a <em>globally consistent</em> order over all lockable resources. Always acquire locks in that order. Cycles become impossible because no thread can ever wait for a resource ordered <em>before</em> one it holds.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">void transfer(Account from, Account to, int amount) {
+    Account first  = (from.id &lt; to.id) ? from : to;
+    Account second = (from.id &lt; to.id) ? to : from;
+    synchronized (first.lock) {
+        synchronized (second.lock) {
+            from.balance -= amount;
+            to.balance   += amount;
+        }
+    }
+}
+</code></pre></div>
+<p>By acquiring in <code>id</code>-order, Thread 1 (<code>transfer(A, B)</code>) and Thread 2 (<code>transfer(B, A)</code>) both start with <code>min(A, B)</code> = <code>A</code>. One blocks waiting for <code>A</code>, the other proceeds with both locks, finishes, releases. No cycle.</p>
+<h3 id="what-if-the-resources-dont-have-a-natural-order">What if the resources don't have a natural order?<a class="anchor" href="#what-if-the-resources-dont-have-a-natural-order" aria-hidden="true">#</a></h3>
+<p>Use <code>System.identityHashCode(obj)</code> as the ordering key, with a tiebreaker lock for the rare equal-hash collisions:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">final Object TIE_LOCK = new Object();
+
+void transfer(Account from, Account to) {
+    int h1 = System.identityHashCode(from);
+    int h2 = System.identityHashCode(to);
+    if (h1 &lt; h2) acquireAndTransfer(from, to);
+    else if (h2 &lt; h1) acquireAndTransfer(to, from);
+    else {
+        // hash collision — extremely rare
+        synchronized (TIE_LOCK) { acquireAndTransfer(from, to); }
+    }
+}
+</code></pre></div>
+<p>Goetz's <em>Java Concurrency in Practice</em> (Section 10.1.2) is the canonical reference.</p>
+<h2 id="prevention-2-lock-timeouts-the-universal-escape-valve">Prevention 2 — Lock Timeouts (the Universal Escape Valve)<a class="anchor" href="#prevention-2-lock-timeouts-the-universal-escape-valve" aria-hidden="true">#</a></h2>
+<p><code>Lock.tryLock(timeout, unit)</code> lets a thread give up after a deadline and try another approach:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">boolean ok = false;
+try {
+    if (lockA.tryLock(2, SECONDS)) {
+        try {
+            if (lockB.tryLock(2, SECONDS)) {
+                try { /* critical section */ ok = true; }
+                finally { lockB.unlock(); }
+            }
+            // else: couldn't get B; release A and retry later
+        } finally { lockA.unlock(); }
+    }
+} catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+return ok;
+</code></pre></div>
+<p>Two things happen:</p>
+<ul>
+<li>The thread gives up on timeout instead of waiting forever, simulating <em>preemption</em> (Coffman condition #3 broken).</li>
+<li>The caller decides what to do — retry, abort, log — instead of deadlocking.</li>
+</ul>
+<p>Timeouts are the <em>universal</em> answer when ordering isn't feasible: deeply nested locking with dynamic resource sets, third-party code that holds unknown locks, distributed locking.</p>
+<h2 id="prevention-3-open-calls-and-listener-hygiene">Prevention 3 — Open Calls and Listener Hygiene<a class="anchor" href="#prevention-3-open-calls-and-listener-hygiene" aria-hidden="true">#</a></h2>
+<p><strong>Holding a lock while calling unknown code</strong> is a major deadlock vector. The unknown code may itself try to acquire locks in an arbitrary order:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">void notifyListeners(Event e) {
+    synchronized (listenersLock) {
+        for (var listener : listeners) {
+            listener.onEvent(e);      // ✗ unknown code under our lock
+        }
+    }
+}
+</code></pre></div>
+<p>If a listener tries to acquire any lock we already hold (directly or transitively), or if it calls back into us with a different lock acquisition order, deadlock. The fix is the <strong>open call</strong>: release the lock before the callback.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">void notifyListeners(Event e) {
+    List&lt;Listener&gt; copy;
+    synchronized (listenersLock) { copy = new ArrayList&lt;&gt;(listeners); }   // snapshot under lock
+    for (var listener : copy) listener.onEvent(e);                         // unlocked
+}
+</code></pre></div>
+<p>Snapshot the relevant state under the lock; release; act. Same idea for <code>removeListener</code> etc. — synchronize the <em>bookkeeping</em>, not the <em>callback execution</em>.</p>
+<h2 id="prevention-4-lock-free-single-lock">Prevention 4 — Lock-Free / Single Lock<a class="anchor" href="#prevention-4-lock-free-single-lock" aria-hidden="true">#</a></h2>
+<p>Two structural fixes:</p>
+<ul>
+<li><strong>Lock-free algorithms</strong> (T11 — CAS, AtomicReference, Treiber stack, Michael-Scott queue). No locks → no deadlock. Can still livelock or starve.</li>
+<li><strong>Single global lock</strong> that protects everything. No cycle is possible with one lock. Gives up all parallelism — only suitable for low-traffic or low-contention scenarios.</li>
+</ul>
+<p>The decision: prefer ordered acquisition for the typical case; reach for lock-free for hot paths; use single-lock only when the simplicity outweighs the parallelism loss.</p>
+<h2 id="real-world-deadlocks">Real-World Deadlocks<a class="anchor" href="#real-world-deadlocks" aria-hidden="true">#</a></h2>
+<h3 id="spring-transaction-nesting">Spring transaction nesting<a class="anchor" href="#spring-transaction-nesting" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Transactional
+public void transferA(int from, int to) {
+    accountSvc.update(from, -100);          // holds row lock on row `from`
+    transferB(to, from);                    // calls another @Transactional method
+}
+
+@Transactional
+public void transferB(int from, int to) {
+    accountSvc.update(from, +100);          // tries to lock row `from` (originally `to`)
+    accountSvc.update(to, -100);             // ✗ if called by transferA, this `to` is the row `from` already held
+}
+</code></pre></div>
+<p>Two concurrent calls — <code>transferA(1, 2)</code> and <code>transferA(2, 1)</code> — produce a row-lock cycle in the database, detected and resolved by the database (one transaction rolls back).</p>
+<h3 id="connection-pool-exhaustion">Connection pool exhaustion<a class="anchor" href="#connection-pool-exhaustion" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">DataSource pool = HikariDataSource(maxConnections=10);
+@Transactional public void process(...) {
+    try (Connection c1 = pool.getConnection()) {
+        // ... compute ...
+        process2();    // recursive call
+    }
+}
+@Transactional public void process2() {
+    try (Connection c2 = pool.getConnection()) {     // ✗ each thread needs 2 conns
+        // ...
+    }
+}
+</code></pre></div>
+<p>With 10 concurrent calls each needing 2 connections, the pool runs out — all 10 hold 1 conn and wait for the 11th. Classic resource-exhaustion deadlock. Fix: pool size &gt; 2× expected concurrency, or eliminate the nested transaction.</p>
+<h3 id="logging-framework-re-entry">Logging framework re-entry<a class="anchor" href="#logging-framework-re-entry" aria-hidden="true">#</a></h3>
+<p>Some logging frameworks acquire a lock while constructing log messages. If the message construction itself triggers logging (via a <code>toString()</code> that logs), the same lock is acquired twice from the same thread. With reentrant locks (<code>synchronized</code>, <code>ReentrantLock</code>), this is fine. With non-reentrant locks (<code>StampedLock</code> — T08), this is a self-deadlock.</p>
+<h2 id="livelock-active-yet-stuck">LIVELOCK — Active Yet Stuck<a class="anchor" href="#livelock-active-yet-stuck" aria-hidden="true">#</a></h2>
+<p>Livelock is the more subtle cousin. Threads aren't blocked — they're actively running — but they keep undoing each other's progress, like two people meeting in a hallway who each step to the same side to let the other pass.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// Two threads each:
+while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else { Thread.yield(); /* let the other go */ }
+}
+</code></pre></div>
+<p>If two threads run this in lockstep, both <code>tryAcquire</code> and fail (because the other has it briefly), both <code>yield</code>. The pattern repeats indefinitely — full CPU, zero progress.</p>
+<div class="mermaid">sequenceDiagram
+  participant A as Thread A
+  participant B as Thread B
+  participant R as Resource
+  A->>R: tryAcquire → has it briefly
+  B->>R: tryAcquire → fails, yield
+  A->>R: release (let B go)
+  A->>A: yield, retry
+  B->>R: tryAcquire → has it briefly
+  A->>R: tryAcquire → fails, yield
+  Note over A,B: ... repeats indefinitely ...
+</div>
+<h3 id="cure-randomized-backoff">Cure — Randomized Backoff<a class="anchor" href="#cure-randomized-backoff" aria-hidden="true">#</a></h3>
+<p>Add randomness so the threads don't stay perfectly synchronized:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else {
+        long jitter = ThreadLocalRandom.current().nextInt(0, 100);
+        Thread.sleep(jitter);    // 0-100 ms random pause
+    }
+}
+</code></pre></div>
+<p>Now if two threads collide, the random sleeps differ — one wakes earlier, grabs the resource, proceeds. The other's later wake-up finds the resource available.</p>
+<h3 id="exponential-backoff">Exponential Backoff<a class="anchor" href="#exponential-backoff" aria-hidden="true">#</a></h3>
+<p>For repeated failure (TCP retransmission, database transaction conflicts), the backoff grows exponentially:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int attempt = 0;
+while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else {
+        long base = Math.min(MAX_BACKOFF_MS, (1L &lt;&lt; attempt) * BASE_MS);
+        long jitter = ThreadLocalRandom.current().nextLong(0, base);
+        Thread.sleep(jitter);
+        attempt++;
+    }
+}
+</code></pre></div>
+<p>Add jitter to prevent thundering herd. AWS, Google Cloud, every major distributed system uses this pattern.</p>
+<div class="mermaid">flowchart LR
+  Live["Livelock symptom:<br/>full CPU, no progress"]
+  Cure1["Random jitter — break synchronization"]
+  Cure2["Exponential backoff — grow delay over retries"]
+  Cure3["Priority — let one thread always win ties"]
+  Live --> Cure1
+  Live --> Cure2
+  Live --> Cure3
+</div>
+<h2 id="starvation-never-getting-a-turn">STARVATION — Never Getting a Turn<a class="anchor" href="#starvation-never-getting-a-turn" aria-hidden="true">#</a></h2>
+<p>A thread is <em>starved</em> when it waits indefinitely while others make progress. Three classic causes:</p>
+<h3 id="1-unfair-locks-under-continuous-contention">1. Unfair Locks Under Continuous Contention<a class="anchor" href="#1-unfair-locks-under-continuous-contention" aria-hidden="true">#</a></h3>
+<p><code>ReentrantLock</code> (default unfair, T08) allows newcomers to <em>barge</em> — acquire ahead of waiting threads. Under continuous contention from many newcomers, a queued thread may wait forever.</p>
+<p>The fix: <code>new ReentrantLock(true)</code> — fair locks guarantee FCFS at the cost of throughput.</p>
+<h3 id="2-readerwriter-imbalance">2. Reader/Writer Imbalance<a class="anchor" href="#2-readerwriter-imbalance" aria-hidden="true">#</a></h3>
+<p><code>ReentrantReadWriteLock</code> allows multiple concurrent readers; a writer waits for all readers to release. Under a steady stream of readers, a writer can wait forever (T08).</p>
+<p>The fix: fair RWLock, or limit reader acquisition rate, or use <code>StampedLock</code> with optimistic reads.</p>
+<h3 id="3-priority-inversion-the-mars-pathfinder-bug">3. Priority Inversion — the Mars Pathfinder Bug<a class="anchor" href="#3-priority-inversion-the-mars-pathfinder-bug" aria-hidden="true">#</a></h3>
+<p>In 1997, NASA's Mars Pathfinder rover started rebooting itself. The cause: classic priority inversion:</p>
+<ul>
+<li><strong>Low-priority thread (L)</strong> held a lock.</li>
+<li><strong>High-priority thread (H)</strong> waited for the lock.</li>
+<li><strong>Medium-priority thread (M)</strong> preempted L (because M &gt; L) → M ran while H "had higher priority than M but was waiting for L's lock."</li>
+<li>H was <em>effectively</em> starved by M.</li>
+</ul>
+<p>The fix in real-time systems: <strong>priority inheritance</strong> — when H waits for L's lock, L temporarily inherits H's priority, so M can't preempt L. Pathfinder's bug was fixed by enabling VxWorks's priority inheritance feature (which had been disabled for performance).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p><strong>Standard Java has no priority inheritance.</strong> <code>Thread.setPriority</code> is a hint to the OS scheduler; the JVM may or may not honor it. For real-time guarantees, use Java RTS or RTSJ (the Real-Time Specification for Java). For ordinary apps, <em>don't rely on thread priorities</em> — use proper concurrency primitives and avoid scenarios that need priority-based fairness.</p></div></div>
+<h3 id="lock-free-starvation">Lock-Free Starvation<a class="anchor" href="#lock-free-starvation" aria-hidden="true">#</a></h3>
+<p>CAS loops have their own starvation pattern: one thread's CAS keeps failing because others always win the race. Under extreme contention on a single word, an unlucky thread may retry indefinitely. Mitigations: <code>LongAdder</code> (T11 — stripe across cells), randomized backoff in the CAS loop, or switch to a fair lock if true FCFS is needed.</p>
+<h2 id="race-conditions-three-shapes">RACE CONDITIONS — Three Shapes<a class="anchor" href="#race-conditions-three-shapes" aria-hidden="true">#</a></h2>
+<p>A <em>race condition</em> is any bug where the result depends on the interleaving of threads. ~95% of races fit one of three shapes.</p>
+<h3 id="shape-1-check-then-act">Shape 1 — Check-Then-Act<a class="anchor" href="#shape-1-check-then-act" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ broken
+if (!map.containsKey(key)) {
+    map.put(key, computedValue);
+}
+</code></pre></div>
+<p>Between <code>containsKey</code> and <code>put</code>, another thread can put. Both threads then <code>put</code>, racing to be the "last" — one is silently overwritten. The check-then-act sequence is not atomic.</p>
+<p><strong>Fix</strong>: atomic compound operations on concurrent collections (T10):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✓ atomic
+map.putIfAbsent(key, computedValue);
+
+// ✓ atomic with lazy computation
+map.computeIfAbsent(key, k -&gt; computedValue);
+</code></pre></div>
+<p><code>putIfAbsent</code> and <code>computeIfAbsent</code> are atomic at the CHM bucket level; only one thread successfully puts; others observe the first put's result.</p>
+<h3 id="shape-2-read-modify-write">Shape 2 — Read-Modify-Write<a class="anchor" href="#shape-2-read-modify-write" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ broken
+counter = counter + 1;          // read counter, add 1, write counter — 3 steps
+</code></pre></div>
+<p>Three operations; another thread can interleave between them. Two concurrent <code>++</code> may both read 5, both write 6 — lost update.</p>
+<p><strong>Fix</strong>: atomic CAS (T11):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✓ atomic
+counter.incrementAndGet();       // AtomicInteger
+counter.add(1);                  // LongAdder (faster under contention)
+</code></pre></div>
+<p>Or hold a lock for the entire compound operation:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (this) { counter = counter + 1; }    // ✓ atomic via mutual exclusion
+</code></pre></div>
+<h3 id="shape-3-publication-race">Shape 3 — Publication Race<a class="anchor" href="#shape-3-publication-race" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// ✗ broken: thread A
+sharedRef = new Big();           // construct + publish
+
+// thread B
+Big b = sharedRef;
+b.use();                          // may see partially-constructed object
+</code></pre></div>
+<p>The publication of <code>sharedRef</code> and the writes inside the <code>Big</code> constructor can be reordered (T12). Another thread may see <code>sharedRef != null</code> but the fields uninitialized.</p>
+<p><strong>Fix</strong>: safe publication (T12) — one of:</p>
+<ul>
+<li><code>volatile Big sharedRef;</code> — release/acquire barrier.</li>
+<li><code>final</code> fields in <code>Big</code> — initialization safety covers them.</li>
+<li><code>synchronized</code> around both publish and read.</li>
+<li><code>AtomicReference&lt;Big&gt;</code> — same semantics as volatile.</li>
+</ul>
+<h3 id="toctou-the-security-critical-race">TOCTOU — the Security-Critical Race<a class="anchor" href="#toctou-the-security-critical-race" aria-hidden="true">#</a></h3>
+<p><strong>Time-of-check to time-of-use</strong>: check a security condition; act later; condition changed between check and act:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">if (file.canRead()) {            // CHECK — security check
+    // ... time passes ...
+    String content = Files.readString(file);   // USE — actual access
+}
+</code></pre></div>
+<p>An attacker can swap the file (via symlink, FS race) between check and use. The check passed; the use accesses a different file the attacker controls. Privilege escalation.</p>
+<p><strong>Fix</strong>: capability-based access — open the file once and operate on the handle, not the path. The check and use share the same handle, atomic from the attacker's perspective.</p>
+<h3 id="iteration-race">Iteration Race<a class="anchor" href="#iteration-race" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">List&lt;String&gt; list = Collections.synchronizedList(new ArrayList&lt;&gt;());
+list.add(&quot;x&quot;);
+list.add(&quot;y&quot;);
+for (String s : list) {           // ✗ throws ConcurrentModificationException if any concurrent modify
+    process(s);
+}
+</code></pre></div>
+<p><code>synchronizedList</code>'s individual methods are atomic, but iteration is not — the iterator can observe concurrent modifications and throw CME. Fix: synchronize iteration externally:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (list) { for (String s : list) process(s); }
+</code></pre></div>
+<p>Or use a <code>CopyOnWriteArrayList</code> (T10) whose iterators are snapshots, never throw CME.</p>
+<h3 id="compound-api-race">Compound API Race<a class="anchor" href="#compound-api-race" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// CHM is thread-safe, but this sequence is not:
+if (map.containsKey(k)) {
+    Integer v = map.get(k);
+    map.put(k, v + 1);
+}
+</code></pre></div>
+<p>Each individual call is atomic, but the <em>sequence</em> is not — another thread can put between <code>get</code> and <code>put</code>. The single-line fix:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">map.merge(k, 1, Integer::sum);        // ✓ atomic increment-or-put
+</code></pre></div>
+<p>Or <code>compute</code> for arbitrary update functions:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">map.compute(k, (key, val) -&gt; (val == null) ? 1 : val + 1);
+</code></pre></div>
+<h2 id="detection-tools-worth-knowing">Detection — Tools Worth Knowing<a class="anchor" href="#detection-tools-worth-knowing" aria-hidden="true">#</a></h2>
+<h3 id="static-analysis">Static Analysis<a class="anchor" href="#static-analysis" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Error Prone</strong> (Google) — Bazel plugin; detects many concurrency anti-patterns at compile time.</li>
+<li><strong>SpotBugs</strong> — detects common races (e.g., <code>Math.random()</code> in a thread-unsafe class, unsynchronized access to mutable state).</li>
+<li><strong>IntelliJ inspections</strong> — built-in; <code>@GuardedBy</code> annotation hints.</li>
+<li><strong>NullAway / Checker Framework</strong> — additional pluggable type checkers.</li>
+</ul>
+<h3 id="stress-testing">Stress Testing<a class="anchor" href="#stress-testing" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>jcstress</strong> (Doug Lea) — runs litmus tests millions of times under different JIT settings; verifies only JMM-permitted outcomes are observed. <strong>The</strong> tool for memory-model bug detection (T12).</li>
+<li><strong>Standalone benchmarks</strong> — JMH for throughput + load testing for race exposure.</li>
+</ul>
+<h3 id="runtime-detection">Runtime Detection<a class="anchor" href="#runtime-detection" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Thread dumps</strong> — <code>jstack</code>, <code>jcmd Thread.print</code>; auto-detects monitor deadlocks.</li>
+<li><strong>JFR</strong> — <code>jcmd JFR.start settings=profile</code>; records <code>jdk.JavaMonitorEnter</code>, <code>jdk.ThreadPark</code> for contention analysis.</li>
+<li><strong>Java Pathfinder (JPF)</strong> — model checker; exhaustively explores interleavings. Research-grade; slow for large programs.</li>
+</ul>
+<h3 id="code-review-checklist">Code Review Checklist<a class="anchor" href="#code-review-checklist" aria-hidden="true">#</a></h3>
+<p>For any synchronized/locked code, ask:</p>
+<ul>
+<li>Is every access to the shared state properly synchronized?</li>
+<li>Is there a <code>try/finally</code> ensuring lock release?</li>
+<li>Are nested locks acquired in a consistent order?</li>
+<li>Are there <code>tryLock(timeout)</code> escape valves?</li>
+<li>Are callbacks invoked outside the lock (open calls)?</li>
+<li>Is shared state immutable where possible (T17)?</li>
+</ul>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="holding-a-lock-during-a-network-call">Holding a lock during a network call<a class="anchor" href="#holding-a-lock-during-a-network-call" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (lock) {
+    httpClient.get(url);            // ✗ holds lock for 100s of ms; everyone else blocked
+}
+</code></pre></div>
+<p>Snapshot or compute under lock; do I/O outside.</p>
+<h3 id="mixing-synchronized-with-lock-on-the-same-shared-state">Mixing <code>synchronized</code> with <code>Lock</code> on the same shared state<a class="anchor" href="#mixing-synchronized-with-lock-on-the-same-shared-state" aria-hidden="true">#</a></h3>
+<p>The two are independent — <code>synchronized(obj)</code> doesn't exclude a thread inside <code>lock.lock()</code> from accessing the same field. Pick one mechanism per shared resource.</p>
+<h3 id="forgetting-tryfinally-on-lock">Forgetting <code>try/finally</code> on Lock<a class="anchor" href="#forgetting-tryfinally-on-lock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">lock.lock();
+doWork();              // ✗ if doWork throws, lock leaks
+lock.unlock();
+</code></pre></div>
+<p>Always use <code>try { ... } finally { lock.unlock(); }</code> (T08).</p>
+<h3 id="trust-in-threadsleep-for-fairness">Trust in <code>Thread.sleep</code> for fairness<a class="anchor" href="#trust-in-threadsleep-for-fairness" aria-hidden="true">#</a></h3>
+<p><code>sleep</code> is a scheduler hint, not a synchronization primitive. Don't use it to "give other threads a turn"; use proper primitives.</p>
+<h3 id="volatile-for-compound-atomicity">Volatile for compound atomicity<a class="anchor" href="#volatile-for-compound-atomicity" aria-hidden="true">#</a></h3>
+<p><code>volatile counter; counter++</code> is broken (T11). Use <code>AtomicInteger</code>.</p>
+<h3 id="database-isolation-level-confusion">Database isolation level confusion<a class="anchor" href="#database-isolation-level-confusion" aria-hidden="true">#</a></h3>
+<p><code>READ_COMMITTED</code> doesn't prevent phantom reads; <code>REPEATABLE_READ</code> doesn't prevent write skew; <code>SERIALIZABLE</code> may abort transactions. Race vulnerability depends on the isolation level — code reviews must consider it.</p>
+<h3 id="cancellation-while-locked-deadlock">Cancellation-while-locked deadlock<a class="anchor" href="#cancellation-while-locked-deadlock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (lock) {
+    while (!condition) lock.wait();          // wait releases the monitor
+}
+// from another thread:
+synchronized (lock) { lock.notifyAll(); }     // ✓ this is fine
+// but if cancellation also needs the lock... and uses notifyAll... a cycle is possible
+</code></pre></div>
+<p>Ensure cancellation paths don't require the same lock as the waiting paths if they're dependent.</p>
+<h3 id="pool-deadlock-t05t07">Pool deadlock (T05/T07)<a class="anchor" href="#pool-deadlock-t05t07" aria-hidden="true">#</a></h3>
+<p>Recursive task submission to a bounded pool. Fix: use <code>ForkJoinPool</code> (T13) or virtual threads (T14).</p>
+<h2 id="observability">Observability<a class="anchor" href="#observability" aria-hidden="true">#</a></h2>
+<h3 id="find-a-deadlock-via-thread-dump">Find a deadlock via thread dump<a class="anchor" href="#find-a-deadlock-via-thread-dump" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; Thread.print | grep -A 5 &quot;Found one Java-level deadlock&quot;
+</code></pre></div>
+<p>Or for Lock-based blocking:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-bash">jcmd &lt;pid&gt; Thread.print | grep -B 1 &quot;parking to wait for&quot;
+# correlate with held locks on other threads
+</code></pre></div>
+<h3 id="find-a-livelock-cpu-monitoring">Find a livelock — CPU monitoring<a class="anchor" href="#find-a-livelock-cpu-monitoring" aria-hidden="true">#</a></h3>
+<p>A livelocked process shows full CPU utilization but no forward progress. Take repeated thread dumps; if the same thread is repeatedly running the same code paths without state advancing, livelock.</p>
+<h3 id="find-races-jfr-allocation-profiling">Find races — JFR allocation profiling<a class="anchor" href="#find-races-jfr-allocation-profiling" aria-hidden="true">#</a></h3>
+<p>Repeated allocation of the "wrong-state" object suggests a race in object construction. JFR's <code>jdk.ObjectAllocationOutsideTLAB</code> events with stack traces can localize.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"What are the four Coffman conditions for deadlock?" — Mutual exclusion, hold-and-wait, no preemption, circular wait. <strong>All four must hold</strong> for deadlock; breaking any one prevents it.</p><p>[!INTERVIEW]
+Short Q&amp;A:</p>
+<ol>
+<li><strong>Difference between deadlock and livelock?</strong> Deadlock: threads blocked, zero CPU. Livelock: threads run, full CPU, no progress.</li>
+<li><strong>The four Coffman conditions?</strong> Mutual exclusion, hold-and-wait, no preemption, circular wait.</li>
+<li><strong>How does ordered lock acquisition prevent deadlock?</strong> Breaks circular wait — no thread can ever wait for a lock ordered before one it holds.</li>
+<li><strong>How do timeouts prevent deadlock?</strong> Simulate preemption — the timer takes the lock back.</li>
+<li><strong>What's an open call?</strong> Releasing locks before calling unknown code (listeners, callbacks) to avoid deadlock with their lock acquisitions.</li>
+<li><strong>What's priority inversion?</strong> Low-priority thread holds a lock; high-priority waits; medium-priority preempts low. Effectively the high-priority thread waits for medium-priority. The Mars Pathfinder bug.</li>
+<li><strong>Three race-condition shapes?</strong> Check-then-act, read-modify-write, publication race.</li>
+<li><strong>Fix for check-then-act?</strong> Atomic compound ops — putIfAbsent, computeIfAbsent on concurrent collections.</li>
+<li><strong>Fix for read-modify-write?</strong> Atomic CAS — AtomicInteger.incrementAndGet, LongAdder.add, or lock the compound region.</li>
+<li><strong>Fix for publication race?</strong> Safe publication — volatile, final fields, synchronized, AtomicReference.</li>
+<li><strong>What's TOCTOU?</strong> Time-of-check time-of-use — a race where a check and a subsequent action can be split, letting another thread (or attacker) change state in between.</li>
+<li><strong>Why doesn't volatile fix counter++?</strong> counter++ is read-modify-write — three operations; another thread can interleave. Use AtomicInteger.</li>
+<li><strong>What's the livelock cure?</strong> Randomized backoff — add jitter so threads don't stay synchronized.</li>
+<li><strong>How does jstack help with deadlocks?</strong> Prints "Found one Java-level deadlock" for monitor cycles; for Lock-based blocking, you trace held-vs-waited resources manually.</li>
+<li><strong>What about CHM and races?</strong> CHM operations are individually atomic, but sequences of operations aren't — use merge/compute/computeIfAbsent for compound atomic ops.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Reproduce two-lock deadlock.</strong> Implement the bank transfer example; race transfer(A, B) and transfer(B, A); observe deadlock via jstack.</li>
+<li><strong>Fix with ordered acquisition.</strong> Modify to acquire by account.id; verify no deadlock occurs.</li>
+<li><strong>Fix with timeouts.</strong> Use <code>tryLock(1, SECONDS)</code>; verify the deadlock breaks and one transfer aborts.</li>
+<li><strong>Dining philosophers.</strong> Implement with 5 philosophers and naïve "left then right" → deadlock. Then implement asymmetric solution; verify no deadlock.</li>
+<li><strong>jstack auto-detection.</strong> With your two-lock deadlock running, run <code>jcmd &lt;pid&gt; Thread.print</code>. Confirm the auto-detected report.</li>
+<li><strong>Reproduce livelock.</strong> Two threads each tryAcquire + Thread.yield in a loop. Observe full CPU, no progress. Add randomized backoff; observe correct progress.</li>
+<li><strong>Reproduce starvation with unfair locks.</strong> With 1 fair-waiting thread and 50 barging newcomers continuously CAS'ing ReentrantLock, measure the fair thread's wait time. Observe starvation. Switch to ReentrantLock(true); verify FCFS.</li>
+<li><strong>Check-then-act race.</strong> Implement a "register if absent" using HashMap with check-then-act. Race 10 threads; observe duplicates. Switch to ConcurrentHashMap.putIfAbsent; verify atomicity.</li>
+<li><strong>Counter race.</strong> Two threads each <code>counter++</code> 1M times on volatile int. Print final; observe &lt; 2M. Switch to AtomicInteger; verify 2M.</li>
+<li><strong>Publication race.</strong> Publish a non-volatile reference to a freshly-constructed object; thread reads fields; observe occasional 0 (partially constructed). Add volatile or final; verify always-correct.</li>
+<li><strong>TOCTOU.</strong> Simulate the file-symlink swap race using a slow user-interaction simulation. Show how capability-based open() bypasses it.</li>
+<li><strong>Open call.</strong> Implement an event bus that holds a lock through listener notify; race with listeners that try to remove themselves; observe deadlock. Refactor to open call; verify no deadlock.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>State the <strong>Coffman four conditions</strong> for deadlock (mutual exclusion, hold-and-wait, no preemption, circular wait) — all must hold; breaking any one prevents deadlock.</li>
+<li>Implement the <strong>two canonical deadlock prevention strategies</strong>: ordered lock acquisition (breaks circular wait) and lock timeouts (<code>tryLock(t, u)</code> — simulates preemption).</li>
+<li>Apply the <strong>other deadlock cures</strong>: open calls (release locks before calling unknown code), lock-free algorithms (no mutex), single global lock (no cycle possible).</li>
+<li>Recognize <strong>dining philosophers</strong> as the canonical deadlock illustration; understand asymmetric/ordered/coordinator solutions map to lock-ordering strategies.</li>
+<li>Read <strong>thread dump deadlock reports</strong> ("Found one Java-level deadlock") for monitor cycles; manually trace Lock-based deadlocks via held-vs-waited resources.</li>
+<li>Identify <strong>livelock</strong> (active CPU, no progress) by symptom; fix via <strong>randomized/exponential backoff with jitter</strong>.</li>
+<li>Diagnose <strong>starvation</strong> (some thread never progresses) by cause: unfair locks → fair locks; priority inversion → priority inheritance (only in real-time systems); reader/writer imbalance → fair RWLock or StampedLock; lock-free CAS hot spots → LongAdder striping.</li>
+<li>Recognize the <strong>three race shapes</strong>: check-then-act (fix: atomic compound op), read-modify-write (fix: CAS atomic), publication race (fix: safe publication).</li>
+<li>Spot <strong>TOCTOU</strong> as the security-relevant race; fix via capability-based access (operate on handles, not paths).</li>
+<li>Avoid the <strong>iteration race</strong> (use <code>CopyOnWriteArrayList</code> or externally synchronize iteration) and the <strong>compound API race</strong> (use CHM.merge/compute for sequence atomicity).</li>
+<li>Use <strong>detection tools</strong>: thread dumps (deadlock), JFR (contention), jcstress (memory model), Error Prone/SpotBugs (static analysis), repeated dumps (livelock).</li>
+<li>Avoid <strong>practical pitfalls</strong>: locks across I/O, mixing synchronized + Lock, missing try/finally on lock, volatile for compound ops, sleep-as-synchronization, recursive task pool deadlock.</li>
+<li>Connect to <strong>real-world cases</strong>: Mars Pathfinder priority inversion (1997), Spring transaction nesting, connection pool exhaustion, listener callback deadlock.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t17-thread-safety-patterns.html">Thread-safety patterns</a> — the <em>design</em> patterns that <em>prevent</em> the failure modes from T16. We'll cover <strong>immutability</strong> (the simplest correctness — no shared mutable state to race on), <strong>confinement</strong> (each thread owns its data; ThreadLocal, request-scoped objects), <strong>safe publication</strong> (volatile/final/synchronized/static-init — the four mechanisms from T12), <strong>lock objects vs synchronized blocks</strong> (encapsulation, private final Object lock = new Object()), <strong>monitor patterns</strong> (uniform synchronization style), <strong>defensive copying</strong> (immutable views over mutable data), <strong>single-writer principle</strong> (one thread mutates, many read), <strong>stamp-based optimistic patterns</strong> (T08's StampedLock idiom), and <strong>the @GuardedBy annotation</strong> for compile-time-checked synchronization contracts. T17 closes C01 — the concurrency chapter is then complete.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Concurrency Pitfalls (deadlock, livelock, starvation, races)&quot;
+slug: concurrency-pitfalls-deadlock-livelock-starvation-races
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 16
+tags: [deadlock, livelock, starvation, race-condition, race, coffman-conditions, mutual-exclusion, hold-and-wait, no-preemption, circular-wait, ordered-lock-acquisition, lock-timeout, trylock-timeout, open-calls, dining-philosophers, thread-dump-deadlock-detection, monitor-cycle, found-one-java-level-deadlock, randomized-backoff, exponential-backoff, jitter, priority-inversion, mars-pathfinder, priority-inheritance, fair-locks, unfair-bias, check-then-act, putifabsent, computeifabsent-atomic, read-modify-write, atomic-int, atomic-cas, publication-race, toctou, time-of-check-time-of-use, iteration-cme, concurrent-modification-exception, compound-api-race, lazy-init-race, double-checked-locking, jcstress, error-prone, spotbugs, jpf, java-pathfinder, jfr-contention, deadlock-prevention, transaction-deadlock, db-deadlock-retry, listener-callback-leak, cancellation-deadlock, lock-leak]
+prerequisites: [structured-concurrency, virtual-threads-project-loom, java-memory-model-happens-before-volatile, atomic-variables, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks]
+status: complete
+estimated_minutes: 145
+last_updated: 2026-06-08
+---
+
+# Concurrency Pitfalls (deadlock, livelock, starvation, races)
+
+Every concurrent Java program inherits four classic failure modes from the underlying execution model — and *every* senior engineer should be able to recognize the shape, the cause, and the cure of each on sight. **Deadlock** (threads waiting for each other forever), **livelock** (threads actively working but making no progress), **starvation** (some thread never gets a turn), and **race conditions** (results depend on interleaving). Together they cover essentially every concurrency bug you&#x27;ll ever debug — and the same patterns appear at every layer: locks, atomic CAS loops, lock-free data structures, distributed systems, database transactions.
+
+The depth-bar requirement isn&#x27;t &quot;use ordered lock acquisition.&quot; At the **theoretical** layer, **Coffman et al. (1971)** identified four *necessary* conditions for deadlock — mutual exclusion, hold-and-wait, no preemption, circular wait — and *every* deadlock-prevention strategy breaks at least one of them. At the **detection** layer, the JVM auto-detects monitor cycles and emits &quot;Found one Java-level deadlock&quot; in thread dumps (`jstack`, `jcmd Thread.print`); for non-monitor primitives (Lock, Semaphore), detection requires reading the dump&#x27;s `parking to wait for` lines and tracing held-vs-waited resources manually. At the **prevention** layer, the canonical fixes are **ordered lock acquisition** (acquire by a globally-agreed order — id, name, hash — so a cycle is impossible), **timeouts** (`tryLock(t, u)` breaks out after a deadline), **open calls** (release locks before calling unknown code), and **lock-free / atomic structures** (CAS can spin, livelock, even starve — but never deadlock). At the **race** layer, three shapes cover ~95% of real races — **check-then-act** (use atomic compound ops), **read-modify-write** (use atomic CAS), **publication race** (use volatile/final/safe-publication) — plus the **TOCTOU** security variant where the interleaving lets an attacker squeeze in privilege escalation between check and use. We will cover all four pitfalls in depth, with detection mechanisms, prevention idioms, and the canonical real-world examples (dining philosophers, the Mars Pathfinder priority inversion, the double-checked locking publication race).
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Structured concurrency](./T15-structured-concurrency.md) (L3/C01/T15) — scope-based cancellation prevents some classic races; [Virtual threads](./T14-virtual-threads-project-loom.md) (L3/C01/T14) — VT cheap creation eliminates &quot;pool deadlock&quot; T05/T13 talked about; [Java Memory Model](./T12-java-memory-model-happens-before-volatile.md) (L3/C01/T12) — publication races and visibility; [Atomic variables](./T11-atomic-variables.md) (L3/C01/T11) — CAS-based fixes for check-then-act and read-modify-write; [Locks](./T08-locks-reentrantlock-readwritelock-stampedlock.md) (L3/C01/T08) — `tryLock(timeout)` as the universal deadlock escape valve; [synchronized](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — monitor cycles detected by the JVM.
+
+## The Four Failure Modes — One-Line Summaries
+
+```mermaid
+flowchart TB
+  C[&quot;Concurrency failure modes&quot;]
+  C --&gt; D[&quot;DEADLOCK&lt;br/&gt;threads wait for each other forever&lt;br/&gt;(zero progress, zero CPU)&quot;]
+  C --&gt; L[&quot;LIVELOCK&lt;br/&gt;threads work actively but make no progress&lt;br/&gt;(zero progress, full CPU)&quot;]
+  C --&gt; S[&quot;STARVATION&lt;br/&gt;one thread never gets a turn&lt;br/&gt;(progress for others, none for it)&quot;]
+  C --&gt; R[&quot;RACE CONDITION&lt;br/&gt;result depends on interleaving&lt;br/&gt;(sometimes right, sometimes wrong)&quot;]
+```
+
+| Failure | Symptom | Root cause | Canonical cure |
+|---------|---------|-----------|----------------|
+| Deadlock | Threads stuck in WAITING; zero CPU | Circular wait for resources | Ordered lock acquisition + timeouts |
+| Livelock | Full CPU, no work done | Threads keep yielding to each other | Randomized backoff |
+| Starvation | One thread never progresses | Unfairness, priority inversion | Fair locks, priority inheritance |
+| Race condition | Intermittent wrong results | Unsynchronized access to shared state | Atomic ops, locks, immutability |
+
+## DEADLOCK — the Coffman Conditions
+
+In 1971, Coffman, Elphick, and Shoshani identified the four conditions that must *all* hold for deadlock:
+
+1. **Mutual exclusion** — at least one resource is held exclusively (only one thread can use it at a time).
+2. **Hold and wait** — a thread holds at least one resource while waiting for additional ones.
+3. **No preemption** — resources can only be released voluntarily by the holding thread; they can&#x27;t be forcibly taken back.
+4. **Circular wait** — there exists a cycle of threads, each waiting for a resource the next holds.
+
+All four must be true. Break any one and deadlock is impossible.
+
+```mermaid
+flowchart LR
+  ME[&quot;Mutual exclusion&lt;br/&gt;(at least one exclusive resource)&quot;]
+  HW[&quot;Hold and wait&lt;br/&gt;(thread holds A, waits for B)&quot;]
+  NP[&quot;No preemption&lt;br/&gt;(can&#x27;t forcibly release)&quot;]
+  CW[&quot;Circular wait&lt;br/&gt;(cycle of waiting threads)&quot;]
+  ME --&gt; Deadlock[&quot;Deadlock requires&lt;br/&gt;ALL FOUR&quot;]
+  HW --&gt; Deadlock
+  NP --&gt; Deadlock
+  CW --&gt; Deadlock
+  Prevention[&quot;break ANY ONE → impossible&quot;]
+  Deadlock --&gt; Prevention
+```
+
+Every deadlock-prevention strategy targets at least one condition:
+
+- **Lock-free algorithms** break *mutual exclusion* (no exclusive resources).
+- **Acquire all locks atomically** (single critical section) breaks *hold and wait*.
+- **Timeouts** simulate *preemption* (the timer takes the lock back).
+- **Ordered acquisition** breaks *circular wait* (no cycle possible).
+
+The most-used in practice: **ordered acquisition + timeouts**.
+
+### The Classic Two-Lock Deadlock
+
+```java
+class Account {
+    final Object lock = new Object();
+    int balance;
+}
+
+void transfer(Account from, Account to, int amount) {
+    synchronized (from.lock) {
+        synchronized (to.lock) {
+            from.balance -= amount;
+            to.balance += amount;
+        }
+    }
+}
+
+// Thread 1: transfer(A, B, 100)        Thread 2: transfer(B, A, 50)
+//   acquires from.lock = A.lock           acquires from.lock = B.lock
+//   tries to acquire to.lock = B.lock     tries to acquire to.lock = A.lock
+//   ↓ BLOCKED — Thread 2 holds B          ↓ BLOCKED — Thread 1 holds A
+//   ⛔ DEADLOCK
+```
+
+All four Coffman conditions hold: locks are exclusive (1), each thread holds one while waiting for the other (2), `synchronized` can&#x27;t be preempted (3), and the wait cycle is T1→B→T2→A→T1 (4).
+
+### The Dining Philosophers
+
+Dijkstra&#x27;s classic illustration: 5 philosophers sit around a table; between each pair of adjacent philosophers is one fork; each needs *both* adjacent forks to eat. The naïve algorithm — &quot;pick up left fork, then right&quot; — deadlocks if all 5 simultaneously pick up their left fork: each waits for the right fork the next is holding.
+
+```mermaid
+flowchart LR
+  P1[&quot;P1: holds F1, wants F2&quot;]
+  P2[&quot;P2: holds F2, wants F3&quot;]
+  P3[&quot;P3: holds F3, wants F4&quot;]
+  P4[&quot;P4: holds F4, wants F5&quot;]
+  P5[&quot;P5: holds F5, wants F1&quot;]
+  P1 --&gt; P2 --&gt; P3 --&gt; P4 --&gt; P5 --&gt; P1
+  Note[&quot;cycle — perfect deadlock&quot;]
+```
+
+Fixes:
+
+- **Asymmetric** — one philosopher (say P5) picks up *right* fork first. Breaks symmetry → breaks cycle.
+- **Ordered** — every philosopher picks up the *lower-numbered* fork first. Forces a consistent ordering.
+- **Coordinator** — a waiter (semaphore) limits to 4 simultaneous eaters; one is always idle, breaking the cycle.
+
+The ordered fix maps directly to ordered lock acquisition — the universal Java idiom.
+
+## Detecting Deadlock — `jstack` Auto-Detection
+
+The JVM detects *monitor* cycles automatically and prints them at the bottom of thread dumps:
+
+```text
+Found one Java-level deadlock:
+=============================
+&quot;Thread-1&quot;:
+  waiting to lock monitor 0x00007fc4a8 (object 0x00000007155, a Account),
+  which is held by &quot;Thread-0&quot;
+&quot;Thread-0&quot;:
+  waiting to lock monitor 0x00007fc4d0 (object 0x00000007156, a Account),
+  which is held by &quot;Thread-1&quot;
+
+Java stack information for the threads listed above:
+===================================================
+&quot;Thread-1&quot;:
+  at com.x.Bank.transfer(Bank.java:42)
+  ...
+&quot;Thread-0&quot;:
+  at com.x.Bank.transfer(Bank.java:42)
+  ...
+```
+
+The report shows:
+
+- Which threads are involved.
+- Which monitors each holds vs. waits for.
+- The stack traces at the lock acquisition points.
+
+**Caveat**: auto-detection only works for **intrinsic monitors** (`synchronized`). For `ReentrantLock`, `Semaphore`, or other AQS-based primitives, the dump shows `parking to wait for &lt;0x...&gt;` lines — but the JVM doesn&#x27;t compose them into a cycle. You must trace manually:
+
+```text
+&quot;Thread-A&quot; ... WAITING (parking)
+  - parking to wait for &lt;0x000000071a&gt; (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+&quot;Thread-B&quot; ... WAITING (parking)
+  - parking to wait for &lt;0x000000071b&gt; (a ...ReentrantLock$NonfairSync)
+  - locked &lt;0x000000071a&gt; (a ...ReentrantLock$NonfairSync)     ← B holds what A waits for
+```
+
+To make Lock-based deadlocks detectable, some teams use `-Djava.util.concurrent.lock.detection=true` (JFR-based, JDK 21+) or instrument with a custom Lock wrapper.
+
+&gt; [!TIP]
+&gt; Take **two thread dumps a few seconds apart**. Threads stuck at the same stack frames across both are genuinely deadlocked (or starved). Threads that move between dumps are still making progress.
+
+## Prevention 1 — Ordered Lock Acquisition
+
+Define a *globally consistent* order over all lockable resources. Always acquire locks in that order. Cycles become impossible because no thread can ever wait for a resource ordered *before* one it holds.
+
+```java
+void transfer(Account from, Account to, int amount) {
+    Account first  = (from.id &lt; to.id) ? from : to;
+    Account second = (from.id &lt; to.id) ? to : from;
+    synchronized (first.lock) {
+        synchronized (second.lock) {
+            from.balance -= amount;
+            to.balance   += amount;
+        }
+    }
+}
+```
+
+By acquiring in `id`-order, Thread 1 (`transfer(A, B)`) and Thread 2 (`transfer(B, A)`) both start with `min(A, B)` = `A`. One blocks waiting for `A`, the other proceeds with both locks, finishes, releases. No cycle.
+
+### What if the resources don&#x27;t have a natural order?
+
+Use `System.identityHashCode(obj)` as the ordering key, with a tiebreaker lock for the rare equal-hash collisions:
+
+```java
+final Object TIE_LOCK = new Object();
+
+void transfer(Account from, Account to) {
+    int h1 = System.identityHashCode(from);
+    int h2 = System.identityHashCode(to);
+    if (h1 &lt; h2) acquireAndTransfer(from, to);
+    else if (h2 &lt; h1) acquireAndTransfer(to, from);
+    else {
+        // hash collision — extremely rare
+        synchronized (TIE_LOCK) { acquireAndTransfer(from, to); }
+    }
+}
+```
+
+Goetz&#x27;s *Java Concurrency in Practice* (Section 10.1.2) is the canonical reference.
+
+## Prevention 2 — Lock Timeouts (the Universal Escape Valve)
+
+`Lock.tryLock(timeout, unit)` lets a thread give up after a deadline and try another approach:
+
+```java
+boolean ok = false;
+try {
+    if (lockA.tryLock(2, SECONDS)) {
+        try {
+            if (lockB.tryLock(2, SECONDS)) {
+                try { /* critical section */ ok = true; }
+                finally { lockB.unlock(); }
+            }
+            // else: couldn&#x27;t get B; release A and retry later
+        } finally { lockA.unlock(); }
+    }
+} catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+return ok;
+```
+
+Two things happen:
+
+- The thread gives up on timeout instead of waiting forever, simulating *preemption* (Coffman condition #3 broken).
+- The caller decides what to do — retry, abort, log — instead of deadlocking.
+
+Timeouts are the *universal* answer when ordering isn&#x27;t feasible: deeply nested locking with dynamic resource sets, third-party code that holds unknown locks, distributed locking.
+
+## Prevention 3 — Open Calls and Listener Hygiene
+
+**Holding a lock while calling unknown code** is a major deadlock vector. The unknown code may itself try to acquire locks in an arbitrary order:
+
+```java
+void notifyListeners(Event e) {
+    synchronized (listenersLock) {
+        for (var listener : listeners) {
+            listener.onEvent(e);      // ✗ unknown code under our lock
+        }
+    }
+}
+```
+
+If a listener tries to acquire any lock we already hold (directly or transitively), or if it calls back into us with a different lock acquisition order, deadlock. The fix is the **open call**: release the lock before the callback.
+
+```java
+void notifyListeners(Event e) {
+    List&lt;Listener&gt; copy;
+    synchronized (listenersLock) { copy = new ArrayList&lt;&gt;(listeners); }   // snapshot under lock
+    for (var listener : copy) listener.onEvent(e);                         // unlocked
+}
+```
+
+Snapshot the relevant state under the lock; release; act. Same idea for `removeListener` etc. — synchronize the *bookkeeping*, not the *callback execution*.
+
+## Prevention 4 — Lock-Free / Single Lock
+
+Two structural fixes:
+
+- **Lock-free algorithms** (T11 — CAS, AtomicReference, Treiber stack, Michael-Scott queue). No locks → no deadlock. Can still livelock or starve.
+- **Single global lock** that protects everything. No cycle is possible with one lock. Gives up all parallelism — only suitable for low-traffic or low-contention scenarios.
+
+The decision: prefer ordered acquisition for the typical case; reach for lock-free for hot paths; use single-lock only when the simplicity outweighs the parallelism loss.
+
+## Real-World Deadlocks
+
+### Spring transaction nesting
+
+```java
+@Transactional
+public void transferA(int from, int to) {
+    accountSvc.update(from, -100);          // holds row lock on row `from`
+    transferB(to, from);                    // calls another @Transactional method
+}
+
+@Transactional
+public void transferB(int from, int to) {
+    accountSvc.update(from, +100);          // tries to lock row `from` (originally `to`)
+    accountSvc.update(to, -100);             // ✗ if called by transferA, this `to` is the row `from` already held
+}
+```
+
+Two concurrent calls — `transferA(1, 2)` and `transferA(2, 1)` — produce a row-lock cycle in the database, detected and resolved by the database (one transaction rolls back).
+
+### Connection pool exhaustion
+
+```java
+DataSource pool = HikariDataSource(maxConnections=10);
+@Transactional public void process(...) {
+    try (Connection c1 = pool.getConnection()) {
+        // ... compute ...
+        process2();    // recursive call
+    }
+}
+@Transactional public void process2() {
+    try (Connection c2 = pool.getConnection()) {     // ✗ each thread needs 2 conns
+        // ...
+    }
+}
+```
+
+With 10 concurrent calls each needing 2 connections, the pool runs out — all 10 hold 1 conn and wait for the 11th. Classic resource-exhaustion deadlock. Fix: pool size &gt; 2× expected concurrency, or eliminate the nested transaction.
+
+### Logging framework re-entry
+
+Some logging frameworks acquire a lock while constructing log messages. If the message construction itself triggers logging (via a `toString()` that logs), the same lock is acquired twice from the same thread. With reentrant locks (`synchronized`, `ReentrantLock`), this is fine. With non-reentrant locks (`StampedLock` — T08), this is a self-deadlock.
+
+## LIVELOCK — Active Yet Stuck
+
+Livelock is the more subtle cousin. Threads aren&#x27;t blocked — they&#x27;re actively running — but they keep undoing each other&#x27;s progress, like two people meeting in a hallway who each step to the same side to let the other pass.
+
+```java
+// Two threads each:
+while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else { Thread.yield(); /* let the other go */ }
+}
+```
+
+If two threads run this in lockstep, both `tryAcquire` and fail (because the other has it briefly), both `yield`. The pattern repeats indefinitely — full CPU, zero progress.
+
+```mermaid
+sequenceDiagram
+  participant A as Thread A
+  participant B as Thread B
+  participant R as Resource
+  A-&gt;&gt;R: tryAcquire → has it briefly
+  B-&gt;&gt;R: tryAcquire → fails, yield
+  A-&gt;&gt;R: release (let B go)
+  A-&gt;&gt;A: yield, retry
+  B-&gt;&gt;R: tryAcquire → has it briefly
+  A-&gt;&gt;R: tryAcquire → fails, yield
+  Note over A,B: ... repeats indefinitely ...
+```
+
+### Cure — Randomized Backoff
+
+Add randomness so the threads don&#x27;t stay perfectly synchronized:
+
+```java
+while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else {
+        long jitter = ThreadLocalRandom.current().nextInt(0, 100);
+        Thread.sleep(jitter);    // 0-100 ms random pause
+    }
+}
+```
+
+Now if two threads collide, the random sleeps differ — one wakes earlier, grabs the resource, proceeds. The other&#x27;s later wake-up finds the resource available.
+
+### Exponential Backoff
+
+For repeated failure (TCP retransmission, database transaction conflicts), the backoff grows exponentially:
+
+```java
+int attempt = 0;
+while (!acquired) {
+    if (resource.tryAcquire()) { acquired = true; }
+    else {
+        long base = Math.min(MAX_BACKOFF_MS, (1L &lt;&lt; attempt) * BASE_MS);
+        long jitter = ThreadLocalRandom.current().nextLong(0, base);
+        Thread.sleep(jitter);
+        attempt++;
+    }
+}
+```
+
+Add jitter to prevent thundering herd. AWS, Google Cloud, every major distributed system uses this pattern.
+
+```mermaid
+flowchart LR
+  Live[&quot;Livelock symptom:&lt;br/&gt;full CPU, no progress&quot;]
+  Cure1[&quot;Random jitter — break synchronization&quot;]
+  Cure2[&quot;Exponential backoff — grow delay over retries&quot;]
+  Cure3[&quot;Priority — let one thread always win ties&quot;]
+  Live --&gt; Cure1
+  Live --&gt; Cure2
+  Live --&gt; Cure3
+```
+
+## STARVATION — Never Getting a Turn
+
+A thread is *starved* when it waits indefinitely while others make progress. Three classic causes:
+
+### 1. Unfair Locks Under Continuous Contention
+
+`ReentrantLock` (default unfair, T08) allows newcomers to *barge* — acquire ahead of waiting threads. Under continuous contention from many newcomers, a queued thread may wait forever.
+
+The fix: `new ReentrantLock(true)` — fair locks guarantee FCFS at the cost of throughput.
+
+### 2. Reader/Writer Imbalance
+
+`ReentrantReadWriteLock` allows multiple concurrent readers; a writer waits for all readers to release. Under a steady stream of readers, a writer can wait forever (T08).
+
+The fix: fair RWLock, or limit reader acquisition rate, or use `StampedLock` with optimistic reads.
+
+### 3. Priority Inversion — the Mars Pathfinder Bug
+
+In 1997, NASA&#x27;s Mars Pathfinder rover started rebooting itself. The cause: classic priority inversion:
+
+- **Low-priority thread (L)** held a lock.
+- **High-priority thread (H)** waited for the lock.
+- **Medium-priority thread (M)** preempted L (because M &gt; L) → M ran while H &quot;had higher priority than M but was waiting for L&#x27;s lock.&quot;
+- H was *effectively* starved by M.
+
+The fix in real-time systems: **priority inheritance** — when H waits for L&#x27;s lock, L temporarily inherits H&#x27;s priority, so M can&#x27;t preempt L. Pathfinder&#x27;s bug was fixed by enabling VxWorks&#x27;s priority inheritance feature (which had been disabled for performance).
+
+&gt; [!NOTE]
+&gt; **Standard Java has no priority inheritance.** `Thread.setPriority` is a hint to the OS scheduler; the JVM may or may not honor it. For real-time guarantees, use Java RTS or RTSJ (the Real-Time Specification for Java). For ordinary apps, *don&#x27;t rely on thread priorities* — use proper concurrency primitives and avoid scenarios that need priority-based fairness.
+
+### Lock-Free Starvation
+
+CAS loops have their own starvation pattern: one thread&#x27;s CAS keeps failing because others always win the race. Under extreme contention on a single word, an unlucky thread may retry indefinitely. Mitigations: `LongAdder` (T11 — stripe across cells), randomized backoff in the CAS loop, or switch to a fair lock if true FCFS is needed.
+
+## RACE CONDITIONS — Three Shapes
+
+A *race condition* is any bug where the result depends on the interleaving of threads. ~95% of races fit one of three shapes.
+
+### Shape 1 — Check-Then-Act
+
+```java
+// ✗ broken
+if (!map.containsKey(key)) {
+    map.put(key, computedValue);
+}
+```
+
+Between `containsKey` and `put`, another thread can put. Both threads then `put`, racing to be the &quot;last&quot; — one is silently overwritten. The check-then-act sequence is not atomic.
+
+**Fix**: atomic compound operations on concurrent collections (T10):
+
+```java
+// ✓ atomic
+map.putIfAbsent(key, computedValue);
+
+// ✓ atomic with lazy computation
+map.computeIfAbsent(key, k -&gt; computedValue);
+```
+
+`putIfAbsent` and `computeIfAbsent` are atomic at the CHM bucket level; only one thread successfully puts; others observe the first put&#x27;s result.
+
+### Shape 2 — Read-Modify-Write
+
+```java
+// ✗ broken
+counter = counter + 1;          // read counter, add 1, write counter — 3 steps
+```
+
+Three operations; another thread can interleave between them. Two concurrent `++` may both read 5, both write 6 — lost update.
+
+**Fix**: atomic CAS (T11):
+
+```java
+// ✓ atomic
+counter.incrementAndGet();       // AtomicInteger
+counter.add(1);                  // LongAdder (faster under contention)
+```
+
+Or hold a lock for the entire compound operation:
+
+```java
+synchronized (this) { counter = counter + 1; }    // ✓ atomic via mutual exclusion
+```
+
+### Shape 3 — Publication Race
+
+```java
+// ✗ broken: thread A
+sharedRef = new Big();           // construct + publish
+
+// thread B
+Big b = sharedRef;
+b.use();                          // may see partially-constructed object
+```
+
+The publication of `sharedRef` and the writes inside the `Big` constructor can be reordered (T12). Another thread may see `sharedRef != null` but the fields uninitialized.
+
+**Fix**: safe publication (T12) — one of:
+
+- `volatile Big sharedRef;` — release/acquire barrier.
+- `final` fields in `Big` — initialization safety covers them.
+- `synchronized` around both publish and read.
+- `AtomicReference&lt;Big&gt;` — same semantics as volatile.
+
+### TOCTOU — the Security-Critical Race
+
+**Time-of-check to time-of-use**: check a security condition; act later; condition changed between check and act:
+
+```java
+if (file.canRead()) {            // CHECK — security check
+    // ... time passes ...
+    String content = Files.readString(file);   // USE — actual access
+}
+```
+
+An attacker can swap the file (via symlink, FS race) between check and use. The check passed; the use accesses a different file the attacker controls. Privilege escalation.
+
+**Fix**: capability-based access — open the file once and operate on the handle, not the path. The check and use share the same handle, atomic from the attacker&#x27;s perspective.
+
+### Iteration Race
+
+```java
+List&lt;String&gt; list = Collections.synchronizedList(new ArrayList&lt;&gt;());
+list.add(&quot;x&quot;);
+list.add(&quot;y&quot;);
+for (String s : list) {           // ✗ throws ConcurrentModificationException if any concurrent modify
+    process(s);
+}
+```
+
+`synchronizedList`&#x27;s individual methods are atomic, but iteration is not — the iterator can observe concurrent modifications and throw CME. Fix: synchronize iteration externally:
+
+```java
+synchronized (list) { for (String s : list) process(s); }
+```
+
+Or use a `CopyOnWriteArrayList` (T10) whose iterators are snapshots, never throw CME.
+
+### Compound API Race
+
+```java
+// CHM is thread-safe, but this sequence is not:
+if (map.containsKey(k)) {
+    Integer v = map.get(k);
+    map.put(k, v + 1);
+}
+```
+
+Each individual call is atomic, but the *sequence* is not — another thread can put between `get` and `put`. The single-line fix:
+
+```java
+map.merge(k, 1, Integer::sum);        // ✓ atomic increment-or-put
+```
+
+Or `compute` for arbitrary update functions:
+
+```java
+map.compute(k, (key, val) -&gt; (val == null) ? 1 : val + 1);
+```
+
+## Detection — Tools Worth Knowing
+
+### Static Analysis
+
+- **Error Prone** (Google) — Bazel plugin; detects many concurrency anti-patterns at compile time.
+- **SpotBugs** — detects common races (e.g., `Math.random()` in a thread-unsafe class, unsynchronized access to mutable state).
+- **IntelliJ inspections** — built-in; `@GuardedBy` annotation hints.
+- **NullAway / Checker Framework** — additional pluggable type checkers.
+
+### Stress Testing
+
+- **jcstress** (Doug Lea) — runs litmus tests millions of times under different JIT settings; verifies only JMM-permitted outcomes are observed. **The** tool for memory-model bug detection (T12).
+- **Standalone benchmarks** — JMH for throughput + load testing for race exposure.
+
+### Runtime Detection
+
+- **Thread dumps** — `jstack`, `jcmd Thread.print`; auto-detects monitor deadlocks.
+- **JFR** — `jcmd JFR.start settings=profile`; records `jdk.JavaMonitorEnter`, `jdk.ThreadPark` for contention analysis.
+- **Java Pathfinder (JPF)** — model checker; exhaustively explores interleavings. Research-grade; slow for large programs.
+
+### Code Review Checklist
+
+For any synchronized/locked code, ask:
+
+- Is every access to the shared state properly synchronized?
+- Is there a `try/finally` ensuring lock release?
+- Are nested locks acquired in a consistent order?
+- Are there `tryLock(timeout)` escape valves?
+- Are callbacks invoked outside the lock (open calls)?
+- Is shared state immutable where possible (T17)?
+
+## Common Mistakes
+
+### Holding a lock during a network call
+
+```java
+synchronized (lock) {
+    httpClient.get(url);            // ✗ holds lock for 100s of ms; everyone else blocked
+}
+```
+
+Snapshot or compute under lock; do I/O outside.
+
+### Mixing `synchronized` with `Lock` on the same shared state
+
+The two are independent — `synchronized(obj)` doesn&#x27;t exclude a thread inside `lock.lock()` from accessing the same field. Pick one mechanism per shared resource.
+
+### Forgetting `try/finally` on Lock
+
+```java
+lock.lock();
+doWork();              // ✗ if doWork throws, lock leaks
+lock.unlock();
+```
+
+Always use `try { ... } finally { lock.unlock(); }` (T08).
+
+### Trust in `Thread.sleep` for fairness
+
+`sleep` is a scheduler hint, not a synchronization primitive. Don&#x27;t use it to &quot;give other threads a turn&quot;; use proper primitives.
+
+### Volatile for compound atomicity
+
+`volatile counter; counter++` is broken (T11). Use `AtomicInteger`.
+
+### Database isolation level confusion
+
+`READ_COMMITTED` doesn&#x27;t prevent phantom reads; `REPEATABLE_READ` doesn&#x27;t prevent write skew; `SERIALIZABLE` may abort transactions. Race vulnerability depends on the isolation level — code reviews must consider it.
+
+### Cancellation-while-locked deadlock
+
+```java
+synchronized (lock) {
+    while (!condition) lock.wait();          // wait releases the monitor
+}
+// from another thread:
+synchronized (lock) { lock.notifyAll(); }     // ✓ this is fine
+// but if cancellation also needs the lock... and uses notifyAll... a cycle is possible
+```
+
+Ensure cancellation paths don&#x27;t require the same lock as the waiting paths if they&#x27;re dependent.
+
+### Pool deadlock (T05/T07)
+
+Recursive task submission to a bounded pool. Fix: use `ForkJoinPool` (T13) or virtual threads (T14).
+
+## Observability
+
+### Find a deadlock via thread dump
+
+```bash
+jcmd &lt;pid&gt; Thread.print | grep -A 5 &quot;Found one Java-level deadlock&quot;
+```
+
+Or for Lock-based blocking:
+
+```bash
+jcmd &lt;pid&gt; Thread.print | grep -B 1 &quot;parking to wait for&quot;
+# correlate with held locks on other threads
+```
+
+### Find a livelock — CPU monitoring
+
+A livelocked process shows full CPU utilization but no forward progress. Take repeated thread dumps; if the same thread is repeatedly running the same code paths without state advancing, livelock.
+
+### Find races — JFR allocation profiling
+
+Repeated allocation of the &quot;wrong-state&quot; object suggests a race in object construction. JFR&#x27;s `jdk.ObjectAllocationOutsideTLAB` events with stack traces can localize.
+
+&gt; [!INTERVIEW]
+&gt; &quot;What are the four Coffman conditions for deadlock?&quot; — Mutual exclusion, hold-and-wait, no preemption, circular wait. **All four must hold** for deadlock; breaking any one prevents it.
+
+&gt; [!INTERVIEW]
+&gt; Short Q&amp;A:
+&gt;
+&gt; 1. **Difference between deadlock and livelock?** Deadlock: threads blocked, zero CPU. Livelock: threads run, full CPU, no progress.
+&gt; 2. **The four Coffman conditions?** Mutual exclusion, hold-and-wait, no preemption, circular wait.
+&gt; 3. **How does ordered lock acquisition prevent deadlock?** Breaks circular wait — no thread can ever wait for a lock ordered before one it holds.
+&gt; 4. **How do timeouts prevent deadlock?** Simulate preemption — the timer takes the lock back.
+&gt; 5. **What&#x27;s an open call?** Releasing locks before calling unknown code (listeners, callbacks) to avoid deadlock with their lock acquisitions.
+&gt; 6. **What&#x27;s priority inversion?** Low-priority thread holds a lock; high-priority waits; medium-priority preempts low. Effectively the high-priority thread waits for medium-priority. The Mars Pathfinder bug.
+&gt; 7. **Three race-condition shapes?** Check-then-act, read-modify-write, publication race.
+&gt; 8. **Fix for check-then-act?** Atomic compound ops — putIfAbsent, computeIfAbsent on concurrent collections.
+&gt; 9. **Fix for read-modify-write?** Atomic CAS — AtomicInteger.incrementAndGet, LongAdder.add, or lock the compound region.
+&gt; 10. **Fix for publication race?** Safe publication — volatile, final fields, synchronized, AtomicReference.
+&gt; 11. **What&#x27;s TOCTOU?** Time-of-check time-of-use — a race where a check and a subsequent action can be split, letting another thread (or attacker) change state in between.
+&gt; 12. **Why doesn&#x27;t volatile fix counter++?** counter++ is read-modify-write — three operations; another thread can interleave. Use AtomicInteger.
+&gt; 13. **What&#x27;s the livelock cure?** Randomized backoff — add jitter so threads don&#x27;t stay synchronized.
+&gt; 14. **How does jstack help with deadlocks?** Prints &quot;Found one Java-level deadlock&quot; for monitor cycles; for Lock-based blocking, you trace held-vs-waited resources manually.
+&gt; 15. **What about CHM and races?** CHM operations are individually atomic, but sequences of operations aren&#x27;t — use merge/compute/computeIfAbsent for compound atomic ops.
+
+## Practice
+
+1. **Reproduce two-lock deadlock.** Implement the bank transfer example; race transfer(A, B) and transfer(B, A); observe deadlock via jstack.
+2. **Fix with ordered acquisition.** Modify to acquire by account.id; verify no deadlock occurs.
+3. **Fix with timeouts.** Use `tryLock(1, SECONDS)`; verify the deadlock breaks and one transfer aborts.
+4. **Dining philosophers.** Implement with 5 philosophers and naïve &quot;left then right&quot; → deadlock. Then implement asymmetric solution; verify no deadlock.
+5. **jstack auto-detection.** With your two-lock deadlock running, run `jcmd &lt;pid&gt; Thread.print`. Confirm the auto-detected report.
+6. **Reproduce livelock.** Two threads each tryAcquire + Thread.yield in a loop. Observe full CPU, no progress. Add randomized backoff; observe correct progress.
+7. **Reproduce starvation with unfair locks.** With 1 fair-waiting thread and 50 barging newcomers continuously CAS&#x27;ing ReentrantLock, measure the fair thread&#x27;s wait time. Observe starvation. Switch to ReentrantLock(true); verify FCFS.
+8. **Check-then-act race.** Implement a &quot;register if absent&quot; using HashMap with check-then-act. Race 10 threads; observe duplicates. Switch to ConcurrentHashMap.putIfAbsent; verify atomicity.
+9. **Counter race.** Two threads each `counter++` 1M times on volatile int. Print final; observe &lt; 2M. Switch to AtomicInteger; verify 2M.
+10. **Publication race.** Publish a non-volatile reference to a freshly-constructed object; thread reads fields; observe occasional 0 (partially constructed). Add volatile or final; verify always-correct.
+11. **TOCTOU.** Simulate the file-symlink swap race using a slow user-interaction simulation. Show how capability-based open() bypasses it.
+12. **Open call.** Implement an event bus that holds a lock through listener notify; race with listeners that try to remove themselves; observe deadlock. Refactor to open call; verify no deadlock.
+
+## Recap
+
+You should now be able to:
+
+- State the **Coffman four conditions** for deadlock (mutual exclusion, hold-and-wait, no preemption, circular wait) — all must hold; breaking any one prevents deadlock.
+- Implement the **two canonical deadlock prevention strategies**: ordered lock acquisition (breaks circular wait) and lock timeouts (`tryLock(t, u)` — simulates preemption).
+- Apply the **other deadlock cures**: open calls (release locks before calling unknown code), lock-free algorithms (no mutex), single global lock (no cycle possible).
+- Recognize **dining philosophers** as the canonical deadlock illustration; understand asymmetric/ordered/coordinator solutions map to lock-ordering strategies.
+- Read **thread dump deadlock reports** (&quot;Found one Java-level deadlock&quot;) for monitor cycles; manually trace Lock-based deadlocks via held-vs-waited resources.
+- Identify **livelock** (active CPU, no progress) by symptom; fix via **randomized/exponential backoff with jitter**.
+- Diagnose **starvation** (some thread never progresses) by cause: unfair locks → fair locks; priority inversion → priority inheritance (only in real-time systems); reader/writer imbalance → fair RWLock or StampedLock; lock-free CAS hot spots → LongAdder striping.
+- Recognize the **three race shapes**: check-then-act (fix: atomic compound op), read-modify-write (fix: CAS atomic), publication race (fix: safe publication).
+- Spot **TOCTOU** as the security-relevant race; fix via capability-based access (operate on handles, not paths).
+- Avoid the **iteration race** (use `CopyOnWriteArrayList` or externally synchronize iteration) and the **compound API race** (use CHM.merge/compute for sequence atomicity).
+- Use **detection tools**: thread dumps (deadlock), JFR (contention), jcstress (memory model), Error Prone/SpotBugs (static analysis), repeated dumps (livelock).
+- Avoid **practical pitfalls**: locks across I/O, mixing synchronized + Lock, missing try/finally on lock, volatile for compound ops, sleep-as-synchronization, recursive task pool deadlock.
+- Connect to **real-world cases**: Mars Pathfinder priority inversion (1997), Spring transaction nesting, connection pool exhaustion, listener callback deadlock.
+
+## Next
+
+Continue to [Thread-safety patterns](./T17-thread-safety-patterns.md) — the *design* patterns that *prevent* the failure modes from T16. We&#x27;ll cover **immutability** (the simplest correctness — no shared mutable state to race on), **confinement** (each thread owns its data; ThreadLocal, request-scoped objects), **safe publication** (volatile/final/synchronized/static-init — the four mechanisms from T12), **lock objects vs synchronized blocks** (encapsulation, private final Object lock = new Object()), **monitor patterns** (uniform synchronization style), **defensive copying** (immutable views over mutable data), **single-writer principle** (one thread mutates, many read), **stamp-based optimistic patterns** (T08&#x27;s StampedLock idiom), and **the @GuardedBy annotation** for compile-time-checked synchronization contracts. T17 closes C01 — the concurrency chapter is then complete.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t15-structured-concurrency.html"><div class="lbl">← Previous</div><div class="ttl">T15-structured-concurrency</div><div class="sub">Structured Concurrency</div></a><a class="next" href="../l3/c01-t17-thread-safety-patterns.html"><div class="lbl">Next →</div><div class="ttl">T17-thread-safety-patterns</div><div class="sub">Thread-Safety Patterns</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#the-four-failure-modes-one-line-summaries" data-toc-link>The Four Failure Modes — One-Line Summaries</a></li><li class="lvl-2"><a href="#deadlock-the-coffman-conditions" data-toc-link>DEADLOCK — the Coffman Conditions</a></li><li class="lvl-3"><a href="#the-classic-two-lock-deadlock" data-toc-link>The Classic Two-Lock Deadlock</a></li><li class="lvl-3"><a href="#the-dining-philosophers" data-toc-link>The Dining Philosophers</a></li><li class="lvl-2"><a href="#detecting-deadlock-jstack-auto-detection" data-toc-link>Detecting Deadlock — jstack Auto-Detection</a></li><li class="lvl-2"><a href="#prevention-1-ordered-lock-acquisition" data-toc-link>Prevention 1 — Ordered Lock Acquisition</a></li><li class="lvl-3"><a href="#what-if-the-resources-dont-have-a-natural-order" data-toc-link>What if the resources don&#x27;t have a natural order?</a></li><li class="lvl-2"><a href="#prevention-2-lock-timeouts-the-universal-escape-valve" data-toc-link>Prevention 2 — Lock Timeouts (the Universal Escape Valve)</a></li><li class="lvl-2"><a href="#prevention-3-open-calls-and-listener-hygiene" data-toc-link>Prevention 3 — Open Calls and Listener Hygiene</a></li><li class="lvl-2"><a href="#prevention-4-lock-free-single-lock" data-toc-link>Prevention 4 — Lock-Free / Single Lock</a></li><li class="lvl-2"><a href="#real-world-deadlocks" data-toc-link>Real-World Deadlocks</a></li><li class="lvl-3"><a href="#spring-transaction-nesting" data-toc-link>Spring transaction nesting</a></li><li class="lvl-3"><a href="#connection-pool-exhaustion" data-toc-link>Connection pool exhaustion</a></li><li class="lvl-3"><a href="#logging-framework-re-entry" data-toc-link>Logging framework re-entry</a></li><li class="lvl-2"><a href="#livelock-active-yet-stuck" data-toc-link>LIVELOCK — Active Yet Stuck</a></li><li class="lvl-3"><a href="#cure-randomized-backoff" data-toc-link>Cure — Randomized Backoff</a></li><li class="lvl-3"><a href="#exponential-backoff" data-toc-link>Exponential Backoff</a></li><li class="lvl-2"><a href="#starvation-never-getting-a-turn" data-toc-link>STARVATION — Never Getting a Turn</a></li><li class="lvl-3"><a href="#1-unfair-locks-under-continuous-contention" data-toc-link>1. Unfair Locks Under Continuous Contention</a></li><li class="lvl-3"><a href="#2-readerwriter-imbalance" data-toc-link>2. Reader/Writer Imbalance</a></li><li class="lvl-3"><a href="#3-priority-inversion-the-mars-pathfinder-bug" data-toc-link>3. Priority Inversion — the Mars Pathfinder Bug</a></li><li class="lvl-3"><a href="#lock-free-starvation" data-toc-link>Lock-Free Starvation</a></li><li class="lvl-2"><a href="#race-conditions-three-shapes" data-toc-link>RACE CONDITIONS — Three Shapes</a></li><li class="lvl-3"><a href="#shape-1-check-then-act" data-toc-link>Shape 1 — Check-Then-Act</a></li><li class="lvl-3"><a href="#shape-2-read-modify-write" data-toc-link>Shape 2 — Read-Modify-Write</a></li><li class="lvl-3"><a href="#shape-3-publication-race" data-toc-link>Shape 3 — Publication Race</a></li><li class="lvl-3"><a href="#toctou-the-security-critical-race" data-toc-link>TOCTOU — the Security-Critical Race</a></li><li class="lvl-3"><a href="#iteration-race" data-toc-link>Iteration Race</a></li><li class="lvl-3"><a href="#compound-api-race" data-toc-link>Compound API Race</a></li><li class="lvl-2"><a href="#detection-tools-worth-knowing" data-toc-link>Detection — Tools Worth Knowing</a></li><li class="lvl-3"><a href="#static-analysis" data-toc-link>Static Analysis</a></li><li class="lvl-3"><a href="#stress-testing" data-toc-link>Stress Testing</a></li><li class="lvl-3"><a href="#runtime-detection" data-toc-link>Runtime Detection</a></li><li class="lvl-3"><a href="#code-review-checklist" data-toc-link>Code Review Checklist</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#holding-a-lock-during-a-network-call" data-toc-link>Holding a lock during a network call</a></li><li class="lvl-3"><a href="#mixing-synchronized-with-lock-on-the-same-shared-state" data-toc-link>Mixing synchronized with Lock on the same shared state</a></li><li class="lvl-3"><a href="#forgetting-tryfinally-on-lock" data-toc-link>Forgetting try/finally on Lock</a></li><li class="lvl-3"><a href="#trust-in-threadsleep-for-fairness" data-toc-link>Trust in Thread.sleep for fairness</a></li><li class="lvl-3"><a href="#volatile-for-compound-atomicity" data-toc-link>Volatile for compound atomicity</a></li><li class="lvl-3"><a href="#database-isolation-level-confusion" data-toc-link>Database isolation level confusion</a></li><li class="lvl-3"><a href="#cancellation-while-locked-deadlock" data-toc-link>Cancellation-while-locked deadlock</a></li><li class="lvl-3"><a href="#pool-deadlock-t05t07" data-toc-link>Pool deadlock (T05/T07)</a></li><li class="lvl-2"><a href="#observability" data-toc-link>Observability</a></li><li class="lvl-3"><a href="#find-a-deadlock-via-thread-dump" data-toc-link>Find a deadlock via thread dump</a></li><li class="lvl-3"><a href="#find-a-livelock-cpu-monitoring" data-toc-link>Find a livelock — CPU monitoring</a></li><li class="lvl-3"><a href="#find-races-jfr-allocation-profiling" data-toc-link>Find races — JFR allocation profiling</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

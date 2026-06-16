@@ -1,0 +1,1377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java Memory Model (happens-before, volatile) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="active" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Java Memory Model (happens-before, volatile)</span></div>
+        <h1>Java Memory Model (happens-before, volatile)</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T12-java-memory-model-happens-before-volatile.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~170 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Java Memory Model (happens-before, volatile)"
+slug: java-memory-model-happens-before-volatile
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 12
+tags: [jmm, java-memory-model, happens-before, hb-relation, program-order, monitor-lock-rule, volatile-rule, thread-start-rule, thread-join-rule, interruption-rule, finalizer-rule, transitivity, volatile, volatile-load, volatile-store, atomic-load, atomic-store, atomic-long-tearing, no-reordering, sequential-consistency, sequentially-consistent, as-if-serial, single-thread-semantics, sync-actions, synchronization-actions, jls-17-4, jls-17-4-5, jls-17-5, final-field, final-freeze, safe-publication, static-initializer, double-checked-locking, dcl, dcl-broken, dcl-fixed-volatile, initialization-safety, immutable, partially-constructed, this-escape, x86-tso, total-store-order, store-buffer, store-load-reorder, mfence, store-forwarding, arm-weak-memory, ldar, stlr, dmb-ish, ppc-weak, memory-barrier, fence, load-load, store-store, load-store, store-load, jcstress, doug-lea, out-of-thin-air, visibility, atomicity, ordering, cache-coherence, mesi, virtual-thread-jmm]
+prerequisites: [atomic-variables, concurrent-collections, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks, source-to-bytecode-to-jvm-to-machine-code, how-computers-run-programs-cpu-memory-binary]
+status: complete
+estimated_minutes: 170
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="java-memory-model-happens-before-volatile">Java Memory Model (happens-before, volatile)</h1>
+<p>Every concurrency primitive we have built — <code>synchronized</code> (T03), <code>wait</code>/<code>notify</code> (T04), <code>Lock</code>/<code>Condition</code> (T08), synchronizers (T09), atomic ops (T11), concurrent collections (T10) — <em>implements</em> the Java Memory Model. The JMM is the <strong>formal contract</strong> between the Java programmer and the JVM-plus-hardware: it specifies what writes one thread is <em>guaranteed</em> to see from another, when, and under what conditions. Without it, programs that work on one CPU could silently break on another (different cache architecture, different reorder buffer), the JIT couldn't safely optimize, and "thread-safe" would be undefinable. The JMM (JLS §17.4) is one of the most precisely-formalized parts of the JLS — and arguably the deepest of all Java specifications.</p>
+<p>The depth-bar requirement isn't "use <code>volatile</code> for cross-thread flags." At the <strong>specification</strong> layer, the JMM defines the <strong>happens-before</strong> relation — a partial order over actions that an executing program's threads perform — and <em>eight</em> specific rules (program order, monitor lock, volatile, thread start, thread join, interruption, finalizer, transitivity) that build up the relation. If action A <em>happens-before</em> action B, then B sees all of A's effects; if no such edge exists, anything goes — the <em>racy</em> program may produce any output the JMM permits, which is "almost anything," including values that look impossible. At the <strong>mechanism</strong> layer, <strong><code>volatile</code></strong> is the cheapest primitive that creates cross-thread happens-before edges: every write to a <code>volatile</code> field happens-before every subsequent read, achieving visibility without locking. At the <strong>hardware</strong> layer, the JMM's abstract guarantees map differently to <strong>x86's Total Store Order</strong> (most guarantees free; only store-load reorderings need an <code>MFENCE</code>) and <strong>ARM's weakly-ordered model</strong> (explicit fences everywhere — <code>LDAR</code>/<code>STLR</code> for volatile, <code>DMB ISH</code> for locks). At the <strong>safe-publication</strong> layer, the JMM defines exactly <strong>four mechanisms</strong> that safely make a fully-constructed object visible to other threads — and any other publication leaves a window where threads may see partially constructed state, the root cause of <em>the</em> canonical bug in <code>Double-Checked Locking</code> and a generation of singleton implementations. We will cover all four layers.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t11-atomic-variables.html">Atomic variables</a> (L3/C01/T11) — atomic ops are the <em>implementations</em>; this topic is the <em>spec</em>; <a href="c01-t10-concurrent-collections.html">Concurrent collections</a> (L3/C01/T10) — every CHM <code>get</code> relies on the volatile-load happens-before edge; <a href="c01-t08-locks-reentrantlock-readwritelock-stampedlock.html">Locks</a> (L3/C01/T08) — <code>synchronized</code> and <code>Lock</code>'s memory edge is the monitor-lock rule; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized, monitors &amp; intrinsic locks</a> (L3/C01/T03) — the acquire/release semantics of monitor enter/exit; <a href="../l0/c01-t04-source-to-bytecode-to-jvm-to-machine-code.html">Source to bytecode</a> (L0/C01/T04) — JIT compilation can reorder; <a href="../l0/c01-t01-how-computers-run-programs-cpu-memory-binary.html">How Computers Run Programs</a> (L0/C01/T01) — caches, memory hierarchy.</p></div></div>
+<h2 id="why-a-memory-model-because-the-hardware-lies">Why a Memory Model — Because the Hardware Lies<a class="anchor" href="#why-a-memory-model-because-the-hardware-lies" aria-hidden="true">#</a></h2>
+<p>Every modern CPU lies about what your program does. Not maliciously — for performance:</p>
+<ol>
+<li><strong>Compiler reordering.</strong> The JIT reorders bytecodes for register pressure, instruction scheduling, dead-code elimination. As long as a single thread's <em>observable</em> behavior is unchanged, the JIT is free to reorder.</li>
+<li><strong>CPU out-of-order execution.</strong> Modern cores execute instructions in dataflow order, not program order. An L2-missing load doesn't stall a later add; the add runs immediately if its inputs are ready. Hundreds of in-flight instructions at any time.</li>
+<li><strong>Store buffers.</strong> Writes don't reach the cache immediately — they sit in a per-core store buffer, posted to the cache hierarchy lazily. A read from another core may see the <em>old</em> value of the cache line until the store buffer drains and the cache-coherence protocol delivers the update.</li>
+<li><strong>Cache coherence delays.</strong> Even with MESI keeping caches coherent, the protocol takes cycles — a write on core 0 may take 30-100 cycles to be visible on core 1.</li>
+<li><strong>Memory hierarchy.</strong> Register &gt; L1 &gt; L2 &gt; L3 &gt; RAM. Different cores see different "snapshots" depending on what's in their L1 vs the shared L3.</li>
+</ol>
+<div class="mermaid">flowchart TB
+  Code["Java source<br/>(observable: read x, then read y)"]
+  JIT["JIT reorders<br/>(observable single-thread: same)"]
+  CPU["CPU executes out-of-order<br/>(load y completes first if L1 hits)"]
+  Buff["store buffers<br/>(writes deferred)"]
+  Cache["cache hierarchy<br/>(per-core L1; MESI sync)"]
+  Code --> JIT --> CPU --> Buff --> Cache
+  Effect["across threads: writes may be seen in surprising orders;<br/>reads may see surprising values."]
+  Cache --> Effect
+</div>
+<p>The JMM is what makes this manageable: it tells you <em>exactly</em> which reorderings the JIT and CPU may perform, <em>exactly</em> what guarantees <code>synchronized</code>/<code>volatile</code>/<code>final</code> give you, and exactly what bugs are possible in <em>racy</em> programs (programs without the right synchronization). It does <em>not</em> tell you which reorderings will actually happen on your CPU — that's hardware-and-version-specific. It tells you what the spec <em>permits</em>.</p>
+<h2 id="as-if-serial-the-single-thread-property">As-If-Serial — the Single-Thread Property<a class="anchor" href="#as-if-serial-the-single-thread-property" aria-hidden="true">#</a></h2>
+<p>The JMM's single-thread guarantee:</p>
+<blockquote>
+<p><strong>The JVM and the CPU may freely reorder operations within a single thread as long as the <em>observable</em> effects in that thread's program order are preserved.</strong></p>
+</blockquote>
+<p>So <code>x = 5; y = 10; z = x + y;</code> may execute as "compute z first by speculation" or "issue x = 5 and y = 10 in parallel" — but every read in the thread <em>must</em> see the value as if the writes happened in source order. The reordering is invisible <em>to that thread</em>.</p>
+<p>This is why a single-threaded program "just works" — the JMM gives you sequential consistency <em>within</em> a thread. The trouble begins <em>across</em> threads.</p>
+<h2 id="the-cross-thread-problem-and-why-its-worse-than-you-think">The Cross-Thread Problem — and Why It's Worse Than You Think<a class="anchor" href="#the-cross-thread-problem-and-why-its-worse-than-you-think" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// shared:
+int x = 0, y = 0;
+
+// thread A
+x = 1;
+int r1 = y;
+
+// thread B
+y = 1;
+int r2 = x;
+</code></pre></div>
+<p>What are the possible values of <code>(r1, r2)</code> after both threads complete? <em>Naïve</em> sequential reasoning gives three cases:</p>
+<ul>
+<li>A runs first, then B: <code>r1 = 0, r2 = 1</code>.</li>
+<li>B runs first, then A: <code>r1 = 1, r2 = 0</code>.</li>
+<li>Interleaved: <code>r1 = 0, r2 = 0</code> or <code>r1 = 1, r2 = 1</code>.</li>
+</ul>
+<p>But under the JMM (and on real hardware), <strong><code>(0, 0)</code> is also legal</strong> — even though no sequentially consistent interleaving allows it. Why? Both writes can sit in their respective store buffers; both reads can complete before the stores drain. Each thread sees its own store but not the other's. This is the <em>Dekker's algorithm violation</em> — the canonical example of a non-sequentially-consistent memory model.</p>
+<p>The fix: declare <code>x</code> and <code>y</code> <code>volatile</code>. The JMM's volatile rule (below) then prohibits this specific reordering — <code>volatile</code> writes drain the store buffer, and <code>volatile</code> reads pull from main memory. <code>(0, 0)</code> becomes impossible.</p>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Without proper synchronization, you cannot reason about cross-thread behavior using sequential thinking.</strong> Reads can see "stale" values; writes can be "reordered" relative to each other; values that "couldn't happen" in any interleaving <em>can</em> happen on real hardware. The JMM gives you the tools (<code>synchronized</code>, <code>volatile</code>, <code>final</code>, atomics) to <em>create</em> the sequential reasoning where you need it.</p></div></div>
+<h2 id="the-happens-before-relation">The Happens-Before Relation<a class="anchor" href="#the-happens-before-relation" aria-hidden="true">#</a></h2>
+<p>The JMM defines a partial order over a program's actions called <strong>happens-before</strong> (HB). It's the formal foundation:</p>
+<blockquote>
+<p><strong>If action A <em>happens-before</em> action B, then:</strong>
+- <strong>All effects of A are visible to B</strong> (writes A made are visible to reads B does).
+- <strong>A is ordered before B</strong> (no observed execution can have B appear to precede A).</p>
+</blockquote>
+<p>HB is <strong>partial</strong> — most pairs of actions in a multithreaded program are <em>not</em> ordered by HB, and those pairs can race. HB is <strong>transitive</strong> — if A → B and B → C, then A → C.</p>
+<p>If two actions are <em>not</em> ordered by HB, they're called a <strong>race</strong>, and the JMM says virtually nothing about what one thread sees of the other's writes. Racy programs can exhibit <em>any</em> JMM-permitted behavior — including values that look impossible.</p>
+<h2 id="the-eight-happens-before-rules-jls-1745">The Eight Happens-Before Rules (JLS §17.4.5)<a class="anchor" href="#the-eight-happens-before-rules-jls-1745" aria-hidden="true">#</a></h2>
+<p>The JMM defines HB via <em>synchronization actions</em> — specific things that create HB edges across threads. Eight rules, in their canonical form:</p>
+<h3 id="1-program-order-rule">1. Program order rule<a class="anchor" href="#1-program-order-rule" aria-hidden="true">#</a></h3>
+<p>Within a single thread, each action happens-before every action that comes later in program order.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// thread T:
+x = 1;       // (a)
+y = 2;       // (b) — (a) happens-before (b)
+z = x + y;   // (c) — (b) happens-before (c); transitively (a) hb (c)
+</code></pre></div>
+<p>This is the within-thread guarantee from the as-if-serial rule.</p>
+<h3 id="2-monitor-lock-rule">2. Monitor lock rule<a class="anchor" href="#2-monitor-lock-rule" aria-hidden="true">#</a></h3>
+<p>An unlock of monitor M happens-before every subsequent lock of M.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// thread A
+synchronized (m) { x = 1; }   // unlock happens-before...
+
+// thread B (later)
+synchronized (m) { print(x); } // ...this lock → prints 1 (guaranteed)
+</code></pre></div>
+<p>The release/acquire pair on the same monitor publishes everything A wrote inside its synchronized region.</p>
+<h3 id="3-volatile-variable-rule">3. Volatile variable rule<a class="anchor" href="#3-volatile-variable-rule" aria-hidden="true">#</a></h3>
+<p>A write to volatile field V happens-before every subsequent read of V (that returns the written value).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile boolean ready;
+int data;
+
+// thread A
+data = 42;       // (a)
+ready = true;    // (b) — volatile write — (a) HB (b) by program order
+
+// thread B
+while (!ready); // volatile read
+print(data);     // sees 42 — (b) HB read(ready), and transitively (a) HB print(data)
+</code></pre></div>
+<p>This is what makes <code>volatile</code> the cheapest synchronization. The write-then-read of the volatile is the only cross-thread edge, but it carries with it all writes that happened-before it in the writer thread.</p>
+<h3 id="4-thread-start-rule">4. Thread start rule<a class="anchor" href="#4-thread-start-rule" aria-hidden="true">#</a></h3>
+<p>A call to <code>Thread.start()</code> happens-before any action in the started thread.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int x;
+
+// thread A
+x = 5;
+Thread t = new Thread(() -&gt; print(x));  // (start) — A's prior writes HB any t action
+t.start();
+</code></pre></div>
+<p>The new thread sees everything the starter wrote before <code>start()</code>. This is how thread launch is correct without explicit synchronization — <code>start()</code> is itself a synchronization action.</p>
+<h3 id="5-thread-termination-rule">5. Thread termination rule<a class="anchor" href="#5-thread-termination-rule" aria-hidden="true">#</a></h3>
+<p>All actions in a thread happen-before any other thread successfully returns from a <code>join()</code> on that thread.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">int result;
+
+Thread t = new Thread(() -&gt; { result = compute(); });
+t.start();
+t.join();           // returns
+print(result);      // sees the result — all of t's writes HB this read
+</code></pre></div>
+<p>Same as start, but for the end. Combined with start, this gives you the classic "fan out, fan in" pattern correctness for free.</p>
+<h3 id="6-interruption-rule">6. Interruption rule<a class="anchor" href="#6-interruption-rule" aria-hidden="true">#</a></h3>
+<p>A call to <code>Thread.interrupt()</code> happens-before the interrupted thread detects the interrupt (via <code>InterruptedException</code> or <code>isInterrupted()</code>).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// thread A: t.interrupt();   // (a)
+// thread t: catches InterruptedException from sleep
+// (a) happens-before the catch
+</code></pre></div>
+<p>Practical consequence: anything A wrote before calling <code>interrupt()</code> is visible in the catch block.</p>
+<h3 id="7-finalizer-rule">7. Finalizer rule<a class="anchor" href="#7-finalizer-rule" aria-hidden="true">#</a></h3>
+<p>The end of an object's constructor happens-before the start of its <code>finalize()</code> method.</p>
+<p>Rarely useful — finalizers are deprecated in JDK 9+. Listed for completeness.</p>
+<h3 id="8-transitivity">8. Transitivity<a class="anchor" href="#8-transitivity" aria-hidden="true">#</a></h3>
+<p>If A happens-before B and B happens-before C, then A happens-before C.</p>
+<p>This is the unsung hero — every realistic program relies on chaining HB edges. Producer writes data, sets a volatile flag → consumer reads volatile flag, reads data. The consumer sees the data only because of transitivity: producer's data write HB producer's volatile write (program order) HB consumer's volatile read (volatile rule) HB consumer's data read (program order).</p>
+<div class="mermaid">flowchart LR
+  P1["producer: data = 42"]
+  P2["producer: ready = true (volatile write)"]
+  C1["consumer: ready = true? (volatile read)"]
+  C2["consumer: read data"]
+  P1 -- "program order" --> P2
+  P2 -- "volatile rule" --> C1
+  C1 -- "program order" --> C2
+  Note["transitivity:<br/>P1 HB C2 — consumer is guaranteed to see data == 42"]
+</div>
+<h2 id="volatile-the-cheapest-synchronization">Volatile — the Cheapest Synchronization<a class="anchor" href="#volatile-the-cheapest-synchronization" aria-hidden="true">#</a></h2>
+<p><code>volatile</code> (Java keyword, declared on a field) gives three guarantees over plain access:</p>
+<ol>
+<li>
+<p><strong>Atomic load/store of 32- and 64-bit values.</strong> On a 32-bit JVM, plain <code>long</code> and <code>double</code> reads/writes may be <strong>torn</strong> — the JLS permits the JVM to split them into two 32-bit operations, so a reader can see half of the new value and half of the old. <code>volatile long</code>/<code>double</code> is <em>guaranteed</em> atomic. (On a 64-bit JVM, the JVM typically gives atomic 64-bit anyway, but the language guarantee depends on <code>volatile</code>.)</p>
+</li>
+<li>
+<p><strong>Visibility.</strong> Every write to a <code>volatile</code> field is <em>immediately visible</em> to subsequent reads of the same field on any other thread. No staleness; no buffered-store delay.</p>
+</li>
+<li>
+<p><strong>No reordering across.</strong> Prior loads/stores can't be moved <em>after</em> a volatile write (release semantics); subsequent loads/stores can't be moved <em>before</em> a volatile read (acquire semantics). This is what enables the happens-before edge.</p>
+</li>
+</ol>
+<div class="mermaid">flowchart LR
+  Vol["volatile field"]
+  Vol --> A["1. Atomic 32/64-bit load/store"]
+  Vol --> V["2. Visibility — write is immediately visible to reads"]
+  Vol --> O["3. No reordering across<br/>release(write), acquire(read)"]
+  NotV["What volatile does NOT do"]
+  NotV --> Comp["compound atomicity — counter++ is still broken"]
+  NotV --> Lock["mutual exclusion — multiple threads can write the same volatile"]
+  NotV --> ABA["ABA prevention — that's stamped reference (T11)"]
+</div>
+<h3 id="what-volatile-does-not-give-you">What <code>volatile</code> does <em>not</em> give you<a class="anchor" href="#what-volatile-does-not-give-you" aria-hidden="true">#</a></h3>
+<p>The most common bug: assuming <code>volatile</code> makes compound operations atomic.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile int counter;
+counter++;       // ✗ STILL BROKEN — reads, adds, writes (3 steps); other threads can interleave
+</code></pre></div>
+<p><code>volatile</code> makes each individual read and write atomic and visible. The <code>counter++</code> is <em>three</em> operations, not one. For atomicity over read-modify-write, use <code>AtomicInteger.incrementAndGet()</code> (T11).</p>
+<p>The rule of thumb:</p>
+<ul>
+<li><strong>Single writer, multiple readers</strong>: <code>volatile</code> is sufficient.</li>
+<li><strong>Multiple writers</strong>: <code>volatile</code> won't help — you need locks or atomic CAS.</li>
+</ul>
+<h3 id="idiomatic-uses-of-volatile">Idiomatic uses of <code>volatile</code><a class="anchor" href="#idiomatic-uses-of-volatile" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// A thread-safe &quot;shutdown flag&quot;
+volatile boolean shutdown;
+public void shutdown() { shutdown = true; }
+public void run() { while (!shutdown) doWork(); }
+
+// A &quot;publication&quot; field for an immutable value
+volatile Config config;
+public void publish(Config newConfig) { config = newConfig; }      // releases
+public Config current() { return config; }                          // acquires
+
+// Double-checked locking with volatile (below)
+private volatile Singleton instance;
+</code></pre></div>
+<p>The common pattern: <em>single</em> writer (or atomic CAS for multiple writers); many readers; the field's value is either a primitive flag or an immutable object reference.</p>
+<h2 id="final-field-semantics-initialization-safety">Final Field Semantics — Initialization Safety<a class="anchor" href="#final-field-semantics-initialization-safety" aria-hidden="true">#</a></h2>
+<p><code>final</code> fields have <em>special</em> JMM treatment. The JMM guarantees:</p>
+<blockquote>
+<p><strong>Any thread that observes a fully-constructed object via any safe publication mechanism sees the <em>correctly-initialized</em> values of all <code>final</code> fields, and any objects those finals transitively reference.</strong></p>
+</blockquote>
+<p>This is <em>initialization safety</em> (JLS §17.5). Why it matters:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class Point {
+    public final int x;
+    public final int y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+}
+
+// thread A
+sharedRef = new Point(3, 4);     // unsafe publication! no volatile, no lock
+
+// thread B
+Point p = sharedRef;
+print(p.x, p.y);
+</code></pre></div>
+<p>Without final-field semantics, thread B could see <code>sharedRef</code> as the new Point but see <code>p.x = 0</code> or <code>p.y = 0</code> (the default values before the constructor ran). The constructor's writes are "out of order" relative to the assignment of <code>sharedRef</code>.</p>
+<p>With <code>final</code> fields, the JVM emits a <strong>freeze action</strong> at the end of the constructor that prevents the constructor's final-field writes from being reordered with the publication of the object reference. So any thread that sees <code>sharedRef</code> is guaranteed to see <code>x = 3, y = 4</code>.</p>
+<div class="mermaid">flowchart TB
+  Ctor["constructor: this.x = 3; this.y = 4"]
+  Freeze["FREEZE action (compiler inserts barrier)<br/>guarantees final writes complete before any read of THIS reference"]
+  Pub["sharedRef = new Point(3, 4)"]
+  Read["other thread: sees Point with x=3, y=4 — guaranteed"]
+  Ctor --> Freeze --> Pub --> Read
+  Note["this is why String, Integer, BigDecimal, etc. (immutable + final fields)<br/>are safe across threads even without synchronization."]
+</div>
+<h3 id="the-this-escape-caveat">The <code>this</code>-escape caveat<a class="anchor" href="#the-this-escape-caveat" aria-hidden="true">#</a></h3>
+<p>Initialization safety only applies if the constructor doesn't let <code>this</code> escape — i.e., publish a reference to the partially-constructed object before the constructor finishes. The classic violation:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class Listener {
+    public final int id;
+    public Listener(EventBus bus, int id) {
+        this.id = id;
+        bus.register(this);       // ✗ this escaped before constructor finished!
+                                   //   another thread may see this with id == 0
+    }
+}
+</code></pre></div>
+<p>If the constructor's body publishes <code>this</code> before returning, the freeze action hasn't happened yet, and other threads can see partially-initialized state. Rule: never publish <code>this</code> from a constructor (use a static factory or two-step init).</p>
+<h2 id="safe-publication-the-four-mechanisms">Safe Publication — The Four Mechanisms<a class="anchor" href="#safe-publication-the-four-mechanisms" aria-hidden="true">#</a></h2>
+<p>A fully-constructed object is <strong>safely published</strong> if any of these four conditions hold (other threads observing the reference are guaranteed to see fully-constructed state):</p>
+<ol>
+<li><strong>Static initializer.</strong> A reference stored in a <code>static</code> field initialized by the class's static initializer is safely published — the JLS guarantees class initialization is synchronized.</li>
+</ol>
+<p><code>java
+   class Holder {
+       static final Singleton INSTANCE = new Singleton();   // safe — static init
+   }</code></p>
+<ol start="2">
+<li><strong>Volatile or atomic reference.</strong> Storing the reference in a <code>volatile</code> field (or via <code>AtomicReference.set</code>) creates a happens-before edge from the store to any subsequent read.</li>
+</ol>
+<p><code>java
+   volatile Singleton instance;
+   instance = new Singleton();     // safe — volatile rule</code></p>
+<ol start="3">
+<li><strong>Final fields.</strong> Storing the reference in a <code>final</code> field and publishing the <em>enclosing</em> object — initialization safety covers the entire chain.</li>
+</ol>
+<p><code>java
+   class Container {
+       final Map&lt;String,String&gt; data;
+       Container() { data = new HashMap&lt;&gt;(); }   // safe — Container's final ref propagates
+   }</code></p>
+<ol start="4">
+<li><strong>Lock-protected publication.</strong> Storing the reference inside a <code>synchronized</code> block (or under a <code>Lock</code>) — the monitor-lock rule edge publishes it.</li>
+</ol>
+<p><code>java
+   synchronized (lock) { instance = new Singleton(); }    // safe — monitor lock rule</code></p>
+<p>Anything else is <strong>unsafe publication</strong>: simple assignment to a non-volatile shared field. Other threads may see the reference <em>before</em> the constructor's writes are visible.</p>
+<div class="mermaid">flowchart LR
+  Safe["safe publication mechanisms"]
+  Safe --> S1["1. static initializer<br/>(class init is synchronized)"]
+  Safe --> S2["2. volatile / AtomicReference"]
+  Safe --> S3["3. final fields<br/>(initialization safety)"]
+  Safe --> S4["4. lock-protected publication<br/>(monitor lock rule)"]
+  Un["unsafe — every other shape"]
+  Un --> Risk["other threads may see partially constructed state"]
+</div>
+<h2 id="double-checked-locking-the-canonical-bug-and-its-fix">Double-Checked Locking — the Canonical Bug and Its Fix<a class="anchor" href="#double-checked-locking-the-canonical-bug-and-its-fix" aria-hidden="true">#</a></h2>
+<p>The classic optimization to make singleton initialization cheap after the first call:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Singleton {
+    private static Singleton instance;
+    public static Singleton getInstance() {
+        if (instance == null) {                 // first check (no lock)
+            synchronized (Singleton.class) {
+                if (instance == null) {          // second check (under lock)
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+</code></pre></div>
+<p>The idea: the lock is only acquired on the first call (when <code>instance</code> is null); subsequent calls skip the lock. Should be cheap... but it's <strong>broken pre-JDK 5</strong> and <em>still broken in JDK 5+</em> without <code>volatile</code>:</p>
+<p>The bug: <code>instance = new Singleton()</code> is <strong>not atomic</strong>. At the bytecode level, it's:</p>
+<ol>
+<li>Allocate memory for the new Singleton.</li>
+<li>Run the constructor (assign fields).</li>
+<li>Assign the reference to <code>instance</code>.</li>
+</ol>
+<p>The compiler is free to reorder steps 2 and 3 (allocate, <em>assign reference</em>, run constructor). On JIT'd code, this reordering is common. A racing thread enters <code>getInstance()</code>, sees <code>instance != null</code> (the reference was assigned), and returns a <strong>partially-constructed</strong> Singleton with default field values.</p>
+<h3 id="the-fix-volatile">The fix — <code>volatile</code><a class="anchor" href="#the-fix-volatile" aria-hidden="true">#</a></h3>
+<p>Declaring <code>instance</code> <code>volatile</code> prevents the reordering:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Singleton {
+    private static volatile Singleton instance;    // ← volatile is the fix
+    public static Singleton getInstance() {
+        Singleton local = instance;                 // volatile read — acquire
+        if (local == null) {
+            synchronized (Singleton.class) {
+                local = instance;
+                if (local == null) {
+                    instance = local = new Singleton();   // volatile write — release
+                }
+            }
+        }
+        return local;
+    }
+}
+</code></pre></div>
+<p>The volatile-write acts as a <em>release barrier</em>: all writes inside the constructor must complete before the volatile write of <code>instance</code> becomes visible. The volatile-read on the fast path is the corresponding <em>acquire</em>. The DCL pattern is now correct.</p>
+<p>In practice, <strong>prefer the "holder class" idiom</strong> for singletons:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class Singleton {
+    private Singleton() {}
+    private static class Holder { static final Singleton INSTANCE = new Singleton(); }
+    public static Singleton getInstance() { return Holder.INSTANCE; }
+}
+</code></pre></div>
+<p>The JLS guarantees class init is lazy <em>and</em> synchronized, giving safe publication via mechanism (1) above. No <code>volatile</code>, no locks in the hot path, no DCL — and correct by language guarantee. The DCL pattern survives mostly in libraries that pre-date this idiom or in cases where the singleton class isn't free to introduce a holder.</p>
+<h2 id="x86-total-store-order-tso">x86 — Total Store Order (TSO)<a class="anchor" href="#x86-total-store-order-tso" aria-hidden="true">#</a></h2>
+<p>x86 has a remarkably strong memory model — <strong>Total Store Order</strong>:</p>
+<ul>
+<li>All stores from any single core are observed by all cores in the same order.</li>
+<li>Loads are not reordered with loads.</li>
+<li>Stores are not reordered with stores.</li>
+<li><strong>The only reordering allowed</strong>: a store may be reordered after a later load (the <em>store-load</em> reordering). Same core can see its own pending store in the buffer (store-to-load forwarding); other cores haven't seen it yet.</li>
+</ul>
+<p>This means most JMM rules are <strong>free on x86</strong>:</p>
+<ul>
+<li>Volatile loads: just a plain load. The acquire semantics come for free from TSO.</li>
+<li>Volatile stores: usually a plain store, but the JIT emits an <strong><code>MFENCE</code></strong> (or uses a <code>LOCK</code>-prefixed RMW) <em>after</em> a volatile write to prevent the store-load reordering. This is the only non-free fence on x86.</li>
+<li><code>synchronized</code>: the <code>LOCK CMPXCHG</code> for monitor enter is <em>also</em> a full barrier (T03), free.</li>
+</ul>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">volatile write on x86:
+   mov [addr], rax       ; the store
+   mfence                 ; full barrier prevents store-load reorder
+</code></pre></div>
+<p>Or, when combined with an immediate CAS:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">   lock cmpxchg [addr], rcx     ; both atomic AND full barrier
+</code></pre></div>
+<p>The bottom line on x86: <strong>volatile is cheap, synchronized is cheap, CAS is cheap</strong>. Memory-model concerns rarely surface as performance problems.</p>
+<h2 id="arm-weakly-ordered">ARM — Weakly Ordered<a class="anchor" href="#arm-weakly-ordered" aria-hidden="true">#</a></h2>
+<p>ARM (and POWER) have <strong>weakly-ordered</strong> memory models — almost everything can be reordered by default. The compiler must emit explicit fences for every JMM guarantee.</p>
+<p>ARMv8 provides:</p>
+<ul>
+<li><code>LDAR</code> (load-acquire) and <code>STLR</code> (store-release) — one-way fences embedded in load/store.</li>
+<li><code>DMB ISH</code> — full data memory barrier (inner shareable domain).</li>
+<li><code>DSB ISH</code> — data synchronization barrier (full sync; rarely needed).</li>
+</ul>
+<p>The JIT emits:</p>
+<ul>
+<li>Volatile load: <code>LDAR</code> (no separate fence needed).</li>
+<li>Volatile store: <code>STLR</code> (release semantics).</li>
+<li>Around a volatile-write-then-volatile-read pattern (the store-load case): explicit <code>DMB ISH</code> may be needed for full sequential consistency.</li>
+<li><code>synchronized</code>: <code>LDAR</code> on monitor enter (acquire), <code>STLR</code> on monitor exit (release), <code>DMB ISH</code> for the CAS portion.</li>
+</ul>
+<p>The cost: ARM-specific microbenchmarks show 10-30% overhead vs x86 for heavily synchronized code, purely due to the explicit fences. The JMM is the <em>same</em> on both architectures; the realization differs.</p>
+<div class="mermaid">flowchart LR
+  Arch["JMM realization"]
+  Arch --> X86["x86 (TSO)"]
+  X86 --> Cheap["volatile load: plain load (free)<br/>volatile store: MFENCE (1 cost)<br/>synchronized: LOCK CMPXCHG (1 cost)"]
+  Arch --> ARM["ARM (weak)"]
+  ARM --> ExpFence["volatile load: LDAR<br/>volatile store: STLR<br/>monitor enter/exit: LDAR/STLR<br/>CAS: DMB ISH around"]
+  Note["JMM spec is identical on both;<br/>x86's hardware does the work, ARM emits explicit instructions."]
+</div>
+<h2 id="memory-barriers-informal-vocabulary">Memory Barriers — Informal Vocabulary<a class="anchor" href="#memory-barriers-informal-vocabulary" aria-hidden="true">#</a></h2>
+<p>The JMM spec talks about happens-before. The implementation talks about <strong>memory barriers</strong> (fences) — instructions that constrain reordering. Four orthogonal types:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Barrier</th>
+<th>Prevents</th>
+<th>Example uses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LoadLoad</strong></td>
+<td>later loads from being reordered before earlier loads</td>
+<td>acquire semantics</td>
+</tr>
+<tr>
+<td><strong>StoreStore</strong></td>
+<td>later stores from being reordered before earlier stores</td>
+<td>release semantics (preserves write order)</td>
+</tr>
+<tr>
+<td><strong>LoadStore</strong></td>
+<td>later stores from being reordered before earlier loads</td>
+<td>(rare; partial of release)</td>
+</tr>
+<tr>
+<td><strong>StoreLoad</strong></td>
+<td>later loads from being reordered before earlier stores</td>
+<td>full barrier (most expensive)</td>
+</tr>
+</tbody>
+</table></div>
+<p>On x86, only StoreLoad needs an explicit fence (<code>MFENCE</code>); the rest are implicit in TSO. On ARM, <em>every</em> barrier type has a corresponding <code>DMB</code> variant.</p>
+<p>The most important one: <strong>StoreLoad</strong>. It's what's needed at the end of a release (volatile store) to prevent the next load (a subsequent volatile read) from being moved up. It's the most expensive because it must drain the store buffer to the cache <em>and</em> prevent the cache from serving stale loads.</p>
+<h2 id="the-synchronized-happens-before-bridge">The <code>synchronized</code> → Happens-Before Bridge<a class="anchor" href="#the-synchronized-happens-before-bridge" aria-hidden="true">#</a></h2>
+<p>T03 showed how <code>synchronized</code> realizes the monitor-lock rule. Concretely:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (m) {
+    a = 1;       // ... releases on } below ...
+}
+// release of m
+
+// other thread later:
+synchronized (m) {
+    print(a);     // acquires; sees a == 1
+}
+</code></pre></div>
+<p>The release is <code>monitorexit</code> (T03's bytecode). It does:</p>
+<ul>
+<li>On x86: <code>LOCK CMPXCHG</code> to clear the lock state — also a full barrier.</li>
+<li>On ARM: <code>STLR</code> to clear the lock state.</li>
+</ul>
+<p>The acquire is <code>monitorenter</code>:</p>
+<ul>
+<li>On x86: <code>LOCK CMPXCHG</code> to grab the lock — full barrier.</li>
+<li>On ARM: <code>LDAR</code> on the lock state, plus AQS-style coordination.</li>
+</ul>
+<p>The HB edge — release of m HB acquire of m — is built directly into these hardware operations. <em>The JMM is realized by the lock implementation</em>.</p>
+<h2 id="out-of-thin-air-values-the-subtle-edge">Out-of-Thin-Air Values — the Subtle Edge<a class="anchor" href="#out-of-thin-air-values-the-subtle-edge" aria-hidden="true">#</a></h2>
+<p>The JMM also forbids "out-of-thin-air" values — a <em>causal cycle</em> where a value justifies its own existence in a race:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// shared:
+int x = 0, y = 0;
+
+// thread A
+int r1 = x;
+y = r1;          // (a)
+
+// thread B
+int r2 = y;
+x = r2;          // (b)
+</code></pre></div>
+<p>If we squint: A reads x = 0, writes y = 0. B reads y = 0, writes x = 0. Final: x = 0, y = 0. Boring.</p>
+<p>But can we have <code>r1 = r2 = 42</code>? In some pathological reasoning: A speculates y = 42, writes y = 42, gets r1 = 42. B reads y = 42, writes x = 42, gets r2 = 42. A's speculation is "justified" by B's write — but B's read justified A's speculation. Circular causality — <em>out of thin air</em>.</p>
+<p>The JMM explicitly forbids this. The JLS's full formal definition includes a <em>causality constraint</em> preventing such cycles. In practice, you'll never encounter it directly — it's a constraint on what the spec is allowed to permit, not a daily concern. But it's why the JMM's formal definition is so subtle (and famously took the JSR-133 expert group multiple years to nail down).</p>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="forgetting-volatile-on-a-flag">Forgetting <code>volatile</code> on a flag<a class="anchor" href="#forgetting-volatile-on-a-flag" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">boolean shutdown;                 // ✗ not volatile
+while (!shutdown) doWork();       // JIT may hoist this read out of the loop → infinite loop
+</code></pre></div>
+<p>Without <code>volatile</code>, the JIT sees <code>shutdown</code> is not modified inside the loop and <em>hoists</em> the read above the loop, evaluating once. The loop never sees the update. Add <code>volatile</code>.</p>
+<h3 id="using-volatile-for-compound-operations">Using <code>volatile</code> for compound operations<a class="anchor" href="#using-volatile-for-compound-operations" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile int counter;
+counter++;                         // ✗ still 3 steps; race
+</code></pre></div>
+<p>Use <code>AtomicInteger</code>.</p>
+<h3 id="reading-without-lock-when-writer-holds-lock">Reading without lock when writer holds lock<a class="anchor" href="#reading-without-lock-when-writer-holds-lock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (lock) { data = newValue; }    // writer
+int v = data;                                // reader — no lock → no HB edge
+</code></pre></div>
+<p>No happens-before edge between the writer's write and the reader's read. The reader may see stale data forever. Both must use the same lock.</p>
+<h3 id="double-checked-locking-without-volatile">Double-checked locking without volatile<a class="anchor" href="#double-checked-locking-without-volatile" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private Singleton instance;       // ✗ not volatile
+public Singleton get() {
+    if (instance == null) synchronized (...) { if (instance == null) instance = new Singleton(); }
+    return instance;
+}
+</code></pre></div>
+<p>Pre-JDK-5: always broken. JDK 5+: still broken without <code>volatile</code>. Either make <code>instance</code> volatile or switch to the holder-class idiom.</p>
+<h3 id="letting-this-escape-from-a-constructor">Letting <code>this</code> escape from a constructor<a class="anchor" href="#letting-this-escape-from-a-constructor" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">class X {
+    X() { eventBus.register(this); }      // ✗ this escaped before construction finished
+}
+</code></pre></div>
+<p>Listeners may see partially-constructed state. Use a factory method that constructs then registers.</p>
+<h3 id="assuming-synchronized-orders-unrelated-variables">Assuming <code>synchronized</code> orders unrelated variables<a class="anchor" href="#assuming-synchronized-orders-unrelated-variables" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">synchronized (m) { x = 1; }                 // thread A
+synchronized (n) { print(x); }              // thread B — DIFFERENT monitor
+</code></pre></div>
+<p>The monitor-lock rule requires the <em>same</em> monitor. Different monitors create no HB edge. Use the same lock object for related operations.</p>
+<h3 id="using-volatile-for-the-producer-consumer-queue">Using <code>volatile</code> for the producer-consumer queue<a class="anchor" href="#using-volatile-for-the-producer-consumer-queue" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">volatile Object[] queue;                    // ✗ no atomicity for multi-step queue operations
+</code></pre></div>
+<p>A queue is a multi-field structure; <code>volatile</code> on the array reference doesn't make <code>enqueue/dequeue</code> atomic. Use a proper concurrent queue (T10).</p>
+<h3 id="relying-on-threadsleep-for-synchronization">Relying on <code>Thread.sleep</code> for synchronization<a class="anchor" href="#relying-on-threadsleep-for-synchronization" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">sharedState = 1;
+Thread.sleep(100);                          // ✗ doesn't synchronize anything
+otherThread.access(sharedState);            // may see 0
+</code></pre></div>
+<p><code>sleep</code> is a hint to the scheduler; it doesn't create any HB edges. Use <code>volatile</code>, locks, or atomics.</p>
+<h3 id="caching-jitd-code-in-a-non-thread-safe-way">Caching JIT'd code in a non-thread-safe way<a class="anchor" href="#caching-jitd-code-in-a-non-thread-safe-way" aria-hidden="true">#</a></h3>
+<p>JIT'd compiled methods are themselves shared mutable state. The JVM publishes them safely; user code that tries to "cache" callable references with similar performance hacks is rarely safe and rarely worth it.</p>
+<h2 id="testing-for-memory-model-bugs">Testing for Memory Model Bugs<a class="anchor" href="#testing-for-memory-model-bugs" aria-hidden="true">#</a></h2>
+<p>The JMM permits <em>more</em> reorderings than your specific CPU performs. A program that's racy may work fine on x86 (TSO hides most reorderings) and break on ARM. The right testing tool:</p>
+<p><strong>jcstress</strong> — Doug Lea's Java Concurrency Stress test framework. Writes tiny <em>litmus tests</em> and runs them millions of times under different JIT settings, printing observed outcomes. Verifies that the <em>only</em> observed outcomes are JMM-permitted, and catches surprises where the JMM permits more than your code assumes.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">// jcstress test for the Dekker-style example
+@JCStressTest
+@Outcome(id = &quot;0, 0&quot;, expect = ACCEPTABLE_INTERESTING, desc = &quot;TSO-violation possible&quot;)
+@Outcome(id = &quot;1, 0&quot;, expect = ACCEPTABLE, desc = &quot;A first then B&quot;)
+@Outcome(id = &quot;0, 1&quot;, expect = ACCEPTABLE, desc = &quot;B first then A&quot;)
+@Outcome(id = &quot;1, 1&quot;, expect = ACCEPTABLE, desc = &quot;interleaved&quot;)
+public class DekkerTest {
+    int x, y;
+    @Actor public void actorA(IntResult2 r) { x = 1; r.r1 = y; }
+    @Actor public void actorB(IntResult2 r) { y = 1; r.r2 = x; }
+}
+</code></pre></div>
+<p>Run on ARM and you'll see <code>(0, 0)</code> appear. Run on x86 and it never does — but the JMM <em>permits</em> it, so if you targeted x86 and shipped to ARM, you have a bug. jcstress catches it before shipping.</p>
+<h2 id="virtual-threads-jmm-unchanged">Virtual Threads — JMM Unchanged<a class="anchor" href="#virtual-threads-jmm-unchanged" aria-hidden="true">#</a></h2>
+<p>The JMM applies <em>exactly the same</em> to virtual threads (T14). Happens-before edges work; volatile works; final fields work; the eight rules apply.</p>
+<p>The only nuance: virtual threads run on carrier threads, but the JVM treats them as their own thread for JMM purposes — <code>Thread.start()</code>/<code>join()</code> create HB edges for virtual threads as they do for platform threads. Code that reasoned correctly about JMM pre-Loom continues to reason correctly post-Loom.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"What is the Java Memory Model?" — Senior answer:</p><ol>
+<li><strong>Purpose.</strong> The JMM is the formal contract specifying what writes one thread is guaranteed to see from another, accounting for CPU reordering, store buffers, and cache coherence delays.</li>
+<li><strong>Core relation.</strong> The <em>happens-before</em> relation orders actions across threads. If A happens-before B, then B sees A's effects.</li>
+<li><strong>Eight rules</strong> (JLS 17.4.5): program order, monitor lock (unlock HB subsequent lock), volatile (write HB subsequent read), thread start (start HB any action in new thread), thread join (all of t's actions HB join), interruption, finalizer, transitivity.</li>
+<li><strong>Implementations.</strong> <code>synchronized</code>, <code>volatile</code>, <code>final</code>, <code>Lock</code> create HB edges. Atomics + VarHandle let you pick precise memory-ordering modes per JEP 193.</li>
+<li><strong>Hardware realization.</strong> x86 TSO realizes most JMM guarantees nearly free (only StoreLoad needs MFENCE); ARM weakly-ordered emits explicit LDAR/STLR/DMB fences.</li>
+</ol>
+<p>[!INTERVIEW]
+Short Q&amp;A:</p>
+<ol>
+<li><strong>Why isn't <code>counter++</code> atomic with <code>volatile</code>?</strong> It's three steps: read, add, write. <code>volatile</code> makes each step atomic + visible, but doesn't atomicize the sequence.</li>
+<li><strong>What is happens-before?</strong> Partial order on actions; A HB B means A's effects are visible to B and A is ordered before B.</li>
+<li><strong>List the 8 happens-before rules.</strong> Program order, monitor lock, volatile, thread start, thread termination/join, interruption, finalizer, transitivity.</li>
+<li><strong>What does volatile guarantee?</strong> Atomic 32/64-bit load/store; visibility (write immediately visible to subsequent reads); no reordering across (release+acquire).</li>
+<li><strong>Why do final fields have special JMM treatment?</strong> Initialization safety — a freeze action at constructor end ensures any thread that sees the fully-constructed object via safe publication sees the correct final-field values.</li>
+<li><strong>Four safe publication mechanisms?</strong> Static initializer; volatile/atomic reference; final fields; lock-protected publication.</li>
+<li><strong>Why is double-checked locking broken without volatile?</strong> <code>instance = new Singleton()</code> is not atomic — the JIT can publish the reference before the constructor finishes. Another thread sees the reference but reads default field values.</li>
+<li><strong>What is the <code>this</code>-escape rule?</strong> Don't let <code>this</code> leave the constructor before construction finishes — otherwise other threads may see partially-initialized state.</li>
+<li><strong>What is x86 Total Store Order?</strong> Hardware memory model where most reorderings are forbidden; only store-load reordering is possible. Makes most JMM guarantees free on x86.</li>
+<li><strong>What does ARM need that x86 doesn't?</strong> Explicit memory barriers — <code>LDAR</code>/<code>STLR</code> for volatile, <code>DMB ISH</code> for full sequential consistency. ARM is weakly ordered.</li>
+<li><strong>What's the difference between visibility and atomicity?</strong> Visibility: one thread sees what another wrote. Atomicity: an operation is indivisible. <code>volatile</code> gives visibility; CAS gives both.</li>
+<li><strong>What's a race condition?</strong> Two actions not ordered by happens-before, at least one a write. JMM says little about racy programs — values become "undefined" within JMM constraints.</li>
+<li><strong>Why is the JMM hard to formalize?</strong> Out-of-thin-air values, causality cycles, and the interaction of multiple synchronization actions. The 2005 JSR-133 redesign was a multi-year effort.</li>
+<li><strong>What is jcstress?</strong> Doug Lea's concurrency-stress test framework — runs litmus tests millions of times and verifies only JMM-permitted outcomes are observed.</li>
+<li><strong>Does the JMM change with virtual threads?</strong> No — virtual threads honor all the same rules. Thread.start() and join() create HB edges identically for both kinds of threads.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Reproduce the volatile-flag bug.</strong> Write a loop that exits when <code>shutdown</code> becomes true, but <code>shutdown</code> is plain (not volatile). From another thread set it true. Observe the loop spinning forever. Add volatile; observe immediate exit.</li>
+<li><strong>Reproduce torn long reads.</strong> On a 32-bit JVM (or with <code>-XX:-UseAtomicLongOnX86</code>), have one thread write a long alternating between <code>0x0000FFFFFFFF</code> and <code>0xFFFF00000000</code>; another thread reads and prints. Without volatile, observe torn values. Add volatile; observe atomicity.</li>
+<li><strong>DCL broken vs fixed.</strong> Implement DCL without volatile; race many threads through <code>getInstance()</code>. Use a <code>SharedState</code> field in the Singleton; observe partially-constructed reads (rare on x86; easier on ARM). Fix with volatile; verify.</li>
+<li><strong>The <code>this</code>-escape race.</strong> Implement a <code>Listener</code> that registers itself in the constructor. From another thread, fire events during construction. Observe reads of default field values. Refactor to factory method; observe correctness.</li>
+<li><strong>Safe vs unsafe publication.</strong> Build an immutable <code>Config(int x, int y)</code>. Publish via unsafe assignment to a shared field; race readers. Observe partial reads. Publish via volatile; observe consistency.</li>
+<li><strong>The monitor-lock rule.</strong> One thread writes to a field under <code>synchronized(m)</code>. Another reads it under <code>synchronized(m)</code>. Verify the read sees the write. Then change the writer to <code>synchronized(n)</code> (different monitor); observe potentially stale reads.</li>
+<li><strong>Program-order matters for HB chains.</strong> Write <code>a = 1; vol = true; b = 2;</code>. Reader: <code>if (vol) print(a, b);</code>. Verify <code>a == 1</code> always (program order before vol write HB through vol rule). What about <code>b</code>? — <code>b</code> is NOT in the HB chain (it's written after the volatile write); reader may see <code>b == 0</code>.</li>
+<li><strong>jcstress on the Dekker example.</strong> Install jcstress. Run the Dekker test on x86 and (if available) ARM. On x86, never see (0,0). On ARM, occasionally see it. Confirm <code>volatile</code> on x and y eliminates the (0,0) outcome.</li>
+<li><strong><code>final</code> field guarantee.</strong> Construct an immutable <code>Pair(int a, int b)</code>. Publish it via unsafe assignment. From another thread, repeatedly read and assert both fields are correct. With <code>final</code> fields, never see default values; without, you may.</li>
+<li><strong>Synchronized vs Lock memory-edge equivalence.</strong> Write the same publish-then-consume pattern with <code>synchronized</code> and with <code>ReentrantLock</code>. Verify both create the HB edge equally; verify the JIT lowers them to similar code.</li>
+<li><strong>VarHandle memory-mode comparison.</strong> Build a benchmark that publishes a config via <code>setVolatile</code>, <code>setRelease</code>, <code>setOpaque</code>, <code>set</code> (plain). Measure throughput. On x86, observe small differences; on ARM, larger differences.</li>
+<li><strong>The lazy field-write reorder.</strong> Write <code>data = 42; ready = true;</code> <em>without</em> volatile. Reader: <code>if (ready) print(data);</code>. Test for hours on ARM; observe occasional <code>data = 0</code>. Add <code>volatile</code> to <code>ready</code>; observe correctness.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>State <strong>why a memory model is necessary</strong>: compiler reordering, CPU out-of-order execution, store buffers, cache coherence delays — all mean across-thread observable behavior diverges from program order unless explicitly synchronized.</li>
+<li>Define the <strong>happens-before relation</strong> — partial order over actions where A HB B implies A's effects are visible to B <em>and</em> A is ordered before B; transitive; the foundation of the JMM.</li>
+<li>Recite the <strong>eight happens-before rules</strong> (JLS §17.4.5): program order, monitor lock (unlock HB subsequent lock on same monitor), volatile (write HB subsequent read), thread start (start HB new thread's actions), thread termination/join (target's actions HB join), interruption, finalizer, transitivity.</li>
+<li>Use <strong><code>volatile</code></strong> correctly: atomic 32/64-bit load/store, immediate visibility, no-reordering-across (release on write + acquire on read). Recognize it does <em>not</em> atomize compound operations like <code>counter++</code>.</li>
+<li>Apply <strong>final-field semantics</strong>: a freeze action at constructor end guarantees any thread that sees the fully-constructed object via safe publication sees correct final-field values. Don't let <code>this</code> escape from the constructor — that nullifies the guarantee.</li>
+<li>Identify the <strong>four safe publication mechanisms</strong> (static initializer, volatile/atomic reference, final fields, lock-protected) and reject <strong>unsafe publication</strong> (plain assignment to a shared field).</li>
+<li>Walk through <strong>double-checked locking</strong>: pre-JDK-5 always broken, post-JDK-5 broken <em>without</em> <code>volatile</code>, fixed with <code>volatile</code>. Recommend the <strong>holder-class idiom</strong> as the more idiomatic singleton.</li>
+<li>Understand <strong>x86 Total Store Order</strong> — most JMM guarantees come free; only store-load reordering is allowed, fixed by <code>MFENCE</code> after volatile writes — vs <strong>ARM's weakly-ordered model</strong> with explicit <code>LDAR</code>/<code>STLR</code>/<code>DMB</code> fences. Same JMM, different realizations.</li>
+<li>Distinguish <strong>visibility</strong> (one thread sees what another wrote — gives by volatile + monitor exit) from <strong>atomicity</strong> (an operation is indivisible — needs CAS or lock) from <strong>ordering</strong> (operations execute in source order — preserved by volatile + lock).</li>
+<li>Name the four <strong>informal memory barriers</strong> — LoadLoad, StoreStore, LoadStore, StoreLoad — and recognize StoreLoad as the only one requiring an explicit instruction on x86.</li>
+<li>Reject the <strong>eight common bugs</strong>: missing <code>volatile</code> on flags; compound ops on volatile; unlocked reads against locked writes; DCL without volatile; <code>this</code> escape; cross-monitor reads expecting HB; volatile-array as a queue substitute; sleep-as-synchronization.</li>
+<li>Use <strong><code>jcstress</code></strong> to verify your code against the JMM under reorderings the spec permits but the local CPU may not exhibit.</li>
+<li>State that <strong>virtual threads do not change the JMM</strong> — every rule applies identically.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t13-fork-join-framework.html">Fork/Join framework</a> — the lock-free, work-stealing parallel-computation engine introduced in JDK 7. We'll dissect <code>ForkJoinPool</code>'s per-worker double-ended deques, the work-stealing algorithm (steal from the <em>opposite</em> end of another worker's deque to minimize false sharing), how <code>RecursiveTask</code>/<code>RecursiveAction</code>/<code>CountedCompleter</code> map divide-and-conquer onto the pool, the <code>commonPool</code> we glanced at in T07 (CompletableFuture), and the parallel-streams machinery that rides on top of it.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Java Memory Model (happens-before, volatile)&quot;
+slug: java-memory-model-happens-before-volatile
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 12
+tags: [jmm, java-memory-model, happens-before, hb-relation, program-order, monitor-lock-rule, volatile-rule, thread-start-rule, thread-join-rule, interruption-rule, finalizer-rule, transitivity, volatile, volatile-load, volatile-store, atomic-load, atomic-store, atomic-long-tearing, no-reordering, sequential-consistency, sequentially-consistent, as-if-serial, single-thread-semantics, sync-actions, synchronization-actions, jls-17-4, jls-17-4-5, jls-17-5, final-field, final-freeze, safe-publication, static-initializer, double-checked-locking, dcl, dcl-broken, dcl-fixed-volatile, initialization-safety, immutable, partially-constructed, this-escape, x86-tso, total-store-order, store-buffer, store-load-reorder, mfence, store-forwarding, arm-weak-memory, ldar, stlr, dmb-ish, ppc-weak, memory-barrier, fence, load-load, store-store, load-store, store-load, jcstress, doug-lea, out-of-thin-air, visibility, atomicity, ordering, cache-coherence, mesi, virtual-thread-jmm]
+prerequisites: [atomic-variables, concurrent-collections, locks-reentrantlock-readwritelock-stampedlock, synchronized-monitors-and-intrinsic-locks, source-to-bytecode-to-jvm-to-machine-code, how-computers-run-programs-cpu-memory-binary]
+status: complete
+estimated_minutes: 170
+last_updated: 2026-06-08
+---
+
+# Java Memory Model (happens-before, volatile)
+
+Every concurrency primitive we have built — `synchronized` (T03), `wait`/`notify` (T04), `Lock`/`Condition` (T08), synchronizers (T09), atomic ops (T11), concurrent collections (T10) — *implements* the Java Memory Model. The JMM is the **formal contract** between the Java programmer and the JVM-plus-hardware: it specifies what writes one thread is *guaranteed* to see from another, when, and under what conditions. Without it, programs that work on one CPU could silently break on another (different cache architecture, different reorder buffer), the JIT couldn&#x27;t safely optimize, and &quot;thread-safe&quot; would be undefinable. The JMM (JLS §17.4) is one of the most precisely-formalized parts of the JLS — and arguably the deepest of all Java specifications.
+
+The depth-bar requirement isn&#x27;t &quot;use `volatile` for cross-thread flags.&quot; At the **specification** layer, the JMM defines the **happens-before** relation — a partial order over actions that an executing program&#x27;s threads perform — and *eight* specific rules (program order, monitor lock, volatile, thread start, thread join, interruption, finalizer, transitivity) that build up the relation. If action A *happens-before* action B, then B sees all of A&#x27;s effects; if no such edge exists, anything goes — the *racy* program may produce any output the JMM permits, which is &quot;almost anything,&quot; including values that look impossible. At the **mechanism** layer, **`volatile`** is the cheapest primitive that creates cross-thread happens-before edges: every write to a `volatile` field happens-before every subsequent read, achieving visibility without locking. At the **hardware** layer, the JMM&#x27;s abstract guarantees map differently to **x86&#x27;s Total Store Order** (most guarantees free; only store-load reorderings need an `MFENCE`) and **ARM&#x27;s weakly-ordered model** (explicit fences everywhere — `LDAR`/`STLR` for volatile, `DMB ISH` for locks). At the **safe-publication** layer, the JMM defines exactly **four mechanisms** that safely make a fully-constructed object visible to other threads — and any other publication leaves a window where threads may see partially constructed state, the root cause of *the* canonical bug in `Double-Checked Locking` and a generation of singleton implementations. We will cover all four layers.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Atomic variables](./T11-atomic-variables.md) (L3/C01/T11) — atomic ops are the *implementations*; this topic is the *spec*; [Concurrent collections](./T10-concurrent-collections.md) (L3/C01/T10) — every CHM `get` relies on the volatile-load happens-before edge; [Locks](./T08-locks-reentrantlock-readwritelock-stampedlock.md) (L3/C01/T08) — `synchronized` and `Lock`&#x27;s memory edge is the monitor-lock rule; [synchronized, monitors &amp; intrinsic locks](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — the acquire/release semantics of monitor enter/exit; [Source to bytecode](../../L0-foundations/C01-cs-foundations/T04-source-to-bytecode-to-jvm-to-machine-code.md) (L0/C01/T04) — JIT compilation can reorder; [How Computers Run Programs](../../L0-foundations/C01-cs-foundations/T01-how-computers-run-programs-cpu-memory-binary.md) (L0/C01/T01) — caches, memory hierarchy.
+
+## Why a Memory Model — Because the Hardware Lies
+
+Every modern CPU lies about what your program does. Not maliciously — for performance:
+
+1. **Compiler reordering.** The JIT reorders bytecodes for register pressure, instruction scheduling, dead-code elimination. As long as a single thread&#x27;s *observable* behavior is unchanged, the JIT is free to reorder.
+2. **CPU out-of-order execution.** Modern cores execute instructions in dataflow order, not program order. An L2-missing load doesn&#x27;t stall a later add; the add runs immediately if its inputs are ready. Hundreds of in-flight instructions at any time.
+3. **Store buffers.** Writes don&#x27;t reach the cache immediately — they sit in a per-core store buffer, posted to the cache hierarchy lazily. A read from another core may see the *old* value of the cache line until the store buffer drains and the cache-coherence protocol delivers the update.
+4. **Cache coherence delays.** Even with MESI keeping caches coherent, the protocol takes cycles — a write on core 0 may take 30-100 cycles to be visible on core 1.
+5. **Memory hierarchy.** Register &gt; L1 &gt; L2 &gt; L3 &gt; RAM. Different cores see different &quot;snapshots&quot; depending on what&#x27;s in their L1 vs the shared L3.
+
+```mermaid
+flowchart TB
+  Code[&quot;Java source&lt;br/&gt;(observable: read x, then read y)&quot;]
+  JIT[&quot;JIT reorders&lt;br/&gt;(observable single-thread: same)&quot;]
+  CPU[&quot;CPU executes out-of-order&lt;br/&gt;(load y completes first if L1 hits)&quot;]
+  Buff[&quot;store buffers&lt;br/&gt;(writes deferred)&quot;]
+  Cache[&quot;cache hierarchy&lt;br/&gt;(per-core L1; MESI sync)&quot;]
+  Code --&gt; JIT --&gt; CPU --&gt; Buff --&gt; Cache
+  Effect[&quot;across threads: writes may be seen in surprising orders;&lt;br/&gt;reads may see surprising values.&quot;]
+  Cache --&gt; Effect
+```
+
+The JMM is what makes this manageable: it tells you *exactly* which reorderings the JIT and CPU may perform, *exactly* what guarantees `synchronized`/`volatile`/`final` give you, and exactly what bugs are possible in *racy* programs (programs without the right synchronization). It does *not* tell you which reorderings will actually happen on your CPU — that&#x27;s hardware-and-version-specific. It tells you what the spec *permits*.
+
+## As-If-Serial — the Single-Thread Property
+
+The JMM&#x27;s single-thread guarantee:
+
+&gt; **The JVM and the CPU may freely reorder operations within a single thread as long as the *observable* effects in that thread&#x27;s program order are preserved.**
+
+So `x = 5; y = 10; z = x + y;` may execute as &quot;compute z first by speculation&quot; or &quot;issue x = 5 and y = 10 in parallel&quot; — but every read in the thread *must* see the value as if the writes happened in source order. The reordering is invisible *to that thread*.
+
+This is why a single-threaded program &quot;just works&quot; — the JMM gives you sequential consistency *within* a thread. The trouble begins *across* threads.
+
+## The Cross-Thread Problem — and Why It&#x27;s Worse Than You Think
+
+```java
+// shared:
+int x = 0, y = 0;
+
+// thread A
+x = 1;
+int r1 = y;
+
+// thread B
+y = 1;
+int r2 = x;
+```
+
+What are the possible values of `(r1, r2)` after both threads complete? *Naïve* sequential reasoning gives three cases:
+
+- A runs first, then B: `r1 = 0, r2 = 1`.
+- B runs first, then A: `r1 = 1, r2 = 0`.
+- Interleaved: `r1 = 0, r2 = 0` or `r1 = 1, r2 = 1`.
+
+But under the JMM (and on real hardware), **`(0, 0)` is also legal** — even though no sequentially consistent interleaving allows it. Why? Both writes can sit in their respective store buffers; both reads can complete before the stores drain. Each thread sees its own store but not the other&#x27;s. This is the *Dekker&#x27;s algorithm violation* — the canonical example of a non-sequentially-consistent memory model.
+
+The fix: declare `x` and `y` `volatile`. The JMM&#x27;s volatile rule (below) then prohibits this specific reordering — `volatile` writes drain the store buffer, and `volatile` reads pull from main memory. `(0, 0)` becomes impossible.
+
+&gt; [!IMPORTANT]
+&gt; **Without proper synchronization, you cannot reason about cross-thread behavior using sequential thinking.** Reads can see &quot;stale&quot; values; writes can be &quot;reordered&quot; relative to each other; values that &quot;couldn&#x27;t happen&quot; in any interleaving *can* happen on real hardware. The JMM gives you the tools (`synchronized`, `volatile`, `final`, atomics) to *create* the sequential reasoning where you need it.
+
+## The Happens-Before Relation
+
+The JMM defines a partial order over a program&#x27;s actions called **happens-before** (HB). It&#x27;s the formal foundation:
+
+&gt; **If action A *happens-before* action B, then:**
+&gt; - **All effects of A are visible to B** (writes A made are visible to reads B does).
+&gt; - **A is ordered before B** (no observed execution can have B appear to precede A).
+
+HB is **partial** — most pairs of actions in a multithreaded program are *not* ordered by HB, and those pairs can race. HB is **transitive** — if A → B and B → C, then A → C.
+
+If two actions are *not* ordered by HB, they&#x27;re called a **race**, and the JMM says virtually nothing about what one thread sees of the other&#x27;s writes. Racy programs can exhibit *any* JMM-permitted behavior — including values that look impossible.
+
+## The Eight Happens-Before Rules (JLS §17.4.5)
+
+The JMM defines HB via *synchronization actions* — specific things that create HB edges across threads. Eight rules, in their canonical form:
+
+### 1. Program order rule
+
+Within a single thread, each action happens-before every action that comes later in program order.
+
+```java
+// thread T:
+x = 1;       // (a)
+y = 2;       // (b) — (a) happens-before (b)
+z = x + y;   // (c) — (b) happens-before (c); transitively (a) hb (c)
+```
+
+This is the within-thread guarantee from the as-if-serial rule.
+
+### 2. Monitor lock rule
+
+An unlock of monitor M happens-before every subsequent lock of M.
+
+```java
+// thread A
+synchronized (m) { x = 1; }   // unlock happens-before...
+
+// thread B (later)
+synchronized (m) { print(x); } // ...this lock → prints 1 (guaranteed)
+```
+
+The release/acquire pair on the same monitor publishes everything A wrote inside its synchronized region.
+
+### 3. Volatile variable rule
+
+A write to volatile field V happens-before every subsequent read of V (that returns the written value).
+
+```java
+volatile boolean ready;
+int data;
+
+// thread A
+data = 42;       // (a)
+ready = true;    // (b) — volatile write — (a) HB (b) by program order
+
+// thread B
+while (!ready); // volatile read
+print(data);     // sees 42 — (b) HB read(ready), and transitively (a) HB print(data)
+```
+
+This is what makes `volatile` the cheapest synchronization. The write-then-read of the volatile is the only cross-thread edge, but it carries with it all writes that happened-before it in the writer thread.
+
+### 4. Thread start rule
+
+A call to `Thread.start()` happens-before any action in the started thread.
+
+```java
+int x;
+
+// thread A
+x = 5;
+Thread t = new Thread(() -&gt; print(x));  // (start) — A&#x27;s prior writes HB any t action
+t.start();
+```
+
+The new thread sees everything the starter wrote before `start()`. This is how thread launch is correct without explicit synchronization — `start()` is itself a synchronization action.
+
+### 5. Thread termination rule
+
+All actions in a thread happen-before any other thread successfully returns from a `join()` on that thread.
+
+```java
+int result;
+
+Thread t = new Thread(() -&gt; { result = compute(); });
+t.start();
+t.join();           // returns
+print(result);      // sees the result — all of t&#x27;s writes HB this read
+```
+
+Same as start, but for the end. Combined with start, this gives you the classic &quot;fan out, fan in&quot; pattern correctness for free.
+
+### 6. Interruption rule
+
+A call to `Thread.interrupt()` happens-before the interrupted thread detects the interrupt (via `InterruptedException` or `isInterrupted()`).
+
+```java
+// thread A: t.interrupt();   // (a)
+// thread t: catches InterruptedException from sleep
+// (a) happens-before the catch
+```
+
+Practical consequence: anything A wrote before calling `interrupt()` is visible in the catch block.
+
+### 7. Finalizer rule
+
+The end of an object&#x27;s constructor happens-before the start of its `finalize()` method.
+
+Rarely useful — finalizers are deprecated in JDK 9+. Listed for completeness.
+
+### 8. Transitivity
+
+If A happens-before B and B happens-before C, then A happens-before C.
+
+This is the unsung hero — every realistic program relies on chaining HB edges. Producer writes data, sets a volatile flag → consumer reads volatile flag, reads data. The consumer sees the data only because of transitivity: producer&#x27;s data write HB producer&#x27;s volatile write (program order) HB consumer&#x27;s volatile read (volatile rule) HB consumer&#x27;s data read (program order).
+
+```mermaid
+flowchart LR
+  P1[&quot;producer: data = 42&quot;]
+  P2[&quot;producer: ready = true (volatile write)&quot;]
+  C1[&quot;consumer: ready = true? (volatile read)&quot;]
+  C2[&quot;consumer: read data&quot;]
+  P1 -- &quot;program order&quot; --&gt; P2
+  P2 -- &quot;volatile rule&quot; --&gt; C1
+  C1 -- &quot;program order&quot; --&gt; C2
+  Note[&quot;transitivity:&lt;br/&gt;P1 HB C2 — consumer is guaranteed to see data == 42&quot;]
+```
+
+## Volatile — the Cheapest Synchronization
+
+`volatile` (Java keyword, declared on a field) gives three guarantees over plain access:
+
+1. **Atomic load/store of 32- and 64-bit values.** On a 32-bit JVM, plain `long` and `double` reads/writes may be **torn** — the JLS permits the JVM to split them into two 32-bit operations, so a reader can see half of the new value and half of the old. `volatile long`/`double` is *guaranteed* atomic. (On a 64-bit JVM, the JVM typically gives atomic 64-bit anyway, but the language guarantee depends on `volatile`.)
+
+2. **Visibility.** Every write to a `volatile` field is *immediately visible* to subsequent reads of the same field on any other thread. No staleness; no buffered-store delay.
+
+3. **No reordering across.** Prior loads/stores can&#x27;t be moved *after* a volatile write (release semantics); subsequent loads/stores can&#x27;t be moved *before* a volatile read (acquire semantics). This is what enables the happens-before edge.
+
+```mermaid
+flowchart LR
+  Vol[&quot;volatile field&quot;]
+  Vol --&gt; A[&quot;1. Atomic 32/64-bit load/store&quot;]
+  Vol --&gt; V[&quot;2. Visibility — write is immediately visible to reads&quot;]
+  Vol --&gt; O[&quot;3. No reordering across&lt;br/&gt;release(write), acquire(read)&quot;]
+  NotV[&quot;What volatile does NOT do&quot;]
+  NotV --&gt; Comp[&quot;compound atomicity — counter++ is still broken&quot;]
+  NotV --&gt; Lock[&quot;mutual exclusion — multiple threads can write the same volatile&quot;]
+  NotV --&gt; ABA[&quot;ABA prevention — that&#x27;s stamped reference (T11)&quot;]
+```
+
+### What `volatile` does *not* give you
+
+The most common bug: assuming `volatile` makes compound operations atomic.
+
+```java
+volatile int counter;
+counter++;       // ✗ STILL BROKEN — reads, adds, writes (3 steps); other threads can interleave
+```
+
+`volatile` makes each individual read and write atomic and visible. The `counter++` is *three* operations, not one. For atomicity over read-modify-write, use `AtomicInteger.incrementAndGet()` (T11).
+
+The rule of thumb:
+
+- **Single writer, multiple readers**: `volatile` is sufficient.
+- **Multiple writers**: `volatile` won&#x27;t help — you need locks or atomic CAS.
+
+### Idiomatic uses of `volatile`
+
+```java
+// A thread-safe &quot;shutdown flag&quot;
+volatile boolean shutdown;
+public void shutdown() { shutdown = true; }
+public void run() { while (!shutdown) doWork(); }
+
+// A &quot;publication&quot; field for an immutable value
+volatile Config config;
+public void publish(Config newConfig) { config = newConfig; }      // releases
+public Config current() { return config; }                          // acquires
+
+// Double-checked locking with volatile (below)
+private volatile Singleton instance;
+```
+
+The common pattern: *single* writer (or atomic CAS for multiple writers); many readers; the field&#x27;s value is either a primitive flag or an immutable object reference.
+
+## Final Field Semantics — Initialization Safety
+
+`final` fields have *special* JMM treatment. The JMM guarantees:
+
+&gt; **Any thread that observes a fully-constructed object via any safe publication mechanism sees the *correctly-initialized* values of all `final` fields, and any objects those finals transitively reference.**
+
+This is *initialization safety* (JLS §17.5). Why it matters:
+
+```java
+public final class Point {
+    public final int x;
+    public final int y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+}
+
+// thread A
+sharedRef = new Point(3, 4);     // unsafe publication! no volatile, no lock
+
+// thread B
+Point p = sharedRef;
+print(p.x, p.y);
+```
+
+Without final-field semantics, thread B could see `sharedRef` as the new Point but see `p.x = 0` or `p.y = 0` (the default values before the constructor ran). The constructor&#x27;s writes are &quot;out of order&quot; relative to the assignment of `sharedRef`.
+
+With `final` fields, the JVM emits a **freeze action** at the end of the constructor that prevents the constructor&#x27;s final-field writes from being reordered with the publication of the object reference. So any thread that sees `sharedRef` is guaranteed to see `x = 3, y = 4`.
+
+```mermaid
+flowchart TB
+  Ctor[&quot;constructor: this.x = 3; this.y = 4&quot;]
+  Freeze[&quot;FREEZE action (compiler inserts barrier)&lt;br/&gt;guarantees final writes complete before any read of THIS reference&quot;]
+  Pub[&quot;sharedRef = new Point(3, 4)&quot;]
+  Read[&quot;other thread: sees Point with x=3, y=4 — guaranteed&quot;]
+  Ctor --&gt; Freeze --&gt; Pub --&gt; Read
+  Note[&quot;this is why String, Integer, BigDecimal, etc. (immutable + final fields)&lt;br/&gt;are safe across threads even without synchronization.&quot;]
+```
+
+### The `this`-escape caveat
+
+Initialization safety only applies if the constructor doesn&#x27;t let `this` escape — i.e., publish a reference to the partially-constructed object before the constructor finishes. The classic violation:
+
+```java
+public final class Listener {
+    public final int id;
+    public Listener(EventBus bus, int id) {
+        this.id = id;
+        bus.register(this);       // ✗ this escaped before constructor finished!
+                                   //   another thread may see this with id == 0
+    }
+}
+```
+
+If the constructor&#x27;s body publishes `this` before returning, the freeze action hasn&#x27;t happened yet, and other threads can see partially-initialized state. Rule: never publish `this` from a constructor (use a static factory or two-step init).
+
+## Safe Publication — The Four Mechanisms
+
+A fully-constructed object is **safely published** if any of these four conditions hold (other threads observing the reference are guaranteed to see fully-constructed state):
+
+1. **Static initializer.** A reference stored in a `static` field initialized by the class&#x27;s static initializer is safely published — the JLS guarantees class initialization is synchronized.
+
+   ```java
+   class Holder {
+       static final Singleton INSTANCE = new Singleton();   // safe — static init
+   }
+   ```
+
+2. **Volatile or atomic reference.** Storing the reference in a `volatile` field (or via `AtomicReference.set`) creates a happens-before edge from the store to any subsequent read.
+
+   ```java
+   volatile Singleton instance;
+   instance = new Singleton();     // safe — volatile rule
+   ```
+
+3. **Final fields.** Storing the reference in a `final` field and publishing the *enclosing* object — initialization safety covers the entire chain.
+
+   ```java
+   class Container {
+       final Map&lt;String,String&gt; data;
+       Container() { data = new HashMap&lt;&gt;(); }   // safe — Container&#x27;s final ref propagates
+   }
+   ```
+
+4. **Lock-protected publication.** Storing the reference inside a `synchronized` block (or under a `Lock`) — the monitor-lock rule edge publishes it.
+
+   ```java
+   synchronized (lock) { instance = new Singleton(); }    // safe — monitor lock rule
+   ```
+
+Anything else is **unsafe publication**: simple assignment to a non-volatile shared field. Other threads may see the reference *before* the constructor&#x27;s writes are visible.
+
+```mermaid
+flowchart LR
+  Safe[&quot;safe publication mechanisms&quot;]
+  Safe --&gt; S1[&quot;1. static initializer&lt;br/&gt;(class init is synchronized)&quot;]
+  Safe --&gt; S2[&quot;2. volatile / AtomicReference&quot;]
+  Safe --&gt; S3[&quot;3. final fields&lt;br/&gt;(initialization safety)&quot;]
+  Safe --&gt; S4[&quot;4. lock-protected publication&lt;br/&gt;(monitor lock rule)&quot;]
+  Un[&quot;unsafe — every other shape&quot;]
+  Un --&gt; Risk[&quot;other threads may see partially constructed state&quot;]
+```
+
+## Double-Checked Locking — the Canonical Bug and Its Fix
+
+The classic optimization to make singleton initialization cheap after the first call:
+
+```java
+public class Singleton {
+    private static Singleton instance;
+    public static Singleton getInstance() {
+        if (instance == null) {                 // first check (no lock)
+            synchronized (Singleton.class) {
+                if (instance == null) {          // second check (under lock)
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+The idea: the lock is only acquired on the first call (when `instance` is null); subsequent calls skip the lock. Should be cheap... but it&#x27;s **broken pre-JDK 5** and *still broken in JDK 5+* without `volatile`:
+
+The bug: `instance = new Singleton()` is **not atomic**. At the bytecode level, it&#x27;s:
+
+1. Allocate memory for the new Singleton.
+2. Run the constructor (assign fields).
+3. Assign the reference to `instance`.
+
+The compiler is free to reorder steps 2 and 3 (allocate, *assign reference*, run constructor). On JIT&#x27;d code, this reordering is common. A racing thread enters `getInstance()`, sees `instance != null` (the reference was assigned), and returns a **partially-constructed** Singleton with default field values.
+
+### The fix — `volatile`
+
+Declaring `instance` `volatile` prevents the reordering:
+
+```java
+public class Singleton {
+    private static volatile Singleton instance;    // ← volatile is the fix
+    public static Singleton getInstance() {
+        Singleton local = instance;                 // volatile read — acquire
+        if (local == null) {
+            synchronized (Singleton.class) {
+                local = instance;
+                if (local == null) {
+                    instance = local = new Singleton();   // volatile write — release
+                }
+            }
+        }
+        return local;
+    }
+}
+```
+
+The volatile-write acts as a *release barrier*: all writes inside the constructor must complete before the volatile write of `instance` becomes visible. The volatile-read on the fast path is the corresponding *acquire*. The DCL pattern is now correct.
+
+In practice, **prefer the &quot;holder class&quot; idiom** for singletons:
+
+```java
+public class Singleton {
+    private Singleton() {}
+    private static class Holder { static final Singleton INSTANCE = new Singleton(); }
+    public static Singleton getInstance() { return Holder.INSTANCE; }
+}
+```
+
+The JLS guarantees class init is lazy *and* synchronized, giving safe publication via mechanism (1) above. No `volatile`, no locks in the hot path, no DCL — and correct by language guarantee. The DCL pattern survives mostly in libraries that pre-date this idiom or in cases where the singleton class isn&#x27;t free to introduce a holder.
+
+## x86 — Total Store Order (TSO)
+
+x86 has a remarkably strong memory model — **Total Store Order**:
+
+- All stores from any single core are observed by all cores in the same order.
+- Loads are not reordered with loads.
+- Stores are not reordered with stores.
+- **The only reordering allowed**: a store may be reordered after a later load (the *store-load* reordering). Same core can see its own pending store in the buffer (store-to-load forwarding); other cores haven&#x27;t seen it yet.
+
+This means most JMM rules are **free on x86**:
+
+- Volatile loads: just a plain load. The acquire semantics come for free from TSO.
+- Volatile stores: usually a plain store, but the JIT emits an **`MFENCE`** (or uses a `LOCK`-prefixed RMW) *after* a volatile write to prevent the store-load reordering. This is the only non-free fence on x86.
+- `synchronized`: the `LOCK CMPXCHG` for monitor enter is *also* a full barrier (T03), free.
+
+```text
+volatile write on x86:
+   mov [addr], rax       ; the store
+   mfence                 ; full barrier prevents store-load reorder
+```
+
+Or, when combined with an immediate CAS:
+
+```text
+   lock cmpxchg [addr], rcx     ; both atomic AND full barrier
+```
+
+The bottom line on x86: **volatile is cheap, synchronized is cheap, CAS is cheap**. Memory-model concerns rarely surface as performance problems.
+
+## ARM — Weakly Ordered
+
+ARM (and POWER) have **weakly-ordered** memory models — almost everything can be reordered by default. The compiler must emit explicit fences for every JMM guarantee.
+
+ARMv8 provides:
+
+- `LDAR` (load-acquire) and `STLR` (store-release) — one-way fences embedded in load/store.
+- `DMB ISH` — full data memory barrier (inner shareable domain).
+- `DSB ISH` — data synchronization barrier (full sync; rarely needed).
+
+The JIT emits:
+
+- Volatile load: `LDAR` (no separate fence needed).
+- Volatile store: `STLR` (release semantics).
+- Around a volatile-write-then-volatile-read pattern (the store-load case): explicit `DMB ISH` may be needed for full sequential consistency.
+- `synchronized`: `LDAR` on monitor enter (acquire), `STLR` on monitor exit (release), `DMB ISH` for the CAS portion.
+
+The cost: ARM-specific microbenchmarks show 10-30% overhead vs x86 for heavily synchronized code, purely due to the explicit fences. The JMM is the *same* on both architectures; the realization differs.
+
+```mermaid
+flowchart LR
+  Arch[&quot;JMM realization&quot;]
+  Arch --&gt; X86[&quot;x86 (TSO)&quot;]
+  X86 --&gt; Cheap[&quot;volatile load: plain load (free)&lt;br/&gt;volatile store: MFENCE (1 cost)&lt;br/&gt;synchronized: LOCK CMPXCHG (1 cost)&quot;]
+  Arch --&gt; ARM[&quot;ARM (weak)&quot;]
+  ARM --&gt; ExpFence[&quot;volatile load: LDAR&lt;br/&gt;volatile store: STLR&lt;br/&gt;monitor enter/exit: LDAR/STLR&lt;br/&gt;CAS: DMB ISH around&quot;]
+  Note[&quot;JMM spec is identical on both;&lt;br/&gt;x86&#x27;s hardware does the work, ARM emits explicit instructions.&quot;]
+```
+
+## Memory Barriers — Informal Vocabulary
+
+The JMM spec talks about happens-before. The implementation talks about **memory barriers** (fences) — instructions that constrain reordering. Four orthogonal types:
+
+| Barrier | Prevents | Example uses |
+|---------|----------|-------------|
+| **LoadLoad** | later loads from being reordered before earlier loads | acquire semantics |
+| **StoreStore** | later stores from being reordered before earlier stores | release semantics (preserves write order) |
+| **LoadStore** | later stores from being reordered before earlier loads | (rare; partial of release) |
+| **StoreLoad** | later loads from being reordered before earlier stores | full barrier (most expensive) |
+
+On x86, only StoreLoad needs an explicit fence (`MFENCE`); the rest are implicit in TSO. On ARM, *every* barrier type has a corresponding `DMB` variant.
+
+The most important one: **StoreLoad**. It&#x27;s what&#x27;s needed at the end of a release (volatile store) to prevent the next load (a subsequent volatile read) from being moved up. It&#x27;s the most expensive because it must drain the store buffer to the cache *and* prevent the cache from serving stale loads.
+
+## The `synchronized` → Happens-Before Bridge
+
+T03 showed how `synchronized` realizes the monitor-lock rule. Concretely:
+
+```java
+synchronized (m) {
+    a = 1;       // ... releases on } below ...
+}
+// release of m
+
+// other thread later:
+synchronized (m) {
+    print(a);     // acquires; sees a == 1
+}
+```
+
+The release is `monitorexit` (T03&#x27;s bytecode). It does:
+
+- On x86: `LOCK CMPXCHG` to clear the lock state — also a full barrier.
+- On ARM: `STLR` to clear the lock state.
+
+The acquire is `monitorenter`:
+
+- On x86: `LOCK CMPXCHG` to grab the lock — full barrier.
+- On ARM: `LDAR` on the lock state, plus AQS-style coordination.
+
+The HB edge — release of m HB acquire of m — is built directly into these hardware operations. *The JMM is realized by the lock implementation*.
+
+## Out-of-Thin-Air Values — the Subtle Edge
+
+The JMM also forbids &quot;out-of-thin-air&quot; values — a *causal cycle* where a value justifies its own existence in a race:
+
+```java
+// shared:
+int x = 0, y = 0;
+
+// thread A
+int r1 = x;
+y = r1;          // (a)
+
+// thread B
+int r2 = y;
+x = r2;          // (b)
+```
+
+If we squint: A reads x = 0, writes y = 0. B reads y = 0, writes x = 0. Final: x = 0, y = 0. Boring.
+
+But can we have `r1 = r2 = 42`? In some pathological reasoning: A speculates y = 42, writes y = 42, gets r1 = 42. B reads y = 42, writes x = 42, gets r2 = 42. A&#x27;s speculation is &quot;justified&quot; by B&#x27;s write — but B&#x27;s read justified A&#x27;s speculation. Circular causality — *out of thin air*.
+
+The JMM explicitly forbids this. The JLS&#x27;s full formal definition includes a *causality constraint* preventing such cycles. In practice, you&#x27;ll never encounter it directly — it&#x27;s a constraint on what the spec is allowed to permit, not a daily concern. But it&#x27;s why the JMM&#x27;s formal definition is so subtle (and famously took the JSR-133 expert group multiple years to nail down).
+
+## Common Mistakes
+
+### Forgetting `volatile` on a flag
+
+```java
+boolean shutdown;                 // ✗ not volatile
+while (!shutdown) doWork();       // JIT may hoist this read out of the loop → infinite loop
+```
+
+Without `volatile`, the JIT sees `shutdown` is not modified inside the loop and *hoists* the read above the loop, evaluating once. The loop never sees the update. Add `volatile`.
+
+### Using `volatile` for compound operations
+
+```java
+volatile int counter;
+counter++;                         // ✗ still 3 steps; race
+```
+
+Use `AtomicInteger`.
+
+### Reading without lock when writer holds lock
+
+```java
+synchronized (lock) { data = newValue; }    // writer
+int v = data;                                // reader — no lock → no HB edge
+```
+
+No happens-before edge between the writer&#x27;s write and the reader&#x27;s read. The reader may see stale data forever. Both must use the same lock.
+
+### Double-checked locking without volatile
+
+```java
+private Singleton instance;       // ✗ not volatile
+public Singleton get() {
+    if (instance == null) synchronized (...) { if (instance == null) instance = new Singleton(); }
+    return instance;
+}
+```
+
+Pre-JDK-5: always broken. JDK 5+: still broken without `volatile`. Either make `instance` volatile or switch to the holder-class idiom.
+
+### Letting `this` escape from a constructor
+
+```java
+class X {
+    X() { eventBus.register(this); }      // ✗ this escaped before construction finished
+}
+```
+
+Listeners may see partially-constructed state. Use a factory method that constructs then registers.
+
+### Assuming `synchronized` orders unrelated variables
+
+```java
+synchronized (m) { x = 1; }                 // thread A
+synchronized (n) { print(x); }              // thread B — DIFFERENT monitor
+```
+
+The monitor-lock rule requires the *same* monitor. Different monitors create no HB edge. Use the same lock object for related operations.
+
+### Using `volatile` for the producer-consumer queue
+
+```java
+volatile Object[] queue;                    // ✗ no atomicity for multi-step queue operations
+```
+
+A queue is a multi-field structure; `volatile` on the array reference doesn&#x27;t make `enqueue/dequeue` atomic. Use a proper concurrent queue (T10).
+
+### Relying on `Thread.sleep` for synchronization
+
+```java
+sharedState = 1;
+Thread.sleep(100);                          // ✗ doesn&#x27;t synchronize anything
+otherThread.access(sharedState);            // may see 0
+```
+
+`sleep` is a hint to the scheduler; it doesn&#x27;t create any HB edges. Use `volatile`, locks, or atomics.
+
+### Caching JIT&#x27;d code in a non-thread-safe way
+
+JIT&#x27;d compiled methods are themselves shared mutable state. The JVM publishes them safely; user code that tries to &quot;cache&quot; callable references with similar performance hacks is rarely safe and rarely worth it.
+
+## Testing for Memory Model Bugs
+
+The JMM permits *more* reorderings than your specific CPU performs. A program that&#x27;s racy may work fine on x86 (TSO hides most reorderings) and break on ARM. The right testing tool:
+
+**jcstress** — Doug Lea&#x27;s Java Concurrency Stress test framework. Writes tiny *litmus tests* and runs them millions of times under different JIT settings, printing observed outcomes. Verifies that the *only* observed outcomes are JMM-permitted, and catches surprises where the JMM permits more than your code assumes.
+
+```java
+// jcstress test for the Dekker-style example
+@JCStressTest
+@Outcome(id = &quot;0, 0&quot;, expect = ACCEPTABLE_INTERESTING, desc = &quot;TSO-violation possible&quot;)
+@Outcome(id = &quot;1, 0&quot;, expect = ACCEPTABLE, desc = &quot;A first then B&quot;)
+@Outcome(id = &quot;0, 1&quot;, expect = ACCEPTABLE, desc = &quot;B first then A&quot;)
+@Outcome(id = &quot;1, 1&quot;, expect = ACCEPTABLE, desc = &quot;interleaved&quot;)
+public class DekkerTest {
+    int x, y;
+    @Actor public void actorA(IntResult2 r) { x = 1; r.r1 = y; }
+    @Actor public void actorB(IntResult2 r) { y = 1; r.r2 = x; }
+}
+```
+
+Run on ARM and you&#x27;ll see `(0, 0)` appear. Run on x86 and it never does — but the JMM *permits* it, so if you targeted x86 and shipped to ARM, you have a bug. jcstress catches it before shipping.
+
+## Virtual Threads — JMM Unchanged
+
+The JMM applies *exactly the same* to virtual threads (T14). Happens-before edges work; volatile works; final fields work; the eight rules apply.
+
+The only nuance: virtual threads run on carrier threads, but the JVM treats them as their own thread for JMM purposes — `Thread.start()`/`join()` create HB edges for virtual threads as they do for platform threads. Code that reasoned correctly about JMM pre-Loom continues to reason correctly post-Loom.
+
+&gt; [!INTERVIEW]
+&gt; &quot;What is the Java Memory Model?&quot; — Senior answer:
+&gt;
+&gt; 1. **Purpose.** The JMM is the formal contract specifying what writes one thread is guaranteed to see from another, accounting for CPU reordering, store buffers, and cache coherence delays.
+&gt; 2. **Core relation.** The *happens-before* relation orders actions across threads. If A happens-before B, then B sees A&#x27;s effects.
+&gt; 3. **Eight rules** (JLS 17.4.5): program order, monitor lock (unlock HB subsequent lock), volatile (write HB subsequent read), thread start (start HB any action in new thread), thread join (all of t&#x27;s actions HB join), interruption, finalizer, transitivity.
+&gt; 4. **Implementations.** `synchronized`, `volatile`, `final`, `Lock` create HB edges. Atomics + VarHandle let you pick precise memory-ordering modes per JEP 193.
+&gt; 5. **Hardware realization.** x86 TSO realizes most JMM guarantees nearly free (only StoreLoad needs MFENCE); ARM weakly-ordered emits explicit LDAR/STLR/DMB fences.
+
+&gt; [!INTERVIEW]
+&gt; Short Q&amp;A:
+&gt;
+&gt; 1. **Why isn&#x27;t `counter++` atomic with `volatile`?** It&#x27;s three steps: read, add, write. `volatile` makes each step atomic + visible, but doesn&#x27;t atomicize the sequence.
+&gt; 2. **What is happens-before?** Partial order on actions; A HB B means A&#x27;s effects are visible to B and A is ordered before B.
+&gt; 3. **List the 8 happens-before rules.** Program order, monitor lock, volatile, thread start, thread termination/join, interruption, finalizer, transitivity.
+&gt; 4. **What does volatile guarantee?** Atomic 32/64-bit load/store; visibility (write immediately visible to subsequent reads); no reordering across (release+acquire).
+&gt; 5. **Why do final fields have special JMM treatment?** Initialization safety — a freeze action at constructor end ensures any thread that sees the fully-constructed object via safe publication sees the correct final-field values.
+&gt; 6. **Four safe publication mechanisms?** Static initializer; volatile/atomic reference; final fields; lock-protected publication.
+&gt; 7. **Why is double-checked locking broken without volatile?** `instance = new Singleton()` is not atomic — the JIT can publish the reference before the constructor finishes. Another thread sees the reference but reads default field values.
+&gt; 8. **What is the `this`-escape rule?** Don&#x27;t let `this` leave the constructor before construction finishes — otherwise other threads may see partially-initialized state.
+&gt; 9. **What is x86 Total Store Order?** Hardware memory model where most reorderings are forbidden; only store-load reordering is possible. Makes most JMM guarantees free on x86.
+&gt; 10. **What does ARM need that x86 doesn&#x27;t?** Explicit memory barriers — `LDAR`/`STLR` for volatile, `DMB ISH` for full sequential consistency. ARM is weakly ordered.
+&gt; 11. **What&#x27;s the difference between visibility and atomicity?** Visibility: one thread sees what another wrote. Atomicity: an operation is indivisible. `volatile` gives visibility; CAS gives both.
+&gt; 12. **What&#x27;s a race condition?** Two actions not ordered by happens-before, at least one a write. JMM says little about racy programs — values become &quot;undefined&quot; within JMM constraints.
+&gt; 13. **Why is the JMM hard to formalize?** Out-of-thin-air values, causality cycles, and the interaction of multiple synchronization actions. The 2005 JSR-133 redesign was a multi-year effort.
+&gt; 14. **What is jcstress?** Doug Lea&#x27;s concurrency-stress test framework — runs litmus tests millions of times and verifies only JMM-permitted outcomes are observed.
+&gt; 15. **Does the JMM change with virtual threads?** No — virtual threads honor all the same rules. Thread.start() and join() create HB edges identically for both kinds of threads.
+
+## Practice
+
+1. **Reproduce the volatile-flag bug.** Write a loop that exits when `shutdown` becomes true, but `shutdown` is plain (not volatile). From another thread set it true. Observe the loop spinning forever. Add volatile; observe immediate exit.
+2. **Reproduce torn long reads.** On a 32-bit JVM (or with `-XX:-UseAtomicLongOnX86`), have one thread write a long alternating between `0x0000FFFFFFFF` and `0xFFFF00000000`; another thread reads and prints. Without volatile, observe torn values. Add volatile; observe atomicity.
+3. **DCL broken vs fixed.** Implement DCL without volatile; race many threads through `getInstance()`. Use a `SharedState` field in the Singleton; observe partially-constructed reads (rare on x86; easier on ARM). Fix with volatile; verify.
+4. **The `this`-escape race.** Implement a `Listener` that registers itself in the constructor. From another thread, fire events during construction. Observe reads of default field values. Refactor to factory method; observe correctness.
+5. **Safe vs unsafe publication.** Build an immutable `Config(int x, int y)`. Publish via unsafe assignment to a shared field; race readers. Observe partial reads. Publish via volatile; observe consistency.
+6. **The monitor-lock rule.** One thread writes to a field under `synchronized(m)`. Another reads it under `synchronized(m)`. Verify the read sees the write. Then change the writer to `synchronized(n)` (different monitor); observe potentially stale reads.
+7. **Program-order matters for HB chains.** Write `a = 1; vol = true; b = 2;`. Reader: `if (vol) print(a, b);`. Verify `a == 1` always (program order before vol write HB through vol rule). What about `b`? — `b` is NOT in the HB chain (it&#x27;s written after the volatile write); reader may see `b == 0`.
+8. **jcstress on the Dekker example.** Install jcstress. Run the Dekker test on x86 and (if available) ARM. On x86, never see (0,0). On ARM, occasionally see it. Confirm `volatile` on x and y eliminates the (0,0) outcome.
+9. **`final` field guarantee.** Construct an immutable `Pair(int a, int b)`. Publish it via unsafe assignment. From another thread, repeatedly read and assert both fields are correct. With `final` fields, never see default values; without, you may.
+10. **Synchronized vs Lock memory-edge equivalence.** Write the same publish-then-consume pattern with `synchronized` and with `ReentrantLock`. Verify both create the HB edge equally; verify the JIT lowers them to similar code.
+11. **VarHandle memory-mode comparison.** Build a benchmark that publishes a config via `setVolatile`, `setRelease`, `setOpaque`, `set` (plain). Measure throughput. On x86, observe small differences; on ARM, larger differences.
+12. **The lazy field-write reorder.** Write `data = 42; ready = true;` *without* volatile. Reader: `if (ready) print(data);`. Test for hours on ARM; observe occasional `data = 0`. Add `volatile` to `ready`; observe correctness.
+
+## Recap
+
+You should now be able to:
+
+- State **why a memory model is necessary**: compiler reordering, CPU out-of-order execution, store buffers, cache coherence delays — all mean across-thread observable behavior diverges from program order unless explicitly synchronized.
+- Define the **happens-before relation** — partial order over actions where A HB B implies A&#x27;s effects are visible to B *and* A is ordered before B; transitive; the foundation of the JMM.
+- Recite the **eight happens-before rules** (JLS §17.4.5): program order, monitor lock (unlock HB subsequent lock on same monitor), volatile (write HB subsequent read), thread start (start HB new thread&#x27;s actions), thread termination/join (target&#x27;s actions HB join), interruption, finalizer, transitivity.
+- Use **`volatile`** correctly: atomic 32/64-bit load/store, immediate visibility, no-reordering-across (release on write + acquire on read). Recognize it does *not* atomize compound operations like `counter++`.
+- Apply **final-field semantics**: a freeze action at constructor end guarantees any thread that sees the fully-constructed object via safe publication sees correct final-field values. Don&#x27;t let `this` escape from the constructor — that nullifies the guarantee.
+- Identify the **four safe publication mechanisms** (static initializer, volatile/atomic reference, final fields, lock-protected) and reject **unsafe publication** (plain assignment to a shared field).
+- Walk through **double-checked locking**: pre-JDK-5 always broken, post-JDK-5 broken *without* `volatile`, fixed with `volatile`. Recommend the **holder-class idiom** as the more idiomatic singleton.
+- Understand **x86 Total Store Order** — most JMM guarantees come free; only store-load reordering is allowed, fixed by `MFENCE` after volatile writes — vs **ARM&#x27;s weakly-ordered model** with explicit `LDAR`/`STLR`/`DMB` fences. Same JMM, different realizations.
+- Distinguish **visibility** (one thread sees what another wrote — gives by volatile + monitor exit) from **atomicity** (an operation is indivisible — needs CAS or lock) from **ordering** (operations execute in source order — preserved by volatile + lock).
+- Name the four **informal memory barriers** — LoadLoad, StoreStore, LoadStore, StoreLoad — and recognize StoreLoad as the only one requiring an explicit instruction on x86.
+- Reject the **eight common bugs**: missing `volatile` on flags; compound ops on volatile; unlocked reads against locked writes; DCL without volatile; `this` escape; cross-monitor reads expecting HB; volatile-array as a queue substitute; sleep-as-synchronization.
+- Use **`jcstress`** to verify your code against the JMM under reorderings the spec permits but the local CPU may not exhibit.
+- State that **virtual threads do not change the JMM** — every rule applies identically.
+
+## Next
+
+Continue to [Fork/Join framework](./T13-fork-join-framework.md) — the lock-free, work-stealing parallel-computation engine introduced in JDK 7. We&#x27;ll dissect `ForkJoinPool`&#x27;s per-worker double-ended deques, the work-stealing algorithm (steal from the *opposite* end of another worker&#x27;s deque to minimize false sharing), how `RecursiveTask`/`RecursiveAction`/`CountedCompleter` map divide-and-conquer onto the pool, the `commonPool` we glanced at in T07 (CompletableFuture), and the parallel-streams machinery that rides on top of it.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t11-atomic-variables.html"><div class="lbl">← Previous</div><div class="ttl">T11-atomic-variables</div><div class="sub">Atomic Variables</div></a><a class="next" href="../l3/c01-t13-fork-join-framework.html"><div class="lbl">Next →</div><div class="ttl">T13-fork-join-framework</div><div class="sub">Fork/Join Framework</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-a-memory-model-because-the-hardware-lies" data-toc-link>Why a Memory Model — Because the Hardware Lies</a></li><li class="lvl-2"><a href="#as-if-serial-the-single-thread-property" data-toc-link>As-If-Serial — the Single-Thread Property</a></li><li class="lvl-2"><a href="#the-cross-thread-problem-and-why-its-worse-than-you-think" data-toc-link>The Cross-Thread Problem — and Why It&#x27;s Worse Than You Think</a></li><li class="lvl-2"><a href="#the-happens-before-relation" data-toc-link>The Happens-Before Relation</a></li><li class="lvl-2"><a href="#the-eight-happens-before-rules-jls-1745" data-toc-link>The Eight Happens-Before Rules (JLS §17.4.5)</a></li><li class="lvl-3"><a href="#1-program-order-rule" data-toc-link>1. Program order rule</a></li><li class="lvl-3"><a href="#2-monitor-lock-rule" data-toc-link>2. Monitor lock rule</a></li><li class="lvl-3"><a href="#3-volatile-variable-rule" data-toc-link>3. Volatile variable rule</a></li><li class="lvl-3"><a href="#4-thread-start-rule" data-toc-link>4. Thread start rule</a></li><li class="lvl-3"><a href="#5-thread-termination-rule" data-toc-link>5. Thread termination rule</a></li><li class="lvl-3"><a href="#6-interruption-rule" data-toc-link>6. Interruption rule</a></li><li class="lvl-3"><a href="#7-finalizer-rule" data-toc-link>7. Finalizer rule</a></li><li class="lvl-3"><a href="#8-transitivity" data-toc-link>8. Transitivity</a></li><li class="lvl-2"><a href="#volatile-the-cheapest-synchronization" data-toc-link>Volatile — the Cheapest Synchronization</a></li><li class="lvl-3"><a href="#what-volatile-does-not-give-you" data-toc-link>What volatile does not give you</a></li><li class="lvl-3"><a href="#idiomatic-uses-of-volatile" data-toc-link>Idiomatic uses of volatile</a></li><li class="lvl-2"><a href="#final-field-semantics-initialization-safety" data-toc-link>Final Field Semantics — Initialization Safety</a></li><li class="lvl-3"><a href="#the-this-escape-caveat" data-toc-link>The this-escape caveat</a></li><li class="lvl-2"><a href="#safe-publication-the-four-mechanisms" data-toc-link>Safe Publication — The Four Mechanisms</a></li><li class="lvl-2"><a href="#double-checked-locking-the-canonical-bug-and-its-fix" data-toc-link>Double-Checked Locking — the Canonical Bug and Its Fix</a></li><li class="lvl-3"><a href="#the-fix-volatile" data-toc-link>The fix — volatile</a></li><li class="lvl-2"><a href="#x86-total-store-order-tso" data-toc-link>x86 — Total Store Order (TSO)</a></li><li class="lvl-2"><a href="#arm-weakly-ordered" data-toc-link>ARM — Weakly Ordered</a></li><li class="lvl-2"><a href="#memory-barriers-informal-vocabulary" data-toc-link>Memory Barriers — Informal Vocabulary</a></li><li class="lvl-2"><a href="#the-synchronized-happens-before-bridge" data-toc-link>The synchronized → Happens-Before Bridge</a></li><li class="lvl-2"><a href="#out-of-thin-air-values-the-subtle-edge" data-toc-link>Out-of-Thin-Air Values — the Subtle Edge</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#forgetting-volatile-on-a-flag" data-toc-link>Forgetting volatile on a flag</a></li><li class="lvl-3"><a href="#using-volatile-for-compound-operations" data-toc-link>Using volatile for compound operations</a></li><li class="lvl-3"><a href="#reading-without-lock-when-writer-holds-lock" data-toc-link>Reading without lock when writer holds lock</a></li><li class="lvl-3"><a href="#double-checked-locking-without-volatile" data-toc-link>Double-checked locking without volatile</a></li><li class="lvl-3"><a href="#letting-this-escape-from-a-constructor" data-toc-link>Letting this escape from a constructor</a></li><li class="lvl-3"><a href="#assuming-synchronized-orders-unrelated-variables" data-toc-link>Assuming synchronized orders unrelated variables</a></li><li class="lvl-3"><a href="#using-volatile-for-the-producer-consumer-queue" data-toc-link>Using volatile for the producer-consumer queue</a></li><li class="lvl-3"><a href="#relying-on-threadsleep-for-synchronization" data-toc-link>Relying on Thread.sleep for synchronization</a></li><li class="lvl-3"><a href="#caching-jitd-code-in-a-non-thread-safe-way" data-toc-link>Caching JIT&#x27;d code in a non-thread-safe way</a></li><li class="lvl-2"><a href="#testing-for-memory-model-bugs" data-toc-link>Testing for Memory Model Bugs</a></li><li class="lvl-2"><a href="#virtual-threads-jmm-unchanged" data-toc-link>Virtual Threads — JMM Unchanged</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

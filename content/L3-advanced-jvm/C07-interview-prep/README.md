@@ -22,4 +22,4 @@ Interview questions asked at MNCs for this experience level. Use the fixed Q&A f
 
 - [Interview Prep: Advanced Java & JVM](T01-interview-prep-advanced-java.md)
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

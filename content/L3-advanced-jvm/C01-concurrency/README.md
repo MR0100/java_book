@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Advanced Java & the JVM — Concurrency & Multithreading
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -38,4 +38,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 16 | Concurrency pitfalls (deadlock, livelock, starvation, races) | `T16-concurrency-pitfalls-deadlock-livelock-starvation-races.md` | planned |
 | 17 | Thread-safety patterns | `T17-thread-safety-patterns.md` | planned |
 
-[Back to L3 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L3 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

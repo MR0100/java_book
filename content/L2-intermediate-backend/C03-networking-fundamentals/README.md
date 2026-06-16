@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Intermediate Java & Backend Foundations — Networking & Web Fundamentals
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -32,4 +32,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 10 | CDNs | `T10-cdns.md` | planned |
 | 11 | Firewalls & NAT (basics) | `T11-firewalls-and-nat-basics.md` | planned |
 
-[Back to L2 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L2 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

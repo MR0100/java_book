@@ -1,0 +1,1921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link active" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">🧭</span><span>Ch. 7 · L5 — Architecture &amp; Leadership</span></div><div class="chapter-path">content/L5-architecture-leadership/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l5/overview.html" data-q="l5 — architecture &amp; engineering leadership content/l5-architecture-leadership/readme.md overview"><span>Overview</span></a><details class="mod" data-q="c01 · software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><summary><span class="caret">▶</span><span>C01 · Software Architecture</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — software architecture content/l5-architecture-leadership/c01-software-architecture/readme.md"><a class="" href="../l5/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="layered architecture content/l5-architecture-leadership/c01-software-architecture/t01-layered-architecture.md"><a class="" href="../l5/c01-t01-layered-architecture.html"><span>Layered Architecture</span><span class="kind-pill "></span></a></li><li data-q="clean / hexagonal / onion architecture content/l5-architecture-leadership/c01-software-architecture/t02-clean-hexagonal-onion-architecture.md"><a class="" href="../l5/c01-t02-clean-hexagonal-onion-architecture.html"><span>Clean / Hexagonal / Onion Architecture</span><span class="kind-pill "></span></a></li><li data-q="domain-driven design (ddd) content/l5-architecture-leadership/c01-software-architecture/t03-domain-driven-design-ddd.md"><a class="" href="../l5/c01-t03-domain-driven-design-ddd.html"><span>Domain-Driven Design (DDD)</span><span class="kind-pill "></span></a></li><li data-q="monolith vs microservices vs modular monolith content/l5-architecture-leadership/c01-software-architecture/t04-monolith-vs-microservices-vs-modular-monolith.md"><a class="" href="../l5/c01-t04-monolith-vs-microservices-vs-modular-monolith.html"><span>Monolith vs Microservices vs Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="microservices decomposition content/l5-architecture-leadership/c01-software-architecture/t05-microservices-decomposition.md"><a class="" href="../l5/c01-t05-microservices-decomposition.html"><span>Microservices Decomposition</span><span class="kind-pill "></span></a></li><li data-q="service communication (sync vs async) content/l5-architecture-leadership/c01-software-architecture/t06-service-communication-sync-vs-async.md"><a class="" href="../l5/c01-t06-service-communication-sync-vs-async.html"><span>Service Communication (Sync vs Async)</span><span class="kind-pill "></span></a></li><li data-q="api gateway &amp; service mesh content/l5-architecture-leadership/c01-software-architecture/t07-api-gateway-and-service-mesh.md"><a class="" href="../l5/c01-t07-api-gateway-and-service-mesh.html"><span>API Gateway &amp; Service Mesh</span><span class="kind-pill "></span></a></li><li data-q="event sourcing content/l5-architecture-leadership/c01-software-architecture/t08-event-sourcing.md"><a class="" href="../l5/c01-t08-event-sourcing.html"><span>Event Sourcing</span><span class="kind-pill "></span></a></li><li data-q="cqrs content/l5-architecture-leadership/c01-software-architecture/t09-cqrs.md"><a class="" href="../l5/c01-t09-cqrs.html"><span>CQRS</span><span class="kind-pill "></span></a></li><li data-q="saga pattern (distributed transactions) content/l5-architecture-leadership/c01-software-architecture/t10-saga-pattern-distributed-transactions.md"><a class="" href="../l5/c01-t10-saga-pattern-distributed-transactions.html"><span>Saga Pattern (Distributed Transactions)</span><span class="kind-pill "></span></a></li><li data-q="strangler fig &amp; migration patterns content/l5-architecture-leadership/c01-software-architecture/t11-strangler-fig-and-migration-patterns.md"><a class="" href="../l5/c01-t11-strangler-fig-and-migration-patterns.html"><span>Strangler Fig &amp; Migration Patterns</span><span class="kind-pill "></span></a></li><li data-q="twelve-factor app content/l5-architecture-leadership/c01-software-architecture/t12-twelve-factor-app.md"><a class="" href="../l5/c01-t12-twelve-factor-app.html"><span>Twelve-Factor App</span><span class="kind-pill "></span></a></li><li data-q="anti-corruption layer content/l5-architecture-leadership/c01-software-architecture/t13-anti-corruption-layer.md"><a class="" href="../l5/c01-t13-anti-corruption-layer.html"><span>Anti-Corruption Layer</span><span class="kind-pill "></span></a></li><li data-q="architecture trade-off analysis content/l5-architecture-leadership/c01-software-architecture/t14-architecture-trade-off-analysis.md"><a class="" href="../l5/c01-t14-architecture-trade-off-analysis.html"><span>Architecture Trade-off Analysis</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" open data-q="c02 · distributed systems and system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><summary><span class="caret">▶</span><span>C02 · Distributed Systems And System Design</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — distributed systems &amp; system design content/l5-architecture-leadership/c02-distributed-systems-and-system-design/readme.md"><a class="" href="../l5/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="cap theorem &amp; pacelc content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t01-cap-theorem-and-pacelc.md"><a class="" href="../l5/c02-t01-cap-theorem-and-pacelc.html"><span>CAP Theorem &amp; PACELC</span><span class="kind-pill "></span></a></li><li data-q="consistency models (strong, eventual) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t02-consistency-models-strong-eventual.md"><a class="" href="../l5/c02-t02-consistency-models-strong-eventual.html"><span>Consistency Models (Strong, Eventual)</span><span class="kind-pill "></span></a></li><li data-q="consensus (raft / paxos, intro) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t03-consensus-raft-paxos-intro.md"><a class="" href="../l5/c02-t03-consensus-raft-paxos-intro.html"><span>Consensus (Raft / Paxos, Intro)</span><span class="kind-pill "></span></a></li><li data-q="replication strategies content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t04-replication-strategies.md"><a class="" href="../l5/c02-t04-replication-strategies.html"><span>Replication Strategies</span><span class="kind-pill "></span></a></li><li data-q="partitioning &amp; consistent hashing content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t05-partitioning-and-consistent-hashing.md"><a class="" href="../l5/c02-t05-partitioning-and-consistent-hashing.html"><span>Partitioning &amp; Consistent Hashing</span><span class="kind-pill "></span></a></li><li data-q="distributed transactions (2pc, saga) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t06-distributed-transactions-2pc-saga.md"><a class="" href="../l5/c02-t06-distributed-transactions-2pc-saga.html"><span>Distributed Transactions (2PC, Saga)</span><span class="kind-pill "></span></a></li><li data-q="idempotency &amp; deduplication content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t07-idempotency-and-deduplication.md"><a class="" href="../l5/c02-t07-idempotency-and-deduplication.html"><span>Idempotency &amp; Deduplication</span><span class="kind-pill "></span></a></li><li data-q="distributed locking content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t08-distributed-locking.md"><a class="" href="../l5/c02-t08-distributed-locking.html"><span>Distributed Locking</span><span class="kind-pill "></span></a></li><li data-q="clocks &amp; ordering (logical / vector clocks) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t09-clocks-and-ordering-logical-vector-clocks.md"><a class="" href="../l5/c02-t09-clocks-and-ordering-logical-vector-clocks.html"><span>Clocks &amp; Ordering (Logical / Vector Clocks)</span><span class="kind-pill "></span></a></li><li data-q="load balancing (algorithms, l4/l7) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t10-load-balancing-algorithms-l4-l7.md"><a class="" href="../l5/c02-t10-load-balancing-algorithms-l4-l7.html"><span>Load Balancing (Algorithms, L4/L7)</span><span class="kind-pill "></span></a></li><li data-q="caching strategies at scale content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t11-caching-strategies-at-scale.md"><a class="" href="../l5/c02-t11-caching-strategies-at-scale.html"><span>Caching Strategies at Scale</span><span class="kind-pill "></span></a></li><li data-q="scaling (horizontal/vertical, autoscaling, statelessness) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t12-scaling-horizontal-vertical-autoscaling-statelessness.md"><a class="" href="../l5/c02-t12-scaling-horizontal-vertical-autoscaling-statelessness.html"><span>Scaling (Horizontal/Vertical, Autoscaling, Statelessness)</span><span class="kind-pill "></span></a></li><li data-q="rate limiting algorithms content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t13-rate-limiting-algorithms.md"><a class="" href="../l5/c02-t13-rate-limiting-algorithms.html"><span>Rate Limiting Algorithms</span><span class="kind-pill "></span></a></li><li data-q="resilience (circuit breaker, bulkhead, retry, timeout, backpressure) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md"><a class="active" href="../l5/c02-t14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.html"><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span><span class="kind-pill "></span></a></li><li data-q="reliability (sli/slo/sla, redundancy, failover) content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t15-reliability-sli-slo-sla-redundancy-failover.md"><a class="" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><span>Reliability (SLI/SLO/SLA, Redundancy, Failover)</span><span class="kind-pill "></span></a></li><li data-q="system design methodology / framework content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t16-system-design-methodology-framework.md"><a class="" href="../l5/c02-t16-system-design-methodology-framework.html"><span>System Design Methodology / Framework</span><span class="kind-pill "></span></a></li><li data-q="worked design: url shortener content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t17-worked-design-url-shortener.md"><a class="" href="../l5/c02-t17-worked-design-url-shortener.html"><span>Worked Design: URL Shortener</span><span class="kind-pill "></span></a></li><li data-q="worked design: rate limiter content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t18-worked-design-rate-limiter.md"><a class="" href="../l5/c02-t18-worked-design-rate-limiter.html"><span>Worked Design: Rate Limiter</span><span class="kind-pill "></span></a></li><li data-q="worked design: news feed / timeline content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t19-worked-design-news-feed-timeline.md"><a class="" href="../l5/c02-t19-worked-design-news-feed-timeline.html"><span>Worked Design: News Feed / Timeline</span><span class="kind-pill "></span></a></li><li data-q="worked design: chat / messaging content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t20-worked-design-chat-messaging.md"><a class="" href="../l5/c02-t20-worked-design-chat-messaging.html"><span>Worked Design: Chat / Messaging</span><span class="kind-pill "></span></a></li><li data-q="worked design: payment system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t21-worked-design-payment-system.md"><a class="" href="../l5/c02-t21-worked-design-payment-system.html"><span>Worked Design: Payment System</span><span class="kind-pill "></span></a></li><li data-q="worked design: notification system content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t22-worked-design-notification-system.md"><a class="" href="../l5/c02-t22-worked-design-notification-system.html"><span>Worked Design: Notification System</span><span class="kind-pill "></span></a></li><li data-q="worked design: ride-hailing / food delivery content/l5-architecture-leadership/c02-distributed-systems-and-system-design/t23-worked-design-ride-hailing-food-delivery.md"><a class="" href="../l5/c02-t23-worked-design-ride-hailing-food-delivery.html"><span>Worked Design: Ride-Hailing / Food Delivery</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · engineering leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><summary><span class="caret">▶</span><span>C03 · Engineering Leadership</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — engineering craft &amp; leadership content/l5-architecture-leadership/c03-engineering-leadership/readme.md"><a class="" href="../l5/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="code review (giving &amp; receiving) content/l5-architecture-leadership/c03-engineering-leadership/t01-code-review-giving-and-receiving.md"><a class="" href="../l5/c03-t01-code-review-giving-and-receiving.html"><span>Code Review (Giving &amp; Receiving)</span><span class="kind-pill "></span></a></li><li data-q="technical writing &amp; design docs / rfcs content/l5-architecture-leadership/c03-engineering-leadership/t02-technical-writing-and-design-docs-rfcs.md"><a class="" href="../l5/c03-t02-technical-writing-and-design-docs-rfcs.html"><span>Technical Writing &amp; Design Docs / RFCs</span><span class="kind-pill "></span></a></li><li data-q="architecture decision records (adrs) content/l5-architecture-leadership/c03-engineering-leadership/t03-architecture-decision-records-adrs.md"><a class="" href="../l5/c03-t03-architecture-decision-records-adrs.html"><span>Architecture Decision Records (ADRs)</span><span class="kind-pill "></span></a></li><li data-q="estimation &amp; breaking down work content/l5-architecture-leadership/c03-engineering-leadership/t04-estimation-and-breaking-down-work.md"><a class="" href="../l5/c03-t04-estimation-and-breaking-down-work.html"><span>Estimation &amp; Breaking Down Work</span><span class="kind-pill "></span></a></li><li data-q="agile / scrum / kanban content/l5-architecture-leadership/c03-engineering-leadership/t05-agile-scrum-kanban.md"><a class="" href="../l5/c03-t05-agile-scrum-kanban.html"><span>Agile / Scrum / Kanban</span><span class="kind-pill "></span></a></li><li data-q="mentoring &amp; growing engineers content/l5-architecture-leadership/c03-engineering-leadership/t06-mentoring-and-growing-engineers.md"><a class="" href="../l5/c03-t06-mentoring-and-growing-engineers.html"><span>Mentoring &amp; Growing Engineers</span><span class="kind-pill "></span></a></li><li data-q="tech-debt management content/l5-architecture-leadership/c03-engineering-leadership/t07-tech-debt-management.md"><a class="" href="../l5/c03-t07-tech-debt-management.html"><span>Tech-Debt Management</span><span class="kind-pill "></span></a></li><li data-q="technical strategy &amp; roadmaps content/l5-architecture-leadership/c03-engineering-leadership/t08-technical-strategy-and-roadmaps.md"><a class="" href="../l5/c03-t08-technical-strategy-and-roadmaps.html"><span>Technical Strategy &amp; Roadmaps</span><span class="kind-pill "></span></a></li><li data-q="cross-team collaboration &amp; communication content/l5-architecture-leadership/c03-engineering-leadership/t09-cross-team-collaboration-and-communication.md"><a class="" href="../l5/c03-t09-cross-team-collaboration-and-communication.html"><span>Cross-Team Collaboration &amp; Communication</span><span class="kind-pill "></span></a></li><li data-q="incident response &amp; blameless postmortems content/l5-architecture-leadership/c03-engineering-leadership/t10-incident-response-and-blameless-postmortems.md"><a class="" href="../l5/c03-t10-incident-response-and-blameless-postmortems.html"><span>Incident Response &amp; Blameless Postmortems</span><span class="kind-pill "></span></a></li><li data-q="on-call &amp; production ownership content/l5-architecture-leadership/c03-engineering-leadership/t11-on-call-and-production-ownership.md"><a class="" href="../l5/c03-t11-on-call-and-production-ownership.html"><span>On-Call &amp; Production Ownership</span><span class="kind-pill "></span></a></li><li data-q="hiring &amp; interviewing (as interviewer) content/l5-architecture-leadership/c03-engineering-leadership/t12-hiring-and-interviewing-as-interviewer.md"><a class="" href="../l5/c03-t12-hiring-and-interviewing-as-interviewer.html"><span>Hiring &amp; Interviewing (As Interviewer)</span><span class="kind-pill "></span></a></li><li data-q="stakeholder &amp; upward communication content/l5-architecture-leadership/c03-engineering-leadership/t13-stakeholder-and-upward-communication.md"><a class="" href="../l5/c03-t13-stakeholder-and-upward-communication.html"><span>Stakeholder &amp; Upward Communication</span><span class="kind-pill "></span></a></li><li data-q="cost engineering &amp; finops for backend systems content/l5-architecture-leadership/c03-engineering-leadership/t14-cost-engineering-and-finops.md"><a class="" href="../l5/c03-t14-cost-engineering-and-finops.html"><span>Cost Engineering &amp; FinOps for Backend Systems</span><span class="kind-pill "></span></a></li><li data-q="jvm container right-sizing content/l5-architecture-leadership/c03-engineering-leadership/t15-jvm-container-right-sizing.md"><a class="" href="../l5/c03-t15-jvm-container-right-sizing.html"><span>JVM Container Right-Sizing</span><span class="kind-pill "></span></a></li><li data-q="spot &amp; preemptible instance patterns content/l5-architecture-leadership/c03-engineering-leadership/t16-spot-and-preemptible-patterns.md"><a class="" href="../l5/c03-t16-spot-and-preemptible-patterns.html"><span>Spot &amp; Preemptible Instance Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — tools &amp; environment content/l5-architecture-leadership/c04-tools-and-environment/readme.md"><a class="" href="../l5/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for architecture &amp; leadership content/l5-architecture-leadership/c04-tools-and-environment/t01-tools-for-architecture-and-leadership.md"><a class="" href="../l5/c04-t01-tools-for-architecture-and-leadership.html"><span>Tools for Architecture &amp; Leadership</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l5-architecture-leadership/c05-hands-on/readme.md content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — hands-on content/l5-architecture-leadership/c05-hands-on/readme.md"><a class="" href="../l5/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="level project: system design portfolio content/l5-architecture-leadership/c05-hands-on/t01-level-project-system-design-portfolio.md"><a class="" href="../l5/c05-t01-level-project-system-design-portfolio.html"><span>Level Project: System Design Portfolio</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l5-architecture-leadership/c06-best-practices/readme.md content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/readme.md"><a class="" href="../l5/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 best practices &amp; pitfalls content/l5-architecture-leadership/c06-best-practices/t01-best-practices-and-pitfalls-l5.md"><a class="" href="../l5/c06-t01-best-practices-and-pitfalls-l5.html"><span>L5 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — interview prep content/l5-architecture-leadership/c07-interview-prep/readme.md"><a class="" href="../l5/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: staff / principal engineer roles content/l5-architecture-leadership/c07-interview-prep/t01-interview-prep-staff-principal.md"><a class="" href="../l5/c07-t01-interview-prep-staff-principal.html"><span>Interview Prep: Staff / Principal Engineer Roles</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l5-architecture-leadership/c08-qa-faq/readme.md content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/readme.md"><a class="" href="../l5/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="staff engineer q&amp;a / faq content/l5-architecture-leadership/c08-qa-faq/t01-staff-engineer-qa.md"><a class="" href="../l5/c08-t01-staff-engineer-qa.html"><span>Staff Engineer Q&amp;A / FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l5-architecture-leadership/c09-cheatsheets/readme.md content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — cheatsheets &amp; reference content/l5-architecture-leadership/c09-cheatsheets/readme.md"><a class="" href="../l5/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 cheatsheets &amp; quick reference content/l5-architecture-leadership/c09-cheatsheets/t01-l5-cheatsheets.md"><a class="" href="../l5/c09-t01-l5-cheatsheets.html"><span>L5 Cheatsheets &amp; Quick Reference</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l5-architecture-leadership/c10-resources/readme.md content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — resources content/l5-architecture-leadership/c10-resources/readme.md"><a class="" href="../l5/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l5 resources — books, papers, blogs, talks content/l5-architecture-leadership/c10-resources/t01-l5-resources.md"><a class="" href="../l5/c10-t01-l5-resources.html"><span>L5 Resources — Books, Papers, Blogs, Talks</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c11 · ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><summary><span class="caret">▶</span><span>C11 · Ai System Architecture</span></summary><ul class="pages"><li data-q="ai system architecture content/l5-architecture-leadership/c11-ai-system-architecture/readme.md"><a class="" href="../l5/c11-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="when to use llms vs traditional ml — decision framework content/l5-architecture-leadership/c11-ai-system-architecture/t01-when-to-use-llms-vs-traditional-ml.md"><a class="" href="../l5/c11-t01-when-to-use-llms-vs-traditional-ml.html"><span>When to Use LLMs vs Traditional ML — Decision Framework</span><span class="kind-pill "></span></a></li><li data-q="ai gateway design — rate limiting, fallback, caching content/l5-architecture-leadership/c11-ai-system-architecture/t02-ai-gateway-design-rate-limiting-fallback-caching.md"><a class="" href="../l5/c11-t02-ai-gateway-design-rate-limiting-fallback-caching.html"><span>AI Gateway Design — Rate Limiting, Fallback, Caching</span><span class="kind-pill "></span></a></li><li data-q="prompt caching strategies — semantic, exact, prefix content/l5-architecture-leadership/c11-ai-system-architecture/t03-prompt-caching-strategies.md"><a class="" href="../l5/c11-t03-prompt-caching-strategies.html"><span>Prompt Caching Strategies — Semantic, Exact, Prefix</span><span class="kind-pill "></span></a></li><li data-q="rag at scale — millions of docs, fresh data, tight latency content/l5-architecture-leadership/c11-ai-system-architecture/t04-rag-at-scale-millions-of-docs-fresh-data.md"><a class="" href="../l5/c11-t04-rag-at-scale-millions-of-docs-fresh-data.html"><span>RAG at Scale — Millions of Docs, Fresh Data, Tight Latency</span><span class="kind-pill "></span></a></li><li data-q="model fine-tuning architecture — when, how, infrastructure content/l5-architecture-leadership/c11-ai-system-architecture/t05-model-fine-tuning-architecture-decisions.md"><a class="" href="../l5/c11-t05-model-fine-tuning-architecture-decisions.html"><span>Model Fine-Tuning Architecture — When, How, Infrastructure</span><span class="kind-pill "></span></a></li><li data-q="ai safety &amp; prompt injection defense — threat model and mitigations content/l5-architecture-leadership/c11-ai-system-architecture/t06-ai-safety-and-prompt-injection-defense.md"><a class="" href="../l5/c11-t06-ai-safety-and-prompt-injection-defense.html"><span>AI Safety &amp; Prompt Injection Defense — Threat Model and Mitigations</span><span class="kind-pill "></span></a></li><li data-q="cost/latency optimization — smaller models, batching, distillation content/l5-architecture-leadership/c11-ai-system-architecture/t07-cost-latency-optimization-smaller-models-batching.md"><a class="" href="../l5/c11-t07-cost-latency-optimization-smaller-models-batching.html"><span>Cost/Latency Optimization — Smaller Models, Batching, Distillation</span><span class="kind-pill "></span></a></li><li data-q="hybrid ai/traditional architectures — when ai augments vs replaces content/l5-architecture-leadership/c11-ai-system-architecture/t08-hybrid-ai-traditional-architectures.md"><a class="" href="../l5/c11-t08-hybrid-ai-traditional-architectures.html"><span>Hybrid AI/Traditional Architectures — When AI Augments vs Replaces</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c12 · real world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><summary><span class="caret">▶</span><span>C12 · Real World Case Studies</span></summary><ul class="pages"><li data-q="architecture &amp; engineering leadership — real-world case studies content/l5-architecture-leadership/c12-real-world-case-studies/readme.md"><a class="" href="../l5/c12-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="netflix — resilience &amp; microservices at scale content/l5-architecture-leadership/c12-real-world-case-studies/t01-netflix-resilience-and-microservices.md"><a class="" href="../l5/c12-t01-netflix-resilience-and-microservices.html"><span>Netflix — Resilience &amp; Microservices at Scale</span><span class="kind-pill "></span></a></li><li data-q="stripe — idempotency, ledgers &amp; api longevity content/l5-architecture-leadership/c12-real-world-case-studies/t02-stripe-idempotency-ledgers-api-longevity.md"><a class="" href="../l5/c12-t02-stripe-idempotency-ledgers-api-longevity.html"><span>Stripe — Idempotency, Ledgers &amp; API Longevity</span><span class="kind-pill "></span></a></li><li data-q="discord — storage evolution: mongodb to cassandra to scylladb content/l5-architecture-leadership/c12-real-world-case-studies/t03-discord-storage-evolution-cassandra-scylladb.md"><a class="" href="../l5/c12-t03-discord-storage-evolution-cassandra-scylladb.html"><span>Discord — Storage Evolution: MongoDB to Cassandra to ScyllaDB</span><span class="kind-pill "></span></a></li><li data-q="uber — domain-oriented microservices &amp; geo-sharding content/l5-architecture-leadership/c12-real-world-case-studies/t04-uber-domain-oriented-microservices-geo-sharding.md"><a class="" href="../l5/c12-t04-uber-domain-oriented-microservices-geo-sharding.html"><span>Uber — Domain-Oriented Microservices &amp; Geo-Sharding</span><span class="kind-pill "></span></a></li><li data-q="shopify — the modular monolith content/l5-architecture-leadership/c12-real-world-case-studies/t05-shopify-modular-monolith.md"><a class="" href="../l5/c12-t05-shopify-modular-monolith.html"><span>Shopify — The Modular Monolith</span><span class="kind-pill "></span></a></li><li data-q="airbnb — monolith to soa migration content/l5-architecture-leadership/c12-real-world-case-studies/t06-airbnb-monolith-to-soa-migration.md"><a class="" href="../l5/c12-t06-airbnb-monolith-to-soa-migration.html"><span>Airbnb — Monolith to SOA Migration</span><span class="kind-pill "></span></a></li><li data-q="meta — data infrastructure at scale: memcache &amp; tao content/l5-architecture-leadership/c12-real-world-case-studies/t07-meta-data-infrastructure-tao-memcache.md"><a class="" href="../l5/c12-t07-meta-data-infrastructure-tao-memcache.html"><span>Meta — Data Infrastructure at Scale: Memcache &amp; TAO</span><span class="kind-pill "></span></a></li><li data-q="cross-cutting patterns &amp; a decision framework content/l5-architecture-leadership/c12-real-world-case-studies/t08-cross-cutting-patterns-and-decision-framework.md"><a class="" href="../l5/c12-t08-cross-cutting-patterns-and-decision-framework.html"><span>Cross-Cutting Patterns &amp; a Decision Framework</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l5/index.html">L5 — Architecture &amp; Leadership</a><span class="sep">/</span><span>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</span></div>
+        <h1>Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</h1>
+        <div><span class="source-path">content/L5-architecture-leadership/C02-distributed-systems-and-system-design/T14-resilience-circuit-breaker-bulkhead-retry-timeout-backpressure.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">lead</span><span class="meta-pill mins">~75 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)"
+slug: resilience-circuit-breaker-bulkhead-retry-timeout-backpressure
+level: L5
+module: "Architecture &amp; Engineering Leadership"
+section: "Distributed Systems &amp; System Design"
+type: concept
+difficulty: lead
+order: 14
+tags: [resilience, circuit-breaker, bulkhead, retry, timeout, backpressure, michael-nygard, hystrix, resilience4j, exponential-backoff, jitter, hedged-requests, fail-fast, fail-stop, graceful-degradation, fallback, half-open, closed, open, project-reactor, reactive-streams]
+prerequisites: [service-communication-sync-vs-async, idempotency-and-deduplication, load-balancing-algorithms-l4-l7]
+status: complete
+estimated_minutes: 75
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="resilience-circuit-breaker-bulkhead-retry-timeout-backpressure">Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)</h1>
+<p>A microservices system depends on N other services, each of which can fail, slow down, or partition. <strong>Without resilience patterns, every downstream failure becomes an upstream failure.</strong> A slow database call holds a thread; threads pile up; the application can't accept new requests; the load balancer routes traffic to a thrashing instance; the system cascades. Michael Nygard's 2007 <em>Release It!</em> catalogued the patterns that prevent the cascade — <strong>timeout</strong> (don't wait forever), <strong>retry</strong> (transient errors recover), <strong>circuit breaker</strong> (stop calling a dead dependency), <strong>bulkhead</strong> (isolate failures to one compartment), <strong>backpressure</strong> (slow the producer when the consumer can't keep up). Each pattern addresses a specific failure mode; combined, they make distributed systems tolerable to operate.</p>
+<p>The depth bar here is <strong>how each pattern actually works under load, how they compose, and the failure modes when they're tuned wrong</strong>. Tuning is the central skill: a circuit breaker with too-eager opening cuts off healthy traffic; too-lazy opening admits cascading load. A retry with no jitter produces synchronized retry storms. A timeout shorter than typical p99 latency causes spurious failures. A bulkhead sized too small under-utilizes the system; sized too large defeats the isolation purpose. We cover the <strong>Hystrix → Resilience4j</strong> transition (Netflix open-sourced Hystrix in 2012, then put it in maintenance mode; the JVM community moved to Resilience4j 2018+), the <strong>Spring Cloud Circuit Breaker abstraction</strong> (works with any backend), and the <strong>reactive backpressure</strong> model from Project Reactor and Reactive Streams. We name the production failures these patterns prevent: <strong>Knight Capital 2012</strong> (no circuit breaker on the legacy code path), <strong>AWS S3 2017</strong> (no fallback for sync S3 dependencies, cascade across the industry), <strong>the 2018 Slack outage</strong> (retries amplifying load). By the end you will configure Resilience4j with concrete numbers, recognize when a pattern is <em>missing</em> from a code review, and refuse retries that aren't paired with backoff + jitter + circuit breakers.</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t06-service-communication-sync-vs-async.html">Service Communication</a> (synchronous communication's failure modes), <a href="c02-t07-idempotency-and-deduplication.html">Idempotency</a> (retries require idempotency), <a href="c02-t10-load-balancing-algorithms-l4-l7.html">Load Balancing</a> (LB-level resilience).</p></div></div>
+<h2 id="where-resilience-patterns-came-from-power-engineering-industrial-safety-and-a-2007-book">Where Resilience Patterns Came From — Power Engineering, Industrial Safety, And A 2007 Book<a class="anchor" href="#where-resilience-patterns-came-from-power-engineering-industrial-safety-and-a-2007-book" aria-hidden="true">#</a></h2>
+<p>The resilience pattern names — <strong>circuit breaker, bulkhead, retry, timeout, backpressure</strong> — are not software-engineering inventions. Every one is borrowed from older engineering disciplines that had already solved analogous problems. Understanding the heritage matters because each pattern carries forward <em>specific failure mode reasoning</em> from its origin field, and missing that reasoning produces shallow implementations.</p>
+<h3 id="the-2007-book-that-named-the-patterns-michael-nygards-release-it">The 2007 Book That Named The Patterns: Michael Nygard's <em>Release It!</em><a class="anchor" href="#the-2007-book-that-named-the-patterns-michael-nygards-release-it" aria-hidden="true">#</a></h3>
+<p>The canonical software-engineering articulation of resilience patterns is <strong>Michael Nygard's <a href="https://pragprog.com/titles/mnee2/release-it-second-edition/"><em>Release It! Design and Deploy Production-Ready Software</em></a></strong> (Pragmatic Bookshelf, March 2007; second edition 2018). The book is the <em>single most influential text on production-ready distributed systems</em> and is on virtually every staff-engineer reading list.</p>
+<p>Nygard was a consulting architect at Cognitect (later Nubank) who had spent the early 2000s diagnosing post-mortem failures of newly-deployed systems. His pattern: a system that <em>passed all tests</em> in development would fail catastrophically in production within hours of launch. The failures were always cross-system, always involved cascading dependencies, and were never anticipated by the tests. He started cataloguing them.</p>
+<p>The book's first edition (2007) named patterns that the industry had been <em>informally using</em>:
+- <strong>Circuit Breaker</strong>
+- <strong>Bulkhead</strong>
+- <strong>Timeout</strong>
+- <strong>Steady State</strong>
+- <strong>Fail Fast</strong>
+- <strong>Handshaking</strong>
+- <strong>Test Harness</strong>
+- <strong>Decoupling Middleware</strong></p>
+<p>Each pattern was given a <em>name</em>, a <em>failure scenario it addressed</em>, and a <em>concrete implementation</em>. The names borrowed from older disciplines, but the <em>systematic codification</em> was Nygard's contribution.</p>
+<h3 id="why-circuit-breaker-the-electrical-engineering-origin">Why "Circuit Breaker"? — The Electrical Engineering Origin<a class="anchor" href="#why-circuit-breaker-the-electrical-engineering-origin" aria-hidden="true">#</a></h3>
+<p>The term <strong>circuit breaker</strong> comes from electrical engineering, specifically the <strong>household circuit breaker</strong> invented incrementally between 1879 (Edison's fuse) and 1924 (Hugo Stotz's screw-in circuit breaker — the modern form).</p>
+<p>The mechanism: an electrical circuit is monitored for <em>abnormal current</em>. If the current exceeds a threshold (indicating a short circuit or overload), the breaker <em>physically opens</em> the circuit, stopping current flow. The protection is to the <em>rest of the system</em> (preventing fire, equipment damage), not the failing circuit.</p>
+<p>After a delay, the breaker can be reset. If the underlying problem persists, the breaker opens again. This is the <strong>closed → open → half-open → closed</strong> state machine you see in Resilience4j and Hystrix.</p>
+<p>The software application of the pattern: a <em>service call</em> is the circuit. <em>Failures</em> are the abnormal current. When failures exceed a threshold, the breaker opens, stopping calls to the failing dependency, <em>protecting the caller from the cascade</em>.</p>
+<p>The protection target is critical: <strong>the circuit breaker protects the caller, not the callee</strong>. The failing dependency continues to be down; the breaker just stops the caller from continuing to throw itself against it. This is the <em>failure containment</em> purpose.</p>
+<h3 id="why-bulkhead-the-maritime-engineering-origin">Why "Bulkhead"? — The Maritime Engineering Origin<a class="anchor" href="#why-bulkhead-the-maritime-engineering-origin" aria-hidden="true">#</a></h3>
+<p>The term <strong>bulkhead</strong> comes from shipbuilding. A bulkhead is a <em>vertical wall</em> inside a ship's hull that divides it into watertight compartments. If the hull is breached and water enters one compartment, the bulkheads prevent water from spreading to other compartments. The ship <em>takes on water</em> in the breached compartment but <em>stays afloat</em> because the rest is sealed.</p>
+<p>The Titanic famously had insufficient bulkhead height — when enough compartments flooded, water spilled over the top of the bulkheads into adjacent compartments. The lesson is <em>implementation matters</em>: bulkheads work only if they're tall enough.</p>
+<p>The software application: a <em>thread pool</em> is the compartment. If one dependency (Service B) becomes slow, threads waiting on it pile up in the pool. Without bulkheads, all threads from the application's main pool get stuck on B, and calls to healthy Services C and D also fail (no threads to handle them). With bulkheads, <em>each dependency has its own dedicated thread pool</em>. B's slowness floods only B's pool; C and D continue normally.</p>
+<p>The Hystrix library (Netflix, 2012) implemented this literally: a <code>HystrixCommand</code> wrapping a call to Service B used a dedicated thread pool sized for B's expected concurrency. When Hystrix was deprecated in favor of Resilience4j (2018+), the bulkhead pattern survived in two forms: <strong>thread-pool bulkhead</strong> (same as Hystrix) and <strong>semaphore bulkhead</strong> (caps concurrent calls without dedicating threads).</p>
+<h3 id="why-timeout-from-telephony">Why "Timeout"? — From Telephony<a class="anchor" href="#why-timeout-from-telephony" aria-hidden="true">#</a></h3>
+<p><strong>Timeout</strong> as a pattern long predates software. The earliest telephony switches (1880s) used <em>electromechanical timers</em> to disconnect calls that hadn't completed within a configured window. The motivation: a stuck call (one side hung up without notifying the switch) consumed scarce circuit resources indefinitely.</p>
+<p>The same reasoning applies to every distributed system: a stuck call (the remote side never responds) consumes a thread, a connection, and a slot in the load balancer. Without a timeout, stuck calls accumulate until the system runs out of resources.</p>
+<p>The deceptive simplicity: every senior engineer knows "always set a timeout," and yet <em>the default in many libraries is no timeout</em>. JDBC default for <code>socket_timeout</code>: infinite. RestTemplate default in old Spring versions: no read timeout. Java's <code>HttpURLConnection</code>: no read timeout unless explicitly set. These defaults have caused thousands of production incidents — the engineer assumed the library had a sensible default; the library didn't.</p>
+<p>The senior practice: <strong>timeout configuration is the first thing checked in any library integration</strong>, regardless of language or framework. Trust no default.</p>
+<h3 id="why-retry-from-network-protocols">Why "Retry"? — From Network Protocols<a class="anchor" href="#why-retry-from-network-protocols" aria-hidden="true">#</a></h3>
+<p>Retry with exponential backoff comes from the <strong>Ethernet collision resolution protocol</strong> (Metcalfe and Boggs, 1976). When two devices on the same Ethernet segment transmitted simultaneously, they collided. The protocol's response: each device waited a <em>random</em> time, then retried. If they collided again, they waited longer (doubling the backoff window). This was called <strong>truncated binary exponential backoff</strong> in the 1976 paper.</p>
+<p>The TCP/IP retransmission algorithm (TCP, 1981) used the same approach for lost packets. By the time DNS (1983) and HTTP/1.1 (1997) were standardized, exponential backoff was the canonical "try again, but politely" pattern.</p>
+<p>The deep insight: <strong>synchronized retries amplify failures</strong>. If 1,000 clients all retry simultaneously after seeing a failure, the second wave of traffic is identical to the first — same simultaneous burst. Backoff with <em>randomization</em> (jitter) breaks the synchronization. AWS's <a href="https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/">Architecture Blog post on exponential backoff and jitter</a> (2015) is the canonical modern articulation; jitter is now considered part of the standard retry pattern.</p>
+<h3 id="why-backpressure-from-hydraulics">Why "Backpressure"? — From Hydraulics<a class="anchor" href="#why-backpressure-from-hydraulics" aria-hidden="true">#</a></h3>
+<p><strong>Backpressure</strong> is a term from fluid dynamics: the resistance to flow caused by downstream conditions. In a hydraulic system, if the downstream valve is partially closed, pressure builds up upstream. The upstream pump <em>senses</em> the pressure and (if well-designed) reduces its output rate to match the downstream capacity.</p>
+<p>The software application: a producer (data source) is generating events faster than a consumer can process them. Without backpressure, events buffer until memory is exhausted, then are dropped or cause an OOM crash. <em>With</em> backpressure, the consumer signals "I can handle N more events," and the producer respects the demand.</p>
+<p>The <strong>Reactive Streams</strong> specification (Lightbend, Netflix, Pivotal, Twitter, 2013) formalized backpressure for JVM systems. Project Reactor, RxJava, Akka Streams all implement the same protocol. The mechanical mechanism: the consumer calls <code>request(n)</code>; the producer emits at most n items before waiting for the next <code>request</code>.</p>
+<p>Before Reactive Streams, JVM systems often handled backpressure implicitly via TCP (the slow consumer's socket fills, the producer's writes block) or via bounded queues with rejection. The Reactive Streams contribution: making backpressure explicit and composable in application code.</p>
+<h3 id="who-michael-nygard-is">Who Michael Nygard Is<a class="anchor" href="#who-michael-nygard-is" aria-hidden="true">#</a></h3>
+<p><strong>Michael Nygard</strong> (born ~1968) is a consulting architect who spent the late 1990s and 2000s at companies like Sapient and IBM Global Services before moving to Cognitect (which became Nubank). His prior writings on systems thinking and his post-mortem-driven approach to architecture made him the natural person to codify the resilience patterns.</p>
+<p>The <em>Release It!</em> second edition (2018) added chapters on the modern era (microservices, container orchestration, chaos engineering) but the original pattern catalog remained largely intact — those patterns have proven durable.</p>
+<h3 id="why-netflixs-hystrix-2012-was-the-industrial-validation">Why Netflix's Hystrix (2012) Was The Industrial Validation<a class="anchor" href="#why-netflixs-hystrix-2012-was-the-industrial-validation" aria-hidden="true">#</a></h3>
+<p>By 2012, Netflix was running its streaming service on AWS at internet scale. Failures of internal services were <em>constant</em> — AWS instance failures, network blips, software bugs. Without resilience patterns, every failure cascaded.</p>
+<p>Netflix's <a href="https://github.com/Netflix/Hystrix">open-sourced Hystrix library</a> (announced November 2012) was the <em>industrial validation</em> of Nygard's patterns. Hystrix wrapped every service call in a <code>HystrixCommand</code> with:
+- A timeout.
+- A thread-pool bulkhead.
+- A circuit breaker.
+- A fallback.</p>
+<p>The pattern was now <em>infrastructure</em> — engineers didn't have to implement circuit breakers from scratch; they used Hystrix. By 2015, Spring Cloud Netflix had wrapped Hystrix for Spring Boot, and the patterns reached every Java engineer.</p>
+<h3 id="hystrix-deprecation-and-resilience4j-2018">Hystrix Deprecation And Resilience4j (2018+)<a class="anchor" href="#hystrix-deprecation-and-resilience4j-2018" aria-hidden="true">#</a></h3>
+<p>In 2018, Netflix announced Hystrix was in <strong>maintenance mode</strong> — no new features, only bug fixes. The reasons:
+- Hystrix's thread-pool-per-dependency model was heavy.
+- The JVM ecosystem had moved toward reactive/non-blocking I/O.
+- A simpler, more modular alternative was needed.</p>
+<p><strong>Resilience4j</strong> (Robert Winkler, 2017+) became the replacement. It's modular (you pick the patterns you need), lighter, and reactive-friendly. By 2024, Resilience4j is the canonical Java resilience library; Hystrix is legacy.</p>
+<p>The Spring Cloud Circuit Breaker abstraction (2019) provides an interface above Resilience4j (and other implementations), so Spring code can switch libraries without rewrites.</p>
+<h2 id="why-resilience-specifically-the-senior-engineers-qa">Why Resilience, Specifically: The Senior Engineer's Q&amp;A<a class="anchor" href="#why-resilience-specifically-the-senior-engineers-qa" aria-hidden="true">#</a></h2>
+<h3 id="q1-why-arent-well-engineered-distributed-systems-just-naturally-resilient">Q1: Why aren't well-engineered distributed systems just naturally resilient?<a class="anchor" href="#q1-why-arent-well-engineered-distributed-systems-just-naturally-resilient" aria-hidden="true">#</a></h3>
+<p>Because <strong>the distribution adds failure modes that don't exist in monoliths</strong>. Specifically:</p>
+<ol>
+<li><strong>Partial failures</strong>: in a monolith, a method call either returns or throws. In a distributed system, a network call can succeed on the remote side but fail on the response path — leaving the caller uncertain.</li>
+<li><strong>Slow failures</strong>: a network call can take 30 seconds before timing out. During that time, a thread is occupied.</li>
+<li><strong>Correlated failures</strong>: one slow dependency makes its callers slow, which makes their callers slow. Without circuit breakers, the slowness cascades across the entire system.</li>
+</ol>
+<p>These failures <em>don't happen</em> in a monolith (no network = no partial failures), so the patterns are <em>specific to distribution</em>. Without explicit resilience, distributed systems naturally inherit all three failure modes.</p>
+<h3 id="q2-why-is-timeout-the-most-violated-rule">Q2: Why is timeout the most-violated rule?<a class="anchor" href="#q2-why-is-timeout-the-most-violated-rule" aria-hidden="true">#</a></h3>
+<p>Because <strong>the default in most libraries is "no timeout"</strong>. The engineer has to <em>actively configure</em> a timeout; if they forget, the call defaults to infinite. Examples:</p>
+<ul>
+<li>JDBC's <code>setNetworkTimeout(0, ...)</code>: no timeout.</li>
+<li><code>RestTemplate.exchange(...)</code> with default <code>ClientHttpRequestFactory</code>: no read timeout.</li>
+<li><code>Socket.read()</code>: no timeout unless <code>setSoTimeout</code> was called.</li>
+<li><code>URL.openStream()</code>: no timeout (legacy API).</li>
+<li><code>Files.readAllBytes()</code> on a network filesystem: blocks indefinitely.</li>
+</ul>
+<p>The senior practice: <strong>review every library integration for timeout defaults</strong>. The mantra: "trust nothing; configure everything."</p>
+<h3 id="q3-whats-the-difference-between-a-circuit-breaker-and-a-retry">Q3: What's the difference between a circuit breaker and a retry?<a class="anchor" href="#q3-whats-the-difference-between-a-circuit-breaker-and-a-retry" aria-hidden="true">#</a></h3>
+<p>Subtly different:</p>
+<ul>
+<li><strong>Retry</strong> attempts the same operation again <em>immediately</em>, hoping the transient failure was a blip.</li>
+<li><strong>Circuit breaker</strong> <em>stops</em> attempts after repeated failures, giving the dependency time to recover.</li>
+</ul>
+<p>They compose: retry with exponential backoff for transient failures; circuit breaker for sustained failures. Resilience4j combines them: <code>@CircuitBreaker @Retry @Timeout</code> on the same method.</p>
+<p>The order of decoration matters: the <em>outermost</em> annotation runs first. Standard order: <code>Bulkhead → TimeLimiter → CircuitBreaker → Retry → Fallback</code>. This means: acquire a bulkhead permit, set the timeout, check the circuit, retry on failure, fall back if everything fails.</p>
+<h3 id="q4-when-does-a-fallback-make-sense">Q4: When does a fallback make sense?<a class="anchor" href="#q4-when-does-a-fallback-make-sense" aria-hidden="true">#</a></h3>
+<p>When you can return a <em>degraded but useful</em> response instead of an error. Examples:</p>
+<ul>
+<li>Recommendations service is down → return <em>popular</em> products instead of personalized ones.</li>
+<li>User profile service is down → return <em>cached</em> profile (potentially stale).</li>
+<li>Inventory check is slow → assume <em>available</em> and check at fulfillment time.</li>
+</ul>
+<p>When can you <em>not</em> fall back? When the operation's correctness requires the call to succeed (e.g., taking payment — if the payment service is down, you cannot fall back to "assume paid").</p>
+<p>The senior judgment: identify the <em>graceful degradation</em> options at design time. The fallback is a business decision, not a technical one.</p>
+<h3 id="q5-how-does-backpressure-interact-with-the-synchronous-requestresponse-model">Q5: How does backpressure interact with the synchronous request/response model?<a class="anchor" href="#q5-how-does-backpressure-interact-with-the-synchronous-requestresponse-model" aria-hidden="true">#</a></h3>
+<p>It doesn't, directly. <strong>Backpressure is a streaming concept</strong> — it requires that the producer and consumer be in a <em>continuous relationship</em>, where the consumer can signal demand. Synchronous request/response is one-shot; backpressure doesn't apply.</p>
+<p>For sync, the equivalent is <strong>rate limiting</strong>: cap the upstream's request rate before it overwhelms the downstream. This is <em>external</em> control (the caller throttles itself), vs backpressure's <em>internal</em> control (the consumer signals demand).</p>
+<p>The senior judgment: streaming systems need backpressure; sync systems need rate limiting. Mixing the two requires explicit boundaries.</p>
+<h2 id="common-misconceptions-explained">Common Misconceptions Explained<a class="anchor" href="#common-misconceptions-explained" aria-hidden="true">#</a></h2>
+<h3 id="resilience-patterns-slow-down-the-system">"Resilience patterns slow down the system."<a class="anchor" href="#resilience-patterns-slow-down-the-system" aria-hidden="true">#</a></h3>
+<p>Half true. Each pattern adds some overhead (a circuit breaker check, a retry wait, a bulkhead permit acquisition). The overhead is microseconds — negligible against request budgets of milliseconds. The patterns make the system <em>significantly faster on failure</em> (fail fast instead of waiting for timeout) but slightly slower on success.</p>
+<h3 id="if-you-have-retries-you-dont-need-a-circuit-breaker">"If you have retries, you don't need a circuit breaker."<a class="anchor" href="#if-you-have-retries-you-dont-need-a-circuit-breaker" aria-hidden="true">#</a></h3>
+<p>False. Retries handle <em>transient</em> failures (lost packet, brief overload). Circuit breakers handle <em>sustained</em> failures (dependency is broken). Without a circuit breaker, retries amplify sustained failures (each retry burns a thread on a known-failing call).</p>
+<h3 id="resilience-patterns-are-optional-optimization">"Resilience patterns are optional optimization."<a class="anchor" href="#resilience-patterns-are-optional-optimization" aria-hidden="true">#</a></h3>
+<p>False. <strong>In a distributed system with N dependencies, the probability of at least one being slow at any moment is high</strong>. Without resilience patterns, every slowness cascades. Resilience is a <em>correctness</em> property, not an optimization.</p>
+<h3 id="hystrix-is-still-the-right-choice">"Hystrix is still the right choice."<a class="anchor" href="#hystrix-is-still-the-right-choice" aria-hidden="true">#</a></h3>
+<p>False. Hystrix is in maintenance mode since 2018. New systems should use Resilience4j (or Spring Cloud Circuit Breaker as an abstraction).</p>
+<h3 id="fallbacks-should-always-be-present">"Fallbacks should always be present."<a class="anchor" href="#fallbacks-should-always-be-present" aria-hidden="true">#</a></h3>
+<p>False. Fallbacks make sense when <em>degraded service is useful</em>. When the operation requires correctness (payments, security checks, inventory commits), no fallback is appropriate — fail fast and let the caller handle it.</p>
+<h3 id="retries-should-be-unlimited-until-success">"Retries should be unlimited until success."<a class="anchor" href="#retries-should-be-unlimited-until-success" aria-hidden="true">#</a></h3>
+<p>False. Unlimited retries amplify load and prevent the dependency from recovering. <strong>Retry budgets</strong> (cap total retries to a percentage of total request rate) prevent the retry storm pattern.</p>
+<h2 id="why-resilience-is-mandatory-in-distributed-systems">Why Resilience Is Mandatory In Distributed Systems<a class="anchor" href="#why-resilience-is-mandatory-in-distributed-systems" aria-hidden="true">#</a></h2>
+<p>A monolith has <em>internal</em> dependencies (method calls in one process). A method call either returns or throws; there is no "slow" or "partial." A distributed system has <em>network</em> dependencies, and the network adds three new failure modes:</p>
+<ol>
+<li><strong>Timeouts</strong> — the call hangs indefinitely (no response, no error).</li>
+<li><strong>Slow responses</strong> — the call returns, but in 10 seconds instead of 100 ms.</li>
+<li><strong>Partial failures</strong> — the call hits one instance of three; that instance is dead; the LB retries to another, doubling latency.</li>
+</ol>
+<p>Without resilience patterns, every one of these failure modes leaks upward — a slow service consumes its caller's threads, the caller becomes slow, that caller's caller becomes slow, and the system cascades. <strong>Production stability in a microservices system is not the absence of failures; it is the containment of them.</strong></p>
+<h2 id="the-five-patterns">The Five Patterns<a class="anchor" href="#the-five-patterns" aria-hidden="true">#</a></h2>
+<h3 id="1-timeout">1. Timeout<a class="anchor" href="#1-timeout" aria-hidden="true">#</a></h3>
+<p>The most basic pattern: every network call has an explicit timeout. <strong>Without an explicit timeout, calls can hang for the OS-level TCP timeout (often 5+ minutes)</strong>, holding threads.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">RestClient client = RestClient.builder()
+    .requestFactory(builder -&gt; builder
+        .connectTimeout(Duration.ofMillis(500))
+        .readTimeout(Duration.ofSeconds(3)))
+    .build();
+</code></pre></div>
+<p>Two separate timeouts: <strong>connect timeout</strong> (max time to establish TCP/TLS) and <strong>read timeout</strong> (max time waiting for response after connect). Both must be set.</p>
+<p><strong>The right value</strong>: lower than the caller's own timeout budget. If your service has a 30-second SLA, downstream calls should time out at 1–5 seconds — leaving room for retries, mapping, and the rest of the request.</p>
+<p><strong>The wrong value</strong>: the framework default (often unlimited or 30+ s). Always set explicitly.</p>
+<h3 id="2-retry-with-backoff-and-jitter">2. Retry With Backoff And Jitter<a class="anchor" href="#2-retry-with-backoff-and-jitter" aria-hidden="true">#</a></h3>
+<p>Transient errors (network blips, instance hiccups, brief timeouts) often recover on retry. Retry helps — but the wrong retry pattern <em>amplifies</em> failures.</p>
+<div class="mermaid">flowchart TB
+  Bad["Bad: retry immediately, fixed interval"]
+  Bad --> Storm["All clients retry at exactly the same moment<br/>→ synchronized load spike"]
+  Good["Good: exponential backoff with jitter"]
+  Good --> Spread["Retries spread out over time<br/>→ no synchronized spike"]
+</div>
+<p><strong>Exponential backoff</strong>: each retry waits longer than the last. 100 ms, 200 ms, 400 ms, 800 ms, 1600 ms.</p>
+<p><strong>Jitter</strong>: add randomness to break synchronization. AWS recommends <em>equal jitter</em> (random in [base/2, base]) or <em>full jitter</em> (random in [0, base]).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Retryable(
+  retryFor = TransientFailure.class,
+  maxAttempts = 4,
+  backoff = @Backoff(delay = 100, multiplier = 2, maxDelay = 5000, random = true)
+)
+public Result call() { /* ... */ }
+</code></pre></div>
+<p><strong>Retry budget</strong>: cap total retry rate (e.g., "no more than 10% of total request rate may be retries"). Prevents retry storms when the underlying system is sick.</p>
+<p><strong>Retries require idempotency</strong> (<a href="c02-t07-idempotency-and-deduplication.html">T07</a>). A non-idempotent operation retried produces duplicate side effects. <strong>Don't retry unless idempotency is verified.</strong></p>
+<h3 id="3-circuit-breaker">3. Circuit Breaker<a class="anchor" href="#3-circuit-breaker" aria-hidden="true">#</a></h3>
+<p>When a dependency is failing, <em>stop calling it</em>. The circuit breaker tracks recent failure rates; when failures exceed a threshold, it <em>opens</em> — subsequent calls fail fast without hitting the downstream. After a cooldown, it goes <em>half-open</em> and admits one trial call; if successful, <em>closes</em> (resume normal operation); if it fails, opens again.</p>
+<div class="mermaid">stateDiagram-v2
+  [*] --> Closed
+  Closed --> Open: failure rate > threshold
+  Open --> HalfOpen: cooldown elapsed
+  HalfOpen --> Closed: trial succeeded
+  HalfOpen --> Open: trial failed
+  Closed --> Closed: requests pass through
+  Open --> Open: requests fail fast
+</div>
+<p>The pattern's value: <strong>the downstream gets a break to recover</strong>. Continuing to slam a struggling service makes it slower; stopping for 30 seconds often allows it to recover.</p>
+<p><strong>Resilience4j configuration</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">resilience4j.circuitbreaker:
+  instances:
+    paymentService:
+      failureRateThreshold: 50              # open if 50% of last N calls failed
+      slidingWindowSize: 20
+      minimumNumberOfCalls: 10
+      waitDurationInOpenState: 30s
+      permittedNumberOfCallsInHalfOpenState: 3
+      slowCallRateThreshold: 80             # also count &quot;slow&quot; calls as failures
+      slowCallDurationThreshold: 2s
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@CircuitBreaker(name = &quot;paymentService&quot;, fallbackMethod = &quot;paymentFallback&quot;)
+public Receipt charge(ChargeRequest req) {
+  return paymentClient.charge(req);
+}
+public Receipt paymentFallback(ChargeRequest req, Throwable t) {
+  return Receipt.deferred(req);                 // graceful degradation
+}
+</code></pre></div>
+<p>The <strong>fallback</strong> gives the caller something reasonable instead of an exception — return cached data, return an empty result, queue for later, anything that lets the system degrade gracefully rather than fail outright.</p>
+<p><strong>Tuning</strong>: too eager (low threshold) means brief blips open the circuit unnecessarily; too lazy (high threshold) means a sick service drags the caller down before the breaker opens. Default Resilience4j thresholds (50% failure rate over 20 calls) are reasonable starting points; tune by observation.</p>
+<h3 id="4-bulkhead">4. Bulkhead<a class="anchor" href="#4-bulkhead" aria-hidden="true">#</a></h3>
+<p>Compartmentalize failures so one dependency's collapse doesn't drag down everything. Named after ship compartments — a hole in one compartment doesn't sink the ship.</p>
+<div class="mermaid">flowchart TB
+  App[Application]
+  App -->|"thread pool A (20 threads)"| ServiceA[Service A]
+  App -->|"thread pool B (20 threads)"| ServiceB[Service B]
+  App -->|"thread pool C (20 threads)"| ServiceC[Service C]
+  Note["If Service A is slow,<br/>only pool A's 20 threads are blocked.<br/>Pools B and C continue normally."]
+</div>
+<p>Without bulkheads, all downstream calls share the application's main thread pool. A slow Service A consumes threads; eventually the pool is exhausted; calls to Services B and C also fail because there are no threads.</p>
+<p><strong>Resilience4j thread-pool bulkhead</strong>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">resilience4j.thread-pool-bulkhead:
+  instances:
+    paymentService:
+      maxThreadPoolSize: 20
+      coreThreadPoolSize: 10
+      queueCapacity: 50
+</code></pre></div>
+<p>Alternative: <strong>semaphore bulkhead</strong>, which caps concurrent calls without dedicating threads (lower overhead, but the calls still consume the caller's thread).</p>
+<h3 id="5-backpressure">5. Backpressure<a class="anchor" href="#5-backpressure" aria-hidden="true">#</a></h3>
+<p>When a producer generates faster than a consumer can process, <em>the producer slows down</em>. The opposite — the producer continues at full rate — fills queues until something gives (memory pressure, OOM, dropped messages).</p>
+<p>Reactive Streams (Project Reactor, RxJava, Akka Streams) implement backpressure explicitly: the consumer signals "I can handle N more items"; the producer respects the demand.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Flux&lt;Order&gt; orders = Flux.fromStream(stream)
+    .onBackpressureBuffer(1000, BufferOverflowStrategy.DROP_OLDEST);
+orders.subscribe(consumer);
+</code></pre></div>
+<p>Without reactive streams, backpressure happens implicitly through TCP (a slow consumer's TCP socket fills, the producer's writes block) or via bounded queues with rejection policies.</p>
+<h2 id="how-they-compose">How They Compose<a class="anchor" href="#how-they-compose" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@CircuitBreaker(name = &quot;ext&quot;)
+@Retry(name = &quot;ext&quot;)
+@TimeLimiter(name = &quot;ext&quot;)
+@Bulkhead(name = &quot;ext&quot;)
+public CompletionStage&lt;Result&gt; call() {
+  return externalClient.fetch();
+}
+</code></pre></div>
+<p>Order matters. Resilience4j's default decoration order (outer to inner): <code>Bulkhead → TimeLimiter → CircuitBreaker → Retry → Fallback</code>. Reading inside-out: a single request acquires a bulkhead permit, opens a timeout, passes through the circuit breaker, may be retried, and finally falls back if all else fails.</p>
+<h2 id="hedged-requests">Hedged Requests<a class="anchor" href="#hedged-requests" aria-hidden="true">#</a></h2>
+<p>A subtle pattern: if the first request is taking too long, send a second concurrent request to a different instance; whichever returns first wins. Reduces tail latency at the cost of a small increase in total load.</p>
+<p>Google's <a href="https://research.google/pubs/the-tail-at-scale/">The Tail at Scale</a> paper details how Google uses hedged requests to reduce p99 latency in distributed reads.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">CompletableFuture&lt;Result&gt; primary = service.call(serverA);
+CompletableFuture&lt;Result&gt; hedge = CompletableFuture
+    .delayedExecutor(50, TimeUnit.MILLISECONDS)
+    .thenComposeAsync(unused -&gt; service.call(serverB));
+CompletableFuture&lt;Result&gt; result = CompletableFuture.anyOf(primary, hedge);
+</code></pre></div>
+<p><strong>Critical</strong>: the operation must be idempotent (<a href="c02-t07-idempotency-and-deduplication.html">T07</a>).</p>
+<h2 id="fail-fast-vs-fail-slow">Fail-Fast Vs Fail-Slow<a class="anchor" href="#fail-fast-vs-fail-slow" aria-hidden="true">#</a></h2>
+<p>A central design choice. When the system can't serve a request well, two paths:</p>
+<ul>
+<li><strong>Fail-fast</strong>: return an error immediately. The caller sees the failure and acts (degrade, retry, fall back).</li>
+<li><strong>Fail-slow</strong>: wait, hoping the dependency recovers. Threads pile up; the system degrades silently.</li>
+</ul>
+<p><strong>Fail-fast is almost always correct.</strong> Resilience patterns (timeout, circuit breaker) exist to enforce fail-fast in scenarios where the naive call would fail-slow.</p>
+<h2 id="graceful-degradation">Graceful Degradation<a class="anchor" href="#graceful-degradation" aria-hidden="true">#</a></h2>
+<p>When a non-critical dependency fails, <em>continue with reduced functionality</em>. The order page shows the product name and price but can't fetch recommendations — that's fine. The recommendations service is non-critical; the page loads.</p>
+<p>The fallback pattern in circuit breakers implements this: define what "good enough" looks like when the dependency is down.</p>
+<h2 id="hystrix-resilience4j">Hystrix → Resilience4j<a class="anchor" href="#hystrix-resilience4j" aria-hidden="true">#</a></h2>
+<p>Netflix open-sourced <strong>Hystrix</strong> in 2012 — the canonical Java circuit-breaker. Hystrix put Java-based fault tolerance on the map. In 2018, Netflix announced Hystrix was in maintenance mode (no new features); the community migrated to <strong>Resilience4j</strong>:</p>
+<ul>
+<li><strong>Lightweight</strong>: small footprint, modular (use only what you need).</li>
+<li><strong>Functional</strong>: built on Java 8 functional interfaces; cleaner API.</li>
+<li><strong>Spring Cloud integration</strong>: via <code>spring-cloud-starter-circuitbreaker-resilience4j</code>.</li>
+<li><strong>Actively maintained</strong>: 2018+.</li>
+</ul>
+<p>For a Java project starting in 2026, Resilience4j is the default.</p>
+<h2 id="spring-cloud-circuit-breaker">Spring Cloud Circuit Breaker<a class="anchor" href="#spring-cloud-circuit-breaker" aria-hidden="true">#</a></h2>
+<p>Spring's abstraction over circuit-breaker libraries — Resilience4j is the standard backend, but Sentinel, Spring Retry, and others are available.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+class OrderService {
+  private final CircuitBreaker breaker;
+  private final RestClient client;
+
+  public OrderService(CircuitBreakerFactory factory, RestClient client) {
+    this.breaker = factory.create(&quot;payment&quot;);
+    this.client = client;
+  }
+
+  public Receipt charge(Request req) {
+    return breaker.run(
+        () -&gt; client.post().uri(&quot;/charge&quot;).body(req).retrieve().body(Receipt.class),
+        throwable -&gt; Receipt.deferred(req)
+    );
+  }
+}
+</code></pre></div>
+<h2 id="real-production-incidents">Real Production Incidents<a class="anchor" href="#real-production-incidents" aria-hidden="true">#</a></h2>
+<h3 id="knight-capital-august-1-2012">Knight Capital, August 1, 2012<a class="anchor" href="#knight-capital-august-1-2012" aria-hidden="true">#</a></h3>
+<p>Multiple factors, but one: a synchronous call to a legacy code path that had been "dead" but not removed. No circuit breaker or feature flag. The call worked normally; the side effect produced unwanted trades. $440M lost in 45 minutes. <em>A feature flag + circuit breaker around the legacy path would have caught the unexpected activation.</em></p>
+<h3 id="aws-s3-outage-28-february-2017">AWS S3 Outage, 28 February 2017<a class="anchor" href="#aws-s3-outage-28-february-2017" aria-hidden="true">#</a></h3>
+<p>S3's index subsystem went down regionally. Many services that synchronously called S3 had <strong>no fallback or circuit breaker</strong>; their primary path was "S3 is up." When S3 failed, those services failed. Slack, Trello, GitHub status pages, AWS's own status page (running on S3) — all went down. <em>Each had a graceful-degradation answer (cache, async load, alternative store) they hadn't built.</em></p>
+<h3 id="slack-2018-multi-hour-outage">Slack 2018 Multi-Hour Outage<a class="anchor" href="#slack-2018-multi-hour-outage" aria-hidden="true">#</a></h3>
+<p>A Kafka consumer was non-idempotent; under retry, duplicates multiplied load on a downstream service; that service tipped over; the system spent hours unwinding. <em>Idempotent consumers + retry budgets would have contained it.</em></p>
+<h3 id="the-2017-cloudflare-cloudbleed">The 2017 Cloudflare "Cloudbleed"<a class="anchor" href="#the-2017-cloudflare-cloudbleed" aria-hidden="true">#</a></h3>
+<p>Different failure mode: a buffer-overflow bug in Cloudflare's edge worker leaked memory across customer requests. Not a resilience issue per se, but the cascade scope (millions of sites affected by one bug in one library) shows how a single-point dependency without isolation can spread.</p>
+<h2 id="the-patterns-that-arent-there-anti-patterns">The Patterns That Aren't There — Anti-Patterns<a class="anchor" href="#the-patterns-that-arent-there-anti-patterns" aria-hidden="true">#</a></h2>
+<h3 id="retry-without-idempotency">Retry Without Idempotency<a class="anchor" href="#retry-without-idempotency" aria-hidden="true">#</a></h3>
+<p>A POST that creates an order is retried; the order is created twice. Solution: idempotency keys (<a href="c02-t07-idempotency-and-deduplication.html">T07</a>).</p>
+<h3 id="retry-without-backoff">Retry Without Backoff<a class="anchor" href="#retry-without-backoff" aria-hidden="true">#</a></h3>
+<p>Tight-loop retries amplify load on a struggling dependency. Always exponential with jitter.</p>
+<h3 id="timeout-without-connect-timeout">Timeout Without Connect Timeout<a class="anchor" href="#timeout-without-connect-timeout" aria-hidden="true">#</a></h3>
+<p><code>readTimeout = 30s</code> but no connect timeout: a slow TCP handshake hangs forever. Always set both.</p>
+<h3 id="circuit-breaker-without-fallback">Circuit Breaker Without Fallback<a class="anchor" href="#circuit-breaker-without-fallback" aria-hidden="true">#</a></h3>
+<p>The breaker opens; subsequent calls throw; the application throws to the user. The user sees an error instead of a degraded experience. Always implement a fallback.</p>
+<h3 id="bulkhead-sized-too-small">Bulkhead Sized Too Small<a class="anchor" href="#bulkhead-sized-too-small" aria-hidden="true">#</a></h3>
+<p>Per-dependency thread pool of 5 threads; legitimate traffic uses all 5; healthy calls queue. Match bulkhead size to expected concurrent demand.</p>
+<h3 id="backpressure-ignored">Backpressure Ignored<a class="anchor" href="#backpressure-ignored" aria-hidden="true">#</a></h3>
+<p>A reactive stream with no backpressure operator drops data silently or buffers unboundedly. Always specify the strategy (<code>onBackpressureBuffer</code>, <code>onBackpressureDrop</code>, <code>onBackpressureLatest</code>).</p>
+<h2 id="cross-language-notes">Cross-Language Notes<a class="anchor" href="#cross-language-notes" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Resilience library</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java / Spring</strong></td>
+<td>Resilience4j (canonical), Spring Cloud Circuit Breaker, Hystrix (deprecated)</td>
+</tr>
+<tr>
+<td><strong>C# / .NET</strong></td>
+<td>Polly (canonical, similar API)</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td>hystrix-go, sony/gobreaker, failsafe-go</td>
+</tr>
+<tr>
+<td><strong>Node.js</strong></td>
+<td>opossum (circuit breaker), Bottleneck (rate limiter)</td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>tenacity (retry), pybreaker, circuitbreaker</td>
+</tr>
+<tr>
+<td><strong>Rust</strong></td>
+<td>failsafe-rs, fail-rs</td>
+</tr>
+</tbody>
+</table></div>
+<p>The patterns are universal; implementation libraries differ.</p>
+<h2 id="trade-off-summary">Trade-Off Summary<a class="anchor" href="#trade-off-summary" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timeout</td>
+<td>Every network call. Always.</td>
+</tr>
+<tr>
+<td>Retry (with backoff + jitter)</td>
+<td>Idempotent operations with transient failures</td>
+</tr>
+<tr>
+<td>Circuit breaker</td>
+<td>Calls to dependencies that can degrade or fail</td>
+</tr>
+<tr>
+<td>Bulkhead</td>
+<td>When multiple dependencies share a thread pool</td>
+</tr>
+<tr>
+<td>Backpressure</td>
+<td>Streaming or async data flows</td>
+</tr>
+<tr>
+<td>Hedged requests</td>
+<td>High-tail-latency operations where extra load is acceptable</td>
+</tr>
+<tr>
+<td>Fallback</td>
+<td>Always pair with circuit breakers; give callers a degraded answer</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>A common L5 prompt: "Walk me through resilience patterns." Strong answers (a) name all five with the failure each prevents, (b) emphasize idempotency as the precondition for retries, (c) order them: timeout always, retry where idempotent, circuit breaker on shaky dependencies, bulkhead when isolating, backpressure on streams, (d) cite a real incident.</p></div></div>
+<h2 id="deeper-dive-resilience4j-complete-configuration">Deeper Dive — Resilience4j Complete Configuration<a class="anchor" href="#deeper-dive-resilience4j-complete-configuration" aria-hidden="true">#</a></h2>
+<h3 id="yaml-configuration-spring-boot">YAML Configuration (Spring Boot)<a class="anchor" href="#yaml-configuration-spring-boot" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">resilience4j:
+  circuitbreaker:
+    instances:
+      payment-gateway:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED        # or TIME_BASED
+        sliding-window-size: 100
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50              # 50% failures open the circuit
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 80            # 80% slow calls = open
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        ignore-exceptions:
+          - com.example.BusinessException        # 4xx errors don't trigger CB
+
+  retry:
+    instances:
+      payment-gateway:
+        max-attempts: 3
+        wait-duration: 1s
+        exponential-backoff-multiplier: 2
+        randomization-factor: 0.5               # jitter
+        retry-exceptions:
+          - java.io.IOException
+        ignore-exceptions:
+          - com.example.NonRetryableException
+
+  ratelimiter:
+    instances:
+      payment-gateway:
+        limit-for-period: 100                    # 100 calls per
+        limit-refresh-period: 1s                 # 1 second
+        timeout-duration: 0                      # fail fast if rate-limited
+
+  bulkhead:
+    instances:
+      payment-gateway:
+        max-concurrent-calls: 20                 # max 20 concurrent calls
+        max-wait-duration: 100ms                 # wait briefly for slot
+      payment-gateway-tp:
+        type: THREADPOOL                          # thread-pool bulkhead
+        max-thread-pool-size: 20
+        core-thread-pool-size: 10
+        queue-capacity: 50
+
+  timelimiter:
+    instances:
+      payment-gateway:
+        timeout-duration: 5s
+        cancel-running-future: true
+</code></pre></div>
+<h3 id="service-code-with-stacked-annotations">Service Code with Stacked Annotations<a class="anchor" href="#service-code-with-stacked-annotations" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Service
+public class PaymentClient {
+
+    @CircuitBreaker(name = &quot;payment-gateway&quot;, fallbackMethod = &quot;fallbackCharge&quot;)
+    @Retry(name = &quot;payment-gateway&quot;, fallbackMethod = &quot;fallbackCharge&quot;)
+    @RateLimiter(name = &quot;payment-gateway&quot;)
+    @Bulkhead(name = &quot;payment-gateway&quot;)
+    @TimeLimiter(name = &quot;payment-gateway&quot;)
+    public CompletableFuture&lt;ChargeResult&gt; charge(ChargeRequest req) {
+        return CompletableFuture.supplyAsync(() -&gt;
+            restTemplate.postForObject(
+                &quot;/api/charges&quot;,
+                req,
+                ChargeResult.class
+            ));
+    }
+
+    public CompletableFuture&lt;ChargeResult&gt; fallbackCharge(ChargeRequest req, Throwable t) {
+        // Graceful degradation
+        if (t instanceof CallNotPermittedException) {
+            // Circuit breaker OPEN — service is failing
+            log.warn(&quot;Payment gateway circuit OPEN; queueing request for later&quot;);
+            paymentQueue.enqueue(req);
+            return CompletableFuture.completedFuture(ChargeResult.queued(req));
+        }
+        if (t instanceof BulkheadFullException) {
+            // Too many concurrent calls
+            return CompletableFuture.completedFuture(ChargeResult.tryLater());
+        }
+        if (t instanceof RequestNotPermitted) {
+            // Rate limit hit
+            return CompletableFuture.completedFuture(ChargeResult.rateLimited());
+        }
+        // Other failures: fall back to cached or default
+        return CompletableFuture.completedFuture(ChargeResult.degraded(req));
+    }
+}
+</code></pre></div>
+<p><strong>Order of annotations</strong> (critical):
+1. <code>@CircuitBreaker</code> — outermost; short-circuits before doing anything else
+2. <code>@Retry</code> — retries the inner call (within the CB)
+3. <code>@RateLimiter</code> — drops if over rate (with or without retry)
+4. <code>@Bulkhead</code> — limits concurrency
+5. <code>@TimeLimiter</code> — bounded duration for each attempt</p>
+<h2 id="deeper-dive-circuit-breaker-state-machine">Deeper Dive — Circuit Breaker State Machine<a class="anchor" href="#deeper-dive-circuit-breaker-state-machine" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>              ┌─────────────────┐
+              │     CLOSED      │
+              │ (normal, allow) │
+              └────────┬────────┘
+                       │
+                       │ failure rate &gt;= 50%
+                       │ (over sliding window)
+                       ▼
+              ┌─────────────────┐
+              │      OPEN       │
+              │ (reject calls)  │
+              └────────┬────────┘
+                       │
+                       │ wait 30s
+                       ▼
+              ┌─────────────────┐
+              │   HALF-OPEN     │
+              │  (probe with 5  │
+              │   test calls)   │
+              └────┬────────┬───┘
+                   │        │
+            success│        │ failure
+                   │        │
+                   ▼        ▼
+              CLOSED      OPEN
+</code></pre></div>
+<h3 id="spring-actuator-health-view">Spring Actuator Health View<a class="anchor" href="#spring-actuator-health-view" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml">management:
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-json">GET /actuator/health/circuitBreakers
+
+{
+  &quot;status&quot;: &quot;UP&quot;,
+  &quot;details&quot;: {
+    &quot;payment-gateway&quot;: {
+      &quot;status&quot;: &quot;UP&quot;,
+      &quot;details&quot;: {
+        &quot;state&quot;: &quot;CLOSED&quot;,
+        &quot;failureRate&quot;: &quot;3.0%&quot;,
+        &quot;slowCallRate&quot;: &quot;0.0%&quot;,
+        &quot;bufferedCalls&quot;: 100,
+        &quot;failedCalls&quot;: 3,
+        &quot;notPermittedCalls&quot;: 0
+      }
+    }
+  }
+}
+</code></pre></div>
+<h2 id="deeper-dive-retry-strategy-with-jitter">Deeper Dive — Retry Strategy with Jitter<a class="anchor" href="#deeper-dive-retry-strategy-with-jitter" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class ExponentialBackoffWithJitter {
+    private final int maxRetries;
+    private final long baseMs;
+    private final long maxMs;
+    private final Random random = new Random();
+
+    public &lt;T&gt; T retry(Supplier&lt;T&gt; operation) {
+        Throwable lastError = null;
+
+        for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {
+            try {
+                return operation.get();
+            } catch (Throwable t) {
+                if (!isRetryable(t)) throw new RuntimeException(t);
+                lastError = t;
+
+                if (attempt &lt; maxRetries) {
+                    long backoff = computeBackoff(attempt);
+                    try {
+                        Thread.sleep(backoff);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException(&quot;Interrupted&quot;, e);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException(&quot;Retries exhausted&quot;, lastError);
+    }
+
+    private long computeBackoff(int attempt) {
+        // Exponential: base × 2^(attempt-1)
+        long exponential = baseMs * (long) Math.pow(2, attempt - 1);
+        long capped = Math.min(exponential, maxMs);
+
+        // Full jitter: random(0, capped) — best to avoid thundering herd
+        return random.nextLong(0, capped + 1);
+    }
+}
+
+// Configuration: max 5 retries, 100ms base, 30s max
+new ExponentialBackoffWithJitter(5, 100, 30_000);
+// Retries at: random(0, 100), random(0, 200), random(0, 400), random(0, 800), random(0, 1600)
+</code></pre></div>
+<h3 id="jitter-strategies-compared">Jitter Strategies Compared<a class="anchor" href="#jitter-strategies-compared" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>NO JITTER:
+  100ms, 200ms, 400ms, 800ms ← all clients retry simultaneously
+  → thundering herd → cascading failures
+
+EQUAL JITTER:
+  random(50, 150), random(100, 300), ...
+  → some spread but still synchronized somewhat
+
+FULL JITTER (RECOMMENDED):
+  random(0, 100), random(0, 200), ...
+  → maximum spread; complete de-synchronization
+
+DECORRELATED JITTER:
+  next = random(base, prev * 3)
+  → adapts based on previous backoff
+  → avoids accidental synchronization
+</code></pre></div>
+<h2 id="deeper-dive-retry-budget-pattern-prevent-retry-amplification">Deeper Dive — Retry Budget Pattern (Prevent Retry Amplification)<a class="anchor" href="#deeper-dive-retry-budget-pattern-prevent-retry-amplification" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class RetryBudgetManager {
+    private final AtomicLong totalCalls = new AtomicLong();
+    private final AtomicLong totalRetries = new AtomicLong();
+
+    private static final double MAX_RETRY_RATIO = 0.10;   // max 10% of calls can be retries
+
+    public boolean shouldRetry() {
+        long calls = totalCalls.get();
+        long retries = totalRetries.get();
+
+        if (calls == 0) return true;
+
+        double currentRatio = (double) retries / calls;
+        return currentRatio &lt; MAX_RETRY_RATIO;
+    }
+
+    public void recordCall() { totalCalls.incrementAndGet(); }
+    public void recordRetry() {
+        if (shouldRetry()) {
+            totalRetries.incrementAndGet();
+        }
+    }
+
+    // Reset periodically
+    @Scheduled(fixedRate = 60_000)
+    public void reset() {
+        totalCalls.set(0);
+        totalRetries.set(0);
+    }
+}
+</code></pre></div>
+<p><strong>Why budget matters</strong>: a service handling 1000 RPS that retries 3× per failure during outage = 3000 RPS hitting failing downstream = amplifies the problem.</p>
+<h2 id="deeper-dive-hedged-requests-pattern">Deeper Dive — Hedged Requests Pattern<a class="anchor" href="#deeper-dive-hedged-requests-pattern" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public class HedgedRequest&lt;T&gt; {
+    private final ExecutorService executor;
+
+    public T executeHedged(Supplier&lt;T&gt; primary, Supplier&lt;T&gt; secondary,
+                           Duration hedgeDelay) {
+        CompletableFuture&lt;T&gt; primaryFuture = CompletableFuture.supplyAsync(primary, executor);
+        CompletableFuture&lt;T&gt; secondaryFuture = new CompletableFuture&lt;&gt;();
+
+        // Schedule secondary call after delay if primary hasn't completed
+        executor.schedule(() -&gt; {
+            if (!primaryFuture.isDone()) {
+                try {
+                    secondaryFuture.complete(secondary.get());
+                } catch (Throwable t) {
+                    secondaryFuture.completeExceptionally(t);
+                }
+            }
+        }, hedgeDelay.toMillis(), TimeUnit.MILLISECONDS);
+
+        // Return whichever completes first
+        return CompletableFuture.anyOf(primaryFuture, secondaryFuture)
+            .thenApply(result -&gt; (T) result)
+            .join();
+    }
+}
+
+// Usage: if primary doesn't return in 50ms, also fire secondary
+T result = hedge.executeHedged(
+    () -&gt; serviceClient.get(id),     // primary call
+    () -&gt; serviceClient.get(id),     // secondary (different instance via LB)
+    Duration.ofMillis(50)
+);
+</code></pre></div>
+<p><strong>Benefit</strong>: p99 latency drops significantly (2 chances at fast response).
+<strong>Cost</strong>: ~5-10% extra load (only fires on slow responses).
+<strong>Used by</strong>: Google search, Bing, many high-availability systems.</p>
+<h2 id="deeper-dive-bulkhead-pattern-variants">Deeper Dive — Bulkhead Pattern Variants<a class="anchor" href="#deeper-dive-bulkhead-pattern-variants" aria-hidden="true">#</a></h2>
+<h3 id="semaphore-bulkhead-lightweight">Semaphore Bulkhead (Lightweight)<a class="anchor" href="#semaphore-bulkhead-lightweight" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bulkhead(name = &quot;payment-gateway&quot;)    // semaphore-based by default
+public ChargeResult charge(ChargeRequest req) { ... }
+</code></pre></div>
+<p><strong>Use when</strong>: limit concurrent invocations within current thread. Suitable for synchronous calls.</p>
+<h3 id="thread-pool-bulkhead-strong-isolation">Thread-Pool Bulkhead (Strong Isolation)<a class="anchor" href="#thread-pool-bulkhead-strong-isolation" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Bulkhead(name = &quot;payment-gateway&quot;, type = Bulkhead.Type.THREADPOOL)
+public CompletableFuture&lt;ChargeResult&gt; charge(ChargeRequest req) {
+    return CompletableFuture.supplyAsync(() -&gt; restTemplate.post(...));
+}
+</code></pre></div>
+<p><strong>Use when</strong>: isolate slow calls from main thread pool. Caller threads can do other work while waiting.</p>
+<p><strong>Cost</strong>: extra thread management; ~10ms latency overhead per call.</p>
+<h3 id="explicit-connection-pool-limits">Explicit Connection Pool Limits<a class="anchor" href="#explicit-connection-pool-limits" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">yaml</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-yaml"># HTTP client per-host limits
+spring.cloud.openfeign.client.config:
+  payment-gateway:
+    connection-pool:
+      max-connections-per-host: 50    # bulkhead via HTTP pool
+      max-connections: 200
+</code></pre></div>
+<h2 id="deeper-dive-real-world-resilience-failures">Deeper Dive — Real-World Resilience Failures<a class="anchor" href="#deeper-dive-real-world-resilience-failures" aria-hidden="true">#</a></h2>
+<h3 id="cascading-failure-2017-gitlab-database-loss">Cascading Failure: 2017 GitLab Database Loss<a class="anchor" href="#cascading-failure-2017-gitlab-database-loss" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: Slow database replication → primary blocked → replicas lag → cascade
+
+NO RESILIENCE:
+  All clients hammer with retries
+  DB CPU 100% → can't keep up
+  Eventually data loss during recovery
+
+LESSONS:
+  - Circuit breaker on DB calls would have shed load
+  - Bulkhead would have isolated impact
+  - Retry budget would have limited amplification
+</code></pre></div>
+<h3 id="cascade-failure-2019-cloudflare-30-min-outage">Cascade Failure: 2019 Cloudflare 30-min Outage<a class="anchor" href="#cascade-failure-2019-cloudflare-30-min-outage" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: Regex CPU spike → some workers OOM
+  → load balancer routed away from failing workers
+  → healthy workers received more load
+  → MORE workers OOM → cascade
+
+LESSONS:
+  - Bulkhead per-customer would have contained blast radius
+  - Circuit breaker on individual regex execution
+  - Resource quotas (CPU/memory per request) would have limited damage
+</code></pre></div>
+<h3 id="aws-dynamodb-2015-outage">AWS DynamoDB 2015 Outage<a class="anchor" href="#aws-dynamodb-2015-outage" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code>SCENARIO: Metadata service became slow
+  → DynamoDB requests slowed
+  → clients retried more aggressively
+  → metadata service became slower
+  → death spiral
+
+LESSONS:
+  - Adaptive retry (slow when many failures)
+  - Backpressure (signal client to slow down)
+  - Service-side rate limiting
+  - Circuit breakers in clients
+</code></pre></div>
+<h2 id="deeper-dive-production-health-check-integration">Deeper Dive — Production Health-Check Integration<a class="anchor" href="#deeper-dive-production-health-check-integration" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">@Component
+public class ResilienceHealthIndicator implements HealthIndicator {
+    @Autowired private CircuitBreakerRegistry cbRegistry;
+
+    @Override
+    public Health health() {
+        Map&lt;String, Object&gt; details = new HashMap&lt;&gt;();
+
+        boolean allHealthy = true;
+        for (CircuitBreaker cb : cbRegistry.getAllCircuitBreakers()) {
+            CircuitBreaker.Metrics metrics = cb.getMetrics();
+            String state = cb.getState().toString();
+
+            Map&lt;String, Object&gt; cbDetails = Map.of(
+                &quot;state&quot;, state,
+                &quot;failureRate&quot;, metrics.getFailureRate(),
+                &quot;slowCallRate&quot;, metrics.getSlowCallRate(),
+                &quot;bufferedCalls&quot;, metrics.getNumberOfBufferedCalls()
+            );
+
+            details.put(cb.getName(), cbDetails);
+
+            // Service unhealthy if any critical CB is OPEN
+            if (state.equals(&quot;OPEN&quot;) &amp;&amp; cb.getName().startsWith(&quot;critical-&quot;)) {
+                allHealthy = false;
+            }
+        }
+
+        return allHealthy
+            ? Health.up().withDetails(details).build()
+            : Health.outOfService().withDetails(details).build();
+    }
+}
+</code></pre></div>
+<h2 id="deeper-dive-resilience-patterns-decision-matrix">Deeper Dive — Resilience Patterns Decision Matrix<a class="anchor" href="#deeper-dive-resilience-patterns-decision-matrix" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Pattern</th>
+<th>Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>External API call</td>
+<td>Timeout + Retry + CB</td>
+<td>timeout 5s, retry 3×, CB at 50% failure</td>
+</tr>
+<tr>
+<td>Database query</td>
+<td>Timeout + Connection Pool</td>
+<td>timeout 30s, pool size cores×2</td>
+</tr>
+<tr>
+<td>Background job</td>
+<td>Retry + DLQ</td>
+<td>retry 3×, send to DLQ if fails</td>
+</tr>
+<tr>
+<td>Stream processing</td>
+<td>Backpressure</td>
+<td>onBackpressureBuffer or onBackpressureDrop</td>
+</tr>
+<tr>
+<td>User-facing search</td>
+<td>Hedged Request</td>
+<td>50ms hedge delay</td>
+</tr>
+<tr>
+<td>Cache lookup</td>
+<td>Single-flight + Fallback</td>
+<td>LoadingCache + DB fallback</td>
+</tr>
+<tr>
+<td>Notification send</td>
+<td>Retry + Idempotency</td>
+<td>exponential backoff + dedup table</td>
+</tr>
+<tr>
+<td>Internal microservice</td>
+<td>Timeout + CB + Bulkhead</td>
+<td>timeout 2s, CB, semaphore 20</td>
+</tr>
+<tr>
+<td>Async pipeline</td>
+<td>Retry + DLQ</td>
+<td>max 5 retries, DLQ for ops review</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Audit timeouts.</strong> In your service, find every network call. Verify each has both connect and read timeouts. Set explicit values for any that don't.</li>
+<li><strong>Resilience4j configuration.</strong> Configure a circuit breaker, retry, timeout, and bulkhead for one downstream dependency. Test by injecting failures.</li>
+<li><strong>Retry with jitter.</strong> Implement exponential backoff with full jitter in Java. Show that synchronized clients de-synchronize over a few retries.</li>
+<li><strong>Find a missing circuit breaker.</strong> Search any service's code for downstream calls without circuit breakers. Add one with a graceful fallback.</li>
+<li><strong>Bulkhead exercise.</strong> Set up two downstream dependencies sharing a single thread pool. Slow one deliberately; observe the other being affected. Add bulkheads; verify isolation.</li>
+<li><strong>Hedged request prototype.</strong> For a read-only endpoint with high p99 latency, prototype a hedged request after 50 ms. Measure p99 improvement.</li>
+<li><strong>Backpressure verification.</strong> In a Reactor-based service, force a slow consumer; observe whether the system handles backpressure gracefully or drops data.</li>
+<li><strong>Retry-budget enforcement.</strong> Implement a global retry budget (max 10% of total request rate is retries). Verify under a failure burst.</li>
+<li><strong>Failure-injection drill.</strong> Use a chaos-engineering tool (Chaos Monkey, Litmus, Gremlin) to inject failures. Verify each resilience pattern engages.</li>
+<li><strong>The skeptic conversation.</strong> A senior engineer says "we don't need circuit breakers, our dependencies are reliable." Write a 200-word response on the cascade scenarios circuit breakers prevent.</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Articulate <strong>why resilience is mandatory</strong> — synchronous distributed calls produce three failure modes (timeout, slow response, partial failure) that cascade without patterns.</li>
+<li>Apply <strong>timeout</strong> with explicit connect and read values lower than the caller's budget.</li>
+<li>Apply <strong>retry</strong> with exponential backoff, jitter, retry budgets, and <strong>idempotency as precondition</strong>.</li>
+<li>Apply <strong>circuit breaker</strong> with appropriate threshold, sliding window, half-open trial; pair with <strong>fallback</strong>.</li>
+<li>Apply <strong>bulkhead</strong> to isolate dependencies' failure domains via per-dependency thread pools or semaphores.</li>
+<li>Apply <strong>backpressure</strong> in reactive streams via explicit strategies (buffer, drop, latest).</li>
+<li>Use <strong>hedged requests</strong> for tail-latency reduction on idempotent operations.</li>
+<li>Choose <strong>fail-fast over fail-slow</strong> as the design default.</li>
+<li>Implement <strong>graceful degradation</strong> via fallbacks that give callers reasonable answers when dependencies fail.</li>
+<li>Configure <strong>Resilience4j</strong> with concrete numbers, recognize Hystrix as deprecated, integrate via Spring Cloud Circuit Breaker.</li>
+<li>Recognize and refuse <strong>anti-patterns</strong>: retry without idempotency, retry without backoff, timeout without connect timeout, circuit breaker without fallback, bulkhead too small, ignored backpressure.</li>
+<li>Cite <strong>real incidents</strong> (Knight Capital, AWS S3 2017, Slack 2018) tied to missing patterns.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c02-t15-reliability-sli-slo-sla-redundancy-failover.html">Reliability (SLI/SLO/SLA, Redundancy, Failover)</a> — the discipline of measuring and committing to reliability targets, and the patterns (redundancy, failover, multi-region) that achieve them.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)&quot;
+slug: resilience-circuit-breaker-bulkhead-retry-timeout-backpressure
+level: L5
+module: &quot;Architecture &amp; Engineering Leadership&quot;
+section: &quot;Distributed Systems &amp; System Design&quot;
+type: concept
+difficulty: lead
+order: 14
+tags: [resilience, circuit-breaker, bulkhead, retry, timeout, backpressure, michael-nygard, hystrix, resilience4j, exponential-backoff, jitter, hedged-requests, fail-fast, fail-stop, graceful-degradation, fallback, half-open, closed, open, project-reactor, reactive-streams]
+prerequisites: [service-communication-sync-vs-async, idempotency-and-deduplication, load-balancing-algorithms-l4-l7]
+status: complete
+estimated_minutes: 75
+last_updated: 2026-06-08
+---
+
+# Resilience (Circuit Breaker, Bulkhead, Retry, Timeout, Backpressure)
+
+A microservices system depends on N other services, each of which can fail, slow down, or partition. **Without resilience patterns, every downstream failure becomes an upstream failure.** A slow database call holds a thread; threads pile up; the application can&#x27;t accept new requests; the load balancer routes traffic to a thrashing instance; the system cascades. Michael Nygard&#x27;s 2007 *Release It!* catalogued the patterns that prevent the cascade — **timeout** (don&#x27;t wait forever), **retry** (transient errors recover), **circuit breaker** (stop calling a dead dependency), **bulkhead** (isolate failures to one compartment), **backpressure** (slow the producer when the consumer can&#x27;t keep up). Each pattern addresses a specific failure mode; combined, they make distributed systems tolerable to operate.
+
+The depth bar here is **how each pattern actually works under load, how they compose, and the failure modes when they&#x27;re tuned wrong**. Tuning is the central skill: a circuit breaker with too-eager opening cuts off healthy traffic; too-lazy opening admits cascading load. A retry with no jitter produces synchronized retry storms. A timeout shorter than typical p99 latency causes spurious failures. A bulkhead sized too small under-utilizes the system; sized too large defeats the isolation purpose. We cover the **Hystrix → Resilience4j** transition (Netflix open-sourced Hystrix in 2012, then put it in maintenance mode; the JVM community moved to Resilience4j 2018+), the **Spring Cloud Circuit Breaker abstraction** (works with any backend), and the **reactive backpressure** model from Project Reactor and Reactive Streams. We name the production failures these patterns prevent: **Knight Capital 2012** (no circuit breaker on the legacy code path), **AWS S3 2017** (no fallback for sync S3 dependencies, cascade across the industry), **the 2018 Slack outage** (retries amplifying load). By the end you will configure Resilience4j with concrete numbers, recognize when a pattern is *missing* from a code review, and refuse retries that aren&#x27;t paired with backoff + jitter + circuit breakers.
+
+&gt; [!NOTE]
+&gt; Prerequisites: [Service Communication](../C01-software-architecture/T06-service-communication-sync-vs-async.md) (synchronous communication&#x27;s failure modes), [Idempotency](./T07-idempotency-and-deduplication.md) (retries require idempotency), [Load Balancing](./T10-load-balancing-algorithms-l4-l7.md) (LB-level resilience).
+
+## Where Resilience Patterns Came From — Power Engineering, Industrial Safety, And A 2007 Book
+
+The resilience pattern names — **circuit breaker, bulkhead, retry, timeout, backpressure** — are not software-engineering inventions. Every one is borrowed from older engineering disciplines that had already solved analogous problems. Understanding the heritage matters because each pattern carries forward *specific failure mode reasoning* from its origin field, and missing that reasoning produces shallow implementations.
+
+### The 2007 Book That Named The Patterns: Michael Nygard&#x27;s *Release It!*
+
+The canonical software-engineering articulation of resilience patterns is **Michael Nygard&#x27;s [*Release It! Design and Deploy Production-Ready Software*](https://pragprog.com/titles/mnee2/release-it-second-edition/)** (Pragmatic Bookshelf, March 2007; second edition 2018). The book is the *single most influential text on production-ready distributed systems* and is on virtually every staff-engineer reading list.
+
+Nygard was a consulting architect at Cognitect (later Nubank) who had spent the early 2000s diagnosing post-mortem failures of newly-deployed systems. His pattern: a system that *passed all tests* in development would fail catastrophically in production within hours of launch. The failures were always cross-system, always involved cascading dependencies, and were never anticipated by the tests. He started cataloguing them.
+
+The book&#x27;s first edition (2007) named patterns that the industry had been *informally using*:
+- **Circuit Breaker**
+- **Bulkhead**
+- **Timeout**
+- **Steady State**
+- **Fail Fast**
+- **Handshaking**
+- **Test Harness**
+- **Decoupling Middleware**
+
+Each pattern was given a *name*, a *failure scenario it addressed*, and a *concrete implementation*. The names borrowed from older disciplines, but the *systematic codification* was Nygard&#x27;s contribution.
+
+### Why &quot;Circuit Breaker&quot;? — The Electrical Engineering Origin
+
+The term **circuit breaker** comes from electrical engineering, specifically the **household circuit breaker** invented incrementally between 1879 (Edison&#x27;s fuse) and 1924 (Hugo Stotz&#x27;s screw-in circuit breaker — the modern form).
+
+The mechanism: an electrical circuit is monitored for *abnormal current*. If the current exceeds a threshold (indicating a short circuit or overload), the breaker *physically opens* the circuit, stopping current flow. The protection is to the *rest of the system* (preventing fire, equipment damage), not the failing circuit.
+
+After a delay, the breaker can be reset. If the underlying problem persists, the breaker opens again. This is the **closed → open → half-open → closed** state machine you see in Resilience4j and Hystrix.
+
+The software application of the pattern: a *service call* is the circuit. *Failures* are the abnormal current. When failures exceed a threshold, the breaker opens, stopping calls to the failing dependency, *protecting the caller from the cascade*.
+
+The protection target is critical: **the circuit breaker protects the caller, not the callee**. The failing dependency continues to be down; the breaker just stops the caller from continuing to throw itself against it. This is the *failure containment* purpose.
+
+### Why &quot;Bulkhead&quot;? — The Maritime Engineering Origin
+
+The term **bulkhead** comes from shipbuilding. A bulkhead is a *vertical wall* inside a ship&#x27;s hull that divides it into watertight compartments. If the hull is breached and water enters one compartment, the bulkheads prevent water from spreading to other compartments. The ship *takes on water* in the breached compartment but *stays afloat* because the rest is sealed.
+
+The Titanic famously had insufficient bulkhead height — when enough compartments flooded, water spilled over the top of the bulkheads into adjacent compartments. The lesson is *implementation matters*: bulkheads work only if they&#x27;re tall enough.
+
+The software application: a *thread pool* is the compartment. If one dependency (Service B) becomes slow, threads waiting on it pile up in the pool. Without bulkheads, all threads from the application&#x27;s main pool get stuck on B, and calls to healthy Services C and D also fail (no threads to handle them). With bulkheads, *each dependency has its own dedicated thread pool*. B&#x27;s slowness floods only B&#x27;s pool; C and D continue normally.
+
+The Hystrix library (Netflix, 2012) implemented this literally: a `HystrixCommand` wrapping a call to Service B used a dedicated thread pool sized for B&#x27;s expected concurrency. When Hystrix was deprecated in favor of Resilience4j (2018+), the bulkhead pattern survived in two forms: **thread-pool bulkhead** (same as Hystrix) and **semaphore bulkhead** (caps concurrent calls without dedicating threads).
+
+### Why &quot;Timeout&quot;? — From Telephony
+
+**Timeout** as a pattern long predates software. The earliest telephony switches (1880s) used *electromechanical timers* to disconnect calls that hadn&#x27;t completed within a configured window. The motivation: a stuck call (one side hung up without notifying the switch) consumed scarce circuit resources indefinitely.
+
+The same reasoning applies to every distributed system: a stuck call (the remote side never responds) consumes a thread, a connection, and a slot in the load balancer. Without a timeout, stuck calls accumulate until the system runs out of resources.
+
+The deceptive simplicity: every senior engineer knows &quot;always set a timeout,&quot; and yet *the default in many libraries is no timeout*. JDBC default for `socket_timeout`: infinite. RestTemplate default in old Spring versions: no read timeout. Java&#x27;s `HttpURLConnection`: no read timeout unless explicitly set. These defaults have caused thousands of production incidents — the engineer assumed the library had a sensible default; the library didn&#x27;t.
+
+The senior practice: **timeout configuration is the first thing checked in any library integration**, regardless of language or framework. Trust no default.
+
+### Why &quot;Retry&quot;? — From Network Protocols
+
+Retry with exponential backoff comes from the **Ethernet collision resolution protocol** (Metcalfe and Boggs, 1976). When two devices on the same Ethernet segment transmitted simultaneously, they collided. The protocol&#x27;s response: each device waited a *random* time, then retried. If they collided again, they waited longer (doubling the backoff window). This was called **truncated binary exponential backoff** in the 1976 paper.
+
+The TCP/IP retransmission algorithm (TCP, 1981) used the same approach for lost packets. By the time DNS (1983) and HTTP/1.1 (1997) were standardized, exponential backoff was the canonical &quot;try again, but politely&quot; pattern.
+
+The deep insight: **synchronized retries amplify failures**. If 1,000 clients all retry simultaneously after seeing a failure, the second wave of traffic is identical to the first — same simultaneous burst. Backoff with *randomization* (jitter) breaks the synchronization. AWS&#x27;s [Architecture Blog post on exponential backoff and jitter](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/) (2015) is the canonical modern articulation; jitter is now considered part of the standard retry pattern.
+
+### Why &quot;Backpressure&quot;? — From Hydraulics
+
+**Backpressure** is a term from fluid dynamics: the resistance to flow caused by downstream conditions. In a hydraulic system, if the downstream valve is partially closed, pressure builds up upstream. The upstream pump *senses* the pressure and (if well-designed) reduces its output rate to match the downstream capacity.
+
+The software application: a producer (data source) is generating events faster than a consumer can process them. Without backpressure, events buffer until memory is exhausted, then are dropped or cause an OOM crash. *With* backpressure, the consumer signals &quot;I can handle N more events,&quot; and the producer respects the demand.
+
+The **Reactive Streams** specification (Lightbend, Netflix, Pivotal, Twitter, 2013) formalized backpressure for JVM systems. Project Reactor, RxJava, Akka Streams all implement the same protocol. The mechanical mechanism: the consumer calls `request(n)`; the producer emits at most n items before waiting for the next `request`.
+
+Before Reactive Streams, JVM systems often handled backpressure implicitly via TCP (the slow consumer&#x27;s socket fills, the producer&#x27;s writes block) or via bounded queues with rejection. The Reactive Streams contribution: making backpressure explicit and composable in application code.
+
+### Who Michael Nygard Is
+
+**Michael Nygard** (born ~1968) is a consulting architect who spent the late 1990s and 2000s at companies like Sapient and IBM Global Services before moving to Cognitect (which became Nubank). His prior writings on systems thinking and his post-mortem-driven approach to architecture made him the natural person to codify the resilience patterns.
+
+The *Release It!* second edition (2018) added chapters on the modern era (microservices, container orchestration, chaos engineering) but the original pattern catalog remained largely intact — those patterns have proven durable.
+
+### Why Netflix&#x27;s Hystrix (2012) Was The Industrial Validation
+
+By 2012, Netflix was running its streaming service on AWS at internet scale. Failures of internal services were *constant* — AWS instance failures, network blips, software bugs. Without resilience patterns, every failure cascaded.
+
+Netflix&#x27;s [open-sourced Hystrix library](https://github.com/Netflix/Hystrix) (announced November 2012) was the *industrial validation* of Nygard&#x27;s patterns. Hystrix wrapped every service call in a `HystrixCommand` with:
+- A timeout.
+- A thread-pool bulkhead.
+- A circuit breaker.
+- A fallback.
+
+The pattern was now *infrastructure* — engineers didn&#x27;t have to implement circuit breakers from scratch; they used Hystrix. By 2015, Spring Cloud Netflix had wrapped Hystrix for Spring Boot, and the patterns reached every Java engineer.
+
+### Hystrix Deprecation And Resilience4j (2018+)
+
+In 2018, Netflix announced Hystrix was in **maintenance mode** — no new features, only bug fixes. The reasons:
+- Hystrix&#x27;s thread-pool-per-dependency model was heavy.
+- The JVM ecosystem had moved toward reactive/non-blocking I/O.
+- A simpler, more modular alternative was needed.
+
+**Resilience4j** (Robert Winkler, 2017+) became the replacement. It&#x27;s modular (you pick the patterns you need), lighter, and reactive-friendly. By 2024, Resilience4j is the canonical Java resilience library; Hystrix is legacy.
+
+The Spring Cloud Circuit Breaker abstraction (2019) provides an interface above Resilience4j (and other implementations), so Spring code can switch libraries without rewrites.
+
+## Why Resilience, Specifically: The Senior Engineer&#x27;s Q&amp;A
+
+### Q1: Why aren&#x27;t well-engineered distributed systems just naturally resilient?
+
+Because **the distribution adds failure modes that don&#x27;t exist in monoliths**. Specifically:
+
+1. **Partial failures**: in a monolith, a method call either returns or throws. In a distributed system, a network call can succeed on the remote side but fail on the response path — leaving the caller uncertain.
+2. **Slow failures**: a network call can take 30 seconds before timing out. During that time, a thread is occupied.
+3. **Correlated failures**: one slow dependency makes its callers slow, which makes their callers slow. Without circuit breakers, the slowness cascades across the entire system.
+
+These failures *don&#x27;t happen* in a monolith (no network = no partial failures), so the patterns are *specific to distribution*. Without explicit resilience, distributed systems naturally inherit all three failure modes.
+
+### Q2: Why is timeout the most-violated rule?
+
+Because **the default in most libraries is &quot;no timeout&quot;**. The engineer has to *actively configure* a timeout; if they forget, the call defaults to infinite. Examples:
+
+- JDBC&#x27;s `setNetworkTimeout(0, ...)`: no timeout.
+- `RestTemplate.exchange(...)` with default `ClientHttpRequestFactory`: no read timeout.
+- `Socket.read()`: no timeout unless `setSoTimeout` was called.
+- `URL.openStream()`: no timeout (legacy API).
+- `Files.readAllBytes()` on a network filesystem: blocks indefinitely.
+
+The senior practice: **review every library integration for timeout defaults**. The mantra: &quot;trust nothing; configure everything.&quot;
+
+### Q3: What&#x27;s the difference between a circuit breaker and a retry?
+
+Subtly different:
+
+- **Retry** attempts the same operation again *immediately*, hoping the transient failure was a blip.
+- **Circuit breaker** *stops* attempts after repeated failures, giving the dependency time to recover.
+
+They compose: retry with exponential backoff for transient failures; circuit breaker for sustained failures. Resilience4j combines them: `@CircuitBreaker @Retry @Timeout` on the same method.
+
+The order of decoration matters: the *outermost* annotation runs first. Standard order: `Bulkhead → TimeLimiter → CircuitBreaker → Retry → Fallback`. This means: acquire a bulkhead permit, set the timeout, check the circuit, retry on failure, fall back if everything fails.
+
+### Q4: When does a fallback make sense?
+
+When you can return a *degraded but useful* response instead of an error. Examples:
+
+- Recommendations service is down → return *popular* products instead of personalized ones.
+- User profile service is down → return *cached* profile (potentially stale).
+- Inventory check is slow → assume *available* and check at fulfillment time.
+
+When can you *not* fall back? When the operation&#x27;s correctness requires the call to succeed (e.g., taking payment — if the payment service is down, you cannot fall back to &quot;assume paid&quot;).
+
+The senior judgment: identify the *graceful degradation* options at design time. The fallback is a business decision, not a technical one.
+
+### Q5: How does backpressure interact with the synchronous request/response model?
+
+It doesn&#x27;t, directly. **Backpressure is a streaming concept** — it requires that the producer and consumer be in a *continuous relationship*, where the consumer can signal demand. Synchronous request/response is one-shot; backpressure doesn&#x27;t apply.
+
+For sync, the equivalent is **rate limiting**: cap the upstream&#x27;s request rate before it overwhelms the downstream. This is *external* control (the caller throttles itself), vs backpressure&#x27;s *internal* control (the consumer signals demand).
+
+The senior judgment: streaming systems need backpressure; sync systems need rate limiting. Mixing the two requires explicit boundaries.
+
+## Common Misconceptions Explained
+
+### &quot;Resilience patterns slow down the system.&quot;
+
+Half true. Each pattern adds some overhead (a circuit breaker check, a retry wait, a bulkhead permit acquisition). The overhead is microseconds — negligible against request budgets of milliseconds. The patterns make the system *significantly faster on failure* (fail fast instead of waiting for timeout) but slightly slower on success.
+
+### &quot;If you have retries, you don&#x27;t need a circuit breaker.&quot;
+
+False. Retries handle *transient* failures (lost packet, brief overload). Circuit breakers handle *sustained* failures (dependency is broken). Without a circuit breaker, retries amplify sustained failures (each retry burns a thread on a known-failing call).
+
+### &quot;Resilience patterns are optional optimization.&quot;
+
+False. **In a distributed system with N dependencies, the probability of at least one being slow at any moment is high**. Without resilience patterns, every slowness cascades. Resilience is a *correctness* property, not an optimization.
+
+### &quot;Hystrix is still the right choice.&quot;
+
+False. Hystrix is in maintenance mode since 2018. New systems should use Resilience4j (or Spring Cloud Circuit Breaker as an abstraction).
+
+### &quot;Fallbacks should always be present.&quot;
+
+False. Fallbacks make sense when *degraded service is useful*. When the operation requires correctness (payments, security checks, inventory commits), no fallback is appropriate — fail fast and let the caller handle it.
+
+### &quot;Retries should be unlimited until success.&quot;
+
+False. Unlimited retries amplify load and prevent the dependency from recovering. **Retry budgets** (cap total retries to a percentage of total request rate) prevent the retry storm pattern.
+
+## Why Resilience Is Mandatory In Distributed Systems
+
+A monolith has *internal* dependencies (method calls in one process). A method call either returns or throws; there is no &quot;slow&quot; or &quot;partial.&quot; A distributed system has *network* dependencies, and the network adds three new failure modes:
+
+1. **Timeouts** — the call hangs indefinitely (no response, no error).
+2. **Slow responses** — the call returns, but in 10 seconds instead of 100 ms.
+3. **Partial failures** — the call hits one instance of three; that instance is dead; the LB retries to another, doubling latency.
+
+Without resilience patterns, every one of these failure modes leaks upward — a slow service consumes its caller&#x27;s threads, the caller becomes slow, that caller&#x27;s caller becomes slow, and the system cascades. **Production stability in a microservices system is not the absence of failures; it is the containment of them.**
+
+## The Five Patterns
+
+### 1. Timeout
+
+The most basic pattern: every network call has an explicit timeout. **Without an explicit timeout, calls can hang for the OS-level TCP timeout (often 5+ minutes)**, holding threads.
+
+```java
+RestClient client = RestClient.builder()
+    .requestFactory(builder -&gt; builder
+        .connectTimeout(Duration.ofMillis(500))
+        .readTimeout(Duration.ofSeconds(3)))
+    .build();
+```
+
+Two separate timeouts: **connect timeout** (max time to establish TCP/TLS) and **read timeout** (max time waiting for response after connect). Both must be set.
+
+**The right value**: lower than the caller&#x27;s own timeout budget. If your service has a 30-second SLA, downstream calls should time out at 1–5 seconds — leaving room for retries, mapping, and the rest of the request.
+
+**The wrong value**: the framework default (often unlimited or 30+ s). Always set explicitly.
+
+### 2. Retry With Backoff And Jitter
+
+Transient errors (network blips, instance hiccups, brief timeouts) often recover on retry. Retry helps — but the wrong retry pattern *amplifies* failures.
+
+```mermaid
+flowchart TB
+  Bad[&quot;Bad: retry immediately, fixed interval&quot;]
+  Bad --&gt; Storm[&quot;All clients retry at exactly the same moment&lt;br/&gt;→ synchronized load spike&quot;]
+  Good[&quot;Good: exponential backoff with jitter&quot;]
+  Good --&gt; Spread[&quot;Retries spread out over time&lt;br/&gt;→ no synchronized spike&quot;]
+```
+
+**Exponential backoff**: each retry waits longer than the last. 100 ms, 200 ms, 400 ms, 800 ms, 1600 ms.
+
+**Jitter**: add randomness to break synchronization. AWS recommends *equal jitter* (random in [base/2, base]) or *full jitter* (random in [0, base]).
+
+```java
+@Retryable(
+  retryFor = TransientFailure.class,
+  maxAttempts = 4,
+  backoff = @Backoff(delay = 100, multiplier = 2, maxDelay = 5000, random = true)
+)
+public Result call() { /* ... */ }
+```
+
+**Retry budget**: cap total retry rate (e.g., &quot;no more than 10% of total request rate may be retries&quot;). Prevents retry storms when the underlying system is sick.
+
+**Retries require idempotency** ([T07](./T07-idempotency-and-deduplication.md)). A non-idempotent operation retried produces duplicate side effects. **Don&#x27;t retry unless idempotency is verified.**
+
+### 3. Circuit Breaker
+
+When a dependency is failing, *stop calling it*. The circuit breaker tracks recent failure rates; when failures exceed a threshold, it *opens* — subsequent calls fail fast without hitting the downstream. After a cooldown, it goes *half-open* and admits one trial call; if successful, *closes* (resume normal operation); if it fails, opens again.
+
+```mermaid
+stateDiagram-v2
+  [*] --&gt; Closed
+  Closed --&gt; Open: failure rate &gt; threshold
+  Open --&gt; HalfOpen: cooldown elapsed
+  HalfOpen --&gt; Closed: trial succeeded
+  HalfOpen --&gt; Open: trial failed
+  Closed --&gt; Closed: requests pass through
+  Open --&gt; Open: requests fail fast
+```
+
+The pattern&#x27;s value: **the downstream gets a break to recover**. Continuing to slam a struggling service makes it slower; stopping for 30 seconds often allows it to recover.
+
+**Resilience4j configuration**:
+
+```yaml
+resilience4j.circuitbreaker:
+  instances:
+    paymentService:
+      failureRateThreshold: 50              # open if 50% of last N calls failed
+      slidingWindowSize: 20
+      minimumNumberOfCalls: 10
+      waitDurationInOpenState: 30s
+      permittedNumberOfCallsInHalfOpenState: 3
+      slowCallRateThreshold: 80             # also count &quot;slow&quot; calls as failures
+      slowCallDurationThreshold: 2s
+```
+
+```java
+@CircuitBreaker(name = &quot;paymentService&quot;, fallbackMethod = &quot;paymentFallback&quot;)
+public Receipt charge(ChargeRequest req) {
+  return paymentClient.charge(req);
+}
+public Receipt paymentFallback(ChargeRequest req, Throwable t) {
+  return Receipt.deferred(req);                 // graceful degradation
+}
+```
+
+The **fallback** gives the caller something reasonable instead of an exception — return cached data, return an empty result, queue for later, anything that lets the system degrade gracefully rather than fail outright.
+
+**Tuning**: too eager (low threshold) means brief blips open the circuit unnecessarily; too lazy (high threshold) means a sick service drags the caller down before the breaker opens. Default Resilience4j thresholds (50% failure rate over 20 calls) are reasonable starting points; tune by observation.
+
+### 4. Bulkhead
+
+Compartmentalize failures so one dependency&#x27;s collapse doesn&#x27;t drag down everything. Named after ship compartments — a hole in one compartment doesn&#x27;t sink the ship.
+
+```mermaid
+flowchart TB
+  App[Application]
+  App --&gt;|&quot;thread pool A (20 threads)&quot;| ServiceA[Service A]
+  App --&gt;|&quot;thread pool B (20 threads)&quot;| ServiceB[Service B]
+  App --&gt;|&quot;thread pool C (20 threads)&quot;| ServiceC[Service C]
+  Note[&quot;If Service A is slow,&lt;br/&gt;only pool A&#x27;s 20 threads are blocked.&lt;br/&gt;Pools B and C continue normally.&quot;]
+```
+
+Without bulkheads, all downstream calls share the application&#x27;s main thread pool. A slow Service A consumes threads; eventually the pool is exhausted; calls to Services B and C also fail because there are no threads.
+
+**Resilience4j thread-pool bulkhead**:
+
+```yaml
+resilience4j.thread-pool-bulkhead:
+  instances:
+    paymentService:
+      maxThreadPoolSize: 20
+      coreThreadPoolSize: 10
+      queueCapacity: 50
+```
+
+Alternative: **semaphore bulkhead**, which caps concurrent calls without dedicating threads (lower overhead, but the calls still consume the caller&#x27;s thread).
+
+### 5. Backpressure
+
+When a producer generates faster than a consumer can process, *the producer slows down*. The opposite — the producer continues at full rate — fills queues until something gives (memory pressure, OOM, dropped messages).
+
+Reactive Streams (Project Reactor, RxJava, Akka Streams) implement backpressure explicitly: the consumer signals &quot;I can handle N more items&quot;; the producer respects the demand.
+
+```java
+Flux&lt;Order&gt; orders = Flux.fromStream(stream)
+    .onBackpressureBuffer(1000, BufferOverflowStrategy.DROP_OLDEST);
+orders.subscribe(consumer);
+```
+
+Without reactive streams, backpressure happens implicitly through TCP (a slow consumer&#x27;s TCP socket fills, the producer&#x27;s writes block) or via bounded queues with rejection policies.
+
+## How They Compose
+
+```java
+@CircuitBreaker(name = &quot;ext&quot;)
+@Retry(name = &quot;ext&quot;)
+@TimeLimiter(name = &quot;ext&quot;)
+@Bulkhead(name = &quot;ext&quot;)
+public CompletionStage&lt;Result&gt; call() {
+  return externalClient.fetch();
+}
+```
+
+Order matters. Resilience4j&#x27;s default decoration order (outer to inner): `Bulkhead → TimeLimiter → CircuitBreaker → Retry → Fallback`. Reading inside-out: a single request acquires a bulkhead permit, opens a timeout, passes through the circuit breaker, may be retried, and finally falls back if all else fails.
+
+## Hedged Requests
+
+A subtle pattern: if the first request is taking too long, send a second concurrent request to a different instance; whichever returns first wins. Reduces tail latency at the cost of a small increase in total load.
+
+Google&#x27;s [The Tail at Scale](https://research.google/pubs/the-tail-at-scale/) paper details how Google uses hedged requests to reduce p99 latency in distributed reads.
+
+```java
+CompletableFuture&lt;Result&gt; primary = service.call(serverA);
+CompletableFuture&lt;Result&gt; hedge = CompletableFuture
+    .delayedExecutor(50, TimeUnit.MILLISECONDS)
+    .thenComposeAsync(unused -&gt; service.call(serverB));
+CompletableFuture&lt;Result&gt; result = CompletableFuture.anyOf(primary, hedge);
+```
+
+**Critical**: the operation must be idempotent ([T07](./T07-idempotency-and-deduplication.md)).
+
+## Fail-Fast Vs Fail-Slow
+
+A central design choice. When the system can&#x27;t serve a request well, two paths:
+
+- **Fail-fast**: return an error immediately. The caller sees the failure and acts (degrade, retry, fall back).
+- **Fail-slow**: wait, hoping the dependency recovers. Threads pile up; the system degrades silently.
+
+**Fail-fast is almost always correct.** Resilience patterns (timeout, circuit breaker) exist to enforce fail-fast in scenarios where the naive call would fail-slow.
+
+## Graceful Degradation
+
+When a non-critical dependency fails, *continue with reduced functionality*. The order page shows the product name and price but can&#x27;t fetch recommendations — that&#x27;s fine. The recommendations service is non-critical; the page loads.
+
+The fallback pattern in circuit breakers implements this: define what &quot;good enough&quot; looks like when the dependency is down.
+
+## Hystrix → Resilience4j
+
+Netflix open-sourced **Hystrix** in 2012 — the canonical Java circuit-breaker. Hystrix put Java-based fault tolerance on the map. In 2018, Netflix announced Hystrix was in maintenance mode (no new features); the community migrated to **Resilience4j**:
+
+- **Lightweight**: small footprint, modular (use only what you need).
+- **Functional**: built on Java 8 functional interfaces; cleaner API.
+- **Spring Cloud integration**: via `spring-cloud-starter-circuitbreaker-resilience4j`.
+- **Actively maintained**: 2018+.
+
+For a Java project starting in 2026, Resilience4j is the default.
+
+## Spring Cloud Circuit Breaker
+
+Spring&#x27;s abstraction over circuit-breaker libraries — Resilience4j is the standard backend, but Sentinel, Spring Retry, and others are available.
+
+```java
+@Service
+class OrderService {
+  private final CircuitBreaker breaker;
+  private final RestClient client;
+
+  public OrderService(CircuitBreakerFactory factory, RestClient client) {
+    this.breaker = factory.create(&quot;payment&quot;);
+    this.client = client;
+  }
+
+  public Receipt charge(Request req) {
+    return breaker.run(
+        () -&gt; client.post().uri(&quot;/charge&quot;).body(req).retrieve().body(Receipt.class),
+        throwable -&gt; Receipt.deferred(req)
+    );
+  }
+}
+```
+
+## Real Production Incidents
+
+### Knight Capital, August 1, 2012
+
+Multiple factors, but one: a synchronous call to a legacy code path that had been &quot;dead&quot; but not removed. No circuit breaker or feature flag. The call worked normally; the side effect produced unwanted trades. $440M lost in 45 minutes. *A feature flag + circuit breaker around the legacy path would have caught the unexpected activation.*
+
+### AWS S3 Outage, 28 February 2017
+
+S3&#x27;s index subsystem went down regionally. Many services that synchronously called S3 had **no fallback or circuit breaker**; their primary path was &quot;S3 is up.&quot; When S3 failed, those services failed. Slack, Trello, GitHub status pages, AWS&#x27;s own status page (running on S3) — all went down. *Each had a graceful-degradation answer (cache, async load, alternative store) they hadn&#x27;t built.*
+
+### Slack 2018 Multi-Hour Outage
+
+A Kafka consumer was non-idempotent; under retry, duplicates multiplied load on a downstream service; that service tipped over; the system spent hours unwinding. *Idempotent consumers + retry budgets would have contained it.*
+
+### The 2017 Cloudflare &quot;Cloudbleed&quot;
+
+Different failure mode: a buffer-overflow bug in Cloudflare&#x27;s edge worker leaked memory across customer requests. Not a resilience issue per se, but the cascade scope (millions of sites affected by one bug in one library) shows how a single-point dependency without isolation can spread.
+
+## The Patterns That Aren&#x27;t There — Anti-Patterns
+
+### Retry Without Idempotency
+
+A POST that creates an order is retried; the order is created twice. Solution: idempotency keys ([T07](./T07-idempotency-and-deduplication.md)).
+
+### Retry Without Backoff
+
+Tight-loop retries amplify load on a struggling dependency. Always exponential with jitter.
+
+### Timeout Without Connect Timeout
+
+`readTimeout = 30s` but no connect timeout: a slow TCP handshake hangs forever. Always set both.
+
+### Circuit Breaker Without Fallback
+
+The breaker opens; subsequent calls throw; the application throws to the user. The user sees an error instead of a degraded experience. Always implement a fallback.
+
+### Bulkhead Sized Too Small
+
+Per-dependency thread pool of 5 threads; legitimate traffic uses all 5; healthy calls queue. Match bulkhead size to expected concurrent demand.
+
+### Backpressure Ignored
+
+A reactive stream with no backpressure operator drops data silently or buffers unboundedly. Always specify the strategy (`onBackpressureBuffer`, `onBackpressureDrop`, `onBackpressureLatest`).
+
+## Cross-Language Notes
+
+| Ecosystem | Resilience library |
+|-----------|--------------------|
+| **Java / Spring** | Resilience4j (canonical), Spring Cloud Circuit Breaker, Hystrix (deprecated) |
+| **C# / .NET** | Polly (canonical, similar API) |
+| **Go** | hystrix-go, sony/gobreaker, failsafe-go |
+| **Node.js** | opossum (circuit breaker), Bottleneck (rate limiter) |
+| **Python** | tenacity (retry), pybreaker, circuitbreaker |
+| **Rust** | failsafe-rs, fail-rs |
+
+The patterns are universal; implementation libraries differ.
+
+## Trade-Off Summary
+
+| Pattern | When to use |
+|---------|-------------|
+| Timeout | Every network call. Always. |
+| Retry (with backoff + jitter) | Idempotent operations with transient failures |
+| Circuit breaker | Calls to dependencies that can degrade or fail |
+| Bulkhead | When multiple dependencies share a thread pool |
+| Backpressure | Streaming or async data flows |
+| Hedged requests | High-tail-latency operations where extra load is acceptable |
+| Fallback | Always pair with circuit breakers; give callers a degraded answer |
+
+&gt; [!INTERVIEW]
+&gt; A common L5 prompt: &quot;Walk me through resilience patterns.&quot; Strong answers (a) name all five with the failure each prevents, (b) emphasize idempotency as the precondition for retries, (c) order them: timeout always, retry where idempotent, circuit breaker on shaky dependencies, bulkhead when isolating, backpressure on streams, (d) cite a real incident.
+
+## Deeper Dive — Resilience4j Complete Configuration
+
+### YAML Configuration (Spring Boot)
+
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-gateway:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED        # or TIME_BASED
+        sliding-window-size: 100
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50              # 50% failures open the circuit
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 80            # 80% slow calls = open
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        ignore-exceptions:
+          - com.example.BusinessException        # 4xx errors don&#x27;t trigger CB
+
+  retry:
+    instances:
+      payment-gateway:
+        max-attempts: 3
+        wait-duration: 1s
+        exponential-backoff-multiplier: 2
+        randomization-factor: 0.5               # jitter
+        retry-exceptions:
+          - java.io.IOException
+        ignore-exceptions:
+          - com.example.NonRetryableException
+
+  ratelimiter:
+    instances:
+      payment-gateway:
+        limit-for-period: 100                    # 100 calls per
+        limit-refresh-period: 1s                 # 1 second
+        timeout-duration: 0                      # fail fast if rate-limited
+
+  bulkhead:
+    instances:
+      payment-gateway:
+        max-concurrent-calls: 20                 # max 20 concurrent calls
+        max-wait-duration: 100ms                 # wait briefly for slot
+      payment-gateway-tp:
+        type: THREADPOOL                          # thread-pool bulkhead
+        max-thread-pool-size: 20
+        core-thread-pool-size: 10
+        queue-capacity: 50
+
+  timelimiter:
+    instances:
+      payment-gateway:
+        timeout-duration: 5s
+        cancel-running-future: true
+```
+
+### Service Code with Stacked Annotations
+
+```java
+@Service
+public class PaymentClient {
+
+    @CircuitBreaker(name = &quot;payment-gateway&quot;, fallbackMethod = &quot;fallbackCharge&quot;)
+    @Retry(name = &quot;payment-gateway&quot;, fallbackMethod = &quot;fallbackCharge&quot;)
+    @RateLimiter(name = &quot;payment-gateway&quot;)
+    @Bulkhead(name = &quot;payment-gateway&quot;)
+    @TimeLimiter(name = &quot;payment-gateway&quot;)
+    public CompletableFuture&lt;ChargeResult&gt; charge(ChargeRequest req) {
+        return CompletableFuture.supplyAsync(() -&gt;
+            restTemplate.postForObject(
+                &quot;/api/charges&quot;,
+                req,
+                ChargeResult.class
+            ));
+    }
+
+    public CompletableFuture&lt;ChargeResult&gt; fallbackCharge(ChargeRequest req, Throwable t) {
+        // Graceful degradation
+        if (t instanceof CallNotPermittedException) {
+            // Circuit breaker OPEN — service is failing
+            log.warn(&quot;Payment gateway circuit OPEN; queueing request for later&quot;);
+            paymentQueue.enqueue(req);
+            return CompletableFuture.completedFuture(ChargeResult.queued(req));
+        }
+        if (t instanceof BulkheadFullException) {
+            // Too many concurrent calls
+            return CompletableFuture.completedFuture(ChargeResult.tryLater());
+        }
+        if (t instanceof RequestNotPermitted) {
+            // Rate limit hit
+            return CompletableFuture.completedFuture(ChargeResult.rateLimited());
+        }
+        // Other failures: fall back to cached or default
+        return CompletableFuture.completedFuture(ChargeResult.degraded(req));
+    }
+}
+```
+
+**Order of annotations** (critical):
+1. `@CircuitBreaker` — outermost; short-circuits before doing anything else
+2. `@Retry` — retries the inner call (within the CB)
+3. `@RateLimiter` — drops if over rate (with or without retry)
+4. `@Bulkhead` — limits concurrency
+5. `@TimeLimiter` — bounded duration for each attempt
+
+## Deeper Dive — Circuit Breaker State Machine
+
+```
+              ┌─────────────────┐
+              │     CLOSED      │
+              │ (normal, allow) │
+              └────────┬────────┘
+                       │
+                       │ failure rate &gt;= 50%
+                       │ (over sliding window)
+                       ▼
+              ┌─────────────────┐
+              │      OPEN       │
+              │ (reject calls)  │
+              └────────┬────────┘
+                       │
+                       │ wait 30s
+                       ▼
+              ┌─────────────────┐
+              │   HALF-OPEN     │
+              │  (probe with 5  │
+              │   test calls)   │
+              └────┬────────┬───┘
+                   │        │
+            success│        │ failure
+                   │        │
+                   ▼        ▼
+              CLOSED      OPEN
+```
+
+### Spring Actuator Health View
+
+```yaml
+management:
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+```
+
+```json
+GET /actuator/health/circuitBreakers
+
+{
+  &quot;status&quot;: &quot;UP&quot;,
+  &quot;details&quot;: {
+    &quot;payment-gateway&quot;: {
+      &quot;status&quot;: &quot;UP&quot;,
+      &quot;details&quot;: {
+        &quot;state&quot;: &quot;CLOSED&quot;,
+        &quot;failureRate&quot;: &quot;3.0%&quot;,
+        &quot;slowCallRate&quot;: &quot;0.0%&quot;,
+        &quot;bufferedCalls&quot;: 100,
+        &quot;failedCalls&quot;: 3,
+        &quot;notPermittedCalls&quot;: 0
+      }
+    }
+  }
+}
+```
+
+## Deeper Dive — Retry Strategy with Jitter
+
+```java
+public class ExponentialBackoffWithJitter {
+    private final int maxRetries;
+    private final long baseMs;
+    private final long maxMs;
+    private final Random random = new Random();
+
+    public &lt;T&gt; T retry(Supplier&lt;T&gt; operation) {
+        Throwable lastError = null;
+
+        for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {
+            try {
+                return operation.get();
+            } catch (Throwable t) {
+                if (!isRetryable(t)) throw new RuntimeException(t);
+                lastError = t;
+
+                if (attempt &lt; maxRetries) {
+                    long backoff = computeBackoff(attempt);
+                    try {
+                        Thread.sleep(backoff);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException(&quot;Interrupted&quot;, e);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException(&quot;Retries exhausted&quot;, lastError);
+    }
+
+    private long computeBackoff(int attempt) {
+        // Exponential: base × 2^(attempt-1)
+        long exponential = baseMs * (long) Math.pow(2, attempt - 1);
+        long capped = Math.min(exponential, maxMs);
+
+        // Full jitter: random(0, capped) — best to avoid thundering herd
+        return random.nextLong(0, capped + 1);
+    }
+}
+
+// Configuration: max 5 retries, 100ms base, 30s max
+new ExponentialBackoffWithJitter(5, 100, 30_000);
+// Retries at: random(0, 100), random(0, 200), random(0, 400), random(0, 800), random(0, 1600)
+```
+
+### Jitter Strategies Compared
+
+```
+NO JITTER:
+  100ms, 200ms, 400ms, 800ms ← all clients retry simultaneously
+  → thundering herd → cascading failures
+
+EQUAL JITTER:
+  random(50, 150), random(100, 300), ...
+  → some spread but still synchronized somewhat
+
+FULL JITTER (RECOMMENDED):
+  random(0, 100), random(0, 200), ...
+  → maximum spread; complete de-synchronization
+
+DECORRELATED JITTER:
+  next = random(base, prev * 3)
+  → adapts based on previous backoff
+  → avoids accidental synchronization
+```
+
+## Deeper Dive — Retry Budget Pattern (Prevent Retry Amplification)
+
+```java
+@Component
+public class RetryBudgetManager {
+    private final AtomicLong totalCalls = new AtomicLong();
+    private final AtomicLong totalRetries = new AtomicLong();
+
+    private static final double MAX_RETRY_RATIO = 0.10;   // max 10% of calls can be retries
+
+    public boolean shouldRetry() {
+        long calls = totalCalls.get();
+        long retries = totalRetries.get();
+
+        if (calls == 0) return true;
+
+        double currentRatio = (double) retries / calls;
+        return currentRatio &lt; MAX_RETRY_RATIO;
+    }
+
+    public void recordCall() { totalCalls.incrementAndGet(); }
+    public void recordRetry() {
+        if (shouldRetry()) {
+            totalRetries.incrementAndGet();
+        }
+    }
+
+    // Reset periodically
+    @Scheduled(fixedRate = 60_000)
+    public void reset() {
+        totalCalls.set(0);
+        totalRetries.set(0);
+    }
+}
+```
+
+**Why budget matters**: a service handling 1000 RPS that retries 3× per failure during outage = 3000 RPS hitting failing downstream = amplifies the problem.
+
+## Deeper Dive — Hedged Requests Pattern
+
+```java
+public class HedgedRequest&lt;T&gt; {
+    private final ExecutorService executor;
+
+    public T executeHedged(Supplier&lt;T&gt; primary, Supplier&lt;T&gt; secondary,
+                           Duration hedgeDelay) {
+        CompletableFuture&lt;T&gt; primaryFuture = CompletableFuture.supplyAsync(primary, executor);
+        CompletableFuture&lt;T&gt; secondaryFuture = new CompletableFuture&lt;&gt;();
+
+        // Schedule secondary call after delay if primary hasn&#x27;t completed
+        executor.schedule(() -&gt; {
+            if (!primaryFuture.isDone()) {
+                try {
+                    secondaryFuture.complete(secondary.get());
+                } catch (Throwable t) {
+                    secondaryFuture.completeExceptionally(t);
+                }
+            }
+        }, hedgeDelay.toMillis(), TimeUnit.MILLISECONDS);
+
+        // Return whichever completes first
+        return CompletableFuture.anyOf(primaryFuture, secondaryFuture)
+            .thenApply(result -&gt; (T) result)
+            .join();
+    }
+}
+
+// Usage: if primary doesn&#x27;t return in 50ms, also fire secondary
+T result = hedge.executeHedged(
+    () -&gt; serviceClient.get(id),     // primary call
+    () -&gt; serviceClient.get(id),     // secondary (different instance via LB)
+    Duration.ofMillis(50)
+);
+```
+
+**Benefit**: p99 latency drops significantly (2 chances at fast response).
+**Cost**: ~5-10% extra load (only fires on slow responses).
+**Used by**: Google search, Bing, many high-availability systems.
+
+## Deeper Dive — Bulkhead Pattern Variants
+
+### Semaphore Bulkhead (Lightweight)
+
+```java
+@Bulkhead(name = &quot;payment-gateway&quot;)    // semaphore-based by default
+public ChargeResult charge(ChargeRequest req) { ... }
+```
+
+**Use when**: limit concurrent invocations within current thread. Suitable for synchronous calls.
+
+### Thread-Pool Bulkhead (Strong Isolation)
+
+```java
+@Bulkhead(name = &quot;payment-gateway&quot;, type = Bulkhead.Type.THREADPOOL)
+public CompletableFuture&lt;ChargeResult&gt; charge(ChargeRequest req) {
+    return CompletableFuture.supplyAsync(() -&gt; restTemplate.post(...));
+}
+```
+
+**Use when**: isolate slow calls from main thread pool. Caller threads can do other work while waiting.
+
+**Cost**: extra thread management; ~10ms latency overhead per call.
+
+### Explicit Connection Pool Limits
+
+```yaml
+# HTTP client per-host limits
+spring.cloud.openfeign.client.config:
+  payment-gateway:
+    connection-pool:
+      max-connections-per-host: 50    # bulkhead via HTTP pool
+      max-connections: 200
+```
+
+## Deeper Dive — Real-World Resilience Failures
+
+### Cascading Failure: 2017 GitLab Database Loss
+
+```
+SCENARIO: Slow database replication → primary blocked → replicas lag → cascade
+
+NO RESILIENCE:
+  All clients hammer with retries
+  DB CPU 100% → can&#x27;t keep up
+  Eventually data loss during recovery
+
+LESSONS:
+  - Circuit breaker on DB calls would have shed load
+  - Bulkhead would have isolated impact
+  - Retry budget would have limited amplification
+```
+
+### Cascade Failure: 2019 Cloudflare 30-min Outage
+
+```
+SCENARIO: Regex CPU spike → some workers OOM
+  → load balancer routed away from failing workers
+  → healthy workers received more load
+  → MORE workers OOM → cascade
+
+LESSONS:
+  - Bulkhead per-customer would have contained blast radius
+  - Circuit breaker on individual regex execution
+  - Resource quotas (CPU/memory per request) would have limited damage
+```
+
+### AWS DynamoDB 2015 Outage
+
+```
+SCENARIO: Metadata service became slow
+  → DynamoDB requests slowed
+  → clients retried more aggressively
+  → metadata service became slower
+  → death spiral
+
+LESSONS:
+  - Adaptive retry (slow when many failures)
+  - Backpressure (signal client to slow down)
+  - Service-side rate limiting
+  - Circuit breakers in clients
+```
+
+## Deeper Dive — Production Health-Check Integration
+
+```java
+@Component
+public class ResilienceHealthIndicator implements HealthIndicator {
+    @Autowired private CircuitBreakerRegistry cbRegistry;
+
+    @Override
+    public Health health() {
+        Map&lt;String, Object&gt; details = new HashMap&lt;&gt;();
+
+        boolean allHealthy = true;
+        for (CircuitBreaker cb : cbRegistry.getAllCircuitBreakers()) {
+            CircuitBreaker.Metrics metrics = cb.getMetrics();
+            String state = cb.getState().toString();
+
+            Map&lt;String, Object&gt; cbDetails = Map.of(
+                &quot;state&quot;, state,
+                &quot;failureRate&quot;, metrics.getFailureRate(),
+                &quot;slowCallRate&quot;, metrics.getSlowCallRate(),
+                &quot;bufferedCalls&quot;, metrics.getNumberOfBufferedCalls()
+            );
+
+            details.put(cb.getName(), cbDetails);
+
+            // Service unhealthy if any critical CB is OPEN
+            if (state.equals(&quot;OPEN&quot;) &amp;&amp; cb.getName().startsWith(&quot;critical-&quot;)) {
+                allHealthy = false;
+            }
+        }
+
+        return allHealthy
+            ? Health.up().withDetails(details).build()
+            : Health.outOfService().withDetails(details).build();
+    }
+}
+```
+
+## Deeper Dive — Resilience Patterns Decision Matrix
+
+| Scenario | Pattern | Configuration |
+|---|---|---|
+| External API call | Timeout + Retry + CB | timeout 5s, retry 3×, CB at 50% failure |
+| Database query | Timeout + Connection Pool | timeout 30s, pool size cores×2 |
+| Background job | Retry + DLQ | retry 3×, send to DLQ if fails |
+| Stream processing | Backpressure | onBackpressureBuffer or onBackpressureDrop |
+| User-facing search | Hedged Request | 50ms hedge delay |
+| Cache lookup | Single-flight + Fallback | LoadingCache + DB fallback |
+| Notification send | Retry + Idempotency | exponential backoff + dedup table |
+| Internal microservice | Timeout + CB + Bulkhead | timeout 2s, CB, semaphore 20 |
+| Async pipeline | Retry + DLQ | max 5 retries, DLQ for ops review |
+
+## Practice
+
+1. **Audit timeouts.** In your service, find every network call. Verify each has both connect and read timeouts. Set explicit values for any that don&#x27;t.
+2. **Resilience4j configuration.** Configure a circuit breaker, retry, timeout, and bulkhead for one downstream dependency. Test by injecting failures.
+3. **Retry with jitter.** Implement exponential backoff with full jitter in Java. Show that synchronized clients de-synchronize over a few retries.
+4. **Find a missing circuit breaker.** Search any service&#x27;s code for downstream calls without circuit breakers. Add one with a graceful fallback.
+5. **Bulkhead exercise.** Set up two downstream dependencies sharing a single thread pool. Slow one deliberately; observe the other being affected. Add bulkheads; verify isolation.
+6. **Hedged request prototype.** For a read-only endpoint with high p99 latency, prototype a hedged request after 50 ms. Measure p99 improvement.
+7. **Backpressure verification.** In a Reactor-based service, force a slow consumer; observe whether the system handles backpressure gracefully or drops data.
+8. **Retry-budget enforcement.** Implement a global retry budget (max 10% of total request rate is retries). Verify under a failure burst.
+9. **Failure-injection drill.** Use a chaos-engineering tool (Chaos Monkey, Litmus, Gremlin) to inject failures. Verify each resilience pattern engages.
+10. **The skeptic conversation.** A senior engineer says &quot;we don&#x27;t need circuit breakers, our dependencies are reliable.&quot; Write a 200-word response on the cascade scenarios circuit breakers prevent.
+
+## Recap
+
+You should now be able to:
+
+- Articulate **why resilience is mandatory** — synchronous distributed calls produce three failure modes (timeout, slow response, partial failure) that cascade without patterns.
+- Apply **timeout** with explicit connect and read values lower than the caller&#x27;s budget.
+- Apply **retry** with exponential backoff, jitter, retry budgets, and **idempotency as precondition**.
+- Apply **circuit breaker** with appropriate threshold, sliding window, half-open trial; pair with **fallback**.
+- Apply **bulkhead** to isolate dependencies&#x27; failure domains via per-dependency thread pools or semaphores.
+- Apply **backpressure** in reactive streams via explicit strategies (buffer, drop, latest).
+- Use **hedged requests** for tail-latency reduction on idempotent operations.
+- Choose **fail-fast over fail-slow** as the design default.
+- Implement **graceful degradation** via fallbacks that give callers reasonable answers when dependencies fail.
+- Configure **Resilience4j** with concrete numbers, recognize Hystrix as deprecated, integrate via Spring Cloud Circuit Breaker.
+- Recognize and refuse **anti-patterns**: retry without idempotency, retry without backoff, timeout without connect timeout, circuit breaker without fallback, bulkhead too small, ignored backpressure.
+- Cite **real incidents** (Knight Capital, AWS S3 2017, Slack 2018) tied to missing patterns.
+
+## Next
+
+Continue to [Reliability (SLI/SLO/SLA, Redundancy, Failover)](./T15-reliability-sli-slo-sla-redundancy-failover.md) — the discipline of measuring and committing to reliability targets, and the patterns (redundancy, failover, multi-region) that achieve them.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l5/c02-t13-rate-limiting-algorithms.html"><div class="lbl">← Previous</div><div class="ttl">T13-rate-limiting-algorithms</div><div class="sub">Rate Limiting Algorithms</div></a><a class="next" href="../l5/c02-t15-reliability-sli-slo-sla-redundancy-failover.html"><div class="lbl">Next →</div><div class="ttl">T15-reliability-sli-slo-sla-redundancy-failover</div><div class="sub">Reliability (SLI/SLO/SLA, Redundancy, Failover)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#where-resilience-patterns-came-from-power-engineering-industrial-safety-and-a-2007-book" data-toc-link>Where Resilience Patterns Came From — Power Engineering, Industrial Safety, And A 2007 Book</a></li><li class="lvl-3"><a href="#the-2007-book-that-named-the-patterns-michael-nygards-release-it" data-toc-link>The 2007 Book That Named The Patterns: Michael Nygard&#x27;s Release It!</a></li><li class="lvl-3"><a href="#why-circuit-breaker-the-electrical-engineering-origin" data-toc-link>Why &quot;Circuit Breaker&quot;? — The Electrical Engineering Origin</a></li><li class="lvl-3"><a href="#why-bulkhead-the-maritime-engineering-origin" data-toc-link>Why &quot;Bulkhead&quot;? — The Maritime Engineering Origin</a></li><li class="lvl-3"><a href="#why-timeout-from-telephony" data-toc-link>Why &quot;Timeout&quot;? — From Telephony</a></li><li class="lvl-3"><a href="#why-retry-from-network-protocols" data-toc-link>Why &quot;Retry&quot;? — From Network Protocols</a></li><li class="lvl-3"><a href="#why-backpressure-from-hydraulics" data-toc-link>Why &quot;Backpressure&quot;? — From Hydraulics</a></li><li class="lvl-3"><a href="#who-michael-nygard-is" data-toc-link>Who Michael Nygard Is</a></li><li class="lvl-3"><a href="#why-netflixs-hystrix-2012-was-the-industrial-validation" data-toc-link>Why Netflix&#x27;s Hystrix (2012) Was The Industrial Validation</a></li><li class="lvl-3"><a href="#hystrix-deprecation-and-resilience4j-2018" data-toc-link>Hystrix Deprecation And Resilience4j (2018+)</a></li><li class="lvl-2"><a href="#why-resilience-specifically-the-senior-engineers-qa" data-toc-link>Why Resilience, Specifically: The Senior Engineer&#x27;s Q&amp;amp;A</a></li><li class="lvl-3"><a href="#q1-why-arent-well-engineered-distributed-systems-just-naturally-resilient" data-toc-link>Q1: Why aren&#x27;t well-engineered distributed systems just naturally resilient?</a></li><li class="lvl-3"><a href="#q2-why-is-timeout-the-most-violated-rule" data-toc-link>Q2: Why is timeout the most-violated rule?</a></li><li class="lvl-3"><a href="#q3-whats-the-difference-between-a-circuit-breaker-and-a-retry" data-toc-link>Q3: What&#x27;s the difference between a circuit breaker and a retry?</a></li><li class="lvl-3"><a href="#q4-when-does-a-fallback-make-sense" data-toc-link>Q4: When does a fallback make sense?</a></li><li class="lvl-3"><a href="#q5-how-does-backpressure-interact-with-the-synchronous-requestresponse-model" data-toc-link>Q5: How does backpressure interact with the synchronous request/response model?</a></li><li class="lvl-2"><a href="#common-misconceptions-explained" data-toc-link>Common Misconceptions Explained</a></li><li class="lvl-3"><a href="#resilience-patterns-slow-down-the-system" data-toc-link>&quot;Resilience patterns slow down the system.&quot;</a></li><li class="lvl-3"><a href="#if-you-have-retries-you-dont-need-a-circuit-breaker" data-toc-link>&quot;If you have retries, you don&#x27;t need a circuit breaker.&quot;</a></li><li class="lvl-3"><a href="#resilience-patterns-are-optional-optimization" data-toc-link>&quot;Resilience patterns are optional optimization.&quot;</a></li><li class="lvl-3"><a href="#hystrix-is-still-the-right-choice" data-toc-link>&quot;Hystrix is still the right choice.&quot;</a></li><li class="lvl-3"><a href="#fallbacks-should-always-be-present" data-toc-link>&quot;Fallbacks should always be present.&quot;</a></li><li class="lvl-3"><a href="#retries-should-be-unlimited-until-success" data-toc-link>&quot;Retries should be unlimited until success.&quot;</a></li><li class="lvl-2"><a href="#why-resilience-is-mandatory-in-distributed-systems" data-toc-link>Why Resilience Is Mandatory In Distributed Systems</a></li><li class="lvl-2"><a href="#the-five-patterns" data-toc-link>The Five Patterns</a></li><li class="lvl-3"><a href="#1-timeout" data-toc-link>1. Timeout</a></li><li class="lvl-3"><a href="#2-retry-with-backoff-and-jitter" data-toc-link>2. Retry With Backoff And Jitter</a></li><li class="lvl-3"><a href="#3-circuit-breaker" data-toc-link>3. Circuit Breaker</a></li><li class="lvl-3"><a href="#4-bulkhead" data-toc-link>4. Bulkhead</a></li><li class="lvl-3"><a href="#5-backpressure" data-toc-link>5. Backpressure</a></li><li class="lvl-2"><a href="#how-they-compose" data-toc-link>How They Compose</a></li><li class="lvl-2"><a href="#hedged-requests" data-toc-link>Hedged Requests</a></li><li class="lvl-2"><a href="#fail-fast-vs-fail-slow" data-toc-link>Fail-Fast Vs Fail-Slow</a></li><li class="lvl-2"><a href="#graceful-degradation" data-toc-link>Graceful Degradation</a></li><li class="lvl-2"><a href="#hystrix-resilience4j" data-toc-link>Hystrix → Resilience4j</a></li><li class="lvl-2"><a href="#spring-cloud-circuit-breaker" data-toc-link>Spring Cloud Circuit Breaker</a></li><li class="lvl-2"><a href="#real-production-incidents" data-toc-link>Real Production Incidents</a></li><li class="lvl-3"><a href="#knight-capital-august-1-2012" data-toc-link>Knight Capital, August 1, 2012</a></li><li class="lvl-3"><a href="#aws-s3-outage-28-february-2017" data-toc-link>AWS S3 Outage, 28 February 2017</a></li><li class="lvl-3"><a href="#slack-2018-multi-hour-outage" data-toc-link>Slack 2018 Multi-Hour Outage</a></li><li class="lvl-3"><a href="#the-2017-cloudflare-cloudbleed" data-toc-link>The 2017 Cloudflare &quot;Cloudbleed&quot;</a></li><li class="lvl-2"><a href="#the-patterns-that-arent-there-anti-patterns" data-toc-link>The Patterns That Aren&#x27;t There — Anti-Patterns</a></li><li class="lvl-3"><a href="#retry-without-idempotency" data-toc-link>Retry Without Idempotency</a></li><li class="lvl-3"><a href="#retry-without-backoff" data-toc-link>Retry Without Backoff</a></li><li class="lvl-3"><a href="#timeout-without-connect-timeout" data-toc-link>Timeout Without Connect Timeout</a></li><li class="lvl-3"><a href="#circuit-breaker-without-fallback" data-toc-link>Circuit Breaker Without Fallback</a></li><li class="lvl-3"><a href="#bulkhead-sized-too-small" data-toc-link>Bulkhead Sized Too Small</a></li><li class="lvl-3"><a href="#backpressure-ignored" data-toc-link>Backpressure Ignored</a></li><li class="lvl-2"><a href="#cross-language-notes" data-toc-link>Cross-Language Notes</a></li><li class="lvl-2"><a href="#trade-off-summary" data-toc-link>Trade-Off Summary</a></li><li class="lvl-2"><a href="#deeper-dive-resilience4j-complete-configuration" data-toc-link>Deeper Dive — Resilience4j Complete Configuration</a></li><li class="lvl-3"><a href="#yaml-configuration-spring-boot" data-toc-link>YAML Configuration (Spring Boot)</a></li><li class="lvl-3"><a href="#service-code-with-stacked-annotations" data-toc-link>Service Code with Stacked Annotations</a></li><li class="lvl-2"><a href="#deeper-dive-circuit-breaker-state-machine" data-toc-link>Deeper Dive — Circuit Breaker State Machine</a></li><li class="lvl-3"><a href="#spring-actuator-health-view" data-toc-link>Spring Actuator Health View</a></li><li class="lvl-2"><a href="#deeper-dive-retry-strategy-with-jitter" data-toc-link>Deeper Dive — Retry Strategy with Jitter</a></li><li class="lvl-3"><a href="#jitter-strategies-compared" data-toc-link>Jitter Strategies Compared</a></li><li class="lvl-2"><a href="#deeper-dive-retry-budget-pattern-prevent-retry-amplification" data-toc-link>Deeper Dive — Retry Budget Pattern (Prevent Retry Amplification)</a></li><li class="lvl-2"><a href="#deeper-dive-hedged-requests-pattern" data-toc-link>Deeper Dive — Hedged Requests Pattern</a></li><li class="lvl-2"><a href="#deeper-dive-bulkhead-pattern-variants" data-toc-link>Deeper Dive — Bulkhead Pattern Variants</a></li><li class="lvl-3"><a href="#semaphore-bulkhead-lightweight" data-toc-link>Semaphore Bulkhead (Lightweight)</a></li><li class="lvl-3"><a href="#thread-pool-bulkhead-strong-isolation" data-toc-link>Thread-Pool Bulkhead (Strong Isolation)</a></li><li class="lvl-3"><a href="#explicit-connection-pool-limits" data-toc-link>Explicit Connection Pool Limits</a></li><li class="lvl-2"><a href="#deeper-dive-real-world-resilience-failures" data-toc-link>Deeper Dive — Real-World Resilience Failures</a></li><li class="lvl-3"><a href="#cascading-failure-2017-gitlab-database-loss" data-toc-link>Cascading Failure: 2017 GitLab Database Loss</a></li><li class="lvl-3"><a href="#cascade-failure-2019-cloudflare-30-min-outage" data-toc-link>Cascade Failure: 2019 Cloudflare 30-min Outage</a></li><li class="lvl-3"><a href="#aws-dynamodb-2015-outage" data-toc-link>AWS DynamoDB 2015 Outage</a></li><li class="lvl-2"><a href="#deeper-dive-production-health-check-integration" data-toc-link>Deeper Dive — Production Health-Check Integration</a></li><li class="lvl-2"><a href="#deeper-dive-resilience-patterns-decision-matrix" data-toc-link>Deeper Dive — Resilience Patterns Decision Matrix</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

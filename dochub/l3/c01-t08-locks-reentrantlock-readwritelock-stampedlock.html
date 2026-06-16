@@ -1,0 +1,1816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Locks (ReentrantLock, ReadWriteLock, StampedLock) — Java 0-to-Hero</title>
+<link rel="stylesheet" href="../assets/style.css" />
+<script>
+  try {
+    var t = localStorage.getItem('dochub-theme');
+    if (t && t !== 'auto') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div class="progress-bar"><div class="fill"></div></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-logo">J</div>
+      <div>
+        <div class="brand-name">Java 0-to-Hero</div>
+        <div class="brand-sub">Documentation hub</div>
+      </div>
+    </a>
+    <nav><a class="nav-link" href="../reference/index.html" title="Reference"><span class="name">Ref</span><span class="count">8</span></a><a class="nav-link" href="../l0/index.html" title="L0 — Foundations"><span class="name">L0</span><span class="count">49</span></a><a class="nav-link" href="../l1/index.html" title="L1 — Core Java &amp; OOP"><span class="name">L1</span><span class="count">70</span></a><a class="nav-link" href="../l2/index.html" title="L2 — Intermediate &amp; Backend"><span class="name">L2</span><span class="count">71</span></a><a class="nav-link active" href="../l3/index.html" title="L3 — Advanced JVM"><span class="name">L3</span><span class="count">62</span></a><a class="nav-link" href="../l4/index.html" title="L4 — Backend Engineering"><span class="name">L4</span><span class="count">172</span></a><a class="nav-link" href="../l5/index.html" title="L5 — Architecture &amp; Leadership"><span class="name">L5</span><span class="count">89</span></a><a class="nav-link" href="../l6/index.html" title="L6 — Interview Mastery"><span class="name">L6</span><span class="count">101</span></a><a class="nav-link" href="../examples/index.html" title="Examples"><span class="name">Run</span><span class="count">21</span></a></nav>
+    <div class="spacer"></div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Theme: auto (click to cycle)"><span class="tt-icon" aria-hidden="true">◐</span><span class="tt-label">Auto</span></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <aside class="sidebar"><div class="chapter-pill"><span class="ic">⚙</span><span>Ch. 5 · L3 — Advanced JVM</span></div><div class="chapter-path">content/L3-advanced-jvm/</div><div class="side-search"><input id="side-search" type="search" placeholder="Filter this chapter…" /></div><div class="nav-section"><a class="mod-flat" href="../l3/overview.html" data-q="l3 — advanced java &amp; the jvm content/l3-advanced-jvm/readme.md overview"><span>Overview</span></a><details class="mod" open data-q="c01 · concurrency content/l3-advanced-jvm/c01-concurrency/readme.md content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><summary><span class="caret">▶</span><span>C01 · Concurrency</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — concurrency &amp; multithreading content/l3-advanced-jvm/c01-concurrency/readme.md"><a class="" href="../l3/c01-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="threads &amp; runnable content/l3-advanced-jvm/c01-concurrency/t01-threads-and-runnable.md"><a class="" href="../l3/c01-t01-threads-and-runnable.html"><span>Threads &amp; Runnable</span><span class="kind-pill "></span></a></li><li data-q="thread lifecycle &amp; states content/l3-advanced-jvm/c01-concurrency/t02-thread-lifecycle-and-states.md"><a class="" href="../l3/c01-t02-thread-lifecycle-and-states.html"><span>Thread Lifecycle &amp; States</span><span class="kind-pill "></span></a></li><li data-q="synchronized, monitors &amp; intrinsic locks content/l3-advanced-jvm/c01-concurrency/t03-synchronized-monitors-and-intrinsic-locks.md"><a class="" href="../l3/c01-t03-synchronized-monitors-and-intrinsic-locks.html"><span>synchronized, Monitors &amp; Intrinsic Locks</span><span class="kind-pill "></span></a></li><li data-q="wait / notify / notifyall content/l3-advanced-jvm/c01-concurrency/t04-wait-notify-notifyall.md"><a class="" href="../l3/c01-t04-wait-notify-notifyall.html"><span>wait / notify / notifyAll</span><span class="kind-pill "></span></a></li><li data-q="executors &amp; thread pools content/l3-advanced-jvm/c01-concurrency/t05-executors-and-thread-pools.md"><a class="" href="../l3/c01-t05-executors-and-thread-pools.html"><span>Executors &amp; Thread Pools</span><span class="kind-pill "></span></a></li><li data-q="callable &amp; future content/l3-advanced-jvm/c01-concurrency/t06-callable-and-future.md"><a class="" href="../l3/c01-t06-callable-and-future.html"><span>Callable &amp; Future</span><span class="kind-pill "></span></a></li><li data-q="completablefuture &amp; async composition content/l3-advanced-jvm/c01-concurrency/t07-completablefuture-and-async-composition.md"><a class="" href="../l3/c01-t07-completablefuture-and-async-composition.html"><span>CompletableFuture &amp; Async Composition</span><span class="kind-pill "></span></a></li><li data-q="locks (reentrantlock, readwritelock, stampedlock) content/l3-advanced-jvm/c01-concurrency/t08-locks-reentrantlock-readwritelock-stampedlock.md"><a class="active" href="../l3/c01-t08-locks-reentrantlock-readwritelock-stampedlock.html"><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span><span class="kind-pill "></span></a></li><li data-q="synchronizers (semaphore, countdownlatch, cyclicbarrier, phaser) content/l3-advanced-jvm/c01-concurrency/t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md"><a class="" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><span>Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</span><span class="kind-pill "></span></a></li><li data-q="concurrent collections content/l3-advanced-jvm/c01-concurrency/t10-concurrent-collections.md"><a class="" href="../l3/c01-t10-concurrent-collections.html"><span>Concurrent Collections</span><span class="kind-pill "></span></a></li><li data-q="atomic variables content/l3-advanced-jvm/c01-concurrency/t11-atomic-variables.md"><a class="" href="../l3/c01-t11-atomic-variables.html"><span>Atomic Variables</span><span class="kind-pill "></span></a></li><li data-q="java memory model (happens-before, volatile) content/l3-advanced-jvm/c01-concurrency/t12-java-memory-model-happens-before-volatile.md"><a class="" href="../l3/c01-t12-java-memory-model-happens-before-volatile.html"><span>Java Memory Model (happens-before, volatile)</span><span class="kind-pill "></span></a></li><li data-q="fork/join framework content/l3-advanced-jvm/c01-concurrency/t13-fork-join-framework.md"><a class="" href="../l3/c01-t13-fork-join-framework.html"><span>Fork/Join Framework</span><span class="kind-pill "></span></a></li><li data-q="virtual threads (project loom) content/l3-advanced-jvm/c01-concurrency/t14-virtual-threads-project-loom.md"><a class="" href="../l3/c01-t14-virtual-threads-project-loom.html"><span>Virtual Threads (Project Loom)</span><span class="kind-pill "></span></a></li><li data-q="structured concurrency content/l3-advanced-jvm/c01-concurrency/t15-structured-concurrency.md"><a class="" href="../l3/c01-t15-structured-concurrency.html"><span>Structured Concurrency</span><span class="kind-pill "></span></a></li><li data-q="concurrency pitfalls (deadlock, livelock, starvation, races) content/l3-advanced-jvm/c01-concurrency/t16-concurrency-pitfalls-deadlock-livelock-starvation-races.md"><a class="" href="../l3/c01-t16-concurrency-pitfalls-deadlock-livelock-starvation-races.html"><span>Concurrency Pitfalls (deadlock, livelock, starvation, races)</span><span class="kind-pill "></span></a></li><li data-q="thread-safety patterns content/l3-advanced-jvm/c01-concurrency/t17-thread-safety-patterns.md"><a class="" href="../l3/c01-t17-thread-safety-patterns.html"><span>Thread-Safety Patterns</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c02 · jvm internals and performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><summary><span class="caret">▶</span><span>C02 · JVM Internals And Performance</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — jvm internals &amp; performance content/l3-advanced-jvm/c02-jvm-internals-and-performance/readme.md"><a class="" href="../l3/c02-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="jvm architecture &amp; runtime data areas content/l3-advanced-jvm/c02-jvm-internals-and-performance/t01-jvm-architecture-and-runtime-data-areas.md"><a class="" href="../l3/c02-t01-jvm-architecture-and-runtime-data-areas.html"><span>JVM Architecture &amp; Runtime Data Areas</span><span class="kind-pill "></span></a></li><li data-q="class loading &amp; class loaders content/l3-advanced-jvm/c02-jvm-internals-and-performance/t02-class-loading-and-class-loaders.md"><a class="" href="../l3/c02-t02-class-loading-and-class-loaders.html"><span>Class Loading &amp; Class Loaders</span><span class="kind-pill "></span></a></li><li data-q="bytecode basics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t03-bytecode-basics.md"><a class="" href="../l3/c02-t03-bytecode-basics.html"><span>Bytecode Basics</span><span class="kind-pill "></span></a></li><li data-q="jit compilation (c1/c2, tiered) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t04-jit-compilation-c1-c2-tiered.md"><a class="" href="../l3/c02-t04-jit-compilation-c1-c2-tiered.html"><span>JIT Compilation (C1/C2, Tiered)</span><span class="kind-pill "></span></a></li><li data-q="aot &amp; graalvm native image content/l3-advanced-jvm/c02-jvm-internals-and-performance/t05-aot-and-graalvm-native-image.md"><a class="" href="../l3/c02-t05-aot-and-graalvm-native-image.html"><span>AOT &amp; GraalVM Native Image</span><span class="kind-pill "></span></a></li><li data-q="memory model: heap, stack, metaspace content/l3-advanced-jvm/c02-jvm-internals-and-performance/t06-memory-model-heap-stack-metaspace.md"><a class="" href="../l3/c02-t06-memory-model-heap-stack-metaspace.html"><span>Memory Model: Heap, Stack, Metaspace</span><span class="kind-pill "></span></a></li><li data-q="garbage collection fundamentals content/l3-advanced-jvm/c02-jvm-internals-and-performance/t07-garbage-collection-fundamentals.md"><a class="" href="../l3/c02-t07-garbage-collection-fundamentals.html"><span>Garbage Collection Fundamentals</span><span class="kind-pill "></span></a></li><li data-q="gc algorithms (serial, parallel, g1, zgc, shenandoah) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.md"><a class="" href="../l3/c02-t08-gc-algorithms-serial-parallel-g1-zgc-shenandoah.html"><span>GC Algorithms (Serial, Parallel, G1, ZGC, Shenandoah)</span><span class="kind-pill "></span></a></li><li data-q="gc tuning &amp; monitoring content/l3-advanced-jvm/c02-jvm-internals-and-performance/t09-gc-tuning-and-monitoring.md"><a class="" href="../l3/c02-t09-gc-tuning-and-monitoring.html"><span>GC Tuning &amp; Monitoring</span><span class="kind-pill "></span></a></li><li data-q="memory leaks &amp; heap dump analysis content/l3-advanced-jvm/c02-jvm-internals-and-performance/t10-memory-leaks-and-heap-dump-analysis.md"><a class="" href="../l3/c02-t10-memory-leaks-and-heap-dump-analysis.html"><span>Memory Leaks &amp; Heap Dump Analysis</span><span class="kind-pill "></span></a></li><li data-q="profiling (jfr, async-profiler, visualvm) content/l3-advanced-jvm/c02-jvm-internals-and-performance/t11-profiling-jfr-async-profiler-visualvm.md"><a class="" href="../l3/c02-t11-profiling-jfr-async-profiler-visualvm.html"><span>Profiling (JFR, async-profiler, VisualVM)</span><span class="kind-pill "></span></a></li><li data-q="benchmarking with jmh content/l3-advanced-jvm/c02-jvm-internals-and-performance/t12-benchmarking-with-jmh.md"><a class="" href="../l3/c02-t12-benchmarking-with-jmh.html"><span>Benchmarking with JMH</span><span class="kind-pill "></span></a></li><li data-q="performance tuning methodology content/l3-advanced-jvm/c02-jvm-internals-and-performance/t13-performance-tuning-methodology.md"><a class="" href="../l3/c02-t13-performance-tuning-methodology.html"><span>Performance Tuning Methodology</span><span class="kind-pill "></span></a></li><li data-q="jvm flags &amp; ergonomics content/l3-advanced-jvm/c02-jvm-internals-and-performance/t14-jvm-flags-and-ergonomics.md"><a class="" href="../l3/c02-t14-jvm-flags-and-ergonomics.html"><span>JVM Flags &amp; Ergonomics</span><span class="kind-pill "></span></a></li><li data-q="project valhalla: value classes &amp; the end of the primitive/object divide content/l3-advanced-jvm/c02-jvm-internals-and-performance/t15-project-valhalla-value-classes.md"><a class="" href="../l3/c02-t15-project-valhalla-value-classes.html"><span>Project Valhalla: Value Classes &amp; the End of the Primitive/Object Divide</span><span class="kind-pill "></span></a></li><li data-q="webassembly &amp; java: wasm, wasi, and running the jvm everywhere content/l3-advanced-jvm/c02-jvm-internals-and-performance/t16-webassembly-and-java.md"><a class="" href="../l3/c02-t16-webassembly-and-java.html"><span>WebAssembly &amp; Java: WASM, WASI, and Running the JVM Everywhere</span><span class="kind-pill "></span></a></li><li data-q="tail-latency engineering &amp; load testing content/l3-advanced-jvm/c02-jvm-internals-and-performance/t17-tail-latency-engineering-and-load-testing.md"><a class="" href="../l3/c02-t17-tail-latency-engineering-and-load-testing.html"><span>Tail-Latency Engineering &amp; Load Testing</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c03 · design patterns and principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><summary><span class="caret">▶</span><span>C03 · Design Patterns And Principles</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — design patterns &amp; principles content/l3-advanced-jvm/c03-design-patterns-and-principles/readme.md"><a class="" href="../l3/c03-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="solid principles content/l3-advanced-jvm/c03-design-patterns-and-principles/t01-solid-principles.md"><a class="" href="../l3/c03-t01-solid-principles.html"><span>SOLID Principles</span><span class="kind-pill "></span></a></li><li data-q="dry, kiss, yagni content/l3-advanced-jvm/c03-design-patterns-and-principles/t02-dry-kiss-yagni.md"><a class="" href="../l3/c03-t02-dry-kiss-yagni.html"><span>DRY, KISS, YAGNI</span><span class="kind-pill "></span></a></li><li data-q="coupling &amp; cohesion content/l3-advanced-jvm/c03-design-patterns-and-principles/t03-coupling-and-cohesion.md"><a class="" href="../l3/c03-t03-coupling-and-cohesion.html"><span>Coupling &amp; Cohesion</span><span class="kind-pill "></span></a></li><li data-q="creational patterns (singleton, factory, builder, prototype) content/l3-advanced-jvm/c03-design-patterns-and-principles/t04-creational-patterns-singleton-factory-builder-prototype.md"><a class="" href="../l3/c03-t04-creational-patterns-singleton-factory-builder-prototype.html"><span>Creational Patterns (Singleton, Factory, Builder, Prototype)</span><span class="kind-pill "></span></a></li><li data-q="structural patterns (adapter, decorator, proxy, facade) content/l3-advanced-jvm/c03-design-patterns-and-principles/t05-structural-patterns-adapter-decorator-proxy-facade.md"><a class="" href="../l3/c03-t05-structural-patterns-adapter-decorator-proxy-facade.html"><span>Structural patterns (Adapter, Decorator, Proxy, Facade)</span><span class="kind-pill "></span></a></li><li data-q="behavioral patterns (strategy, observer, command, template) content/l3-advanced-jvm/c03-design-patterns-and-principles/t06-behavioral-patterns-strategy-observer-command-template.md"><a class="" href="../l3/c03-t06-behavioral-patterns-strategy-observer-command-template.html"><span>Behavioral patterns (Strategy, Observer, Command, Template)</span><span class="kind-pill "></span></a></li><li data-q="dependency injection / ioc (concept) content/l3-advanced-jvm/c03-design-patterns-and-principles/t07-dependency-injection-ioc-concept.md"><a class="" href="../l3/c03-t07-dependency-injection-ioc-concept.html"><span>Dependency Injection / IoC (concept)</span><span class="kind-pill "></span></a></li><li data-q="enterprise patterns (dto, repository, service layer, unit of work) content/l3-advanced-jvm/c03-design-patterns-and-principles/t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.md"><a class="" href="../l3/c03-t08-enterprise-patterns-dto-repository-service-layer-unit-of-work.html"><span>Enterprise patterns (DTO, Repository, Service layer, Unit of Work)</span><span class="kind-pill "></span></a></li><li data-q="functional-style patterns in modern java content/l3-advanced-jvm/c03-design-patterns-and-principles/t09-functional-style-patterns-in-modern-java.md"><a class="" href="../l3/c03-t09-functional-style-patterns-in-modern-java.html"><span>Functional-style patterns in modern Java</span><span class="kind-pill "></span></a></li><li data-q="anti-patterns &amp; code smells content/l3-advanced-jvm/c03-design-patterns-and-principles/t10-anti-patterns-and-code-smells.md"><a class="" href="../l3/c03-t10-anti-patterns-and-code-smells.html"><span>Anti-patterns &amp; code smells</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c04 · tools and environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><summary><span class="caret">▶</span><span>C04 · Tools And Environment</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — tools &amp; environment content/l3-advanced-jvm/c04-tools-and-environment/readme.md"><a class="" href="../l3/c04-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="tools for advanced java &amp; the jvm content/l3-advanced-jvm/c04-tools-and-environment/t01-tools-for-advanced-java-and-the-jvm.md"><a class="" href="../l3/c04-t01-tools-for-advanced-java-and-the-jvm.html"><span>Tools for Advanced Java &amp; the JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c05 · hands on content/l3-advanced-jvm/c05-hands-on/readme.md content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><summary><span class="caret">▶</span><span>C05 · Hands On</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — hands-on content/l3-advanced-jvm/c05-hands-on/readme.md"><a class="" href="../l3/c05-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 level project: jvm performance lab content/l3-advanced-jvm/c05-hands-on/t01-level-project-jvm-performance-lab.md"><a class="" href="../l3/c05-t01-level-project-jvm-performance-lab.html"><span>L3 Level Project: JVM Performance Lab</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c06 · best practices content/l3-advanced-jvm/c06-best-practices/readme.md content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><summary><span class="caret">▶</span><span>C06 · Best Practices</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/readme.md"><a class="" href="../l3/c06-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 best practices &amp; pitfalls content/l3-advanced-jvm/c06-best-practices/t01-best-practices-and-pitfalls-l3.md"><a class="" href="../l3/c06-t01-best-practices-and-pitfalls-l3.html"><span>L3 Best Practices &amp; Pitfalls</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c07 · interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><summary><span class="caret">▶</span><span>C07 · Interview Prep</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — interview prep content/l3-advanced-jvm/c07-interview-prep/readme.md"><a class="" href="../l3/c07-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="interview prep: advanced java &amp; jvm content/l3-advanced-jvm/c07-interview-prep/t01-interview-prep-advanced-java.md"><a class="" href="../l3/c07-t01-interview-prep-advanced-java.html"><span>Interview Prep: Advanced Java &amp; JVM</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c08 · qa faq content/l3-advanced-jvm/c08-qa-faq/readme.md content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><summary><span class="caret">▶</span><span>C08 · QA FAQ</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — q&amp;a / faq content/l3-advanced-jvm/c08-qa-faq/readme.md"><a class="" href="../l3/c08-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 q&amp;a and faq content/l3-advanced-jvm/c08-qa-faq/t01-l3-qa.md"><a class="" href="../l3/c08-t01-l3-qa.html"><span>L3 Q&amp;A and FAQ</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c09 · cheatsheets content/l3-advanced-jvm/c09-cheatsheets/readme.md content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><summary><span class="caret">▶</span><span>C09 · Cheatsheets</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — cheatsheets &amp; reference content/l3-advanced-jvm/c09-cheatsheets/readme.md"><a class="" href="../l3/c09-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 cheatsheets content/l3-advanced-jvm/c09-cheatsheets/t01-l3-cheatsheets.md"><a class="" href="../l3/c09-t01-l3-cheatsheets.html"><span>L3 Cheatsheets</span><span class="kind-pill "></span></a></li></ul></details><details class="mod" data-q="c10 · resources content/l3-advanced-jvm/c10-resources/readme.md content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><summary><span class="caret">▶</span><span>C10 · Resources</span></summary><ul class="pages"><li data-q="advanced java &amp; the jvm — resources content/l3-advanced-jvm/c10-resources/readme.md"><a class="" href="../l3/c10-readme.html"><span>Overview</span><span class="kind-pill overview">intro</span></a></li><li data-q="l3 resources content/l3-advanced-jvm/c10-resources/t01-l3-resources.md"><a class="" href="../l3/c10-t01-l3-resources.html"><span>L3 Resources</span><span class="kind-pill "></span></a></li></ul></details></div></aside>
+    <main>
+      <div class="article-head">
+        <div class="breadcrumb"><a href="../index.html">Docs hub</a><span class="sep">/</span><a href="../l3/index.html">L3 — Advanced JVM</a><span class="sep">/</span><span>Locks (ReentrantLock, ReadWriteLock, StampedLock)</span></div>
+        <h1>Locks (ReentrantLock, ReadWriteLock, StampedLock)</h1>
+        <div><span class="source-path">content/L3-advanced-jvm/C01-concurrency/T08-locks-reentrantlock-readwritelock-stampedlock.md</span></div>
+        <div class="meta-row"><span class="meta-pill status-complete">complete</span><span class="meta-pill difficulty">advanced</span><span class="meta-pill mins">~180 min</span><span class="meta-pill date">updated 2026-06-08</span></div>
+        
+        
+        <div class="view-toggle" role="tablist">
+          <button data-view="rendered" class="active">Rendered</button>
+          <button data-view="raw">Raw Markdown</button>
+        </div>
+      </div>
+      <article class="markdown"><hr>
+<p>title: "Locks (ReentrantLock, ReadWriteLock, StampedLock)"
+slug: locks-reentrantlock-readwritelock-stampedlock
+level: L3
+module: "Advanced Java &amp; the JVM"
+section: "Concurrency &amp; Multithreading"
+type: concept
+difficulty: advanced
+order: 8
+tags: [lock, reentrantlock, reentrantreadwritelock, stampedlock, abstractqueuedsynchronizer, aqs, clh-queue, lock-support, park, unpark, trylock, lockinterruptibly, fair-lock, nonfair-lock, barging, hasqueuedpredecessors, exclusiveownerthread, set-exclusive-owner-thread, recursion-count, condition, conditionobject, await, signal, signalall, condition-queue, signal-transfer, waitstatus, signal-status, cancelled-status, condition-status, propagate-status, shouldparkafterfailedacquire, acquirequeued, addwaiter, unparksuccessor, shared-acquire, exclusive-acquire, tryacquire, tryrelease, readlock, writelock, downgrade, upgrade-deadlock, reader-count, writer-count, sharedshift, exclusivemask, max-count-65535, writer-starvation, fair-rwlock, stamped-lock-state, optimistic-read, validate-stamp, write-stamp, read-stamp, mode-conversion, tryconverttowritelock, stamped-lock-not-reentrant, generation-counter, sequence-lock, jep-491-future, virtual-thread-lock-friendly, lock-vs-synchronized-2026]
+prerequisites: [completablefuture-and-async-composition, callable-and-future, wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states]
+status: complete
+estimated_minutes: 180
+last_updated: 2026-06-08</p>
+<hr>
+<h1 id="locks-reentrantlock-readwritelock-stampedlock">Locks (ReentrantLock, ReadWriteLock, StampedLock)</h1>
+<p><code>synchronized</code> (T03) gives you mutual exclusion and JMM happens-before in one keyword — but it pays for that simplicity with rigidity: no timed wait, no interruptibility, no "try-and-give-up," no fairness control, no multiple condition queues per lock, and no programmatic way to query the lock's state. The <code>java.util.concurrent.locks</code> package, contributed by Doug Lea for JDK 5, exposes the <em>same</em> monitor semantics through a richer API — <code>Lock</code>, <code>ReentrantLock</code>, <code>ReentrantReadWriteLock</code>, <code>StampedLock</code> — and, more importantly, builds them all on top of one ingeniously general framework: <strong><code>AbstractQueuedSynchronizer</code></strong> (AQS), a 2,000-line class that is <em>the</em> shared engine behind every lock, latch, semaphore, barrier, and synchronizer in the JDK, plus <code>FutureTask</code> (T06), <code>ThreadPoolExecutor.Worker</code> (T05), and dozens of third-party libraries.</p>
+<p>The depth-bar requirement isn't "call <code>lock.lock()</code> and put <code>lock.unlock()</code> in a <code>finally</code>." At the <strong>language</strong> layer, <code>Lock</code> is an interface with six methods — <code>lock</code>, <code>lockInterruptibly</code>, <code>tryLock</code>, <code>tryLock(timeout)</code>, <code>unlock</code>, <code>newCondition</code> — and the discipline rule that <em>you</em> are now responsible for the release (the JVM no longer emits an implicit <code>monitorexit</code> for you). At the <strong>framework</strong> layer, AQS exposes a single <strong><code>volatile int state</code></strong> plus a <em>CLH-style</em> lock-free FIFO <strong>queue of <code>Node</code> objects</strong> that the lock subclass interprets — <code>ReentrantLock</code>'s state is "reentry count," <code>ReentrantReadWriteLock</code>'s is <em>two</em> counts packed into 16+16 bits (reader-count high, writer-count low), <code>Semaphore</code>'s is "available permits," <code>CountDownLatch</code>'s is "countdown remaining" — and AQS handles every thread queueing, parking, signalling, cancellation, and condition-variable detail with two subclass hooks: <code>tryAcquire(int)</code> and <code>tryRelease(int)</code>. At the <strong>algorithmic</strong> layer, the acquire path is the famous <em>lazy-SIGNAL</em> protocol — <code>shouldParkAfterFailedAcquire</code> walks back over CANCELLED predecessors, CAS's the predecessor's status to <code>SIGNAL</code>, and only <em>then</em> parks via <code>LockSupport.park</code> — so the predecessor knows on release that it must <code>LockSupport.unpark(successor)</code>. At the <strong>architecture</strong> layer, <strong><code>StampedLock</code></strong> (JDK 8) is <em>not</em> AQS-based; it's a hand-rolled sequence lock with three modes (write, read, optimistic-read) whose <strong>optimistic-read</strong> path costs <em>two volatile reads</em> (no CAS, no fence beyond the read itself) and is the highest-performance read primitive in the JDK for read-mostly data. We will cover all four layers, with AQS source as the ground truth, and finish with the <code>synchronized</code> vs <code>Lock</code> decision in 2026 (JDK 24, JEP 491-fixed).</p>
+<div class="callout callout-note"><div class="callout-head"><span class="callout-ic">ⓘ</span><span class="callout-kind">Note</span></div><div class="callout-body"><p>Prerequisites: <a href="c01-t07-completablefuture-and-async-composition.html">CompletableFuture &amp; async composition</a> (L3/C01/T07) — same Treiber-stack/<code>LockSupport</code>-park machinery in a different shape; <a href="c01-t06-callable-and-future.html">Callable &amp; Future</a> (L3/C01/T06) — <code>FutureTask</code>'s state-machine pattern; <a href="c01-t04-wait-notify-notifyall.html">wait / notify / notifyAll</a> (L3/C01/T04) — condition-variable semantics <code>Condition</code> re-exposes; <a href="c01-t03-synchronized-monitors-and-intrinsic-locks.html">synchronized, monitors &amp; intrinsic locks</a> (L3/C01/T03) — the baseline <code>synchronized</code> mechanics this topic replaces; <a href="c01-t02-thread-lifecycle-and-states.html">Thread lifecycle &amp; states</a> (L3/C01/T02) — <code>WAITING (parking)</code>, <code>LockSupport</code>, the futex.</p></div></div>
+<h2 id="why-an-explicit-lock-api-what-synchronized-cannot-do">Why an Explicit <code>Lock</code> API — What <code>synchronized</code> Cannot Do<a class="anchor" href="#why-an-explicit-lock-api-what-synchronized-cannot-do" aria-hidden="true">#</a></h2>
+<p><code>synchronized</code> (T03) is a one-shape primitive — <em>the</em> one shape, in fact, that the JVM optimizes hardest. But six things it cannot do, that explicit locks can:</p>
+<ol>
+<li><strong>Timed acquisition.</strong> "Acquire within 100 ms, or give up." <code>synchronized</code> blocks indefinitely; <code>Lock.tryLock(100, MILLISECONDS)</code> returns a boolean.</li>
+<li><strong>Interruptible acquisition.</strong> "Acquire, unless I get interrupted while waiting." <code>synchronized</code> cannot be interrupted <em>while waiting to acquire</em> — once a thread starts to enter, it's committed. <code>Lock.lockInterruptibly()</code> throws <code>InterruptedException</code> if the waiter is interrupted before the lock is granted.</li>
+<li><strong>Non-blocking try-acquire.</strong> "Acquire if free; else do something else." <code>synchronized</code> has no such variant; <code>Lock.tryLock()</code> returns immediately with a boolean.</li>
+<li><strong>Fairness control.</strong> "Hand the lock to the longest waiter." <code>synchronized</code> is unfair by design (T03 — barging is allowed). <code>ReentrantLock(true)</code> is a fair lock.</li>
+<li><strong>Multiple condition queues per lock.</strong> A monitor has <em>one</em> wait set. A <code>Lock</code> can produce <em>many</em> <code>Condition</code>s — each its own queue — so producer/consumer code can <code>signal</code> the <em>right</em> queue without thundering-herd risk (T04).</li>
+<li><strong>Programmatic state inspection.</strong> <code>isLocked</code>, <code>isHeldByCurrentThread</code>, <code>getHoldCount</code>, <code>getQueueLength</code>, <code>hasQueuedThread(t)</code>. <code>synchronized</code> exposes none of these (and <code>Thread.holdsLock(obj)</code> is the only equivalent — and only a single boolean check).</li>
+</ol>
+<div class="mermaid">flowchart LR
+  Sync["synchronized"]
+  Sync --> Cant1["no timed wait"]
+  Sync --> Cant2["no interruptible wait"]
+  Sync --> Cant3["no tryLock"]
+  Sync --> Cant4["always unfair"]
+  Sync --> Cant5["1 wait set per monitor"]
+  Sync --> Cant6["no state queries"]
+  Lock["java.util.concurrent.locks.Lock"]
+  Lock --> Can["✓ all six"]
+</div>
+<p>The cost of all this expressiveness: <strong>you</strong> must release the lock. The JVM emits no implicit release; an exception inside an unguarded critical section leaks the lock forever.</p>
+<h2 id="the-lock-interface-and-the-finally-discipline">The <code>Lock</code> Interface and the <code>finally</code> Discipline<a class="anchor" href="#the-lock-interface-and-the-finally-discipline" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public interface Lock {
+    void lock();
+    void lockInterruptibly() throws InterruptedException;
+    boolean tryLock();
+    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+    void unlock();
+    Condition newCondition();
+}
+</code></pre></div>
+<p>The canonical usage:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">lock.lock();
+try {
+    // critical section
+} finally {
+    lock.unlock();
+}
+</code></pre></div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>The <code>try</code> block must start <em>after</em> <code>lock.lock()</code> succeeds, not before.</strong> If you write <code>try { lock.lock(); ... } finally { lock.unlock(); }</code>, an exception <em>before</em> <code>lock()</code> returns (extremely rare, but possible — <code>OutOfMemoryError</code> during queue node allocation) would trigger <code>unlock()</code> on a lock you don't hold, throwing <code>IllegalMonitorStateException</code> that masks the original exception. The acquire goes <em>before</em> the <code>try</code>; the <code>try</code> covers only "what happens <em>while holding</em> the lock."</p></div></div>
+<p>For the timed and interruptible variants:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">if (!lock.tryLock(100, MILLISECONDS)) return false;     // give up after 100 ms
+try { /* critical section */ } finally { lock.unlock(); }
+
+try {
+    lock.lockInterruptibly();
+} catch (InterruptedException ie) {
+    Thread.currentThread().interrupt();              // T02 — restore
+    return;                                           // we were cancelled while waiting
+}
+try { /* critical section */ } finally { lock.unlock(); }
+</code></pre></div>
+<p>The interruptible variant is <em>the</em> feature <code>synchronized</code> cannot match — a thread <code>BLOCKED</code> on <code>synchronized</code> cannot be cancelled mid-acquire (T02). Production code that needs graceful shutdown for any operation involving locks should prefer <code>Lock.lockInterruptibly</code>.</p>
+<h2 id="reentrantlock-the-workhorse"><code>ReentrantLock</code> — the Workhorse<a class="anchor" href="#reentrantlock-the-workhorse" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private final Lock lock = new ReentrantLock();       // unfair (default)
+private final Lock fairLock = new ReentrantLock(true);   // fair
+</code></pre></div>
+<p>Two constructor forms, then the six interface methods plus a fistful of inspection methods (<code>isLocked</code>, <code>isHeldByCurrentThread</code>, <code>getHoldCount</code>, <code>getQueueLength</code>, etc.). <strong>Reentrant</strong> means the same thread can acquire the lock multiple times — each acquire increments a recursion counter, each <code>unlock</code> decrements, only the final <code>unlock</code> actually releases.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ReentrantLock lock = new ReentrantLock();
+lock.lock();            // acquire — hold count = 1
+lock.lock();            // re-acquire (same thread) — hold count = 2
+lock.unlock();          // hold count = 1 — still held
+lock.unlock();          // hold count = 0 — released
+lock.unlock();          // IllegalMonitorStateException — we don't hold it
+</code></pre></div>
+<p>The unfair variant lets a newly-arriving thread <em>barge</em> — attempt to acquire the lock before checking the wait queue. The fair variant requires checking the queue first: a thread arrives, sees waiters ahead of it, and queues without trying to acquire. Both use the <em>same</em> AQS underneath; only the <code>tryAcquire</code> hook differs.</p>
+<h2 id="aqs-abstractqueuedsynchronizer-the-engine-underneath">AQS — <code>AbstractQueuedSynchronizer</code>, the Engine Underneath<a class="anchor" href="#aqs-abstractqueuedsynchronizer-the-engine-underneath" aria-hidden="true">#</a></h2>
+<p>Every lock, latch, semaphore, and barrier in <code>java.util.concurrent</code> — plus <code>ThreadPoolExecutor.Worker</code> (T05) and <code>FutureTask</code>-adjacent primitives — is built on <code>AbstractQueuedSynchronizer</code>. AQS is a 2,000-line abstract class that gives you:</p>
+<ul>
+<li><strong>One <code>volatile int state</code></strong> — the meaning is <em>defined by the subclass</em> (reentry count, permit count, countdown, mode bits, whatever).</li>
+<li><strong>A FIFO queue of <code>Node</code> objects</strong> — the waiters, doubly-linked.</li>
+<li><strong><code>LockSupport.park</code>/<code>unpark</code> integration</strong> — thread suspension via the futex (T02).</li>
+<li><strong><code>tryAcquire(arg)</code> / <code>tryRelease(arg)</code> hooks</strong> — the subclass implements only these; AQS handles all queueing, parking, signalling, cancellation.</li>
+<li><strong>Shared-mode variants</strong> — <code>tryAcquireShared</code> / <code>tryReleaseShared</code> for semaphores, latches, RWLock's read side.</li>
+<li><strong>Condition support</strong> — <code>ConditionObject</code> provides <code>await</code>/<code>signal</code>/<code>signalAll</code> per AQS instance.</li>
+</ul>
+<p>The brilliance of AQS is that it factors out <em>every</em> hard part — thread queueing, parking, cancellation cleanup, ordering, condition transfer — into one place, leaving the subclass to write a tiny <code>tryAcquire</code> that decides "can I take the state?" and <code>tryRelease</code> that decides "is the state now releasable?" The same engine powers <code>ReentrantLock</code>, <code>ReentrantReadWriteLock</code>, <code>Semaphore</code>, <code>CountDownLatch</code>, <code>CyclicBarrier</code>, <code>Phaser</code>, and dozens of others.</p>
+<div class="mermaid">flowchart TB
+  AQS["AbstractQueuedSynchronizer<br/>(volatile int state + CLH queue + park/unpark + condition support)"]
+  AQS --> RL["ReentrantLock<br/>state = reentry count"]
+  AQS --> RWL["ReentrantReadWriteLock<br/>state = 16-bit read | 16-bit write"]
+  AQS --> Sem["Semaphore (T09)<br/>state = available permits"]
+  AQS --> CDL["CountDownLatch (T09)<br/>state = count remaining"]
+  AQS --> CB["CyclicBarrier (T09)<br/>(uses ReentrantLock + Condition internally)"]
+  AQS --> Phaser["Phaser (T09)"]
+  AQS --> TPE["ThreadPoolExecutor.Worker (T05)<br/>state = 0 idle / 1 mid-task"]
+  AQS --> Other["FutureTask uses similar pattern<br/>(T06 — not AQS but same shape)"]
+</div>
+<h3 id="the-state-field-meaning-by-subclass">The <code>state</code> field — meaning by subclass<a class="anchor" href="#the-state-field-meaning-by-subclass" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private volatile int state;
+
+protected final int getState();
+protected final void setState(int newState);
+protected final boolean compareAndSetState(int expect, int update);
+</code></pre></div>
+<p>For <code>ReentrantLock</code>:</p>
+<ul>
+<li><code>state = 0</code> — lock free.</li>
+<li><code>state &gt; 0</code> — lock held by <code>exclusiveOwnerThread</code>; value is the reentry count.</li>
+</ul>
+<p>For <code>ReentrantReadWriteLock</code> (next section):</p>
+<ul>
+<li>High 16 bits: read count (number of concurrent readers).</li>
+<li>Low 16 bits: write count (write reentry; 0 means no writer).</li>
+</ul>
+<p>For <code>Semaphore</code>:</p>
+<ul>
+<li><code>state</code> = currently-available permits.</li>
+</ul>
+<p>For <code>CountDownLatch</code>:</p>
+<ul>
+<li><code>state</code> = countdown remaining; reaches 0 → permanently signalled.</li>
+</ul>
+<p>For <code>ThreadPoolExecutor.Worker</code> (T05):</p>
+<ul>
+<li><code>state = -1</code> initially (no interrupts allowed yet during construction).</li>
+<li><code>state = 0</code> — idle (lock-free, can be interrupted by <code>shutdown</code>).</li>
+<li><code>state = 1</code> — mid-task (locked; <code>shutdown</code> skips interrupting).</li>
+</ul>
+<p>Six wildly different semantics from one <code>volatile int</code> — that's AQS.</p>
+<h3 id="the-clh-style-queue-and-the-node-struct">The CLH-style queue and the <code>Node</code> struct<a class="anchor" href="#the-clh-style-queue-and-the-node-struct" aria-hidden="true">#</a></h3>
+<p>AQS's wait queue is a doubly-linked FIFO of <code>Node</code> objects, derived from the <strong>CLH (Craig, Landin, Hagersten) lock</strong> of 1993 — a classic lock-free linked-list queue, modified by Doug Lea to support cancellation and the "predecessor-signals-successor" pattern that eliminates spinning.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">static final class Node {
+    static final Node SHARED = new Node();         // marker for shared mode
+    static final Node EXCLUSIVE = null;             // null next-waiter means exclusive
+
+    static final int CANCELLED =  1;
+    static final int SIGNAL    = -1;                // &quot;you must unpark me on release&quot;
+    static final int CONDITION = -2;                // I'm on a condition queue, not the main queue
+    static final int PROPAGATE = -3;                // shared release should cascade
+
+    volatile int waitStatus;
+    volatile Node prev;
+    volatile Node next;
+    volatile Thread thread;
+    Node nextWaiter;                                 // mode marker OR condition-queue link
+}
+</code></pre></div>
+<p>The queue:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">   head (dummy, no thread)
+     ↓
+     prev←next
+     ↓
+   Node{T1, status=SIGNAL}
+     ↓
+     prev←next
+     ↓
+   Node{T2, status=SIGNAL}
+     ↓
+     prev←next
+     ↓
+   Node{T3, status=0}      ← tail
+</code></pre></div>
+<p><strong><code>head</code> is always a dummy node</strong> — the thread that "owns the head" is actually the current lock holder, but the node that represents them is the <code>head</code> itself with no live thread reference (the thread field is nulled on acquisition). The first <em>waiter</em> is <code>head.next</code>. The most-recently-arrived waiter is <code>tail</code>.</p>
+<div class="mermaid">flowchart LR
+  Head["head (dummy node)"]
+  W1["Node{T1, SIGNAL}"]
+  W2["Node{T2, SIGNAL}"]
+  W3["Node{T3, status=0}"]
+  Head <--> W1 <--> W2 <--> W3
+  Tail["tail = W3"]
+  Note["enqueue: CAS new node onto tail.<br/>dequeue: head = head.next; clear thread."]
+</div>
+<h3 id="waitstatus-the-four-meaningful-values"><code>waitStatus</code> — the four meaningful values<a class="anchor" href="#waitstatus-the-four-meaningful-values" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong><code>0</code> (default)</strong> — neutral; the node was just enqueued, neither needs signalling nor has cancelled.</li>
+<li><strong><code>SIGNAL</code> (-1)</strong> — "my predecessor will unpark me when it releases." Set by the <em>successor</em>, on its own predecessor, just before parking.</li>
+<li><strong><code>CANCELLED</code> (1)</strong> — this node was cancelled (e.g., interrupted timed-out). Predecessors must skip it when looking for a successor to signal.</li>
+<li><strong><code>CONDITION</code> (-2)</strong> — this node is on a <code>ConditionObject</code> queue, not the main wait queue. Used during <code>await</code>.</li>
+<li><strong><code>PROPAGATE</code> (-3)</strong> — shared-mode bookkeeping; tells <code>releaseShared</code> to keep propagating wakeups.</li>
+</ul>
+<p>The lazy-SIGNAL invariant: <strong>only the node about to park sets its predecessor's status to SIGNAL.</strong> This means a thread that arrives but immediately re-tries <code>tryAcquire</code> (the fast spin in <code>acquireQueued</code>) doesn't burden its predecessor with signalling work it may not need to do.</p>
+<h2 id="the-acquire-algorithm-lazy-signal-park-and-retry">The Acquire Algorithm — Lazy-SIGNAL, Park-and-Retry<a class="anchor" href="#the-acquire-algorithm-lazy-signal-park-and-retry" aria-hidden="true">#</a></h2>
+<p>The full <code>acquire(int arg)</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final void acquire(int arg) {
+    if (!tryAcquire(arg) &amp;&amp;
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+</code></pre></div>
+<p>Three steps:</p>
+<ol>
+<li><strong><code>tryAcquire(arg)</code></strong> — subclass hook. If it returns <code>true</code>, we got the lock without queueing.</li>
+<li><strong><code>addWaiter(Node.EXCLUSIVE)</code></strong> — enqueue a new node at the tail (one CAS).</li>
+<li><strong><code>acquireQueued(node, arg)</code></strong> — the park-and-retry loop.</li>
+</ol>
+<h3 id="addwaiter-the-tail-cas"><code>addWaiter</code> — the tail CAS<a class="anchor" href="#addwaiter-the-tail-cas" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private Node addWaiter(Node mode) {
+    Node node = new Node(Thread.currentThread(), mode);
+    Node pred = tail;
+    if (pred != null) {
+        node.prev = pred;
+        if (compareAndSetTail(pred, node)) {     // CAS tail
+            pred.next = node;
+            return node;
+        }
+    }
+    enq(node);                                    // slow path: initialize queue or retry
+    return node;
+}
+</code></pre></div>
+<p>Lock-free push at the tail: read <code>tail</code>, CAS-replace it with the new node. The slow path (<code>enq</code>) handles initialization (first ever enqueue creates the dummy head + tail node) and retry under contention.</p>
+<h3 id="acquirequeued-the-loop"><code>acquireQueued</code> — the loop<a class="anchor" href="#acquirequeued-the-loop" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">final boolean acquireQueued(Node node, int arg) {
+    boolean interrupted = false;
+    try {
+        for (;;) {
+            Node p = node.predecessor();
+            if (p == head &amp;&amp; tryAcquire(arg)) {           // I'm at the front; try again
+                setHead(node);
+                p.next = null;                              // help GC
+                return interrupted;
+            }
+            if (shouldParkAfterFailedAcquire(p, node))     // CAS predecessor's status to SIGNAL
+                interrupted |= parkAndCheckInterrupt();    // park; on wake, loop back
+        }
+    } catch (Throwable t) {
+        cancelAcquire(node);
+        throw t;
+    }
+}
+</code></pre></div>
+<p>Two key things happen here:</p>
+<ol>
+<li><strong>The front-of-queue retry.</strong> When my predecessor <em>is</em> the head (a dummy), I'm next in line. I <code>tryAcquire</code> one more time <em>before</em> parking — handles the case where my predecessor just released between my last failed <code>tryAcquire</code> and now.</li>
+<li><strong>Park then re-check.</strong> <code>shouldParkAfterFailedAcquire</code> sets my predecessor's <code>waitStatus</code> to <code>SIGNAL</code> and returns <code>true</code>, telling me it's safe to park. <code>parkAndCheckInterrupt</code> calls <code>LockSupport.park(this)</code> (parking on the futex, T02), suspending until <code>unpark</code>. On wake, I loop back and try again.</li>
+</ol>
+<h3 id="shouldparkafterfailedacquire-the-lazy-signal-handshake"><code>shouldParkAfterFailedAcquire</code> — the lazy-SIGNAL handshake<a class="anchor" href="#shouldparkafterfailedacquire-the-lazy-signal-handshake" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+    int ws = pred.waitStatus;
+    if (ws == SIGNAL) return true;                      // predecessor will signal me
+    if (ws &gt; 0) {
+        // predecessor is CANCELLED — walk back skipping cancelled predecessors
+        do { node.prev = pred = pred.prev; } while (pred.waitStatus &gt; 0);
+        pred.next = node;
+        return false;                                    // try again with the new predecessor
+    } else {
+        // status is 0 or PROPAGATE — try to CAS it to SIGNAL
+        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+        return false;                                    // loop back, try acquire once more, then park
+    }
+}
+</code></pre></div>
+<p>The two-pass pattern is the elegance: first call returns <code>false</code> after CAS-ing SIGNAL onto predecessor; we loop, retry <code>tryAcquire</code>; if still failing, second call sees SIGNAL and returns <code>true</code>, so we park. The whole machinery ensures we <em>never</em> park without our predecessor knowing it must unpark us.</p>
+<div class="mermaid">sequenceDiagram
+  participant Me as my Node
+  participant Pred as predecessor Node
+  participant LS as LockSupport
+  Me->>Me: tryAcquire — failed
+  Me->>Pred: read waitStatus = 0
+  Me->>Pred: CAS waitStatus = SIGNAL
+  Me->>Me: shouldParkAfterFailedAcquire returns false
+  Me->>Me: loop — tryAcquire again
+  Me->>Me: failed again
+  Me->>Pred: read waitStatus = SIGNAL
+  Me->>Me: shouldParkAfterFailedAcquire returns true
+  Me->>LS: LockSupport.park(this)
+  Note over Me,LS: thread state = WAITING (parking)<br/>(0% CPU, on futex)
+</div>
+<h2 id="the-release-algorithm">The Release Algorithm<a class="anchor" href="#the-release-algorithm" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final boolean release(int arg) {
+    if (tryRelease(arg)) {                           // subclass hook
+        Node h = head;
+        if (h != null &amp;&amp; h.waitStatus != 0)
+            unparkSuccessor(h);
+        return true;
+    }
+    return false;
+}
+
+private void unparkSuccessor(Node node) {
+    int ws = node.waitStatus;
+    if (ws &lt; 0) compareAndSetWaitStatus(node, ws, 0);
+    Node s = node.next;
+    if (s == null || s.waitStatus &gt; 0) {              // successor missing or CANCELLED
+        s = null;
+        for (Node t = tail; t != null &amp;&amp; t != node; t = t.prev)
+            if (t.waitStatus &lt;= 0) s = t;             // walk back from tail to find first non-cancelled
+    }
+    if (s != null) LockSupport.unpark(s.thread);      // wake the successor
+}
+</code></pre></div>
+<p>On release: if the head's status is non-zero (someone is waiting and asked to be signalled), wake the next non-cancelled successor. The walk-back-from-tail is a quirk needed because <code>next</code> pointers can be stale (set lazily after the CAS on <code>prev</code>/tail), but <code>prev</code> pointers are always valid.</p>
+<div class="mermaid">sequenceDiagram
+  participant H as Holder (head)
+  participant Pred as Pred Node (status=SIGNAL)
+  participant Succ as Successor Node
+  H->>Pred: tryRelease succeeds
+  Pred->>Succ: read status, CAS = 0
+  Pred->>Succ: LockSupport.unpark(Succ.thread)
+  Succ->>Succ: wake; loop in acquireQueued
+  Succ->>Succ: predecessor == head, tryAcquire succeeds
+  Succ->>Succ: setHead(self), return
+  Note over Succ: lock now held by Succ
+</div>
+<h2 id="fair-vs-unfair-one-line-of-code-apart">Fair vs Unfair — One Line of Code Apart<a class="anchor" href="#fair-vs-unfair-one-line-of-code-apart" aria-hidden="true">#</a></h2>
+<p>The unfair <code>tryAcquire</code> (<code>ReentrantLock</code> default):</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">final boolean nonfairTryAcquire(int acquires) {
+    final Thread current = Thread.currentThread();
+    int c = getState();
+    if (c == 0) {
+        if (compareAndSetState(0, acquires)) {            // BARGE — no queue check!
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    } else if (current == getExclusiveOwnerThread()) {     // reentry
+        int nextc = c + acquires;
+        if (nextc &lt; 0) throw new Error(&quot;Maximum lock count exceeded&quot;);
+        setState(nextc);
+        return true;
+    }
+    return false;
+}
+</code></pre></div>
+<p>The fair version differs by one check:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">protected final boolean tryAcquire(int acquires) {
+    final Thread current = Thread.currentThread();
+    int c = getState();
+    if (c == 0) {
+        if (!hasQueuedPredecessors() &amp;&amp;                    // FAIR — yield to queued waiters
+            compareAndSetState(0, acquires)) {
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    } else if (current == getExclusiveOwnerThread()) {
+        ...
+    }
+    return false;
+}
+</code></pre></div>
+<p><code>hasQueuedPredecessors()</code> walks the queue to see if any other thread is queued ahead. If so, this thread queues without attempting the CAS — yielding its turn to the longer waiters. The unfair version skips that check and CAS-attempts immediately, allowing a newcomer to <em>barge</em> past queued threads.</p>
+<p><strong>Why is unfair the default?</strong> Throughput. A barging newcomer that successfully CAS's the state proceeds <em>immediately</em> — no enqueue, no park, no unpark cycle. The waiters who were going to wake anyway lose only a small turn-share to the barger. In aggregate, the unfair lock has 2–3× the throughput of the fair lock under contention, at the cost of <em>occasional</em> tail-latency outliers (a thread can starve in extreme cases). The fair version guarantees <strong>first-come-first-served</strong> but pays for every acquire.</p>
+<div class="mermaid">flowchart LR
+  NF["unfair (default)<br/>nonfairTryAcquire"]
+  NF --> NFcas["immediate CAS state 0→1<br/>(BARGE if free)"]
+  NF --> NFperf["✓ higher throughput<br/>✗ rare starvation"]
+  F["fair<br/>tryAcquire(acquires)"]
+  F --> Fcheck["hasQueuedPredecessors()?"]
+  F --> Fcheck2["only CAS if no queued waiter"]
+  F --> Fperf["✓ FCFS, no starvation<br/>✗ ~2-3x slower under contention"]
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>Don't reach for fair locks "to be safe."</strong> They cost real throughput and the starvation they prevent is rare in real workloads (typically requires pathological producer patterns to manifest). Use fair locks only when you've <em>measured</em> unfairness causing latency outliers, or when ordering is a domain requirement (e.g., a queue that <em>must</em> return items in submission order across threads). Default to unfair.</p></div></div>
+<h2 id="condition-multiple-wait-queues-per-lock"><code>Condition</code> — Multiple Wait Queues Per Lock<a class="anchor" href="#condition-multiple-wait-queues-per-lock" aria-hidden="true">#</a></h2>
+<p><code>Lock.newCondition()</code> returns a <code>Condition</code> — AQS's <code>ConditionObject</code>. Each <code>Condition</code> has its own FIFO queue (separate from the lock's main wait queue), and you can create <strong>multiple Conditions per lock</strong> — one for "queue is not full," one for "queue is not empty," etc. That single capability is the single biggest reason to prefer <code>Lock</code> over <code>synchronized</code> for producer/consumer code: it lets you <code>signal</code> the <em>right</em> queue, avoiding the thundering-herd that forces <code>notifyAll</code> with intrinsic monitors (T04).</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public interface Condition {
+    void await() throws InterruptedException;
+    long awaitNanos(long nanosTimeout) throws InterruptedException;
+    boolean await(long time, TimeUnit unit) throws InterruptedException;
+    boolean awaitUntil(Date deadline) throws InterruptedException;
+    void awaitUninterruptibly();
+    void signal();
+    void signalAll();
+}
+</code></pre></div>
+<h3 id="the-awaitsignal-protocol-same-pattern-separate-queues">The await/signal protocol — same pattern, separate queues<a class="anchor" href="#the-awaitsignal-protocol-same-pattern-separate-queues" aria-hidden="true">#</a></h3>
+<p>When a thread calls <code>condition.await()</code> while holding the lock:</p>
+<ol>
+<li>Build a new <code>Node</code> with <code>waitStatus = CONDITION</code> (-2).</li>
+<li>Append to the <strong>condition queue</strong> (separate from the AQS wait queue).</li>
+<li><em>Fully</em> release the lock (saving the reentry count for restoration).</li>
+<li><code>LockSupport.park</code> — descend into <code>WAITING</code> state.</li>
+</ol>
+<p>When another thread calls <code>condition.signal()</code> while holding the lock:</p>
+<ol>
+<li>Pop the head of the condition queue.</li>
+<li><strong>Transfer</strong> that node to the AQS <em>main</em> wait queue (set <code>waitStatus = 0</code>).</li>
+<li><code>LockSupport.unpark</code> the node's thread.</li>
+</ol>
+<p>The signalled thread wakes, finds itself on the main wait queue, runs <code>acquireQueued</code> to re-acquire the lock, restores its reentry count, and returns from <code>await</code>. Same semantics as <code>wait</code>/<code>notify</code> (T04) but with explicit, multiple queues.</p>
+<div class="mermaid">flowchart LR
+  subgraph Lock
+    Lq["Lock wait queue:<br/>T1 → T2"]
+  end
+  subgraph CondA["Condition notFull"]
+    Aq["T3 → T4<br/>(producers waiting on space)"]
+  end
+  subgraph CondB["Condition notEmpty"]
+    Bq["T5 → T6<br/>(consumers waiting on items)"]
+  end
+  Signal["notEmpty.signal()"]
+  Signal --> Transfer["transfer T5 from Bq → Lock wait queue<br/>(only T5, not T3 — perfect targeting)"]
+</div>
+<p>The producer/consumer reference from T04, with <code>Lock</code> + <code>Condition</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public final class BoundedBuffer&lt;T&gt; {
+    private final Deque&lt;T&gt; q = new ArrayDeque&lt;&gt;();
+    private final int cap;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition notFull  = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+
+    public BoundedBuffer(int cap) { this.cap = cap; }
+
+    public void put(T x) throws InterruptedException {
+        lock.lock();
+        try {
+            while (q.size() == cap) notFull.await();    // wait WHILE full
+            q.add(x);
+            notEmpty.signal();                           // wake ONE consumer — no thundering herd
+        } finally { lock.unlock(); }
+    }
+
+    public T take() throws InterruptedException {
+        lock.lock();
+        try {
+            while (q.isEmpty()) notEmpty.await();
+            T x = q.remove();
+            notFull.signal();                            // wake ONE producer
+            return x;
+        } finally { lock.unlock(); }
+    }
+}
+</code></pre></div>
+<p>The same shape <code>ArrayBlockingQueue</code> uses internally (T10). <code>signal</code> instead of <code>notifyAll</code> because each Condition's queue only contains waiters on <em>that</em> predicate — no cross-condition mistakes, no thundering herd.</p>
+<h2 id="reentrantreadwritelock-two-locks-one-state-word"><code>ReentrantReadWriteLock</code> — Two Locks, One State Word<a class="anchor" href="#reentrantreadwritelock-two-locks-one-state-word" aria-hidden="true">#</a></h2>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+Lock readLock  = rwl.readLock();
+Lock writeLock = rwl.writeLock();
+</code></pre></div>
+<p>Two <code>Lock</code> instances sharing one AQS state. The contract:</p>
+<ul>
+<li><strong>Read lock</strong> (shared). Multiple readers may hold simultaneously, as long as no writer holds.</li>
+<li><strong>Write lock</strong> (exclusive). Only one writer, and no readers while it's held.</li>
+<li><strong>Reentrant.</strong> A thread holding the write lock can re-acquire the write lock or <em>additionally</em> acquire the read lock (downgrade). A thread holding the read lock cannot upgrade to write lock without deadlock risk (see below).</li>
+<li><strong>Fair / unfair</strong> option, same as <code>ReentrantLock</code>.</li>
+</ul>
+<h3 id="the-1616-packed-state">The 16+16 packed state<a class="anchor" href="#the-1616-packed-state" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private static final int SHARED_SHIFT   = 16;
+private static final int SHARED_UNIT    = (1 &lt;&lt; SHARED_SHIFT);          // 0x0001_0000
+private static final int MAX_COUNT      = (1 &lt;&lt; SHARED_SHIFT) - 1;       // 65535
+private static final int EXCLUSIVE_MASK = (1 &lt;&lt; SHARED_SHIFT) - 1;
+
+static int sharedCount(int c)    { return c &gt;&gt;&gt; SHARED_SHIFT; }
+static int exclusiveCount(int c) { return c &amp; EXCLUSIVE_MASK; }
+</code></pre></div>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">state (32 bits):
+
+   bit:  31 ........... 16  15 ........... 0
+         |   read count   |   write count   |
+         | (max 65535)    |   (max 65535)   |
+</code></pre></div>
+<p>A read acquire adds <code>SHARED_UNIT</code> to state (<code>+= 0x10000</code>); a write acquire adds 1 to the low half. Reads and writes are <em>independent counters</em> in the same word — one CAS atomically updates both halves.</p>
+<p>Max readers or writes: 65,535. Exceeding either throws <code>Error("Maximum lock count exceeded")</code>. In practice you'll never see it; mention exists for completeness.</p>
+<h3 id="per-thread-read-hold-count-via-threadlocal">Per-thread read hold count via <code>ThreadLocal</code><a class="anchor" href="#per-thread-read-hold-count-via-threadlocal" aria-hidden="true">#</a></h3>
+<p>The state field tracks the <em>total</em> read count but not <em>which threads</em> hold reads — needed for reentrancy bookkeeping (the same thread acquiring the read lock twice should keep a personal hold count). The implementation uses a <code>ThreadLocal</code> cache for the most-recent reader (the firstReader optimization) plus a regular <code>ThreadLocal&lt;HoldCounter&gt;</code> for all others.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">private transient ThreadLocalHoldCounter readHolds;
+private transient HoldCounter cachedHoldCounter;       // most-recent reader's counter
+private transient Thread firstReader;                   // single-reader optimization
+private transient int firstReaderHoldCount;
+</code></pre></div>
+<p>The first thread to acquire the read lock skips the ThreadLocal access entirely (<code>firstReader = currentThread()</code>). The second non-first reader gets a <code>cachedHoldCounter</code>. Subsequent readers hit the <code>ThreadLocal</code>. Three layers of caching to avoid the ThreadLocal cost in the common cases.</p>
+<h3 id="the-downgrade-pattern">The downgrade pattern<a class="anchor" href="#the-downgrade-pattern" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">writeLock.lock();
+try {
+    // make modifications under exclusive lock
+    ...
+    readLock.lock();         // acquire read lock WHILE STILL HOLDING write lock
+} finally {
+    writeLock.unlock();      // release write lock; still hold read lock
+}
+try {
+    // now we have exclusive view from when we modified, with read-lock access
+} finally {
+    readLock.unlock();
+}
+</code></pre></div>
+<p>This pattern lets a writer atomically downgrade to a reader without a window where state is unprotected. Useful for "modify, then verify" patterns where the verification only needs a read lock but must see the post-modification state.</p>
+<h3 id="why-upgrade-is-impossible">Why upgrade is impossible<a class="anchor" href="#why-upgrade-is-impossible" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">readLock.lock();
+// ...
+writeLock.lock();         // ✗ DEADLOCK if another reader also tries this
+</code></pre></div>
+<p>If two threads each hold the read lock and each tries to upgrade to write, both wait for the other's read to release — deadlock. The lock has no atomic mode-change primitive, so upgrade requires releasing the read lock first, attempting the write lock, and re-acquiring the read lock on failure — with a window where state may have changed. <code>StampedLock</code> (below) provides <code>tryConvertToWriteLock</code> for this exact purpose.</p>
+<h3 id="writer-starvation-in-the-unfair-variant">Writer starvation in the unfair variant<a class="anchor" href="#writer-starvation-in-the-unfair-variant" aria-hidden="true">#</a></h3>
+<p>In unfair mode, an arriving reader doesn't check for queued waiters — it just CAS-acquires if no writer is currently holding. So a <em>steady stream of readers</em> can keep the read count above 0 forever, leaving a queued writer waiting indefinitely.</p>
+<p>The fair variant prevents this (a writer at the head of the queue causes new readers to queue behind it). Even in the unfair variant, JDK 8+ has a <em>writer-preference</em> heuristic: in unfair mode, if a writer is queued and another reader arrives, the reader yields (one writer at a time gets priority). Reduces but doesn't fully eliminate starvation; reach for fair RWLock if starvation is intolerable.</p>
+<div class="mermaid">flowchart TB
+  Unfair["unfair RWLock<br/>(default)"]
+  Unfair --> US["readers can BARGE if no current writer"]
+  US --> WStarve["writer starvation possible<br/>under steady reader stream"]
+  Unfair --> WriterPref["JDK 8+ unfair: writer-preference heuristic<br/>(reader yields if writer queued)"]
+  Fair["fair RWLock<br/>new ReentrantReadWriteLock(true)"]
+  Fair --> FFifo["strict FCFS — no starvation"]
+  Fair --> Fperf["~2-3x slower under contention"]
+</div>
+<h3 id="when-not-to-use-rwlock">When (not) to use RWLock<a class="anchor" href="#when-not-to-use-rwlock" aria-hidden="true">#</a></h3>
+<p>The motivating intuition — "reads can be parallel, so a read-write lock is faster than a regular lock for read-heavy data" — is <em>often wrong</em> in practice. Reasons:</p>
+<ul>
+<li>AQS state is a single word; every read acquire/release CAS's it. Under heavy read concurrency, that one cache line is the bottleneck.</li>
+<li>The read lock's bookkeeping (ThreadLocal hold counts, AQS queue ops) is heavier than a plain <code>ReentrantLock</code> acquire.</li>
+<li>For truly read-mostly data, a <code>ConcurrentHashMap</code> (per-bucket locks) or <code>CopyOnWriteArrayList</code> (no read locks) outperforms RWLock by far.</li>
+<li>For data where reads can be optimistic, <strong><code>StampedLock</code></strong> is dramatically faster (next section).</li>
+</ul>
+<p>Rule of thumb: RWLock helps when reads are <em>infrequent but long</em>, so the parallel-read benefit dominates the bookkeeping cost. For <em>frequent</em> reads, prefer <code>StampedLock</code> or a CAS-based structure.</p>
+<h2 id="stampedlock-optimistic-read-for-the-fast-path"><code>StampedLock</code> — Optimistic Read for the Fast Path<a class="anchor" href="#stampedlock-optimistic-read-for-the-fast-path" aria-hidden="true">#</a></h2>
+<p><code>StampedLock</code> (JDK 8) is a hand-rolled sequence lock — <em>not</em> AQS-based — with three modes:</p>
+<ol>
+<li><strong>Write lock</strong> (exclusive) — <code>writeLock()</code> returns a <em>stamp</em>, <code>unlockWrite(stamp)</code> releases.</li>
+<li><strong>Pessimistic read lock</strong> (shared) — <code>readLock()</code> / <code>unlockRead(stamp)</code>. Like RWLock's read lock.</li>
+<li><strong>Optimistic read</strong> — <code>tryOptimisticRead()</code> returns a stamp; you read the protected data; <code>validate(stamp)</code> checks whether a writer intervened. <strong>No actual lock acquired — just a stamp</strong>.</li>
+</ol>
+<p>The optimistic read is the headline. For read-mostly data where writes are rare, the optimistic read is essentially <strong>two volatile reads</strong> (one for the stamp, one for <code>validate</code>) — orders of magnitude faster than acquiring any lock.</p>
+<h3 id="state-layout">State layout<a class="anchor" href="#state-layout" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">state (64 bits):
+
+   bit:  63 ........... 8   7 6 5 4 3 2 1 0
+         |   generation   |   reader_count   | write_bit
+         | (56 bits)       |   (7 bits)       |
+</code></pre></div>
+<p>Approximate layout — actual bit allocation is fiddly. The <strong>generation</strong> counter increments on every write release, so any stamp issued before a write becomes invalid after. <code>validate(stamp)</code> simply checks that the current state matches the issuance generation.</p>
+<h3 id="the-optimistic-read-pattern">The optimistic-read pattern<a class="anchor" href="#the-optimistic-read-pattern" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">public Point read(StampedLock lock, double[] x_y) {
+    long stamp = lock.tryOptimisticRead();        // record current generation
+    double x = x_y[0];                              // read field
+    double y = x_y[1];                              // read field
+    if (!lock.validate(stamp)) {                    // did a writer happen in between?
+        stamp = lock.readLock();                    // fall back to actual read lock
+        try { x = x_y[0]; y = x_y[1]; }
+        finally { lock.unlockRead(stamp); }
+    }
+    return new Point(x, y);
+}
+</code></pre></div>
+<p>The optimistic path: read fields without locking, then verify. If no writer interfered, return. If a writer did, <strong>redo with a pessimistic read lock</strong>. Because writes are rare, the common path skips all the AQS machinery.</p>
+<div class="mermaid">flowchart TB
+  Start["tryOptimisticRead() — record generation stamp"]
+  Read["read fields (no lock)"]
+  Val{"validate(stamp)<br/>generation unchanged?"}
+  Start --> Read --> Val
+  Val -- yes --> Done["return — TWO volatile reads total, no fence beyond"]
+  Val -- no --> Slow["readLock() — actual lock"]
+  Slow --> Re["redo reads under lock"]
+  Re --> Unlock["unlockRead(stamp)"]
+  Unlock --> Done2["return"]
+</div>
+<div class="callout callout-important"><div class="callout-head"><span class="callout-ic">‼</span><span class="callout-kind">Important</span></div><div class="callout-body"><p><strong>The fields being read must be <code>volatile</code> or safely published, because the optimistic read does not synchronize.</strong> Without volatile, the reader could see uninitialized or out-of-order values. The <code>validate(stamp)</code> only checks that the generation matched at <em>both</em> the start and end of the read — it doesn't synchronize the fields' visibility. Standard idiom: protect arrays / data structures whose individual elements are themselves safely published (e.g., final fields of value objects, primitive arrays whose individual element accesses are atomic).</p></div></div>
+<h3 id="mode-conversion">Mode conversion<a class="anchor" href="#mode-conversion" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">long stamp = lock.tryOptimisticRead();
+// ... read fields ...
+if (!lock.validate(stamp)) {
+    long writeStamp = lock.tryConvertToWriteLock(stamp);
+    if (writeStamp == 0L) {
+        // couldn't convert; fall back to writeLock()
+        writeStamp = lock.writeLock();
+    }
+    try { /* now hold write lock */ } finally { lock.unlockWrite(writeStamp); }
+}
+</code></pre></div>
+<p><code>tryConvertToWriteLock(stamp)</code> is the canonical answer to RWLock's deadlock-prone upgrade pattern: it <em>atomically</em> upgrades an optimistic-read or read-lock holder to write-lock, <em>or</em> returns 0 if not possible (writes can't happen if any other reader holds). The caller decides whether to retry, fall back to <code>writeLock()</code> (which queues), or abort.</p>
+<h3 id="why-stampedlock-is-not-reentrant">Why <code>StampedLock</code> is not reentrant<a class="anchor" href="#why-stampedlock-is-not-reentrant" aria-hidden="true">#</a></h3>
+<p>A famous gotcha: <strong><code>StampedLock</code> is not reentrant</strong>. The same thread holding a write lock that tries to acquire it again <em>deadlocks itself</em>. There's no <code>exclusiveOwnerThread</code> tracking; the stamp is the only identifier and recursive acquires would have no way to record the recursion.</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">StampedLock lock = new StampedLock();
+long s1 = lock.writeLock();          // hold write lock
+long s2 = lock.writeLock();          // ✗ DEADLOCK — self-block forever
+</code></pre></div>
+<p>This restriction is the price of the simpler design (no thread tracking, no recursion counter). For reentrant logic, use <code>ReentrantReadWriteLock</code>. For purely read-heavy data accessed non-recursively, <code>StampedLock</code> is the clear winner.</p>
+<div class="mermaid">flowchart LR
+  RL["ReentrantLock"]
+  RWL["ReentrantReadWriteLock"]
+  SL["StampedLock"]
+  RL --> RLfeatures["reentrant, fair option,<br/>conditions, AQS-based"]
+  RWL --> RWLfeatures["reentrant, read+write separation,<br/>16+16 state, AQS-based"]
+  SL --> SLfeatures["NON-reentrant, NO conditions,<br/>optimistic read, generation stamp,<br/>fastest read in the JDK"]
+</div>
+<h3 id="performance-comparison">Performance comparison<a class="anchor" href="#performance-comparison" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lock</th>
+<th style="text-align: right;">Uncontended write</th>
+<th style="text-align: right;">Uncontended read</th>
+<th style="text-align: right;">Contended (parking)</th>
+<th style="text-align: center;">Read parallelism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>synchronized</code></td>
+<td style="text-align: right;">~15-40 ns</td>
+<td style="text-align: right;">n/a</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr>
+<td><code>ReentrantLock</code></td>
+<td style="text-align: right;">~50-100 ns</td>
+<td style="text-align: right;">n/a</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr>
+<td><code>ReentrantReadWriteLock</code> write</td>
+<td style="text-align: right;">~60-120 ns</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">n/a</td>
+</tr>
+<tr>
+<td><code>ReentrantReadWriteLock</code> read</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">~60-100 ns</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr>
+<td><code>StampedLock</code> write</td>
+<td style="text-align: right;">~50-80 ns</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">n/a</td>
+</tr>
+<tr>
+<td><code>StampedLock</code> read (pessimistic)</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">~50-80 ns</td>
+<td style="text-align: right;">~1-3 µs</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr>
+<td><strong><code>StampedLock</code> optimistic read</strong></td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;"><strong>~5-10 ns</strong></td>
+<td style="text-align: right;">n/a (no parking)</td>
+<td style="text-align: center;">yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>The optimistic read's ~5-10 ns is <em>the</em> number to remember: for read-mostly data, <code>StampedLock</code> is ~10× faster than any other lock, and orders of magnitude faster than a CAS-based primitive.</p>
+<h2 id="locks-virtual-threads-always-friendly">Locks + Virtual Threads — Always Friendly<a class="anchor" href="#locks-virtual-threads-always-friendly" aria-hidden="true">#</a></h2>
+<p>Every <code>j.u.c.locks.Lock</code> implementation uses <code>LockSupport.park</code> for blocking. Loom (T14) intercepts <code>LockSupport.park</code> to <em>unmount</em> the virtual thread; the carrier is released, and the parked virtual thread costs ~hundreds of bytes of heap continuation. <strong>No version of any <code>Lock</code> has <em>ever</em> pinned virtual threads</strong> — <code>ReentrantLock</code>, <code>ReentrantReadWriteLock</code>, <code>StampedLock</code> all work cleanly with virtual threads on JDK 21 onwards. This is the property that drove the JDK 21-23 recommendation to use <code>ReentrantLock</code> instead of <code>synchronized</code> for hot virtual-thread blocking paths — that advice is <em>because</em> <code>Lock</code> has always parked via <code>LockSupport</code>, while <code>synchronized</code> (before JEP 491) parked the carrier directly.</p>
+<p>JEP 491 (JDK 24) closed the gap: <code>synchronized</code> now also unmounts on JDK 24+. So in 2026 code on JDK 24+:</p>
+<ul>
+<li><strong><code>synchronized</code> vs <code>Lock</code></strong> is back to a <strong>feature/style</strong> choice, not a virtual-thread choice.</li>
+<li>Pick <code>synchronized</code> if you don't need timed/interruptible acquires or multiple conditions; the JIT optimizes it harder (coarsening, elision — T03), and it auto-releases on exception.</li>
+<li>Pick <code>Lock</code> if you need any of the six advantages enumerated at the top — timed acquisition, interruptibility, fairness, multiple conditions, programmatic state inspection. Then prefer <code>ReentrantLock</code> for general use, <code>ReentrantReadWriteLock</code> for actual read-heavy contention, <code>StampedLock</code> for read-heavy data accessed non-recursively where you can use optimistic reads.</li>
+</ul>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>The 2026 senior answer to "synchronized vs ReentrantLock": <strong>on JDK 24+ they're performance-equivalent for the common case (JEP 491 lifted the virtual-thread pinning concern). Choose by feature need: <code>synchronized</code> for simple mutual exclusion (auto-release, JIT-friendly); <code>ReentrantLock</code> when you need timed/interruptible acquire, fairness, multiple <code>Condition</code>s, or state inspection. The 2021-2023 advice of "always ReentrantLock for virtual-thread fitness" no longer applies.</strong></p></div></div>
+<h2 id="common-mistakes">Common Mistakes<a class="anchor" href="#common-mistakes" aria-hidden="true">#</a></h2>
+<h3 id="forgetting-finally-unlock">Forgetting <code>finally { unlock(); }</code><a class="anchor" href="#forgetting-finally-unlock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">lock.lock();
+doWork();             // ✗ if doWork() throws, lock stays held FOREVER
+lock.unlock();
+</code></pre></div>
+<p>The single most common Lock bug. <code>synchronized</code> auto-releases on exception (T03 — emitted exception-handler block); <code>Lock</code> does not. Always wrap in <code>try { ... } finally { lock.unlock(); }</code>.</p>
+<h3 id="lock-inside-the-try"><code>lock()</code> inside the <code>try</code><a class="anchor" href="#lock-inside-the-try" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">try {
+    lock.lock();
+    doWork();
+} finally {
+    lock.unlock();        // ✗ if lock() threw, unlock fails with IMSE, masking original
+}
+</code></pre></div>
+<p>Put <code>lock()</code> <em>before</em> <code>try</code>. Otherwise, a (rare) exception during <code>lock()</code> (OutOfMemoryError, etc.) leads to an <code>unlock()</code> on a lock we don't hold.</p>
+<h3 id="self-deadlocking-on-stampedlock">Self-deadlocking on <code>StampedLock</code><a class="anchor" href="#self-deadlocking-on-stampedlock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">StampedLock sl = new StampedLock();
+long s1 = sl.writeLock();
+something(sl);              // if something() calls sl.writeLock(), deadlock
+sl.unlockWrite(s1);
+</code></pre></div>
+<p><code>StampedLock</code> is not reentrant. If <code>something</code> might re-enter, use <code>ReentrantReadWriteLock</code> instead.</p>
+<h3 id="read-lock-upgrade-on-rwlock">Read-lock upgrade on RWLock<a class="anchor" href="#read-lock-upgrade-on-rwlock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">rwLock.readLock().lock();
+rwLock.writeLock().lock();  // ✗ deadlock if another reader is also doing this
+</code></pre></div>
+<p><code>ReentrantReadWriteLock</code> does not support upgrade. Use <code>StampedLock.tryConvertToWriteLock</code> or release the read first.</p>
+<h3 id="mismatched-lockunlock-objects">Mismatched lock/unlock objects<a class="anchor" href="#mismatched-lockunlock-objects" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">ReentrantLock a = new ReentrantLock();
+ReentrantLock b = new ReentrantLock();
+a.lock();
+b.unlock();        // ✗ IllegalMonitorStateException — we don't hold b
+</code></pre></div>
+<p><code>Lock.unlock()</code> checks ownership. Pair locks and unlocks by <em>the same instance</em>.</p>
+<h3 id="calling-conditionsignal-without-holding-the-lock">Calling <code>Condition.signal</code> without holding the lock<a class="anchor" href="#calling-conditionsignal-without-holding-the-lock" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">Condition cond = lock.newCondition();
+cond.signal();           // ✗ IllegalMonitorStateException — must hold the lock
+</code></pre></div>
+<p>Same rule as wait/notify (T04). <code>signal</code> requires holding the underlying <code>Lock</code>.</p>
+<h3 id="fair-rwlock-as-a-safe-default">Fair RWLock as a "safe default"<a class="anchor" href="#fair-rwlock-as-a-safe-default" aria-hidden="true">#</a></h3>
+<p><code>new ReentrantReadWriteLock(true)</code> is 2-3× slower than the unfair variant under contention, and the starvation it prevents is rare in real workloads. Default to unfair; reach for fair only when measurement justifies it.</p>
+<h3 id="using-rwlock-for-high-throughput-read-mostly-data">Using RWLock for high-throughput read-mostly data<a class="anchor" href="#using-rwlock-for-high-throughput-read-mostly-data" aria-hidden="true">#</a></h3>
+<p>The single-state-word cache-line contention dominates above moderate concurrency. Prefer <code>StampedLock</code> (optimistic reads), <code>ConcurrentHashMap</code> (per-bucket locks), or <code>CopyOnWriteArrayList</code> (no read locks).</p>
+<h3 id="reading-non-volatile-fields-under-stampedlocktryoptimisticread">Reading non-volatile fields under <code>StampedLock.tryOptimisticRead</code><a class="anchor" href="#reading-non-volatile-fields-under-stampedlocktryoptimisticread" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">long stamp = sl.tryOptimisticRead();
+String s = mySharedString;        // ✗ if mySharedString isn't volatile, read may be torn
+if (!sl.validate(stamp)) { ... }
+</code></pre></div>
+<p>Optimistic reads don't synchronize the read; they verify <em>afterward</em> that no writer happened. Fields read must be <code>volatile</code> or referenced through safely-published containers.</p>
+<h2 id="observability">Observability<a class="anchor" href="#observability" aria-hidden="true">#</a></h2>
+<h3 id="thread-dump-signature">Thread dump signature<a class="anchor" href="#thread-dump-signature" aria-hidden="true">#</a></h3>
+<p>A thread blocked acquiring a <code>ReentrantLock</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">&quot;worker-3&quot; #21 ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071ab2&gt; (a j.u.c.locks.ReentrantLock$NonfairSync)
+   at java.util.concurrent.locks.LockSupport.park(LockSupport.java:341)
+   at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(AbstractQueuedSynchronizer.java:506)
+   at java.util.concurrent.locks.ReentrantLock.lock(ReentrantLock.java:330)
+   at com.x.Service.method(Service.java:42)
+</code></pre></div>
+<p>Note <code>WAITING (parking)</code> — <em>not</em> <code>BLOCKED</code>. Lock waiters are parked on <code>LockSupport</code>, while <code>synchronized</code> waiters are <code>BLOCKED on object monitor</code>. Different visual signature; same outcome (no CPU, queued for the lock).</p>
+<p>A thread in <code>await()</code>:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-text">&quot;consumer-1&quot; ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071c00&gt; (a j.u.c.locks.AbstractQueuedSynchronizer$ConditionObject)
+   at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await
+   at com.x.BoundedBuffer.take(BoundedBuffer.java:31)
+</code></pre></div>
+<p>The <code>ConditionObject</code> is named; the producer/consumer pattern is recognizable. Comparing held-lock IDs across threads (<code>- locked &lt;0x...&gt;</code>) identifies who blocks whom.</p>
+<h3 id="jfr">JFR<a class="anchor" href="#jfr" aria-hidden="true">#</a></h3>
+<p><code>jdk.JavaMonitorEnter</code> events are specific to <code>synchronized</code>; <code>jdk.ThreadPark</code> events cover <code>Lock</code> waiters. Aggregate by <code>parkedClass</code> to find which Lock subclass dominates contention. JDK 21+ also has <code>jdk.ContendedLock</code> (preliminary) for Lock contention specifically.</p>
+<h3 id="getqueuelength-hasqueuedthreads"><code>getQueueLength</code> / <code>hasQueuedThreads</code><a class="anchor" href="#getqueuelength-hasqueuedthreads" aria-hidden="true">#</a></h3>
+<div class="code-block"><div class="code-head"><span class="code-lang">java</span><button class="code-copy" type="button" title="Copy">Copy</button></div><pre class="codehilite"><code class="language-java">if (lock.getQueueLength() &gt; THRESHOLD) {
+    metrics.recordContention(lock.getQueueLength());
+}
+</code></pre></div>
+<p>Approximate (may race), but cheap and exposed by <code>ReentrantLock</code> for programmatic monitoring. <code>ReentrantReadWriteLock.getReadLockCount()</code> / <code>getWriteHoldCount()</code> similarly expose readable counts.</p>
+<div class="callout callout-interview"><div class="callout-head"><span class="callout-ic">🎤</span><span class="callout-kind">Interview</span></div><div class="callout-body"><p>"How does <code>ReentrantLock</code> work internally?" — Senior answer hits all four layers:</p><ol>
+<li><strong>API.</strong> <code>Lock</code> interface with six methods; <code>ReentrantLock</code> is reentrant (per-thread reentry count). <code>finally</code>-unlock discipline is the user's responsibility.</li>
+<li><strong>AQS framework.</strong> Backed by <code>AbstractQueuedSynchronizer</code>'s <code>volatile int state</code> (= reentry count) and a doubly-linked FIFO CLH-style queue of <code>Node</code>s. Two subclass hooks: <code>tryAcquire(int)</code> (CAS state 0→1 or bump reentry) and <code>tryRelease(int)</code> (decrement, CAS to 0 if outermost).</li>
+<li><strong>Algorithm.</strong> Acquire: <code>tryAcquire</code> fast path; on failure, enqueue (one CAS at tail), loop on <code>acquireQueued</code> — at front-of-queue retry, else <code>shouldParkAfterFailedAcquire</code> sets predecessor's <code>SIGNAL</code> status, then <code>LockSupport.park</code>. Release: <code>tryRelease</code>; if successor is present and signal-pending, <code>LockSupport.unpark</code> it.</li>
+<li><strong>Fair vs unfair.</strong> Differs by one check in <code>tryAcquire</code>: unfair barges (immediate CAS); fair calls <code>hasQueuedPredecessors</code> first and yields to queued waiters. Unfair has 2-3× throughput; fair guarantees FCFS.</li>
+</ol>
+<p>Add: same machinery powers <code>Semaphore</code>, <code>CountDownLatch</code>, <code>ReentrantReadWriteLock</code>, even <code>ThreadPoolExecutor.Worker</code> (T05) — AQS is <em>the</em> shared engine for every j.u.c. synchronizer.</p>
+<p>[!INTERVIEW]
+Short Q&amp;A:</p>
+<ol>
+<li><strong>Six advantages of <code>Lock</code> over <code>synchronized</code>?</strong> Timed acquire, interruptible acquire, tryLock, fairness, multiple Conditions, state inspection.</li>
+<li><strong>What's AQS?</strong> <code>AbstractQueuedSynchronizer</code> — Doug Lea's framework providing a <code>volatile int state</code> + lock-free FIFO queue + <code>LockSupport.park</code>/<code>unpark</code> + <code>Condition</code> support, with subclass hooks <code>tryAcquire</code>/<code>tryRelease</code>. Used by every j.u.c. lock/latch/semaphore/barrier plus <code>ThreadPoolExecutor.Worker</code>.</li>
+<li><strong>What's the lazy-SIGNAL pattern?</strong> <code>shouldParkAfterFailedAcquire</code> CAS's the predecessor's <code>waitStatus</code> to <code>SIGNAL</code> <em>only when about to park</em>, not when arriving. Means parks/unparks are minimal: each waiter signals exactly one successor on release.</li>
+<li><strong>Fair vs unfair <code>ReentrantLock</code>?</strong> Unfair barges (immediate CAS); fair checks <code>hasQueuedPredecessors</code> first. Unfair is ~2-3× faster; fair guarantees FCFS but can starve under steady contention.</li>
+<li><strong>What's <code>Condition</code>?</strong> AQS's condition-variable analogue. Multiple <code>Condition</code>s per <code>Lock</code>, each with its own queue. <code>signal</code> transfers a waiter from the condition queue to the lock's main wait queue. Avoids the thundering-herd that <code>notifyAll</code> causes with <code>synchronized</code>.</li>
+<li><strong>How does <code>ReentrantReadWriteLock</code> pack state?</strong> 32-bit <code>state</code>: high 16 = read count, low 16 = write count. Max 65535 of each. One CAS atomically updates either half.</li>
+<li><strong>What's the downgrade pattern?</strong> <code>writeLock.lock(); ... readLock.lock(); writeLock.unlock();</code> — atomically transition from writer to reader without a window of unprotected state.</li>
+<li><strong>Why can't you upgrade from read to write?</strong> No atomic mode-change; multiple readers each trying would deadlock. Use <code>StampedLock.tryConvertToWriteLock</code> instead.</li>
+<li><strong>What is <code>StampedLock</code>?</strong> Hand-rolled sequence lock (not AQS-based) with three modes: write, read, <strong>optimistic read</strong>. The optimistic read records a generation stamp, reads without locking, then <code>validate(stamp)</code> to check no writer intervened. ~5-10 ns vs ~50-100 ns for any other lock — <em>the</em> fastest read in the JDK for read-mostly data.</li>
+<li><strong>Why isn't <code>StampedLock</code> reentrant?</strong> No thread-identity tracking — the stamp is the only handle, and there's no way to record recursive acquires on a stamp. Side-effect of the simpler design.</li>
+<li><strong>How does <code>LockSupport</code> differ from <code>Object.wait</code>?</strong> <code>LockSupport.park</code> parks a thread regardless of what lock (if any) it holds; <code>wait</code> requires the monitor. <code>LockSupport</code> is the primitive AQS builds on. The "permit" semantics (T02) make <code>unpark</code> ordering-independent: an <code>unpark</code> before <code>park</code> is <em>not</em> lost.</li>
+<li><strong>What's a thread dump signature for a <code>ReentrantLock</code> waiter?</strong> <code>WAITING (parking)</code> + <code>parking to wait for &lt;0x...&gt; (a ReentrantLock$NonfairSync)</code> (compare with <code>synchronized</code>'s <code>BLOCKED (on object monitor)</code>).</li>
+<li><strong>What does virtual-thread fitness look like for locks?</strong> All j.u.c. locks have <em>always</em> been virtual-thread-friendly (they use <code>LockSupport.park</code>, which Loom unmounts). <code>synchronized</code> was the only primitive needing JEP 491 (JDK 24) to gain that property.</li>
+<li><strong>When should I prefer <code>RWLock</code> over <code>synchronized</code>?</strong> When reads are <em>both</em> read-heavy and <em>long</em> (so parallel reads genuinely beat the AQS bookkeeping cost). For frequent short reads, prefer <code>StampedLock</code>, <code>ConcurrentHashMap</code>, or <code>CopyOnWriteArrayList</code>.</li>
+<li><strong>In 2026, when should I pick <code>Lock</code> over <code>synchronized</code>?</strong> When you need any of the six unique features (timed/interruptible acquire, tryLock, fairness, multiple Conditions, state inspection). For simple mutual exclusion, <code>synchronized</code> is the simpler default — JIT-friendlier (T03) and auto-releasing. JEP 491 (JDK 24) removed the virtual-thread reason to prefer <code>Lock</code>.</li>
+</ol></div></div>
+<h2 id="practice">Practice<a class="anchor" href="#practice" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Lock + finally discipline.</strong> Write a <code>ReentrantLock</code>-based counter where the increment throws halfway through. Run two threads. Show that without <code>finally</code>, the second thread deadlocks; with <code>finally</code>, it proceeds. (The cost of "you own the unlock.")</li>
+<li><strong><code>tryLock(timeout)</code> race.</strong> Two threads, one holding the lock for 500 ms. The other does <code>tryLock(100, MILLISECONDS)</code>. Confirm it returns <code>false</code> and proceeds without blocking further.</li>
+<li><strong><code>lockInterruptibly</code>.</strong> Thread A holds the lock for 5 s. Thread B tries <code>lockInterruptibly</code>. Thread C interrupts B 100 ms later. Confirm B throws <code>InterruptedException</code> instead of blocking for 5 s.</li>
+<li><strong>Inspect the AQS queue.</strong> Write 10 threads contending for a <code>ReentrantLock</code>. Periodically print <code>lock.getQueueLength()</code> and the held-by-current-thread state. Verify the queue length tracks the contending count.</li>
+<li><strong>Build a fair vs unfair throughput benchmark.</strong> With JMH, measure throughput of 100 threads contending on <code>ReentrantLock(false)</code> vs <code>ReentrantLock(true)</code>. Confirm unfair is 2-3× faster.</li>
+<li><strong>Producer/consumer with two Conditions.</strong> Implement the bounded buffer with <code>notFull</code>/<code>notEmpty</code>. Verify with two consumers and two producers: <code>signal</code> only wakes the right kind of waiter (counter the thundering herd).</li>
+<li><strong>RWLock downgrade.</strong> Hold the write lock, modify a field, acquire the read lock, release the write lock. Verify a concurrent reader sees the post-modification field and that during the downgrade no writer can intervene.</li>
+<li><strong>RWLock writer starvation.</strong> With unfair RWLock + 50 readers acquiring/releasing rapidly + 1 writer, measure how long the writer waits. Repeat with fair RWLock; observe writer wait drop to bounded.</li>
+<li><strong><code>StampedLock</code> optimistic read benchmark.</strong> Compare reads/s for <code>ReentrantLock</code>, <code>ReentrantReadWriteLock</code>, <code>StampedLock</code> (pessimistic read), and <code>StampedLock</code> (optimistic read) on 100 threads reading a <code>Point(x, y)</code> with 1% writes. Confirm optimistic is ~10× faster than any other.</li>
+<li><strong><code>StampedLock</code> not reentrant.</strong> Write a method that calls <code>sl.writeLock()</code> recursively. Set a 5-second JVM timeout. Confirm self-deadlock.</li>
+<li><strong><code>tryConvertToWriteLock</code>.</strong> With <code>StampedLock</code>, start with optimistic read, on validation failure try converting to write; on conversion failure, fall back to <code>writeLock()</code>. Stress test with 10 readers + 1 writer; verify zero data races.</li>
+<li><strong>AQS source dive.</strong> Read the source of <code>AbstractQueuedSynchronizer.acquireQueued</code>, <code>shouldParkAfterFailedAcquire</code>, <code>cancelAcquire</code>, <code>unparkSuccessor</code>. Annotate with comments explaining the CAS sequence and the cancellation cleanup. (One evening — single most rewarding source dive in the JDK.)</li>
+</ol>
+<h2 id="recap">Recap<a class="anchor" href="#recap" aria-hidden="true">#</a></h2>
+<p>You should now be able to:</p>
+<ul>
+<li>Enumerate <strong>the six features <code>Lock</code> provides over <code>synchronized</code></strong>: timed acquisition, interruptible acquisition, non-blocking <code>tryLock</code>, fairness control, multiple <code>Condition</code>s per lock, programmatic state inspection — and state the cost: <strong>you</strong> must <code>unlock()</code> (always in a <code>finally</code>).</li>
+<li>Write the <strong>canonical <code>try/finally</code> pattern</strong> correctly: <code>lock.lock()</code> <em>outside</em> the try, <code>try { ... } finally { lock.unlock(); }</code>.</li>
+<li>Recognize that <strong><code>ReentrantLock</code> is AQS-backed</strong> with <code>state</code> = reentry count, fair vs unfair as a single-line <code>tryAcquire</code> difference (<code>hasQueuedPredecessors</code> check), and reentrancy via <code>exclusiveOwnerThread</code> + counter.</li>
+<li>Explain <strong><code>AbstractQueuedSynchronizer</code></strong> — the framework underneath every j.u.c. lock, latch, semaphore, barrier, plus <code>ThreadPoolExecutor.Worker</code>. One <code>volatile int state</code>, a CLH-style FIFO queue of <code>Node</code> objects, <code>LockSupport.park</code>/<code>unpark</code> for blocking, two subclass hooks (<code>tryAcquire</code>/<code>tryRelease</code>).</li>
+<li>Walk through the <strong>acquire algorithm</strong>: <code>tryAcquire</code> fast path → <code>addWaiter</code> (CAS at tail) → <code>acquireQueued</code> loop (front-of-queue retry, then <code>shouldParkAfterFailedAcquire</code> CAS's predecessor's <code>waitStatus = SIGNAL</code>, then <code>LockSupport.park</code>).</li>
+<li>Walk through the <strong>release algorithm</strong>: <code>tryRelease</code> → if head's status non-zero, <code>unparkSuccessor</code> walks from tail back to find first non-cancelled successor and <code>LockSupport.unpark</code>s its thread.</li>
+<li>State the <strong>lazy-SIGNAL invariant</strong>: only the node about to park sets its predecessor's status to SIGNAL — so signal/unpark work is <em>minimal</em>.</li>
+<li>Recognize the four meaningful <strong><code>waitStatus</code></strong> values — <code>SIGNAL</code> (-1, "predecessor must wake me"), <code>CANCELLED</code> (1, "skip me"), <code>CONDITION</code> (-2, "I'm on a condition queue"), <code>PROPAGATE</code> (-3, "shared-mode propagation") — plus default 0.</li>
+<li>Use <strong><code>Condition</code></strong> correctly: multiple Conditions per Lock, each its own FIFO queue; <code>await</code> releases the lock (full recursion depth saved), parks the thread, and on <code>signal</code> transfers the node to the AQS main queue to re-acquire. <code>signal</code> (single) is safe when each Condition has a homogeneous waiter set — avoids the thundering-herd that forces <code>notifyAll</code> with <code>synchronized</code> (T04).</li>
+<li>Walk through <strong><code>ReentrantReadWriteLock</code></strong>: 32-bit state with <strong>16 high bits = read count, 16 low = write count</strong>; per-thread read hold tracked via <code>ThreadLocal</code> (with firstReader + cachedHoldCounter optimizations); reentrant; <strong>downgrade pattern</strong> is the only safe mode-change (read → write upgrade deadlocks); writer starvation possible in unfair mode.</li>
+<li>Walk through <strong><code>StampedLock</code></strong>: three modes (write / pessimistic-read / <strong>optimistic-read</strong>); 64-bit state with high bits = generation counter, low bits = reader-count + write-bit; the <strong>optimistic-read pattern</strong> (<code>tryOptimisticRead</code> → read fields → <code>validate(stamp)</code> → fall back to <code>readLock()</code> on validation failure) costs only ~5-10 ns for the success case; <em>not</em> reentrant; <code>tryConvertToWriteLock</code> for safe mode upgrade.</li>
+<li>Compare <strong>performance characteristics</strong>: optimistic StampedLock read at ~5-10 ns is the fastest read primitive in the JDK; <code>synchronized</code> uncontended is ~15-40 ns; <code>ReentrantLock</code> uncontended is ~50-100 ns; contended-parked is ~1-3 µs for any of them.</li>
+<li>Diagnose <strong>thread dumps</strong>: <code>WAITING (parking)</code> + <code>parking to wait for &lt;0x...&gt; (a ReentrantLock$NonfairSync)</code> for <code>Lock</code> waiters; <code>WAITING (parking)</code> + <code>(a ...ConditionObject)</code> for <code>await</code> waiters; <code>BLOCKED (on object monitor)</code> for <code>synchronized</code> waiters. Use <code>getQueueLength()</code> for programmatic contention monitoring.</li>
+<li>State the <strong>virtual-thread compatibility</strong>: every j.u.c. <code>Lock</code> has <em>always</em> been VT-friendly (uses <code>LockSupport.park</code>, which Loom unmounts). Only <code>synchronized</code> needed <strong>JEP 491 (JDK 24)</strong> to gain the same property. The 2021-2023 "always-<code>ReentrantLock</code>-for-VT" rule no longer applies in 2026.</li>
+<li>Avoid the <strong>nine common bugs</strong>: missing <code>finally { unlock(); }</code>, <code>lock()</code> inside try, self-deadlocking <code>StampedLock</code>, RWLock read-to-write upgrade, mismatched lock/unlock objects, <code>signal</code> without holding the lock, fair-as-default, RWLock for high-throughput data, optimistic-read on non-volatile fields.</li>
+<li>State the <strong>2026 decision rule</strong>: <code>synchronized</code> vs <code>Lock</code> is a <em>feature/style</em> choice, not a virtual-thread choice. Pick <code>synchronized</code> for simple mutual exclusion (auto-release, JIT-friendlier); pick <code>ReentrantLock</code> for any of the six unique features; pick <code>ReentrantReadWriteLock</code> for truly read-heavy long-read data; pick <code>StampedLock</code> for read-heavy non-recursive data with optimistic-read potential.</li>
+</ul>
+<h2 id="next">Next<a class="anchor" href="#next" aria-hidden="true">#</a></h2>
+<p>Continue to <a href="c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html">Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</a> — every primitive in this section is built on the <em>same</em> AQS engine you just learned. We'll see <code>Semaphore.state</code> as available permits with shared-mode acquire/release; <code>CountDownLatch.state</code> as monotonic countdown; <code>CyclicBarrier</code>'s lock-and-condition reuse for "wait until N threads arrive"; <code>Phaser</code>'s hierarchical-phase model for repeated barriers across dynamic party counts. Then T10 covers the concurrent collections (<code>ConcurrentHashMap</code>, <code>ConcurrentLinkedQueue</code>, <code>CopyOnWriteArrayList</code>) whose internals layer the same lock-free / CAS / AQS techniques.</p></article>
+      <div class="raw-pane"><pre><code>---
+title: &quot;Locks (ReentrantLock, ReadWriteLock, StampedLock)&quot;
+slug: locks-reentrantlock-readwritelock-stampedlock
+level: L3
+module: &quot;Advanced Java &amp; the JVM&quot;
+section: &quot;Concurrency &amp; Multithreading&quot;
+type: concept
+difficulty: advanced
+order: 8
+tags: [lock, reentrantlock, reentrantreadwritelock, stampedlock, abstractqueuedsynchronizer, aqs, clh-queue, lock-support, park, unpark, trylock, lockinterruptibly, fair-lock, nonfair-lock, barging, hasqueuedpredecessors, exclusiveownerthread, set-exclusive-owner-thread, recursion-count, condition, conditionobject, await, signal, signalall, condition-queue, signal-transfer, waitstatus, signal-status, cancelled-status, condition-status, propagate-status, shouldparkafterfailedacquire, acquirequeued, addwaiter, unparksuccessor, shared-acquire, exclusive-acquire, tryacquire, tryrelease, readlock, writelock, downgrade, upgrade-deadlock, reader-count, writer-count, sharedshift, exclusivemask, max-count-65535, writer-starvation, fair-rwlock, stamped-lock-state, optimistic-read, validate-stamp, write-stamp, read-stamp, mode-conversion, tryconverttowritelock, stamped-lock-not-reentrant, generation-counter, sequence-lock, jep-491-future, virtual-thread-lock-friendly, lock-vs-synchronized-2026]
+prerequisites: [completablefuture-and-async-composition, callable-and-future, wait-notify-notifyall, synchronized-monitors-and-intrinsic-locks, thread-lifecycle-and-states]
+status: complete
+estimated_minutes: 180
+last_updated: 2026-06-08
+---
+
+# Locks (ReentrantLock, ReadWriteLock, StampedLock)
+
+`synchronized` (T03) gives you mutual exclusion and JMM happens-before in one keyword — but it pays for that simplicity with rigidity: no timed wait, no interruptibility, no &quot;try-and-give-up,&quot; no fairness control, no multiple condition queues per lock, and no programmatic way to query the lock&#x27;s state. The `java.util.concurrent.locks` package, contributed by Doug Lea for JDK 5, exposes the *same* monitor semantics through a richer API — `Lock`, `ReentrantLock`, `ReentrantReadWriteLock`, `StampedLock` — and, more importantly, builds them all on top of one ingeniously general framework: **`AbstractQueuedSynchronizer`** (AQS), a 2,000-line class that is *the* shared engine behind every lock, latch, semaphore, barrier, and synchronizer in the JDK, plus `FutureTask` (T06), `ThreadPoolExecutor.Worker` (T05), and dozens of third-party libraries.
+
+The depth-bar requirement isn&#x27;t &quot;call `lock.lock()` and put `lock.unlock()` in a `finally`.&quot; At the **language** layer, `Lock` is an interface with six methods — `lock`, `lockInterruptibly`, `tryLock`, `tryLock(timeout)`, `unlock`, `newCondition` — and the discipline rule that *you* are now responsible for the release (the JVM no longer emits an implicit `monitorexit` for you). At the **framework** layer, AQS exposes a single **`volatile int state`** plus a *CLH-style* lock-free FIFO **queue of `Node` objects** that the lock subclass interprets — `ReentrantLock`&#x27;s state is &quot;reentry count,&quot; `ReentrantReadWriteLock`&#x27;s is *two* counts packed into 16+16 bits (reader-count high, writer-count low), `Semaphore`&#x27;s is &quot;available permits,&quot; `CountDownLatch`&#x27;s is &quot;countdown remaining&quot; — and AQS handles every thread queueing, parking, signalling, cancellation, and condition-variable detail with two subclass hooks: `tryAcquire(int)` and `tryRelease(int)`. At the **algorithmic** layer, the acquire path is the famous *lazy-SIGNAL* protocol — `shouldParkAfterFailedAcquire` walks back over CANCELLED predecessors, CAS&#x27;s the predecessor&#x27;s status to `SIGNAL`, and only *then* parks via `LockSupport.park` — so the predecessor knows on release that it must `LockSupport.unpark(successor)`. At the **architecture** layer, **`StampedLock`** (JDK 8) is *not* AQS-based; it&#x27;s a hand-rolled sequence lock with three modes (write, read, optimistic-read) whose **optimistic-read** path costs *two volatile reads* (no CAS, no fence beyond the read itself) and is the highest-performance read primitive in the JDK for read-mostly data. We will cover all four layers, with AQS source as the ground truth, and finish with the `synchronized` vs `Lock` decision in 2026 (JDK 24, JEP 491-fixed).
+
+&gt; [!NOTE]
+&gt; Prerequisites: [CompletableFuture &amp; async composition](./T07-completablefuture-and-async-composition.md) (L3/C01/T07) — same Treiber-stack/`LockSupport`-park machinery in a different shape; [Callable &amp; Future](./T06-callable-and-future.md) (L3/C01/T06) — `FutureTask`&#x27;s state-machine pattern; [wait / notify / notifyAll](./T04-wait-notify-notifyall.md) (L3/C01/T04) — condition-variable semantics `Condition` re-exposes; [synchronized, monitors &amp; intrinsic locks](./T03-synchronized-monitors-and-intrinsic-locks.md) (L3/C01/T03) — the baseline `synchronized` mechanics this topic replaces; [Thread lifecycle &amp; states](./T02-thread-lifecycle-and-states.md) (L3/C01/T02) — `WAITING (parking)`, `LockSupport`, the futex.
+
+## Why an Explicit `Lock` API — What `synchronized` Cannot Do
+
+`synchronized` (T03) is a one-shape primitive — *the* one shape, in fact, that the JVM optimizes hardest. But six things it cannot do, that explicit locks can:
+
+1. **Timed acquisition.** &quot;Acquire within 100 ms, or give up.&quot; `synchronized` blocks indefinitely; `Lock.tryLock(100, MILLISECONDS)` returns a boolean.
+2. **Interruptible acquisition.** &quot;Acquire, unless I get interrupted while waiting.&quot; `synchronized` cannot be interrupted *while waiting to acquire* — once a thread starts to enter, it&#x27;s committed. `Lock.lockInterruptibly()` throws `InterruptedException` if the waiter is interrupted before the lock is granted.
+3. **Non-blocking try-acquire.** &quot;Acquire if free; else do something else.&quot; `synchronized` has no such variant; `Lock.tryLock()` returns immediately with a boolean.
+4. **Fairness control.** &quot;Hand the lock to the longest waiter.&quot; `synchronized` is unfair by design (T03 — barging is allowed). `ReentrantLock(true)` is a fair lock.
+5. **Multiple condition queues per lock.** A monitor has *one* wait set. A `Lock` can produce *many* `Condition`s — each its own queue — so producer/consumer code can `signal` the *right* queue without thundering-herd risk (T04).
+6. **Programmatic state inspection.** `isLocked`, `isHeldByCurrentThread`, `getHoldCount`, `getQueueLength`, `hasQueuedThread(t)`. `synchronized` exposes none of these (and `Thread.holdsLock(obj)` is the only equivalent — and only a single boolean check).
+
+```mermaid
+flowchart LR
+  Sync[&quot;synchronized&quot;]
+  Sync --&gt; Cant1[&quot;no timed wait&quot;]
+  Sync --&gt; Cant2[&quot;no interruptible wait&quot;]
+  Sync --&gt; Cant3[&quot;no tryLock&quot;]
+  Sync --&gt; Cant4[&quot;always unfair&quot;]
+  Sync --&gt; Cant5[&quot;1 wait set per monitor&quot;]
+  Sync --&gt; Cant6[&quot;no state queries&quot;]
+  Lock[&quot;java.util.concurrent.locks.Lock&quot;]
+  Lock --&gt; Can[&quot;✓ all six&quot;]
+```
+
+The cost of all this expressiveness: **you** must release the lock. The JVM emits no implicit release; an exception inside an unguarded critical section leaks the lock forever.
+
+## The `Lock` Interface and the `finally` Discipline
+
+```java
+public interface Lock {
+    void lock();
+    void lockInterruptibly() throws InterruptedException;
+    boolean tryLock();
+    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+    void unlock();
+    Condition newCondition();
+}
+```
+
+The canonical usage:
+
+```java
+lock.lock();
+try {
+    // critical section
+} finally {
+    lock.unlock();
+}
+```
+
+&gt; [!IMPORTANT]
+&gt; **The `try` block must start *after* `lock.lock()` succeeds, not before.** If you write `try { lock.lock(); ... } finally { lock.unlock(); }`, an exception *before* `lock()` returns (extremely rare, but possible — `OutOfMemoryError` during queue node allocation) would trigger `unlock()` on a lock you don&#x27;t hold, throwing `IllegalMonitorStateException` that masks the original exception. The acquire goes *before* the `try`; the `try` covers only &quot;what happens *while holding* the lock.&quot;
+
+For the timed and interruptible variants:
+
+```java
+if (!lock.tryLock(100, MILLISECONDS)) return false;     // give up after 100 ms
+try { /* critical section */ } finally { lock.unlock(); }
+
+try {
+    lock.lockInterruptibly();
+} catch (InterruptedException ie) {
+    Thread.currentThread().interrupt();              // T02 — restore
+    return;                                           // we were cancelled while waiting
+}
+try { /* critical section */ } finally { lock.unlock(); }
+```
+
+The interruptible variant is *the* feature `synchronized` cannot match — a thread `BLOCKED` on `synchronized` cannot be cancelled mid-acquire (T02). Production code that needs graceful shutdown for any operation involving locks should prefer `Lock.lockInterruptibly`.
+
+## `ReentrantLock` — the Workhorse
+
+```java
+private final Lock lock = new ReentrantLock();       // unfair (default)
+private final Lock fairLock = new ReentrantLock(true);   // fair
+```
+
+Two constructor forms, then the six interface methods plus a fistful of inspection methods (`isLocked`, `isHeldByCurrentThread`, `getHoldCount`, `getQueueLength`, etc.). **Reentrant** means the same thread can acquire the lock multiple times — each acquire increments a recursion counter, each `unlock` decrements, only the final `unlock` actually releases.
+
+```java
+ReentrantLock lock = new ReentrantLock();
+lock.lock();            // acquire — hold count = 1
+lock.lock();            // re-acquire (same thread) — hold count = 2
+lock.unlock();          // hold count = 1 — still held
+lock.unlock();          // hold count = 0 — released
+lock.unlock();          // IllegalMonitorStateException — we don&#x27;t hold it
+```
+
+The unfair variant lets a newly-arriving thread *barge* — attempt to acquire the lock before checking the wait queue. The fair variant requires checking the queue first: a thread arrives, sees waiters ahead of it, and queues without trying to acquire. Both use the *same* AQS underneath; only the `tryAcquire` hook differs.
+
+## AQS — `AbstractQueuedSynchronizer`, the Engine Underneath
+
+Every lock, latch, semaphore, and barrier in `java.util.concurrent` — plus `ThreadPoolExecutor.Worker` (T05) and `FutureTask`-adjacent primitives — is built on `AbstractQueuedSynchronizer`. AQS is a 2,000-line abstract class that gives you:
+
+- **One `volatile int state`** — the meaning is *defined by the subclass* (reentry count, permit count, countdown, mode bits, whatever).
+- **A FIFO queue of `Node` objects** — the waiters, doubly-linked.
+- **`LockSupport.park`/`unpark` integration** — thread suspension via the futex (T02).
+- **`tryAcquire(arg)` / `tryRelease(arg)` hooks** — the subclass implements only these; AQS handles all queueing, parking, signalling, cancellation.
+- **Shared-mode variants** — `tryAcquireShared` / `tryReleaseShared` for semaphores, latches, RWLock&#x27;s read side.
+- **Condition support** — `ConditionObject` provides `await`/`signal`/`signalAll` per AQS instance.
+
+The brilliance of AQS is that it factors out *every* hard part — thread queueing, parking, cancellation cleanup, ordering, condition transfer — into one place, leaving the subclass to write a tiny `tryAcquire` that decides &quot;can I take the state?&quot; and `tryRelease` that decides &quot;is the state now releasable?&quot; The same engine powers `ReentrantLock`, `ReentrantReadWriteLock`, `Semaphore`, `CountDownLatch`, `CyclicBarrier`, `Phaser`, and dozens of others.
+
+```mermaid
+flowchart TB
+  AQS[&quot;AbstractQueuedSynchronizer&lt;br/&gt;(volatile int state + CLH queue + park/unpark + condition support)&quot;]
+  AQS --&gt; RL[&quot;ReentrantLock&lt;br/&gt;state = reentry count&quot;]
+  AQS --&gt; RWL[&quot;ReentrantReadWriteLock&lt;br/&gt;state = 16-bit read | 16-bit write&quot;]
+  AQS --&gt; Sem[&quot;Semaphore (T09)&lt;br/&gt;state = available permits&quot;]
+  AQS --&gt; CDL[&quot;CountDownLatch (T09)&lt;br/&gt;state = count remaining&quot;]
+  AQS --&gt; CB[&quot;CyclicBarrier (T09)&lt;br/&gt;(uses ReentrantLock + Condition internally)&quot;]
+  AQS --&gt; Phaser[&quot;Phaser (T09)&quot;]
+  AQS --&gt; TPE[&quot;ThreadPoolExecutor.Worker (T05)&lt;br/&gt;state = 0 idle / 1 mid-task&quot;]
+  AQS --&gt; Other[&quot;FutureTask uses similar pattern&lt;br/&gt;(T06 — not AQS but same shape)&quot;]
+```
+
+### The `state` field — meaning by subclass
+
+```java
+private volatile int state;
+
+protected final int getState();
+protected final void setState(int newState);
+protected final boolean compareAndSetState(int expect, int update);
+```
+
+For `ReentrantLock`:
+
+- `state = 0` — lock free.
+- `state &gt; 0` — lock held by `exclusiveOwnerThread`; value is the reentry count.
+
+For `ReentrantReadWriteLock` (next section):
+
+- High 16 bits: read count (number of concurrent readers).
+- Low 16 bits: write count (write reentry; 0 means no writer).
+
+For `Semaphore`:
+
+- `state` = currently-available permits.
+
+For `CountDownLatch`:
+
+- `state` = countdown remaining; reaches 0 → permanently signalled.
+
+For `ThreadPoolExecutor.Worker` (T05):
+
+- `state = -1` initially (no interrupts allowed yet during construction).
+- `state = 0` — idle (lock-free, can be interrupted by `shutdown`).
+- `state = 1` — mid-task (locked; `shutdown` skips interrupting).
+
+Six wildly different semantics from one `volatile int` — that&#x27;s AQS.
+
+### The CLH-style queue and the `Node` struct
+
+AQS&#x27;s wait queue is a doubly-linked FIFO of `Node` objects, derived from the **CLH (Craig, Landin, Hagersten) lock** of 1993 — a classic lock-free linked-list queue, modified by Doug Lea to support cancellation and the &quot;predecessor-signals-successor&quot; pattern that eliminates spinning.
+
+```java
+static final class Node {
+    static final Node SHARED = new Node();         // marker for shared mode
+    static final Node EXCLUSIVE = null;             // null next-waiter means exclusive
+
+    static final int CANCELLED =  1;
+    static final int SIGNAL    = -1;                // &quot;you must unpark me on release&quot;
+    static final int CONDITION = -2;                // I&#x27;m on a condition queue, not the main queue
+    static final int PROPAGATE = -3;                // shared release should cascade
+
+    volatile int waitStatus;
+    volatile Node prev;
+    volatile Node next;
+    volatile Thread thread;
+    Node nextWaiter;                                 // mode marker OR condition-queue link
+}
+```
+
+The queue:
+
+```text
+   head (dummy, no thread)
+     ↓
+     prev←next
+     ↓
+   Node{T1, status=SIGNAL}
+     ↓
+     prev←next
+     ↓
+   Node{T2, status=SIGNAL}
+     ↓
+     prev←next
+     ↓
+   Node{T3, status=0}      ← tail
+```
+
+**`head` is always a dummy node** — the thread that &quot;owns the head&quot; is actually the current lock holder, but the node that represents them is the `head` itself with no live thread reference (the thread field is nulled on acquisition). The first *waiter* is `head.next`. The most-recently-arrived waiter is `tail`.
+
+```mermaid
+flowchart LR
+  Head[&quot;head (dummy node)&quot;]
+  W1[&quot;Node{T1, SIGNAL}&quot;]
+  W2[&quot;Node{T2, SIGNAL}&quot;]
+  W3[&quot;Node{T3, status=0}&quot;]
+  Head &lt;--&gt; W1 &lt;--&gt; W2 &lt;--&gt; W3
+  Tail[&quot;tail = W3&quot;]
+  Note[&quot;enqueue: CAS new node onto tail.&lt;br/&gt;dequeue: head = head.next; clear thread.&quot;]
+```
+
+### `waitStatus` — the four meaningful values
+
+- **`0` (default)** — neutral; the node was just enqueued, neither needs signalling nor has cancelled.
+- **`SIGNAL` (-1)** — &quot;my predecessor will unpark me when it releases.&quot; Set by the *successor*, on its own predecessor, just before parking.
+- **`CANCELLED` (1)** — this node was cancelled (e.g., interrupted timed-out). Predecessors must skip it when looking for a successor to signal.
+- **`CONDITION` (-2)** — this node is on a `ConditionObject` queue, not the main wait queue. Used during `await`.
+- **`PROPAGATE` (-3)** — shared-mode bookkeeping; tells `releaseShared` to keep propagating wakeups.
+
+The lazy-SIGNAL invariant: **only the node about to park sets its predecessor&#x27;s status to SIGNAL.** This means a thread that arrives but immediately re-tries `tryAcquire` (the fast spin in `acquireQueued`) doesn&#x27;t burden its predecessor with signalling work it may not need to do.
+
+## The Acquire Algorithm — Lazy-SIGNAL, Park-and-Retry
+
+The full `acquire(int arg)`:
+
+```java
+public final void acquire(int arg) {
+    if (!tryAcquire(arg) &amp;&amp;
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+```
+
+Three steps:
+
+1. **`tryAcquire(arg)`** — subclass hook. If it returns `true`, we got the lock without queueing.
+2. **`addWaiter(Node.EXCLUSIVE)`** — enqueue a new node at the tail (one CAS).
+3. **`acquireQueued(node, arg)`** — the park-and-retry loop.
+
+### `addWaiter` — the tail CAS
+
+```java
+private Node addWaiter(Node mode) {
+    Node node = new Node(Thread.currentThread(), mode);
+    Node pred = tail;
+    if (pred != null) {
+        node.prev = pred;
+        if (compareAndSetTail(pred, node)) {     // CAS tail
+            pred.next = node;
+            return node;
+        }
+    }
+    enq(node);                                    // slow path: initialize queue or retry
+    return node;
+}
+```
+
+Lock-free push at the tail: read `tail`, CAS-replace it with the new node. The slow path (`enq`) handles initialization (first ever enqueue creates the dummy head + tail node) and retry under contention.
+
+### `acquireQueued` — the loop
+
+```java
+final boolean acquireQueued(Node node, int arg) {
+    boolean interrupted = false;
+    try {
+        for (;;) {
+            Node p = node.predecessor();
+            if (p == head &amp;&amp; tryAcquire(arg)) {           // I&#x27;m at the front; try again
+                setHead(node);
+                p.next = null;                              // help GC
+                return interrupted;
+            }
+            if (shouldParkAfterFailedAcquire(p, node))     // CAS predecessor&#x27;s status to SIGNAL
+                interrupted |= parkAndCheckInterrupt();    // park; on wake, loop back
+        }
+    } catch (Throwable t) {
+        cancelAcquire(node);
+        throw t;
+    }
+}
+```
+
+Two key things happen here:
+
+1. **The front-of-queue retry.** When my predecessor *is* the head (a dummy), I&#x27;m next in line. I `tryAcquire` one more time *before* parking — handles the case where my predecessor just released between my last failed `tryAcquire` and now.
+2. **Park then re-check.** `shouldParkAfterFailedAcquire` sets my predecessor&#x27;s `waitStatus` to `SIGNAL` and returns `true`, telling me it&#x27;s safe to park. `parkAndCheckInterrupt` calls `LockSupport.park(this)` (parking on the futex, T02), suspending until `unpark`. On wake, I loop back and try again.
+
+### `shouldParkAfterFailedAcquire` — the lazy-SIGNAL handshake
+
+```java
+private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+    int ws = pred.waitStatus;
+    if (ws == SIGNAL) return true;                      // predecessor will signal me
+    if (ws &gt; 0) {
+        // predecessor is CANCELLED — walk back skipping cancelled predecessors
+        do { node.prev = pred = pred.prev; } while (pred.waitStatus &gt; 0);
+        pred.next = node;
+        return false;                                    // try again with the new predecessor
+    } else {
+        // status is 0 or PROPAGATE — try to CAS it to SIGNAL
+        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+        return false;                                    // loop back, try acquire once more, then park
+    }
+}
+```
+
+The two-pass pattern is the elegance: first call returns `false` after CAS-ing SIGNAL onto predecessor; we loop, retry `tryAcquire`; if still failing, second call sees SIGNAL and returns `true`, so we park. The whole machinery ensures we *never* park without our predecessor knowing it must unpark us.
+
+```mermaid
+sequenceDiagram
+  participant Me as my Node
+  participant Pred as predecessor Node
+  participant LS as LockSupport
+  Me-&gt;&gt;Me: tryAcquire — failed
+  Me-&gt;&gt;Pred: read waitStatus = 0
+  Me-&gt;&gt;Pred: CAS waitStatus = SIGNAL
+  Me-&gt;&gt;Me: shouldParkAfterFailedAcquire returns false
+  Me-&gt;&gt;Me: loop — tryAcquire again
+  Me-&gt;&gt;Me: failed again
+  Me-&gt;&gt;Pred: read waitStatus = SIGNAL
+  Me-&gt;&gt;Me: shouldParkAfterFailedAcquire returns true
+  Me-&gt;&gt;LS: LockSupport.park(this)
+  Note over Me,LS: thread state = WAITING (parking)&lt;br/&gt;(0% CPU, on futex)
+```
+
+## The Release Algorithm
+
+```java
+public final boolean release(int arg) {
+    if (tryRelease(arg)) {                           // subclass hook
+        Node h = head;
+        if (h != null &amp;&amp; h.waitStatus != 0)
+            unparkSuccessor(h);
+        return true;
+    }
+    return false;
+}
+
+private void unparkSuccessor(Node node) {
+    int ws = node.waitStatus;
+    if (ws &lt; 0) compareAndSetWaitStatus(node, ws, 0);
+    Node s = node.next;
+    if (s == null || s.waitStatus &gt; 0) {              // successor missing or CANCELLED
+        s = null;
+        for (Node t = tail; t != null &amp;&amp; t != node; t = t.prev)
+            if (t.waitStatus &lt;= 0) s = t;             // walk back from tail to find first non-cancelled
+    }
+    if (s != null) LockSupport.unpark(s.thread);      // wake the successor
+}
+```
+
+On release: if the head&#x27;s status is non-zero (someone is waiting and asked to be signalled), wake the next non-cancelled successor. The walk-back-from-tail is a quirk needed because `next` pointers can be stale (set lazily after the CAS on `prev`/tail), but `prev` pointers are always valid.
+
+```mermaid
+sequenceDiagram
+  participant H as Holder (head)
+  participant Pred as Pred Node (status=SIGNAL)
+  participant Succ as Successor Node
+  H-&gt;&gt;Pred: tryRelease succeeds
+  Pred-&gt;&gt;Succ: read status, CAS = 0
+  Pred-&gt;&gt;Succ: LockSupport.unpark(Succ.thread)
+  Succ-&gt;&gt;Succ: wake; loop in acquireQueued
+  Succ-&gt;&gt;Succ: predecessor == head, tryAcquire succeeds
+  Succ-&gt;&gt;Succ: setHead(self), return
+  Note over Succ: lock now held by Succ
+```
+
+## Fair vs Unfair — One Line of Code Apart
+
+The unfair `tryAcquire` (`ReentrantLock` default):
+
+```java
+final boolean nonfairTryAcquire(int acquires) {
+    final Thread current = Thread.currentThread();
+    int c = getState();
+    if (c == 0) {
+        if (compareAndSetState(0, acquires)) {            // BARGE — no queue check!
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    } else if (current == getExclusiveOwnerThread()) {     // reentry
+        int nextc = c + acquires;
+        if (nextc &lt; 0) throw new Error(&quot;Maximum lock count exceeded&quot;);
+        setState(nextc);
+        return true;
+    }
+    return false;
+}
+```
+
+The fair version differs by one check:
+
+```java
+protected final boolean tryAcquire(int acquires) {
+    final Thread current = Thread.currentThread();
+    int c = getState();
+    if (c == 0) {
+        if (!hasQueuedPredecessors() &amp;&amp;                    // FAIR — yield to queued waiters
+            compareAndSetState(0, acquires)) {
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    } else if (current == getExclusiveOwnerThread()) {
+        ...
+    }
+    return false;
+}
+```
+
+`hasQueuedPredecessors()` walks the queue to see if any other thread is queued ahead. If so, this thread queues without attempting the CAS — yielding its turn to the longer waiters. The unfair version skips that check and CAS-attempts immediately, allowing a newcomer to *barge* past queued threads.
+
+**Why is unfair the default?** Throughput. A barging newcomer that successfully CAS&#x27;s the state proceeds *immediately* — no enqueue, no park, no unpark cycle. The waiters who were going to wake anyway lose only a small turn-share to the barger. In aggregate, the unfair lock has 2–3× the throughput of the fair lock under contention, at the cost of *occasional* tail-latency outliers (a thread can starve in extreme cases). The fair version guarantees **first-come-first-served** but pays for every acquire.
+
+```mermaid
+flowchart LR
+  NF[&quot;unfair (default)&lt;br/&gt;nonfairTryAcquire&quot;]
+  NF --&gt; NFcas[&quot;immediate CAS state 0→1&lt;br/&gt;(BARGE if free)&quot;]
+  NF --&gt; NFperf[&quot;✓ higher throughput&lt;br/&gt;✗ rare starvation&quot;]
+  F[&quot;fair&lt;br/&gt;tryAcquire(acquires)&quot;]
+  F --&gt; Fcheck[&quot;hasQueuedPredecessors()?&quot;]
+  F --&gt; Fcheck2[&quot;only CAS if no queued waiter&quot;]
+  F --&gt; Fperf[&quot;✓ FCFS, no starvation&lt;br/&gt;✗ ~2-3x slower under contention&quot;]
+```
+
+&gt; [!IMPORTANT]
+&gt; **Don&#x27;t reach for fair locks &quot;to be safe.&quot;** They cost real throughput and the starvation they prevent is rare in real workloads (typically requires pathological producer patterns to manifest). Use fair locks only when you&#x27;ve *measured* unfairness causing latency outliers, or when ordering is a domain requirement (e.g., a queue that *must* return items in submission order across threads). Default to unfair.
+
+## `Condition` — Multiple Wait Queues Per Lock
+
+`Lock.newCondition()` returns a `Condition` — AQS&#x27;s `ConditionObject`. Each `Condition` has its own FIFO queue (separate from the lock&#x27;s main wait queue), and you can create **multiple Conditions per lock** — one for &quot;queue is not full,&quot; one for &quot;queue is not empty,&quot; etc. That single capability is the single biggest reason to prefer `Lock` over `synchronized` for producer/consumer code: it lets you `signal` the *right* queue, avoiding the thundering-herd that forces `notifyAll` with intrinsic monitors (T04).
+
+```java
+public interface Condition {
+    void await() throws InterruptedException;
+    long awaitNanos(long nanosTimeout) throws InterruptedException;
+    boolean await(long time, TimeUnit unit) throws InterruptedException;
+    boolean awaitUntil(Date deadline) throws InterruptedException;
+    void awaitUninterruptibly();
+    void signal();
+    void signalAll();
+}
+```
+
+### The await/signal protocol — same pattern, separate queues
+
+When a thread calls `condition.await()` while holding the lock:
+
+1. Build a new `Node` with `waitStatus = CONDITION` (-2).
+2. Append to the **condition queue** (separate from the AQS wait queue).
+3. *Fully* release the lock (saving the reentry count for restoration).
+4. `LockSupport.park` — descend into `WAITING` state.
+
+When another thread calls `condition.signal()` while holding the lock:
+
+1. Pop the head of the condition queue.
+2. **Transfer** that node to the AQS *main* wait queue (set `waitStatus = 0`).
+3. `LockSupport.unpark` the node&#x27;s thread.
+
+The signalled thread wakes, finds itself on the main wait queue, runs `acquireQueued` to re-acquire the lock, restores its reentry count, and returns from `await`. Same semantics as `wait`/`notify` (T04) but with explicit, multiple queues.
+
+```mermaid
+flowchart LR
+  subgraph Lock
+    Lq[&quot;Lock wait queue:&lt;br/&gt;T1 → T2&quot;]
+  end
+  subgraph CondA[&quot;Condition notFull&quot;]
+    Aq[&quot;T3 → T4&lt;br/&gt;(producers waiting on space)&quot;]
+  end
+  subgraph CondB[&quot;Condition notEmpty&quot;]
+    Bq[&quot;T5 → T6&lt;br/&gt;(consumers waiting on items)&quot;]
+  end
+  Signal[&quot;notEmpty.signal()&quot;]
+  Signal --&gt; Transfer[&quot;transfer T5 from Bq → Lock wait queue&lt;br/&gt;(only T5, not T3 — perfect targeting)&quot;]
+```
+
+The producer/consumer reference from T04, with `Lock` + `Condition`:
+
+```java
+public final class BoundedBuffer&lt;T&gt; {
+    private final Deque&lt;T&gt; q = new ArrayDeque&lt;&gt;();
+    private final int cap;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition notFull  = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+
+    public BoundedBuffer(int cap) { this.cap = cap; }
+
+    public void put(T x) throws InterruptedException {
+        lock.lock();
+        try {
+            while (q.size() == cap) notFull.await();    // wait WHILE full
+            q.add(x);
+            notEmpty.signal();                           // wake ONE consumer — no thundering herd
+        } finally { lock.unlock(); }
+    }
+
+    public T take() throws InterruptedException {
+        lock.lock();
+        try {
+            while (q.isEmpty()) notEmpty.await();
+            T x = q.remove();
+            notFull.signal();                            // wake ONE producer
+            return x;
+        } finally { lock.unlock(); }
+    }
+}
+```
+
+The same shape `ArrayBlockingQueue` uses internally (T10). `signal` instead of `notifyAll` because each Condition&#x27;s queue only contains waiters on *that* predicate — no cross-condition mistakes, no thundering herd.
+
+## `ReentrantReadWriteLock` — Two Locks, One State Word
+
+```java
+ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+Lock readLock  = rwl.readLock();
+Lock writeLock = rwl.writeLock();
+```
+
+Two `Lock` instances sharing one AQS state. The contract:
+
+- **Read lock** (shared). Multiple readers may hold simultaneously, as long as no writer holds.
+- **Write lock** (exclusive). Only one writer, and no readers while it&#x27;s held.
+- **Reentrant.** A thread holding the write lock can re-acquire the write lock or *additionally* acquire the read lock (downgrade). A thread holding the read lock cannot upgrade to write lock without deadlock risk (see below).
+- **Fair / unfair** option, same as `ReentrantLock`.
+
+### The 16+16 packed state
+
+```java
+private static final int SHARED_SHIFT   = 16;
+private static final int SHARED_UNIT    = (1 &lt;&lt; SHARED_SHIFT);          // 0x0001_0000
+private static final int MAX_COUNT      = (1 &lt;&lt; SHARED_SHIFT) - 1;       // 65535
+private static final int EXCLUSIVE_MASK = (1 &lt;&lt; SHARED_SHIFT) - 1;
+
+static int sharedCount(int c)    { return c &gt;&gt;&gt; SHARED_SHIFT; }
+static int exclusiveCount(int c) { return c &amp; EXCLUSIVE_MASK; }
+```
+
+```text
+state (32 bits):
+
+   bit:  31 ........... 16  15 ........... 0
+         |   read count   |   write count   |
+         | (max 65535)    |   (max 65535)   |
+```
+
+A read acquire adds `SHARED_UNIT` to state (`+= 0x10000`); a write acquire adds 1 to the low half. Reads and writes are *independent counters* in the same word — one CAS atomically updates both halves.
+
+Max readers or writes: 65,535. Exceeding either throws `Error(&quot;Maximum lock count exceeded&quot;)`. In practice you&#x27;ll never see it; mention exists for completeness.
+
+### Per-thread read hold count via `ThreadLocal`
+
+The state field tracks the *total* read count but not *which threads* hold reads — needed for reentrancy bookkeeping (the same thread acquiring the read lock twice should keep a personal hold count). The implementation uses a `ThreadLocal` cache for the most-recent reader (the firstReader optimization) plus a regular `ThreadLocal&lt;HoldCounter&gt;` for all others.
+
+```java
+private transient ThreadLocalHoldCounter readHolds;
+private transient HoldCounter cachedHoldCounter;       // most-recent reader&#x27;s counter
+private transient Thread firstReader;                   // single-reader optimization
+private transient int firstReaderHoldCount;
+```
+
+The first thread to acquire the read lock skips the ThreadLocal access entirely (`firstReader = currentThread()`). The second non-first reader gets a `cachedHoldCounter`. Subsequent readers hit the `ThreadLocal`. Three layers of caching to avoid the ThreadLocal cost in the common cases.
+
+### The downgrade pattern
+
+```java
+writeLock.lock();
+try {
+    // make modifications under exclusive lock
+    ...
+    readLock.lock();         // acquire read lock WHILE STILL HOLDING write lock
+} finally {
+    writeLock.unlock();      // release write lock; still hold read lock
+}
+try {
+    // now we have exclusive view from when we modified, with read-lock access
+} finally {
+    readLock.unlock();
+}
+```
+
+This pattern lets a writer atomically downgrade to a reader without a window where state is unprotected. Useful for &quot;modify, then verify&quot; patterns where the verification only needs a read lock but must see the post-modification state.
+
+### Why upgrade is impossible
+
+```java
+readLock.lock();
+// ...
+writeLock.lock();         // ✗ DEADLOCK if another reader also tries this
+```
+
+If two threads each hold the read lock and each tries to upgrade to write, both wait for the other&#x27;s read to release — deadlock. The lock has no atomic mode-change primitive, so upgrade requires releasing the read lock first, attempting the write lock, and re-acquiring the read lock on failure — with a window where state may have changed. `StampedLock` (below) provides `tryConvertToWriteLock` for this exact purpose.
+
+### Writer starvation in the unfair variant
+
+In unfair mode, an arriving reader doesn&#x27;t check for queued waiters — it just CAS-acquires if no writer is currently holding. So a *steady stream of readers* can keep the read count above 0 forever, leaving a queued writer waiting indefinitely.
+
+The fair variant prevents this (a writer at the head of the queue causes new readers to queue behind it). Even in the unfair variant, JDK 8+ has a *writer-preference* heuristic: in unfair mode, if a writer is queued and another reader arrives, the reader yields (one writer at a time gets priority). Reduces but doesn&#x27;t fully eliminate starvation; reach for fair RWLock if starvation is intolerable.
+
+```mermaid
+flowchart TB
+  Unfair[&quot;unfair RWLock&lt;br/&gt;(default)&quot;]
+  Unfair --&gt; US[&quot;readers can BARGE if no current writer&quot;]
+  US --&gt; WStarve[&quot;writer starvation possible&lt;br/&gt;under steady reader stream&quot;]
+  Unfair --&gt; WriterPref[&quot;JDK 8+ unfair: writer-preference heuristic&lt;br/&gt;(reader yields if writer queued)&quot;]
+  Fair[&quot;fair RWLock&lt;br/&gt;new ReentrantReadWriteLock(true)&quot;]
+  Fair --&gt; FFifo[&quot;strict FCFS — no starvation&quot;]
+  Fair --&gt; Fperf[&quot;~2-3x slower under contention&quot;]
+```
+
+### When (not) to use RWLock
+
+The motivating intuition — &quot;reads can be parallel, so a read-write lock is faster than a regular lock for read-heavy data&quot; — is *often wrong* in practice. Reasons:
+
+- AQS state is a single word; every read acquire/release CAS&#x27;s it. Under heavy read concurrency, that one cache line is the bottleneck.
+- The read lock&#x27;s bookkeeping (ThreadLocal hold counts, AQS queue ops) is heavier than a plain `ReentrantLock` acquire.
+- For truly read-mostly data, a `ConcurrentHashMap` (per-bucket locks) or `CopyOnWriteArrayList` (no read locks) outperforms RWLock by far.
+- For data where reads can be optimistic, **`StampedLock`** is dramatically faster (next section).
+
+Rule of thumb: RWLock helps when reads are *infrequent but long*, so the parallel-read benefit dominates the bookkeeping cost. For *frequent* reads, prefer `StampedLock` or a CAS-based structure.
+
+## `StampedLock` — Optimistic Read for the Fast Path
+
+`StampedLock` (JDK 8) is a hand-rolled sequence lock — *not* AQS-based — with three modes:
+
+1. **Write lock** (exclusive) — `writeLock()` returns a *stamp*, `unlockWrite(stamp)` releases.
+2. **Pessimistic read lock** (shared) — `readLock()` / `unlockRead(stamp)`. Like RWLock&#x27;s read lock.
+3. **Optimistic read** — `tryOptimisticRead()` returns a stamp; you read the protected data; `validate(stamp)` checks whether a writer intervened. **No actual lock acquired — just a stamp**.
+
+The optimistic read is the headline. For read-mostly data where writes are rare, the optimistic read is essentially **two volatile reads** (one for the stamp, one for `validate`) — orders of magnitude faster than acquiring any lock.
+
+### State layout
+
+```text
+state (64 bits):
+
+   bit:  63 ........... 8   7 6 5 4 3 2 1 0
+         |   generation   |   reader_count   | write_bit
+         | (56 bits)       |   (7 bits)       |
+```
+
+Approximate layout — actual bit allocation is fiddly. The **generation** counter increments on every write release, so any stamp issued before a write becomes invalid after. `validate(stamp)` simply checks that the current state matches the issuance generation.
+
+### The optimistic-read pattern
+
+```java
+public Point read(StampedLock lock, double[] x_y) {
+    long stamp = lock.tryOptimisticRead();        // record current generation
+    double x = x_y[0];                              // read field
+    double y = x_y[1];                              // read field
+    if (!lock.validate(stamp)) {                    // did a writer happen in between?
+        stamp = lock.readLock();                    // fall back to actual read lock
+        try { x = x_y[0]; y = x_y[1]; }
+        finally { lock.unlockRead(stamp); }
+    }
+    return new Point(x, y);
+}
+```
+
+The optimistic path: read fields without locking, then verify. If no writer interfered, return. If a writer did, **redo with a pessimistic read lock**. Because writes are rare, the common path skips all the AQS machinery.
+
+```mermaid
+flowchart TB
+  Start[&quot;tryOptimisticRead() — record generation stamp&quot;]
+  Read[&quot;read fields (no lock)&quot;]
+  Val{&quot;validate(stamp)&lt;br/&gt;generation unchanged?&quot;}
+  Start --&gt; Read --&gt; Val
+  Val -- yes --&gt; Done[&quot;return — TWO volatile reads total, no fence beyond&quot;]
+  Val -- no --&gt; Slow[&quot;readLock() — actual lock&quot;]
+  Slow --&gt; Re[&quot;redo reads under lock&quot;]
+  Re --&gt; Unlock[&quot;unlockRead(stamp)&quot;]
+  Unlock --&gt; Done2[&quot;return&quot;]
+```
+
+&gt; [!IMPORTANT]
+&gt; **The fields being read must be `volatile` or safely published, because the optimistic read does not synchronize.** Without volatile, the reader could see uninitialized or out-of-order values. The `validate(stamp)` only checks that the generation matched at *both* the start and end of the read — it doesn&#x27;t synchronize the fields&#x27; visibility. Standard idiom: protect arrays / data structures whose individual elements are themselves safely published (e.g., final fields of value objects, primitive arrays whose individual element accesses are atomic).
+
+### Mode conversion
+
+```java
+long stamp = lock.tryOptimisticRead();
+// ... read fields ...
+if (!lock.validate(stamp)) {
+    long writeStamp = lock.tryConvertToWriteLock(stamp);
+    if (writeStamp == 0L) {
+        // couldn&#x27;t convert; fall back to writeLock()
+        writeStamp = lock.writeLock();
+    }
+    try { /* now hold write lock */ } finally { lock.unlockWrite(writeStamp); }
+}
+```
+
+`tryConvertToWriteLock(stamp)` is the canonical answer to RWLock&#x27;s deadlock-prone upgrade pattern: it *atomically* upgrades an optimistic-read or read-lock holder to write-lock, *or* returns 0 if not possible (writes can&#x27;t happen if any other reader holds). The caller decides whether to retry, fall back to `writeLock()` (which queues), or abort.
+
+### Why `StampedLock` is not reentrant
+
+A famous gotcha: **`StampedLock` is not reentrant**. The same thread holding a write lock that tries to acquire it again *deadlocks itself*. There&#x27;s no `exclusiveOwnerThread` tracking; the stamp is the only identifier and recursive acquires would have no way to record the recursion.
+
+```java
+StampedLock lock = new StampedLock();
+long s1 = lock.writeLock();          // hold write lock
+long s2 = lock.writeLock();          // ✗ DEADLOCK — self-block forever
+```
+
+This restriction is the price of the simpler design (no thread tracking, no recursion counter). For reentrant logic, use `ReentrantReadWriteLock`. For purely read-heavy data accessed non-recursively, `StampedLock` is the clear winner.
+
+```mermaid
+flowchart LR
+  RL[&quot;ReentrantLock&quot;]
+  RWL[&quot;ReentrantReadWriteLock&quot;]
+  SL[&quot;StampedLock&quot;]
+  RL --&gt; RLfeatures[&quot;reentrant, fair option,&lt;br/&gt;conditions, AQS-based&quot;]
+  RWL --&gt; RWLfeatures[&quot;reentrant, read+write separation,&lt;br/&gt;16+16 state, AQS-based&quot;]
+  SL --&gt; SLfeatures[&quot;NON-reentrant, NO conditions,&lt;br/&gt;optimistic read, generation stamp,&lt;br/&gt;fastest read in the JDK&quot;]
+```
+
+### Performance comparison
+
+| Lock | Uncontended write | Uncontended read | Contended (parking) | Read parallelism |
+|------|------------------:|------------------:|--------------------:|:----------------:|
+| `synchronized` | ~15-40 ns | n/a | ~1-3 µs | no |
+| `ReentrantLock` | ~50-100 ns | n/a | ~1-3 µs | no |
+| `ReentrantReadWriteLock` write | ~60-120 ns | — | ~1-3 µs | n/a |
+| `ReentrantReadWriteLock` read | — | ~60-100 ns | ~1-3 µs | yes |
+| `StampedLock` write | ~50-80 ns | — | ~1-3 µs | n/a |
+| `StampedLock` read (pessimistic) | — | ~50-80 ns | ~1-3 µs | yes |
+| **`StampedLock` optimistic read** | — | **~5-10 ns** | n/a (no parking) | yes |
+
+The optimistic read&#x27;s ~5-10 ns is *the* number to remember: for read-mostly data, `StampedLock` is ~10× faster than any other lock, and orders of magnitude faster than a CAS-based primitive.
+
+## Locks + Virtual Threads — Always Friendly
+
+Every `j.u.c.locks.Lock` implementation uses `LockSupport.park` for blocking. Loom (T14) intercepts `LockSupport.park` to *unmount* the virtual thread; the carrier is released, and the parked virtual thread costs ~hundreds of bytes of heap continuation. **No version of any `Lock` has *ever* pinned virtual threads** — `ReentrantLock`, `ReentrantReadWriteLock`, `StampedLock` all work cleanly with virtual threads on JDK 21 onwards. This is the property that drove the JDK 21-23 recommendation to use `ReentrantLock` instead of `synchronized` for hot virtual-thread blocking paths — that advice is *because* `Lock` has always parked via `LockSupport`, while `synchronized` (before JEP 491) parked the carrier directly.
+
+JEP 491 (JDK 24) closed the gap: `synchronized` now also unmounts on JDK 24+. So in 2026 code on JDK 24+:
+
+- **`synchronized` vs `Lock`** is back to a **feature/style** choice, not a virtual-thread choice.
+- Pick `synchronized` if you don&#x27;t need timed/interruptible acquires or multiple conditions; the JIT optimizes it harder (coarsening, elision — T03), and it auto-releases on exception.
+- Pick `Lock` if you need any of the six advantages enumerated at the top — timed acquisition, interruptibility, fairness, multiple conditions, programmatic state inspection. Then prefer `ReentrantLock` for general use, `ReentrantReadWriteLock` for actual read-heavy contention, `StampedLock` for read-heavy data accessed non-recursively where you can use optimistic reads.
+
+&gt; [!INTERVIEW]
+&gt; The 2026 senior answer to &quot;synchronized vs ReentrantLock&quot;: **on JDK 24+ they&#x27;re performance-equivalent for the common case (JEP 491 lifted the virtual-thread pinning concern). Choose by feature need: `synchronized` for simple mutual exclusion (auto-release, JIT-friendly); `ReentrantLock` when you need timed/interruptible acquire, fairness, multiple `Condition`s, or state inspection. The 2021-2023 advice of &quot;always ReentrantLock for virtual-thread fitness&quot; no longer applies.**
+
+## Common Mistakes
+
+### Forgetting `finally { unlock(); }`
+
+```java
+lock.lock();
+doWork();             // ✗ if doWork() throws, lock stays held FOREVER
+lock.unlock();
+```
+
+The single most common Lock bug. `synchronized` auto-releases on exception (T03 — emitted exception-handler block); `Lock` does not. Always wrap in `try { ... } finally { lock.unlock(); }`.
+
+### `lock()` inside the `try`
+
+```java
+try {
+    lock.lock();
+    doWork();
+} finally {
+    lock.unlock();        // ✗ if lock() threw, unlock fails with IMSE, masking original
+}
+```
+
+Put `lock()` *before* `try`. Otherwise, a (rare) exception during `lock()` (OutOfMemoryError, etc.) leads to an `unlock()` on a lock we don&#x27;t hold.
+
+### Self-deadlocking on `StampedLock`
+
+```java
+StampedLock sl = new StampedLock();
+long s1 = sl.writeLock();
+something(sl);              // if something() calls sl.writeLock(), deadlock
+sl.unlockWrite(s1);
+```
+
+`StampedLock` is not reentrant. If `something` might re-enter, use `ReentrantReadWriteLock` instead.
+
+### Read-lock upgrade on RWLock
+
+```java
+rwLock.readLock().lock();
+rwLock.writeLock().lock();  // ✗ deadlock if another reader is also doing this
+```
+
+`ReentrantReadWriteLock` does not support upgrade. Use `StampedLock.tryConvertToWriteLock` or release the read first.
+
+### Mismatched lock/unlock objects
+
+```java
+ReentrantLock a = new ReentrantLock();
+ReentrantLock b = new ReentrantLock();
+a.lock();
+b.unlock();        // ✗ IllegalMonitorStateException — we don&#x27;t hold b
+```
+
+`Lock.unlock()` checks ownership. Pair locks and unlocks by *the same instance*.
+
+### Calling `Condition.signal` without holding the lock
+
+```java
+Condition cond = lock.newCondition();
+cond.signal();           // ✗ IllegalMonitorStateException — must hold the lock
+```
+
+Same rule as wait/notify (T04). `signal` requires holding the underlying `Lock`.
+
+### Fair RWLock as a &quot;safe default&quot;
+
+`new ReentrantReadWriteLock(true)` is 2-3× slower than the unfair variant under contention, and the starvation it prevents is rare in real workloads. Default to unfair; reach for fair only when measurement justifies it.
+
+### Using RWLock for high-throughput read-mostly data
+
+The single-state-word cache-line contention dominates above moderate concurrency. Prefer `StampedLock` (optimistic reads), `ConcurrentHashMap` (per-bucket locks), or `CopyOnWriteArrayList` (no read locks).
+
+### Reading non-volatile fields under `StampedLock.tryOptimisticRead`
+
+```java
+long stamp = sl.tryOptimisticRead();
+String s = mySharedString;        // ✗ if mySharedString isn&#x27;t volatile, read may be torn
+if (!sl.validate(stamp)) { ... }
+```
+
+Optimistic reads don&#x27;t synchronize the read; they verify *afterward* that no writer happened. Fields read must be `volatile` or referenced through safely-published containers.
+
+## Observability
+
+### Thread dump signature
+
+A thread blocked acquiring a `ReentrantLock`:
+
+```text
+&quot;worker-3&quot; #21 ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071ab2&gt; (a j.u.c.locks.ReentrantLock$NonfairSync)
+   at java.util.concurrent.locks.LockSupport.park(LockSupport.java:341)
+   at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(AbstractQueuedSynchronizer.java:506)
+   at java.util.concurrent.locks.ReentrantLock.lock(ReentrantLock.java:330)
+   at com.x.Service.method(Service.java:42)
+```
+
+Note `WAITING (parking)` — *not* `BLOCKED`. Lock waiters are parked on `LockSupport`, while `synchronized` waiters are `BLOCKED on object monitor`. Different visual signature; same outcome (no CPU, queued for the lock).
+
+A thread in `await()`:
+
+```text
+&quot;consumer-1&quot; ... java.lang.Thread.State: WAITING (parking)
+   at jdk.internal.misc.Unsafe.park(Native Method)
+   - parking to wait for &lt;0x000000071c00&gt; (a j.u.c.locks.AbstractQueuedSynchronizer$ConditionObject)
+   at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await
+   at com.x.BoundedBuffer.take(BoundedBuffer.java:31)
+```
+
+The `ConditionObject` is named; the producer/consumer pattern is recognizable. Comparing held-lock IDs across threads (`- locked &lt;0x...&gt;`) identifies who blocks whom.
+
+### JFR
+
+`jdk.JavaMonitorEnter` events are specific to `synchronized`; `jdk.ThreadPark` events cover `Lock` waiters. Aggregate by `parkedClass` to find which Lock subclass dominates contention. JDK 21+ also has `jdk.ContendedLock` (preliminary) for Lock contention specifically.
+
+### `getQueueLength` / `hasQueuedThreads`
+
+```java
+if (lock.getQueueLength() &gt; THRESHOLD) {
+    metrics.recordContention(lock.getQueueLength());
+}
+```
+
+Approximate (may race), but cheap and exposed by `ReentrantLock` for programmatic monitoring. `ReentrantReadWriteLock.getReadLockCount()` / `getWriteHoldCount()` similarly expose readable counts.
+
+&gt; [!INTERVIEW]
+&gt; &quot;How does `ReentrantLock` work internally?&quot; — Senior answer hits all four layers:
+&gt;
+&gt; 1. **API.** `Lock` interface with six methods; `ReentrantLock` is reentrant (per-thread reentry count). `finally`-unlock discipline is the user&#x27;s responsibility.
+&gt; 2. **AQS framework.** Backed by `AbstractQueuedSynchronizer`&#x27;s `volatile int state` (= reentry count) and a doubly-linked FIFO CLH-style queue of `Node`s. Two subclass hooks: `tryAcquire(int)` (CAS state 0→1 or bump reentry) and `tryRelease(int)` (decrement, CAS to 0 if outermost).
+&gt; 3. **Algorithm.** Acquire: `tryAcquire` fast path; on failure, enqueue (one CAS at tail), loop on `acquireQueued` — at front-of-queue retry, else `shouldParkAfterFailedAcquire` sets predecessor&#x27;s `SIGNAL` status, then `LockSupport.park`. Release: `tryRelease`; if successor is present and signal-pending, `LockSupport.unpark` it.
+&gt; 4. **Fair vs unfair.** Differs by one check in `tryAcquire`: unfair barges (immediate CAS); fair calls `hasQueuedPredecessors` first and yields to queued waiters. Unfair has 2-3× throughput; fair guarantees FCFS.
+&gt;
+&gt; Add: same machinery powers `Semaphore`, `CountDownLatch`, `ReentrantReadWriteLock`, even `ThreadPoolExecutor.Worker` (T05) — AQS is *the* shared engine for every j.u.c. synchronizer.
+
+&gt; [!INTERVIEW]
+&gt; Short Q&amp;A:
+&gt;
+&gt; 1. **Six advantages of `Lock` over `synchronized`?** Timed acquire, interruptible acquire, tryLock, fairness, multiple Conditions, state inspection.
+&gt; 2. **What&#x27;s AQS?** `AbstractQueuedSynchronizer` — Doug Lea&#x27;s framework providing a `volatile int state` + lock-free FIFO queue + `LockSupport.park`/`unpark` + `Condition` support, with subclass hooks `tryAcquire`/`tryRelease`. Used by every j.u.c. lock/latch/semaphore/barrier plus `ThreadPoolExecutor.Worker`.
+&gt; 3. **What&#x27;s the lazy-SIGNAL pattern?** `shouldParkAfterFailedAcquire` CAS&#x27;s the predecessor&#x27;s `waitStatus` to `SIGNAL` *only when about to park*, not when arriving. Means parks/unparks are minimal: each waiter signals exactly one successor on release.
+&gt; 4. **Fair vs unfair `ReentrantLock`?** Unfair barges (immediate CAS); fair checks `hasQueuedPredecessors` first. Unfair is ~2-3× faster; fair guarantees FCFS but can starve under steady contention.
+&gt; 5. **What&#x27;s `Condition`?** AQS&#x27;s condition-variable analogue. Multiple `Condition`s per `Lock`, each with its own queue. `signal` transfers a waiter from the condition queue to the lock&#x27;s main wait queue. Avoids the thundering-herd that `notifyAll` causes with `synchronized`.
+&gt; 6. **How does `ReentrantReadWriteLock` pack state?** 32-bit `state`: high 16 = read count, low 16 = write count. Max 65535 of each. One CAS atomically updates either half.
+&gt; 7. **What&#x27;s the downgrade pattern?** `writeLock.lock(); ... readLock.lock(); writeLock.unlock();` — atomically transition from writer to reader without a window of unprotected state.
+&gt; 8. **Why can&#x27;t you upgrade from read to write?** No atomic mode-change; multiple readers each trying would deadlock. Use `StampedLock.tryConvertToWriteLock` instead.
+&gt; 9. **What is `StampedLock`?** Hand-rolled sequence lock (not AQS-based) with three modes: write, read, **optimistic read**. The optimistic read records a generation stamp, reads without locking, then `validate(stamp)` to check no writer intervened. ~5-10 ns vs ~50-100 ns for any other lock — *the* fastest read in the JDK for read-mostly data.
+&gt; 10. **Why isn&#x27;t `StampedLock` reentrant?** No thread-identity tracking — the stamp is the only handle, and there&#x27;s no way to record recursive acquires on a stamp. Side-effect of the simpler design.
+&gt; 11. **How does `LockSupport` differ from `Object.wait`?** `LockSupport.park` parks a thread regardless of what lock (if any) it holds; `wait` requires the monitor. `LockSupport` is the primitive AQS builds on. The &quot;permit&quot; semantics (T02) make `unpark` ordering-independent: an `unpark` before `park` is *not* lost.
+&gt; 12. **What&#x27;s a thread dump signature for a `ReentrantLock` waiter?** `WAITING (parking)` + `parking to wait for &lt;0x...&gt; (a ReentrantLock$NonfairSync)` (compare with `synchronized`&#x27;s `BLOCKED (on object monitor)`).
+&gt; 13. **What does virtual-thread fitness look like for locks?** All j.u.c. locks have *always* been virtual-thread-friendly (they use `LockSupport.park`, which Loom unmounts). `synchronized` was the only primitive needing JEP 491 (JDK 24) to gain that property.
+&gt; 14. **When should I prefer `RWLock` over `synchronized`?** When reads are *both* read-heavy and *long* (so parallel reads genuinely beat the AQS bookkeeping cost). For frequent short reads, prefer `StampedLock`, `ConcurrentHashMap`, or `CopyOnWriteArrayList`.
+&gt; 15. **In 2026, when should I pick `Lock` over `synchronized`?** When you need any of the six unique features (timed/interruptible acquire, tryLock, fairness, multiple Conditions, state inspection). For simple mutual exclusion, `synchronized` is the simpler default — JIT-friendlier (T03) and auto-releasing. JEP 491 (JDK 24) removed the virtual-thread reason to prefer `Lock`.
+
+## Practice
+
+1. **Lock + finally discipline.** Write a `ReentrantLock`-based counter where the increment throws halfway through. Run two threads. Show that without `finally`, the second thread deadlocks; with `finally`, it proceeds. (The cost of &quot;you own the unlock.&quot;)
+2. **`tryLock(timeout)` race.** Two threads, one holding the lock for 500 ms. The other does `tryLock(100, MILLISECONDS)`. Confirm it returns `false` and proceeds without blocking further.
+3. **`lockInterruptibly`.** Thread A holds the lock for 5 s. Thread B tries `lockInterruptibly`. Thread C interrupts B 100 ms later. Confirm B throws `InterruptedException` instead of blocking for 5 s.
+4. **Inspect the AQS queue.** Write 10 threads contending for a `ReentrantLock`. Periodically print `lock.getQueueLength()` and the held-by-current-thread state. Verify the queue length tracks the contending count.
+5. **Build a fair vs unfair throughput benchmark.** With JMH, measure throughput of 100 threads contending on `ReentrantLock(false)` vs `ReentrantLock(true)`. Confirm unfair is 2-3× faster.
+6. **Producer/consumer with two Conditions.** Implement the bounded buffer with `notFull`/`notEmpty`. Verify with two consumers and two producers: `signal` only wakes the right kind of waiter (counter the thundering herd).
+7. **RWLock downgrade.** Hold the write lock, modify a field, acquire the read lock, release the write lock. Verify a concurrent reader sees the post-modification field and that during the downgrade no writer can intervene.
+8. **RWLock writer starvation.** With unfair RWLock + 50 readers acquiring/releasing rapidly + 1 writer, measure how long the writer waits. Repeat with fair RWLock; observe writer wait drop to bounded.
+9. **`StampedLock` optimistic read benchmark.** Compare reads/s for `ReentrantLock`, `ReentrantReadWriteLock`, `StampedLock` (pessimistic read), and `StampedLock` (optimistic read) on 100 threads reading a `Point(x, y)` with 1% writes. Confirm optimistic is ~10× faster than any other.
+10. **`StampedLock` not reentrant.** Write a method that calls `sl.writeLock()` recursively. Set a 5-second JVM timeout. Confirm self-deadlock.
+11. **`tryConvertToWriteLock`.** With `StampedLock`, start with optimistic read, on validation failure try converting to write; on conversion failure, fall back to `writeLock()`. Stress test with 10 readers + 1 writer; verify zero data races.
+12. **AQS source dive.** Read the source of `AbstractQueuedSynchronizer.acquireQueued`, `shouldParkAfterFailedAcquire`, `cancelAcquire`, `unparkSuccessor`. Annotate with comments explaining the CAS sequence and the cancellation cleanup. (One evening — single most rewarding source dive in the JDK.)
+
+## Recap
+
+You should now be able to:
+
+- Enumerate **the six features `Lock` provides over `synchronized`**: timed acquisition, interruptible acquisition, non-blocking `tryLock`, fairness control, multiple `Condition`s per lock, programmatic state inspection — and state the cost: **you** must `unlock()` (always in a `finally`).
+- Write the **canonical `try/finally` pattern** correctly: `lock.lock()` *outside* the try, `try { ... } finally { lock.unlock(); }`.
+- Recognize that **`ReentrantLock` is AQS-backed** with `state` = reentry count, fair vs unfair as a single-line `tryAcquire` difference (`hasQueuedPredecessors` check), and reentrancy via `exclusiveOwnerThread` + counter.
+- Explain **`AbstractQueuedSynchronizer`** — the framework underneath every j.u.c. lock, latch, semaphore, barrier, plus `ThreadPoolExecutor.Worker`. One `volatile int state`, a CLH-style FIFO queue of `Node` objects, `LockSupport.park`/`unpark` for blocking, two subclass hooks (`tryAcquire`/`tryRelease`).
+- Walk through the **acquire algorithm**: `tryAcquire` fast path → `addWaiter` (CAS at tail) → `acquireQueued` loop (front-of-queue retry, then `shouldParkAfterFailedAcquire` CAS&#x27;s predecessor&#x27;s `waitStatus = SIGNAL`, then `LockSupport.park`).
+- Walk through the **release algorithm**: `tryRelease` → if head&#x27;s status non-zero, `unparkSuccessor` walks from tail back to find first non-cancelled successor and `LockSupport.unpark`s its thread.
+- State the **lazy-SIGNAL invariant**: only the node about to park sets its predecessor&#x27;s status to SIGNAL — so signal/unpark work is *minimal*.
+- Recognize the four meaningful **`waitStatus`** values — `SIGNAL` (-1, &quot;predecessor must wake me&quot;), `CANCELLED` (1, &quot;skip me&quot;), `CONDITION` (-2, &quot;I&#x27;m on a condition queue&quot;), `PROPAGATE` (-3, &quot;shared-mode propagation&quot;) — plus default 0.
+- Use **`Condition`** correctly: multiple Conditions per Lock, each its own FIFO queue; `await` releases the lock (full recursion depth saved), parks the thread, and on `signal` transfers the node to the AQS main queue to re-acquire. `signal` (single) is safe when each Condition has a homogeneous waiter set — avoids the thundering-herd that forces `notifyAll` with `synchronized` (T04).
+- Walk through **`ReentrantReadWriteLock`**: 32-bit state with **16 high bits = read count, 16 low = write count**; per-thread read hold tracked via `ThreadLocal` (with firstReader + cachedHoldCounter optimizations); reentrant; **downgrade pattern** is the only safe mode-change (read → write upgrade deadlocks); writer starvation possible in unfair mode.
+- Walk through **`StampedLock`**: three modes (write / pessimistic-read / **optimistic-read**); 64-bit state with high bits = generation counter, low bits = reader-count + write-bit; the **optimistic-read pattern** (`tryOptimisticRead` → read fields → `validate(stamp)` → fall back to `readLock()` on validation failure) costs only ~5-10 ns for the success case; *not* reentrant; `tryConvertToWriteLock` for safe mode upgrade.
+- Compare **performance characteristics**: optimistic StampedLock read at ~5-10 ns is the fastest read primitive in the JDK; `synchronized` uncontended is ~15-40 ns; `ReentrantLock` uncontended is ~50-100 ns; contended-parked is ~1-3 µs for any of them.
+- Diagnose **thread dumps**: `WAITING (parking)` + `parking to wait for &lt;0x...&gt; (a ReentrantLock$NonfairSync)` for `Lock` waiters; `WAITING (parking)` + `(a ...ConditionObject)` for `await` waiters; `BLOCKED (on object monitor)` for `synchronized` waiters. Use `getQueueLength()` for programmatic contention monitoring.
+- State the **virtual-thread compatibility**: every j.u.c. `Lock` has *always* been VT-friendly (uses `LockSupport.park`, which Loom unmounts). Only `synchronized` needed **JEP 491 (JDK 24)** to gain the same property. The 2021-2023 &quot;always-`ReentrantLock`-for-VT&quot; rule no longer applies in 2026.
+- Avoid the **nine common bugs**: missing `finally { unlock(); }`, `lock()` inside try, self-deadlocking `StampedLock`, RWLock read-to-write upgrade, mismatched lock/unlock objects, `signal` without holding the lock, fair-as-default, RWLock for high-throughput data, optimistic-read on non-volatile fields.
+- State the **2026 decision rule**: `synchronized` vs `Lock` is a *feature/style* choice, not a virtual-thread choice. Pick `synchronized` for simple mutual exclusion (auto-release, JIT-friendlier); pick `ReentrantLock` for any of the six unique features; pick `ReentrantReadWriteLock` for truly read-heavy long-read data; pick `StampedLock` for read-heavy non-recursive data with optimistic-read potential.
+
+## Next
+
+Continue to [Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)](./T09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.md) — every primitive in this section is built on the *same* AQS engine you just learned. We&#x27;ll see `Semaphore.state` as available permits with shared-mode acquire/release; `CountDownLatch.state` as monotonic countdown; `CyclicBarrier`&#x27;s lock-and-condition reuse for &quot;wait until N threads arrive&quot;; `Phaser`&#x27;s hierarchical-phase model for repeated barriers across dynamic party counts. Then T10 covers the concurrent collections (`ConcurrentHashMap`, `ConcurrentLinkedQueue`, `CopyOnWriteArrayList`) whose internals layer the same lock-free / CAS / AQS techniques.
+</code></pre></div>
+      <div class="pager"><a class="prev" href="../l3/c01-t07-completablefuture-and-async-composition.html"><div class="lbl">← Previous</div><div class="ttl">T07-completablefuture-and-async-composition</div><div class="sub">CompletableFuture &amp; Async Composition</div></a><a class="next" href="../l3/c01-t09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser.html"><div class="lbl">Next →</div><div class="ttl">T09-synchronizers-semaphore-countdownlatch-cyclicbarrier-phaser</div><div class="sub">Synchronizers (Semaphore, CountDownLatch, CyclicBarrier, Phaser)</div></a></div>
+    </main>
+    <aside class="toc-rail" aria-label="On this page"><h4>On this page</h4><ul><li class="lvl-2"><a href="#why-an-explicit-lock-api-what-synchronized-cannot-do" data-toc-link>Why an Explicit Lock API — What synchronized Cannot Do</a></li><li class="lvl-2"><a href="#the-lock-interface-and-the-finally-discipline" data-toc-link>The Lock Interface and the finally Discipline</a></li><li class="lvl-2"><a href="#reentrantlock-the-workhorse" data-toc-link>ReentrantLock — the Workhorse</a></li><li class="lvl-2"><a href="#aqs-abstractqueuedsynchronizer-the-engine-underneath" data-toc-link>AQS — AbstractQueuedSynchronizer, the Engine Underneath</a></li><li class="lvl-3"><a href="#the-state-field-meaning-by-subclass" data-toc-link>The state field — meaning by subclass</a></li><li class="lvl-3"><a href="#the-clh-style-queue-and-the-node-struct" data-toc-link>The CLH-style queue and the Node struct</a></li><li class="lvl-3"><a href="#waitstatus-the-four-meaningful-values" data-toc-link>waitStatus — the four meaningful values</a></li><li class="lvl-2"><a href="#the-acquire-algorithm-lazy-signal-park-and-retry" data-toc-link>The Acquire Algorithm — Lazy-SIGNAL, Park-and-Retry</a></li><li class="lvl-3"><a href="#addwaiter-the-tail-cas" data-toc-link>addWaiter — the tail CAS</a></li><li class="lvl-3"><a href="#acquirequeued-the-loop" data-toc-link>acquireQueued — the loop</a></li><li class="lvl-3"><a href="#shouldparkafterfailedacquire-the-lazy-signal-handshake" data-toc-link>shouldParkAfterFailedAcquire — the lazy-SIGNAL handshake</a></li><li class="lvl-2"><a href="#the-release-algorithm" data-toc-link>The Release Algorithm</a></li><li class="lvl-2"><a href="#fair-vs-unfair-one-line-of-code-apart" data-toc-link>Fair vs Unfair — One Line of Code Apart</a></li><li class="lvl-2"><a href="#condition-multiple-wait-queues-per-lock" data-toc-link>Condition — Multiple Wait Queues Per Lock</a></li><li class="lvl-3"><a href="#the-awaitsignal-protocol-same-pattern-separate-queues" data-toc-link>The await/signal protocol — same pattern, separate queues</a></li><li class="lvl-2"><a href="#reentrantreadwritelock-two-locks-one-state-word" data-toc-link>ReentrantReadWriteLock — Two Locks, One State Word</a></li><li class="lvl-3"><a href="#the-1616-packed-state" data-toc-link>The 16+16 packed state</a></li><li class="lvl-3"><a href="#per-thread-read-hold-count-via-threadlocal" data-toc-link>Per-thread read hold count via ThreadLocal</a></li><li class="lvl-3"><a href="#the-downgrade-pattern" data-toc-link>The downgrade pattern</a></li><li class="lvl-3"><a href="#why-upgrade-is-impossible" data-toc-link>Why upgrade is impossible</a></li><li class="lvl-3"><a href="#writer-starvation-in-the-unfair-variant" data-toc-link>Writer starvation in the unfair variant</a></li><li class="lvl-3"><a href="#when-not-to-use-rwlock" data-toc-link>When (not) to use RWLock</a></li><li class="lvl-2"><a href="#stampedlock-optimistic-read-for-the-fast-path" data-toc-link>StampedLock — Optimistic Read for the Fast Path</a></li><li class="lvl-3"><a href="#state-layout" data-toc-link>State layout</a></li><li class="lvl-3"><a href="#the-optimistic-read-pattern" data-toc-link>The optimistic-read pattern</a></li><li class="lvl-3"><a href="#mode-conversion" data-toc-link>Mode conversion</a></li><li class="lvl-3"><a href="#why-stampedlock-is-not-reentrant" data-toc-link>Why StampedLock is not reentrant</a></li><li class="lvl-3"><a href="#performance-comparison" data-toc-link>Performance comparison</a></li><li class="lvl-2"><a href="#locks-virtual-threads-always-friendly" data-toc-link>Locks + Virtual Threads — Always Friendly</a></li><li class="lvl-2"><a href="#common-mistakes" data-toc-link>Common Mistakes</a></li><li class="lvl-3"><a href="#forgetting-finally-unlock" data-toc-link>Forgetting finally { unlock(); }</a></li><li class="lvl-3"><a href="#lock-inside-the-try" data-toc-link>lock() inside the try</a></li><li class="lvl-3"><a href="#self-deadlocking-on-stampedlock" data-toc-link>Self-deadlocking on StampedLock</a></li><li class="lvl-3"><a href="#read-lock-upgrade-on-rwlock" data-toc-link>Read-lock upgrade on RWLock</a></li><li class="lvl-3"><a href="#mismatched-lockunlock-objects" data-toc-link>Mismatched lock/unlock objects</a></li><li class="lvl-3"><a href="#calling-conditionsignal-without-holding-the-lock" data-toc-link>Calling Condition.signal without holding the lock</a></li><li class="lvl-3"><a href="#fair-rwlock-as-a-safe-default" data-toc-link>Fair RWLock as a &quot;safe default&quot;</a></li><li class="lvl-3"><a href="#using-rwlock-for-high-throughput-read-mostly-data" data-toc-link>Using RWLock for high-throughput read-mostly data</a></li><li class="lvl-3"><a href="#reading-non-volatile-fields-under-stampedlocktryoptimisticread" data-toc-link>Reading non-volatile fields under StampedLock.tryOptimisticRead</a></li><li class="lvl-2"><a href="#observability" data-toc-link>Observability</a></li><li class="lvl-3"><a href="#thread-dump-signature" data-toc-link>Thread dump signature</a></li><li class="lvl-3"><a href="#jfr" data-toc-link>JFR</a></li><li class="lvl-3"><a href="#getqueuelength-hasqueuedthreads" data-toc-link>getQueueLength / hasQueuedThreads</a></li><li class="lvl-2"><a href="#practice" data-toc-link>Practice</a></li><li class="lvl-2"><a href="#recap" data-toc-link>Recap</a></li><li class="lvl-2"><a href="#next" data-toc-link>Next</a></li></ul></aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div>&copy; Java 0-to-Hero · Static site generated from the repo Markdown</div>
+    <div>Read-only mirror of <code>content/</code> and root reference docs</div>
+  </div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

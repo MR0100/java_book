@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Interview Mastery (FAANGM + MNC) — Foundations of Interviewing
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -27,4 +27,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 | 05 | Communication mechanics — clarify, structure, think-aloud, recover | `T05-communication-mechanics-clarify-structure-think-aloud-recover.md` | planned |
 | 06 | Prep system — weeks-out plan, mock cadence, day-of routine | `T06-prep-system-weeks-out-plan-mock-cadence-day-of-routine.md` | planned |
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

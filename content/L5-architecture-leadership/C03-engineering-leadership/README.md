@@ -16,7 +16,7 @@ last_updated: 2026-06-09
 
 # Architecture & Engineering Leadership — Engineering Craft & Leadership
 
-This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../CONVENTIONS.md).
+This section covers the topics below. Each `.md` file is created as the topic is authored — see [CONVENTIONS](../../../templates/CONVENTIONS.md).
 
 | # | Topic | Planned file | Status |
 |---|-------|--------------|--------|
@@ -41,4 +41,4 @@ This section covers the topics below. Each `.md` file is created as the topic is
 > T14–T16 are **Phase 6 (2026+ Forward-Looking)** additions (a cost-efficiency cluster),
 > hand-maintained; per-topic frontmatter `status` is the source of truth.
 
-[Back to L5 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L5 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)

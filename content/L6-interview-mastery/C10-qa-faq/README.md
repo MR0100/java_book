@@ -18,4 +18,4 @@ last_updated: 2026-06-09
 
 Quick answers to interview-prep FAQ: 'How long do I prep?', 'Should I use Java or Python?', 'Do interviewers care about syntax?', 'What if I freeze?'
 
-[Back to L6 index](../README.md) · [Master curriculum](../../../CURRICULUM.md)
+[Back to L6 index](../README.md) · [Master curriculum](../../../docs/CONTENTS.md)
